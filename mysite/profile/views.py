@@ -28,6 +28,7 @@ import simplejson
 import re
 import collections
 import logging
+import os.path
 
 # Django
 from django.template.loader import render_to_string
@@ -42,6 +43,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 # Haystack
 import haystack.query
@@ -570,6 +572,16 @@ def person_id2data_as_javascript(request):
     # For now, we simply use django-staticgenerator to generate a static version,
     # and we have ad-hoc post-save hooks on those three models to clear the
     # cache that this generates.
+
+    # XXX: Total hack to speed up the page load for logged-in users
+    # When we use If-Modified-Since, we can throw this away.
+    if not request.GET.get('q', ''):
+        cached_path = os.path.join(settings.WEB_ROOT, reverse(person_id2data_as_javascript)[1:] + '/index.html')
+        if os.path.exists(cached_path):
+            with open(cached_path) as f:
+                as_json = f.read()
+                return HttpResponse(as_json,
+                                    mimetype='application/javascript')
 
     # So, the user might have requested just a subset of the people. Let's grab
     # just that subset.
