@@ -49,3 +49,13 @@ class Timestamp(models.Model):
         timestamp.timestamp = override_time or datetime.datetime.utcnow()
         timestamp.save() # definitely!
         return timestamp
+
+    @staticmethod
+    def key_for_model(cls):
+        '''This is a helper function that lets the user pass us a model, and
+        we generate the key to use.
+
+        It just takes the class name and prepends
+        "model last updated " to it.'''
+        s = 'model last updated ' + cls.__module__ + '.' + cls.__name__
+        return s
