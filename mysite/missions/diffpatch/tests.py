@@ -154,6 +154,18 @@ class DiffSingleFileTests(TwillTests):
         else:
             self.fail('no exception raised')
 
+    def test_diff_missing_headers(self):
+        """
+        If a diff submission lacks headers, raise a special IncorrectPatch
+        exception with a hint that the headers should be included.
+        """
+        try:
+            controllers.DiffSingleFileMission.validate_patch("I lack headers.")
+        except controllers.IncorrectPatch, e:
+            self.assert_('Make sure you are including the diff headers' in str(e))
+        else:
+            self.fail('no exception raised')
+
     def test_do_mission_correctly(self):
         orig_response = self.client.get(reverse(views.diffsingle_get_original_file))
         orig_lines = StringIO(orig_response.content).readlines()

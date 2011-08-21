@@ -319,6 +319,10 @@ class Patch(object):
           nexthunkno += 1
           continue
 
+    if not nextfileno or not self.source or not self.target or not self.header:
+      warning("patch file is missing headers")
+      return
+
     if not hunkskip:
       warning("patch file incomplete")
       if not hunkinfo.invalid:
@@ -326,7 +330,6 @@ class Patch(object):
         # switch to hunkskip state
         hunkbody = False
         hunkskip = True
-      # sys.exit(?)
     else:
       # duplicated message when an eof is reached
       if debugmode and len(self.source) > 0:

@@ -29,6 +29,12 @@ class SingleFilePatch(object):
     @classmethod
     def validate_patch(cls, patchdata):
         the_patch = patch.fromstring(patchdata)
+
+        # If we couldn't create even 1 hunk, the patch headers are missing.
+        if not the_patch.hunks:
+            raise IncorrectPatch, 'The file resulting from patching does not have the correct contents. \
+        Make sure you are including the diff headers (those --- and +++ and @@ lines).'
+
         # Check that it only patches one file.
         if len(the_patch.hunks) != 1:
             raise IncorrectPatch, 'The patch affects more than one file.'
