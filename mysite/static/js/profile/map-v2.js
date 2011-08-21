@@ -95,6 +95,6 @@ function init() {
     s.activate();
     map.setCenter(new OpenLayers.LonLat(0, 0), 1);
     var query_string = window.location.search.substring(1); // substring(1) to remove "?"
-    jQuery.getJSON("/+cacheable/+people/location_data?" + query_string, handleResults);
+    jQuery.getJSON("/+cacheable/+people/location_data/?" + query_string, handleResults);
     map.events.register("moveend", null, drawResults);
 }

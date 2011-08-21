@@ -174,7 +174,7 @@ urlpatterns = patterns('',
         (r'^people/$',
             'mysite.profile.views.people'),
 
-        (r'^\+cacheable/\+people/location_data$',
+        (r'^\+cacheable/\+people/location_data/$',
             'mysite.profile.views.person_id2data_as_javascript'),
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
