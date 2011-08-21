@@ -562,7 +562,14 @@ def person_id2data_as_javascript(request):
     # be a separate request, like this. Plus, one day, we can apply
     # reasonable caching to this request.)
     #
-    # FIXME: Come up with some sort of reasonable caching for this.
+    # Caching-wise: The output of this depends on:
+    # * Person
+    # * PortfolioEntry (just the published ones, really)
+    # * LinkPersonTag
+    #
+    # For now, we simply use django-staticgenerator to generate a static version,
+    # and we have ad-hoc post-save hooks on those three models to clear the
+    # cache that this generates.
 
     # So, the user might have requested just a subset of the people. Let's grab
     # just that subset.
