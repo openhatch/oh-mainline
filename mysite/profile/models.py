@@ -93,26 +93,26 @@ class Person(models.Model):
     gotten_name_from_ohloh = models.BooleanField(default=False)
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
-    bio = models.TextField(blank=True) 
+    bio = models.TextField(blank=True)
     contact_blurb = models.TextField(blank=True)
     expand_next_steps = models.BooleanField(default=True)
     photo = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' + 
+                              lambda a, b: 'static/photos/profile-photos/' +
                               generate_person_photo_path(a, b),
                               default='')
     photo_thumbnail = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' + 
+                              lambda a, b: 'static/photos/profile-photos/' +
                               generate_person_photo_path(a, b, suffix="-thumbnail"),
                               default='',
                               null=True)
 
     photo_thumbnail_30px_wide = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' + 
+                              lambda a, b: 'static/photos/profile-photos/' +
                               generate_person_photo_path(a, b, suffix="-thumbnail-30px-wide"),
                               default='', null=True)
 
     photo_thumbnail_20px_wide = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' + 
+                              lambda a, b: 'static/photos/profile-photos/' +
                               generate_person_photo_path(a, b, suffix="-thumbnail-20px-wide"),
                               default='', null=True)
 
@@ -123,9 +123,9 @@ class Person(models.Model):
                                              verbose_name='Location')
     email_me_weekly_re_projects = models.BooleanField( default=True,
             verbose_name='Email me weekly about activity in my projects')
-    
+
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
-    
+
     @staticmethod
     def create_dummy(first_name="", email=None, **kwargs):
 
@@ -175,7 +175,7 @@ class Person(models.Model):
             return self.location_display_name
         else:
             return DEFAULT_LOCATION
-    
+
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
                 self.user.first_name, self.user.last_name)
@@ -261,7 +261,7 @@ class Person(models.Model):
 
     def get_list_of_all_published_projects(self):
         # This method looks familiar but testing -- jl
-        
+
         return self.get_published_portfolio_entries()
 
     def get_list_of_all_project_names(self):
@@ -281,7 +281,7 @@ class Person(models.Model):
     @staticmethod
     def only_terms_with_results(terms):
         # Remove terms whose hit counts are zero.
-        terms_with_results = [] 
+        terms_with_results = []
         for term in terms:
             query = mysite.search.controllers.Query(terms=[term])
             hit_count = query.get_or_create_cached_hit_count()
@@ -292,7 +292,7 @@ class Person(models.Model):
     def get_recommended_search_terms(self):
         # {{{
         terms = []
-        
+
         # Add terms based on languages in citations
         citations = self.get_published_citations_flat()
         for c in citations:
@@ -303,7 +303,7 @@ class Person(models.Model):
                 [pfe.project.name for pfe in self.get_published_portfolio_entries()
                     if pfe.project.name and pfe.project.name.strip()])
 
-        # Add terms based on tags 
+        # Add terms based on tags
         terms.extend([tag.text for tag in self.get_tags_for_recommendations()])
 
         # Remove duplicates
@@ -360,7 +360,7 @@ class Person(models.Model):
 
     def get_full_name(self):
         # {{{
-        name = self.user.first_name 
+        name = self.user.first_name
         if self.user.first_name and self.user.last_name:
             name += " "
         name += self.user.last_name
@@ -371,7 +371,7 @@ class Person(models.Model):
         full_name = self.get_full_name()
         full_name_escaped = cgi.escape(full_name)
         full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
-        return full_name_escaped_with_nbsps 
+        return full_name_escaped_with_nbsps
 
     def get_full_name_or_username(self):
         return self.get_full_name() or self.user.username
@@ -386,17 +386,17 @@ class Person(models.Model):
     def generate_thumbnail_from_photo(self):
         if self.photo:
             width = 40
-            self.photo.file.seek(0) 
+            self.photo.file.seek(0)
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
             width = 30
-            self.photo.file.seek(0) 
+            self.photo.file.seek(0)
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail_30px_wide.save('', ContentFile(scaled_down))
 
             width = 20
-            self.photo.file.seek(0) 
+            self.photo.file.seek(0)
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail_20px_wide.save('', ContentFile(scaled_down))
 
@@ -409,7 +409,7 @@ class Person(models.Model):
             people = random.sample(people, min(n, len(people)))
             collaborator_lists.append(people)
         round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
-        collaborators = set() 
+        collaborators = set()
         while len(collaborators) < n:
             try:
                 collaborators.add(round_robin.next())
@@ -454,12 +454,12 @@ class Person(models.Model):
         token.save()
         return token
 
-    # }}} 
+    # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
     if created:
         person, p_created = Person.objects.get_or_create(user=instance)
-        
+
 models.signals.post_save.connect(create_profile_when_user_created, User)
 
 class DataImportAttempt(models.Model):
@@ -606,7 +606,7 @@ class Link_SF_Proj_Dude_FM(models.Model):
     class Meta:
         unique_together = [
             ('person', 'project'),]
-            
+
     @staticmethod
     def create_from_flossmole_row_data(dev_loginname, proj_unixname, is_admin,
                                        position, date_collected):
@@ -690,7 +690,7 @@ class UntrashedCitationManager(models.Manager):
         return super(UntrashedCitationManager, self).get_query_set().filter(
 
                 # Was the citation superseded by a previously imported equivalent?
-                ignored_due_to_duplicate=False, 
+                ignored_due_to_duplicate=False,
 
                 # Was the citation deleted?
                 is_deleted=False,
@@ -822,7 +822,7 @@ class Forwarder(models.Model):
         line = '%s %s' % (self.get_email_address(), self.user.email)
         return line
 
-    def get_email_address(self): 
+    def get_email_address(self):
         return self.address + "@" + settings.FORWARDER_DOMAIN
 
     @staticmethod
@@ -835,7 +835,7 @@ class Forwarder(models.Model):
                 forwarder.delete()
                 deleted_one = True
             # else if it's too old to be displayed and they still want a forwarder: make a fresh new one
-            elif forwarder.stops_being_listed_on < now and '$fwd' in forwarder.user.get_profile().contact_blurb: 
+            elif forwarder.stops_being_listed_on < now and '$fwd' in forwarder.user.get_profile().contact_blurb:
                 mysite.base.controllers.generate_forwarder(forwarder.user)
         return deleted_one
 
@@ -858,7 +858,7 @@ class UnsubscribeToken(mysite.search.models.OpenHatchModel):
             return UnsubscribeToken.objects.get(string=string, created_date__gte=expiry_date).owner
         except UnsubscribeToken.DoesNotExist:
             return None
-        
+
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_person_tag_cache
     update_person_tag_cache.delay(person__pk=instance.person.pk)
