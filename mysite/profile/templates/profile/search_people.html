@@ -228,12 +228,8 @@ People Search
     {# Here's the big list of everybody with an account on the site. #}
     <div id="results">
     <ul id="people-list" class="people-list-map{%if center_json and not geocode_failed %} dont_show_until_map_loads{%endif%}">
-        {% for person in people %}
-            {% if person.user.username %}
-                {% include 'profile/person-summary-li.html' %}
-            {% endif %}
-        {% endfor %}
     </ul>
+    <p>Loading the map...</p>
     </div>
 
     {% endif %}
