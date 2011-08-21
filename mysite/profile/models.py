@@ -18,6 +18,9 @@
 
 # vim: set ai ts=4 sw=4 et:
 
+import os.path
+import shutil
+
 from mysite.search.models import Project, get_image_data_scaled
 import mysite.customs.models
 import mysite.profile.controllers
@@ -885,5 +888,17 @@ models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
 models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
 
 models.signals.post_save.connect(ping_twisted, sender=DataImportAttempt)
+
+### The following signals are here so that we clear the cached list
+### of people for the map whenever Person, PortfolioEntry, or LinkPersonTag
+### change.
+def flush_map_json_cache(*args, **kwargs):
+    path = os.path.join(settings.WEB_ROOT, '+cacheable')
+    shutil.rmtree(path, ignore_errors=True)
+
+models.signals.post_save.connect(flush_map_json_cache, sender=PortfolioEntry)
+models.signals.post_save.connect(flush_map_json_cache, sender=Person)
+models.signals.post_save.connect(flush_map_json_cache, sender=Link_Person_Tag)
+
 
 # vim: set nu:
