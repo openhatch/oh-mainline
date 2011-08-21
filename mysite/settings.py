@@ -122,6 +122,7 @@ TEMPLATE_DIRS = (
 STATIC_GENERATOR_URLS = (
     r'^/people/',
     r'^/search/',
+    r'^/\+cacheable/',
 )
 
 STATIC_DOC_ROOT = 'static/'
