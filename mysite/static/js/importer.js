@@ -996,7 +996,7 @@ PortfolioEntry.Add.$link = null;
 PortfolioEntry.Add.$projectNames = null;
 PortfolioEntry.Add.init = function () {
     console.info('console me');
-    PortfolioEntry.Add.$link = $('a#add_pf_entry');
+    PortfolioEntry.Add.$link = $('#add_pf_entry');
     PortfolioEntry.Add.bindEventHandlers();
 };
 // We do this so that this particular method can be monkeypatched in testDeleteAdderWidget.
