@@ -82,8 +82,8 @@ body#profile .citations-wrapper, .involvement_placeholder { float: left; width: 
 body#profile .citations li.unpublished .summary { background-color: #ffc; }
 body#profile .citations li.deleted .summary { background-color: pink; }
 body#profile .citations li.to_be_deleted a { text-decoration: line-through; }
-body#profile .citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -webkit-border-radius: 6px; -moz-border-radius: 6px; padding: 6px; }
-body#profile .citations-wrapper a.add:hover { color: #000; text-decoration: none; }
+body#profile .citations-wrapper .add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -webkit-border-radius: 6px; -moz-border-radius: 6px; padding: 6px; }
+body#profile .citations-wrapper .add:hover { color: #000; text-decoration: none; }
 body#profile .error-message { color: pink; font-weight: bold; }
 body#profile .citations-wrapper .howto { color: #111; }
 body#profile #main .citations-wrapper .howto .body { float: none ! important; }
