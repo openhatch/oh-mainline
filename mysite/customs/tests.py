@@ -2059,6 +2059,12 @@ class DailyBugImporter(django.test.TestCase):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
+    def test_management_command_does_not_explode_in_the_face_of_errors(self):
+        def explosive_function():
+            raise ValueError()
+        cmd = mysite.customs.management.commands.customs_daily_tasks.Command()
+        cmd.handle(override_cdt_fns = {'explosive': explosive_function})
+
 class GoogleCodeBugImporter(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.

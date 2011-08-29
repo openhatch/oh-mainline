@@ -163,8 +163,11 @@ Supported tracker types:
                     citation.url = None
                     citation.save()
 
-    def handle(self, *args, **options):
-        cdt_fns = {
+    def handle(self, override_cdt_fns=None, *args, **options):
+        if override_cdt_fns:
+            cdt_fns = override_cdt_fns
+        else:
+            cdt_fns = {
                 'ohloh': self.check_for_broken_ohloh_links,
                 'trac': self.find_and_update_enabled_trac_instances,
                 'roundup': self.find_and_update_enabled_roundup_trackers,
@@ -181,4 +184,14 @@ Supported tracker types:
 
         # Okay, so do the work.
         for key in tasks:
-            cdt_fns[key]()
+            # Here, we call every one of the worker functions.
+            #
+            # If they fail wih an error, we log the error and proceed
+            # to the next worker function. (The alternative is that we
+            # let the exception bubble-up and make the entire call to the
+            # management command fail.)
+            try:
+                cdt_fns[key]()
+            except Exception:
+                logging.exception("During %s, the particular importer failed. "
+                                  "Skipping it.", key)
