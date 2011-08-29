@@ -18,8 +18,6 @@
 import logging
 import urllib2
 
-import gdata.client
-
 from django.core.management.base import BaseCommand
 
 import django.conf
