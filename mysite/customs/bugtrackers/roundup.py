@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
-import urllib
 import re
 import lxml.html # scraper library
 import itertools
@@ -24,8 +23,6 @@ import csv
 import datetime
 import logging
 import urlparse
-
-from django.db import models
 
 import mysite.search.models
 import mysite.customs.mechanize_helpers
