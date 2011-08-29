@@ -124,7 +124,7 @@ class Project(OpenHatchModel):
         ret = Project(**data)
         ret.save()
         return ret
-        
+
     @staticmethod
     def create_dummy_no_icon(**kwargs):
         data = dict(name=uuid.uuid4().hex,
@@ -244,7 +244,7 @@ class Project(OpenHatchModel):
         # First of all, do nothing if self.icon_raw is a false value.
         if not self.icon_raw:
             return
-        # Okay, now we must have some normal-sized icon. 
+        # Okay, now we must have some normal-sized icon.
 
         raw_icon_data = self.icon_raw.file.read()
 
@@ -266,7 +266,7 @@ class Project(OpenHatchModel):
         this Project."""
         from mysite.profile.models import Person
         return Person.objects.filter(
-                portfolioentry__project=self, 
+                portfolioentry__project=self,
                 portfolioentry__is_deleted=False,
                 portfolioentry__is_published=True
                 ).distinct()
@@ -296,16 +296,16 @@ class Project(OpenHatchModel):
 
     def __unicode__(self):
         return "name='%s' display_name='%s' language='%s'" % (self.name, self.display_name, self.language)
-    
+
     def get_url(self):
         import mysite.project.views
         return reverse(mysite.project.views.project,
-                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
+                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
 
     def get_edit_page_url(self):
         import mysite.project.views
         return reverse(mysite.project.views.edit_project,
-                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
+                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
 
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
@@ -346,7 +346,7 @@ class Project(OpenHatchModel):
             return random.choice(pfentries)
         else:
             return None
-    
+
 def populate_icon_on_project_creation(instance, raw, created, *args, **kwargs):
     if raw:
         return
@@ -415,12 +415,12 @@ class WrongIcon(OpenHatchModel):
         default=None)
 
     logo_contains_name = models.BooleanField(default=False)
-    
+
 class Buildhelper(OpenHatchModel):
     '''Model where all the steps in the buildhelper live'''
     project = models.ForeignKey(Project)
     default_frustration_handler = models.URLField(max_length=200, default='')
-    
+
     def addStep(self, name, time, is_prerequisite = False, description='', command='', hint='', frustration_handler = None):
         '''creates and saves a BuildhelperStep object'''
         if frustration_handler is None:
@@ -428,11 +428,11 @@ class Buildhelper(OpenHatchModel):
             frustration_handler = self.default_frustration_handler
         s = BuildhelperStep(buildhelper = self,is_prerequisite = is_prerequisite, name = name, description = description, command = command, time = time, hint= hint, frustration_handler = frustration_handler)
         s.save()
-        
+
     def __unicode__(self):
         return self.project.display_name +"'s Buildhelper"
-        
-    
+
+
 class BuildhelperStep(OpenHatchModel):
     '''A single step in the buildhelper'''
     buildhelper = models.ForeignKey(Buildhelper)
@@ -636,7 +636,7 @@ class Bug(OpenHatchModel):
                                          blank=False, null=False)
     good_for_newcomers = models.BooleanField(default=False)
     looks_closed = models.BooleanField(default=False)
-    bize_size_tag_name = models.CharField(max_length=50) 
+    bize_size_tag_name = models.CharField(max_length=50)
     concerns_just_documentation = models.BooleanField(default=False)
     as_appears_in_distribution = models.CharField(max_length=200, default='')
 
@@ -665,7 +665,7 @@ class Bug(OpenHatchModel):
         now = datetime.datetime.utcnow()
         n = str(Bug.all_bugs.count())
         # FIXME (?) Project.objects.all()[0] call below makes an out-of-bounds error in testing...
-        data = dict(title=n, project=Project.objects.all()[0], 
+        data = dict(title=n, project=Project.objects.all()[0],
                 date_reported=now,
                 last_touched=now,
                 last_polled=now,
