@@ -25,21 +25,16 @@ from django.core.files.images import get_image_dimensions
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.core.cache import cache
 from django.conf import settings
 import datetime
 import StringIO
 import uuid
-import urllib
 from urlparse import urljoin
 import random
-from django.db.models import Q
 import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
-import hashlib
-import celery.decorators
 import mysite.customs.ohloh
 try:
     import Image
@@ -161,7 +156,6 @@ class Project(OpenHatchModel):
         pass
 
     def get_random_pfentry_that_has_a_project_description(self):
-        import random
         pfentries = self.portfolioentry_set.exclude(project_description='')
         only_good_pfentries = lambda pfe: pfe.project_description.strip()
         pfentries = filter(only_good_pfentries, pfentries)
