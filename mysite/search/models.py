@@ -117,7 +117,6 @@ class Project(OpenHatchModel):
 
     @staticmethod
     def create_dummy(**kwargs):
-        now = datetime.datetime.utcnow()
         data = dict(name=uuid.uuid4().hex,
                 icon_raw='/static/no-project-icon.png',
                     language='C')
@@ -128,7 +127,6 @@ class Project(OpenHatchModel):
         
     @staticmethod
     def create_dummy_no_icon(**kwargs):
-        now = datetime.datetime.utcnow()
         data = dict(name=uuid.uuid4().hex,
                 icon_raw='',
                     language='C')
