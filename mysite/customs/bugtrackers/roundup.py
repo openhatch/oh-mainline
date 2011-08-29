@@ -150,9 +150,9 @@ class RoundupTracker(object):
         bug_object.last_touched = self.str2datetime_obj(last_touched)
         bug_object.canonical_bug_link = remote_bug_url
 
-        bug_object.status = metadata_dict['Status'] 
+        bug_object.status = metadata_dict['Status']
         bug_object.looks_closed = (metadata_dict['Status'] == 'closed')
-        bug_object.title = metadata_dict['Title'] 
+        bug_object.title = metadata_dict['Title']
         bug_object.importance = metadata_dict['Priority']
 
         # For description, just grab the first "message"
