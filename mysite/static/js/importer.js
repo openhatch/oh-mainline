@@ -752,7 +752,9 @@ PortfolioEntry.Save.postOptions.success = function (response) {
     Notifier.displayMessage('Saved entry for '+project_name+'.');
 
     // Poll until we stop looking for an icon
-    window.checkForNewIconsRepeatedly = window.setTimeout(askServerForPortfolio, 1500);
+    var iconChecker = PerProjectIconRefresher(response.project__pk,
+					     response.portfolio_entry__pk);
+    iconChecker.startPolling();
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
     Notifier.displayMessage('Oh dear! There was an error saving this entry in your portfolio. '
@@ -1179,11 +1181,12 @@ $(function () {
 */
 // neo-classical constructor, attempting to clone from
 // javascript the good parts.
-var PerProjectIconRefresher =  function(project_id) {
+var PerProjectIconRefresher =  function(project_id, portfolio_entry_id) {
     var instance = {}; // empty object
 
     // private members
     var projectId = project_id;
+    var portfolioEntryId = portfolio_entry_id;
 
     var doNothing = function() {};
 
@@ -1200,11 +1203,12 @@ var PerProjectIconRefresher =  function(project_id) {
 		    'error': doNothing
 		};
 		$.ajax(ajaxOptions);
+		console.debug("Enqueuing a JSON GET.");
 	    }, delayBetweenPolls);
     };
 
     var getPortfolioEntryOnPage = function() {
-	var id = 'portfolio_entry_' + portfolioEntry.pk;
+	var id = 'portfolio_entry_' + portfolioEntryId;
 
         $portfolio_entry = $('#' + id);
 
@@ -1224,6 +1228,7 @@ var PerProjectIconRefresher =  function(project_id) {
 
 	       Bailing.
 	    */
+	    console.warn("Mysteriously, we could not find a matching PFE box on the page.");
 	    return;
 	}
         var $icon = $pfeOnPage.find(".project_icon");
@@ -1236,14 +1241,16 @@ var PerProjectIconRefresher =  function(project_id) {
             $icon.css('background-image', response_src_for_css);
             $pfeOnPage.find('.icon_flagger').show();
         }
+	console.debug("Successfully updated page with icon.");
     };
 
     var findMyPortfolioEntry = function(portfolio_json) {
 	/* This function looks for the individual PortfolioEntry that
 	   corresponds to our project. */
+	var project_id = null;
         for (var i = 0; i < portfolio_json.projects.length; i++) {
             var project = portfolio_json.projects[i];
-            if (project.fields.pk === projectId) {
+            if (project.pk === projectId) {
 		return project;
 	    }
 	}
@@ -1252,6 +1259,7 @@ var PerProjectIconRefresher =  function(project_id) {
     };
 
     var ajaxResponseHandler = function(response) {
+	console.debug("ajaxResponseHandler started.");
 	myPortfolioEntry = findMyPortfolioEntry(response);
 	if (myPortfolioEntry === null) {
 	    // if we could not find it, then we bail immediately.
@@ -1263,6 +1271,7 @@ var PerProjectIconRefresher =  function(project_id) {
 	} else {
 	    updatePageWithIcon(myPortfolioEntry);
 	}
+	console.debug("ajaxResponseHandler finished.");
     };
 
     // public members
