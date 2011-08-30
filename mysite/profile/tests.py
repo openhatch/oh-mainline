@@ -934,8 +934,10 @@ class SavePortfolioEntry(TwillTests):
     def setUp(self):
         TwillTests.setUp(self)
         self.user = "paulproteus"
+        self.project = Project.objects.get_or_create(name='project name')[0]
+
         self.portfolio_entry = PortfolioEntry.objects.get_or_create(
-            project=Project.objects.get_or_create(name='project name')[0],
+            project=self.project,
             person=Person.objects.get(user__username=self.user))[0]
         citation = Citation(
             portfolio_entry=self.portfolio_entry,
@@ -973,7 +975,8 @@ class SavePortfolioEntry(TwillTests):
         expected_output = {
             'success': True,
             'pf_entry_element_id': 'blargle',
-            'portfolio_entry__pk': self.portfolio_entry.pk
+            'portfolio_entry__pk': self.portfolio_entry.pk,
+            'project__pk': self.project.id,
         }
 
         # check output
@@ -1109,12 +1112,15 @@ class PortfolioEntryAdd(TwillTests):
 
         new_pk = PortfolioEntry.objects.get(person__user__username='paulproteus',
                 project__name='new project name').pk
+        new_project_id = PortfolioEntry.objects.get(person__user__username='paulproteus',
+                project__name='new project name').project.id
 
         # Check response
 
         expected_response_obj = {
             'success': True,
             'pf_entry_element_id': 'element_18',
+            'project__pk': new_project_id,
             'portfolio_entry__pk': new_pk,
         }
         self.assertEqual(simplejson.loads(response.content), expected_response_obj)
