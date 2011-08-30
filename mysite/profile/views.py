@@ -1059,6 +1059,7 @@ def save_portfolio_entry_do(request):
     return mysite.base.helpers.json_response({
             'success': True,
             'pf_entry_element_id': request.POST['pf_entry_element_id'],
+            'project__pk': p.project_id,
             'portfolio_entry__pk': p.pk
         })
 
