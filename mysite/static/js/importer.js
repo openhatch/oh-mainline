@@ -743,20 +743,6 @@ PortfolioEntry.Save.postOptions.success = function (response) {
         $new_project_name_span = $('<span></span>').addClass('project_name')
             .text(project_name);
         $old_project_name_field.replaceWith($new_project_name_span);
-
-        var iconLookupIsOver = function (project_name) {
-            return function (portfolio_json) { 
-                for (var p = 0; p < portfolio_json.projects.length; p++) {
-                    var project = portfolio_json.projects[p];
-                    if (project.fields.name.toLowerCase() == project_name.toLowerCase()) {
-                        var new_date = project.fields.date_icon_was_fetched_from_ohloh;
-                        if (new_date === null) { return false; }
-                        else { return true; }
-                    }
-                }
-            }
-        }(project_name);
-        PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue.push(iconLookupIsOver);
     }
     var $entry = $('#portfolio_entry_'+response.portfolio_entry__pk);
     $entry.removeClass('unsaved').removeClass('adding').removeClass('unpublished');
