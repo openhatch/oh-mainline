@@ -44,7 +44,11 @@ class PopulateProjectLanguageFromOhloh(Task):
         if not p.language:
             oh = mysite.customs.ohloh.get_ohloh()
             try:
-                analysis_id = oh.get_latest_project_analysis_id(p.name)
+                raise KeyError # NOTE: This is known to be broken.
+                # It used to call this:
+                # analysis_id = oh.get_latest_project_analysis_id(p.name)
+                # but the we removed the get_latest_project_analysis_id
+                # method.
             except KeyError:
                 logger.info("No Ohloh analysis found -- early %s" %
                             p.name)
