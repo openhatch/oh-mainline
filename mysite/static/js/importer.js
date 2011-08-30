@@ -1189,7 +1189,7 @@ $(function () {
 }
 // vim: set nu:
 
-/* Icon refresher
+/* Icon refresher class.
 */
 // neo-classical constructor, attempting to clone from
 // javascript the good parts.
@@ -1197,23 +1197,61 @@ var PerProjectIconRefresher =  function(project_id) {
     var instance = {}; // empty object
 
     // private members
-    var private_project_id = project_id;
+    var projectId = project_id;
 
-    var privateMethod_should_stop_polling = function() {
-	return false; // FIXME: Implement this
+    var doNothing = function() {};
+
+    var enqueueNextPoll = function() {
+	var delay = 1500; /* Unit: milliseconds */
+
+	window.setTimeout(
+	    function() {
+		var ajaxOptions = {
+		    'type': 'GET',
+		    'url': '/profile/views/gimme_json_for_portfolio',
+		    'dataType': 'json',
+		    'success': ajaxResponseHandler,
+		    'error': doNothing
+		};
+		$.ajax(ajaxOptions);
+	    }, delay);
     };
 
-    var privateMethod_enqueue_next_poll = function() {
-	return false; // FIXME: Implement this
+
+    var updatePageWithIcon = function(new_icon_data) {
+	alert("Should update the page"); // FIXME: Implement this
     };
 
-    var privateMethod_update_page_with_new_icon = function(new_icon_data) {
-	return false; // FIXME: Implement this
+    var findMyPortfolioEntry = function(portfolio_json) {
+	/* This function looks for the individual PortfolioEntry that
+	   corresponds to our project. */
+        for (var i = 0; i < portfolio_json.projects.length; i++) {
+            var project = portfolio_json.projects[i];
+            if (project.fields.pk === projectId) {
+		return project;
+	    }
+	}
+
+	return null; /* if it is not found */
+    };
+
+    var ajaxResponseHandler = function(response) {
+	myPortfolioEntry = findMyPortfolioEntry(response);
+	if (myPortfolioEntry === null) {
+	    // if we could not find it, then we bail immediately.
+	    return;
+	}
+
+	if (myPortfolioEntry.fields.date_icon_was_fetched_from_ohloh === null) {
+	    enqueueNextPoll();
+	} else {
+	    updatePageWithIcon(myPortfolioEntry);
+	}
     };
 
     // public members
-    instance.ajaxResponseCallback = function(response) {
-	// FIXME: Write this.
+    instance.startPolling = function() {
+	enqueueNextPoll();
     };
 
     instance.toString = function(){
