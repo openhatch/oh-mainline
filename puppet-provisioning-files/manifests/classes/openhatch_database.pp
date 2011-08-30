@@ -14,7 +14,8 @@ class openhatch_database {
     cwd => '/vagrant/',
     logoutput => on_failure,
     require => [Exec["/usr/bin/python2.6 /vagrant/bootstrap.py"],
-                Exec['/usr/bin/mysql -uroot < /vagrant/mysite/scripts/database_01_create.sql']],
+                Exec['/usr/bin/mysql -uroot < /vagrant/mysite/scripts/database_01_create.sql'],
+                Exec['/vagrant/bin/buildout']],
   }
 
   exec { "/vagrant/bin/mysite migrate":
