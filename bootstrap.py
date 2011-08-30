@@ -54,26 +54,21 @@ USE_DISTRIBUTE = options.distribute
 args = args + ['bootstrap']
 
 to_reload = False
-try:
-    import pkg_resources
-    if not hasattr(pkg_resources, '_distribute'):
-        to_reload = True
-        raise ImportError
-except ImportError:
-    ez = {}
-    if USE_DISTRIBUTE:
-        exec urllib2.urlopen('http://python-distribute.org/distribute_setup.py'
-                         ).read() in ez
-        ez['use_setuptools'](to_dir=tmpeggs, download_delay=0, no_fake=True)
-    else:
-        exec urllib2.urlopen('http://peak.telecommunity.com/dist/ez_setup.py'
-                             ).read() in ez
-        ez['use_setuptools'](to_dir=tmpeggs, download_delay=0)
 
-    if to_reload:
-        reload(pkg_resources)
-    else:
-        import pkg_resources
+ez = {}
+if USE_DISTRIBUTE:
+    exec urllib2.urlopen('http://python-distribute.org/distribute_setup.py'
+                         ).read() in ez
+    ez['use_setuptools'](to_dir=tmpeggs, download_delay=0, no_fake=True)
+else:
+    exec urllib2.urlopen('http://peak.telecommunity.com/dist/ez_setup.py'
+                        ).read() in ez
+    ez['use_setuptools'](to_dir=tmpeggs, download_delay=0)
+
+if to_reload:
+    reload(pkg_resources)
+else:
+    import pkg_resources
 
 if sys.platform == 'win32':
     def quote(c):
