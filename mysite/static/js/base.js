@@ -23,6 +23,7 @@ if (typeof console == "undefined") {
     console.log = function() {};
     console.debug = function() {};
     console.info = function() {};
+    console.warn = function() {};
 }
 
 fireunitEnabled = true;
