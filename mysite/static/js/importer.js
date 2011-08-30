@@ -1188,3 +1188,37 @@ $(function () {
         });
 }
 // vim: set nu:
+
+/* Icon refresher
+*/
+// neo-classical constructor, attempting to clone from
+// javascript the good parts.
+var PerProjectIconRefresher =  function(project_id) {
+    var instance = {}; // empty object
+
+    // private members
+    var private_project_id = project_id;
+
+    var privateMethod_should_stop_polling = function() {
+	return false; // FIXME: Implement this
+    };
+
+    var privateMethod_enqueue_next_poll = function() {
+	return false; // FIXME: Implement this
+    };
+
+    var privateMethod_update_page_with_new_icon = function(new_icon_data) {
+	return false; // FIXME: Implement this
+    };
+
+    // public members
+    instance.ajaxResponseCallback = function(response) {
+	// FIXME: Write this.
+    };
+
+    instance.toString = function(){
+        return "<PerProjectIconRefresher for project_id=" + private_project_id + ">";
+    };
+
+    return instance;
+}
