@@ -759,7 +759,7 @@ PortfolioEntry.Save.postOptions.success = function (response) {
         PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue.push(iconLookupIsOver);
     }
     var $entry = $('#portfolio_entry_'+response.portfolio_entry__pk);
-    $entry.removeClass('unsaved').removeClass('adding');
+    $entry.removeClass('unsaved').removeClass('adding').removeClass('unpublished');
     var $newupdateIcon = $entry.find('.actions li#update_icon');
     $newupdateIcon.toggle();
     var project_name = $entry.find('.project_name').text();
