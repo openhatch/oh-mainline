@@ -1201,9 +1201,9 @@ var PerProjectIconRefresher =  function(project_id) {
 
     var doNothing = function() {};
 
-    var enqueueNextPoll = function() {
-	var delay = 1500; /* Unit: milliseconds */
+    var delayBetweenPolls = 1500; /* Unit: milliseconds */
 
+    var enqueueNextPoll = function() {
 	window.setTimeout(
 	    function() {
 		var ajaxOptions = {
@@ -1214,12 +1214,42 @@ var PerProjectIconRefresher =  function(project_id) {
 		    'error': doNothing
 		};
 		$.ajax(ajaxOptions);
-	    }, delay);
+	    }, delayBetweenPolls);
     };
 
+    var getPortfolioEntryOnPage = function() {
+	var id = 'portfolio_entry_' + portfolioEntry.pk;
 
-    var updatePageWithIcon = function(new_icon_data) {
-	alert("Should update the page"); // FIXME: Implement this
+        $portfolio_entry = $('#' + id);
+
+	return $portfolio_entry;
+    };
+
+    var updatePageWithIcon = function(project_data) {
+        /* So, the object we select is a DIV whose CSS background-image
+         * is what causes the browser to display the icon. We store a
+         * copy of the URL JavaScript gave us in a totally made-up "src"
+         * attribute of the DIV to make life easier for us.
+         */
+	var $pfeOnPage = getPortfolioEntryOnPage();
+	if ($pfeOnPage.size() == 0) {
+	    /* Well, for some reason, we are trying to update a portfolio entry
+	       we cannot find.
+
+	       Bailing.
+	    */
+	    return;
+	}
+        var $icon = $pfeOnPage.find(".project_icon");
+        var current_src = $icon.attr('src');
+        var response_src = ("/static/" +
+			    project_data.fields.icon_for_profile);
+        var response_src_for_css = 'url(' + response_src + ')';
+        if (current_src != response_src) {
+            $icon.attr('src', response_src); /* just for us */
+            $icon.css('background-image', response_src_for_css);
+            $pfeOnPage.find('.icon_flagger').show();
+        }
     };
 
     var findMyPortfolioEntry = function(portfolio_json) {
