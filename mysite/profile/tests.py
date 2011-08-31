@@ -324,7 +324,6 @@ class UserListTests(TwillTests):
         url = make_twill_url(url)
         tc.go(url)
         tc.find(r'paulproteus')
-        tc.find(r'Barry Spinoza')
 
         tc.follow('paulproteus')
         tc.url('people/paulproteus')
@@ -695,8 +694,7 @@ class PersonInfoLinksToSearch(TwillTests):
         # Now, click on "thing1"
         tc.follow("thing1")
 
-        # Now find ourself there
-        tc.find('Asheesh Laroia')
+        # XXX see fixme remark in top of method
 
 class Widget(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
