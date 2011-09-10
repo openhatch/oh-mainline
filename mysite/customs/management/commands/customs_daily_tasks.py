@@ -18,6 +18,9 @@
 import logging
 import urllib2
 
+import gevent.pool
+import gevent.monkey
+
 from django.core.management.base import BaseCommand
 
 import django.conf
@@ -182,6 +185,10 @@ Supported tracker types:
         return things_to_do
 
     def handle(self, override_cdt_fns=None, *args, **options):
+        # Patch modules like urllib2 so that gevent's green-threads can know
+        # to switch to the next thread when one thread blocks on network I/O.
+        gevent.monkey.patch_all()
+
         if override_cdt_fns:
             cdt_fns = override_cdt_fns
         else:
@@ -200,20 +207,28 @@ Supported tracker types:
             # Plan to do them all, since the user did not sub-specify.
             tasks = cdt_fns.keys()
 
+        logging.info("Creating gevent pool.")
+        pool = gevent.pool.Pool(50)
+
         # Okay, so do the work.
         for key in tasks:
             # Each of these keys returns an iterable of functions to call.
             #
             # We simply pass each of those callables into the pool.
-            for function in cdt_fns[key]():
-                # Here, we call every one of the worker functions.
-                #
-                # If they fail wih an error, we log the error and proceed
-                # to the next worker function. (The alternative is that we
-                # let the exception bubble-up and make the entire call to the
-                # management command fail.)
-                try:
-                    function()
-                except Exception:
-                    logging.exception("During %s, the particular importer failed. "
-                                      "Skipping it.", key)
+            def do_it(key=key):
+                for function in cdt_fns[key]():
+                    # Here, we call every one of the worker functions.
+                    #
+                    # If they fail wih an error, we log the error and proceed
+                    # to the next worker function. (The alternative is that we
+                    # let the exception bubble-up and make the entire call to the
+                    # management command fail.)
+                    try:
+                        function()
+                    except Exception:
+                        logging.exception("During %s, the particular importer failed. "
+                                          "Skipping it.", key)
+            pool.spawn(do_it)
+
+        # By calling join(), we refuse to proceed until all the threads finish.
+        pool.join()
