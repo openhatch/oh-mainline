@@ -1889,47 +1889,57 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
         # But now it should be fresh!
         self.assert_(mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL))
 
+def do_list_of_work(l):
+    '''Some helper methods in mysite.customs.management.commands.customs_daily_tasks
+       return a list of worker functions to call. This wrapper simply executes all
+       the elements of l, assuming they are callables.'''
+    for thing in l:
+        thing()
+
 class DailyBugImporter(django.test.TestCase):
 
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_roundup_http_error_408_does_not_break(self, mock_error):
         mock_error.side_effect = generate_408
-        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers()
+        do_list_of_work(mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers())
 
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     @mock.patch('feedparser.parse')
     def test_roundup_generic_error_does_break(self, mock_timeline_error, mock_error):
         mock_error.side_effect = ValueError()
         mock_timeline_error.side_effect = ValueError()
-        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers)
+        self.assertRaises(ValueError,
+                          do_list_of_work, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers())
 
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     @mock.patch('feedparser.parse')
     def test_trac_http_error_408_does_not_break(self, mock_timeline_error, mock_error):
         mock_error.side_effect = generate_408
         mock_timeline_error.side_effect = generate_408
-        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances()
+        do_list_of_work(mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances())
 
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_trac_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances)
+        self.assertRaises(ValueError, do_list_of_work, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances())
 
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_bugzilla_http_error_504_does_not_break(self, mock_error):
         mock_error.side_effect = generate_504
-        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
+        do_list_of_work(mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances())
 
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_bugzilla_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
+        self.assertRaises(ValueError, do_list_of_work, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances())
 
     def test_management_command_does_not_explode_in_the_face_of_errors(self):
-        def explosive_function():
-            raise ValueError()
+        def list_of_explosive_functions():
+            def explosive_function():
+                raise ValueError()
+            return [explosive_function]
         cmd = mysite.customs.management.commands.customs_daily_tasks.Command()
-        cmd.handle(override_cdt_fns = {'explosive': explosive_function})
+        cmd.handle(override_cdt_fns = {'explosive': list_of_explosive_functions})
 
 class GoogleCodeBugImporter(django.test.TestCase):
     def setUp(self):

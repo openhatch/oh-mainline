@@ -72,6 +72,7 @@ Supported tracker types:
  * launchpad"""
 
     def find_and_update_enabled_roundup_trackers(self):
+        things_to_do = []
         enabled_roundup_trackers = []
 
         ### First, the "find" step
@@ -84,16 +85,20 @@ Supported tracker types:
 
         ### Okay, now update!
         for thing in enabled_roundup_trackers:
-            instantiated = thing()
-            project_name = instantiated.project.name
-            logging.info("[Roundup] About to update bugs from project named %s." % project_name)
-            try:
-                instantiated.update()
-            except urllib2.URLError, e:
-                logging.error("[Roundup] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
-                logging.error("[Roundup] Error message: %s" % str(e))
+            def do_it(thing=thing):
+                instantiated = thing()
+                project_name = instantiated.project.name
+                logging.info("[Roundup] About to update bugs from project named %s." % project_name)
+                try:
+                    instantiated.update()
+                except urllib2.URLError, e:
+                    logging.error("[Roundup] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
+                    logging.error("[Roundup] Error message: %s" % str(e))
+            things_to_do.append(do_it)
+        return things_to_do
 
     def find_and_update_enabled_trac_instances(self):
+        things_to_do = []
         enabled_trac_instances = []
 
         ### First, the "find" step
@@ -106,16 +111,20 @@ Supported tracker types:
 
         ### Okay, now update!
         for thing in enabled_trac_instances:
-            instantiated = thing()
-            tracker_name = instantiated.tracker_name
-            logging.info("[Trac] About to update bugs from project named %s." % tracker_name)
-            try:
-                instantiated.update()
-            except urllib2.URLError, e:
-                logging.error("[Trac] ERROR: %s importer failed with urllib2.URLError, skipping..." % tracker_name)
-                logging.error("[Trac] Error message: %s" % str(e))
+            def do_it(thing=thing):
+                instantiated = thing()
+                tracker_name = instantiated.tracker_name
+                logging.info("[Trac] About to update bugs from project named %s." % tracker_name)
+                try:
+                    instantiated.update()
+                except urllib2.URLError, e:
+                    logging.error("[Trac] ERROR: %s importer failed with urllib2.URLError, skipping..." % tracker_name)
+                    logging.error("[Trac] Error message: %s" % str(e))
+            things_to_do.append(do_it)
+        return things_to_do
 
     def find_and_update_enabled_bugzilla_instances(self):
+        things_to_do = []
         enabled_bugzilla_instances = []
 
         ### First, the "find" step
@@ -128,40 +137,49 @@ Supported tracker types:
 
         ### Okay, now update!
         for thing in enabled_bugzilla_instances:
-            instantiated = thing()
-            tracker_name = instantiated.tracker_name
-            logging.info("[Bugzilla] About to update bugs from project named %s." % tracker_name)
-            # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
-            # For now, chuck in a dirty big try except to stop importer
-            # breaking.
-            try:
-                instantiated.update()
-            except urllib2.URLError, e:
-                logging.error("[Bugzilla] ERROR: %s importer failed with urllib2.URLError, skipping..." % tracker_name)
-                logging.error("[Bugzilla] Error message: %s" % str(e))
+            def do_it(thing=thing):
+                instantiated = thing()
+                tracker_name = instantiated.tracker_name
+                logging.info("[Bugzilla] About to update bugs from project named %s." % tracker_name)
+                # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
+                # For now, chuck in a dirty big try except to stop importer
+                # breaking.
+                try:
+                    instantiated.update()
+                except urllib2.URLError, e:
+                    logging.error("[Bugzilla] ERROR: %s importer failed with urllib2.URLError, skipping..." % tracker_name)
+                    logging.error("[Bugzilla] Error message: %s" % str(e))
+            things_to_do.append(do_it)
+        return things_to_do
 
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
-        # First, we ask the projects' bug trackers if there are new bugs we should know about
-        mysite.customs.bugtrackers.launchpad.refresh_bugs_from_all_indexed_launchpad_projects()
-        # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
-        mysite.customs.bugtrackers.launchpad.refresh_all_launchpad_bugs()
+        things_to_do = [
+            # First, we ask the projects' bug trackers if there are new bugs we should know about
+            mysite.customs.bugtrackers.launchpad.refresh_bugs_from_all_indexed_launchpad_projects,
+            # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
+            mysite.customs.bugtrackers.launchpad.refresh_all_launchpad_bugs]
+        return things_to_do
 
     def check_for_broken_ohloh_links(self):
+        things_to_do = []
         for citation in mysite.profile.models.Citation.untrashed.filter(
             data_import_attempt__source__in=('oh', 'rs')):
-            # check citation URL for being a 404
-            # if so, remove set the URL to None. Also, log it.
-            if citation.url:
-                if mysite.customs.mechanize_helpers.link_works(citation.url):
-                    # then we do nothing
-                    pass
-                else:
-                    # aww shucks, I guess we have to remove it.
-                    logging.warning("We had to remove the url %s from the citation whose PK is %d" % (
-                        citation.url, citation.pk))
-                    citation.url = None
-                    citation.save()
+            def do_it(citation=citation):
+                # check citation URL for being a 404
+                # if so, remove set the URL to None. Also, log it.
+                if citation.url:
+                    if mysite.customs.mechanize_helpers.link_works(citation.url):
+                        # then we do nothing
+                        pass
+                    else:
+                        # aww shucks, I guess we have to remove it.
+                        logging.warning("We had to remove the url %s from the citation whose PK is %d" % (
+                                citation.url, citation.pk))
+                        citation.url = None
+                        citation.save()
+            things_to_do.append(do_it)
+        return things_to_do
 
     def handle(self, override_cdt_fns=None, *args, **options):
         if override_cdt_fns:
@@ -184,14 +202,18 @@ Supported tracker types:
 
         # Okay, so do the work.
         for key in tasks:
-            # Here, we call every one of the worker functions.
+            # Each of these keys returns an iterable of functions to call.
             #
-            # If they fail wih an error, we log the error and proceed
-            # to the next worker function. (The alternative is that we
-            # let the exception bubble-up and make the entire call to the
-            # management command fail.)
-            try:
-                cdt_fns[key]()
-            except Exception:
-                logging.exception("During %s, the particular importer failed. "
-                                  "Skipping it.", key)
+            # We simply pass each of those callables into the pool.
+            for function in cdt_fns[key]():
+                # Here, we call every one of the worker functions.
+                #
+                # If they fail wih an error, we log the error and proceed
+                # to the next worker function. (The alternative is that we
+                # let the exception bubble-up and make the entire call to the
+                # management command fail.)
+                try:
+                    function()
+                except Exception:
+                    logging.exception("During %s, the particular importer failed. "
+                                      "Skipping it.", key)
