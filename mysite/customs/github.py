@@ -139,5 +139,3 @@ def repos_by_username_from_activity_feed(github_username):
                     continue # skip the ones owned by this user
                 repo_urls_emitted.add(repo['url']) # avoid sending out duplicates
                 yield mysite.base.helpers.ObjectFromDict(repo)
-    
-        
