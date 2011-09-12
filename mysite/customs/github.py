@@ -32,7 +32,6 @@ from django.conf import settings
 import mysite.customs.mechanize_helpers
 import simplejson
 import mysite.base.helpers
-import urllib
 import urllib2
 
 _github = None
