@@ -39,13 +39,19 @@ Open source training missions
 {% block main %}
 <div class="module">
   <div class="body">
-    <p>These missions will allow you to learn some skills that will help you successfully contribute to free/open source projects.</p>
+    <h2>About the training missions</h2>
+    <p>Some video games have a “training level” where you can get shot
+      at without dying. These training missions are a place to learn
+      open source contribution skills without getting burned.</p>
 
-    <p>We developed them as part of John's Google Summer of Code project, which you can <a href="https://openhatch.org/blog/2010/google-summer-of-code-project-training-missions/">read more about in the OpenHatch blog</a>.</p>
+    <p>A training mission shuns “manuals” and long, boring blobs
+    of text. Instead it says, “Here’s a short, concrete task to
+    perform. Interact with this web-based robot here, and it will tell
+    you if you succeeded.”</p>
 
-    <p>We're looking for feedback.  Please <a href="http://openhatch.org/contact/">get in touch with us</a> and let us know what you think. Our plan is to polish up these missions and then write a HOWTO guide explaining how other people can add their own missions.</p>
+    <h2>Here's what we have so far</h2>
 
-    <h2>Using tar</h2>
+    <h3 class="nofloat">Using tar</h3>
     <p>Learn how to work with tar archives.</p>
     {% if completed_missions.tar or completed_missions.tar_extract %}
       {% if completed_missions.tar and completed_missions.tar_extract %}
@@ -56,7 +62,7 @@ Open source training missions
     {% endif %}
     <p><a href="{% url mysite.missions.tar.views.about %}">Go to this mission</a></p>
 
-    <h2>Using diff and patch</h2>
+    <h3 class="nofloat">Using diff and patch</h3>
     <p>Learn how to use diff and patch to submit changes to a project or apply others' changes.</p>
     {% if completed_missions.diffpatch_diffsingle or completed_missions.diffpatch_patchsingle or completed_missions.diffpatch_diffrecursive or completed_missions.diffpatch_patchrecursive %}
       {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
@@ -67,7 +73,7 @@ Open source training missions
     {% endif %}
     <p><a href="{% url mysite.missions.diffpatch.views.about %}">Go to this mission</a></p>
 
-    <h2>Using Subversion</h2>
+    <h3 class="nofloat">Using Subversion</h3>
     <p>Learn how to interact with projects that use the Subversion version control system.</p>
     {% if completed_missions.svn_checkout or completed_missions.svn_diff or completed_missions.svn_commit %}
       {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
@@ -78,7 +84,7 @@ Open source training missions
     {% endif %}
     <p><a href="{% url mysite.missions.svn.views.main_page %}">Go to this mission</a></p>
 
-    <h2>Using Git</h2>
+    <h3 class="nofloat">Using Git</h3>
     <p>Learn how to interact with projects that use the Git version control
     system.</p>
     {% if completed_missions.git_checkout or completed_missions.git_diff or completed_missions.git_rebase%}
@@ -90,6 +96,14 @@ Open source training missions
     {% endif %}
     <p><a href="{% url mysite.missions.git.views.main_page %}">Go to this
     mission</a></p>
+
+    <h2>Where they came from, and where they're going</h2>
+    <p>We developed with the help of Google Summer of Code. We wrote about the
+      <a href="https://openhatch.org/blog/2010/the-thinking-behind-the-training-missions/">vision behind the training missions</a> on the OpenHatch blog.</p>
+
+    <p>Our community of volunteers takes care of creating more missions and fixing bugs in them. We could use feedback, and if you want to jump in to help, we'd love to have you!
+      <a href="http://openhatch.org/contact/">Get in touch with us</a> and let us know what you think (or how you want to help out!). If you get stuck, <a href="http://openhatch.org/wiki/Mission_help">read our tips</a>.
+      </p>
 
   </div>
 </div>
