@@ -55,7 +55,6 @@ import twisted.internet.defer
 import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
-import mysite.customs.github
 
 import mysite.customs.models
 import mysite.customs.bugimporters.trac

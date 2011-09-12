@@ -24,7 +24,6 @@ import datetime
 import urllib2
 import urllib
 import mysite.base.models
-import mysite.customs.github
 import mysite.profile.models
 from mysite.search.models import Project
 from celery.decorators import task
