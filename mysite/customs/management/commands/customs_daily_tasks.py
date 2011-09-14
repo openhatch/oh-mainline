@@ -214,7 +214,8 @@ Supported tracker types:
         for key in tasks:
             # Each of these keys returns an iterable of functions to call.
             #
-            # We simply pass each of those callables into the pool.
+            # We wrap each callable with a big Exception handler so that
+            # one failure does not kill the entire process.
             def do_it(key=key):
                 for function in cdt_fns[key]():
                     # Here, we call every one of the worker functions.
