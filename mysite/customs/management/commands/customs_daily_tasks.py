@@ -208,7 +208,7 @@ Supported tracker types:
             tasks = cdt_fns.keys()
 
         logging.info("Creating gevent pool.")
-        pool = gevent.pool.Pool(50)
+        pool = gevent.pool.Pool(500)
 
         # Okay, so do the work.
         for key in tasks:
