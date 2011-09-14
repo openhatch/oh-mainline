@@ -216,8 +216,8 @@ Supported tracker types:
             #
             # We wrap each callable with a big Exception handler so that
             # one failure does not kill the entire process.
-            def do_it(key=key):
-                for function in cdt_fns[key]():
+            for function in cdt_fns[key]():
+                def do_it(function=function, key=key):
                     # Here, we call every one of the worker functions.
                     #
                     # If they fail wih an error, we log the error and proceed
@@ -229,7 +229,7 @@ Supported tracker types:
                     except Exception:
                         logging.exception("During %s, the particular importer failed. "
                                           "Skipping it.", key)
-            pool.spawn(do_it)
+                pool.spawn(do_it)
 
         # By calling join(), we refuse to proceed until all the threads finish.
         pool.join()
