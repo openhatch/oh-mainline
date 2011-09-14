@@ -27,3 +27,4 @@ mysite.egg-info/
 .vagrant
 deactivate/
 mysite/indexes/
+mysite/static/twisted-ping-dir/twisted-ping-file
