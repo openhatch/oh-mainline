@@ -89,10 +89,32 @@ class MissionPageState(object):
 # This is the /missions/ page.
 @view
 def main_page(request):
-    completed_missions = {}
+    completed_missions = collections.defaultdict(bool)
+    fully_completed_missions = {}
+
     if request.user.is_authenticated():
-        completed_missions = collections.defaultdict(bool)
-        completed_missions.update(
-            dict((c.step.name, True)
-                 for c in StepCompletion.objects.filter(person=request.user.get_profile())))
-    return (request, 'missions/main.html', {'completed_missions': completed_missions})
+        for c in StepCompletion.objects.filter(person=request.user.get_profile()):
+            completed_missions[c.step.name] = True
+
+        ### FIXME: Below is a hack. It should be easier to find out if a
+        ### training mission is fully completed.
+        if (completed_missions['tar'] and
+            completed_missions['tar_extract']):
+            fully_completed_missions['tar'] = True
+        if (completed_missions['diffpatch_diffsingle'] and
+            completed_missions['diffpatch_patchsingle'] and
+            completed_missions['diffpatch_diffrecursive'] and
+            completed_missions['diffpatch_patchrecursive']):
+            fully_completed_missions['diffpatch'] = True
+        if (completed_missions['svn_checkout'] and
+            completed_missions['svn_diff'] and
+            completed_missions['svn_commit']):
+            fully_completed_missions['svn'] = True
+        if (completed_missions['git_checkout'] and
+            completed_missions['git_diff'] and
+            completed_missions['git_rebase']):
+            fully_completed_missions['git'] = True
+
+    return (request, 'missions/main.html', {
+            'completed_missions': completed_missions,
+            'fully_completed_missions': fully_completed_missions})
