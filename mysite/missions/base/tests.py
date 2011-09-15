@@ -40,6 +40,12 @@ import random
 def make_testdata_filename(mission_type, filename):
     return os.path.join(os.path.dirname(__file__), '..', mission_type, 'testdata', filename)
 
+def list_of_true_keys(d):
+    ret = []
+    for key in d:
+        if d[key]:
+            ret.append(key)
+    return ret
 
 class MainPageTests(TwillTests):
     fixtures = ['person-paulproteus', 'user-paulproteus']
@@ -50,10 +56,11 @@ class MainPageTests(TwillTests):
 
     def test_mission_completion_list_display(self):
         response = self.client.get(reverse(views.main_page))
-        self.assertEqual(response.context['completed_missions'], {})
+        self.assertFalse(list_of_true_keys(response.context['completed_missions']))
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         StepCompletion(person=paulproteus, step=Step.objects.get(name='tar')).save()
 
         response = self.client.get(reverse(views.main_page))
-        self.assertEqual(response.context['completed_missions'], {'tar': True})
+        self.assertEqual(['tar'],
+                         list_of_true_keys(response.context['completed_missions']))

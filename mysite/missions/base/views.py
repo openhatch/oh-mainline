@@ -29,6 +29,7 @@ from django.contrib.auth.decorators import login_required
 
 import os
 import simplejson
+import collections
 
 # Other missions use this helper.
 #
@@ -90,5 +91,8 @@ class MissionPageState(object):
 def main_page(request):
     completed_missions = {}
     if request.user.is_authenticated():
-        completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
+        completed_missions = collections.defaultdict(bool)
+        completed_missions.update(
+            dict((c.step.name, True)
+                 for c in StepCompletion.objects.filter(person=request.user.get_profile())))
     return (request, 'missions/main.html', {'completed_missions': completed_missions})
