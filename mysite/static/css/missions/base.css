@@ -55,6 +55,12 @@ body.missions .mission-help {
     background-color: yellow;
 }
 
+body#missions_index div.body h2 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+    clear: both;
+}
+
 .card {
     float: left;
     width: 15em;

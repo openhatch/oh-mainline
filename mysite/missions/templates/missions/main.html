@@ -19,6 +19,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% block body_id %}missions_index{% endblock %}
+
 {% block css %}
 {{ block.super }}
 .up-top {
@@ -71,8 +73,6 @@ Open source training missions
     {% endwith %}
     {% endwith %}
     {% endwith %}
-
-    <br style="clear: both;" />
 
     <h2>Practice contributing to a project</h2>
 
