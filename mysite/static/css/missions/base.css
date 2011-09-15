@@ -54,3 +54,44 @@ body.missions .mission-help {
     padding-right: 7px;
     background-color: yellow;
 }
+
+.card {
+    float: left;
+    width: 15em;
+    margin-right: 2em;
+    margin-bottom: 0.5em;
+    border: 1px dashed;
+}
+
+.card .body {
+    padding: 0.5em;
+}
+
+.card h3 {
+    height: 20px;
+    padding-top: 0.5em;
+    text-align: center;
+    border-bottom: 1px solid;
+    float: none;
+}
+
+.card h3 .text {
+    position: relative;
+    top: -3px;
+}
+
+.card .go_to_it {
+    text-align: right;
+    float: right;
+}
+
+.card .status {
+    float: left;
+    text-align: center;
+    width: 80%;
+}
+
+.card .description {
+    margin-top: 0.2em;
+    margin-bottom: 1em;
+}
