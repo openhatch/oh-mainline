@@ -81,6 +81,15 @@ body#missions_index div.body h2 {
     float: none;
 }
 
+.card h3.uncompleted {
+    height: 20px;
+    padding-top: 0.5em;
+    text-align: center;
+    border-bottom: 1px solid;
+    float: none;
+    color: black;
+}
+
 .card h3 .text {
     position: relative;
     top: -3px;

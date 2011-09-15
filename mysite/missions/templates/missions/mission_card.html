@@ -1,7 +1,7 @@
 <div class="card">
-  <h3>
+  <h3 {% if not mission_completed %} class="uncompleted" {% endif %}>
     {% if mission_completed %}
-    <img width="26" width="16" class="completed_indicator" src="https://openhatch.org/static/images/tick.png" alt="(Completed)" />&nbsp;
+    <img width="26" width="16" class="completed_indicator" src="/static/images/tick.png" alt="(Completed)" />&nbsp;
     {% endif %}
     <span class="text">{{ mission_title }}</span>
   </h3>
