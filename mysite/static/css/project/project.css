@@ -6,7 +6,7 @@ body#project input[type='submit'] { padding: 2px 8px; display: block; }
 
 
 body#project h1 { float: left; margin-top: 10px; }
-body#project h3.supertitle { font-size: 10pt; margin-top: 20px; display: block; width: 100%;}
+body#project h3.supertitle { font-size: 10pt; margin-top: 20px; display: inline; margin-right: 10px;}
 body#project .head { width: 100% ! important; }
 body#project h3 a { color: #555; }
 body#project #left { width: 60%; margin-right: 20px; }

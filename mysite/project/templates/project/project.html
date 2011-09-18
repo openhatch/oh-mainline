@@ -53,7 +53,7 @@ about how you can help {{ project.display_name }}
         </style>
     </noscript>
 
-    <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
+    <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>&laquo; Projects</a></h3>
     <h1>{{ project.display_name }}</h1>
 
     <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'>
