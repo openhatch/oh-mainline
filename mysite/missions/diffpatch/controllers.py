@@ -17,7 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base.controllers import *
+import difflib
+import os.path
+from cStringIO import StringIO
+import re
+import tarfile
+
+from mysite.missions.base.controllers import (
+    IncorrectPatch,
+    patch,
+    get_mission_data_path)
 
 class SingleFilePatch(object):
     @classmethod

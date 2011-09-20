@@ -17,7 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base.views import *
+import os.path
+from mysite.missions.base.views import (
+    make_download,
+    login_required,
+    MissionPageState,
+    view,
+    )
+from mysite.missions.base.controllers import (
+    mission_completed,
+    set_mission_completed,
+    )
 from mysite.missions.diffpatch import forms, controllers
 
 ### POST handlers
@@ -44,7 +54,7 @@ def patchsingle_submit(request):
         form = forms.PatchSingleUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if form.cleaned_data['patched_file'].read() == open(controllers.PatchSingleFileMission.NEW_FILE).read():
-                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchsingle')
+                set_mission_completed(request.user.get_profile(), 'diffpatch_patchsingle')
                 data['patchsingle_success'] = True
             else:
                 data['patchsingle_error_message'] = 'The file did not match the contents it should have.'
@@ -67,7 +77,7 @@ def diffsingle_submit(request):
         if form.is_valid():
             try:
                 controllers.DiffSingleFileMission.validate_patch(form.cleaned_data['diff'])
-                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
+                set_mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
                 data['diffsingle_success'] = True
             except controllers.IncorrectPatch, e:
                 data['diffsingle_error_message'] = str(e)
@@ -89,7 +99,7 @@ def diffrecursive_submit(request):
         if form.is_valid():
             try:
                 controllers.DiffRecursiveMission.validate_patch(form.cleaned_data['diff'].read())
-                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive')
+                set_mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive')
                 data['diffrecursive_success'] = True
             except controllers.IncorrectPatch, e:
                 data['diffrecursive_error_message'] = str(e)
@@ -119,7 +129,7 @@ def patchrecursive_submit(request):
                 else:
                     data['patchrecursive_%s_error_message' % key] = ''
             if not wrong_answers_present:
-                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
+                set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
                 data['patchrecursive_success'] = True
         data['patchrecursive_form'] = form
     return recursive_patch(request, data)
@@ -133,10 +143,10 @@ class DiffPatchMissionPageState(MissionPageState):
         (data, person) = self.get_base_data_dict_and_person()
         if person:
             data.update({
-                'patchrecursive_done': controllers.mission_completed(person, 'diffpatch_patchrecursive'),
-                'diffrecursive_done': controllers.mission_completed(person, 'diffpatch_diffrecursive'),
-                'patchsingle_done': controllers.mission_completed(person, 'diffpatch_patchsingle'),
-                'diffsingle_done': controllers.mission_completed(person, 'diffpatch_diffsingle')
+                'patchrecursive_done': mission_completed(person, 'diffpatch_patchrecursive'),
+                'diffrecursive_done': mission_completed(person, 'diffpatch_diffrecursive'),
+                'patchsingle_done': mission_completed(person, 'diffpatch_patchsingle'),
+                'diffsingle_done': mission_completed(person, 'diffpatch_diffsingle')
             })
         return data
 
