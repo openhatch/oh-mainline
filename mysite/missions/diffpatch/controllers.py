@@ -77,6 +77,30 @@ class DiffRecursiveMission(object):
     TARBALL_NAME = ORIG_DIR + '.tar.gz'
     SUBSTITUTIONS = [('aubergine', 'eggplant'),
                      ('Aubergine', 'Eggplant')]
+    ALTERNATE_FILENAMES = {'Skillet.txt': 'AubergineAndChickpeaSkillet.txt',
+                           'Grilled.txt': 'GrilledAubergine.txt'}
+
+    @staticmethod
+    def name_new2old(s):
+        for new_name in DiffRecursiveMission.ALTERNATE_FILENAMES:
+            old_name = DiffRecursiveMission.ALTERNATE_FILENAMES[
+                new_name]
+            if s.endswith('/' + new_name):
+                return s.replace('/' + new_name, '/' + old_name, 1)
+            if s == new_name:
+                return old_name
+        return s
+
+    @staticmethod
+    def name_old2new(s):
+        for new_name in DiffRecursiveMission.ALTERNATE_FILENAMES:
+            old_name = DiffRecursiveMission.ALTERNATE_FILENAMES[
+                new_name]
+            if s.endswith('/' + old_name):
+                return s.replace('/' + old_name, '/' + new_name, 1)
+            if s == old_name:
+                return new_name
+        return s
 
     @classmethod
     def synthesize_tarball(cls):
@@ -119,7 +143,18 @@ class DiffRecursiveMission(object):
             try:
                 index = the_patch.source.index(filename)
             except ValueError:
-                raise IncorrectPatch, 'Patch does not modify file "%s", which it should modify.' % filename
+                # Hmm. The user submitted some file with a filename
+                # we didn't really recognize.
+                #
+                # We did rename a bunch of the files a little while ago.
+                # Maybe we can process their submission anyway by looking for
+                # the old filename in the patch header.
+                filename = DiffRecursiveMission.name_new2old(filename)
+                try:
+                    index = the_patch.source.index(filename)
+                except ValueError:
+                    raise IncorrectPatch, 'Patch does not modify file "%s", which it should modify.' % filename
+
             if the_patch.target[index] != filename:
                 raise IncorrectPatch, 'Patch headers for file "%s" have inconsistent filenames.' % filename
 

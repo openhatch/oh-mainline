@@ -244,6 +244,37 @@ class DiffRecursiveTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 1)
 
+    def test_do_mission_correctly_with_old_filenames(self):
+        orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
+        tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
+        diff = StringIO()
+        for fileinfo in tfile:
+            if not fileinfo.isfile():
+                continue
+
+            # calcualate the old name
+            transformed_name = controllers.DiffRecursiveMission.name_new2old(
+                fileinfo.name)
+
+            oldlines = tfile.extractfile(fileinfo).readlines()
+            newlines = []
+            for line in oldlines:
+                for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
+                    line = line.replace(old, new)
+                newlines.append(line)
+
+            diff.writelines(difflib.unified_diff(oldlines, newlines,
+                                                 'orig-'+transformed_name,
+                                                 transformed_name))
+
+        diff.seek(0)
+        diff.name = 'foo.patch'
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
+        self.assert_(submit_response.context['diffrecursive_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 1)
+
     def test_do_mission_incorrectly(self):
         diff = StringIO('--- a/foo.txt\n+++ b/foo.txt\n@@ -0,0 +0,1 @@\n+Hello World\n')
         diff.name = 'foo.patch'
