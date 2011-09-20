@@ -17,7 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base.tests import *
+import tempfile
+import os
+import subprocess
+from StringIO import StringIO
+import difflib
+import tarfile
+import shutil
+
+from mysite.missions.base.tests import (
+    TwillTests,
+    Person,
+    reverse,
+    StepCompletion,
+    )
 from mysite.missions.diffpatch import views, controllers
 
 class PatchSingleFileTests(TwillTests):
