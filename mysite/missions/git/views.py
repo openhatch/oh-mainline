@@ -144,6 +144,7 @@ def diff(request, passed_data = None):
     state.mission_step_prerequisite = 'git_checkout'
     data = state.as_dict_for_template_context()
     data['git_diff_form'] = forms.DiffForm()
+    data['file_for_git_diff'] = 'hello.py'
     return (request, 'missions/git/diff.html', data)
 
 @login_required
