@@ -117,6 +117,7 @@ class DiffRecursiveMission(object):
 
         # Strip one level of directories from the left of the filenames.
         for i, filename in enumerate(the_patch.source):
+
             if not '/' in filename:
                 raise IncorrectPatch, 'Attempting to strip one level of slashes from header line "--- %s" left nothing.' % filename
             the_patch.source[i] = re.sub('^[^/]*/', '', filename)
@@ -128,6 +129,7 @@ class DiffRecursiveMission(object):
         # Go through the files and check that ones that should be mentioned in the patch are so mentioned.
         path_to_mission_files = os.path.join(get_mission_data_path('diffpatch'), cls.ORIG_DIR)
         for filename in os.listdir(path_to_mission_files):
+            old_style_filename = filename
             full_filename = os.path.join(path_to_mission_files, filename)
             if not os.path.isfile(full_filename):
                 continue
@@ -149,13 +151,14 @@ class DiffRecursiveMission(object):
                 # We did rename a bunch of the files a little while ago.
                 # Maybe we can process their submission anyway by looking for
                 # the old filename in the patch header.
-                filename = DiffRecursiveMission.name_new2old(filename)
+                old_style_filename = DiffRecursiveMission.name_new2old(filename)
                 try:
-                    index = the_patch.source.index(filename)
+                    index = the_patch.source.index(old_style_filename)
                 except ValueError:
                     raise IncorrectPatch, 'Patch does not modify file "%s", which it should modify.' % filename
 
-            if the_patch.target[index] != filename:
+            if (the_patch.target[index] != filename and
+                the_patch.target[index] != old_style_filename):
                 raise IncorrectPatch, 'Patch headers for file "%s" have inconsistent filenames.' % filename
 
             hunks = the_patch.hunks[index]
