@@ -80,6 +80,12 @@ class GitViewTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertTrue(controllers.mission_completed(paulproteus, 'git_config'))
 
+    def test_do_git_description_mission_correctly_with_weird_email_address(self):
+        correct_email = 'paulproteus@localhost.com'
+        response = self.client.post(reverse(views.long_description_submit), {'user_email': correct_email})
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertTrue(controllers.mission_completed(paulproteus, 'git_config'))
+
     def test_do_rebase_mission_incorrectly(self):
         word = 'the wrong word'
         response = self.client.post(reverse(views.rebase_submit), {'secret_word': word})

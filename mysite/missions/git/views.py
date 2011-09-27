@@ -64,14 +64,10 @@ def long_description_submit(request):
     if request.method == 'POST':
         form = forms.ConfigForm(request.POST)
         if form.is_valid():
-            gitemail = form.cleaned_data['user_email']
-            if ('local' in gitemail or 'none' in gitemail or 'host' in gitemail):
-                data['git_config_error_message'] = 'The email address is invalid \
-                because it contains one of these words: <b>local, none or host!</b>'
-            else:
-                controllers.set_mission_completed(request.user.get_profile(), 'git_config')
-                return HttpResponseRedirect(reverse(long_description))
-            data['git_config_form'] = form
+            controllers.set_mission_completed(request.user.get_profile(), 'git_config')
+            return HttpResponseRedirect(reverse(long_description))
+
+    data['git_config_form'] = form
     return long_description(request, data)
 
 @login_required

@@ -19,7 +19,15 @@
 import django.forms
 
 class ConfigForm(django.forms.Form):
+    BAD_ENDINGS = ['local', 'none', 'host']
+
     user_email = django.forms.EmailField()
+    def clean_user_email(self):
+        for ending in ConfigForm.BAD_ENDINGS:
+            if self.cleaned_data['user_email'].endswith(ending):
+                raise django.forms.ValidationError, (
+                    'The email address is invalid '
+                    'because it ends with %s' % (ending,))
 
 class CheckoutForm(django.forms.Form):
     secret_word = django.forms.CharField(error_messages={'required': 'No author was given.'})
