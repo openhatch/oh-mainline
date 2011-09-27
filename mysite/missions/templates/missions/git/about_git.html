@@ -74,7 +74,7 @@ git.</p>
             <a name="gitconfig-form"></a>
             <br style="clear: left;" />
             {% if git_config_form.user_email.errors %}
-                <ul class="errorlist"><li>{{ git_config_form.user_email.errors }}  {{ git_config_error_message|safe|escape }}</li></ul><br style="clear: left;" />
+                <ul class="errorlist"><li style="width: inherit;">{{ git_config_form.user_email.errors }}  {{ git_config_error_message|safe|escape }}</li></ul><br style="clear: left;" />
             {% endif %}
             To confirm that you have setup git correctly, please copy the output from...
 		<blockquote><tt>git config --global user.email</tt></blockquote>
