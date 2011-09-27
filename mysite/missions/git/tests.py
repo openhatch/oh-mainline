@@ -60,6 +60,10 @@ class GitViewTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'git_checkout'))
 
+    def test_do_checkout_mission_incorrectly(self):
+        word = 'the wrong word'
+        response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
+
     def email_address_is_rejected(self, email_address):
         response = self.client.post(reverse(views.long_description_submit), {'user_email': email_address})
         self.assertEqual(200, response.status_code)
