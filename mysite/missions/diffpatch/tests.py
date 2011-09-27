@@ -116,6 +116,15 @@ class DiffSingleFileTests(TwillTests):
         del oldlines[0]
         return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
 
+    def make_patch_without_trailing_whitespace(self):
+        # Make a patch that will not apply correctly.
+        good_patch = self.make_good_patch()
+        lines = good_patch.split('\n')
+        output_lines = []
+        for line in lines:
+            output_lines.append(line.rstrip())
+        return '\n'.join(output_lines)
+
     def make_wrong_dest_patch(self):
         # Make a patch that will apply correctly but does not result in the right file.
         oldlines = open(controllers.DiffSingleFileMission.OLD_FILE).readlines()
@@ -164,6 +173,18 @@ class DiffSingleFileTests(TwillTests):
             controllers.DiffSingleFileMission.validate_patch(self.make_swapped_patch())
         except controllers.IncorrectPatch, e:
             self.assert_('order of files passed to diff was flipped' in str(e))
+        else:
+            self.fail('no exception raised')
+
+    def test_remove_trailing_whitespace(self):
+        """
+        A diff that is corrupted by the removal of line-end whitespace
+        generates a special IncorrectPatch exception.
+        """
+        try:
+            controllers.DiffSingleFileMission.validate_patch(self.make_patch_without_trailing_whitespace())
+        except controllers.IncorrectPatch, e:
+            self.assert_('removed the space' in str(e))
         else:
             self.fail('no exception raised')
 

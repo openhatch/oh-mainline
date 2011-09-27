@@ -58,9 +58,22 @@ class SingleFilePatch(object):
         if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
             raise IncorrectPatch, 'The patch will not apply correctly to the original file.'
 
+
         # Check that the resulting file matches what is expected.
-        if ''.join(the_patch.patch_stream(open(cls.OLD_FILE), the_patch.hunks[0])) != open(cls.NEW_FILE).read():
-            raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
+        if ''.join(the_patch.patch_stream(open(cls.OLD_FILE), the_patch.hunks[0])) == open(cls.NEW_FILE).read():
+            # Sweet! Success.
+            return True
+
+        # Okay, at this point, we know the resulting contents are not good.
+
+        # Maybe the problem is that the user accidentally removed
+        # line-ending whitespace from the patch file. We detect that
+        # by seeing if \n\n appears in the patch file.
+        if '\n\n' in patchdata:
+            raise IncorrectPatch, 'You seem to have removed the space (" ") characters at the end of some lines. Those are essential to the patch format'
+
+        # Otherwise, we give a generic error message.
+        raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
 
 class PatchSingleFileMission(SingleFilePatch):
     OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'fib1.c')
