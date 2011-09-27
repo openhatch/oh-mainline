@@ -143,6 +143,8 @@ def long_description(request, passed_data = None):
     state.this_mission_page_short_name = 'Setup Git'
     data = state.as_dict_for_template_context()
     data['git_config_form'] = forms.ConfigForm()
+    if passed_data:
+        data.update(passed_data)
     return (request, 'missions/git/about_git.html', data)
 
 @login_required
