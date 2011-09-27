@@ -30,7 +30,7 @@ class GitViewTestsWhileLoggedOut(TwillTests):
     def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
         response = self.client.get(reverse(views.main_page))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
-        
+
 class GitViewTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -41,19 +41,19 @@ class GitViewTests(TwillTests):
         # Make sure that our test user's git repository does not exist.
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
-            
+
     def test_main_page_does_not_complain_about_prereqs(self):
         response = self.client.get(reverse(views.main_page))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
-        
+
     def test_resetrepo_returns_error_with_get(self):
         response = self.client.get(reverse(views.resetrepo))
         self.assert_(response.status_code == 405)
-        
+
     def test_resetrepo_creates_valid_repo(self):
         self.client.post(reverse(views.resetrepo))
         self.assertTrue(os.path.exists(self.repo_path + "/.git"))
-        
+
     def test_do_checkout_mission_correctly(self):
         word = 'the brain'
         response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
@@ -85,7 +85,7 @@ class GitViewTests(TwillTests):
         response = self.client.post(reverse(views.rebase_submit), {'secret_word': word})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'git_rebase'))
-        
+
     def test_do_diff_mission_correctly(self):
         self.client.post(reverse(views.resetrepo))
         cwd=self.repo_path
@@ -95,7 +95,7 @@ class GitViewTests(TwillTests):
         response = self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'git_diff'))
-        
+
     def test_do_diff_mission_incorrectly(self):
         self.client.post(reverse(views.resetrepo))
         cwd=self.repo_path
@@ -106,4 +106,4 @@ class GitViewTests(TwillTests):
         response = self.client.post(reverse(views.diff_submit), {'diff': unexpected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'git_diff'))
-    
+
