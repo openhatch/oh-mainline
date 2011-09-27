@@ -32,12 +32,33 @@
 
 <p>The purpose of this mission is to teach you how to clone a remote repository, make changes to a file, check them into your local copy, and finally create a patch file.</p>
 
-<h3>Preparing for the mission</h3>
-<ul class="raquo_bullets">
-  <li>Install git onto your machine.  In linux, the package is typically named "git-core" and is likely available via your package manager.  The <a href="http://git-scm.com/download">git website</a> contains options for downloading the latest version and builds for other platforms.</li>
-  <li>Configure your user name: git config --global user.name 'First Last'</li>
-  <li>Configure your user email: git config --global user.email 'name@domain.com'</li>
-</ul>
+<h3>Preparing for the mission: Install git</h3>
+
+<p>If you run Debian, Ubuntu, Fedora, and other systems with a package manager, just search for "git" or "git-core" and install it.</p>
+
+<p>If you run Windows, go to <a href="http://git-scm.com/">git-scm.com</a> (the git homepage), click the Windows logo, and look for the latest download labeled "Full installer for official Git for Windows." Download it and run that installer. Then you can launch git by clicking Start -&gt; Programs -&gt; Git and clicking "Git Bash." That will open a command prompt specially configured to run git.</p>
+
+<p>If you run Mac OS, go to <a href="http://git-scm.com/">git-scm.com</a> (the git homepage), click the Mac logo, and look for the latest download for your version of Mac OS. After you install it, launch the Terminal app that comes with your Mac.</p>
+
+<p>No matter what operating system you use, you should be able to type <tt>git</tt> into your prompt and see a help message about git commands. Try that now.</p>
+
+<h3>Preparing for the mission: Configure git</h3>
+
+<p>When you make changes to a git repository, git also records your name and email address.
+During this training mission, you'll be making and sharing changes, so you'll have to configure
+git.</p>
+
+<p>First, tell git your name. (Replace 'First Last' with your name, surrounded by quotes.)</p>
+
+<blockquote><tt>git config --global user.name 'First Last'</tt></blockquote>
+
+<p>Now, tell git your email address. (Replace 'name@domain.com' with your email address, surrounded by quotes.)</p>
+
+<blockquote><tt>git config --global user.email 'name@domain.com'</tt></blockquote>
+
+<p>When these commands succeed, they print nothing. (Also, if you're wondering, we pass "--global" so we configure git itself, rather than configuring one individual repository.)</p>
+
+<h3>Now, show us</h3>
 
 {% if user.is_authenticated %}
     {% if git_config_done %}
@@ -55,8 +76,8 @@
             {% if git_config_error_message or git_config_form.user_email.errors %}
                 <ul class="errorlist"><li>{{ git_config_form.user_email.errors }}  {{ git_config_error_message|safe|escape }}</li></ul><br style="clear: left;" />
             {% endif %}
-            To confirm that you have setup git correctly, please copy the output from...<br />
-            <code>git config --global user.email</code><br style="clear: left;" /><br />
+            To confirm that you have setup git correctly, please copy the output from...
+		<blockquote><tt>git config --global user.email</tt></blockquote>
             {{ git_config_form.user_email }}
             <br style="clear: left;" />
             <input type="submit" value="Submit" style="float: right; margin-top: -20px; margin-right: 200px;" />
