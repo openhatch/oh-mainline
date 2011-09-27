@@ -28,3 +28,4 @@ mysite.egg-info/
 deactivate/
 mysite/indexes/
 mysite/static/twisted-ping-dir/twisted-ping-file
+mysite/missions-userdata/git/*
