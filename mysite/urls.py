@@ -25,13 +25,12 @@ from django.shortcuts import redirect
 
 from django.conf import settings
 
-import django_authopenid
 from django.contrib import admin
 admin.autodiscover()
 
 import mysite.account.forms
 
-from django_authopenid import views as oid_views
+import django_authopenid.views
 
 #used for the robots.txt redirection
 from django.views.generic.simple import direct_to_template
@@ -219,7 +218,7 @@ urlpatterns = patterns('',
             'mysite.profile.views.edit_person_info_do'),
 
         # OpenID URL prefix for django_authopenid.urls
-        url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
+        url(r'^openid/signin/$', django_authopenid.views.signin, name='user_signin'),
 
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/register/$',
