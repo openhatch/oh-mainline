@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url, include, handler404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 
@@ -167,7 +167,7 @@ urlpatterns = patterns('',
         (r'^\+landing/projects$', 'mysite.base.views.landing_for_project_maintainers'),
 
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
-        (r'^admin/(.*)', admin.site.urls),
+        (r'^admin/', include(admin.site.urls)),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT}),
 
