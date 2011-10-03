@@ -183,19 +183,19 @@ def meta_data():
     one_hour_and_two_days_ago = (datetime.datetime.now() -
                                 datetime.timedelta(days=2, hours=1))
 
-    my['Bugs last polled more than than two days + one hour ago'] = mysite.search.models.Bug.all_bugs.filter(
+    my['Bugs last polled more than than two days + one hour ago'] = mysite.search.models.Bug.open_ones.filter(
         last_polled__lt=one_hour_and_two_days_ago).count()
 
     three_days_ago = (datetime.datetime.now() -
                     datetime.timedelta(days=3))
-    my['Bugs last polled more than three days ago'] = mysite.search.models.Bug.all_bugs.filter(
+    my['Bugs last polled more than three days ago'] = mysite.search.models.Bug.open_ones.filter(
         last_polled__lt=three_days_ago).count()
 
     # Test for 0 division
-    allbug = mysite.search.models.Bug.all_bugs.count()
+    allbug = mysite.search.models.Bug.open_ones.count()
     perbug = 0.0
     if allbug:
-        perbug = ( mysite.search.models.Bug.all_bugs.filter(
+        perbug = ( mysite.search.models.Bug.open_ones.filter(
             last_polled__lt=three_days_ago).count() * 100.0 / allbug)
 
     my['Bugs last polled more than three days ago (in percent)'] = perbug
