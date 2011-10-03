@@ -184,6 +184,36 @@ Supported tracker types:
             things_to_do.append(do_it)
         return things_to_do
 
+    def ask_every_bug_to_refresh_itself(self):
+        '''Bug objects now store a pointer to a .bug_tracker object. This lets
+        them refresh themselves. Let's take advantage of this.'''
+        bug_tracker2bug_to_refresh = {}
+
+        for bug in mysite.search.models.Bug.open_ones.all():
+            # Skip the fresh ones
+            if bug.data_is_more_fresh_than_one_day():
+                continue
+
+            # Skip the ones with no bug_tracker link
+            if bug.bug_tracker is None:
+                logging.warn("Bug is missing a bug_tracker link: %s", bug)
+                continue
+
+            if bug.bug_tracker not in bug_tracker2bug_to_refresh:
+                bug_tracker2bug_to_refresh[bug.bug_tracker] = []
+
+            bug_tracker2bug_to_refresh[bug.bug_tracker].append(bug)
+
+        worker_functions = []
+        for bug_tracker in bug_tracker2bug_to_refresh:
+            bugs = bug_tracker2bug_to_refresh[bug_tracker]
+            def do_it(bug_tracker=bug_tracker, bugs=bugs):
+                instance = bug_tracker.make_instance()
+                for bug in bugs:
+                    instance.refresh_one_bug(bug)
+            worker_functions.append(do_it)
+        return worker_functions
+
     def handle(self, override_cdt_fns=None, *args, **options):
         # Patch modules like urllib2 so that gevent's green-threads can know
         # to switch to the next thread when one thread blocks on network I/O.
@@ -197,7 +227,8 @@ Supported tracker types:
                 'trac': self.find_and_update_enabled_trac_instances,
                 'roundup': self.find_and_update_enabled_roundup_trackers,
                 'bugzilla': self.find_and_update_enabled_bugzilla_instances,
-                'launchpad': self.update_launchpad_hosted_projects
+                'launchpad': self.update_launchpad_hosted_projects,
+                'bugs_themselves': self.ask_every_bug_to_refresh_itself,
                 }
         ## Which ones do we plan to do this, time we run?
         # Well, if the user supplied arguments on the command line, then put those in the list.
