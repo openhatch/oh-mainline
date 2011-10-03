@@ -676,6 +676,7 @@ class MozillaBugzilla(BugzillaBugTracker):
                              'Mozilla Services': 'Mozilla Services',
                              'Webtools': 'Mozilla Webtools',
                              'Input': 'Mozilla Input',
+                             'Fennec': 'Fennec',
                              }
         if bb.product == 'Other Applications':
             bug_project_name = 'Mozilla ' + bb.component
