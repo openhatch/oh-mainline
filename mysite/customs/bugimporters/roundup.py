@@ -216,7 +216,8 @@ class RoundupBugParser(object):
 
         date_reported, submitter_username, last_touched, last_toucher = [
                 x.text_content() for x in self.bug_html.cssselect(
-                    'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b')]
+                    'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b, ' +
+                    'form[name=itemSynopsis] + p > strong, form[name=itemSynopsis] + hr + p > strong')]
 
         # For description, just grab the first "message"
         try:
