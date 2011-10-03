@@ -144,7 +144,8 @@ class RoundupTracker(object):
 
         date_reported, bug_object.submitter_username, last_touched, last_toucher = [
                 x.text_content() for x in tree.cssselect(
-                    'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b')]
+                    'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b, ' +
+                    'form[name=itemSynopsis] + p > strong, form[name=itemSynopsis] + hr + p > strong')]
         bug_object.submitter_realname = self.get_submitter_realname(tree, bug_object.submitter_username)
         bug_object.date_reported = self.str2datetime_obj(date_reported)
         bug_object.last_touched = self.str2datetime_obj(last_touched)
