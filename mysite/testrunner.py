@@ -25,6 +25,7 @@ import random
 import subprocess
 import signal
 import mock
+import logging
 
 def override_settings_for_testing():
     settings.CELERY_ALWAYS_EAGER = True
@@ -51,6 +52,10 @@ def cleanup_after_tests():
 
 def run(*args, **kwargs):
     override_settings_for_testing()
+
+    if not args or not args[0]:
+        logging.info("You did not specify which tests to run. I will run all the OpenHatch-related ones.")
+        args = (['base', 'profile', 'account', 'project', 'missions', 'search', 'customs'],)
 
     try:
         if os.environ.get('USER', 'unknown') == 'hudson':
