@@ -76,7 +76,7 @@ def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
     and tag_name = 'tag', returns 'text'."""
     tags = xml_doc.xpath(tag_name)
     try:
-        return tags[index].text
+        return tags[index].text or u''
     except IndexError:
         return ''
     assert False, "You should not get here."
