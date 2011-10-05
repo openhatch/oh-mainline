@@ -18,7 +18,6 @@
 from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
-from mysite.profile.models import Person
 import mysite.project.controllers
 import django.template
 import mysite.base.decorators
@@ -26,16 +25,13 @@ import mysite.profile.views
 import mysite.project.forms
 
 from django.http import HttpResponse, HttpResponseRedirect, \
-        HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, get_list_or_404
+        HttpResponsePermanentRedirect, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
 from django.utils.datastructures import MultiValueDictKeyError
-
-import random
-from mysite.base.helpers import render_response
 
 def create_project_page_do(request):
     project_name = request.POST.get('project_name', None)
