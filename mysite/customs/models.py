@@ -84,12 +84,12 @@ class TrackerModel(models.Model):
         It is part of this superclass so that derived classes can use the
         functionality without implementing it themselves. It relies on
         the classes being manually added to
-        mysite.customs.bugtrackers.all_trackers.'''
-        import mysite.customs.bugtrackers
+        mysite.customs.bugimporters.all_trackers.'''
+        import mysite.customs.bugimporters
         my_short_name = None
 
-        for short_name in mysite.customs.bugtrackers.all_trackers:
-            klass = mysite.customs.bugtrackers.all_trackers[short_name]['model']
+        for short_name in mysite.customs.bugimporters.all_trackers:
+            klass = mysite.customs.bugimporters.all_trackers[short_name]['model']
             if self.__class__ == klass:
                 my_short_name = short_name
                 break

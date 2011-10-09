@@ -13,3 +13,36 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import mysite.customs.models
+import mysite.customs.forms
+
+all_trackers = {
+        'bugzilla': {
+            'namestr': 'Bugzilla',
+            'model': mysite.customs.models.BugzillaTrackerModel,
+            'form': mysite.customs.forms.BugzillaTrackerForm,
+            'urlmodel': mysite.customs.models.BugzillaQueryModel,
+            'urlform': mysite.customs.forms.BugzillaQueryForm,
+            },
+        'google': {
+            'namestr': 'Google Code',
+            'model': mysite.customs.models.GoogleTrackerModel,
+            'form': mysite.customs.forms.GoogleTrackerForm,
+            'urlmodel': mysite.customs.models.GoogleQueryModel,
+            'urlform': mysite.customs.forms.GoogleQueryForm,
+            },
+        'roundup': {
+            'namestr': 'Roundup',
+            'model': mysite.customs.models.RoundupTrackerModel,
+            'form': mysite.customs.forms.RoundupTrackerForm,
+            'urlmodel': mysite.customs.models.RoundupQueryModel,
+            'urlform': mysite.customs.forms.RoundupQueryForm,
+            },
+        'trac': {
+            'namestr': 'Trac',
+            'model': mysite.customs.models.TracTrackerModel,
+            'form': mysite.customs.forms.TracTrackerForm,
+            'urlmodel': mysite.customs.models.TracQueryModel,
+            'urlform': mysite.customs.forms.TracQueryForm,
+            },
+        }
