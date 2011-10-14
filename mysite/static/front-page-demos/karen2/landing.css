@@ -1,0 +1,44 @@
+#landing {
+    border: none;
+    background: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0px;
+    }
+
+#landing #landing-message {
+    font-size: 2em;
+    padding: 10px 0 25px 0;
+    margin: 0 0 5px 0;
+    background: white;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+}
+
+#landing .submodule-container {
+    clear: both;
+    margin: 0 auto;
+    padding-bottom: 30px;
+}
+
+#landing .submodule {
+    float: left;
+    width: 28%;
+    margin-right: 20px;
+    font-size: 1.15em;
+}
+
+#landing p {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    padding: 5px 0;
+}
+
+#landing h4 {
+    font-size: 1.5em;
+    float: none;
+}
+
+#landing h4 a {
+    /*color: rgb(160, 220, 10);*/
+}
