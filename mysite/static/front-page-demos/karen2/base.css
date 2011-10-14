@@ -73,7 +73,8 @@ ul#links { margin-left: 20px; }
 
 #nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#topnavlinks li, #account-links li { margin: 15px 0; font-size: 1.2em; }
+#topnavlinks li, #account-links li { margin: 15px 0; font-size: 1.1em; }
+#account-links li { font-size: 1em; }
 
 #topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: white; }
 
