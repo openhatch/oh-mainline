@@ -12,6 +12,14 @@ body.missions div.body > * {
   width: 100%;
 }
 
+/* Don't let the above rule force code markup and hyperlinks to be floated left. */
+body.missions div.body code {
+  float: none;
+}
+body.missions div.body a {
+  float: none;
+}
+
 body.missions p.next_mission_link {
     width: 100%;
 }
