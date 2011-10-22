@@ -39,6 +39,11 @@ tracker2importer = {
         NoneType:
             mysite.customs.bugimporters.base.AddTrackerForeignKeysToBugs,
 
+        # This second one is specifically for Bugs belonging to trackers
+        # that are hard-coded in for one reason or another.
+        #mysite.customs.models.HardCodedTrackerModel:
+        #    mysite.customs.bugimporters.base.HandleHardCodedBugTracker,
+
         # The rest of these link specific subclasses of TrackerModel to the
         # relevant BugImporter class. This includes the hard-coded special
         # cases, where the TrackerModel is just a shell linking to the location
@@ -51,7 +56,7 @@ tracker2importer = {
         # Google Code Issue Tracker
         mysite.customs.models.GoogleTrackerModel:
             mysite.customs.bugimporters.google.GoogleBugImporter,
-        # Roundup1
+        # Roundup
         mysite.customs.models.RoundupTrackerModel:
             mysite.customs.bugimporters.roundup.RoundupBugImporter,
         # Trac
@@ -68,7 +73,7 @@ class Command(BaseCommand):
         queries = mysite.customs.models.TrackerQueryModel.objects.filter(
                 last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)
                 ).select_subclasses()
-        # Convert this list to a dictionary of TrackerModules.
+        # Convert this list to a dictionary of TrackerModels.
         tm_list = [(query, query.tracker) for query in queries if hasattr(query, 'tracker')]
         tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
@@ -77,7 +82,7 @@ class Command(BaseCommand):
             try:
                 icls = tracker2importer[tm.__class__]
             except KeyError:
-                # This TrackerModule doesn't have a BugImporter yet.
+                # This TrackerModel doesn't have a BugImporter yet.
                 continue
             else:
                 # See if there is already an importer running for this tracker.
@@ -99,7 +104,7 @@ class Command(BaseCommand):
             # Fetch a list of all Bugs that are stale.
             bugs = Bug.all_bugs.filter(
                     last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1))
-        # Convert this list to a dictionary of TrackerModules.
+        # Convert this list to a dictionary of TrackerModels.
         tm_list = [(bug, bug.tracker) for bug in bugs]
         tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
@@ -108,7 +113,7 @@ class Command(BaseCommand):
             try:
                 icls = tracker2importer[tm.__class__]
             except KeyError:
-                # This TrackerModule doesn't have a BugImporter yet.
+                # This TrackerModel doesn't have a BugImporter yet.
                 continue
             else:
                 # See if there is already an importer running for this tracker.
