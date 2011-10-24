@@ -29,7 +29,7 @@ Manage projects
 {% block main %}
 {% with 1 as edit_mode %}
 <div id='portfolio' class='module editor'>
-    <div class='head'>
+    <div class='module-head'>
         <h3>Manage projects</h3>
         <ul>
             <li>
@@ -40,8 +40,8 @@ Manage projects
         </ul>
     </div>
 
-    <div class='body contains-submodules'>
-        <style>.apologies p {margin-top: 0; }</style>
+    <div class='module-body contains-submodules'>
+        <style>.apologies p {margin-top: 0; } {% comment %} CSSTODO {% endcomment %}</style>
         <div class='apologies' style='font-size: 17pt; padding: 20px 115px; width: 670px; float: left; text-align: center;'>
             <p>Hi! Here you can document your involvement with free/open source projects.
                 Be proud of everything! Add your bug reports, translations,

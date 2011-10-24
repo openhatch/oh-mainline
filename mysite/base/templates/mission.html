@@ -34,10 +34,10 @@
 {% block main %}
 
     <div id='mission_module' class='module'>
-        <div class='head'>
+        <div class='module-head'>
             <h3> Steps </h3>
         </div>
-        <div class='body' style='font-size: 1.2em;'>
+        <div class='module-body' style='font-size: 1.2em;'>
             <form method='POST' action='{% url mysite.base.views.start_solo_bug_jam_mission_do %}'>{% csrf_token %}
                 <ol>
                     <li>
@@ -68,10 +68,10 @@
     </div>
 
     <div class='module'>
-        <div class='head'>
+        <div class='module-head'>
             <h3>Missions started (34)</h3>
         </div>
-        <div class='body'>
+        <div class='module-body'>
             <div id='tabbed_container_of_missions'>
                 <ul class='tab_nav'>
                     <li><a href='#ongoing'>Ongoing missions (3)</a></li>

@@ -18,6 +18,7 @@
 {% endcomment %}
 
 {% block css %}
+{% comment %} CSSTODO {% endcomment %}
 {{ block.super }}
 .up-top {
     padding: 0;
@@ -31,10 +32,10 @@
 
 {% block main %}
 <div class="module">
-  <div class="head">
+  <div class="module-head">
     <h3>Mission description</h3>
   </div>
-  <div class="body">
+  <div class="module-body">
     <h2>{% block mission_name %}{% endblock mission_name %}</h2>
     {% block mission_summary %}{% endblock mission_summary %}
   </div>
@@ -43,18 +44,18 @@
 
 {% block left %}
 <div class="module">
-  <div class="head">
+  <div class="module-head">
     <h3>People who have done this</h3>
   </div>
-  <div class="body">
+  <div class="module-body">
   </div>
 </div>
 
 <div class="module">
-  <div class="head">
+  <div class="module-head">
     <h3>People who are working on this</h3>
   </div>
-  <div class="body">
+  <div class="module-body">
   </div>
 </div>
 {% endblock left %}

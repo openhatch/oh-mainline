@@ -43,13 +43,13 @@ body#signup_with_password .body { background: #fff;}
 
 {% block content %}
 <div class='module'>
-    <div class='head'>
+    <div class='module-head'>
         <h3>Sign up <span style='font-weight: normal;'>(without OpenID)</span></h3>
         <ul>
             <li><a style='font-weight: normal;' href='/account/login/'>(or log in)</a></li>
         </ul>
     </div>
-    <div class='body'>
+    <div class='module-body'>
         <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
         <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">{% csrf_token %}
             {{ form.as_p }}

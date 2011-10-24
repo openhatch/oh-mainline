@@ -30,11 +30,10 @@
     <style type='text/css'>
     </style>
     <div id='edit_info' class='module'>
-        <div class='head'>
+        <div class='module-head'>
             <h3>Edit your info</h3>
         </div>
-        <div class='body contains-submodules two-columns'>
-            <div class='body'>
+        <div class='module-body contains-submodules two-columns'>
                 {% if has_errors %}
                 <!--has_errors-->
                 <ul id="error_msg" class="errorlist">
@@ -155,5 +154,4 @@
                         <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px" href="{{ user.get_profile.profile_url }} ">Cancel</a>
                     </form>
                 </div>      
-            </div> 
         {% endblock %}

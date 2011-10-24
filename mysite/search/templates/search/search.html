@@ -48,7 +48,7 @@ Volunteer opportunities in free and open source software
 {% block content %}
 
     <div id='filters' class='module'>
-        <div class='body'>
+        <div class='module-body'>
                 {% if not query %}
                     <h2 style='font-weight: normal; font-size: 1.4em; margin-bottom: 1em;'>
                         Select one of the links below to find something to work on.
@@ -190,7 +190,7 @@ Volunteer opportunities in free and open source software
     </div>
 
     <div id='textual_search' class='module right'>
-        <div class='body'>
+        <div class='module-body'>
             <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
                 <input type='text' name='q' id='q' rel='hint'
                 title='Textual search'
@@ -207,7 +207,7 @@ Volunteer opportunities in free and open source software
 
     {% if bunch_of_bugs or query %}
     <div id='results' class='module'>
-        <div class='body'>
+        <div class='module-body'>
 
             {% include 'search/results_widget.html' %}
 
@@ -224,7 +224,7 @@ Volunteer opportunities in free and open source software
             </div>
 
             {% if subscribe_to_alert_form or confirm_email_alert_signup %}
-            <div class='module' id='create_bug_alert'>
+            <div class='submodule' id='create_bug_alert'>
 
                 {% ifequal confirm_email_alert_signup 1 %}
                 <div class='success'>

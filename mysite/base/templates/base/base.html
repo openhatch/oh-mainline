@@ -128,7 +128,10 @@
                     {% endblock %}
                 </ul>
                 {% endif %}
-
+                <div id="pagetop">
+                    {% block pagetop %}
+                    {% endblock pagetop %}
+                </div>
                 <div id='content'>
                     {% block content %}
                     {% endblock content %}

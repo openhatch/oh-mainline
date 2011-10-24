@@ -40,7 +40,7 @@
 {% block content %}
     <div class='column'>
         <div class='module'>
-            <div class='head'>
+            <div class='module-head'>
                 <h3>
                     <span style='font-weight: normal;'>
                         Next step #1:
@@ -48,7 +48,7 @@
                     Learn about some of the other registered helpers for
                     {{ the_lucky_project.display_name }}</h3>
             </div>
-            <div class='body'>
+            <div class='module-body'>
                 <ul class="people-list">
                     {% for person in helpers|slice:":3" %}
                         {% include 'profile/person-summary-li.html' %}
@@ -62,14 +62,14 @@
 
     <div class='column'>
         <div class='module' id='me'>
-            <div class='head'>
+            <div class='module-head'>
                 <h3>
                     <span style='font-weight: normal;'>
                         Next step #2:
                     </span>
                     Read about getting involved in {{ the_lucky_project.display_name }}</h3>
             </div>
-            <div class='body'>
+            <div class='module-body'>
                 <ul class="people-list">
                     {% with user.get_profile as person %}
                         {% include 'profile/person-summary-li.html' %}
@@ -82,14 +82,14 @@
 
     <div class='column'>
         <div class='module' id='me'>
-            <div class='head'>
+            <div class='module-head'>
                 <h3>
                     <span style='font-weight: normal;'>
                         Next step #3:
                     </span>
                     Complete your profile</h3>
             </div>
-            <div class='body'>
+            <div class='module-body'>
                 <ul class="people-list">
                     {% with user.get_profile as person %}
                         {% include 'profile/person-summary-li.html' %}
