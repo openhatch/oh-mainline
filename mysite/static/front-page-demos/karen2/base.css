@@ -29,7 +29,8 @@ h1 a:hover { text-decoration: none; }
 
 .module > .module-foot { background: white; padding: 2px 20px; }
 
-.two-column-module { width: 46%; margin-right: 20px;}
+.two-column-module { width: 47%; margin-right: 20px;}
+.second-column { float: right; margin-right: 0px; margin-left: 20px;}
 
 .submodule { background-color: #fff; margin-bottom: 20px; padding: 8px 10px; border: 2px dashed #e4e4e4; rgba(100, 200, 255,.5); float: left; }
 
@@ -44,7 +45,7 @@ h1 {
 
 #nav-container {
     width: 100%;
-    background: #555;
+    background: #333 url('dark-hatch.png') repeat;
     height: 70px;
     box-shadow: 0 0 7px #333;
     }
@@ -82,7 +83,7 @@ ul#links { margin-left: 20px; }
 
 #footer-wrapper { width: 100%; clear: both; left: 0; padding-top: 20px;}
 
-#footer { width: 100%; background: #555; box-shadow: 0 0 7px #333; padding: 15px 0px; margin: 0 auto; text-align: right; }
+#footer { width: 100%; background: #333 url('dark-hatch.png') repeat; box-shadow: 0 0 7px #333; padding: 15px 0px; margin: 0 auto; text-align: right; }
 
 #footer ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
 
