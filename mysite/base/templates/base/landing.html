@@ -67,11 +67,17 @@ document.documentElement.className = 'javascript_is_enabled';
         </div>
     </div>
 
+    <div class='column three-column'>
     {% include 'feed_widget.html' %}
+    </div>
 
+    <div class='column three-column'>
     {% include 'blog_widget.html' %}
+    </div>
     
+    <div class='column three-column three-column-last'>
     {% include 'contribute_widget.html' %}
+    </div>
 
 {% endcache %}
 {% endblock content %}

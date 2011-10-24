@@ -38,17 +38,52 @@ document.documentElement.className = 'javascript_is_enabled';
 
 {% block content %}
 
-<div class='module' id='what_to_do'>
-  <div class='module-body'>
+<div class="column two-column-left">
+    <div class='module' id='events'>
+      <div class="module-head">
+        <h3>Events:</h3>
+      </div>
+      <div class='module-body'>
+        
+      </div>
+    </div>
 
-  </div>
+
+    <div class="module" id="missions">
+      <div class="module-head">
+        <h3>Missions:</h3>
+      </div>
+      <div class="module-body">
+      
+      </div>
+    </div>
 </div>
 
-    {% include 'feed_widget.html' %}
+<div class="column two-column-right">
+    <div class="module" id="projects">
+      <div class="module-head">
+        <h3>Projects:</h3>
+      </div>
+      <div class="module-body">
+      
+      </div>
+    </div>
+</div>
 
-    {% include 'blog_widget.html' %}
+<div class="clearer">&nbsp;</div>
     
+    <div class='column three-column'>
+    {% include 'feed_widget.html' %}
+    </div>
+
+    <div class='column three-column'>
+    {% include 'blog_widget.html' %}
+    </div>
+    
+    <div class='column three-column three-column-last'>
     {% include 'contribute_widget.html' %}
+    </div>
+
     
 {% endblock content %}
 
