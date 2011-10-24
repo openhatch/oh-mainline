@@ -21,6 +21,8 @@ h1 a:hover { text-decoration: none; }
 
 #container { width: 1000px; margin: 0 auto; padding-bottom: 30px; }
 
+.clearer { width: 100%; clear: both; float: none;}
+
 .module { width: 100%; margin-bottom: 15px; webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; border: 3px solid rgba(100, 200, 255,.3); white; background: rgba(255,255,255,.6); float: left;}
 
 .module > .module-head { background: rgba(100, 200, 255,.3); padding: 2px 20px; }
@@ -28,9 +30,6 @@ h1 a:hover { text-decoration: none; }
 .module > .module-body { clear: both; padding: 20px 20px 30px 20px;} 
 
 .module > .module-foot { background: white; padding: 2px 20px; }
-
-.two-column-module { width: 47%; margin-right: 20px;}
-.second-column { float: right; margin-right: 0px; margin-left: 20px;}
 
 .submodule { background-color: #fff; margin-bottom: 20px; padding: 8px 10px; border: 2px dashed #e4e4e4; rgba(100, 200, 255,.5); float: left; }
 
