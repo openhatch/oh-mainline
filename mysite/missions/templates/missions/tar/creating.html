@@ -21,10 +21,10 @@
 
 {% block mission_main %}
 <div class='submodule fat'>
-  <div class='head'>
+  <div class='submodule-head'>
     <h3>Creating tarballs</h3>
   </div>
-  <div class="body">
+  <div class="submodule-body">
       <p>Now that you know how to unpack tarballs, we made another simple project so you can experiment with creating them.  It is called "myproject" and is at version 0.1, and it consists of {{ filenames_for_tarball|length }} file{{ filenames_for_tarball|length|pluralize }} which you can download here:</p>
       <ul>
         {% for filename in filenames_for_tarball %}

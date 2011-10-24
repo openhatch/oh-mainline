@@ -29,12 +29,8 @@
         <ul id='topnavlinks'>
             <li><a href='{% url mysite.missions.base.views.main_page %}'>missions</a></li>
             <li><a href='http://events.openhatch.org'>events</a></li>
-            <li><a href='{% url mysite.project.views.projects %}'>{% if user.is_authenticated %} all {% endif %} projects</a></li>
-            <li><a href='{% url mysite.profile.views.people%}'>{% if user.is_authenticated %} all {% endif %} people</a></li>
-            {% if user.is_authenticated %}
-                <li><a href='{% url mysite.profile.views.display_person_web user.username %}'>profile</a></li>
-                <li><a href='{% url mysite.base.views.home %}'>home</a></li>
-            {% endif %}
+            <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
+            <li><a href='{% url mysite.profile.views.people%}'>people</a></li>
         </ul>
         <ul id='account-links'>
             {% if user.is_authenticated %}

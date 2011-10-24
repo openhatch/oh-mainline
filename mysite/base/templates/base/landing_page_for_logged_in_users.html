@@ -39,72 +39,17 @@ document.documentElement.className = 'javascript_is_enabled';
 {% block content %}
 
 <div class='module' id='what_to_do'>
-  <div class='body'>
+  <div class='module-body'>
 
-    <div id='tabbed_container_of_big_links'>
-      <ul class='tab_nav'>
-        <li class='ui-state-active'>
-          <a href='#for_contributors'>
-            <h4>Join a project!</h4>
-          </a>
-        </li>
-        <li >
-          <a href='#for_project_maintainers'>
-            <h4>Grow your project!</h4>
-          </a>
-        </li>
-      </ul>
-      {% include 'base/landing_page_for_contributors_tab.html' %}
-      {% include 'base/landing_page_for_maintainers_tab.html' %}
-    </div>
   </div>
 </div>
 
-     <div class='module' id='recent_activity_feed'>
-        <div class='head'>
-            <h3>Recent activity</h3>
-                 <a class='blog-feed' href="{% url oh_feed_url 'activity' %}">
-                    <span class='alt-text'>RSS feed</span>
-                 </a>
-        </div>
-        <div class='body'>
-            <ul>
-                {% for answer in recent_feed_items %}
-                {% include answer.template_for_feed %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div> 
+    {% include 'feed_widget.html' %}
+
+    {% include 'blog_widget.html' %}
     
-    <div class='module' id='blog_feed'>
-        <div class='head'>
-            <h3>
-                <a style='color: inherit;' href='/blog/'>
-                    OpenHatch news
-                </a>
-            </h3> 
-            <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
-                <span class='alt-text'>RSS feed</span>
-            </a>
-        </div>
-        <div class='body'>
-            <ul>
-                {% for entry in entries %}
-                <li>
-                    <a style='font-weight: bold; line-height: 110%;' href="{{ entry.link }}">{{ entry.title }}</a>
-                <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
-                <div class="entry">
-                    {{ entry.unicode_text|truncatewords:15 }}
-                </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <p class="rabbit_hole"><a href='/blog/'>Get the whole blog &raquo;</a></p>
-        </div>
-    </div>
- 
+    {% include 'contribute_widget.html' %}
     
-</div>
 {% endblock content %}
 
 {% block js %}
