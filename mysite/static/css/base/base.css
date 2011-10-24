@@ -1,11 +1,5 @@
-html.javascript_is_enabled .invisible_if_js { display: none !important; }
-
-.ui-tabs-hide { display: none !important; }
-
-body { font: 10pt Helvetica, sans-serif; background-color: #fff; background-position: fixed; color: #222; max-width: 1000px; margin: 0 auto; padding: 0; }
+body { font: 11pt Tuffy, Helvetica, sans-serif; background: #f8f8f8; color: #222; width: 100%; margin: 0 auto; padding: 0; }
 .link_like, a , body .ui-widget-content a { color: #ff6d3d; text-decoration: none; cursor:pointer; cursor:hand; }
-    /* If you change the link color, be sure to change the color of the links
-     * on /static/css/search/search.css */
 
 /* for Firefox */
 input[type="submit"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, button::-moz-focus-inner { border : 0px; }
@@ -25,28 +19,22 @@ abbr { border-bottom: 1px dotted #999; }
 h1 a { text-decoration: none; }
 h1 a:hover { text-decoration: none; }
 
+#container { width: 1000px; margin: 0 auto; padding-bottom: 30px; }
 
-.module { float: left; margin-bottom: 15px; padding: 4px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
+.module { width: 100%; margin-bottom: 15px; webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; border: 3px solid rgba(100, 200, 255,.3); white; background: rgba(255,255,255,.6); float: left;}
 
-.module > .head { float: left; }
+.module > .module-head { background: rgba(100, 200, 255,.3); padding: 2px 20px; }
 
-.module > .body { float: left; padding: 20px; background: #fff; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; } 
+.module > .module-body { clear: both; padding: 20px 20px 30px 20px;} 
 
-.module > .foot, .submodule > .foot { float: left; border-top: 1px solid #e4e4e4; padding: 15px; background-color: #f4f4f4; }
+.module > .module-foot { background: white; padding: 2px 20px; }
 
-.module > .body.contains-submodules { background-color: #fff; }
+.two-column-module { width: 47%; margin-right: 20px;}
+.second-column { float: right; margin-right: 0px; margin-left: 20px;}
 
-.submodule { background-color: #fff; margin-bottom: 20px; border: 4px solid #e8e8e8; border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius: 8px; float: left; }
-
-.submodule > .head { float: left; padding: 10px 20px; background-color: #f4f4f4; border-bottom: 1px solid #e4e4e4; }
-
-.submodule > .body { background-color: #fff; }
+.submodule { background-color: #fff; margin-bottom: 20px; padding: 8px 10px; border: 2px dashed #e4e4e4; rgba(100, 200, 255,.5); float: left; }
 
 ul { padding: 0; margin: 0; list-style: none; }
-
-#outermost { margin: 0 auto; width: 1000px; }
-
-#penoutermost { width: 1000px; }
 
 h1, h2, h3, h4 { margin: 0; }
 
@@ -55,55 +43,24 @@ h1 {
     font-size: 23pt;
 }
 
-.tab_nav li a { border: 0; }
-.tab_nav li a:focus { -moz-outline: 0; }
-
-#header {
-    width: 920px;
-    height: 80px;
-    color: #555;
-    margin-top: 15px;
-    padding: 5px 20px;
-    padding: 5px 65px 5px 5px;
-}
-
-#headerlogo {
-    float: left;
-}
+#nav-container {
+    width: 100%;
+    background: #333;
+    height: 67px;
+    box-shadow: 0 0 7px #333;
+    }
 
 #nav {
-    padding: 10px 20px 0 20px;
+    margin: 0 auto;
+    padding: 3px 20px 0 20px;
     width: 960px;
     border-top: 0;
 }
-#homepage #nav {
-    /* On the homepage, we let the top nav be as non-tall as possible. */
-    height: auto;
-}
 
-#homepage #account-links {
-    padding-right: 8px;
-}
-
-#homepage #nav ul#topnavlinks {
-    padding-left: 0px;
-}
-
-#nav h2 { float: left; }
+#nav h1 { float: left; }
 #nav ul { list-style: none; margin: 0; float: right; }
 #nav li { float: right; margin-left: 20px; margin-top: 10px; }
 
-#location-suggestion-notification { width: 40em; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
-
-#location-suggestion-notification p { margin: 0;}
-
-#location-suggestion-notification p strong.suggested_location { white-space: nowrap; }
-
-#location-suggestion-notification h2 { text-align: left; width: 100%; }
-
-#location-suggestion-notification ul { margin-top: 3px; float: none; text-align: center; float: left; }
-
-#location-suggestion-notification li { display: block; float: none; margin-top: 0px; text-align: left; margin-left: 0px; margin-right: 5px; float: left; }
 
 #page-top { width: 960px; padding: 0 20px; clear: both; }
 
@@ -117,36 +74,33 @@ ul#links { margin-left: 20px; }
 
 #nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#topnavlinks li, #account-links li { margin: 15px 0; font-size: .95em; }
+#topnavlinks li, #account-links li { margin: 15px 0; font-size: 1.1em; }
+#account-links li { font-size: 1em; }
 
-#topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: #484848; }
+#topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: white; }
 
-#content { width: 960px; padding: 10px 20px; padding-bottom: 5px; clear: both; }
+#content { width: 960px; padding: 10px 20px; padding-bottom: 30px; clear: both; }
 
-#footer-wrapper { width: 100%; clear: both; left: 0; }
+#footer-wrapper { width: 100%; clear: both; left: 0; padding-top: 20px;}
 
-#footer { width: 950px; padding: 15px 5px; margin: 0 auto; text-align: right; }
+#footer { width: 100%; background: #333; box-shadow: 0 0 7px #333; padding: 15px 0px; margin: 0 auto; text-align: right; }
 
-#footer ul { display: inline; list-style-type: none; max-width: 108em; margin: 0 auto; }
+#footer ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
 
 #footer li { padding: 0 0 0 20px; display: inline; }
 
-#footer a { color: #555; } 
+#footer a { color: white; } 
 
-#footer a:hover { color: #1e1e1e; }
+#footer a:hover { color: #dedede; }
 
 #widgets { float: left; width: 960px; }
 
-h3 { margin-bottom: 0px; float: left; clear: left; font-weight: normal; font-size: 1.1em; color: #555; letter-spacing: 0; margin: 0; }
+h3 { margin-bottom: 0px; float: left; clear: left; font-weight: normal; font-size: 1.1em; color: #222; letter-spacing: 0; margin: 0; }
 
 h3.nofloat { float: none; }
 
-.module > .head h3 { text-shadow: 0 1px 0 #fff; padding: 4px 10px 7px 10px; }
+.module > .module-head h3 { text-shadow: 0 1px 0 #fff; float: none; padding: 4px 10px 7px 0; font-size: 1.2em;}
 
-.module > .head ul { float: right; padding: 0; margin: 0; }
-
-.module > .head ul li { float: left; margin: 0; }
-.module > .head ul li a { float: right; padding: 5px; line-height: 13pt; text-shadow: 0 1px 0 #fff; }
 img.show-more-link {
     float: right;
     position: relative;
@@ -260,10 +214,6 @@ dd { margin-top: .5em; margin-left: 1.2em; }
     #error #content .module .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
     #error #content .module .body { width: 90%; }
 
-body.two_columns #portfolio .notification { width: 94%; margin: 0; padding: 10px 20px; }
-body.two_columns #portfolio .get-involved { background-color: #666; padding: 8px; color: #fff; float: left; }
-body.two_columns #portfolio .body { background: #fff; }
-
 ul.nudgebuttons li { float: left; width: 100%; margin-bottom: 5px;  }
 ul.nudgebuttons li:last-child { margin-bottom: 0; }
 ul.nudgebuttons a .notification { width: 100%; }
@@ -295,71 +245,11 @@ body ul.raquo_bullets li { margin-bottom: .4em; }
 body ul.raquo_bullets li:last-child { margin-bottom: 0; }
 body ul.raquo_bullets li:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
 
-body.three_columns .column { float: left; width: 35%; margin-right: 0; margin-left: 2%; }
-body.three_columns .column:first-child { width: 30%; margin-left: 0; }
-body.three_columns .column:last-child { width: 30%; }
-body.three_columns .module .body { background: #fff; padding: 3%; width: 94%; }
-body.three_columns .module .head { width: 98%; }
-body.three_columns .module { width: 100%; }
-body.three_columns #right .body { width: 96.5%; }
-body.three_columns #right .entry { font-size: .9em; margin-top: 3px; }
-
 body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc; }
 
 ol > li { margin: 15px 0; }
 
 input[rel='hint'].blur { color: #777; }
-
-.missionary_summary_body { color: #777; }
-
-.tab_nav { float: left; padding: 0 5px 5px 5px; width: 98%; }
-.tab_nav li { padding-bottom: 11px; margin-bottom: 10px; height: 20px; display: inline; margin-right: 3px; }
-.tab_nav li a { border: 0; }
-.tab_nav li a:focus { -moz-outline: 0; }
-
-.tab { float: left; padding-top: 10px; border-top: 1px solid #e0e0e0; }
-
-body#landing .tab { border: 0; }
-
-.collapsible { display: none; }
-.and_more { color: #888; font-variant: small-caps; }
-
-body#survey_question_suggestion_form label { margin: 6px 0 3px 0; display: block; }
-body#survey_question_suggestion_form form input[type="submit"]{display: block; float: none;}
-body#survey_question_suggestion_form form textarea { height: 120px; width: 600px;}
-body#survey_question_suggestion_form p { font-size: 1.3em; margin-top: 0; }
-
-body.nice_form .fat { width: 436px !important; }
-body.nice_form form  { float: left; width: 100%; }
-body.nice_form form div { float: left; width: 90%; margin-bottom: 15px; }
-body.nice_form form p { float: left; width: 90%; margin-bottom: 15px; }
-body.nice_form h4 { width: 90%; }
-body.nice_form .skinny { background: none; border: 0; }
-body.nice_form blockquote { margin: .5em 20px; }
-body.nice_form label { float: left; margin: 0; padding: 0; width: 100%; font-size: 10pt; }
-body.nice_form textarea { height: 2.5em; }
-body.nice_form input[type="text"], textarea { width: 100%; }
-body.nice_form .example { margin: 3px 0 0 0; color: #888; font-size: 8pt; }
-body.nice_form p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
-body.nice_form .module { margin: 0 230px; width: 500px; }
-body.nice_form .module .head { width: 500px; }
-body.nice_form .module .body { width: 460px; }
-
-body.landing_page.two_columns #main { width: 60%; margin-right: 2%; }
-body.landing_page.two_columns #main .module > .head { width: 96%; }
-body.landing_page.two_columns #main .module > .body { width: 93%; }
-
-/* Sorry about this: It's called #left, but it actually appears on the right. */
-body.landing_page.two_columns #left { width: 35%; }
-body.landing_page.two_columns #left .module { width: 100%; }
-body.landing_page.two_columns #left .module > .head { width: 88%; }
-body.landing_page.two_columns #left .module > .body { width: 88%; }
-
-body.landing_page .accordion div { display: none; border-bottom: 1px dashed #ccc; }
-body.landing_page h4 { cursor: hand; cursor: pointer; float: none; padding: .8em 0; margin-bottom: 0; border-bottom: 1px dashed #ccc; }
-
-body.landing_page .note-wrapper { background-image: url(/static/images/downarrow-yellow.png); background-repeat: no-repeat; background-position: bottom center; padding-bottom: 10px; }
-body.landing_page .note { text-shadow: 0 1px 0 #fff; font-size: 1.2em; text-align: center; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffa; margin: 0 30px; padding: 8px 60px; }
 
 body#people-map #search_engine_is_down_message { float: left; display: block; margin-top: 1em; margin-bottom: 0; font-size: 1.3em; }
 
