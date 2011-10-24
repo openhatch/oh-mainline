@@ -1,4 +1,4 @@
-body { font: 11pt Tuffy, Helvetica, sans-serif; background: #f8f8f8 url('motif-eee.png') repeat; color: #222; width: 100%; margin: 0 auto; padding: 0; }
+body { font: 11pt Tuffy, Helvetica, sans-serif; background: #f8f8f8 url('light-hatch.png') repeat; color: #222; width: 100%; margin: 0 auto; padding: 0; }
 .link_like, a { color: #ff6d3d; text-decoration: none; cursor:pointer; cursor:hand; }
 
 /* for Firefox */

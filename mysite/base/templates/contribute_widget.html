@@ -15,33 +15,24 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
-{% load cache %}
-{% load base_extras %}
-{% load profile_extras %}
-
-    <div class='module two-column-module second-column' id='blog-feed'>
+    <div class='module two-column-module second-column' id='contribute-message'>
         <div class='module-head'>
             <h3>
                 <a style='color: inherit;' href='/blog/'>
-                    OpenHatch news
+                    Join and improve the project
                 </a>
-            </h3> 
-            <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
-                <span class='alt-text'>RSS feed</span>
-            </a>
+            </h3>
         </div>
         <div class='module-body'>
-            <ul>
-                {% for entry in entries %}
+            <ul style="padding-bottom: 5px;">
+
                 <li>
-                    <a style='font-weight: bold; line-height: 110%;' href="{{ entry.link }}">{{ entry.title }}</a>
-                <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
-                <div class="entry">
-                    {{ entry.unicode_text|truncatewords:15 }}
-                </div>
+		  OpenHatch is an open source community of its own. You can dive in and
+		  organize events, mentor new contributors, or improve this Python+Django
+		  website.
                 </li>
-                {% endfor %}
+
             </ul>
-            <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
+            <a style='float: right;' href='/blog/'>Read more about getting involved &raquo;</a>
         </div>
     </div>
