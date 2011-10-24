@@ -36,6 +36,7 @@ about how you can help {{ project.display_name }}
 
 {% block css %}
 {{ block.super }}
+{% comment %} CSSTODO {% endcomment %}
 #big-project-list form p label{ text-align: left; display: block; width: 100%;}
 #big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
 #big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
@@ -56,8 +57,8 @@ about how you can help {{ project.display_name }}
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>&laquo; Projects</a></h3>
     <h1>{{ project.display_name }}</h1>
 
-    <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'>
-        <div class='head'>
+    <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'> {% comment %} CSSTODO {% endcomment %}
+        <div class='module-head'>
             <h3>Next steps for helpers
                 <a id='show' style='font-weight: normal;' href='#'>(show)</a>
 		<form style="display: none;" id="show_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
@@ -72,7 +73,7 @@ about how you can help {{ project.display_name }}
     </div>
 
     <div class='next_steps_for_helpers contains_just_the_body {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
-        <div class='body'>
+        <div class='module-body'>
                 <ul class='raquo_bullets'>
                     <li><a href='{% url mysite.profile.views.edit_info %}'>
                             Talk about your skills and interests on your profile</a></li>
@@ -96,7 +97,7 @@ about how you can help {{ project.display_name }}
 
 {% block left %}
     <div id='project-tab-container' class='module contains_questions'>
-            <ul class='head tab_nav'>
+            <ul class='module-head tab_nav'>
                     <li class='ui-state-active'>
                         <h3><a href='#chatter'>Chatter</a></h3>
                     </li>
@@ -111,7 +112,7 @@ about how you can help {{ project.display_name }}
                         </li>
                     {% endif %}
             </ul>
-        <div id="chatter" class='body tab'>
+        <div id="chatter" class='module-body tab'>
             <div style="font-size: 1.3em" class="you-are-missing-things">
             {% if cookies_disabled %}
             <div>Please enable cookies in order to post answers.</div>
@@ -187,7 +188,7 @@ about how you can help {{ project.display_name }}
     </strong>
     </div>
     {% if buildhelper_steps %}
-        <div id="buildhelper" class='body tab invisible_if_js'>
+        <div id="buildhelper" class='module-body tab invisible_if_js'>
             <div class="explanation">
                 <p>This is the buildhelper for the {{ project.display_name }} project. It should help you get a working {{ project.display_name }} developer environment up and running on your computer. Click the checkboxes to track your progress!</p> 
                 <p>If you run into trouble with a certain step, look for a <span class="hint">hint</span> link for more information, or if you're stumped, a <span class="frustration">frustration</span> link to get help from {{ project.display_name }} volunteers.</p>
@@ -230,7 +231,7 @@ about how you can help {{ project.display_name }}
 
 {% block main %}
     <div class='module' id='about'>
-        <div class='head'>
+        <div class='module-head'>
             <h3>About {{ project.display_name }}</h3>
             <ul>
                 <li>
@@ -238,7 +239,7 @@ about how you can help {{ project.display_name }}
                 </li>
             </ul>
         </div>
-        <div class='body'>
+        <div class='module-body'>
             <div class='project_icon' 
                     style="float: left; width: 64px; margin-right: 20px;
                     background-image: url({% version project.get_url_of_icon_or_generic %})"
@@ -298,7 +299,7 @@ about how you can help {{ project.display_name }}
 </div>
 
 <div class='module' id='contributors'>
-    <div class='head'>
+    <div class='module-head'>
         <h3>Registered contributors ({% firstof project.get_contributor_count "none listed yet" %})</h3>
             <ul>
                 <li>
@@ -312,7 +313,7 @@ about how you can help {{ project.display_name }}
             </ul>
     </div>
     {% if project.cached_contributor_count %}
-        <div class='body'>
+        <div class='module-body'>
             <ul class="people-list">
                 {% for person in contributors %}
                     {% include 'profile/person-summary-li.html' %}
@@ -323,8 +324,8 @@ about how you can help {{ project.display_name }}
 </div>
 
 <div class='module' id='bugs'>
-    <div class='head'> <h3>Volunteer opportunities, etc.</h3> </div>
-    <div class='body'>
+    <div class='module-head'> <h3>Volunteer opportunities, etc.</h3> </div>
+    <div class='module-body'>
         <style>
             #bugs p { margin-top: 0; }
         </style>

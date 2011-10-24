@@ -300,14 +300,14 @@
     #openhatch-widget .module > .body { width: 280px; background-color: #fff; } 
 
     #openhatch-widget .project-name{ font-size: 8pt; } 
-
+{% comment %} CSSTODO {% endcomment %}
 </style>
 <div id='openhatch-widget'>
     <div class='module'>
-        <div class='head'>
+        <div class='module-head'>
             <h3>My <abbr title='Free, Libre Open Source Software'>FLOSS</abbr> contributions</h3>
         </div>
-        <div class='body'>
+        <div class='module-body'>
             <ul>
             {% for entry in person.get_nonarchived_published_portfolio_entries %}
             {% if forloop.counter0|divisibleby:3 and not forloop.first %}
@@ -337,7 +337,7 @@
             {% endfor %}
             </ul>
         </div>
-        <div class='foot'>
+        <div class='module-foot'>
             <a href='{{uri_scheme}}://{{ url_prefix }}{% url mysite.profile.views.display_person_web person.user.username %}'>See my full profile at
                 <img src='{{uri_scheme}}://{{ url_prefix }}{% version '/static/images/logo-for-widget.png' %}' height='55' width='80'/></a>
         </div>
