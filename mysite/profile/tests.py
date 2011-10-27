@@ -2093,11 +2093,11 @@ class Notifications(TwillTests):
             how_to_add_people = [Notifications.add_contributor,
                     Notifications.add_contributor]
 
-        for add_person in how_to_add_people:
+        for index, add_person_function in enumerate(how_to_add_people):
             participant = Person.create_dummy(
-                    first_name=str(add_person),
+                    first_name=str(index),
                     email_me_weekly_re_projects=people_want_emails)
-            add_person(participant, project_with_two_participants)
+            add_person_function(participant, project_with_two_participants)
             participants_who_are_news_to_each_other.append(participant)
 
         self.assertEqual(len(participants_who_are_news_to_each_other), 2)
