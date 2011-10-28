@@ -96,7 +96,6 @@ class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
 
     def run(self, dia_id, **kwargs):
-        """"""
         dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
         try:
             logger = self.get_logger(**kwargs)
