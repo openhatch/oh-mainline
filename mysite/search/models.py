@@ -653,6 +653,9 @@ models.signals.pre_delete.connect(
 
 # Re-index the person when he says he likes a new project
 def update_the_person_index_from_project(sender, instance, **kwargs):
+    if getattr(settings, 'SKIP_PERSON_REINDEX_ON_PROJECT_SAVE', None):
+        return
+
     import mysite.profile.tasks
     for person in instance.people_who_wanna_help.all():
         task = mysite.profile.tasks.ReindexPerson()

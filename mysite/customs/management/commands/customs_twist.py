@@ -231,6 +231,12 @@ class Command(BaseCommand):
         self.already_enqueued_stop_command = False
         self.active_dia_pks = set()
 
+        # Hack: This tells our update_the_person_index_from_project()
+        # to skip its work. Some of the work we do during bug import updates the
+        # Project objects, but we do not need to reindex the Person objects.
+        # So we store a flag in the settings object saying we should skip that.
+        django.conf.settings.SKIP_PERSON_REINDEX_ON_PROJECT_SAVE = True
+
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
         self.update_bugs_without_a_bug_tracker()
