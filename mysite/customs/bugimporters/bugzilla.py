@@ -248,7 +248,7 @@ class BugzillaBugParser:
         and tag_name = 'tag', returns 'text'."""
         tags = xml_doc.xpath(tag_name)
         try:
-            return tags[index].text
+            return tags[index].text or u''
         except IndexError:
             return ''
 
