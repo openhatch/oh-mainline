@@ -634,9 +634,9 @@ class WannaHelperNote(OpenHatchModel):
 
 
 def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, **kwargs):
-         # always bump it
-         import mysite.base.models
-         mysite.base.models.Timestamp.update_timestamp_for_string('hit_count_cache_timestamp'),
+    # always bump it
+    import mysite.base.models
+    mysite.base.models.Timestamp.update_timestamp_for_string('hit_count_cache_timestamp'),
 
 # Clear the hit count cache whenever Bugs are added or removed. This is
 # simply done by bumping the Timestamp used to generate the cache keys.
