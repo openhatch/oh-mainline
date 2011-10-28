@@ -219,11 +219,6 @@ class TracBugImporter(BugImporter):
 
         # Get the parsed data dict from the TracBugParser
         data = tbp.get_parsed_data_dict(self.tm)
-        if self.tm.old_trac:
-            # It's an old version of Trac that doesn't have links from the
-            # bugs to the timeline. So we need to fetch these times from
-            # the database built earlier.
-            (data['date_reported'], data['last_touched']) = self.timeline.get_times(tbp.bug_url)
 
         # Get or create a Bug object to put the parsed data in.
         try:
@@ -231,6 +226,14 @@ class TracBugImporter(BugImporter):
                 canonical_bug_link=tbp.bug_url)
         except mysite.search.models.Bug.DoesNotExist:
             bug = mysite.search.models.Bug(canonical_bug_link = tbp.bug_url)
+
+        if self.tm.old_trac:
+            tbt = mysite.customs.models.TracBugTimes.objects.get(
+                canonical_bug_link=tbp.bug_url)
+            # It's an old version of Trac that doesn't have links from the
+            # bugs to the timeline. So we need to fetch these times from
+            # the database built earlier.
+            (data['date_reported'], data['last_touched']) = tbt.timeline.get_times(tbp.bug_url)
 
         # Fill the Bug
         for key in data:
