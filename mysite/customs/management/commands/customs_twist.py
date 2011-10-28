@@ -177,16 +177,16 @@ class Command(BaseCommand):
             url = url.encode('utf-8')
         callback = data_dict['callback']
         errback = data_dict.get('errback', None)
-        
+
         logging.debug("Creating getPage for " + url)
 
         # First, actually create the Deferred.
         d = twisted.web.client.getPage(url)
-        
+
         # Then, keep track of it.
         state_manager.urls_we_are_waiting_on[url] += 1
         self.running_deferreds += 1
-        
+
         # wrap the callback
         wrapped_callback = mysite.customs.profile_importers.ImportActionWrapper(
             url=url,
