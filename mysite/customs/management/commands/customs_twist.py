@@ -212,6 +212,7 @@ class Command(BaseCommand):
             twisted.internet.reactor.callWhenRunning(lambda *args: twisted.internet.reactor.stop())
 
     def handle(self, use_reactor=True, *args, **options):
+        # Initialize the state of this class
         self.running_deferreds = 0
         self.running_importers = {}
         self.already_enqueued_stop_command = False
