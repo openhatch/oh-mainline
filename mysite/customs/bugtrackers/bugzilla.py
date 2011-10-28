@@ -249,10 +249,6 @@ class BugzillaBugTracker(object):
             # This is a new bug
             bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
-        # If the Bug does not know who made it, tell it:
-        if not bug.bug_tracker:
-            bug.set_bug_tracker_class_from_instance(self)
-
         # Looks like we have some refreshing to do.
         logging.info("[Bugzilla] Refreshing bug %d from tracker named %s." % (bug_id, self.tracker_name))
         # Get the dictionary of data to put into the bug. The function for
