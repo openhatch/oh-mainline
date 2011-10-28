@@ -21,7 +21,7 @@ import mysite.base.unicode_sanity
 import mysite.base.decorators
 import re
 import hashlib
-from django.core.cache import cache
+import django.core.cache
 from django.db.models import Q
 import logging
 
@@ -359,7 +359,7 @@ class Query:
         # Get the cache key used to store the hit count.
         hit_count_cache_key = self.get_hit_count_cache_key()
         # Fetch the hit count from the cache.
-        hit_count = cache.get(hit_count_cache_key)
+        hit_count = django.core.cache.cache.get(hit_count_cache_key)
         logging.debug( "Cached hit count: " + str(hit_count))
         # We need to be careful to check if the count is None, rather than just if the
         # count is a false value. That's because a value of zero is still a cached value;
@@ -371,7 +371,7 @@ class Query:
             # been refreshed due to a change in the Bug objects. So get
             # a new count.
             hit_count = self.get_bugs_unordered().count()
-            cache.set(hit_count_cache_key, hit_count)
+            django.core.cache.cache.set(hit_count_cache_key, hit_count)
             logging.info("Set hit count: " + str(hit_count))
         # TODO: Add sql query in the logging
         logging.info("Hit Count:" + str(hit_count))

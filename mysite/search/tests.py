@@ -38,7 +38,7 @@ import mock
 from twill import commands as tc
 
 from django.test import TestCase
-from django.core.cache import cache
+import django.core.cache
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
@@ -1015,21 +1015,34 @@ class HashQueryData(SearchTest):
 
     # How on earth do we test for collisions?
 
+class FakeCache(object):
+    def __init__(self):
+        self._data = {}
+    def get(self, key):
+        return self._data.get(key, None)
+    def set(self, key, value):
+        self._data[key] = value
+
 class QueryGrabHitCount(SearchTest):
 
-    def test_eventhive_grab_hitcount_once_stored(self):
-
+    @mock.patch('django.core.cache')
+    def test_eventhive_grab_hitcount_once_stored(self, fake_cache):
+        fake_cache.cache = FakeCache()
         data = {u'q': u'eventhive', u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
         stored_hit_count = 10
         # Get the cache key used to store the hit count.
         hit_count_cache_key = query.get_hit_count_cache_key()
         # Set the cache value.
-        cache.set(hit_count_cache_key, stored_hit_count)
+        django.core.cache.cache.set(hit_count_cache_key, stored_hit_count)
         # Test that it is fetched correctly.
+        self.assertEqual(stored_hit_count,
+                         django.core.cache.cache.get(hit_count_cache_key))
         self.assertEqual(query.get_or_create_cached_hit_count(), stored_hit_count)
 
-    def test_shoutnow_cache_hitcount_on_grab(self):
+    @mock.patch('django.core.cache')
+    def test_shoutnow_cache_hitcount_on_grab(self, fake_cache):
+        fake_cache.cache = FakeCache()
 
         project = Project.create_dummy(language=u'shoutNOW')
 
@@ -1043,7 +1056,7 @@ class QueryGrabHitCount(SearchTest):
         # Get the cache key used to store the hit count.
         hit_count_cache_key = query.get_hit_count_cache_key()
         # Get the cache value.
-        stored_hit_count = cache.get(hit_count_cache_key)
+        stored_hit_count = django.core.cache.cache.get(hit_count_cache_key)
         print "Stored: %s" % stored_hit_count
         # Test that it was stored correctly.
         self.assertEqual(stored_hit_count, expected_hit_count)
@@ -1492,46 +1505,6 @@ accuracy.""",
         # Django documents publicly that linebreaks replaces one "\n" with "<br />".
         # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaks
         self.assertContains(project_page, "<br />".join(text))
-
-class TestBugClassTimestamp(TwillTests):
-    def test_on_mark_looks_closed(self):
-        # There's no Timestamp for Bug class yet, right?
-        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
-        self.assertEqual(now, mysite.base.models.Timestamp.ZERO_O_CLOCK)
-
-        # Making a Bug should not bump the Bug class Timestamp
-        p = mysite.search.models.Project.create_dummy()
-        b = mysite.search.models.Bug.create_dummy(project=p)
-
-        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
-        self.assertEqual(now,
-                         mysite.base.models.Timestamp.ZERO_O_CLOCK)
-
-        # Setting the bug to looks_closed should bump the Bug class Timestamp
-        b.looks_closed = True
-        b.save()
-
-        # Now it's higher, right?
-        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
-        self.assert_(now > mysite.base.models.Timestamp.ZERO_O_CLOCK)
-
-    def test_on_delete(self):
-        # There's no Timestamp for Bug class yet, right?
-        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
-        self.assertEqual(now, mysite.base.models.Timestamp.ZERO_O_CLOCK)
-
-        # Making a Bug should not bump the Bug class Timestamp
-        p = mysite.search.models.Project.create_dummy()
-        b = mysite.search.models.Bug.create_dummy(project=p)
-
-        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
-        self.assertEqual(now,
-                         mysite.base.models.Timestamp.ZERO_O_CLOCK)
-
-        # Deleting that Bug should bump the Bug class Timestamp
-        b.delete()
-        later = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
-        self.assert_(later > now)
 
 class BugKnowsItsFreshness(TestCase):
     def test(self):
