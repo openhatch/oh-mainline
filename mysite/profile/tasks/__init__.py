@@ -139,7 +139,10 @@ except celery.registry.AlreadyRegistered:
 
 @task
 def update_person_tag_cache(person__pk):
-    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    try:
+        person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    except mysite.profile.models.Person.DoesNotExist:
+        return
     cache_key = person.get_tag_texts_cache_key()
     django.core.cache.cache.delete(cache_key)
     
