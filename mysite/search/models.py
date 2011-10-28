@@ -737,9 +737,9 @@ def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, *
 models.signals.post_save.connect(
     post_bug_save_delete_increment_hit_count_cache_timestamp,
     Bug)
-models.signals.post_delete.connect(
-    post_bug_save_delete_increment_hit_count_cache_timestamp
-    ,Bug)
+models.signals.pre_delete.connect(
+    post_bug_save_delete_increment_hit_count_cache_timestamp,
+    Bug)
 
 # Re-index the person when he says he likes a new project
 def update_the_person_index_from_project(sender, instance, **kwargs):
