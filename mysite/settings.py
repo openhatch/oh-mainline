@@ -264,3 +264,25 @@ GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you cl
 ### Initialize celery
 import djcelery
 djcelery.setup_loader()
+
+# By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
+# that off.
+#
+# If you want to see all SQL queries (e.g., when running a management command
+# locally), remove the stanza related to django.db.backends.
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class':'django.utils.log.NullHandler',
+            },
+        },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['null'],  # Quiet by default!
+            'propagate': False,
+            'level':'DEBUG',
+            },
+        }
+}
