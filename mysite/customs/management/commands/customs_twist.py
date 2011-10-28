@@ -23,6 +23,7 @@ import mysite.customs.profile_importers
 import datetime
 import logging
 from types import NoneType
+import django.db.models
 
 import mysite.customs.models
 import mysite.customs.bugimporters.base
@@ -95,15 +96,27 @@ class Command(BaseCommand):
                 # Give the importer queries to process.
                 im.process_queries(queries)
 
+
+    def update_bugs_without_a_bug_tracker(self, bug_list=None):
+        '''This method enqueues work to refresh bugs that have no bug_tracker
+        object attached.'''
+        if bug_list is None:
+            bug_list = Bug.all_bugs.filter(
+                last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)).filter(
+                django.db.models.Q(tracker_id=None))
+        return self.update_bugs(bug_list=bug_list)
+
     def update_bugs(self, bug_list = None):
-        print "For all Bugs we know of, enqueue the stale ones."
+        print "For all Bugs we know of, enqueue the stale ones...",
         # Check if we have been specifically passed Bugs to update.
         if bug_list:
             bugs = bug_list
         else:
             # Fetch a list of all Bugs that are stale.
             bugs = Bug.all_bugs.filter(
-                    last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1))
+                    last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)).filter(
+                    ~django.db.models.Q(tracker_id=None))
+        print "%d bugs enqueued." % (len(bugs),)
         # Convert this list to a dictionary of TrackerModels.
         tm_list = [(bug, bug.tracker) for bug in bugs]
         tm_dict = defaultdict(list)
@@ -220,6 +233,7 @@ class Command(BaseCommand):
 
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
+        self.update_bugs_without_a_bug_tracker()
         self.update_trackers()
         self.update_bugs()
         if self.running_deferreds:
