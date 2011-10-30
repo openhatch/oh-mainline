@@ -61,7 +61,10 @@ h1 {
 #nav li { float: right; margin-left: 20px; margin-top: 10px; }
 
 
-#page-top { width: 960px; padding: 0 20px; clear: both; }
+#pagetop { width: 960px; padding: 0 20px; clear: both; }
+
+.up-top { padding: 0; margin-bottom: -15px;
+}
 
 ul#links { margin-left: 20px; }
 
