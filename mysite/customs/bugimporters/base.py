@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import twisted.web.client
+import logging
 
 from mysite.customs.models import TrackerModel
 from mysite.search.models import Bug

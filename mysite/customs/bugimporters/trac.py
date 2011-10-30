@@ -23,6 +23,7 @@ import lxml.html
 import twisted.web.error
 import twisted.web.http
 import urlparse
+import logging
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
@@ -59,6 +60,7 @@ class TracBugImporter(BugImporter):
         # Add all the queries to the waiting list
         for query in queries:
             query_url = query.get_query_url()
+            print query_url
             self.add_url_to_waiting_list(
                     url=query_url,
                     callback=self.handle_query_csv)
@@ -209,6 +211,10 @@ class TracBugImporter(BugImporter):
                 pass
             # To keep the callback chain happy, explicity return None.
             return None
+        elif failure.check(twisted.web.client.PartialDownloadError):
+            # Log and squelch
+            logging.warn(failure)
+            return tbp
         else:
             # Pass the Failure on.
             return failure
@@ -345,6 +351,7 @@ class TracBugParser(object):
         self.bug_csv = dr.next()
 
     def set_bug_html_data(self, bug_html):
+        self.bug_html_as_bytes = bug_html
         self.bug_html = lxml.html.fromstring(bug_html)
 
     @staticmethod
@@ -371,7 +378,15 @@ class TracBugParser(object):
         ret['looks_closed'] = (self.bug_csv['status'] == 'closed')
 
         page_metadata = TracBugParser.page2metadata_table(self.bug_html)
-        
+
+        # Set as_appears_in_distribution.
+        ret['as_appears_in_distribution'] = tm.as_appears_in_distribution
+
+        if not page_metadata:
+            logging.warn("This Trac bug got no page metadata. Probably we did not find it on the page.")
+            logging.warn("Bug URL: %s", self.bug_url)
+            return ret
+
         all_people = set(TracBugParser.all_people_in_changes(self.bug_html))
         all_people.add(page_metadata['Reported by:'])
         all_people.update(
@@ -411,9 +426,6 @@ class TracBugParser(object):
             ret['concerns_just_documentation'] = any(d in self.bug_csv[tm.documentation_type] for d in d_list)
         else:
             ret['concerns_just_documentation'] = False
-
-        # Set as_appears_in_distribution.
-        ret['as_appears_in_distribution'] = tm.as_appears_in_distribution
 
         # Then pass ret out
         return ret

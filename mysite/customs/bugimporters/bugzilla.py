@@ -20,6 +20,7 @@ import lxml.etree
 import twisted.web.error
 import twisted.web.http
 import urlparse
+import logging
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
@@ -150,6 +151,7 @@ class BugzillaBugImporter(BugImporter):
         self.push_urls_onto_reactor()
 
     def errback_bug_xml(self, failure, bug_id_list):
+        logging.info("STARTING ERRBACK")
         # Check if the failure was related to the size of the request.
         size_related_errors = [
                 twisted.web.http.REQUEST_ENTITY_TOO_LARGE,
@@ -191,8 +193,19 @@ class BugzillaBugImporter(BugImporter):
             return failure
 
     def handle_bug_xml(self, bug_list_xml_string):
+        logging.info("STARTING XML")
         # Turn the string into an XML tree.
-        bug_list_xml = lxml.etree.XML(bug_list_xml_string)
+        try:
+            bug_list_xml = lxml.etree.XML(bug_list_xml_string)
+        except:
+            logging.exception("Eek, XML parsing failed. Jumping to the errback.")
+            logging.error("If this keeps happening, you might want to "
+                          "delete/disable the bug tracker causing this.")
+            raise
+
+        return self.handle_bug_list_xml_parsed(bug_list_xml)
+
+    def handle_bug_list_xml_parsed(self, bug_list_xml):
         for bug_xml in bug_list_xml.xpath('bug'):
             # Create a BugzillaBugParser with the XML data.
             bbp = BugzillaBugParser(bug_xml)
@@ -314,7 +327,7 @@ class BugzillaBugParser:
             'canonical_bug_link': self.bug_url,
             'looks_closed': looks_closed
             }
-        keywords_text = self.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords_text = self.get_tag_text_from_xml(xml_data, 'keywords') or ''
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         # Check for the bitesized keyword
