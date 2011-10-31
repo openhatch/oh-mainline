@@ -29,10 +29,14 @@ import mysite.search.models
 
 class BugzillaBugImporter(BugImporter):
     def __init__(self, *args, **kwargs):
-        # Create a list to store bug ids obtained from queries.
-        self.bug_ids = []
         # Call the parent __init__.
         super(BugzillaBugImporter, self).__init__(*args, **kwargs)
+
+        if self.bug_parser is None:
+            self.bug_parser = BugzillaBugParser
+
+        # Create a list to store bug ids obtained from queries.
+        self.bug_ids = []
 
     def process_queries(self, queries):
         # Add all the queries to the waiting list.
@@ -207,7 +211,7 @@ class BugzillaBugImporter(BugImporter):
     def handle_bug_list_xml_parsed(self, bug_list_xml):
         for bug_xml in bug_list_xml.xpath('bug'):
             # Create a BugzillaBugParser with the XML data.
-            bbp = BugzillaBugParser(bug_xml)
+            bbp = self.bug_parser(bug_xml)
 
             # Get the parsed data dict from the BugzillaBugParser.
             data = bbp.get_parsed_data_dict(self.tm)
