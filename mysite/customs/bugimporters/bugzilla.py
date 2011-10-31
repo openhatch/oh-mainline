@@ -165,7 +165,6 @@ class BugzillaBugImporter(BugImporter):
             # Split bug_id_list into pieces, and turn each piece into a URL.
             # Note that (floor division)+1 is used to ensure that for
             # odd-numbered lists we don't end up with one bug id left over.
-            split_bug_id_list = []
             num_ids = len(bug_id_list)
             step = (num_ids//2)+1
             for i in xrange(0, num_ids, step):
