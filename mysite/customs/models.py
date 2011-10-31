@@ -75,6 +75,14 @@ class TrackerModel(models.Model):
     created_for_project = models.ForeignKey(
         'search.Project', null=True,
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
+
+    ### This optional attribute specifies a class name, which is intepreted as
+    ### part of the mysite.customs.bugimporters module.
+    ###
+    ### If the class is specified, we will use custom code from that class
+    ### when doing bug parsing.
+    custom_parser = models.CharField(max_length=200, blank=True, default='')
+
     objects = InheritanceManager()
 
     def get_edit_url(self):
