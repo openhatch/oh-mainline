@@ -224,13 +224,14 @@ class Command(BaseCommand):
             self.already_enqueued_stop_command = True
             twisted.internet.reactor.callWhenRunning(lambda *args: twisted.internet.reactor.stop())
 
-    def handle(self, use_reactor=True, *args, **options):
-        # Initialize the state of this class
+    def __init__(self, *args, **kwargs):
+        super(Command, self).__init__(*args, **kwargs)
         self.running_deferreds = 0
         self.running_importers = {}
         self.already_enqueued_stop_command = False
         self.active_dia_pks = set()
 
+    def handle(self, use_reactor=True, *args, **options):
         # Hack: This tells our update_the_person_index_from_project()
         # to skip its work. Some of the work we do during bug import updates the
         # Project objects, but we do not need to reindex the Person objects.
