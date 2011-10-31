@@ -216,6 +216,19 @@ class BugzillaBugImporter(BugImporter):
             # Get the parsed data dict from the BugzillaBugParser.
             data = bbp.get_parsed_data_dict(self.tm)
 
+            # Make a project to put into the Bug object
+            project_name = bbp.generate_bug_project_name(
+                bug_project_name_format=self.tm.bug_project_name_format,
+                tracker_name=self.tm.tracker_name)
+            project_from_name, _ = mysite.search.models.Project.objects.get_or_create(
+                    name=project_name)
+
+            # Manually save() the Project to ensure that if it was
+            # created then it has a display_name. Then add that to the
+            # data to be saved in the bug.
+            project_from_name.save()
+            data['project'] = project_from_name
+
             # Get or create a Bug object to put the parsed data in.
             try:
                 bug = mysite.search.models.Bug.all_bugs.get(
@@ -228,26 +241,10 @@ class BugzillaBugImporter(BugImporter):
                 value = data[key]
                 setattr(bug, key, value)
 
-            # Save the project onto it
-            # Project name is generated from the bug_project_name_format property
-            # of the TrackerModel.
-            project_from_name, _ = mysite.search.models.Project.objects.get_or_create(
-                    name=self.generate_bug_project_name(bbp))
-            # Manually save() the Project to ensure that if it was created then it has
-            # a display_name.
-            project_from_name.save()
-            bug.project = project_from_name
-
             # Store the tracker that generated the Bug, update last_polled and save it!
             bug.tracker = self.tm
             bug.last_polled = datetime.datetime.utcnow()
             bug.save()
-
-    def generate_bug_project_name(self, bbp):
-        return self.tm.bug_project_name_format.format(
-                tracker_name=self.tm.tracker_name,
-                product=bbp.product,
-                component=bbp.component)
 
     def determine_if_finished(self):
         # If we got here then there are no more URLs in the waiting list.
@@ -359,5 +356,18 @@ class BugzillaBugParser:
                 ret_dict['concerns_just_documentation'] = False
         else:
             ret_dict['concerns_just_documentation'] = False
+
+        # If being called in a subclass, open ourselves up to some overriding
+        self.extract_tracker_specific_data(xml_data, ret_dict)
+
         # And pass ret_dict on.
         return ret_dict
+
+    def extract_tracker_specific_data(self, xml_data, ret_dict):
+        pass # Override me
+
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        return bug_project_name_format.format(
+                tracker_name=tracker_name,
+                product=self.product,
+                component=self.component)
