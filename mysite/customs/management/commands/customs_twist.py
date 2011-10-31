@@ -68,6 +68,31 @@ tracker2importer = {
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
+    def _get_importer_instance_for_tracker_model(self, tracker_model):
+        '''This takes a TrackerModel as input, and returns an instantiated
+        BugImporter subclass.'''
+        # Some TrackerModel values have no corresponding BugImporter. Test
+        # for that first so that we can bail early if needed.
+        if tracker_model.__class__ not in tracker2importer:
+            raise ValueError, "That tracker_model has no corresponding importer"
+
+        # Okay, so success is possible.
+        # We keep the collection of running importers indexed by the type of
+        # TrackerModel. If we already such an importer running, we can
+        # look it up and grab it from that collection.
+        key = tracker_model
+        if key in self.running_importers:
+            return self.running_importers[key]
+
+        # Okay, at this point we're going to have to create it. Note that
+        # when we create it, we store it in the self.running_importers dict
+        # so that later calls to this will find it.
+        bug_importer_subclass = tracker2importer[tracker_model.__class__]
+        bug_importer_instance = bug_importer_subclass(tracker_model, self)
+        self.running_importers[key] = bug_importer_instance
+
+        return self.running_importers[key]
+
     def update_trackers(self):
         print "For all tracker queries we know about, enqueue the stale ones."
         # Fetch a list of Queries that are stale.
@@ -81,21 +106,10 @@ class Command(BaseCommand):
         # For each TrackerModel, process its stale Queries.
         for tm, queries in tm_dict.items():
             try:
-                icls = tracker2importer[tm.__class__]
-            except KeyError:
-                # This TrackerModel doesn't have a BugImporter yet.
+                importer = self._get_importer_instance_for_tracker_model(tm)
+            except ValueError:
                 continue
-            else:
-                # See if there is already an importer running for this tracker.
-                im = self.running_importers.get(tm, None)
-                if not im:
-                    # There isn't, so create one.
-                    im = icls(tm, self)
-                    # And store it.
-                    self.running_importers[tm] = im
-                # Give the importer queries to process.
-                im.process_queries(queries)
-
+            importer.process_queries(queries)
 
     def update_bugs_without_a_bug_tracker(self, bug_list=None):
         '''This method enqueues work to refresh bugs that have no bug_tracker
@@ -124,24 +138,16 @@ class Command(BaseCommand):
         # For each TrackerModel, process its stale Bugs.
         for tm, bugs in tm_dict.items():
             try:
-                icls = tracker2importer[tm.__class__]
-            except KeyError:
-                # This TrackerModel doesn't have a BugImporter yet.
+                importer = self._get_importer_instance_for_tracker_model(tm)
+            except ValueError:
                 continue
-            else:
-                # See if there is already an importer running for this tracker.
-                im = self.running_importers.get(tm, None)
-                if not im:
-                    # There isn't, so create one.
-                    im = icls(tm, self)
-                    # And store it.
-                    self.running_importers[tm] = im
-                # Give the importer bug URLs to process.
-                bug_urls = [bug.canonical_bug_link for bug in bugs]
-                # Put the bug list in the form required for process_bugs.
-                # The second entry of the tuple is None as we obviously have no data yet.
-                bug_list = [(bug_url, None) for bug_url in bug_urls]
-                im.process_bugs(bug_list)
+
+            # Give the importer bug URLs to process.
+            bug_urls = [bug.canonical_bug_link for bug in bugs]
+            # Put the bug list in the form required for process_bugs.
+            # The second entry of the tuple is None as we obviously have no data yet.
+            bug_list = [(bug_url, None) for bug_url in bug_urls]
+            importer.process_bugs(bug_list)
 
     def create_tasks_from_dias(self, max = 8):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
