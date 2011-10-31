@@ -562,6 +562,25 @@ class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(
             person=asheesh, source='oh', query='paulproteus.ohloh@asheesh.org')
 
+############################################################
+# Generator of sub-classes from data
+
+def generate_bugzilla_tracker_classes(tracker_name=None):
+    # If a tracker name was passed in then return the
+    # specific sub-class for that tracker.
+    if tracker_name:
+        try:
+            bt = mysite.customs.models.BugzillaTrackerModel.all_trackers.get(tracker_name=tracker_name)
+            bt_class = mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
+        except mysite.customs.models.BugzillaTrackerModel.DoesNotExist:
+            bt_class = None
+        yield bt_class
+        return
+    else:
+        # Create a generator that yields all sub-classes.
+        for bt in mysite.customs.models.BugzillaTrackerModel.all_trackers.all():
+            yield mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
+
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
@@ -611,7 +630,7 @@ class BugzillaTests(django.test.TestCase):
                 tracker=miro_tracker,
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -656,7 +675,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker,
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -695,7 +714,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -730,7 +749,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -761,7 +780,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -2536,7 +2555,7 @@ class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCas
                 tracker=miro_tracker,
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro video player')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro video player')
         miro = gen_miro.next()
         self.miro_instance = miro()
 
