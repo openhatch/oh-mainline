@@ -2540,32 +2540,6 @@ class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCas
         miro = gen_miro.next()
         self.miro_instance = miro()
 
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_miro_bugs(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-                    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-
-        # self.miro_instance is the BugzillaTrackerModel instance that corresponds to the Miro bug tracker
-        self.miro_instance.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-
-        self.assertEqual(1, mock_xml_opener.call_count)
-
-        # Okay, so now that the BugzillaTrackerModel created a Bug object,
-        # push its polled_date back into the distant past. We will
-        # then ask it to refresh itself.
-        #
-        # We check the mock_xml_opener to make sure that the
-        # BugzillaTrackerModel tried to download the bug data.
-        bug.last_polled = datetime.datetime(1970, 1, 1, 0, 0, 0)
-        bug.save()
-
-        bug.bug_tracker.make_instance().refresh_one_bug(bug)
-
-        self.assertEqual(2, mock_xml_opener.call_count)
-
 class BugTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
