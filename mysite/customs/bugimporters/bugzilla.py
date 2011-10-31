@@ -26,6 +26,7 @@ from mysite.base.decorators import cached_property
 import mysite.base.helpers
 from mysite.customs.bugimporters.base import BugImporter
 import mysite.search.models
+import mysite.customs.bugtrackers.bugzilla
 
 class BugzillaBugImporter(BugImporter):
     def __init__(self, *args, **kwargs):
@@ -371,3 +372,92 @@ class BugzillaBugParser:
                 tracker_name=tracker_name,
                 product=self.product,
                 component=self.component)
+
+### Custom bug parsers
+class KDEBugzilla(BugzillaBugParser):
+
+    def extract_tracker_specific_data(self, xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('junior-jobs' in keywords)
+        ret_dict['bite_size_tag_name'] = 'junior-jobs'
+        # Remove 'JJ:' from title if present
+        if ret_dict['title'].startswith("JJ:"):
+            ret_dict['title'] = ret_dict['title'][3:].strip()
+        # Check whether documentation bug
+        product = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'product')
+        ret_dict['concerns_just_documentation'] = (product == 'docs')
+        # Then pass ret_dict back
+        return ret_dict
+
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        product = self.product
+        reasonable_products = set([
+            'Akonadi',
+            'Phonon'
+            'kmail',
+            'Rocs',
+            'akregator',
+            'amarok',
+            'ark',
+            'cervisia',
+            'k3b',
+            'kappfinder',
+            'kbabel',
+            'kdeprint',
+            'kdesktop',
+            'kfile',
+            'kfourinline',
+            'khotkeys',
+            'kio',
+            'kmail',
+            'kmplot',
+            'koffice',
+            'kompare',
+            'konquerorr',
+            'kopete',
+            'kpat',
+            'kphotoalbum',
+            'krita',
+            'ksmserver',
+            'kspread',
+            'ksysguard',
+            'ktimetracker',
+            'kwin',
+            'kword',
+            'marble',
+            'okular',
+            'plasma',
+            'printer-applet',
+            'rsibreak',
+            'step',
+            'systemsettings',
+            'kdelibs',
+            'kcontrol',
+            'korganizer',
+            'kipiplugins',
+            'Phonon',
+            'dolphin',
+            'umbrello']
+            )
+        products_to_be_renamed = {
+            'konqueror': 'boomski',
+            'digikamimageplugins': 'digikam image plugins',
+            'Network Management': 'KDE Network Management',
+            'telepathy': 'telepathy for KDE',
+            'docs': 'KDE documentation',
+            }
+        component = self.component
+        things = (product, component)
+
+        if product in reasonable_products:
+            bug_project_name = product
+        else:
+            if product in products_to_be_renamed:
+                bug_project_name = products_to_be_renamed[product]
+            else:
+                logging.info("Guessing on KDE subproject name. Found %s" %  repr(things))
+                bug_project_name = product
+        return bug_project_name
