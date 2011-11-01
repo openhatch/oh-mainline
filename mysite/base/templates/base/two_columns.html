@@ -22,12 +22,14 @@
 {% block body_class %}two_columns{% endblock body_class %}
 
 {% block content %}
-<div id='left'>
+<div class="column two-column-left">
     {% block left %}
     {% endblock left %}
 </div>
-<div id='main'>
+<div class="column two-column-right">
     {% block main %}
     {% endblock main %}
 </div>
+{% block more_content %}
+{% endblock more_content %}
 {% endblock content %}
