@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base/two_columns.html' %}
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2011 Jack Grigg
@@ -36,9 +36,7 @@ document.documentElement.className = 'javascript_is_enabled';
 </script>
 {% endblock %}
 
-{% block content %}
-
-<div class="column two-column-left">
+{% block left %}
     <div class='module' id='events'>
       <div class="module-head">
         <h3>Upcoming events:</h3>
@@ -100,9 +98,9 @@ document.documentElement.className = 'javascript_is_enabled';
       
       </div>
     </div>
-</div>
+{% endblock left %}
 
-<div class="column two-column-right">
+{% block main %}
     <div class="module" id="projects">
       <div class="module-head">
         <h3>Projects:</h3>
@@ -168,8 +166,9 @@ document.documentElement.className = 'javascript_is_enabled';
         </div>
       </div>
     </div>
-</div>
+{% endblock main %}
 
+{% block more_content %}
 <div class="clearer">&nbsp;</div>
     
     <div class='column three-column'>
@@ -185,7 +184,7 @@ document.documentElement.className = 'javascript_is_enabled';
     </div>
 
     
-{% endblock content %}
+{% endblock more_content %}
 
 {% block js %}
 {{ block.super }}
