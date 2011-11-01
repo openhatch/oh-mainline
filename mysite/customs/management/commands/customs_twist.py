@@ -82,29 +82,27 @@ class Command(BaseCommand):
         # TrackerModel. If we already such an importer running, we can
         # look it up and grab it from that collection.
         key = (tracker_model, tracker_model.custom_parser)
-        if key in self.running_importers:
-            return self.running_importers[key]
+        if key not in self.running_importers:
+            # Find the custom parser class, if specified.
+            custom_parser_class = None
+            if tracker_model.custom_parser:
+                try:
+                    module_part, custom_parser_class_name = (
+                        tracker_model.custom_parser.rsplit('.', 1))
+                    module = importlib.import_module(
+                        'mysite.customs.bugimporters.' + module_part)
+                    custom_parser_class = getattr(module, custom_parser_class_name)
+                except Exception:
+                    logging.error("Uh oh, failed trying to grab %s", custom_parser_class_name)
+                    logging.exception("We failed to import the requested custom importer.")
 
-        # Find the custom parser class, if specified.
-        custom_parser_class = None
-        if tracker_model.custom_parser:
-            try:
-                module_part, custom_parser_class_name = (
-                    tracker_model.custom_parser.rsplit('.', 1))
-                module = importlib.import_module(
-                    'mysite.customs.bugimporters.' + module_part)
-                custom_parser_class = getattr(module, custom_parser_class_name)
-            except Exception:
-                logging.error("Uh oh, failed trying to grab %s", custom_parser_class_name)
-                logging.exception("We failed to import the requested custom importer.")
-
-        # Okay, at this point we're going to have to create it. Note that
-        # when we create it, we store it in the self.running_importers dict
-        # so that later calls to this will find it.
-        bug_importer_subclass = tracker2importer[tracker_model.__class__]
-        bug_importer_instance = bug_importer_subclass(
-            tracker_model, self, bug_parser=custom_parser_class)
-        self.running_importers[key] = bug_importer_instance
+            # Okay, at this point we're going to have to create it. Note that
+            # when we create it, we store it in the self.running_importers dict
+            # so that later calls to this will find it.
+            bug_importer_subclass = tracker2importer[tracker_model.__class__]
+            bug_importer_instance = bug_importer_subclass(
+                tracker_model, self, bug_parser=custom_parser_class)
+            self.running_importers[key] = bug_importer_instance
 
         return self.running_importers[key]
 
