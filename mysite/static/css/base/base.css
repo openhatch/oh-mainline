@@ -112,8 +112,6 @@ ul#links { margin-left: 20px; }
 
 #footer a { color: white; } 
 
-#widgets { float: left; width: 960px; }
-
 h3 { margin-bottom: 0px; text-align: left; clear: left; font-weight: normal; font-size: 1.1em; color: #222; letter-spacing: 0; margin: 0; }
 
 h3.nofloat { float: none; }
