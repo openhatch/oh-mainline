@@ -43,8 +43,9 @@ document.documentElement.className = 'javascript_is_enabled';
       </div>
       <div class='module-body'>
         Events go here!
-        <p class="rabbit_hole"><a href="">More events &raquo;</a>  <a href="{% url mysite.missions.base.views.main_page %}">Add events &raquo;</a></p>
       </div>
+        <div class="module-foot"><a href="" class="module-foot-left">More events &raquo;</a>  <a href="{% url mysite.missions.base.views.main_page %}">Add events &raquo;</a></div>
+      
     </div>
 
 
@@ -93,10 +94,9 @@ document.documentElement.className = 'javascript_is_enabled';
           <p>You haven't completed any missions yet.</p>
           {% endif %}
           {% endif %}
-
-          <p class="rabbit_hole"><a href="{% url mysite.missions.base.views.main_page %}">More missions &raquo;</a>  <a href="">Write a mission &raquo;</a></p>
+          </div>
+        <div class="module-foot"><a href="{% url mysite.missions.base.views.main_page %}" class="module-foot-left">More missions &raquo;</a>  <a href="">Write a mission &raquo;</a></div>
       
-      </div>
     </div>
 {% endblock left %}
 
@@ -128,8 +128,9 @@ document.documentElement.className = 'javascript_is_enabled';
         {% else %}
         <p>No projects listed yet.</p>
         {% endif %}
-        <p class="rabbit_hole"><a href='{% url mysite.project.views.projects %}'>Find more projects to help with &raquo;</a></p>
-
+        </div>
+        <div class="module-foot"><a href='{% url mysite.project.views.projects %}'>Find more projects to help with &raquo;</a></div>
+        <div class="module-body">
       <h3>Recommended bugs based on your profile
         <a class="feed" href="/+feeds/recbugs/{{ user.username }}/"><img alt="Subscribe" src="{% version '/static/images/icons/feed-icon-14x14.png' %}" ></a>
       </h3>
@@ -161,11 +162,10 @@ document.documentElement.className = 'javascript_is_enabled';
           </ul>
           {% endif %}
           {% endif %}
-
-          <p class="rabbit_hole"><a href='{% url mysite.search.views.fetch_bugs %}'>Find more recommendations and other opportunities &raquo;</a></p>
-        </div>
+          </div>
+          </div>
+          <div class="module-foot"><a href='{% url mysite.search.views.fetch_bugs %}'>Find more recommendations and other opportunities &raquo;</a></div>
       </div>
-    </div>
 {% endblock main %}
 
 {% block more_content %}
