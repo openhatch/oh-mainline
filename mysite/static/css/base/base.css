@@ -31,7 +31,22 @@ h1 a:hover { text-decoration: none; }
 
 .module > .module-foot { background: white; padding: 2px 20px; }
 
+.submodule-container {
+float: none;
+clear: both;
+margin: 0 auto;
+width: 100%;
+}
+
 .submodule { background-color: #fff; margin-bottom: 20px; padding: 8px 10px; border: 2px dashed #e4e4e4; rgba(100, 200, 255,.5); float: left; }
+
+.submodule-head {
+    margin-bottom: 5px;
+}
+
+.submodule-body {
+clear: both;
+}
 
 ul { padding: 0; margin: 0; list-style: none; }
 
