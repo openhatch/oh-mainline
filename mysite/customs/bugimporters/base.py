@@ -131,7 +131,7 @@ class BugImporter(object):
         raise NotImplementedError
 
 class AddTrackerForeignKeysToBugs(object):
-    def __init__(self, tracker_model, reactor_manager):
+    def __init__(self, tracker_model, reactor_manager, bug_parser=None):
         # Store the tracker model
         self.tm = tracker_model
         # Store the reactor manager

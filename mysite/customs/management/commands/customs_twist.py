@@ -81,11 +81,12 @@ class Command(BaseCommand):
         # We keep the collection of running importers indexed by the type of
         # TrackerModel. If we already such an importer running, we can
         # look it up and grab it from that collection.
-        key = (tracker_model, tracker_model.custom_parser)
+        custom_parser = getattr(tracker_model, 'custom_parser', None)
+        key = (tracker_model, custom_parser)
         if key not in self.running_importers:
             # Find the custom parser class, if specified.
             custom_parser_class = None
-            if tracker_model.custom_parser:
+            if custom_parser:
                 try:
                     module_part, custom_parser_class_name = (
                         tracker_model.custom_parser.rsplit('.', 1))

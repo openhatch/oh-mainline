@@ -849,6 +849,13 @@ class TestCustomBugParser(django.test.TestCase):
         self.assertEqual(mysite.customs.bugimporters.bugzilla.KDEBugzilla,
                          importer.bug_parser)
 
+    ### Now, test that the customs_twist class will create an importer
+    ### configured to use the right class.
+    def test_customs_twist_creates_importers_correctly_for_none(self):
+        twister = mysite.customs.management.commands.customs_twist.Command()
+        importer = twister._get_importer_instance_for_tracker_model(None)
+        self.assertTrue(importer)
+
 class BugzillaBugImporterTests(django.test.TestCase):
     fixtures = ['miro-project']
     def setUp(self):
