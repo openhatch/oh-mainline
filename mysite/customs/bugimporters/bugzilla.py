@@ -385,7 +385,7 @@ class KDEBugzilla(BugzillaBugParser):
 
     def extract_tracker_specific_data(self, xml_data, ret_dict):
         # Make modifications to ret_dict using provided metadata
-        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords_text = self.get_tag_text_from_xml(xml_data, 'keywords')
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('junior-jobs' in keywords)
@@ -394,7 +394,7 @@ class KDEBugzilla(BugzillaBugParser):
         if ret_dict['title'].startswith("JJ:"):
             ret_dict['title'] = ret_dict['title'][3:].strip()
         # Check whether documentation bug
-        product = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'product')
+        product = self.get_tag_text_from_xml(xml_data, 'product')
         ret_dict['concerns_just_documentation'] = (product == 'docs')
         # Then pass ret_dict back
         return ret_dict
