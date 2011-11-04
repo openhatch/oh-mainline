@@ -81,7 +81,8 @@ class TrackerModel(models.Model):
     ###
     ### If the class is specified, we will use custom code from that class
     ### when doing bug parsing.
-    custom_parser = models.CharField(max_length=200, blank=True, default='')
+    custom_parser = models.CharField(max_length=200, blank=True, default='',
+                                     help_text='(For use by OpenHatch admins) Choose a custom bug parser class for the tracker')
 
     objects = InheritanceManager()
 
