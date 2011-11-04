@@ -259,7 +259,14 @@ class BugzillaBugParser:
     @staticmethod
     def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
         """Given an object representing <bug><tag>text</tag></bug>,
-        and tag_name = 'tag', returns 'text'."""
+        and tag_name = 'tag', returns 'text'.
+
+        If someone carelessly passes us something else, we bail
+        with ValueError."""
+        if xml_doc.tag != 'bug':
+            error_msg = "You passed us a %s tag. We wanted a <bug> object." % (
+                xml_doc.tag,)
+            raise ValueError, error_msg
         tags = xml_doc.xpath(tag_name)
         try:
             return tags[index].text or u''
