@@ -201,7 +201,7 @@ class BugzillaBugImporter(BugImporter):
         # Turn the string into an XML tree.
         try:
             bug_list_xml = lxml.etree.XML(bug_list_xml_string)
-        except:
+        except Exception:
             logging.exception("Eek, XML parsing failed. Jumping to the errback.")
             logging.error("If this keeps happening, you might want to "
                           "delete/disable the bug tracker causing this.")
