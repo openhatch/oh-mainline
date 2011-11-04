@@ -32,6 +32,7 @@ import mysite.customs.views
 
 from django.core.urlresolvers import reverse
 
+import logging
 import mock
 import os
 import time
@@ -2620,3 +2621,51 @@ class BugTrackerEditingViews(TwillTests):
         response = client.get(url)
         self.assertEqual(self.twisted,
                          response.context['tracker_form'].initial['created_for_project'])
+
+class BugzillaTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(BugzillaTrackerEditingViews, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+    def test_form_create_bugzilla_tracker(self):
+        # We start with no BugzillaTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.BugzillaTrackerForm({
+                'tracker_name': 'KDE Bugzilla',
+                'base_url': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'query_url_type': 'xml',
+                'max_connections': '8',
+                'bug_project_name_format': 'format'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+
+    def test_form_create_bugzilla_tracker_with_custom_parser(self):
+        # We start with no BugzillaTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.BugzillaTrackerForm({
+                'tracker_name': 'KDE Bugzilla',
+                'base_url': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'query_url_type': 'xml',
+                'max_connections': '8',
+                'custom_parser': 'bugzilla.KDEBugzilla',
+                'bug_project_name_format': 'format'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
+        self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
