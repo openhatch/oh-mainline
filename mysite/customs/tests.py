@@ -802,6 +802,35 @@ Keywords: Torrent unittest""")
         bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
+class TestCustomBugParser(django.test.TestCase):
+    ### First, test that if we create the bug importer correctly, the
+    ### right thing would happen.
+    def test_bugzilla_bug_importer_uses_bugzilla_parser_by_default(self):
+        bbi = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(
+            tracker_model=None, reactor_manager=None,
+            bug_parser=None)
+        self.assertEqual(bbi.bug_parser, mysite.customs.bugimporters.bugzilla.BugzillaBugParser)
+
+    def test_bugzilla_bug_importer_accepts_bug_parser(self):
+        bbi = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(
+            tracker_model=None, reactor_manager=None,
+            bug_parser=mysite.customs.bugimporters.bugzilla.KDEBugzilla)
+        self.assertEqual(bbi.bug_parser, mysite.customs.bugimporters.bugzilla.KDEBugzilla)
+
+    @mock.patch('mysite.customs.bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data')
+    def test_kdebugparser_uses_tracker_specific_method(self, mock_specific):
+        bugzilla_data = lxml.etree.XML(open(os.path.join(
+                    settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
+        bug_data = bugzilla_data.xpath('bug')[0]
+
+        kdebugzilla = mysite.customs.bugimporters.bugzilla.KDEBugzilla(bug_data)
+        kdebugzilla.get_parsed_data_dict(base_url='http://bugs.kde.org/',
+                                         bitesized_type=None,
+                                         bitesized_text='',
+                                         documentation_type=None,
+                                         documentation_text='')
+        self.assertTrue(mock_specific.called)
+
 class BugzillaBugImporterTests(django.test.TestCase):
     fixtures = ['miro-project']
     def setUp(self):

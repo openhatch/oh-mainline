@@ -215,7 +215,11 @@ class BugzillaBugImporter(BugImporter):
             bbp = self.bug_parser(bug_xml)
 
             # Get the parsed data dict from the BugzillaBugParser.
-            data = bbp.get_parsed_data_dict(self.tm)
+            data = bbp.get_parsed_data_dict(base_url=self.tm.get_base_url(),
+                                            bitesized_type=self.tm.bitesized_type,
+                                            bitesized_text=self.tm.bitesized_text,
+                                            documentation_type=self.tm.documentation_type,
+                                            documentation_text=self.tm.documentation_text)
 
             # Make a project to put into the Bug object
             project_name = bbp.generate_bug_project_name(
@@ -307,10 +311,12 @@ class BugzillaBugParser:
     def bugzilla_date_to_datetime(date_string):
         return mysite.base.helpers.string2naive_datetime(date_string)
 
-    def get_parsed_data_dict(self, tm):
+    def get_parsed_data_dict(self,
+                             base_url, bitesized_type, bitesized_text,
+                             documentation_type, documentation_text):
         # Generate the bug_url.
         self.bug_url = urlparse.urljoin(
-                tm.get_base_url(),
+                base_url,
                 'show_bug.cgi?id=%d' % self.bug_id)
 
         xml_data = self.bug_xml
@@ -339,26 +345,26 @@ class BugzillaBugParser:
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         # Check for the bitesized keyword
-        if tm.bitesized_type:
-            ret_dict['bite_size_tag_name'] = tm.bitesized_text
-            b_list = tm.bitesized_text.split(',')
-            if tm.bitesized_type == 'key':
+        if bitesized_type:
+            ret_dict['bite_size_tag_name'] = bitesized_text
+            b_list = bitesized_text.split(',')
+            if bitesized_type == 'key':
                 ret_dict['good_for_newcomers'] = any(b in keywords for b in b_list)
-            elif tm.bitesized_type == 'wboard':
+            elif bitesized_type == 'wboard':
                 whiteboard_text = self.get_tag_text_from_xml(xml_data, 'status_whiteboard')
                 ret_dict['good_for_newcomers'] = any(b in whiteboard_text for b in b_list)
             else:
                 ret_dict['good_for_newcomers'] = False
         else:
             ret_dict['good_for_newcomers'] = False
-        # Check whether this is a documentation bug.
-        if tm.documentation_type:
-            d_list = tm.documentation_text.split(',')
-            if tm.documentation_type == 'key':
+        # Chemck whether this is a documentation bug.
+        if documentation_type:
+            d_list = documentation_text.split(',')
+            if documentation_type == 'key':
                 ret_dict['concerns_just_documentation'] = any(d in keywords for d in d_list)
-            elif tm.documentation_type == 'comp':
+            elif documentation_type == 'comp':
                 ret_dict['concerns_just_documentation'] = any(d == self.component for d in d_list)
-            elif tm.documentation_type == 'prod':
+            elif documentation_type == 'prod':
                 ret_dict['concerns_just_documentation'] = any(d == self.product for d in d_list)
             else:
                 ret_dict['concerns_just_documentation'] = False
