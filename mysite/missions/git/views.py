@@ -79,11 +79,14 @@ def diff_submit(request):
     if request.method == 'POST':
         form = forms.DiffForm(request.POST)
         if form.is_valid():
-                if controllers.GitDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff']):
+                if controllers.GitDiffMission.commit_if_ok(request.user.username, form.cleaned_data['diff']):
+                    data['git_diff_error_message'] = ""
                     controllers.set_mission_completed(request.user.get_profile(), 'git_diff')
                     return HttpResponseRedirect(reverse(diff))
                 else:
-                    data['git_diff_error_message'] = "The patch file is incorrect.  Give it another try!"
+                    data['git_diff_error_message'] = "Unable to commit the patch. Please check your username and try again"
+        else:
+            data['git_diff_error_message'] = "Something doesn't look right.The expected line is '+print...' Give it another try!"
         data['git_diff_form'] = form
     return diff(request, data)
 

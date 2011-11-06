@@ -47,21 +47,16 @@ class GitRepository(object):
 class GitDiffMission(object):
 
     @classmethod
-    def validate_diff_and_commit_if_ok(cls, username, diff):
-        EXPECTED_DIFF_LINE = '+print "Hello world!"'
-        success_count = diff.find(EXPECTED_DIFF_LINE)
+    def commit_if_ok(cls, username, diff):
         repo = GitRepository(username)
-        if success_count != -1:
-            commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
-            commit_diff.communicate(str(diff))
-            if commit_diff.returncode == 0: # for shell commands, success is 0
-                commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
-                    Come to my house for a dinner party.
-                    Knock 3 times and give the secret password: Pinky.""" % username
-                subprocess.Popen(['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)
-                return True
-            else:
-                subprocess.check_call(['git', 'am', '--abort'], cwd=repo.repo_path)
-                return False
+        commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
+        commit_diff.communicate(str(diff))
+        if commit_diff.returncode == 0: # for shell commands, success is 0
+            commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
+                Come to my house for a dinner party.
+                Knock 3 times and give the secret password: Pinky.""" % username
+            subprocess.Popen(['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)
+            return True
         else:
+            subprocess.check_call(['git', 'am', '--abort'], cwd=repo.repo_path)
             return False
