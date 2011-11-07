@@ -30,7 +30,6 @@ from mysite.search.models import Project, Bug, \
 from mysite.search import views
 import datetime
 import mysite.project.views
-import mysite.customs.bugtrackers
 
 import hashlib
 import simplejson
@@ -1538,17 +1537,5 @@ class WeCanPollSomethingToCheckIfAProjectIconIsLoaded(TestCase):
             mysite.search.views.project_has_icon,
             kwargs={'project_name': p.name}))
         self.assertEqual(response.content, p.get_url_of_icon_or_generic())
-
-class BugCanRefreshItself(TestCase):
-
-    @mock.patch('mysite.customs.bugtrackers.BugTracker.refresh_one_bug')
-    def test_from_static_class(self, mock_refresh_one):
-        refresh_was_successfully_called = False
-        bt = mysite.customs.bugtrackers.BugTracker()
-
-        b = mysite.search.models.Bug.create_dummy_with_project()
-        b.set_bug_tracker_class_from_instance(bt)
-        b.bug_tracker.make_instance().refresh_one_bug(b)
-        self.assertTrue(mock_refresh_one.called)
 
 # vim: set nu ai et ts=4 sw=4:
