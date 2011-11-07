@@ -41,7 +41,7 @@ class DiffForm(django.forms.Form):
         success_count = re.search(REGEX_DIFF_LINE, self.cleaned_data['diff'])
         if success_count == None :
             raise django.forms.ValidationError, (
-                "Something doesn't look right.The expected line is '+print...' Give it another try!")
+                "Something doesn't look right.The expected line is '+print... ' Give it another try!")
         return self.cleaned_data['diff']
                
 

@@ -50,7 +50,7 @@ class GitDiffMission(object):
     def commit_if_ok(cls, username, diff):
         repo = GitRepository(username)
         commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
-        out,err = commit_diff.communicate(str(diff))
+        commit_diff.communicate(str(diff))
         if commit_diff.returncode == 0: # for shell commands, success is 0
             commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
                 Come to my house for a dinner party.

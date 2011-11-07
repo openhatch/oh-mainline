@@ -83,7 +83,7 @@ def diff_submit(request):
                     controllers.set_mission_completed(request.user.get_profile(), 'git_diff')
                     return HttpResponseRedirect(reverse(diff))
                 else:
-                    data['git_diff_error_message'] = "Unable to commit the patch. Please check your patch and try again"
+                    data['git_diff_error_message'] = "Unable to commit the patch. Please check your patch and try again "
         data['git_diff_form'] = form
     return diff(request, data)
 
