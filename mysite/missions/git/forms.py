@@ -42,8 +42,8 @@ class DiffForm(django.forms.Form):
         if success_count == None :
             raise django.forms.ValidationError, (
                 "Something doesn't look right.The expected line is '+print...' Give it another try!")
-            data['git_diff_error_message'] = "Something doesn't look right.The expected line is '+print...' Give it another try!"
-        
+        return self.cleaned_data['diff']
+               
 
 class RebaseForm(django.forms.Form):
     secret_word = django.forms.CharField(error_messages={'required': 'The password was incorrect.'})
