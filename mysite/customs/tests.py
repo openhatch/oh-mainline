@@ -78,7 +78,7 @@ class FakeGetPage(object):
         self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-personal-feed.json')).read()
         self.url2data['https://api.launchpad.net/1.0/people?ws.op=find&text=asheesh%40asheesh.org'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'people?ws.op=find&text=asheesh@asheesh.org')).read()
+            settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'people__ws.op=find&text=asheesh@asheesh.org')).read()
         self.url2data['https://launchpad.net/~paulproteus'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~paulproteus')).read()
         self.url2data['https://launchpad.net/~Mozilla'] = open(os.path.join(
