@@ -66,5 +66,17 @@ def activate_foreign_keys(sender, connection, **kwargs):
     if connection.vendor == 'sqlite':
         cursor = connection.cursor()
         cursor.execute('PRAGMA foreign_keys = ON;')
+
+def set_asynchronous_for_sqlite(sender, connection, **kwargs):
+    """Make sqlite3 be asynchronous. This is risky in case your
+    machine crashes, but comes at such a performance boost that
+    we do it anyway.
+
+    More info: http://www.sqlite.org/pragma.html#pragma_synchronous """
+    if connection.vendor == 'sqlite':
+        cursor = connection.cursor()
+        cursor.execute('PRAGMA synchronous=OFF;')
+
 from django.db.backends.signals import connection_created
 connection_created.connect(activate_foreign_keys)
+connection_created.connect(set_asynchronous_for_sqlite)
