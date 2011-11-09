@@ -7,8 +7,10 @@
 from settings import *
 # ...and then we override some values.
 
+# Use MySQL in production
+DATABASES['default'] = DATABASES['mysql']
 # But use the linode as our MySQL server
-DATABASE_HOST='linode.openhatch.org'
+DATABASES['default']['HOST'] ='linode.openhatch.org'
 
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
