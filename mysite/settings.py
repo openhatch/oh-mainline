@@ -154,7 +154,6 @@ INSTALLED_APPS = (
     'registration',
     'django_authopenid',
     'django_extensions',
-    'windmill',
     'south',
     'django_assets',
     'celery',
