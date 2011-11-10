@@ -37,6 +37,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'CHARSET': 'utf8',
     },
+}
+
+OTHER_DATABASES = {
     'mysql': {
         'NAME': 'oh_milestone_a',
         'ENGINE': 'django.db.backends.mysql',
@@ -45,11 +48,11 @@ DATABASES = {
         'PASSWORD': 'ahmaC0Th',
         'OPTIONS': {'read_default_file': './my.cnf'},
         'CHARSET': 'utf8',
-    }
+    },
 }
 
 if os.environ.get('USE_MYSQL', ''):
-    DATABASES['default'] = DATABASES['mysql']
+    DATABASES['default'] = OTHER_DATABASES['mysql']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
