@@ -133,8 +133,8 @@ class EditPhotoForm(django.forms.ModelForm):
             # Scale it down.
             too_big = PIL.Image.open(StringIO.StringIO(data))
             format = too_big.format
-            new_w = 200
-            new_h = (h * 1.0 / w) * 200
+            new_w = int(200)
+            new_h = int((h * 1.0 / w) * 200)
 
             smaller = too_big.resize((new_w, new_h),
                                      PIL.Image.ANTIALIAS)
