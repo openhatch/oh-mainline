@@ -259,6 +259,7 @@ class Recommend(SearchTest):
 
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
     # Use that to exclude 'will never understand' tags from recommended search terms.
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
     def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
 
@@ -288,6 +289,7 @@ class Recommend(SearchTest):
 
     # FIXME: Include recommendations from tags.
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
     def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
 
@@ -710,6 +712,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
         self.assertEqual(bitesize_dict[u'count'], 1)
         self.assertEqual(all_dict[u'count'], 2)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_get_toughness_facet_options_with_terms(self):
 
         python_project = Project.create_dummy(language=u'Python')
@@ -747,6 +750,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         Bug.create_dummy(project=c_project, title=u'b')
         Bug.create_dummy(project=unknown_project, title=u'unknowable')
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
         # a search for 'a'. They are in two different languages, so let's make
