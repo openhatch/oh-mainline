@@ -130,15 +130,28 @@ def get_geoip_guess_for_ip(ip_as_string):
     # initialize database
     global geoip_database
     if geoip_database is None:
-        # FIXME come up with reliable path place
-        try:
-            geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
-                                                        '../../downloads/GeoLiteCity.dat'))
-        except IOError:
-            logging.warn("Uh, we could not find the GeoIP database.")
-            return False, u''
-    
-    all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
+        system_geoip_path = '/usr/share/GeoIP/GeoIP.dat'
+        downloaded_geolitecity_path = os.path.join(
+            settings.MEDIA_ROOT,
+            '../../downloads/GeoLiteCity.dat')
+        if os.path.exists(system_geoip_path):
+            geoip_database = pygeoip.GeoIP(system_geoip_path)
+        if os.path.exists(downloaded_geolitecity_path):
+            geoip_database = pygeoip.GeoIP(downloaded_geolitecity_path)
+
+    if geoip_database is None: # still?
+        logging.warn("Uh, we could not find the GeoIP database.")
+        return False, u''
+
+    # First, get the country. This works on both the GeoCountry
+    # and the GeoLiteCity database.
+    country_name = geoip_database.country_name_by_addr(ip_as_string)
+
+    # Try to increase our accuracy if we have the GeoLiteCity database.
+    try:
+        all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
+    except pygeoip.GeoIPError:
+        return True, unicode(country_name, 'latin-1')
 
     if all_data_about_this_ip is None:
         return False, ''
