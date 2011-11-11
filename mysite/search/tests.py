@@ -31,6 +31,9 @@ from mysite.search import views
 import datetime
 import mysite.project.views
 
+from django.utils.unittest import skipIf
+import django.db
+
 import hashlib
 import simplejson
 import mock
@@ -150,108 +153,6 @@ class AutoCompleteTests(SearchTest):
         response = self.client.get( u'/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class SearchResultsSpecificBugs(SearchTest):
-    fixtures = ['short_list_of_bugs.json']
-
-    def setUp(self):
-        SearchTest.setUp(self)
-
-        query = u'PYTHON'
-
-        # The four canonical_filters by which a bug can match a query
-        whole_word = "[[:<:]]%s[[:>:]]" % query
-        self.canonical_filters = [
-                Q(project__language__iexact=query),
-                Q(title__iregex=whole_word),
-                Q(project__name__iregex=whole_word),
-                Q(description__iregex=whole_word)
-                ]
-
-    def no_canonical_filters(self, except_one=Q()):
-        """Returns the complex filter, 'Matches no canonical filters except the specified one.'"""
-
-        # Create the complex filter, 'Matches no canonical filters,
-        # except perhaps the specified one.'
-        other_c_filters = Q() # Initial value
-        for cf in self.canonical_filters:
-            if cf != except_one:
-                other_c_filters = other_c_filters | cf
-
-        # Read this as "Just that one filter and no others."
-        return except_one & ~other_c_filters
-
-    def test_that_fixture_works_properly(self):
-        """Is the fixture is wired correctly?
-
-        To test the search engine, I've loaded the fixture with six
-        'canonical' bugs. Four of them are canonical matches, two
-        are canonical non-matches. A working search engine will return
-        just the matches.
-
-        There are four ways a bug can match a query:
-            - project language = the query
-            - project name contains the query
-            - project title contains the query
-            - project description contains the query
-
-        Let's call each of these a 'canonical filter'.
-
-        For each of these canonical filters, there should be a canonical bug
-        in the fixture that matches that, and only that, filter.
-
-        This test checks the fixture for the existence of these
-        canonical bugs.
-
-        If the fixture is wired correctly, when we search it for
-        'python', it will return bugs 1, 2, 3 and 4, and exclude
-        bugs 400 and 401. """
-
-        # Remember, a canonical bug meets ONLY ONE criterion.
-        # Assert there's just one canonical bug per criterion.
-        for cf in self.canonical_filters:
-            matches = Bug.all_bugs.filter(self.no_canonical_filters(except_one=cf))[:]
-            self.failUnlessEqual(len(matches), 1,
-                    "There are %d, not 1, canonical bug(s) for the filter %s" % (len(matches), cf))
-
-        # Assert there's at least one canonical nonmatch.
-        canonical_non_matches = Bug.all_bugs.filter(self.no_canonical_filters())
-        self.assert_(len(canonical_non_matches) > 1)
-
-    def test_search_single_query(self):
-        """Test that Query.get_bugs_unordered()
-        produces the expected results."""
-        response = self.client.get(u'/search/', {u'q': u'python'})
-        returned_bugs = response.context[0][u'bunch_of_bugs']
-        for cf in self.canonical_filters:
-            self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs,
-                    "Search engine did not correctly use the filter %s" % cf)
-
-        for bug in Bug.all_bugs.filter(self.no_canonical_filters()):
-            self.failIf(bug in returned_bugs, "Search engine returned a false positive: %s." % bug)
-
-    def test_search_two_queries(self):
-
-        title_of_bug_to_include = u'An interesting title'
-        title_of_bug_to_exclude = "This shouldn't be in the results for [pyt*hon 'An interesting description']."
-
-        # If either of these bugs aren't there, then this test won't work properly.
-        self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_include))) == 1)
-        self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_exclude))) == 1)
-
-        response = self.client.get(u'/search/',
-                                   {u'q': u'python "An interesting description"'})
-
-        included_the_right_bug = False
-        excluded_the_wrong_bug = True
-        for bug in response.context[0][u'bunch_of_bugs']:
-            if bug.title == title_of_bug_to_include:
-                included_the_right_bug = True
-            if bug.title == title_of_bug_to_exclude:
-                excluded_the_wrong_bug = False
-
-        self.assert_(included_the_right_bug)
-        self.assert_(excluded_the_wrong_bug)
-
 class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
     def test(self):
         difficult = "With spaces (and parens)"
@@ -358,6 +259,7 @@ class Recommend(SearchTest):
 
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
     # Use that to exclude 'will never understand' tags from recommended search terms.
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
     def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
 
@@ -387,6 +289,7 @@ class Recommend(SearchTest):
 
     # FIXME: Include recommendations from tags.
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
     def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
 
@@ -527,6 +430,7 @@ class IconGetsScaled(SearchTest):
         self.assertEqual(p.icon_smaller_for_badge.height, 11)
 
 class SearchOnFullWords(SearchTest):
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_find_perl_not_properly(self):
         Project.create_dummy()
         Bug.create_dummy(description='properly')
@@ -808,6 +712,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
         self.assertEqual(bitesize_dict[u'count'], 1)
         self.assertEqual(all_dict[u'count'], 2)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_get_toughness_facet_options_with_terms(self):
 
         python_project = Project.create_dummy(language=u'Python')
@@ -845,6 +750,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         Bug.create_dummy(project=c_project, title=u'b')
         Bug.create_dummy(project=unknown_project, title=u'unknowable')
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
         # a search for 'a'. They are in two different languages, so let's make
