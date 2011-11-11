@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>django-authopenid Example App</title>
+        <!--[if IE]>
+
+        <script>
+            // allow IE to recognize HTMl5 elements
+            document.createElement('section');
+            document.createElement('article');
+            document.createElement('aside');
+            document.createElement('footer');
+            document.createElement('header');
+            document.createElement('nav');
+            document.createElement('time');
+
+        </script>
+        <![endif]-->
+        {% if request.is_secure %}
+        <meta http-equiv="X-XRDS-Location" content="https://{{ request.get_host }}{% url oid_xrdf %}" />
+        {% else %}
+        <meta http-equiv="X-XRDS-Location" content="http://{{ request.get_host }}{% url oid_xrdf %}" />  
+        {% endif %}
+
+        <link rel="stylesheet" href="{{ MEDIA_URL }}/css/base.css" />
+        <link rel="stylesheet" href="{{ MEDIA_URL }}/css/openid.css" />
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+        <header id="top">
+            <h1>django-authopenid Example App</h1>
+        </header>
+        
+        {% block content %}{% endblock %}
+        
+        <script type="text/javascript" src="{{ MEDIA_URL }}/js/jquery-1.3.2.min.js"></script>
+
+    	{% block extra_scripts %}{% endblock %}
+    	
+    	<footer id="bottom">
+        <p>This is an example of how to use <strong>django-authopenid</strong> with modified  
+        <a href="http://code.google.com/p/openid-selector/">Javascript OpenID-Selector</a> in a <a href="http://djangoproject.com">django</a> application. <a href="http://bitbucket.org/benoitc/django-authopenid/">More...</a>
+        </footer>
+    </body>
+</html>

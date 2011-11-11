@@ -1,0 +1,59 @@
+
+What is python-otp?
+-------------------
+
+python-otp is a module which implements support for all requirements,
+recommendations, and optional features described in RFC2289. This RFC
+defines a standard for the implementation of OTP - one-time passwords.
+
+
+Features
+--------
+
+- Support for all requirements, recommendations, and optional
+  features described in RFC2289 (besides those that make no sense for
+  a library);
+- Support for all recommended hashes (md5, sha1, md4[1]);
+- Pluggable support for easily adding new hashes and output formats;
+- Support for decoding of alternative dictionaries (Appendix B in RFC);
+- Support for easily plugging an alternative dictionary;
+- Support for key validation using the next key in the sequence, or
+  provided information (passwd/seed/sequence or passwd/challenge);
+- Alternative dictionary generator;
+- Automatic hash type detection;
+- Seed and challenge generator;
+- Challenge parsing;
+- Hash reformatting and hash comparing;
+- Comprehensive unittests.
+
+[1] Requires mhash or pycrypto python modules
+
+
+Project page
+------------
+
+http://moin.conectiva.com.br/PythonOtp
+
+
+Documentation
+-------------
+
+Comprehensive documentation is found in the project web page.
+
+
+Download
+--------
+
+In the web page as well.
+
+
+License
+-------
+
+python-otp is licensed under the GPL.
+
+
+Author
+------
+
+Gustavo Niemeyer <niemeyer@conectiva.com>

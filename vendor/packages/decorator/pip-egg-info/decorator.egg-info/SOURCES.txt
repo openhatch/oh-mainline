@@ -1,0 +1,11 @@
+MANIFEST.in
+README.txt
+documentation.py
+documentation3.py
+setup.cfg
+pip-egg-info/decorator.egg-info/PKG-INFO
+pip-egg-info/decorator.egg-info/SOURCES.txt
+pip-egg-info/decorator.egg-info/dependency_links.txt
+pip-egg-info/decorator.egg-info/not-zip-safe
+pip-egg-info/decorator.egg-info/top_level.txt
+src/decorator.py

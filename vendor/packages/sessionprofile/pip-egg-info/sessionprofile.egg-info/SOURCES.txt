@@ -1,0 +1,11 @@
+README.txt
+setup.cfg
+pip-egg-info/sessionprofile.egg-info/PKG-INFO
+pip-egg-info/sessionprofile.egg-info/SOURCES.txt
+pip-egg-info/sessionprofile.egg-info/dependency_links.txt
+pip-egg-info/sessionprofile.egg-info/top_level.txt
+sessionprofile/__init__.py
+sessionprofile/cleanup_inactive_sessions.py
+sessionprofile/middleware.py
+sessionprofile/models.py
+sessionprofile/tests.py

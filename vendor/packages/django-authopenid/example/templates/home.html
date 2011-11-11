@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<p>Welcome {{ user }}</p>
+
+
+{% if request.GET.msg %}
+	<p class="warning">{{ request.GET.msg }}</p>
+{% endif %}
+
+{% if user.is_authenticated%}
+
+{% if has_openids %}
+<h2>Associated openids</h2>
+<ul>
+	{% for oid_url in associated_openids %}
+		<li>{{ oid_url }} (<a href="{% url user_dissociate %}?openid_url={{ oid_url }}">dissociate</a>)</li>
+	{% endfor %}
+</ul>
+
+{% endif %}
+
+
+
+<h2>Actions:</h2>
+<ul>
+	<li><a href="{% url user_associate %}">Associate a new openid</a></li>
+	<li><a href="{% url auth_password_change %}">Change password</a></li>
+  	<li><a href="{% url user_signout %}">signout</a></li>
+</ul>
+{% else %}
+<h2>Make a choice:</h2>
+<p> <a href="{% url registration_register %}">Register</a> | <a href="{% url user_signin %}">Log-In</a></p>
+<div class="login">
+
+    <form id="auth_form" name="auth_form" action="{% url user_signin %}" method="post">
+    <input type="hidden" name="next" value="{{ next }}" />
+	<fieldset>
+	    
+	    
+		<legend>{% trans "Sign In Using Your Account ID" %}</legend>
+		<div class="form-row"><label for="id_username">{% trans "Username:" %}</label><br />{{ form2.username }}</div>
+		<div class="form-row"><label for="id_password">{% trans "Password" %}</label><br />{{ form2.password }}</div>
+		
+        <div class="submit-row"><input type="submit" name="blogin" value="{% trans "Sign in" %}"> </div>
+	</fieldset>	
+</form>
+
+<form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
+    <input type="hidden" name="action" value="verify" />
+    <input type="hidden" name="next" value="{{ next }}" />
+	<fieldset>
+		<legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
+		<div id="openid_choice">
+    		<p>Please click your account provider:</p>
+    		<div id="openid_btns"></div>
+    	</div>
+    	    <div id="openid_input_area">
+                <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
+                <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
+            </div>
+		
+	</fieldset>
+</form>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not has_openids %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/openid-jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    openid.init('id_openid_url');
+});
+</script>
+<!-- /Simple OpenID Selector -->
+{% endif %}
+{% endblock %}

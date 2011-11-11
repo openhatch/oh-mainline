@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Debugging Haystack &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Best Practices" href="best_practices.html" />
+    <link rel="prev" title="Haystack-Related Applications" href="other_apps.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="best_practices.html" title="Best Practices"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="other_apps.html" title="Haystack-Related Applications"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="debugging-haystack">
+<h1>Debugging Haystack<a class="headerlink" href="#debugging-haystack" title="Permalink to this headline">¶</a></h1>
+<p>There are some common problems people run into when using Haystack for the first
+time. Some of the common problems and things to try appear below.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As a general suggestion, your best friend when debugging an issue is to
+use the <tt class="docutils literal"><span class="pre">pdb</span></tt> library included with Python. By dropping a
+<tt class="docutils literal"><span class="pre">import</span> <span class="pre">pdb;</span> <span class="pre">pdb.set_trace()</span></tt> in your code before the issue occurs, you
+can step through and examine variable/logic as you progress through. Make
+sure you don&#8217;t commit those <tt class="docutils literal"><span class="pre">pdb</span></tt> lines though.</p>
+</div>
+<div class="section" id="no-module-named-haystack">
+<h2>&#8220;No module named haystack.&#8221;<a class="headerlink" href="#no-module-named-haystack" title="Permalink to this headline">¶</a></h2>
+<p>This problem usually occurs when first adding Haystack to your project.</p>
+<ul class="simple">
+<li>Are you using the <tt class="docutils literal"><span class="pre">haystack</span></tt> directory within your <tt class="docutils literal"><span class="pre">django-haystack</span></tt>
+checkout/install?</li>
+<li>Is the <tt class="docutils literal"><span class="pre">haystack</span></tt> directory on your <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt>? Alternatively, is
+<tt class="docutils literal"><span class="pre">haystack</span></tt> symlinked into your project?</li>
+<li>Start a Django shell (<tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">shell</span></tt>) and try <tt class="docutils literal"><span class="pre">import</span> <span class="pre">haystack</span></tt>.
+You may receive a different, more descriptive error message.</li>
+<li>Double-check to ensure you have no circular imports. (i.e. module A tries
+importing from module B which is trying to import from module A.)</li>
+</ul>
+</div>
+<div class="section" id="no-results-found-on-the-web-page">
+<h2>&#8220;No results found.&#8221; (On the web page)<a class="headerlink" href="#no-results-found-on-the-web-page" title="Permalink to this headline">¶</a></h2>
+<p>Several issues can cause no results to be found. Most commonly it is either
+not running a <tt class="docutils literal"><span class="pre">rebuild_index</span></tt> to populate your index or having a blank
+<tt class="docutils literal"><span class="pre">document=True</span></tt> field, resulting in no content for the engine to search on.</p>
+<ul>
+<li><p class="first">Do you have a <tt class="docutils literal"><span class="pre">search_sites.py</span></tt> that runs <tt class="docutils literal"><span class="pre">haystack.autodiscover</span></tt>?</p>
+</li>
+<li><p class="first">Have you registered your models with the main <tt class="docutils literal"><span class="pre">haystack.site</span></tt> (usually
+within your <tt class="docutils literal"><span class="pre">search_indexes.py</span></tt>)?</p>
+</li>
+<li><p class="first">Do you have data in your database?</p>
+</li>
+<li><p class="first">Have you run a <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">rebuild_index</span></tt> to index all of your content?</p>
+</li>
+<li><p class="first">Start a Django shell (<tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">shell</span></tt>) and try:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You should get back an integer &gt; 0. If not, check the above and reindex.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># Should get back a SearchResult object.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="c"># Should get something back like &#39;myapp.mymodel.1&#39;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="c"># ... or whatever your document=True field is.</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If you get back either <tt class="docutils literal"><span class="pre">u''</span></tt> or <tt class="xref docutils literal"><span class="pre">None</span></tt>, it means that your data isn&#8217;t
+making it into the main field that gets searched. You need to check that the
+field either has a template that uses the model data, a <tt class="docutils literal"><span class="pre">model_attr</span></tt> that
+pulls data directly from the model or a <tt class="docutils literal"><span class="pre">prepare/prepare_FOO</span></tt> method that
+populates the data at index time.</p>
+</li>
+<li><p class="first">Check the template for your search page and ensure it is looping over the
+results properly. Also ensure that it&#8217;s either accessing valid fields coming
+back from the search engine or that it&#8217;s trying to access the associated
+model via the <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">result.object.foo</span> <span class="pre">}}</span></tt> lookup.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="lockerror-errno-17-file-exists-path-to-whoosh-index-main-lock">
+<h2>&#8220;LockError: [Errno 17] File exists: &#8216;/path/to/whoosh_index/_MAIN_LOCK&#8217;&#8221;<a class="headerlink" href="#lockerror-errno-17-file-exists-path-to-whoosh-index-main-lock" title="Permalink to this headline">¶</a></h2>
+<p>This is a Whoosh-specific traceback. It occurs when the Whoosh engine in one
+process/thread is locks the index files for writing while another process/thread
+tries to access them. This is a common error when using <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt>
+with Whoosh under any kind of load, which is why it&#8217;s only recommended for
+small sites or development.</p>
+<p>A way to solve this is to subclass <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> instead:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.indexes</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># Change from:</span>
+<span class="c">#</span>
+<span class="c">#   class MySearchIndex(RealTimeSearchIndex):</span>
+<span class="c">#</span>
+<span class="c"># to:</span>
+<span class="k">class</span> <span class="nc">MySearchIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>The final step is to set up a cron job that runs
+<tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">rebuild_index</span></tt> (optionally with <tt class="docutils literal"><span class="pre">--age=24</span></tt>) that runs nightly
+(or however often you need) to refresh the search indexes.</p>
+<p>The downside to this is that you lose real-time search. For many people, this
+isn&#8217;t an issue and this will allow you to scale Whoosh up to a much higher
+traffic. If this is not acceptable, you should investigate either the Solr or
+Xapian backends.</p>
+</div>
+<div class="section" id="import-errors-on-start-up-mentioning-handle-registrations">
+<h2>&#8220;Import errors on start-up mentioning &#8216;handle_registrations&#8217;&#8221;<a class="headerlink" href="#import-errors-on-start-up-mentioning-handle-registrations" title="Permalink to this headline">¶</a></h2>
+<p>When initializing, Haystack attempts to import and register all of the
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes you&#8217;ve setup. As a by-product of this, especially in
+conjunction with third-party apps that attempt to do similar types of imports,
+it&#8217;s possible (though rare) to get a traceback very early in the start-up
+process, usually mentioning <tt class="docutils literal"><span class="pre">handle_registrations</span></tt>.</p>
+<p>There are typically three possible causes for this error:</p>
+<blockquote>
+<ul class="simple">
+<li>A syntax/import error in a file included by the <tt class="docutils literal"><span class="pre">search_indexes.py</span></tt> file</li>
+<li>A circular import</li>
+<li>Another app causing models to load early</li>
+</ul>
+</blockquote>
+<p>The first two causes can be debugged by dropping an
+<tt class="docutils literal"><span class="pre">import</span> <span class="pre">pdb;</span> <span class="pre">pdb.set_trace()</span></tt> at the top of the <tt class="docutils literal"><span class="pre">search_indexes.py</span></tt> where
+the error is occurring and stepping through to see the real error.</p>
+<p>If neither of those is the case, Haystack provides an advanced setting
+(<tt class="docutils literal"><span class="pre">HAYSTACK_ENABLE_REGISTRATIONS</span></tt> - <a class="reference internal" href="settings.html"><em>Haystack Settings</em></a>) to disable this importing
+behavior and allow your applications to function.</p>
+<p>As a note of caution, setting <tt class="docutils literal"><span class="pre">HAYSTACK_ENABLE_REGISTRATIONS</span> <span class="pre">=</span> <span class="pre">False</span></tt> in your
+settings causes Haystack to be left in an uninitialized state. This means that
+none of your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes will be registered and all attempts to use
+<tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> will yield no results. To continue using Haystack, you&#8217;ll
+need to manually import your <tt class="docutils literal"><span class="pre">search_indexes.py</span></tt> files, either in your
+<tt class="docutils literal"><span class="pre">models.py</span></tt> or <tt class="docutils literal"><span class="pre">views.py</span></tt> files (or something similar). Additionally, any
+use at the console/management commands may also require similar imports.</p>
+<p>Finally, should this occur to you, it would be appreciated if you could report
+the issue and the app(s) you&#8217;re using that are causing the issue in conjunction
+with Haystack on either the mailing list or on the GitHub issue tracker.</p>
+</div>
+<div class="section" id="failed-to-add-documents-to-solr-reason-none">
+<h2>&#8220;Failed to add documents to Solr: [Reason: None]&#8221;<a class="headerlink" href="#failed-to-add-documents-to-solr-reason-none" title="Permalink to this headline">¶</a></h2>
+<p>This is a Solr-specific traceback. It generally occurs when there is an error
+with your <tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_URL</span></tt>. Since Solr acts as a webservice, you should
+test the URL in your web browser. If you receive an error, you may need to
+change your URL.</p>
+<p>This can also be caused when using old versions of pysolr (2.0.9 and before),
+using httplib2 and including a trailing slash in your <tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_URL</span></tt>.
+Please upgrade your version of pysolr (2.0.13+).</p>
+</div>
+<div class="section" id="got-an-unexpected-keyword-argument-boost">
+<h2>&#8220;Got an unexpected keyword argument &#8216;boost&#8217;&#8221;<a class="headerlink" href="#got-an-unexpected-keyword-argument-boost" title="Permalink to this headline">¶</a></h2>
+<p>This is a Solr-specific traceback. This can also be caused when using old
+versions of pysolr (2.0.12 and before). Please upgrade your version of
+pysolr (2.0.13+).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Debugging Haystack</a><ul>
+<li><a class="reference internal" href="#no-module-named-haystack">&#8220;No module named haystack.&#8221;</a></li>
+<li><a class="reference internal" href="#no-results-found-on-the-web-page">&#8220;No results found.&#8221; (On the web page)</a></li>
+<li><a class="reference internal" href="#lockerror-errno-17-file-exists-path-to-whoosh-index-main-lock">&#8220;LockError: [Errno 17] File exists: &#8216;/path/to/whoosh_index/_MAIN_LOCK&#8217;&#8221;</a></li>
+<li><a class="reference internal" href="#import-errors-on-start-up-mentioning-handle-registrations">&#8220;Import errors on start-up mentioning &#8216;handle_registrations&#8217;&#8221;</a></li>
+<li><a class="reference internal" href="#failed-to-add-documents-to-solr-reason-none">&#8220;Failed to add documents to Solr: [Reason: None]&#8221;</a></li>
+<li><a class="reference internal" href="#got-an-unexpected-keyword-argument-boost">&#8220;Got an unexpected keyword argument &#8216;boost&#8217;&#8221;</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="other_apps.html"
+                        title="previous chapter">Haystack-Related Applications</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="best_practices.html"
+                        title="next chapter">Best Practices</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/debugging.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="best_practices.html" title="Best Practices"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="other_apps.html" title="Haystack-Related Applications"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

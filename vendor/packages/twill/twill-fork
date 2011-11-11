@@ -1,0 +1,145 @@
+#! /usr/bin/env python
+# This file is part of the twill source distribution.
+#
+# twill is a extensible scriptlet language for testing Web apps,
+# available at http://twill.idyll.org/.
+#
+# Contact author: C. Titus Brown, titus@idyll.org.
+#
+# This program and all associated source code files are Copyright (C)
+# 2005-2007 by C. Titus Brown.  It is released under the MIT license;
+# please see the included LICENSE.txt file for more information, or
+# go to http://www.opensource.org/licenses/mit-license.php.
+
+"""
+twill multiprocess execution system.
+"""
+
+import sys, os, time
+from twill import execute_file
+from optparse import OptionParser
+from cPickle import load, dump
+
+###
+# make sure that the current working directory is in the path.  does this
+# work on Windows??
+
+if not '.' in sys.path:
+    sys.path.append('.')
+###
+
+#### OPTIONS
+
+parser = OptionParser()
+
+parser.add_option('-u', '--url', nargs=1, action="store", dest="url",
+                  help="start at the given URL before each script")
+
+parser.add_option('-n', '--number', nargs=1, action="store", dest="number",
+                  default=1, type="int",
+                  help="number of times to run the given script(s)")
+
+parser.add_option('-p', '--processes', nargs=1, action="store",
+                  dest="processes", default=1, type="int",
+                  help="number of processes to execute in parallel")
+
+####
+
+# parse arguments.
+(options, args) = parser.parse_args()
+
+if not len(args):
+    sys.stderr.write('Error!  Must specify one or more scripts to execute...\n')
+    sys.exit(-1)
+
+average_number = int(options.number / options.processes)
+last_number = average_number + options.number % options.processes
+is_parent = True
+child_pids = []
+
+#
+# start a bunch of child processes & record their pids in the parent.
+#
+
+for i in range(0, options.processes):
+    pid = os.fork()
+    if pid == 0:
+        if i == 0:
+            repeat = last_number        # make sure we execute 'em *all*
+        else:
+            repeat = average_number
+            
+        is_parent = False
+        break
+    else:
+        child_pids.append(pid)          # keep track of children
+
+#
+# set the children up to run & record their stats
+#
+
+failed = False
+
+if not is_parent:
+    print '[twill-fork: pid %d : executing %d times]' % (os.getpid(), repeat)
+
+    start_time = time.time()
+
+    for i in range(0, repeat):
+        for filename in args:
+            execute_file(filename, initial_url=options.url)
+        
+    end_time = time.time()
+    this_time = end_time - start_time
+
+    # write statistics
+    fp = open('.status.%d' % (os.getpid(),), 'w')
+    info = (this_time, repeat)
+    dump(info, fp)
+    fp.close()
+
+else:                                   # is_parent
+    total_time = 0.
+    total_exec = 0
+
+    # iterate over all the child pids, wait 'til they finish, and then
+    # sum statistics.
+    
+    left_childs = child_pids[:]
+    for child_pid in left_childs:
+        child_pid, status = os.waitpid(child_pid, 0)
+
+        # status != 0 indicates failure:
+        
+        if status != 0:
+            print '[twill-fork parent: process %d FAILED: exit status %d]' % (child_pid, status,)
+            print '[twill-fork parent: (not counting stats for this process)]'
+            failed = True
+        else:
+            # record statistics, otherwise
+            
+            fp = open('.status.%d' % (child_pid,))
+            (this_time, n_executed) = load(fp)
+            fp.close()
+            os.unlink('.status.%d' % (child_pid,))
+
+            total_time += this_time
+            total_exec += n_executed
+
+    #
+    # summarize
+    #
+
+    print '\n---'
+    print 'n processes: %d' % (options.processes,)
+    print 'total executed: %d' % (total_exec,)
+    print 'total time to execute: %f' % (total_time,)
+    if total_exec:
+        print 'average time: %f' % (total_time / total_exec,)
+    else:
+        print '(nothing completed, no average!)'
+
+if failed:
+    sys.exit(-1)
+
+sys.exit(0)

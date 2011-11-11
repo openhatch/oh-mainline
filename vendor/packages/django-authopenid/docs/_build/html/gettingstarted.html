@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; django-authopenid v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="django-authopenid v1.0 documentation" href="index.html" />
+    <link rel="next" title="Views reference" href="views.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="views.html" title="Views reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">django-authopenid v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-started">
+<span id="gettingstarted"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial exposes key features of this library and how to setup the default settings.</p>
+<p>If you have not installed django-authopenid yet, the <a class="reference external" href="installation.html#installation"><em>installation docs</em></a>
+will get you started.</p>
+</div>
+<div class="section" id="basic-use">
+<h1>Basic use<a class="headerlink" href="#basic-use" title="Permalink to this headline">¶</a></h1>
+<p>To use django-authopenid with all the default settings, you will need to do the following:</p>
+<p>1. Add <cite>registration</cite> and <cite>django_authopenid</cite> to <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt> setting of
+your django project:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sites&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+    <span class="s">&#39;registration&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django_authopenid&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>2. Add <cite>django_authopenid.context_processors.authopenid</cite> to <tt class="docutils literal"><span class="pre">TEMPLATE_CONTEXT_PROCESSORS</span></tt>
+setting:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.core.context_processors.auth&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.core.context_processors.debug&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.core.context_processors.i18n&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.core.context_processors.media&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.core.context_processors.request&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django_authopenid.context_processors.authopenid&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li>Add <cite>django_authopenid.middleware.OpenIDMiddleware</cite> to <tt class="docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt> setting:</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MIDDLEWARE_CLASSES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.middleware.common.CommonMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sessions.middleware.SessionMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.middleware.AuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.doc.XViewMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django_authopenid.middleware.OpenIDMiddleware&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic" start="4">
+<li><p class="first">Set <cite>LOGIN_REDIRECT_URL</cite> settings for default redirection of user after user edit. For example <cite>/account/profile</cite> (witch is the default).</p>
+</li>
+<li><dl class="first docutils">
+<dt>Create the necessary templates (see the section on templates below</dt>
+<dd><p class="first last">for details).</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Add this line to your site&#8217;s root URLConf:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^account/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;django_authopenid.urls&#39;</span><span class="p">)),</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Link people to <tt class="docutils literal"><span class="pre">accounts/signin</span></tt> so they can start signing or create a new account.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="templates-used-by-django-authopenid">
+<h1>Templates used by django-authopenid<a class="headerlink" href="#templates-used-by-django-authopenid" title="Permalink to this headline">¶</a></h1>
+<p>The views included in django-authopenid make use of height templates:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">authopenid/associate.html</span></tt> display the form to associate new openids to a registered account.</li>
+<li><tt class="docutils literal"><span class="pre">authopenid/associate_email.txt</span></tt> is used for the body of the email sent when you associate an account to a new openid.</li>
+<li><tt class="docutils literal"><span class="pre">authopenid/associate_email_subject.txt</span></tt> is used for the subject of the email sent when you associate an account to a new openid.</li>
+<li><tt class="docutils literal"><span class="pre">authopenid/complete.html</span></tt> display the final register form for user that signed with their openid.</li>
+<li><tt class="docutils literal"><span class="pre">authopenid/dissociate.html</span></tt> display the form to confirm dissociation of an openid from an account.</li>
+<li><tt class="docutils literal"><span class="pre">authopenid/failure.html</span></tt> display basic failure page</li>
+<li><tt class="docutils literal"><span class="pre">authopenid/password_change_form.html</span></tt> display the form allowing a user to create a password for his account or change the password.</li>
+</ul>
+<p>You have also to create the <cite>registration</cite> templates :</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">registration/registration_form.html</span></tt> displays the registration
+form for users to sign up.</li>
+<li><tt class="docutils literal"><span class="pre">registration/registration_complete.html</span></tt> is displayed after the
+activation email has been sent, to tell the new user to check
+his/her email.</li>
+<li><tt class="docutils literal"><span class="pre">registration/activation_email_subject.txt</span></tt> is used for the
+subject of the activation email.</li>
+<li><tt class="docutils literal"><span class="pre">registration/activation_email.txt</span></tt> is used for the body of the
+activation email.</li>
+<li><tt class="docutils literal"><span class="pre">registration/activate.html</span></tt> is displayed when a user attempts to
+activate his/her account.</li>
+</ul>
+<p>Examples of all of these templates could be found in example folder from
+django-authopenid sources.</p>
+<p>Additionally, the URLConf provided with django-authopenid includes
+URL patterns for useful views in Django&#8217;s built-in authentication
+application and django-regisytraion &#8211; this means that a single <tt class="docutils literal"><span class="pre">include</span></tt>
+in your root URLConf can wire up registration and the auth application&#8217;s signin,
+signout, and password change/reset views.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="views.html#views-ref"><em>Views reference</em></a> and consult <a class="reference external" href="http://www.djangoproject.com/documentation/authentication/">the Django authentication documentation</a>  and <a class="reference external" href="http://bitbucket.org/ubernostrum/django-registration/">django-registration documentation</a> for details on the templates and contexts used by views of these modules.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Don&#8217;t forget to setup your mail server access if you want to send mail.</p>
+</div>
+</div>
+<div class="section" id="how-it-works">
+<h1>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h1>
+<p>Using the recommanded default configuration, the url <cite>/account/signin</cite> will map to the view <tt class="docutils literal"><span class="pre">django_authopenid.views.signin</span></tt> which display a signin form using instances of <tt class="docutils literal"><span class="pre">django.contrib.auth.forms.AuthenticationForm</span></tt> for legacy authentification (username/password) and <tt class="docutils literal"><span class="pre">django_authopenid.forms.OpenidSigninForm</span></tt> for openid authentidcation. This will ask for a legacy account that could be registred by going on <cite>/account/signup</cite> (which will use django-registration module for registration) or an openid. Signing with openid will redirect the user to its openid provider and after he processed authentification to <cite>/account/complete</cite></p>
+<p>If the user signin with its openid and is already registred he will be finally redirected to its home page (the one defined in <cite>settings.LOGIN_REDIRECT_URL</cite> by default). If not he will be redirected to <cite>account/register</cite> page.</p>
+<p>On <cite>account/register</cite> page the user could choose to create a new user or associate this openid to a &#8220;legacy&#8221; account (one registered with username/password). If he chooses to create a new user a new instance of <tt class="docutils literal"><span class="pre">django.contrib.models.auth.User</span></tt> is created with a non usable password which mean that at this step the user could only signin to your django project with its openid. He could later add a password if he wants.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://bitbucket.org/ubernostrum/django-registration/">django-registration documentation</a> for details of legacy account registration.</p>
+</div>
+</div>
+<div class="section" id="where-to-go-from-here">
+<h1>Where to go from here<a class="headerlink" href="#where-to-go-from-here" title="Permalink to this headline">¶</a></h1>
+<p>Full documentation for all included components is bundled in the
+packaged release; see the following files for details:</p>
+<ul class="simple">
+<li><a class="reference external" href="forms.html#forms-ref"><em>Forms reference</em></a></li>
+<li><a class="reference external" href="models.html#models-ref"><em>Models reference</em></a></li>
+<li><a class="reference external" href="views.html#views-ref"><em>Views reference</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Getting Started</a></li>
+<li><a class="reference external" href="#basic-use">Basic use</a></li>
+<li><a class="reference external" href="#templates-used-by-django-authopenid">Templates used by django-authopenid</a></li>
+<li><a class="reference external" href="#how-it-works">How it works</a></li>
+<li><a class="reference external" href="#where-to-go-from-here">Where to go from here</a></li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="installation.html"
+                                  title="previous chapter">Installation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="views.html"
+                                  title="next chapter">Views reference</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/gettingstarted.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="views.html" title="Views reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="index.html">django-authopenid v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Benoît Chesneau.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+Metadata-Version: 1.0
+Name: pygeoip
+Version: 0.2.2
+Summary: Pure Python GeoIP API
+Home-page: http://code.google.com/p/pygeoip/
+Author: Jennifer Ennis
+Author-email: zaylea@gmail.com
+License: LGPL
+Description: UNKNOWN
+Keywords: geoip
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3

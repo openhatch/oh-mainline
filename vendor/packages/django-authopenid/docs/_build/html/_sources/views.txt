@@ -1,0 +1,33 @@
+.. _views-ref:
+
+Views reference
+===============
+
+.. autofunction:: django_authopenid.views.signin_success
+
+.. autofunction:: django_authopenid.views.signin_failure
+
+.. autofunction:: django_authopenid.views.complete_signin
+
+.. autofunction:: django_authopenid.views.signin
+
+.. autofunction:: django_authopenid.views.register
+
+.. autofunction:: django_authopenid.views.signout
+
+.. autofunction:: django_authopenid.views.password_change
+
+.. autofunction:: django_authopenid.views.associate
+
+.. autofunction:: django_authopenid.views.associate_success
+
+.. autofunction:: django_authopenid.views.associate_failure
+
+.. autofunction:: django_authopenid.views.complete_associate
+
+.. autofunction:: django_authopenid.views.dissociate
+
+.. autofunction:: django_authopenid.views.xrdf
+	
+	
+.. seealso:: `django-registration views documentation <http://bitbucket.org/ubernostrum/django-registration/src/tip/docs/views.txt>`_ .

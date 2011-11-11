@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchField API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchResult API" href="searchresult_api.html" />
+    <link rel="prev" title="SearchIndex API" href="searchindex_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchresult_api.html" title="SearchResult API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchindex_api.html" title="SearchIndex API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchfield-api">
+<span id="ref-searchfield-api"></span><h1><tt class="docutils literal"><span class="pre">SearchField</span></tt> API<a class="headerlink" href="#searchfield-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchField">
+<em class="property">class </em><tt class="descname">SearchField</tt><a class="headerlink" href="#SearchField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchField</span></tt> and it&#8217;s subclasses provides a way to declare what data
+you&#8217;re interested in indexing. They are used with <tt class="docutils literal"><span class="pre">SearchIndexes</span></tt>, much like
+<tt class="docutils literal"><span class="pre">forms.*Field</span></tt> are used within forms or <tt class="docutils literal"><span class="pre">models.*Field</span></tt> within models.</p>
+<p>They provide both the means for storing data in the index, as well as preparing
+the data before it&#8217;s placed in the index. Haystack uses all fields from all
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes to determine what the engine&#8217;s index schema ought to
+look like.</p>
+<p>In practice, you&#8217;ll likely never actually use the base <tt class="docutils literal"><span class="pre">SearchField</span></tt>, as the
+subclasses are much better at handling real data.</p>
+<div class="section" id="subclasses">
+<h2>Subclasses<a class="headerlink" href="#subclasses" title="Permalink to this headline">¶</a></h2>
+<p>Included with Haystack are the following field types:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">BooleanField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">CharField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">DateField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">DateTimeField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">DecimalField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">EdgeNgramField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FloatField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">IntegerField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">MultiValueField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">NgramField</span></tt></li>
+</ul>
+<p>And equivalent faceted versions:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">FacetBooleanField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetCharField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetDateField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetDateTimeField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetDecimalField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetFloatField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetIntegerField</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FacetMultiValueField</span></tt></li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is no faceted variant of the n-gram fields. Because of how the engine
+generates n-grams, faceting on these field types (<tt class="docutils literal"><span class="pre">NgramField</span></tt> &amp;
+<tt class="docutils literal"><span class="pre">EdgeNgram</span></tt>) would make very little sense.</p>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>While <tt class="docutils literal"><span class="pre">SearchField</span></tt> objects can be used on their own, they&#8217;re generally used
+within a <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>. You use them in a declarative manner, just like
+fields in <tt class="docutils literal"><span class="pre">django.forms.Form</span></tt> or <tt class="docutils literal"><span class="pre">django.db.models.Model</span></tt> objects. For
+example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.indexes</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will hook up those fields with the index and, when updating a <tt class="docutils literal"><span class="pre">Model</span></tt>
+object, pull the relevant data out and prepare it for storage in the index.</p>
+</div>
+<div class="section" id="field-options">
+<h2>Field Options<a class="headerlink" href="#field-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="default">
+<h3><tt class="docutils literal"><span class="pre">default</span></tt><a class="headerlink" href="#default" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.default">
+<tt class="descclassname">SearchField.</tt><tt class="descname">default</tt><a class="headerlink" href="#SearchField.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides a means for specifying a fallback value in the event that no data is
+found for the field. Can be either a value or a callable.</p>
+</div>
+<div class="section" id="document">
+<h3><tt class="docutils literal"><span class="pre">document</span></tt><a class="headerlink" href="#document" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.document">
+<tt class="descclassname">SearchField.</tt><tt class="descname">document</tt><a class="headerlink" href="#SearchField.document" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A boolean flag that indicates which of the fields in the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> ought
+to be the primary field for searching within. Default is <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only one field can be marked as the <tt class="docutils literal"><span class="pre">document=True</span></tt> field, so you should
+standardize this name and the format of the field between all of your
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes.</p>
+</div>
+</div>
+<div class="section" id="indexed">
+<h3><tt class="docutils literal"><span class="pre">indexed</span></tt><a class="headerlink" href="#indexed" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.indexed">
+<tt class="descclassname">SearchField.</tt><tt class="descname">indexed</tt><a class="headerlink" href="#SearchField.indexed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A boolean flag for indicating whether or not the the data from this field will
+be searchable within the index. Default is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p>The companion of this option is <tt class="docutils literal"><span class="pre">stored</span></tt>.</p>
+</div>
+<div class="section" id="index-fieldname">
+<h3><tt class="docutils literal"><span class="pre">index_fieldname</span></tt><a class="headerlink" href="#index-fieldname" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.index_fieldname">
+<tt class="descclassname">SearchField.</tt><tt class="descname">index_fieldname</tt><a class="headerlink" href="#SearchField.index_fieldname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">index_fieldname</span></tt> option allows you to force the name of the field in the
+index. This does not change how Haystack refers to the field. This is useful
+when using Solr&#8217;s dynamic attributes or when integrating with other external
+software.</p>
+<p>Default is variable name of the field within the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>.</p>
+</div>
+<div class="section" id="model-attr">
+<h3><tt class="docutils literal"><span class="pre">model_attr</span></tt><a class="headerlink" href="#model-attr" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.model_attr">
+<tt class="descclassname">SearchField.</tt><tt class="descname">model_attr</tt><a class="headerlink" href="#SearchField.model_attr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">model_attr</span></tt> option is a shortcut for preparing data. Rather than having
+to manually fetch data out of a <tt class="docutils literal"><span class="pre">Model</span></tt>, <tt class="docutils literal"><span class="pre">model_attr</span></tt> allows you to specify
+a string that will automatically pull data out for you. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Automatically looks within the model and populates the field with</span>
+<span class="c"># the ``last_name`` attribute.</span>
+<span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;last_name&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It also handles callables:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># On a ``User`` object, pulls the full name as pieced together by the</span>
+<span class="c"># ``get_full_name`` method.</span>
+<span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;get_full_name&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And can look through relations:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Pulls the ``bio`` field from a ``UserProfile`` object that has a</span>
+<span class="c"># ``OneToOneField`` relationship to a ``User`` object.</span>
+<span class="n">biography</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user__profile__bio&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="null">
+<h3><tt class="docutils literal"><span class="pre">null</span></tt><a class="headerlink" href="#null" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.null">
+<tt class="descclassname">SearchField.</tt><tt class="descname">null</tt><a class="headerlink" href="#SearchField.null" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A boolean flag for indicating whether or not it&#8217;s permissible for the field
+not to contain any data. Default is <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unlike Django&#8217;s database layer, which injects a <tt class="docutils literal"><span class="pre">NULL</span></tt> into the database
+when a field is marked nullable, <tt class="docutils literal"><span class="pre">null=True</span></tt> will actually exclude that
+field from being included with the document. This more efficient for the
+search engine to deal with.</p>
+</div>
+</div>
+<div class="section" id="stored">
+<h3><tt class="docutils literal"><span class="pre">stored</span></tt><a class="headerlink" href="#stored" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.stored">
+<tt class="descclassname">SearchField.</tt><tt class="descname">stored</tt><a class="headerlink" href="#SearchField.stored" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A boolean flag for indicating whether or not the data from this field will
+be stored within the index. Default is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p>This is useful for pulling data out of the index along with the search result
+in order to save on hits to the database.</p>
+<p>The companion of this option is <tt class="docutils literal"><span class="pre">indexed</span></tt>.</p>
+</div>
+<div class="section" id="template-name">
+<h3><tt class="docutils literal"><span class="pre">template_name</span></tt><a class="headerlink" href="#template-name" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.template_name">
+<tt class="descclassname">SearchField.</tt><tt class="descname">template_name</tt><a class="headerlink" href="#SearchField.template_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Allows you to override the name of the template to use when preparing data. By
+default, the data templates for fields are located within your <tt class="docutils literal"><span class="pre">TEMPLATE_DIRS</span></tt>
+under a path like <tt class="docutils literal"><span class="pre">search/indexes/{app_label}/{model_name}_{field_name}.txt</span></tt>.
+This option lets you override that path (though still within <tt class="docutils literal"><span class="pre">TEMPLATE_DIRS</span></tt>).</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bio</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&#39;myapp/data/bio.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also provide a list of templates, as <tt class="docutils literal"><span class="pre">loader.select_template</span></tt> is used
+under the hood.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bio</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;myapp/data/bio.txt&#39;</span><span class="p">,</span> <span class="s">&#39;myapp/bio.txt&#39;</span><span class="p">,</span> <span class="s">&#39;bio.txt&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="use-template">
+<h3><tt class="docutils literal"><span class="pre">use_template</span></tt><a class="headerlink" href="#use-template" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="SearchField.use_template">
+<tt class="descclassname">SearchField.</tt><tt class="descname">use_template</tt><a class="headerlink" href="#SearchField.use_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A boolean flag for indicating whether or not a field should prepare its data
+via a data template or not. Default is False.</p>
+<p>Data templates are extremely useful, as they let you easily tie together
+different parts of the <tt class="docutils literal"><span class="pre">Model</span></tt> (and potentially related models). This leads
+to better search results with very little effort.</p>
+</div>
+</div>
+<div class="section" id="method-reference">
+<h2>Method Reference<a class="headerlink" href="#method-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="init">
+<h3><tt class="docutils literal"><span class="pre">__init__</span></tt><a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchField.__init__">
+<tt class="descclassname">SearchField.</tt><tt class="descname">__init__</tt><big>(</big><em>self</em>, <em>model_attr=None</em>, <em>use_template=False</em>, <em>template_name=None</em>, <em>document=False</em>, <em>indexed=True</em>, <em>stored=True</em>, <em>faceted=False</em>, <em>default=NOT_PROVIDED</em>, <em>null=False</em>, <em>index_fieldname=None</em>, <em>facet_class=None</em>, <em>boost=1.0</em>, <em>weight=None</em><big>)</big><a class="headerlink" href="#SearchField.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Instantiates a fresh <tt class="docutils literal"><span class="pre">SearchField</span></tt> instance.</p>
+</div>
+<div class="section" id="has-default">
+<h3><tt class="docutils literal"><span class="pre">has_default</span></tt><a class="headerlink" href="#has-default" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchField.has_default">
+<tt class="descclassname">SearchField.</tt><tt class="descname">has_default</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchField.has_default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns a boolean of whether this field has a default value.</p>
+</div>
+<div class="section" id="prepare">
+<h3><tt class="docutils literal"><span class="pre">prepare</span></tt><a class="headerlink" href="#prepare" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchField.prepare">
+<tt class="descclassname">SearchField.</tt><tt class="descname">prepare</tt><big>(</big><em>self</em>, <em>obj</em><big>)</big><a class="headerlink" href="#SearchField.prepare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Takes data from the provided object and prepares it for storage in the
+index.</p>
+</div>
+<div class="section" id="prepare-template">
+<h3><tt class="docutils literal"><span class="pre">prepare_template</span></tt><a class="headerlink" href="#prepare-template" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchField.prepare_template">
+<tt class="descclassname">SearchField.</tt><tt class="descname">prepare_template</tt><big>(</big><em>self</em>, <em>obj</em><big>)</big><a class="headerlink" href="#SearchField.prepare_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Flattens an object for indexing.</p>
+<p>This loads a template
+(<tt class="docutils literal"><span class="pre">search/indexes/{app_label}/{model_name}_{field_name}.txt</span></tt>) and
+returns the result of rendering that template. <tt class="docutils literal"><span class="pre">object</span></tt> will be in
+its context.</p>
+</div>
+<div class="section" id="convert">
+<h3><tt class="docutils literal"><span class="pre">convert</span></tt><a class="headerlink" href="#convert" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchField.convert">
+<tt class="descclassname">SearchField.</tt><tt class="descname">convert</tt><big>(</big><em>self</em>, <em>value</em><big>)</big><a class="headerlink" href="#SearchField.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Handles conversion between the data found and the type of the field.</p>
+<p>Extending classes should override this method and provide correct
+data coercion.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchField</span></tt> API</a><ul>
+<li><a class="reference internal" href="#subclasses">Subclasses</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#field-options">Field Options</a><ul>
+<li><a class="reference internal" href="#default"><tt class="docutils literal"><span class="pre">default</span></tt></a></li>
+<li><a class="reference internal" href="#document"><tt class="docutils literal"><span class="pre">document</span></tt></a></li>
+<li><a class="reference internal" href="#indexed"><tt class="docutils literal"><span class="pre">indexed</span></tt></a></li>
+<li><a class="reference internal" href="#index-fieldname"><tt class="docutils literal"><span class="pre">index_fieldname</span></tt></a></li>
+<li><a class="reference internal" href="#model-attr"><tt class="docutils literal"><span class="pre">model_attr</span></tt></a></li>
+<li><a class="reference internal" href="#null"><tt class="docutils literal"><span class="pre">null</span></tt></a></li>
+<li><a class="reference internal" href="#stored"><tt class="docutils literal"><span class="pre">stored</span></tt></a></li>
+<li><a class="reference internal" href="#template-name"><tt class="docutils literal"><span class="pre">template_name</span></tt></a></li>
+<li><a class="reference internal" href="#use-template"><tt class="docutils literal"><span class="pre">use_template</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-reference">Method Reference</a><ul>
+<li><a class="reference internal" href="#init"><tt class="docutils literal"><span class="pre">__init__</span></tt></a></li>
+<li><a class="reference internal" href="#has-default"><tt class="docutils literal"><span class="pre">has_default</span></tt></a></li>
+<li><a class="reference internal" href="#prepare"><tt class="docutils literal"><span class="pre">prepare</span></tt></a></li>
+<li><a class="reference internal" href="#prepare-template"><tt class="docutils literal"><span class="pre">prepare_template</span></tt></a></li>
+<li><a class="reference internal" href="#convert"><tt class="docutils literal"><span class="pre">convert</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchindex_api.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">SearchIndex</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchresult_api.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">SearchResult</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchfield_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchresult_api.html" title="SearchResult API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchindex_api.html" title="SearchIndex API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

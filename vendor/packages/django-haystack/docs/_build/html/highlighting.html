@@ -1,0 +1,184 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlighting &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Faceting" href="faceting.html" />
+    <link rel="prev" title="Best Practices" href="best_practices.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="faceting.html" title="Faceting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="best_practices.html" title="Best Practices"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="highlighting">
+<span id="ref-highlighting"></span><h1>Highlighting<a class="headerlink" href="#highlighting" title="Permalink to this headline">¶</a></h1>
+<p>Haystack supports two different methods of highlighting. You can either use
+<tt class="docutils literal"><span class="pre">SearchQuerySet.highlight</span></tt> or the built-in <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">highlight</span> <span class="pre">%}</span></tt> template tag,
+which uses the <tt class="docutils literal"><span class="pre">Highlighter</span></tt> class. Each approach has advantages and
+disadvantages you need to weigh when deciding which to use.</p>
+<p>If you want portable, flexible, decently fast code, the
+<tt class="docutils literal"><span class="pre">{%</span> <span class="pre">highlight</span> <span class="pre">%}</span></tt> template tag (or manually using the underlying
+<tt class="docutils literal"><span class="pre">Highlighter</span></tt> class) is the way to go. On the other hand, if you care more
+about speed and will only ever be using one backend,
+<tt class="docutils literal"><span class="pre">SearchQuerySet.highlight</span></tt> may suit your needs better.</p>
+<p>Use of <tt class="docutils literal"><span class="pre">SearchQuerySet.highlight</span></tt> is documented in the
+<a class="reference internal" href="searchqueryset_api.html"><em>SearchQuerySet API</em></a> documentation and the <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">highlight</span> <span class="pre">%}</span></tt> tag is
+covered in the <a class="reference internal" href="templatetags.html"><em>Template Tags</em></a> documentation, so the rest of this material
+will cover the <tt class="docutils literal"><span class="pre">Highlighter</span></tt> implementation.</p>
+<div class="section" id="highlighter">
+<h2><tt class="docutils literal"><span class="pre">Highlighter</span></tt><a class="headerlink" href="#highlighter" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Highlighter</span></tt> class is a pure-Python implementation included with Haystack
+that&#8217;s designed for flexibility. If you use the <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">highlight</span> <span class="pre">%}</span></tt> template
+tag, you&#8217;ll be automatically using this class. You can also use it manually in
+your code. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">haystack.utils</span> <span class="kn">import</span> <span class="n">Highlighter</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_text</span> <span class="o">=</span> <span class="s">&#39;This is a sample block that would be more meaningful in real life.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_query</span> <span class="o">=</span> <span class="s">&#39;block meaningful&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">highlight</span> <span class="o">=</span> <span class="n">Highlighter</span><span class="p">(</span><span class="n">my_query</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">highlight</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">my_text</span><span class="p">)</span>
+<span class="go">u&#39;...&lt;span class=&quot;highlighted&quot;&gt;block&lt;/span&gt; that would be more &lt;span class=&quot;highlighted&quot;&gt;meaningful&lt;/span&gt; in real life.&#39;</span>
+</pre></div>
+</div>
+<p>The default implementation takes three optional kwargs: <tt class="docutils literal"><span class="pre">html_tag</span></tt>,
+<tt class="docutils literal"><span class="pre">css_class</span></tt> and <tt class="docutils literal"><span class="pre">max_length</span></tt>. These allow for basic customizations to the
+output, like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">haystack.utils</span> <span class="kn">import</span> <span class="n">Highlighter</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_text</span> <span class="o">=</span> <span class="s">&#39;This is a sample block that would be more meaningful in real life.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_query</span> <span class="o">=</span> <span class="s">&#39;block meaningful&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">highlight</span> <span class="o">=</span> <span class="n">Highlighter</span><span class="p">(</span><span class="n">my_query</span><span class="p">,</span> <span class="n">html_tag</span><span class="o">=</span><span class="s">&#39;div&#39;</span><span class="p">,</span> <span class="n">css_class</span><span class="o">=</span><span class="s">&#39;found&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">highlight</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">my_text</span><span class="p">)</span>
+<span class="go">u&#39;...&lt;div class=&quot;found&quot;&gt;block&lt;/div&gt; that would be more &lt;div class=&quot;found&quot;&gt;meaningful&lt;/div&gt;...&#39;</span>
+</pre></div>
+</div>
+<p>Further, if this implementation doesn&#8217;t suit your needs, you can define your own
+custom highlighter class. As long as it implements the API you&#8217;ve just seen, it
+can highlight however you choose. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># In ``myapp/utils.py``...</span>
+<span class="kn">from</span> <span class="nn">haystack.utils</span> <span class="kn">import</span> <span class="n">Highlighter</span>
+
+<span class="k">class</span> <span class="nc">BorkHighlighter</span><span class="p">(</span><span class="n">Highlighter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">render_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highlight_locations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">highlighted_chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="p">[</span><span class="n">start_offset</span><span class="p">:</span><span class="n">end_offset</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_words</span><span class="p">:</span>
+            <span class="n">highlighted_chunk</span> <span class="o">=</span> <span class="n">highlighted_chunk</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="s">&#39;Bork!&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">highlighted_chunk</span>
+</pre></div>
+</div>
+<p>Then set the <tt class="docutils literal"><span class="pre">HAYSTACK_CUSTOM_HIGHLIGHTER</span></tt> setting to
+<tt class="docutils literal"><span class="pre">myapp.utils.BorkHighlighter</span></tt>. Usage would then look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">highlight</span> <span class="o">=</span> <span class="n">BorkHighlighter</span><span class="p">(</span><span class="n">my_query</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">highlight</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">my_text</span><span class="p">)</span>
+<span class="go">u&#39;Bork! that would be more Bork! in real life.&#39;</span>
+</pre></div>
+</div>
+<p>Now the <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">highlight</span> <span class="pre">%}</span></tt> template tag will also use this highlighter.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlighting</a><ul>
+<li><a class="reference internal" href="#highlighter"><tt class="docutils literal"><span class="pre">Highlighter</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="best_practices.html"
+                        title="previous chapter">Best Practices</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="faceting.html"
+                        title="next chapter">Faceting</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/highlighting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="faceting.html" title="Faceting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="best_practices.html" title="Best Practices"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

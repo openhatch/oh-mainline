@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Best Practices &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Highlighting" href="highlighting.html" />
+    <link rel="prev" title="Debugging Haystack" href="debugging.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="highlighting.html" title="Highlighting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="debugging.html" title="Debugging Haystack"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="best-practices">
+<span id="ref-best-practices"></span><h1>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h1>
+<p>What follows are some general recommendations on how to improve your search.
+Some tips represent performance benefits, some provide a better search index.
+You should evaluate these options for yourself and pick the ones that will
+work best for you. Not all situations are created equal and many of these
+options could be considered mandatory in some cases and unnecessary premature
+optimizations in others. Your mileage may vary.</p>
+<div class="section" id="good-search-needs-good-content">
+<h2>Good Search Needs Good Content<a class="headerlink" href="#good-search-needs-good-content" title="Permalink to this headline">¶</a></h2>
+<p>Most search engines work best when they&#8217;re given corpuses with predominantly
+text (as opposed to other data like dates, numbers, etc.) in decent quantities
+(more than a couple words). This is in stark contrast to the databases most
+people are used to, which rely heavily on non-text data to create relationships
+and for ease of querying.</p>
+<p>To this end, if search is important to you, you should take the time to
+carefully craft your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> subclasses to give the search engine the
+best information you can. This isn&#8217;t necessarily hard but is worth the
+investment of time and thought. Assuming you&#8217;ve only ever used the
+<tt class="docutils literal"><span class="pre">BasicSearchIndex</span></tt>, in creating custom <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes, there are
+some easy improvements to make that will make your search better:</p>
+<ul class="simple">
+<li>For your <tt class="docutils literal"><span class="pre">document=True</span></tt> field, use a well-constructed template.</li>
+<li>Add fields for data you might want to be able to filter by.</li>
+<li>If the model has related data, you can squash good content from those
+related models into the parent model&#8217;s <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>.</li>
+<li>Similarly, if you have heavily de-normalized models, it may be best
+represented by a single indexed model rather than many indexed models.</li>
+</ul>
+<div class="section" id="well-constructed-templates">
+<h3>Well-Constructed Templates<a class="headerlink" href="#well-constructed-templates" title="Permalink to this headline">¶</a></h3>
+<p>A relatively unique concept in Haystack is the use of templates associated with
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt> fields. These are data templates, will never been seen by users
+and ideally contain no HTML. They are used to collect various data from the
+model and structure it as a document for the search engine to analyze and index.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you read nothing else, this is the single most important thing you can
+do to make search on your site better for your users. Good templates can
+make or break your search and providing the search engine with good content
+to index is critical.</p>
+</div>
+<p>Good templates structure the data well and incorporate as much pertinent text
+as possible. This may include additional fields such as titles, author
+information, metadata, tags/categories. Without being artificial, you want to
+construct as much context as you can. This doesn&#8217;t mean you should necessarily
+include every field, but you should include fields that provide good content
+or include terms you think your users may frequently search on.</p>
+<p>Unless you have very unique numbers or dates, neither of these types of data
+are a good fit within templates. They are usually better suited to other
+fields for filtering within a <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+</div>
+<div class="section" id="additional-fields-for-filtering">
+<h3>Additional Fields For Filtering<a class="headerlink" href="#additional-fields-for-filtering" title="Permalink to this headline">¶</a></h3>
+<p>Documents by themselves are good for generating indexes of content but are
+generally poor for filtering content, for instance, by date. All search engines
+supported by Haystack provide a means to associate extra data as
+attributes/fields on a record. The database analogy would be adding extra
+columns to the table for filtering.</p>
+<p>Good candidates here are date fields, number fields, de-normalized data from
+related objects, etc. You can expose these things to users in the form of a
+calendar range to specify, an author to look up or only data from a certain
+series of numbers to return.</p>
+<p>You will need to plan ahead and anticipate what you might need to filter on,
+though with each field you add, you increase storage space usage. It&#8217;s generally
+<strong>NOT</strong> recommended to include every field from a model, just ones you are
+likely to use.</p>
+</div>
+<div class="section" id="related-data">
+<h3>Related Data<a class="headerlink" href="#related-data" title="Permalink to this headline">¶</a></h3>
+<p>Related data is somewhat problematic to deal with, as most search engines are
+better with documents than they are with relationships. One way to approach this
+is to de-normalize a related child object or objects into the parent&#8217;s document
+template. The inclusion of a foreign key&#8217;s relevant data or a simple Django
+<tt class="docutils literal"><span class="pre">{%</span> <span class="pre">for</span> <span class="pre">%}</span></tt> templatetag to iterate over the related objects can increase the
+salient data in your document. Be careful what you include and how you structure
+it, as this can have consequences on how well a result might rank in your
+search.</p>
+</div>
+</div>
+<div class="section" id="avoid-hitting-the-database">
+<h2>Avoid Hitting The Database<a class="headerlink" href="#avoid-hitting-the-database" title="Permalink to this headline">¶</a></h2>
+<p>A very easy but effective thing you can do to drastically reduce hits on the
+database is to pre-render your search results using stored fields then disabling
+the <tt class="docutils literal"><span class="pre">load_all</span></tt> aspect of your <tt class="docutils literal"><span class="pre">SearchView</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This technique may cause a substantial increase in the size of your index
+as you are basically using it as a storage mechanism.</p>
+</div>
+<p>To do this, you setup one or more stored fields (<cite>indexed=False</cite>) on your
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes. You should specify a template for the field, filling it
+with the data you&#8217;d want to display on your search results pages. When the model
+attached to the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> is placed in the index, this template will get
+rendered and stored in the index alongside the record.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The downside of this method is that the HTML for the result will be locked
+in once it is indexed. To make changes to the structure, you&#8217;d have to
+reindex all of your content. It also limits you to a single display of the
+content (though you could use multiple fields if that suits your needs).</p>
+</div>
+<p>The second aspect is customizing your <tt class="docutils literal"><span class="pre">SearchView</span></tt> and its templates. First,
+pass the <tt class="docutils literal"><span class="pre">load_all=False</span></tt> to your <tt class="docutils literal"><span class="pre">SearchView</span></tt>, ideally in your URLconf.
+This prevents the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> from loading all models objects for results
+ahead of time. Then, in your template, simply display the stored content from
+your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> as the HTML result.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">To do this, you must absolutely avoid using <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">result.object</span> <span class="pre">}}</span></tt> or any
+further accesses beyond that. That call will hit the database, not only
+nullifying your work on lessening database hits, but actually making it
+worse as there will now be at least query for each result, up from a single
+query for each type of model with <tt class="docutils literal"><span class="pre">load_all=True</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="content-type-specific-templates">
+<h2>Content-Type Specific Templates<a class="headerlink" href="#content-type-specific-templates" title="Permalink to this headline">¶</a></h2>
+<p>Frequently, when displaying results, you&#8217;ll want to customize the HTML output
+based on what model the result represents.</p>
+<p>In practice, the best way to handle this is through the use of <tt class="docutils literal"><span class="pre">include</span></tt>
+along with the data on the <tt class="docutils literal"><span class="pre">SearchResult</span></tt>.</p>
+<p>Your existing loop might look something like:</p>
+<div class="highlight-python"><pre>{% for result in page.object_list %}
+    &lt;p&gt;
+        &lt;a href="{{ result.object.get_absolute_url }}"&gt;{{ result.object.title }}&lt;/a&gt;
+    &lt;/p&gt;
+{% empty %}
+    &lt;p&gt;No results found.&lt;/p&gt;
+{% endfor %}</pre>
+</div>
+<p>An improved version might look like:</p>
+<div class="highlight-python"><pre>{% for result in page.object_list %}
+    {% if result.content_type == "blog.post" %}
+    {% include "search/includes/blog/post.html" %}
+    {% endif %}
+    {% if result.content_type == "media.photo" %}
+    {% include "search/includes/media/photo.html" %}
+    {% endif %}
+{% empty %}
+    &lt;p&gt;No results found.&lt;/p&gt;
+{% endfor %}</pre>
+</div>
+<p>Those include files might look like:</p>
+<div class="highlight-python"><pre># search/includes/blog/post.html
+&lt;div class="post_result"&gt;
+    &lt;h3&gt;&lt;a href="{{ result.object.get_absolute_url }}"&gt;{{ result.object.title }}&lt;/a&gt;&lt;/h3&gt;
+
+    &lt;p&gt;{{ result.object.tease }}&lt;/p&gt;
+&lt;/div&gt;
+
+# search/includes/media/photo.html
+&lt;div class="photo_result"&gt;
+    &lt;a href="{{ result.object.get_absolute_url }}"&gt;
+    &lt;img src="http://your.media.example.com/media/{{ result.object.photo.url }}"&gt;&lt;/a&gt;
+    &lt;p&gt;Taken By {{ result.object.taken_by }}&lt;/p&gt;
+&lt;/div&gt;</pre>
+</div>
+<p>You can make this even better by standardizing on an includes layout, then
+writing a template tag or filter that generates the include filename. Usage
+might looks something like:</p>
+<div class="highlight-python"><pre>{% for result in page.object_list %}
+    {% with result|search_include as fragment %}
+    {% include fragment %}
+    {% endwith %}
+{% empty %}
+    &lt;p&gt;No results found.&lt;/p&gt;
+{% endfor %}</pre>
+</div>
+</div>
+<div class="section" id="real-time-search">
+<h2>Real-Time Search<a class="headerlink" href="#real-time-search" title="Permalink to this headline">¶</a></h2>
+<p>If your site sees heavy search traffic and up-to-date information is very important,
+Haystack provides a way to constantly keep your index up to date. By using the
+<tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt> class instead of the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> class, Haystack will
+automatically update the index whenever a model is saved/deleted.</p>
+<p>You can find more information within the <a class="reference internal" href="searchindex_api.html"><em>SearchIndex API</em></a> documentation.</p>
+</div>
+<div class="section" id="use-of-a-queue-for-a-better-user-experience">
+<h2>Use Of A Queue For A Better User Experience<a class="headerlink" href="#use-of-a-queue-for-a-better-user-experience" title="Permalink to this headline">¶</a></h2>
+<p>By default, you have to manually reindex content, Haystack immediately tries to merge
+it into the search index. If you have a write-heavy site, this could mean your
+search engine may spend most of its time churning on constant merges. If you can
+afford a small delay between when a model is saved and when it appears in the
+search results, queuing these merges is a good idea.</p>
+<p>You gain a snappier interface for users as updates go into a queue (a fast
+operation) and then typical processing continues. You also get a lower churn
+rate, as most search engines deal with batches of updates better than many
+single updates. You can also use this to distribute load, as the queue consumer
+could live on a completely separate server from your webservers, allowing you
+to tune more efficiently.</p>
+<p>Implementing this is relatively simple. There are two parts, creating a new
+<tt class="docutils literal"><span class="pre">QueuedSearchIndex</span></tt> class and creating a queue processing script to handle the
+actual updates.</p>
+<p>For the <tt class="docutils literal"><span class="pre">QueuedSearchIndex</span></tt>, simply inherit from the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> provided
+by Haystack and override the <tt class="docutils literal"><span class="pre">_setup_save</span></tt>/<tt class="docutils literal"><span class="pre">_setup_delete</span></tt> methods. These
+methods usually attach themselves to their model&#8217;s <tt class="docutils literal"><span class="pre">post_save</span></tt>/<tt class="docutils literal"><span class="pre">post_delete</span></tt>
+signals and call the backend to update or remove a record. You should override
+this behavior and place a message in your queue of choice. At a minimum, you&#8217;ll
+want to include the model you&#8217;re indexing and the id of the model within that
+message, so that you can retrieve the proper index from the <tt class="docutils literal"><span class="pre">SearchSite</span></tt> in
+your consumer. Then alter all of your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes to inherit from
+this new class. Now all saves/deletes will be handled by the queue and you
+should receive a speed boost.</p>
+<p>For the consumer, this is much more specific to the queue used and your desired
+setup. At a minimum, you will need to periodically consume the queue, fetch the
+correct index from the <tt class="docutils literal"><span class="pre">SearchSite</span></tt> for your application, load the model from
+the message and pass that model to the <tt class="docutils literal"><span class="pre">update_object</span></tt> or <tt class="docutils literal"><span class="pre">remove_object</span></tt>
+methods on the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>. Proper grouping, batching and intelligent
+handling are all additional things that could be applied on top to further
+improve performance.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Best Practices</a><ul>
+<li><a class="reference internal" href="#good-search-needs-good-content">Good Search Needs Good Content</a><ul>
+<li><a class="reference internal" href="#well-constructed-templates">Well-Constructed Templates</a></li>
+<li><a class="reference internal" href="#additional-fields-for-filtering">Additional Fields For Filtering</a></li>
+<li><a class="reference internal" href="#related-data">Related Data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#avoid-hitting-the-database">Avoid Hitting The Database</a></li>
+<li><a class="reference internal" href="#content-type-specific-templates">Content-Type Specific Templates</a></li>
+<li><a class="reference internal" href="#real-time-search">Real-Time Search</a></li>
+<li><a class="reference internal" href="#use-of-a-queue-for-a-better-user-experience">Use Of A Queue For A Better User Experience</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="debugging.html"
+                        title="previous chapter">Debugging Haystack</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="highlighting.html"
+                        title="next chapter">Highlighting</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/best_practices.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="highlighting.html" title="Highlighting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="debugging.html" title="Debugging Haystack"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

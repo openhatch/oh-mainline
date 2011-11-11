@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchBackend API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Running Tests" href="running_tests.html" />
+    <link rel="prev" title="SearchQuery API" href="searchquery_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="running_tests.html" title="Running Tests"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchquery_api.html" title="SearchQuery API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchbackend-api">
+<span id="ref-searchbackend-api"></span><h1><tt class="docutils literal"><span class="pre">SearchBackend</span></tt> API<a class="headerlink" href="#searchbackend-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchBackend">
+<em class="property">class </em><tt class="descname">SearchBackend</tt><big>(</big><em>site=None</em><big>)</big><a class="headerlink" href="#SearchBackend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchBackend</span></tt> class handles interaction directly with the backend. The
+search query it performs is usually fed to it from a <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> class that
+has been built for that backend.</p>
+<p>This class must be at least partially implemented on a per-backend basis and
+is usually accompanied by a <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> class within the same module.</p>
+<p>Unless you are writing a new backend, it is unlikely you need to directly
+access this class.</p>
+<div class="section" id="method-reference">
+<h2>Method Reference<a class="headerlink" href="#method-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="update">
+<h3><tt class="docutils literal"><span class="pre">update</span></tt><a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.update">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">update</tt><big>(</big><em>self</em>, <em>index</em>, <em>iterable</em><big>)</big><a class="headerlink" href="#SearchBackend.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Updates the backend when given a <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> and a collection of
+documents.</p>
+<p>This method MUST be implemented by each backend, as it will be highly
+specific to each one.</p>
+</div>
+<div class="section" id="remove">
+<h3><tt class="docutils literal"><span class="pre">remove</span></tt><a class="headerlink" href="#remove" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.remove">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">remove</tt><big>(</big><em>self</em>, <em>obj_or_string</em><big>)</big><a class="headerlink" href="#SearchBackend.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Removes a document/object from the backend. Can be either a model
+instance or the identifier (i.e. <tt class="docutils literal"><span class="pre">app_name.model_name.id</span></tt>) in the
+event the object no longer exists.</p>
+<p>This method MUST be implemented by each backend, as it will be highly
+specific to each one.</p>
+</div>
+<div class="section" id="clear">
+<h3><tt class="docutils literal"><span class="pre">clear</span></tt><a class="headerlink" href="#clear" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.clear">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">clear</tt><big>(</big><em>self</em>, <em>models=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#SearchBackend.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Clears the backend of all documents/objects for a collection of models.</p>
+<p>This method MUST be implemented by each backend, as it will be highly
+specific to each one.</p>
+</div>
+<div class="section" id="search">
+<h3><tt class="docutils literal"><span class="pre">search</span></tt><a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.search">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">search</tt><big>(</big><em>self</em>, <em>query_string</em>, <em>sort_by=None</em>, <em>start_offset=0</em>, <em>end_offset=None</em>, <em>fields=''</em>, <em>highlight=False</em>, <em>facets=None</em>, <em>date_facets=None</em>, <em>query_facets=None</em>, <em>narrow_queries=None</em>, <em>spelling_query=None</em>, <em>limit_to_registered_models=None</em>, <em>result_class=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchBackend.search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Takes a query to search on and returns dictionary.</p>
+<p>The query should be a string that is appropriate syntax for the backend.</p>
+<p>The returned dictionary should contain the keys &#8216;results&#8217; and &#8216;hits&#8217;.
+The &#8216;results&#8217; value should be an iterable of populated <tt class="docutils literal"><span class="pre">SearchResult</span></tt>
+objects. The &#8216;hits&#8217; should be an integer count of the number of matched
+results the search backend found.</p>
+<p>This method MUST be implemented by each backend, as it will be highly
+specific to each one.</p>
+</div>
+<div class="section" id="prep-value">
+<h3><tt class="docutils literal"><span class="pre">prep_value</span></tt><a class="headerlink" href="#prep-value" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.prep_value">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">prep_value</tt><big>(</big><em>self</em>, <em>value</em><big>)</big><a class="headerlink" href="#SearchBackend.prep_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Hook to give the backend a chance to prep an attribute value before
+sending it to the search engine.</p>
+<p>By default, just force it to unicode.</p>
+</div>
+<div class="section" id="more-like-this">
+<h3><tt class="docutils literal"><span class="pre">more_like_this</span></tt><a class="headerlink" href="#more-like-this" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.more_like_this">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">more_like_this</tt><big>(</big><em>self</em>, <em>model_instance</em>, <em>additional_query_string=None</em>, <em>result_class=None</em><big>)</big><a class="headerlink" href="#SearchBackend.more_like_this" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Takes a model object and returns results the backend thinks are similar.</p>
+<p>This method MUST be implemented by each backend, as it will be highly
+specific to each one.</p>
+</div>
+<div class="section" id="build-schema">
+<h3><tt class="docutils literal"><span class="pre">build_schema</span></tt><a class="headerlink" href="#build-schema" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.build_schema">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">build_schema</tt><big>(</big><em>self</em>, <em>fields</em><big>)</big><a class="headerlink" href="#SearchBackend.build_schema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Takes a dictionary of fields and returns schema information.</p>
+<p>This method MUST be implemented by each backend, as it will be highly
+specific to each one.</p>
+</div>
+<div class="section" id="build-registered-models-list">
+<h3><tt class="docutils literal"><span class="pre">build_registered_models_list</span></tt><a class="headerlink" href="#build-registered-models-list" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchBackend.build_registered_models_list">
+<tt class="descclassname">SearchBackend.</tt><tt class="descname">build_registered_models_list</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchBackend.build_registered_models_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Builds a list of registered models for searching.</p>
+<p>The <tt class="docutils literal"><span class="pre">search</span></tt> method should use this and the <tt class="docutils literal"><span class="pre">django_ct</span></tt> field to
+narrow the results (unless the user indicates not to). This helps ignore
+any results that are not currently registered models and ensures
+consistent caching.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchBackend</span></tt> API</a><ul>
+<li><a class="reference internal" href="#method-reference">Method Reference</a><ul>
+<li><a class="reference internal" href="#update"><tt class="docutils literal"><span class="pre">update</span></tt></a></li>
+<li><a class="reference internal" href="#remove"><tt class="docutils literal"><span class="pre">remove</span></tt></a></li>
+<li><a class="reference internal" href="#clear"><tt class="docutils literal"><span class="pre">clear</span></tt></a></li>
+<li><a class="reference internal" href="#search"><tt class="docutils literal"><span class="pre">search</span></tt></a></li>
+<li><a class="reference internal" href="#prep-value"><tt class="docutils literal"><span class="pre">prep_value</span></tt></a></li>
+<li><a class="reference internal" href="#more-like-this"><tt class="docutils literal"><span class="pre">more_like_this</span></tt></a></li>
+<li><a class="reference internal" href="#build-schema"><tt class="docutils literal"><span class="pre">build_schema</span></tt></a></li>
+<li><a class="reference internal" href="#build-registered-models-list"><tt class="docutils literal"><span class="pre">build_registered_models_list</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchquery_api.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">SearchQuery</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="running_tests.html"
+                        title="next chapter">Running Tests</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchbackend_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="running_tests.html" title="Running Tests"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchquery_api.html" title="SearchQuery API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>
