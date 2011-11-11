@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>(In)Frequently Asked Questions &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Sites Using Haystack" href="who_uses.html" />
+    <link rel="prev" title="Haystack Settings" href="settings.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="who_uses.html" title="Sites Using Haystack"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Haystack Settings"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="in-frequently-asked-questions">
+<span id="ref-frequently-asked-questions"></span><h1>(In)Frequently Asked Questions<a class="headerlink" href="#in-frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-haystack">
+<h2>What is Haystack?<a class="headerlink" href="#what-is-haystack" title="Permalink to this headline">¶</a></h2>
+<p>Haystack is meant to be a portable interface to a search engine of your choice.
+Some might call it a search framework, an abstraction layer or what have you.
+The idea is that you write your search code once and should be able to freely
+switch between backends as your situation necessitates.</p>
+</div>
+<div class="section" id="why-should-i-consider-using-haystack">
+<h2>Why should I consider using Haystack?<a class="headerlink" href="#why-should-i-consider-using-haystack" title="Permalink to this headline">¶</a></h2>
+<p>Haystack is targeted at the following use cases:</p>
+<ul class="simple">
+<li>If you want to feature search on your site and search solutions like Google or
+Yahoo search don&#8217;t fit your needs.</li>
+<li>If you want to be able to customize your search and search on more than just
+the main content.</li>
+<li>If you want to have features like drill-down (faceting) or &#8220;More Like This&#8221;.</li>
+<li>If you want a interface that is non-search engine specific, allowing you to
+change your mind later without much rewriting.</li>
+</ul>
+</div>
+<div class="section" id="when-should-i-not-be-using-haystack">
+<h2>When should I not be using Haystack?<a class="headerlink" href="#when-should-i-not-be-using-haystack" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Non-Model-based data. If you just want to index random data (flat files,
+alternate sources, etc.), Haystack isn&#8217;t a good solution. Haystack is very
+<tt class="docutils literal"><span class="pre">Model</span></tt>-based and doesn&#8217;t work well outside of that use case.</li>
+<li>Ultra-high volume. Because of the very nature of Haystack (abstraction layer),
+there&#8217;s more overhead involved. This makes it portable, but as with all
+abstraction layers, you lose a little performance. You also can&#8217;t take full
+advantage of the exact feature-set of your search engine. This is the price
+of pluggable backends.</li>
+</ul>
+</div>
+<div class="section" id="why-was-haystack-created-when-there-are-so-many-other-search-options">
+<h2>Why was Haystack created when there are so many other search options?<a class="headerlink" href="#why-was-haystack-created-when-there-are-so-many-other-search-options" title="Permalink to this headline">¶</a></h2>
+<p>The proliferation of search options in Django is a relatively recent development
+and is actually one of the reasons for Haystack&#8217;s existence. There are too
+many options that are only partial solutions or are too engine specific.</p>
+<p>Further, most use an unfamiliar API and documentation is lacking in most cases.</p>
+<p>Haystack is an attempt to unify these efforts into one solution. That&#8217;s not to
+say there should be no alternatives, but Haystack should provide a good
+solution to 80%+ of the search use cases out there.</p>
+</div>
+<div class="section" id="what-s-the-history-behind-haystack">
+<h2>What&#8217;s the history behind Haystack?<a class="headerlink" href="#what-s-the-history-behind-haystack" title="Permalink to this headline">¶</a></h2>
+<p>Haystack started because of my frustration with the lack of good search options
+(before many other apps came out) and as the result of extensive use of
+Djangosearch. Djangosearch was a decent solution but had a number of
+shortcomings, such as:</p>
+<ul class="simple">
+<li>Tied to the models.py, so you&#8217;d have to modify the source of third-party (
+or django.contrib) apps in order to effectively use it.</li>
+<li>All or nothing approach to indexes. So all indexes appear on all sites and
+in all places.</li>
+<li>Lack of tests.</li>
+<li>Lack of documentation.</li>
+<li>Uneven backend implementations.</li>
+</ul>
+<p>The initial idea was to simply fork Djangosearch and improve on these (and
+other issues). However, after stepping back, I decided to overhaul the entire
+API (and most of the underlying code) to be more representative of what I would
+want as an end-user. The result was starting afresh and reusing concepts (and
+some code) from Djangosearch as needed.</p>
+<p>As a result of this heritage, you can actually still find some portions of
+Djangosearch present in Haystack (especially in the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> and
+<tt class="docutils literal"><span class="pre">SearchBackend</span></tt> classes) where it made sense. The original authors of
+Djangosearch are aware of this and thus far have seemed to be fine with this
+reuse.</p>
+</div>
+<div class="section" id="why-doesn-t-search-engine-x-have-a-backend-included-in-haystack">
+<h2>Why doesn&#8217;t &lt;search engine X&gt; have a backend included in Haystack?<a class="headerlink" href="#why-doesn-t-search-engine-x-have-a-backend-included-in-haystack" title="Permalink to this headline">¶</a></h2>
+<p>Several possibilities on this.</p>
+<ol class="arabic">
+<li><p class="first">Licensing</p>
+<p>A common problem is that the Python bindings for a specific engine may
+have been released under an incompatible license. The goal is for Haystack
+to remain BSD licensed and importing bindings with an incompatible license
+can technically convert the entire codebase to that license. This most
+commonly occurs with GPL&#8217;ed bindings.</p>
+</li>
+<li><p class="first">Lack of time</p>
+<p>The search engine in question may be on the list of backends to add and we
+simply haven&#8217;t gotten to it yet. We welcome patches for additional backends.</p>
+</li>
+<li><p class="first">Incompatible API</p>
+<p>In order for an engine to work well with Haystack, a certain baseline set of
+features is needed. This is often an issue when the engine doesn&#8217;t support
+ranged queries or additional attributes associated with a search record.</p>
+</li>
+<li><p class="first">We&#8217;re not aware of the engine</p>
+<p>If you think we may not be aware of the engine you&#8217;d like, please tell us
+about it (preferably via the group -
+<a class="reference external" href="http://groups.google.com/group/django-haystack/">http://groups.google.com/group/django-haystack/</a>). Be sure to check through
+the backends (in case it wasn&#8217;t documented) and search the history on the
+group to minimize duplicates.</p>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">(In)Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#what-is-haystack">What is Haystack?</a></li>
+<li><a class="reference internal" href="#why-should-i-consider-using-haystack">Why should I consider using Haystack?</a></li>
+<li><a class="reference internal" href="#when-should-i-not-be-using-haystack">When should I not be using Haystack?</a></li>
+<li><a class="reference internal" href="#why-was-haystack-created-when-there-are-so-many-other-search-options">Why was Haystack created when there are so many other search options?</a></li>
+<li><a class="reference internal" href="#what-s-the-history-behind-haystack">What&#8217;s the history behind Haystack?</a></li>
+<li><a class="reference internal" href="#why-doesn-t-search-engine-x-have-a-backend-included-in-haystack">Why doesn&#8217;t &lt;search engine X&gt; have a backend included in Haystack?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="settings.html"
+                        title="previous chapter">Haystack Settings</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="who_uses.html"
+                        title="next chapter">Sites Using Haystack</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/faq.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="who_uses.html" title="Sites Using Haystack"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Haystack Settings"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

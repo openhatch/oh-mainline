@@ -1,0 +1,39 @@
+.. _installation:
+
+Installation
+============
+
+The most recent release is always available in the `cheeseshop`_ and can be
+installed using `easy_install`_::
+
+    easy_install django-authopenid
+
+Alternatly, you can also install the development version from 
+our `Mercurial`_ repository::
+
+    hg clone https://dev.e-engura.org/hg/django-authopenid
+    cd django-authopenid
+    sudo python setup.py install
+
+Last command will install django-authopenid as a package via setuptools. This
+will make it available in your python path. Alternately you can copy or symlink
+the django-authopenid subdirectory into your django project directory or
+anywhere in your PYTHONPATH.
+
+You could also get source from  `Bitbucket`_ ::
+
+    hg clone http://hg.e-engura.org/django-authopenid/
+
+Requirements
+============
+
+To use django-authopenid you will need **Python 2.5** or later, `Django`_ 1.0 or later and
+`django-registration`_ . 
+
+.. _cheeseshop: http://pypi.python.org/pypi/WTForms/
+.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _Mercurial: http://www.selenic.com/mercurial/
+.. _Bitbucket: http://hg.e-engura.org/django-authopenid/
+.. _Django: http://www.djangoproject.com/
+.. _django-registration: http://bitbucket.org/ubernostrum/django-registration/
+

@@ -1,0 +1,11 @@
+include setup.cfg
+include setup.py
+include ez_setup.py
+
+include test.py
+include tests/*.py
+include typecheck/*.py
+
+include CHANGELOG
+include MANIFEST.in
+include README.txt

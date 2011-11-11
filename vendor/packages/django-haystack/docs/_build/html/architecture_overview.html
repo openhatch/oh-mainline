@@ -1,0 +1,178 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Architecture Overview &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Backend Support" href="backend_support.html" />
+    <link rel="prev" title="Management Commands" href="management_commands.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="backend_support.html" title="Backend Support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="management_commands.html" title="Management Commands"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="architecture-overview">
+<span id="ref-architecture-overview"></span><h1>Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="searchqueryset">
+<h2><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt><a class="headerlink" href="#searchqueryset" title="Permalink to this headline">¶</a></h2>
+<p>One main implementation.</p>
+<ul class="simple">
+<li>Standard API that loosely follows <tt class="docutils literal"><span class="pre">QuerySet</span></tt></li>
+<li>Handles most queries</li>
+<li>Allows for custom &#8220;parsing&#8221;/building through API</li>
+<li>Dispatches to <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> for actual query</li>
+<li>Handles automatically creating a query</li>
+<li>Allows for raw queries to be passed straight to backend.</li>
+</ul>
+</div>
+<div class="section" id="searchquery">
+<h2><tt class="docutils literal"><span class="pre">SearchQuery</span></tt><a class="headerlink" href="#searchquery" title="Permalink to this headline">¶</a></h2>
+<p>Implemented per-backend.</p>
+<ul class="simple">
+<li>Method for building the query out of the structured data.</li>
+<li>Method for cleaning a string of reserved characters used by the backend.</li>
+</ul>
+<p>Main class provides:</p>
+<ul class="simple">
+<li>Methods to add filters/models/order-by/boost/limits to the search.</li>
+<li>Method to perform a raw search.</li>
+<li>Method to get the number of hits.</li>
+<li>Method to return the results provided by the backend (likely not a full list).</li>
+</ul>
+</div>
+<div class="section" id="searchbackend">
+<h2><tt class="docutils literal"><span class="pre">SearchBackend</span></tt><a class="headerlink" href="#searchbackend" title="Permalink to this headline">¶</a></h2>
+<p>Implemented per-backend.</p>
+<ul class="simple">
+<li>Connects to search engine</li>
+<li>Method for saving new docs to index</li>
+<li>Method for removing docs from index</li>
+<li>Method for performing the actual query</li>
+</ul>
+</div>
+<div class="section" id="searchsite">
+<h2><tt class="docutils literal"><span class="pre">SearchSite</span></tt><a class="headerlink" href="#searchsite" title="Permalink to this headline">¶</a></h2>
+<p>One main implementation.</p>
+<ul class="simple">
+<li>Standard API that loosely follows <tt class="docutils literal"><span class="pre">django.contrib.admin.sites.AdminSite</span></tt></li>
+<li>Handles registering/unregistering models to search on a per-site basis.</li>
+<li>Provides a means of adding custom indexes to a model, like <tt class="docutils literal"><span class="pre">ModelAdmins</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="searchindex">
+<h2><tt class="docutils literal"><span class="pre">SearchIndex</span></tt><a class="headerlink" href="#searchindex" title="Permalink to this headline">¶</a></h2>
+<p>Implemented per-model you wish to index.</p>
+<ul class="simple">
+<li>Handles generating the document to be indexed.</li>
+<li>Populates additional fields to accompany the document.</li>
+<li>Provides a way to limit what types of objects get indexed.</li>
+<li>Provides a way to index the document(s).</li>
+<li>Provides a way to remove the document(s).</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Architecture Overview</a><ul>
+<li><a class="reference internal" href="#searchqueryset"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a></li>
+<li><a class="reference internal" href="#searchquery"><tt class="docutils literal"><span class="pre">SearchQuery</span></tt></a></li>
+<li><a class="reference internal" href="#searchbackend"><tt class="docutils literal"><span class="pre">SearchBackend</span></tt></a></li>
+<li><a class="reference internal" href="#searchsite"><tt class="docutils literal"><span class="pre">SearchSite</span></tt></a></li>
+<li><a class="reference internal" href="#searchindex"><tt class="docutils literal"><span class="pre">SearchIndex</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="management_commands.html"
+                        title="previous chapter">Management Commands</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="backend_support.html"
+                        title="next chapter">Backend Support</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/architecture_overview.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="backend_support.html" title="Backend Support"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="management_commands.html" title="Management Commands"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

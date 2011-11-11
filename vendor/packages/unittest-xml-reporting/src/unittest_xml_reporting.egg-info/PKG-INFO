@@ -1,0 +1,19 @@
+Metadata-Version: 1.0
+Name: unittest-xml-reporting
+Version: 1.3
+Summary: PyUnit-based test runner with JUnit like XML reporting.
+Home-page: http://github.com/danielfm/unittest-xml-reporting/tree/master/
+Author: Daniel Fernandes Martins
+Author-email: daniel.tritone@gmail.com
+License: LGPL
+Description: UNKNOWN
+Keywords: pyunit,unittest,junit xml,report,testrunner
+Platform: Any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Testing

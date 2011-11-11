@@ -1,0 +1,685 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchIndex API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchField API" href="searchfield_api.html" />
+    <link rel="prev" title="SearchQuerySet API" href="searchqueryset_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchfield_api.html" title="SearchField API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchqueryset_api.html" title="SearchQuerySet API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchindex-api">
+<span id="ref-searchindex-api"></span><h1><tt class="docutils literal"><span class="pre">SearchIndex</span></tt> API<a class="headerlink" href="#searchindex-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchIndex">
+<em class="property">class </em><tt class="descname">SearchIndex</tt><big>(</big><em>model</em>, <em>backend=None</em><big>)</big><a class="headerlink" href="#SearchIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> class allows the application developer a way to provide data to
+the backend in a structured format. Developers familiar with Django&#8217;s <tt class="docutils literal"><span class="pre">Form</span></tt>
+or <tt class="docutils literal"><span class="pre">Model</span></tt> classes should find the syntax for indexes familiar.</p>
+<p>This class is arguably the most important part of integrating Haystack into your
+application, as it has a large impact on the quality of the search results and
+how easy it is for users to find what they&#8217;re looking for. Care and effort
+should be put into making your indexes the best they can be.</p>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>For the impatient:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">haystack.indexes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">haystack</span> <span class="kn">import</span> <span class="n">site</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Note</span>
+
+
+<span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">index_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;Used when the entire index for model is updated.&quot;</span>
+        <span class="k">return</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+
+<span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Note</span><span class="p">,</span> <span class="n">NoteIndex</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p>Unlike relational databases, most search engines supported by Haystack are
+primarily document-based. They focus on a single text blob which they tokenize,
+analyze and index. When searching, this field is usually the primary one that
+is searched.</p>
+<p>Further, the schema used by most engines is the same for all types of data
+added, unlike a relational database that has a table schema for each chunk of
+data.</p>
+<p>It may be helpful to think of your search index as something closer to a
+key-value store instead of imagining it in terms of a RDBMS.</p>
+<div class="section" id="why-create-fields">
+<h3>Why Create Fields?<a class="headerlink" href="#why-create-fields" title="Permalink to this headline">¶</a></h3>
+<p>Despite being primarily document-driven, most search engines also support the
+ability to associate other relevant data with the indexed document. These
+attributes can be mapped through the use of fields within Haystack.</p>
+<p>Common uses include storing pertinent data information, categorizations of the
+document, author information and related data. By adding fields for these pieces
+of data, you provide a means to further narrow/filter search terms. This can
+be useful from either a UI perspective (a better advanced search form) or from a
+developer standpoint (section-dependent search, off-loading certain tasks to
+search, et cetera).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Haystack reserves the following field names for internal use: <tt class="docutils literal"><span class="pre">id</span></tt>,
+<tt class="docutils literal"><span class="pre">django_ct</span></tt>, <tt class="docutils literal"><span class="pre">django_id</span></tt> &amp; <tt class="docutils literal"><span class="pre">content</span></tt>. The <tt class="docutils literal"><span class="pre">name</span></tt> &amp; <tt class="docutils literal"><span class="pre">type</span></tt> names
+used to be reserved but no longer are.</p>
+<p class="last">You can override these field names using the <tt class="docutils literal"><span class="pre">HAYSTACK_ID_FIELD</span></tt>,
+<tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_CT_FIELD</span></tt> &amp; <tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_ID_FIELD</span></tt> if needed.</p>
+</div>
+</div>
+<div class="section" id="significance-of-document-true">
+<h3>Significance Of <tt class="docutils literal"><span class="pre">document=True</span></tt><a class="headerlink" href="#significance-of-document-true" title="Permalink to this headline">¶</a></h3>
+<p>Most search engines that were candidates for inclusion in Haystack all had a
+central concept of a document that they indexed. These documents form a corpus
+within which to primarily search. Because this ideal is so central and most of
+Haystack is designed to have pluggable backends, it is important to ensure that
+all engines have at least a bare minimum of the data they need to function.</p>
+<p>As a result, when creating a <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>, at least one field must be marked
+with <tt class="docutils literal"><span class="pre">document=True</span></tt>. This signifies to Haystack that whatever is placed in
+this field while indexing is to be the primary text the search engine indexes.
+The name of this field can be almost anything, but <tt class="docutils literal"><span class="pre">text</span></tt> is one of the
+more common names used.</p>
+</div>
+<div class="section" id="stored-indexed-fields">
+<h3>Stored/Indexed Fields<a class="headerlink" href="#stored-indexed-fields" title="Permalink to this headline">¶</a></h3>
+<p>One shortcoming of the use of search is that you rarely have all or the most
+up-to-date information about an object in the index. As a result, when
+retrieving search results, you will likely have to access the object in the
+database to provide better information.</p>
+<p>However, this can also hit the database quite heavily (think
+<tt class="docutils literal"><span class="pre">.get(pk=result.id)</span></tt> per object). If your search is popular, this can lead
+to a big performance hit. There are two ways to prevent this. The first way is
+<tt class="docutils literal"><span class="pre">SearchQuerySet.load_all</span></tt>, which tries to group all similar objects and pull
+them though one query instead of many. This still hits the DB and incurs a
+performance penalty.</p>
+<p>The other option is to leverage stored fields. By default, all fields in
+Haystack are both indexed (searchable by the engine) and stored (retained by
+the engine and presented in the results). By using a stored field, you can
+store commonly used data in such a way that you don&#8217;t need to hit the database
+when processing the search result to get more information.</p>
+<p>For example, one great way to leverage this is to pre-rendering an object&#8217;s
+search result template DURING indexing. You define an additional field, render
+a template with it and it follows the main indexed record into the index. Then,
+when that record is pulled when it matches a query, you can simply display the
+contents of that field, which avoids the database hit.:</p>
+<p>Within <tt class="docutils literal"><span class="pre">myapp/search_indexes.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+    <span class="c"># Define the additional field.</span>
+    <span class="n">rendered</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">indexed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, inside a template named <tt class="docutils literal"><span class="pre">search/indexes/myapp/note_rendered.txt</span></tt>:</p>
+<div class="highlight-python"><pre>&lt;h2&gt;{{ object.title }}&lt;/h2&gt;
+
+&lt;p&gt;{{ object.content }}&lt;/p&gt;</pre>
+</div>
+<p>And finally, in <tt class="docutils literal"><span class="pre">search/search.html</span></tt>:</p>
+<div class="highlight-python"><pre>...
+
+{% for result in page.object_list %}
+    &lt;div class="search_result"&gt;
+        {{ result.rendered|safe }}
+    &lt;/div&gt;
+{% endfor %}</pre>
+</div>
+</div>
+</div>
+<div class="section" id="keeping-the-index-fresh">
+<h2>Keeping The Index Fresh<a class="headerlink" href="#keeping-the-index-fresh" title="Permalink to this headline">¶</a></h2>
+<p>There are several approaches to keeping the search index in sync with your
+database. None are more correct than the others and depending the traffic you
+see, the churn rate of your data and what concerns are important to you
+(CPU load, how recent, et cetera).</p>
+<p>The conventional method is to use <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> in combination with cron
+jobs. Running a <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">update_index</span></tt> every couple hours will keep your
+data in sync within that timeframe and will handle the updates in a very
+efficient batch. Additionally, Whoosh (and to a lesser extent Xapian) behave
+better when using this approach.</p>
+<p>Another option is to use <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt>, which uses Django&#8217;s signals
+to immediately update the index any time a model is saved/deleted. This
+yields a much more current search index at the expense of being fairly
+inefficient. Solr is the only backend that handles this well under load, and
+even then, you should make sure you have the server capacity to spare.</p>
+<p>A third option is to develop a custom <tt class="docutils literal"><span class="pre">QueueSearchIndex</span></tt> that, much like
+<tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt>, uses Django&#8217;s signals to enqueue messages for
+updates/deletes. Then writing a management command to consume these messages
+in batches, yielding a nice compromise between the previous two options.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Haystack doesn&#8217;t ship with a <tt class="docutils literal"><span class="pre">QueueSearchIndex</span></tt> largely because there is
+such a diversity of lightweight queuing options and that they tend to
+polarize developers. Queuing is outside of Haystack&#8217;s goals (provide good,
+powerful search) and, as such, is left to the developer.</p>
+<p class="last">Additionally, the implementation is relatively trivial in that you simply
+extend the same four methods as <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt> and simply add
+messages to the queue of choice.</p>
+</div>
+</div>
+<div class="section" id="advanced-data-preparation">
+<h2>Advanced Data Preparation<a class="headerlink" href="#advanced-data-preparation" title="Permalink to this headline">¶</a></h2>
+<p>In most cases, using the <cite>model_attr</cite> parameter on your fields allows you to
+easily get data from a Django model to the document in your index, as it handles
+both direct attribute access as well as callable functions within your model.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">model_attr</span></tt> keyword argument also can look through relations in
+models. So you can do something like <tt class="docutils literal"><span class="pre">model_attr='author__first_name'</span></tt>
+to pull just the first name of the author, similar to some lookups used
+by Django&#8217;s ORM.</p>
+</div>
+<p>However, sometimes, even more control over what gets placed in your index is
+needed. To facilitate this, <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> objects have a &#8216;preparation&#8217; stage
+that populates data just before it is indexed. You can hook into this phase in
+several ways.</p>
+<p>This should be very familiar to developers who have used Django&#8217;s <tt class="docutils literal"><span class="pre">forms</span></tt>
+before as it loosely follows similar concepts, though the emphasis here is
+less on cleansing data from user input and more on making the data friendly
+to the search backend.</p>
+<div class="section" id="prepare-foo-self-object">
+<h3>1. <tt class="docutils literal"><span class="pre">prepare_FOO(self,</span> <span class="pre">object)</span></tt><a class="headerlink" href="#prepare-foo-self-object" title="Permalink to this headline">¶</a></h3>
+<p>The most common way to affect a single field&#8217;s data is to create a
+<tt class="docutils literal"><span class="pre">prepare_FOO</span></tt> method (where FOO is the name of the field). As a parameter
+to this method, you will receive the instance that is attempting to be indexed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is analogous to Django&#8217;s <tt class="docutils literal"><span class="pre">Form.clean_FOO</span></tt> methods.</p>
+</div>
+<p>To keep with our existing example, one use case might be altering the name
+inside the <tt class="docutils literal"><span class="pre">author</span></tt> field to be &#8220;firstname lastname &lt;email&gt;&#8221;. In this case,
+you might write the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prepare_author</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> &lt;</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">(),</span> <span class="n">obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This method should return a single value (or list/tuple/dict) to populate that
+fields data upon indexing. Note that this method takes priority over whatever
+data may come from the field itself.</p>
+<p>Just like <tt class="docutils literal"><span class="pre">Form.clean_FOO</span></tt>, the field&#8217;s <tt class="docutils literal"><span class="pre">prepare</span></tt> runs before the
+<tt class="docutils literal"><span class="pre">prepare_FOO</span></tt>, allowing you to access <tt class="docutils literal"><span class="pre">self.prepared_data</span></tt>. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prepare_author</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="c"># Say we want last name first, the hard way.</span>
+        <span class="n">author</span> <span class="o">=</span> <span class="s">u&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="s">&#39;author&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared_data</span><span class="p">:</span>
+            <span class="n">name_bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared_data</span><span class="p">[</span><span class="s">&#39;author&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">author</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name_bits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name_bits</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">author</span>
+</pre></div>
+</div>
+<p>This method is fully function with <tt class="docutils literal"><span class="pre">model_attr</span></tt>, so if there&#8217;s no convenient
+way to access the data you want, this is an excellent way to prepare it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="n">MultiValueField</span><span class="p">()</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prepare_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="c"># Since we&#39;re using a M2M relationship with a complex lookup,</span>
+        <span class="c"># we can prepare the list here.</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">category</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">category_set</span><span class="o">.</span><span class="n">active</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="prepare-self-object">
+<h3>2. <tt class="docutils literal"><span class="pre">prepare(self,</span> <span class="pre">object)</span></tt><a class="headerlink" href="#prepare-self-object" title="Permalink to this headline">¶</a></h3>
+<p>Each <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> gets a <tt class="docutils literal"><span class="pre">prepare</span></tt> method, which handles collecting all
+the data. This method should return a dictionary that will be the final data
+used by the search backend.</p>
+<p>Overriding this method is useful if you need to collect more than one piece
+of data or need to incorporate additional data that is not well represented
+by a single <tt class="docutils literal"><span class="pre">SearchField</span></tt>. An example might look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepared_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">NoteIndex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="c"># Add in tags (assuming there&#39;s a M2M relationship to Tag on the model).</span>
+        <span class="c"># Note that this would NOT get picked up by the automatic</span>
+        <span class="c"># schema tools provided by Haystack.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepared_data</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="nb">object</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared_data</span>
+</pre></div>
+</div>
+<p>If you choose to use this method, you should make a point to be careful to call
+the <tt class="docutils literal"><span class="pre">super()</span></tt> method before altering the data. Without doing so, you may have
+an incomplete set of data populating your indexes.</p>
+<p>This method has the final say in all data, overriding both what the fields
+provide as well as any <tt class="docutils literal"><span class="pre">prepare_FOO</span></tt> methods on the class.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is roughly analogous to Django&#8217;s <tt class="docutils literal"><span class="pre">Form.full_clean</span></tt> and
+<tt class="docutils literal"><span class="pre">Form.clean</span></tt> methods. However, unlike these methods, it is not fired
+as the result of trying to access <tt class="docutils literal"><span class="pre">self.prepared_data</span></tt>. It requires
+an explicit call.</p>
+</div>
+</div>
+<div class="section" id="overriding-prepare-self-object-on-individual-searchfield-objects">
+<h3>3. Overriding <tt class="docutils literal"><span class="pre">prepare(self,</span> <span class="pre">object)</span></tt> On Individual <tt class="docutils literal"><span class="pre">SearchField</span></tt> Objects<a class="headerlink" href="#overriding-prepare-self-object-on-individual-searchfield-objects" title="Permalink to this headline">¶</a></h3>
+<p>The final way to manipulate your data is to implement a custom <tt class="docutils literal"><span class="pre">SearchField</span></tt>
+object and write its <tt class="docutils literal"><span class="pre">prepare</span></tt> method to populate/alter the data any way you
+choose. For instance, a (naive) user-created <tt class="docutils literal"><span class="pre">GeoPointField</span></tt> might look
+something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.indexes</span> <span class="kn">import</span> <span class="n">CharField</span>
+
+<span class="k">class</span> <span class="nc">GeoPointField</span><span class="p">(</span><span class="n">CharField</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;0.00-0.00&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeoPointField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">longitude</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">prepare</span></tt> method simply returns the value to be used for that field. It&#8217;s
+entirely possible to include data that&#8217;s not directly referenced to the object
+here, depending on your needs.</p>
+<p>Note that this is NOT a recommended approach to storing geographic data in a
+search engine (there is no formal suggestion on this as support is usually
+non-existent), merely an example of how to extend existing fields.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is analagous to Django&#8217;s <tt class="docutils literal"><span class="pre">Field.clean</span></tt> methods.</p>
+</div>
+</div>
+</div>
+<div class="section" id="adding-new-fields">
+<h2>Adding New Fields<a class="headerlink" href="#adding-new-fields" title="Permalink to this headline">¶</a></h2>
+<p>If you have an existing <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> and you add a new field to it, Haystack
+will add this new data on any updates it sees after that point. However, this
+will not populate the existing data you already have.</p>
+<p>In order for the data to be picked up, you will need to run <tt class="docutils literal"><span class="pre">./manage.py</span>
+<span class="pre">rebuild_index</span></tt>. This will cause all backends to rebuild the existing data
+already present in the quickest and most efficient way.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">With the Solr backend, you&#8217;ll also have to add to the appropriate
+<tt class="docutils literal"><span class="pre">schema.xml</span></tt> for your configuration before running the <tt class="docutils literal"><span class="pre">rebuild_index</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="search-index">
+<h2><tt class="docutils literal"><span class="pre">Search</span> <span class="pre">Index</span></tt><a class="headerlink" href="#search-index" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="index-queryset">
+<h3><tt class="docutils literal"><span class="pre">index_queryset</span></tt><a class="headerlink" href="#index-queryset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.index_queryset">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">index_queryset</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.index_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Get the default QuerySet to index when doing a full update.</p>
+<p>Subclasses can override this method to avoid indexing certain objects.</p>
+</div>
+<div class="section" id="read-queryset">
+<h3><tt class="docutils literal"><span class="pre">read_queryset</span></tt><a class="headerlink" href="#read-queryset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.read_queryset">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">read_queryset</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.read_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Get the default QuerySet for read actions.</p>
+<p>Subclasses can override this method to work with other managers.
+Useful when working with default managers that filter some objects.</p>
+</div>
+<div class="section" id="prepare">
+<h3><tt class="docutils literal"><span class="pre">prepare</span></tt><a class="headerlink" href="#prepare" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.prepare">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">prepare</tt><big>(</big><em>self</em>, <em>obj</em><big>)</big><a class="headerlink" href="#SearchIndex.prepare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Fetches and adds/alters data before indexing.</p>
+</div>
+<div class="section" id="get-content-field">
+<h3><tt class="docutils literal"><span class="pre">get_content_field</span></tt><a class="headerlink" href="#get-content-field" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.get_content_field">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">get_content_field</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.get_content_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the field that supplies the primary document to be indexed.</p>
+</div>
+<div class="section" id="update">
+<h3><tt class="docutils literal"><span class="pre">update</span></tt><a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.update">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">update</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Update the entire index.</p>
+</div>
+<div class="section" id="update-object">
+<h3><tt class="docutils literal"><span class="pre">update_object</span></tt><a class="headerlink" href="#update-object" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.update_object">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">update_object</tt><big>(</big><em>self</em>, <em>instance</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchIndex.update_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Update the index for a single object. Attached to the class&#8217;s
+post-save hook.</p>
+</div>
+<div class="section" id="remove-object">
+<h3><tt class="docutils literal"><span class="pre">remove_object</span></tt><a class="headerlink" href="#remove-object" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.remove_object">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">remove_object</tt><big>(</big><em>self</em>, <em>instance</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchIndex.remove_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Remove an object from the index. Attached to the class&#8217;s
+post-delete hook.</p>
+</div>
+<div class="section" id="clear">
+<h3><tt class="docutils literal"><span class="pre">clear</span></tt><a class="headerlink" href="#clear" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.clear">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">clear</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Clear the entire index.</p>
+</div>
+<div class="section" id="reindex">
+<h3><tt class="docutils literal"><span class="pre">reindex</span></tt><a class="headerlink" href="#reindex" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.reindex">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">reindex</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.reindex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Completely clear the index for this model and rebuild it.</p>
+</div>
+<div class="section" id="get-updated-field">
+<h3><tt class="docutils literal"><span class="pre">get_updated_field</span></tt><a class="headerlink" href="#get-updated-field" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.get_updated_field">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">get_updated_field</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.get_updated_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Get the field name that represents the updated date for the model.</p>
+<p>If specified, this is used by the reindex command to filter out results
+from the <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, enabling you to reindex only recent records. This
+method should either return None (reindex everything always) or a
+string of the <tt class="docutils literal"><span class="pre">Model</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">DateField</span></tt>/<tt class="docutils literal"><span class="pre">DateTimeField</span></tt> name.</p>
+</div>
+<div class="section" id="should-update">
+<h3><tt class="docutils literal"><span class="pre">should_update</span></tt><a class="headerlink" href="#should-update" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.should_update">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">should_update</tt><big>(</big><em>self</em>, <em>instance</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchIndex.should_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Determine if an object should be updated in the index.</p>
+<p>It&#8217;s useful to override this when an object may save frequently and
+cause excessive reindexing. You should check conditions on the instance
+and return False if it is not to be indexed.</p>
+<p>The <tt class="docutils literal"><span class="pre">kwargs</span></tt> passed along to this method can be the same as the ones passed
+by Django when a Model is saved/delete, so it&#8217;s possible to check if the object
+has been created or not. See <tt class="docutils literal"><span class="pre">django.db.models.signals.post_save</span></tt> for details
+on what is passed.</p>
+<p>By default, returns True (always reindex).</p>
+</div>
+<div class="section" id="load-all-queryset">
+<h3><tt class="docutils literal"><span class="pre">load_all_queryset</span></tt><a class="headerlink" href="#load-all-queryset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchIndex.load_all_queryset">
+<tt class="descclassname">SearchIndex.</tt><tt class="descname">load_all_queryset</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchIndex.load_all_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides the ability to override how objects get loaded in conjunction
+with <tt class="docutils literal"><span class="pre">RelatedSearchQuerySet.load_all</span></tt>. This is useful for post-processing the
+results from the query, enabling things like adding <tt class="docutils literal"><span class="pre">select_related</span></tt> or
+filtering certain data.</p>
+<p>By default, returns <tt class="docutils literal"><span class="pre">all()</span></tt> on the model&#8217;s default manager.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_all_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Pull all objects related to the Note in search results.</span>
+        <span class="k">return</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">select_related</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>When searching, the <tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt> appends on a call to <tt class="docutils literal"><span class="pre">in_bulk</span></tt>, so be
+sure that the <tt class="docutils literal"><span class="pre">QuerySet</span></tt> you provide can accommodate this and that the ids
+passed to <tt class="docutils literal"><span class="pre">in_bulk</span></tt> will map to the model in question.</p>
+<p>If you need a specific <tt class="docutils literal"><span class="pre">QuerySet</span></tt> in one place, you can specify this at the
+<tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt> level using the <tt class="docutils literal"><span class="pre">load_all_queryset</span></tt> method. See
+<a class="reference internal" href="searchqueryset_api.html"><em>SearchQuerySet API</em></a> for usage.</p>
+</div>
+</div>
+<div class="section" id="realtimesearchindex">
+<h2><tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt><a class="headerlink" href="#realtimesearchindex" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt> provides all the same functionality as the standard
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt>. However, in addition, it connects to the
+<tt class="docutils literal"><span class="pre">post_save</span></tt>/<tt class="docutils literal"><span class="pre">post_delete</span></tt> signals of the model it&#8217;s registered with.</p>
+<p>This means that anytime a model is saved or deleted, it&#8217;s automatically and
+immediately updated in the search index, yielding real-time search.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Not all backends deal well with the kind of document churn that can result
+from using the <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt>. Solr is the only one that handles
+it gracefully.</p>
+<p class="last">Additionally, this will add more overhead in terms of CPU usage, so you
+should be sure to accommodate for this and should have appropriate monitoring
+in place.</p>
+</div>
+</div>
+<div class="section" id="modelsearchindex">
+<h2><tt class="docutils literal"><span class="pre">ModelSearchIndex</span></tt><a class="headerlink" href="#modelsearchindex" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">ModelSearchIndex</span></tt> class allows for automatic generation of a
+<tt class="docutils literal"><span class="pre">SearchIndex</span></tt> based on the fields of the model assigned to it.</p>
+<p>With the exception of the automated introspection, it is a <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>
+class, so all notes above pertaining to <tt class="docutils literal"><span class="pre">SearchIndexes</span></tt> apply. As with the
+<tt class="docutils literal"><span class="pre">ModelForm</span></tt> class in Django, it employs an inner class called <tt class="docutils literal"><span class="pre">Meta</span></tt>,
+which should either contain a <tt class="docutils literal"><span class="pre">pass</span></tt> to include all fields, a <tt class="docutils literal"><span class="pre">fields</span></tt> list
+to specify a whitelisted set of fields or <tt class="docutils literal"><span class="pre">excludes</span></tt> to prevent certain fields
+from appearing in the class. Unlike <tt class="docutils literal"><span class="pre">ModelForm</span></tt>, you should <strong>NOT</strong> specify
+a <tt class="docutils literal"><span class="pre">model</span></tt> attribute, as that is already handled when registering the class.</p>
+<p>In addition, it adds a <cite>text</cite> field that is the <tt class="docutils literal"><span class="pre">document=True</span></tt> field and
+has <cite>use_template=True</cite> option set, just like the <tt class="docutils literal"><span class="pre">BasicSearchIndex</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Usage of this class might result in inferior <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> objects, which
+can directly affect your search results. Use this to establish basic
+functionality and move to custom <cite>SearchIndex</cite> objects for better control.</p>
+</div>
+<p>At this time, it does not handle related fields.</p>
+<div class="section" id="id1">
+<h3>Quick Start<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>For the impatient:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">haystack.indexes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">haystack</span> <span class="kn">import</span> <span class="n">site</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Note</span>
+
+<span class="c"># All Fields</span>
+<span class="k">class</span> <span class="nc">AllNoteIndex</span><span class="p">(</span><span class="n">ModelSearchIndex</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+<span class="c"># Blacklisted Fields</span>
+<span class="k">class</span> <span class="nc">LimitedNoteIndex</span><span class="p">(</span><span class="n">ModelSearchIndex</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;user&#39;</span><span class="p">]</span>
+
+<span class="c"># Whitelisted Fields</span>
+<span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">ModelSearchIndex</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="s">&#39;pub_date&#39;</span><span class="p">]</span>
+
+    <span class="c"># Note that regular ``SearchIndex`` methods apply.</span>
+    <span class="k">def</span> <span class="nf">index_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">&quot;Used when the entire index for model is updated.&quot;</span>
+        <span class="k">return</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+
+<span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Note</span><span class="p">,</span> <span class="n">NoteIndex</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchIndex</span></tt> API</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#background">Background</a><ul>
+<li><a class="reference internal" href="#why-create-fields">Why Create Fields?</a></li>
+<li><a class="reference internal" href="#significance-of-document-true">Significance Of <tt class="docutils literal"><span class="pre">document=True</span></tt></a></li>
+<li><a class="reference internal" href="#stored-indexed-fields">Stored/Indexed Fields</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#keeping-the-index-fresh">Keeping The Index Fresh</a></li>
+<li><a class="reference internal" href="#advanced-data-preparation">Advanced Data Preparation</a><ul>
+<li><a class="reference internal" href="#prepare-foo-self-object">1. <tt class="docutils literal"><span class="pre">prepare_FOO(self,</span> <span class="pre">object)</span></tt></a></li>
+<li><a class="reference internal" href="#prepare-self-object">2. <tt class="docutils literal"><span class="pre">prepare(self,</span> <span class="pre">object)</span></tt></a></li>
+<li><a class="reference internal" href="#overriding-prepare-self-object-on-individual-searchfield-objects">3. Overriding <tt class="docutils literal"><span class="pre">prepare(self,</span> <span class="pre">object)</span></tt> On Individual <tt class="docutils literal"><span class="pre">SearchField</span></tt> Objects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-new-fields">Adding New Fields</a></li>
+<li><a class="reference internal" href="#search-index"><tt class="docutils literal"><span class="pre">Search</span> <span class="pre">Index</span></tt></a><ul>
+<li><a class="reference internal" href="#index-queryset"><tt class="docutils literal"><span class="pre">index_queryset</span></tt></a></li>
+<li><a class="reference internal" href="#read-queryset"><tt class="docutils literal"><span class="pre">read_queryset</span></tt></a></li>
+<li><a class="reference internal" href="#prepare"><tt class="docutils literal"><span class="pre">prepare</span></tt></a></li>
+<li><a class="reference internal" href="#get-content-field"><tt class="docutils literal"><span class="pre">get_content_field</span></tt></a></li>
+<li><a class="reference internal" href="#update"><tt class="docutils literal"><span class="pre">update</span></tt></a></li>
+<li><a class="reference internal" href="#update-object"><tt class="docutils literal"><span class="pre">update_object</span></tt></a></li>
+<li><a class="reference internal" href="#remove-object"><tt class="docutils literal"><span class="pre">remove_object</span></tt></a></li>
+<li><a class="reference internal" href="#clear"><tt class="docutils literal"><span class="pre">clear</span></tt></a></li>
+<li><a class="reference internal" href="#reindex"><tt class="docutils literal"><span class="pre">reindex</span></tt></a></li>
+<li><a class="reference internal" href="#get-updated-field"><tt class="docutils literal"><span class="pre">get_updated_field</span></tt></a></li>
+<li><a class="reference internal" href="#should-update"><tt class="docutils literal"><span class="pre">should_update</span></tt></a></li>
+<li><a class="reference internal" href="#load-all-queryset"><tt class="docutils literal"><span class="pre">load_all_queryset</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#realtimesearchindex"><tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt></a></li>
+<li><a class="reference internal" href="#modelsearchindex"><tt class="docutils literal"><span class="pre">ModelSearchIndex</span></tt></a><ul>
+<li><a class="reference internal" href="#id1">Quick Start</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchqueryset_api.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">SearchQuerySet</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchfield_api.html"
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">SearchField</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchindex_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchfield_api.html" title="SearchField API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchqueryset_api.html" title="SearchQuerySet API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

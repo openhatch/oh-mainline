@@ -1,0 +1,82 @@
+[MASTER]
+profile=no
+ignore=.svn
+persistent=yes
+cache-size=500
+
+[REPORTS]
+output-format=colorized
+include-ids=y
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+comment=no
+
+[FORMAT]
+max-line-length=79
+
+
+[BASIC]
+
+# Regular expression which should only match functions or classes name which do
+# not require a docstring
+no-docstring-rgx=__.*__
+
+# Regular expression which should only match correct module names
+module-rgx=[a-z_][a-z0-9_]*$
+
+# Regular expression which should only match correct module level names
+const-rgx=(([a-z_][a-z0-9_]{3,30})|(__.*__)|([A-Z_][A-Z0-9_]{3,30}))$
+
+# Regular expression which should only match correct class names
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+
+# Regular expression which should only match correct function names
+function-rgx=[a-z_][A-Za-z0-9_]{2,30}$
+
+# Regular expression which should only match correct method names
+method-rgx=[a-z_][A-Za-z0-9_]{2,30}$
+
+# Regular expression which should only match correct list comprehension /
+# generator expression variable names
+inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+# Good variable names which should always be accepted, separated by a comma
+good-names=i,j,k,ex,Run,_
+
+# Bad variable names which should always be refused, separated by a comma
+bad-names=foo,bar,baz,toto,tutu,tata
+
+# List of builtins function names that should not be used, separated by a comma
+bad-functions=input
+
+[MESSAGES CONTROL]
+# Disable the message(s) with the given id(s).
+#
+# E0611: No name in module -- pylint gives too many false positives
+#        from orca/scripts/*.py files.
+#
+# W0102: Default argument is a mutable value (list or dictionary)
+# W0141: Used builtin function 'map'
+# W0403: Relative import
+# W0511: Warning note (FIXME or XXX) detected.
+# W0603: Using the global statement
+# W0612: Unused variable
+# W0613: Unused argument
+# W0702: No exception's type specified
+# W0704: Except doesn't do anything
+# C0111: Missing docstring
+# C0302: Module has too much lines
+# R0201: could be a function
+# R0401: Cyclic import between two or more modules detected
+# R0801: Similar lines detected among multiple files
+# R0902: Class has too many instance attributes
+# R0903: Class has too few public methods
+# R0904: Class has too many public methods
+# R0911: Function or method has too many return statements
+# R0912: Function or method has too many branches
+# R0913: Function or method takes too many arguments
+# R0914: Function or method has too many local variables
+# R0915: Function or method has too many statements
+#
+disable-msg=E0611,C0111,R0201,W0102,W0141,W0403,W0603,W0612,W0613,W0702,W0704,W0511,R0801,R0912,R0915,R0914,R0904,R0903,R0401,R0911,R0913,C0302,R0902
+
+

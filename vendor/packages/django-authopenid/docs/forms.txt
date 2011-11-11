@@ -1,0 +1,15 @@
+.. _forms-ref:
+
+Forms reference
+---------------
+
+.. autoclass:: django_authopenid.forms.OpenidSigninForm
+
+.. autoclass:: django_authopenid.forms.OpenidRegisterForm
+
+.. autoclass:: django_authopenid.forms.AssociateOpenID
+
+.. autoclass:: django_authopenid.forms.OpenidDissociateForm
+
+
+.. seealso:: `django-registration forms documentation <http://bitbucket.org/ubernostrum/django-registration/src/tip/docs/forms.txt>`_ for more informations

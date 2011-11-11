@@ -1,0 +1,845 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchQuerySet API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchIndex API" href="searchindex_api.html" />
+    <link rel="prev" title="Advanced Topics" href="do_not_try_this_at_home.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchindex_api.html" title="SearchIndex API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="do_not_try_this_at_home.html" title="Advanced Topics"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchqueryset-api">
+<span id="ref-searchqueryset-api"></span><h1><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> API<a class="headerlink" href="#searchqueryset-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchQuerySet">
+<em class="property">class </em><tt class="descname">SearchQuerySet</tt><big>(</big><em>site=None</em>, <em>query=None</em><big>)</big><a class="headerlink" href="#SearchQuerySet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> class is designed to make performing a search and
+iterating over its results easy and consistent. For those familiar with Django&#8217;s
+ORM <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, much of the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> API should feel familiar.</p>
+<div class="section" id="why-follow-queryset">
+<h2>Why Follow <tt class="docutils literal"><span class="pre">QuerySet</span></tt>?<a class="headerlink" href="#why-follow-queryset" title="Permalink to this headline">¶</a></h2>
+<p>A couple reasons to follow (at least in part) the <tt class="docutils literal"><span class="pre">QuerySet</span></tt> API:</p>
+<ol class="arabic simple">
+<li>Consistency with Django</li>
+<li>Most Django programmers have experience with the ORM and can use this
+knowledge with <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</li>
+</ol>
+<p>And from a high-level perspective, <tt class="docutils literal"><span class="pre">QuerySet</span></tt> and <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> do very similar
+things: given certain criteria, provide a set of results. Both are powered by
+multiple backends, both are abstractions on top of the way a query is performed.</p>
+</div>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>For the impatient:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+<span class="n">all_results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="n">hello_results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;hello&#39;</span><span class="p">)</span>
+<span class="n">hello_world_results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+<span class="n">unfriendly_results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;hello&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;world&#39;</span><span class="p">)</span>
+<span class="n">recent_results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="searchqueryset">
+<h2><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt><a class="headerlink" href="#searchqueryset" title="Permalink to this headline">¶</a></h2>
+<p>By default, <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> provide the documented functionality. You can
+extend with your own behavior by simply subclassing from <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> and
+adding what you need, then using your subclass in place of <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+<p>Most methods in <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> &#8220;chain&#8221; in a similar fashion to <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.
+Additionally, like <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> is lazy (meaning it evaluates the
+query as late as possible). So the following is valid:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;hello&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;world&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">boost</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)[</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-content-shortcut">
+<h2>The <tt class="docutils literal"><span class="pre">content</span></tt> Shortcut<a class="headerlink" href="#the-content-shortcut" title="Permalink to this headline">¶</a></h2>
+<p>Searching your document fields is a very common activity. To help mitigate
+possible differences in <tt class="docutils literal"><span class="pre">SearchField</span></tt> names (and to help the backends deal
+with search queries that inspect the main corpus), there is a special field
+called <tt class="docutils literal"><span class="pre">content</span></tt>. You may use this in any place that other fields names would
+work (e.g. <tt class="docutils literal"><span class="pre">filter</span></tt>, <tt class="docutils literal"><span class="pre">exclude</span></tt>, etc.) to indicate you simply want to
+search the main documents.</p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+
+<span class="c"># This searches whatever fields were marked ``document=True``.</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;hello&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This special pseudo-field works best with the <tt class="docutils literal"><span class="pre">exact</span></tt> lookup and may yield
+strange or unexpected results with the other lookups.</p>
+</div>
+<div class="section" id="searchqueryset-methods">
+<h2><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> Methods<a class="headerlink" href="#searchqueryset-methods" title="Permalink to this headline">¶</a></h2>
+<p>The primary interface to search in Haystack is through the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>
+object. It provides a clean, programmatic, portable API to the search backend.
+Many aspects are also &#8220;chainable&#8221;, meaning you can call methods one after another, each
+applying their changes to the previous <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> and further narrowing
+the search.</p>
+<p>All <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> objects implement a list-like interface, meaning you can
+perform actions like getting the length of the results, accessing a result at an
+offset or even slicing the result list.</p>
+<div class="section" id="methods-that-return-a-searchqueryset">
+<h3>Methods That Return A <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt><a class="headerlink" href="#methods-that-return-a-searchqueryset" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="all">
+<h4><tt class="docutils literal"><span class="pre">all</span></tt><a class="headerlink" href="#all" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt>
+<tt class="descname">SearchQuerySet.all(self):</tt></dt>
+<dd></dd></dl>
+
+<p>Returns all results for the query. This is largely a no-op (returns an identical
+copy) but useful for denoting exactly what behavior is going on.</p>
+</div>
+<div class="section" id="none">
+<h4><tt class="docutils literal"><span class="pre">none</span></tt><a class="headerlink" href="#none" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt>
+<tt class="descname">SearchQuerySet.none(self):</tt></dt>
+<dd></dd></dl>
+
+<p>Returns an <tt class="docutils literal"><span class="pre">EmptySearchQuerySet</span></tt> that behaves like a <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> but
+always yields no results.</p>
+</div>
+<div class="section" id="filter">
+<h4><tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.filter">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">filter</tt><big>(</big><em>self</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchQuerySet.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Filters the search by looking for (and including) certain attributes.</p>
+<p>The lookup parameters (<tt class="docutils literal"><span class="pre">**kwargs</span></tt>) should follow the <a class="reference internal" href="#id1">Field lookups</a> below.
+If you specify more than one pair, they will be joined in the query according to
+the <tt class="docutils literal"><span class="pre">HAYSTACK_DEFAULT_OPERATOR</span></tt> setting (defaults to <tt class="docutils literal"><span class="pre">AND</span></tt>).</p>
+<p>If a string with one or more spaces in it is specified as the value, an exact
+match will be performed on that phrase.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Any data you pass to <tt class="docutils literal"><span class="pre">filter</span></tt> is passed along <strong>unescaped</strong>. If
+you don&#8217;t trust the data you&#8217;re passing along, you should either use
+<tt class="docutils literal"><span class="pre">auto_query</span></tt> or use the <tt class="docutils literal"><span class="pre">clean</span></tt> method on your <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> to
+sanitize the data.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c"># Identical to the previous example.</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c"># To escape user data:</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">sqs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">sqs</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="n">user_query</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exclude">
+<h4><tt class="docutils literal"><span class="pre">exclude</span></tt><a class="headerlink" href="#exclude" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.exclude">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">exclude</tt><big>(</big><em>self</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchQuerySet.exclude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Narrows the search by ensuring certain attributes are not included.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Any data you pass to <tt class="docutils literal"><span class="pre">exclude</span></tt> is passed along <strong>unescaped</strong>. If
+you don&#8217;t trust the data you&#8217;re passing along, you should either use
+<tt class="docutils literal"><span class="pre">auto_query</span></tt> or use the <tt class="docutils literal"><span class="pre">clean</span></tt> method on your <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> to
+sanitize the data.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filter-and">
+<h4><tt class="docutils literal"><span class="pre">filter_and</span></tt><a class="headerlink" href="#filter-and" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.filter_and">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">filter_and</tt><big>(</big><em>self</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchQuerySet.filter_and" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Narrows the search by looking for (and including) certain attributes. Join
+behavior in the query is forced to be <tt class="docutils literal"><span class="pre">AND</span></tt>. Used primarily by the <tt class="docutils literal"><span class="pre">filter</span></tt>
+method.</p>
+</div>
+<div class="section" id="filter-or">
+<h4><tt class="docutils literal"><span class="pre">filter_or</span></tt><a class="headerlink" href="#filter-or" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.filter_or">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">filter_or</tt><big>(</big><em>self</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchQuerySet.filter_or" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Narrows the search by looking for (and including) certain attributes. Join
+behavior in the query is forced to be <tt class="docutils literal"><span class="pre">OR</span></tt>. Used primarily by the <tt class="docutils literal"><span class="pre">filter</span></tt>
+method.</p>
+</div>
+<div class="section" id="order-by">
+<h4><tt class="docutils literal"><span class="pre">order_by</span></tt><a class="headerlink" href="#order-by" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.order_by">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">order_by</tt><big>(</big><em>self</em>, <em>*args</em><big>)</big><a class="headerlink" href="#SearchQuerySet.order_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Alters the order in which the results should appear. Arguments should be strings
+that map to the attributes/fields within the index. You may specify multiple
+fields by comma separating them:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">,</span> <span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Default behavior is ascending order. To specify descending order, prepend the
+string with a <tt class="docutils literal"><span class="pre">-</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In general, ordering is locale-specific. Haystack makes no effort to try to
+reconcile differences between characters from different languages. This
+means that accented characters will sort closely with the same character
+and <strong>NOT</strong> necessarily close to the unaccented form of the character.</p>
+<p class="last">If you want this kind of behavior, you should override the <tt class="docutils literal"><span class="pre">prepare_FOO</span></tt>
+methods on your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> objects to transliterate the characters
+as you see fit.</p>
+</div>
+</div>
+<div class="section" id="highlight">
+<h4><tt class="docutils literal"><span class="pre">highlight</span></tt><a class="headerlink" href="#highlight" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.highlight">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">highlight</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuerySet.highlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>If supported by the backend, the <tt class="docutils literal"><span class="pre">SearchResult</span></tt> objects returned will include
+a highlighted version of the result:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">highlight</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">result</span><span class="o">.</span><span class="n">highlighted</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c"># u&#39;Two computer scientists walk into a bar. The bartender says &quot;&lt;em&gt;Foo&lt;/em&gt;!&quot;.&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="models">
+<h4><tt class="docutils literal"><span class="pre">models</span></tt><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.models">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">models</tt><big>(</big><em>self</em>, <em>*models</em><big>)</big><a class="headerlink" href="#SearchQuerySet.models" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Accepts an arbitrary number of Model classes to include in the search. This will
+narrow the search results to only include results from the models specified.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">models</span><span class="p">(</span><span class="n">BlogEntry</span><span class="p">,</span> <span class="n">Comment</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="result-class">
+<h4><tt class="docutils literal"><span class="pre">result_class</span></tt><a class="headerlink" href="#result-class" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.result_class">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">result_class</tt><big>(</big><em>self</em>, <em>klass</em><big>)</big><a class="headerlink" href="#SearchQuerySet.result_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Allows specifying a different class to use for results.</p>
+<p>Overrides any previous usages. If <tt class="xref docutils literal"><span class="pre">None</span></tt> is provided, Haystack will
+revert back to the default <tt class="docutils literal"><span class="pre">SearchResult</span></tt> object.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">result_class</span><span class="p">(</span><span class="n">CustomResult</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="boost">
+<h4><tt class="docutils literal"><span class="pre">boost</span></tt><a class="headerlink" href="#boost" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.boost">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">boost</tt><big>(</big><em>self</em>, <em>term</em>, <em>boost_value</em><big>)</big><a class="headerlink" href="#SearchQuerySet.boost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Boosts a certain term of the query. You provide the term to be boosted and the
+value is the amount to boost it by. Boost amounts may be either an integer or a
+float.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">boost</span><span class="p">(</span><span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="facet">
+<h4><tt class="docutils literal"><span class="pre">facet</span></tt><a class="headerlink" href="#facet" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.facet">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">facet</tt><big>(</big><em>self</em>, <em>field</em><big>)</big><a class="headerlink" href="#SearchQuerySet.facet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds faceting to a query for the provided field. You provide the field (from one
+of the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes) you like to facet on.</p>
+<p>In the search results you get back, facet counts will be populated in the
+<tt class="docutils literal"><span class="pre">SearchResult</span></tt> object. You can access them via the <tt class="docutils literal"><span class="pre">facet_counts</span></tt> method.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Count document hits for each author within the index.</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">facet</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="date-facet">
+<h4><tt class="docutils literal"><span class="pre">date_facet</span></tt><a class="headerlink" href="#date-facet" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.date_facet">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">date_facet</tt><big>(</big><em>self</em>, <em>field</em>, <em>start_date</em>, <em>end_date</em>, <em>gap_by</em>, <em>gap_amount=1</em><big>)</big><a class="headerlink" href="#SearchQuerySet.date_facet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds faceting to a query for the provided field by date. You provide the field
+(from one of the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes) you like to facet on, a <tt class="docutils literal"><span class="pre">start_date</span></tt>
+(either <tt class="docutils literal"><span class="pre">datetime.datetime</span></tt> or <tt class="docutils literal"><span class="pre">datetime.date</span></tt>), an <tt class="docutils literal"><span class="pre">end_date</span></tt> and the
+amount of time between gaps as <tt class="docutils literal"><span class="pre">gap_by</span></tt> (one of <tt class="docutils literal"><span class="pre">'year'</span></tt>, <tt class="docutils literal"><span class="pre">'month'</span></tt>,
+<tt class="docutils literal"><span class="pre">'day'</span></tt>, <tt class="docutils literal"><span class="pre">'hour'</span></tt>, <tt class="docutils literal"><span class="pre">'minute'</span></tt> or <tt class="docutils literal"><span class="pre">'second'</span></tt>).</p>
+<p>You can also optionally provide a <tt class="docutils literal"><span class="pre">gap_amount</span></tt> to specify a different
+increment than <tt class="docutils literal"><span class="pre">1</span></tt>. For example, specifying gaps by week (every seven days)
+would would be <tt class="docutils literal"><span class="pre">gap_by='day',</span> <span class="pre">gap_amount=7</span></tt>).</p>
+<p>In the search results you get back, facet counts will be populated in the
+<tt class="docutils literal"><span class="pre">SearchResult</span></tt> object. You can access them via the <tt class="docutils literal"><span class="pre">facet_counts</span></tt> method.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Count document hits for each day between 2009-06-07 to 2009-07-07 within the index.</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date_facet</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">end_date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">gap_by</span><span class="o">=</span><span class="s">&#39;day&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="query-facet">
+<h4><tt class="docutils literal"><span class="pre">query_facet</span></tt><a class="headerlink" href="#query-facet" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.query_facet">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">query_facet</tt><big>(</big><em>self</em>, <em>field</em>, <em>query</em><big>)</big><a class="headerlink" href="#SearchQuerySet.query_facet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds faceting to a query for the provided field with a custom query. You provide
+the field (from one of the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes) you like to facet on and the
+backend-specific query (as a string) you&#8217;d like to execute.</p>
+<p>Please note that this is <strong>NOT</strong> portable between backends. The syntax is entirely
+dependent on the backend. No validation/cleansing is performed and it is up to
+the developer to ensure the query&#8217;s syntax is correct.</p>
+<p>In the search results you get back, facet counts will be populated in the
+<tt class="docutils literal"><span class="pre">SearchResult</span></tt> object. You can access them via the <tt class="docutils literal"><span class="pre">facet_counts</span></tt> method.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Count document hits for authors that start with &#39;jo&#39; within the index.</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">query_facet</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">,</span> <span class="s">&#39;jo*&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="narrow">
+<h4><tt class="docutils literal"><span class="pre">narrow</span></tt><a class="headerlink" href="#narrow" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.narrow">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">narrow</tt><big>(</big><em>self</em>, <em>query</em><big>)</big><a class="headerlink" href="#SearchQuerySet.narrow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Pulls a subset of documents from the search engine to search within. This is
+for advanced usage, especially useful when faceting.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Search, from recipes containing &#39;blend&#39;, for recipes containing &#39;banana&#39;.</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="s">&#39;blend&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;banana&#39;</span><span class="p">)</span>
+
+<span class="c"># Using a fielded search where the recipe&#39;s title contains &#39;smoothie&#39;, find all recipes published before 2009.</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="s">&#39;title:smoothie&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>By using <tt class="docutils literal"><span class="pre">narrow</span></tt>, you can create drill-down interfaces for faceting by
+applying <tt class="docutils literal"><span class="pre">narrow</span></tt> calls for each facet that gets selected.</p>
+<p>This method is different from <tt class="docutils literal"><span class="pre">SearchQuerySet.filter()</span></tt> in that it does not
+affect the query sent to the engine. It pre-limits the document set being
+searched. Generally speaking, if you&#8217;re in doubt of whether to use
+<tt class="docutils literal"><span class="pre">filter</span></tt> or <tt class="docutils literal"><span class="pre">narrow</span></tt>, use <tt class="docutils literal"><span class="pre">filter</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is, generally speaking, not necessarily portable between
+backends. The syntax is entirely dependent on the backend, though most
+backends have a similar syntax for basic fielded queries. No
+validation/cleansing is performed and it is up to the developer to ensure
+the query&#8217;s syntax is correct.</p>
+</div>
+</div>
+<div class="section" id="raw-search">
+<h4><tt class="docutils literal"><span class="pre">raw_search</span></tt><a class="headerlink" href="#raw-search" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.raw_search">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">raw_search</tt><big>(</big><em>self</em>, <em>query_string</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchQuerySet.raw_search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Passes a raw query directly to the backend. This is for advanced usage, where
+the desired query can not be expressed via <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unlike many of the other methods on <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>, this method does
+not chain by default (depends on the backend). Any other attributes on the
+<tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> are ignored and only the provided query is run.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># In the case of Solr... (this example could be expressed with SearchQuerySet)</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">raw_search</span><span class="p">(</span><span class="s">&#39;django_ct:blog.blogentry &quot;However, it is&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Please note that this is <strong>NOT</strong> portable between backends. The syntax is entirely
+dependent on the backend. No validation/cleansing is performed and it is up to
+the developer to ensure the query&#8217;s syntax is correct.</p>
+<p>Further, the use of <tt class="docutils literal"><span class="pre">**kwargs</span></tt> are completely undocumented intentionally. If
+a third-party backend can implement special features beyond what&#8217;s present, it
+should use those <tt class="docutils literal"><span class="pre">**kwargs</span></tt> for passing that information. Developers should
+be careful to make sure there are no conflicts with the backend&#8217;s <tt class="docutils literal"><span class="pre">search</span></tt>
+method, as that is called directly.</p>
+</div>
+<div class="section" id="load-all">
+<h4><tt class="docutils literal"><span class="pre">load_all</span></tt><a class="headerlink" href="#load-all" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.load_all">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">load_all</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuerySet.load_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Efficiently populates the objects in the search results. Without using this
+method, DB lookups are done on a per-object basis, resulting in many individual
+trips to the database. If <tt class="docutils literal"><span class="pre">load_all</span></tt> is used, the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> will
+group similar objects into a single query, resulting in only as many queries as
+there are different object types returned.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">load_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="load-all-queryset">
+<h4><tt class="docutils literal"><span class="pre">load_all_queryset</span></tt><a class="headerlink" href="#load-all-queryset" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.load_all_queryset">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">load_all_queryset</tt><big>(</big><em>self</em>, <em>model_class</em>, <em>queryset</em><big>)</big><a class="headerlink" href="#SearchQuerySet.load_all_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Deprecated for removal before Haystack 1.0-final.</p>
+<p>Please see the docs on <tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt>.</p>
+</div>
+<div class="section" id="auto-query">
+<h4><tt class="docutils literal"><span class="pre">auto_query</span></tt><a class="headerlink" href="#auto-query" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.auto_query">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">auto_query</tt><big>(</big><em>self</em>, <em>query_string</em><big>)</big><a class="headerlink" href="#SearchQuerySet.auto_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Performs a best guess constructing the search query.</p>
+<p>This method is intended for common use directly with a user&#8217;s query. It is a
+shortcut to the other API methods that follows generally established search
+syntax without requiring each developer to implement their own parser.</p>
+<p>It handles exact matches (specified with single or double quotes), negation (
+using a <tt class="docutils literal"><span class="pre">-</span></tt> immediately before the term) and joining remaining terms with the
+operator specified in <tt class="docutils literal"><span class="pre">HAYSTACK_DEFAULT_OPERATOR</span></tt>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">auto_query</span><span class="p">(</span><span class="s">&#39;goldfish &quot;old one eye&quot; -tank&#39;</span><span class="p">)</span>
+
+<span class="c"># ... is identical to...</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;old one eye&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;goldfish&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;tank&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This method is somewhat naive but works well enough for simple, common cases.</p>
+</div>
+<div class="section" id="autocomplete">
+<h4><tt class="docutils literal"><span class="pre">autocomplete</span></tt><a class="headerlink" href="#autocomplete" title="Permalink to this headline">¶</a></h4>
+<p>A shortcut method to perform an autocomplete search.</p>
+<p>Must be run against fields that are either <tt class="docutils literal"><span class="pre">NgramField</span></tt> or
+<tt class="docutils literal"><span class="pre">EdgeNgramField</span></tt>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">autocomplete</span><span class="p">(</span><span class="n">title_autocomplete</span><span class="o">=</span><span class="s">&#39;gol&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="more-like-this">
+<h4><tt class="docutils literal"><span class="pre">more_like_this</span></tt><a class="headerlink" href="#more-like-this" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.more_like_this">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">more_like_this</tt><big>(</big><em>self</em>, <em>model_instance</em><big>)</big><a class="headerlink" href="#SearchQuerySet.more_like_this" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Finds similar results to the object passed in.</p>
+<p>You should pass in an instance of a model (for example, one fetched via a
+<tt class="docutils literal"><span class="pre">get</span></tt> in Django&#8217;s ORM). This will execute a query on the backend that searches
+for similar results. The instance you pass in should be an indexed object.
+Previously called methods will have an effect on the provided results.</p>
+<p>It will evaluate its own backend-specific query and populate the
+<cite>SearchQuerySet`</cite> in the same manner as other methods.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entry</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slug</span><span class="o">=</span><span class="s">&#39;haystack-one-oh-released&#39;</span><span class="p">)</span>
+<span class="n">mlt</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">more_like_this</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+<span class="n">mlt</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="c"># 5</span>
+<span class="n">mlt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">title</span> <span class="c"># &quot;Haystack Beta 1 Released&quot;</span>
+
+<span class="c"># ...or...</span>
+<span class="n">mlt</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">public</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">21</span><span class="p">))</span><span class="o">.</span><span class="n">more_like_this</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+<span class="n">mlt</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="c"># 2</span>
+<span class="n">mlt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">title</span> <span class="c"># &quot;Haystack Beta 1 Released&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="methods-that-do-not-return-a-searchqueryset">
+<h3>Methods That Do Not Return A <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt><a class="headerlink" href="#methods-that-do-not-return-a-searchqueryset" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="count">
+<h4><tt class="docutils literal"><span class="pre">count</span></tt><a class="headerlink" href="#count" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.count">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">count</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuerySet.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the total number of matching results.</p>
+<p>This returns an integer count of the total number of results the search backend
+found that matched. This method causes the query to evaluate and run the search.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="best-match">
+<h4><tt class="docutils literal"><span class="pre">best_match</span></tt><a class="headerlink" href="#best-match" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.best_match">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">best_match</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuerySet.best_match" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the best/top search result that matches the query.</p>
+<p>This method causes the query to evaluate and run the search. This method returns
+a <tt class="docutils literal"><span class="pre">SearchResult</span></tt> object that is the best match the search backend found:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">foo</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">best_match</span><span class="p">()</span>
+<span class="n">foo</span><span class="o">.</span><span class="n">id</span> <span class="c"># Something like 5.</span>
+
+<span class="c"># Identical to:</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="latest">
+<h4><tt class="docutils literal"><span class="pre">latest</span></tt><a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.latest">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">latest</tt><big>(</big><em>self</em>, <em>date_field</em><big>)</big><a class="headerlink" href="#SearchQuerySet.latest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the most recent search result that matches the query.</p>
+<p>This method causes the query to evaluate and run the search. This method returns
+a <tt class="docutils literal"><span class="pre">SearchResult</span></tt> object that is the most recent match the search backend
+found:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">foo</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+<span class="n">foo</span><span class="o">.</span><span class="n">id</span> <span class="c"># Something like 3.</span>
+
+<span class="c"># Identical to:</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="facet-counts">
+<h4><tt class="docutils literal"><span class="pre">facet_counts</span></tt><a class="headerlink" href="#facet-counts" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.facet_counts">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">facet_counts</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuerySet.facet_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the facet counts found by the query. This will cause the query to
+execute and should generally be used when presenting the data (template-level).</p>
+<p>You receive back a dictionary with three keys: <tt class="docutils literal"><span class="pre">fields</span></tt>, <tt class="docutils literal"><span class="pre">dates</span></tt> and
+<tt class="docutils literal"><span class="pre">queries</span></tt>. Each contains the facet counts for whatever facets you specified
+within your <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The resulting dictionary may change before 1.0 release. It&#8217;s fairly
+backend-specific at the time of writing. Standardizing is waiting on
+implementing other backends that support faceting and ensuring that the
+results presented will meet their needs as well.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Count document hits for each author.</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">facet</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">)</span>
+
+<span class="n">sqs</span><span class="o">.</span><span class="n">facet_counts</span><span class="p">()</span>
+<span class="c"># Gives the following response:</span>
+<span class="c"># {</span>
+<span class="c">#     &#39;dates&#39;: {},</span>
+<span class="c">#     &#39;fields&#39;: {</span>
+<span class="c">#         &#39;author&#39;: [</span>
+<span class="c">#             (&#39;john&#39;, 4),</span>
+<span class="c">#             (&#39;daniel&#39;, 2),</span>
+<span class="c">#             (&#39;sally&#39;, 1),</span>
+<span class="c">#             (&#39;terry&#39;, 1),</span>
+<span class="c">#         ],</span>
+<span class="c">#     },</span>
+<span class="c">#     &#39;queries&#39;: {}</span>
+<span class="c"># }</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="spelling-suggestion">
+<h4><tt class="docutils literal"><span class="pre">spelling_suggestion</span></tt><a class="headerlink" href="#spelling-suggestion" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="SearchQuerySet.spelling_suggestion">
+<tt class="descclassname">SearchQuerySet.</tt><tt class="descname">spelling_suggestion</tt><big>(</big><em>self</em>, <em>preferred_query=None</em><big>)</big><a class="headerlink" href="#SearchQuerySet.spelling_suggestion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the spelling suggestion found by the query.</p>
+<p>To work, you must set <tt class="docutils literal"><span class="pre">settings.HAYSTACK_INCLUDE_SPELLING</span></tt> (see
+<a class="reference internal" href="settings.html"><em>Haystack Settings</em></a>) to <tt class="xref docutils literal"><span class="pre">True</span></tt>. Otherwise, <tt class="xref docutils literal"><span class="pre">None</span></tt> will be returned.</p>
+<p>This method causes the query to evaluate and run the search if it hasn&#8217;t already
+run. Search results will be populated as normal but with an additional spelling
+suggestion. Note that this does <em>NOT</em> run the revised query, only suggests
+improvements.</p>
+<p>If provided, the optional argument to this method lets you specify an alternate
+query for the spelling suggestion to be run on. This is useful for passing along
+a raw user-provided query, especially when there are many methods chained on the
+<tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">auto_query</span><span class="p">(</span><span class="s">&#39;mor exmples&#39;</span><span class="p">)</span>
+<span class="n">sqs</span><span class="o">.</span><span class="n">spelling_suggestion</span><span class="p">()</span> <span class="c"># u&#39;more examples&#39;</span>
+
+<span class="c"># ...or...</span>
+<span class="n">suggestion</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">spelling_suggestion</span><span class="p">(</span><span class="s">&#39;moar exmples&#39;</span><span class="p">)</span>
+<span class="n">suggestion</span> <span class="c"># u&#39;more examples&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="field-lookups">
+<span id="id1"></span><h3>Field Lookups<a class="headerlink" href="#field-lookups" title="Permalink to this headline">¶</a></h3>
+<p>The following lookup types are supported:</p>
+<ul class="simple">
+<li>exact</li>
+<li>gt</li>
+<li>gte</li>
+<li>lt</li>
+<li>lte</li>
+<li>in</li>
+<li>startswith</li>
+<li>range</li>
+</ul>
+<p>These options are similar in function to the way Django&#8217;s lookup types work.
+The actual behavior of these lookups is backend-specific.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>The <tt class="docutils literal"><span class="pre">startswith</span></tt> filter is strongly affected by the other ways the engine
+parses data, especially in regards to stemming (see <a class="reference internal" href="glossary.html"><em>Glossary</em></a>). This
+can mean that if the query ends in a vowel or a plural form, it may get
+stemmed before being evaluated.</p>
+<p class="last">This is both backend-specific and yet fairly consistent between engines,
+and may be the cause of sometimes unexpected results.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+
+<span class="c"># Identical to:</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content__exact</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+
+<span class="c"># Other usages look like:</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__gte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2008</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">pub_date__lt</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author__in</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;daniel&#39;</span><span class="p">,</span> <span class="s">&#39;john&#39;</span><span class="p">,</span> <span class="s">&#39;jane&#39;</span><span class="p">])</span>
+<span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">view_count__range</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="emptysearchqueryset">
+<h2><tt class="docutils literal"><span class="pre">EmptySearchQuerySet</span></tt><a class="headerlink" href="#emptysearchqueryset" title="Permalink to this headline">¶</a></h2>
+<p>Also included in Haystack is an <tt class="docutils literal"><span class="pre">EmptySearchQuerySet</span></tt> class. It behaves just
+like <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> but will always return zero results. This is useful for
+places where you want no query to occur or results to be returned.</p>
+</div>
+<div class="section" id="relatedsearchqueryset">
+<h2><tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt><a class="headerlink" href="#relatedsearchqueryset" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes you need to filter results based on relations in the database that are
+not present in the search index or are difficult to express that way. To this
+end, <tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt> allows you to post-process the search results by
+calling <tt class="docutils literal"><span class="pre">load_all_queryset</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt> can have negative performance implications.
+Because results are excluded based on the database after the search query
+has been run, you can&#8217;t guarantee offsets within the cache. Therefore, the
+entire cache that appears before the offset you request must be filled in
+order to produce consistent results. On large result sets and at higher
+slices, this can take time.</p>
+<p class="last">This is the old behavior of <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>, so performance is no worse
+than the early days of Haystack.</p>
+</div>
+<p>It supports all other methods that the standard <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> does, with
+the addition of the <tt class="docutils literal"><span class="pre">load_all_queryset</span></tt> method and paying attention to the
+<tt class="docutils literal"><span class="pre">load_all_queryset</span></tt> method of <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> objects when populating the
+cache.</p>
+<div class="section" id="id2">
+<h3><tt class="docutils literal"><span class="pre">load_all_queryset</span></tt><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="RelatedSearchQuerySet.load_all_queryset">
+<tt class="descclassname">RelatedSearchQuerySet.</tt><tt class="descname">load_all_queryset</tt><big>(</big><em>self</em>, <em>model_class</em>, <em>queryset</em><big>)</big><a class="headerlink" href="#RelatedSearchQuerySet.load_all_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Allows for specifying a custom <tt class="docutils literal"><span class="pre">QuerySet</span></tt> that changes how <tt class="docutils literal"><span class="pre">load_all</span></tt> will
+fetch records for the provided model. This is useful for post-processing the
+results from the query, enabling things like adding <tt class="docutils literal"><span class="pre">select_related</span></tt> or
+filtering certain data.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sqs</span> <span class="o">=</span> <span class="n">RelatedSearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">load_all</span><span class="p">()</span>
+<span class="c"># For the Entry model, we want to include related models directly associated</span>
+<span class="c"># with the Entry to save on DB queries.</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">sqs</span><span class="o">.</span><span class="n">load_all_queryset</span><span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This method chains indefinitely, so you can specify <tt class="docutils literal"><span class="pre">QuerySets</span></tt> for as many
+models as you wish, one per model. The <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> appends on a call to
+<tt class="docutils literal"><span class="pre">in_bulk</span></tt>, so be sure that the <tt class="docutils literal"><span class="pre">QuerySet</span></tt> you provide can accommodate this
+and that the ids passed to <tt class="docutils literal"><span class="pre">in_bulk</span></tt> will map to the model in question.</p>
+<p>If you need to do this frequently and have one <tt class="docutils literal"><span class="pre">QuerySet</span></tt> you&#8217;d like to apply
+everywhere, you can specify this at the <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> level using the
+<tt class="docutils literal"><span class="pre">load_all_queryset</span></tt> method. See <a class="reference internal" href="searchindex_api.html"><em>SearchIndex API</em></a> for usage.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> API</a><ul>
+<li><a class="reference internal" href="#why-follow-queryset">Why Follow <tt class="docutils literal"><span class="pre">QuerySet</span></tt>?</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#searchqueryset"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a></li>
+<li><a class="reference internal" href="#the-content-shortcut">The <tt class="docutils literal"><span class="pre">content</span></tt> Shortcut</a></li>
+<li><a class="reference internal" href="#searchqueryset-methods"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> Methods</a><ul>
+<li><a class="reference internal" href="#methods-that-return-a-searchqueryset">Methods That Return A <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a><ul>
+<li><a class="reference internal" href="#all"><tt class="docutils literal"><span class="pre">all</span></tt></a></li>
+<li><a class="reference internal" href="#none"><tt class="docutils literal"><span class="pre">none</span></tt></a></li>
+<li><a class="reference internal" href="#filter"><tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
+<li><a class="reference internal" href="#exclude"><tt class="docutils literal"><span class="pre">exclude</span></tt></a></li>
+<li><a class="reference internal" href="#filter-and"><tt class="docutils literal"><span class="pre">filter_and</span></tt></a></li>
+<li><a class="reference internal" href="#filter-or"><tt class="docutils literal"><span class="pre">filter_or</span></tt></a></li>
+<li><a class="reference internal" href="#order-by"><tt class="docutils literal"><span class="pre">order_by</span></tt></a></li>
+<li><a class="reference internal" href="#highlight"><tt class="docutils literal"><span class="pre">highlight</span></tt></a></li>
+<li><a class="reference internal" href="#models"><tt class="docutils literal"><span class="pre">models</span></tt></a></li>
+<li><a class="reference internal" href="#result-class"><tt class="docutils literal"><span class="pre">result_class</span></tt></a></li>
+<li><a class="reference internal" href="#boost"><tt class="docutils literal"><span class="pre">boost</span></tt></a></li>
+<li><a class="reference internal" href="#facet"><tt class="docutils literal"><span class="pre">facet</span></tt></a></li>
+<li><a class="reference internal" href="#date-facet"><tt class="docutils literal"><span class="pre">date_facet</span></tt></a></li>
+<li><a class="reference internal" href="#query-facet"><tt class="docutils literal"><span class="pre">query_facet</span></tt></a></li>
+<li><a class="reference internal" href="#narrow"><tt class="docutils literal"><span class="pre">narrow</span></tt></a></li>
+<li><a class="reference internal" href="#raw-search"><tt class="docutils literal"><span class="pre">raw_search</span></tt></a></li>
+<li><a class="reference internal" href="#load-all"><tt class="docutils literal"><span class="pre">load_all</span></tt></a></li>
+<li><a class="reference internal" href="#load-all-queryset"><tt class="docutils literal"><span class="pre">load_all_queryset</span></tt></a></li>
+<li><a class="reference internal" href="#auto-query"><tt class="docutils literal"><span class="pre">auto_query</span></tt></a></li>
+<li><a class="reference internal" href="#autocomplete"><tt class="docutils literal"><span class="pre">autocomplete</span></tt></a></li>
+<li><a class="reference internal" href="#more-like-this"><tt class="docutils literal"><span class="pre">more_like_this</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#methods-that-do-not-return-a-searchqueryset">Methods That Do Not Return A <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a><ul>
+<li><a class="reference internal" href="#count"><tt class="docutils literal"><span class="pre">count</span></tt></a></li>
+<li><a class="reference internal" href="#best-match"><tt class="docutils literal"><span class="pre">best_match</span></tt></a></li>
+<li><a class="reference internal" href="#latest"><tt class="docutils literal"><span class="pre">latest</span></tt></a></li>
+<li><a class="reference internal" href="#facet-counts"><tt class="docutils literal"><span class="pre">facet_counts</span></tt></a></li>
+<li><a class="reference internal" href="#spelling-suggestion"><tt class="docutils literal"><span class="pre">spelling_suggestion</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#field-lookups">Field Lookups</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#emptysearchqueryset"><tt class="docutils literal"><span class="pre">EmptySearchQuerySet</span></tt></a></li>
+<li><a class="reference internal" href="#relatedsearchqueryset"><tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt></a><ul>
+<li><a class="reference internal" href="#id2"><tt class="docutils literal"><span class="pre">load_all_queryset</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="do_not_try_this_at_home.html"
+                        title="previous chapter">Advanced Topics</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchindex_api.html"
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">SearchIndex</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchqueryset_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchindex_api.html" title="SearchIndex API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="do_not_try_this_at_home.html" title="Advanced Topics"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

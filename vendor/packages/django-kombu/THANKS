@@ -1,0 +1,3 @@
+Thanks to Rajesh Dhawan and other authors of django-queue-service
+for the database model implementation.
+See http://code.google.com/p/django-queue-service/.
