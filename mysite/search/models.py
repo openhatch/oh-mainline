@@ -55,8 +55,8 @@ def get_image_data_scaled(image_data, width):
 
     w, h = get_image_dimensions(image_fd)
 
-    new_w = width
-    new_h = (h * 1.0 / w) * width
+    new_w = int(width)
+    new_h = int((h * 1.0 / w) * width)
 
     smaller = im.resize((new_w, new_h),
                         Image.ANTIALIAS)
