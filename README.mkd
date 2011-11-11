@@ -27,8 +27,7 @@ but we haven't tested them there. Let us know.
 
 ### System dependencies ###
 
-Most of the dependencies are handled by "buildout" -- more on that below. But you
-must install a few using your system package manager.
+For now, you must install a few dependencies using your system package manager.
 
 This is what we do on Debian testing/unstable:
 
