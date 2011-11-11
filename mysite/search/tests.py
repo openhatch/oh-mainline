@@ -31,6 +31,9 @@ from mysite.search import views
 import datetime
 import mysite.project.views
 
+from django.utils.unittest import skipIf
+import django.db
+
 import hashlib
 import simplejson
 import mock
@@ -527,6 +530,7 @@ class IconGetsScaled(SearchTest):
         self.assertEqual(p.icon_smaller_for_badge.height, 11)
 
 class SearchOnFullWords(SearchTest):
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_find_perl_not_properly(self):
         Project.create_dummy()
         Bug.create_dummy(description='properly')
