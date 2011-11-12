@@ -296,3 +296,6 @@ LOGGING = {
             },
         }
 }
+
+DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
+                                           '../../downloads/GeoLiteCity.dat')

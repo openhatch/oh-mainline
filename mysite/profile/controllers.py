@@ -136,7 +136,7 @@ def get_geoip_guess_for_ip(ip_as_string):
             '../../downloads/GeoLiteCity.dat')
         if os.path.exists(system_geoip_path):
             geoip_database = pygeoip.GeoIP(system_geoip_path)
-        if os.path.exists(downloaded_geolitecity_path):
+        if os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH):
             geoip_database = pygeoip.GeoIP(downloaded_geolitecity_path)
 
     if geoip_database is None: # still?
