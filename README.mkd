@@ -20,7 +20,7 @@ OpenHatch is currently designed to run on Python 2.6 or above.
 
 ### Operating system ###
 
-We develop on Debian 6.0 and Ubuntu 10.x, and currently we run the openhatch.org website on Debian 6.0.
+We develop on Debian 6.0 and Ubuntu 10.x and Ubuntu 11.x, and currently we run the openhatch.org website on Debian 6.0.
 
 These instructions *may* work on Windows, Mac OS, and other GNU/Linux distributions,
 but we haven't tested them there. Let us know.
