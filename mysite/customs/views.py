@@ -25,7 +25,7 @@ import mysite.base.decorators
 import mysite.customs.forms
 import mysite.customs.models
 
-from mysite.customs.bugtrackers import all_trackers
+from mysite.customs.bugimporters import all_trackers
 
 # Lists all the stored trackers of a selected type (Bugzilla, Trac etc.)
 @mysite.base.decorators.view

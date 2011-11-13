@@ -75,6 +75,15 @@ class TrackerModel(models.Model):
     created_for_project = models.ForeignKey(
         'search.Project', null=True,
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
+
+    ### This optional attribute specifies a class name, which is intepreted as
+    ### part of the mysite.customs.bugimporters module.
+    ###
+    ### If the class is specified, we will use custom code from that class
+    ### when doing bug parsing.
+    custom_parser = models.CharField(max_length=200, blank=True, default='',
+                                     help_text='(For use by OpenHatch admins) Choose a custom bug parser class for the tracker')
+
     objects = InheritanceManager()
 
     def get_edit_url(self):
@@ -84,12 +93,12 @@ class TrackerModel(models.Model):
         It is part of this superclass so that derived classes can use the
         functionality without implementing it themselves. It relies on
         the classes being manually added to
-        mysite.customs.bugtrackers.all_trackers.'''
-        import mysite.customs.bugtrackers
+        mysite.customs.bugimporters.all_trackers.'''
+        import mysite.customs.bugimporters
         my_short_name = None
 
-        for short_name in mysite.customs.bugtrackers.all_trackers:
-            klass = mysite.customs.bugtrackers.all_trackers[short_name]['model']
+        for short_name in mysite.customs.bugimporters.all_trackers:
+            klass = mysite.customs.bugimporters.all_trackers[short_name]['model']
             if self.__class__ == klass:
                 my_short_name = short_name
                 break
@@ -158,15 +167,6 @@ class BugzillaTrackerModel(TrackerModel):
 
     def get_base_url(self):
         return self.base_url
-
-    def create_class_that_can_actually_crawl_bugs(self):
-        # FIXME: This is totally busted.
-        # If you run the tests, you'll see that the project_name isn't somehow
-        # flowing through, and I don't know why. :-(
-        import mysite.customs.bugtrackers.bugzilla
-        factory = mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(self)
-        instance = factory()
-        return instance
 
 class BugzillaQueryModel(TrackerQueryModel):
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''

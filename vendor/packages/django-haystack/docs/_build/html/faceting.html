@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Faceting &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Autocomplete" href="autocomplete.html" />
+    <link rel="prev" title="Highlighting" href="highlighting.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="autocomplete.html" title="Autocomplete"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="highlighting.html" title="Highlighting"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="faceting">
+<span id="ref-faceting"></span><h1>Faceting<a class="headerlink" href="#faceting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-faceting">
+<h2>What Is Faceting?<a class="headerlink" href="#what-is-faceting" title="Permalink to this headline">¶</a></h2>
+<p>Faceting is a way to provide users with feedback about the number of documents
+which match terms they may be interested in. At it&#8217;s simplest, it gives
+document counts based on words in the corpus, date ranges, numeric ranges or
+even advanced queries.</p>
+<p>Faceting is particularly useful when trying to provide users with drill-down
+capabilities. The general workflow in this regard is:</p>
+<blockquote>
+<ol class="arabic simple">
+<li>You can choose what you want to facet on.</li>
+<li>The search engine will return the counts it sees for that match.</li>
+<li>You display those counts to the user and provide them with a link.</li>
+<li>When the user chooses a link, you narrow the search query to only include
+those conditions and display the rests, potentially with further facets.</li>
+</ol>
+</blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Faceting can be difficult, especially in providing the user with the right
+number of options and/or the right areas to be able to drill into. This
+is unique to every situation and demands following what real users need.</p>
+<p class="last">You may want to consider logging queries and looking at popular terms to
+help you narrow down how you can help your users.</p>
+</div>
+<p>Haystack provides functionality so that all of the above steps are possible.
+From the ground up, let&#8217;s build a faceted search setup. This assumes that you
+have been to work through the <a class="reference internal" href="tutorial.html"><em>Getting Started with Haystack</em></a> and have a working Haystack
+installation. The same setup from the <a class="reference internal" href="tutorial.html"><em>Getting Started with Haystack</em></a> applies here.</p>
+</div>
+<div class="section" id="determine-facets-and-searchqueryset">
+<h2>1. Determine Facets And <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt><a class="headerlink" href="#determine-facets-and-searchqueryset" title="Permalink to this headline">¶</a></h2>
+<p>Determining what you want to facet on isn&#8217;t always easy. For our purposes,
+we&#8217;ll facet on the <tt class="docutils literal"><span class="pre">author</span></tt> field.</p>
+<p>In order to facet effectively, the search engine should store both a standard
+representation of your data as well as exact version to facet on. This is
+generally accomplished by duplicating the field and storing it via two
+different types. Duplication is suggested so that those fields are still
+searchable in the standard ways.</p>
+<p>To inform Haystack of this, you simply pass along a <tt class="docutils literal"><span class="pre">faceted=True</span></tt> parameter
+on the field(s) you wish to facet on. So to modify our existing example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="n">faceted</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Haystack quietly handles all of the backend details for you, creating a similar
+field to the type you specified with <tt class="docutils literal"><span class="pre">_exact</span></tt> appended. Our example would now
+have both a <tt class="docutils literal"><span class="pre">author</span></tt> and <tt class="docutils literal"><span class="pre">author_exact</span></tt> field, though this is largely an
+implementation detail.</p>
+<p>To pull faceting information out of the index, we&#8217;ll use the
+<tt class="docutils literal"><span class="pre">SearchQuerySet.facet</span></tt> method to setup the facet and the
+<tt class="docutils literal"><span class="pre">SearchQuerySet.facet_counts</span></tt> method to retrieve back the counts seen.</p>
+<p>Experimenting in a shell (<tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">shell</span></tt>) is a good way to get a feel
+for what various facets might look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">facet</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqs</span><span class="o">.</span><span class="n">facet_counts</span><span class="p">()</span>
+<span class="go">{</span>
+<span class="go">    &#39;dates&#39;: {},</span>
+<span class="go">    &#39;fields&#39;: {</span>
+<span class="go">        &#39;author&#39;: [</span>
+<span class="go">            (&#39;john&#39;, 4),</span>
+<span class="go">            (&#39;daniel&#39;, 2),</span>
+<span class="go">            (&#39;sally&#39;, 1),</span>
+<span class="go">            (&#39;terry&#39;, 1),</span>
+<span class="go">        ],</span>
+<span class="go">    },</span>
+<span class="go">    &#39;queries&#39;: {}</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that, despite the duplication of fields, you should provide the
+regular name of the field when faceting. Haystack will intelligently
+handle the underlying details and mapping.</p>
+</div>
+<p>As you can see, we get back a dictionary which provides access to the three
+types of facets available: <tt class="docutils literal"><span class="pre">fields</span></tt>, <tt class="docutils literal"><span class="pre">dates</span></tt> and <tt class="docutils literal"><span class="pre">queries</span></tt>. Since we only
+faceted on the <tt class="docutils literal"><span class="pre">author</span></tt> field (which actually facets on the <tt class="docutils literal"><span class="pre">author_exact</span></tt>
+field managed by Haystack), only the <tt class="docutils literal"><span class="pre">fields</span></tt> key has any data
+associated with it. In this case, we have a corpus of eight documents with four
+unique authors.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Facets are chainable, like most <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> methods. However, unlike
+most <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> methods, they are <em>NOT</em> affected by <tt class="docutils literal"><span class="pre">filter</span></tt> or
+similar methods. The only method that has any effect on facets is the
+<tt class="docutils literal"><span class="pre">narrow</span></tt> method (which is how you provide drill-down).</p>
+</div>
+<p>Now that we have the facet we want, it&#8217;s time to implement it.</p>
+</div>
+<div class="section" id="switch-to-the-facetedsearchview-and-facetedsearchform">
+<h2>2. Switch to the <tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt> and <tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt><a class="headerlink" href="#switch-to-the-facetedsearchview-and-facetedsearchform" title="Permalink to this headline">¶</a></h2>
+<p>There are three things that we&#8217;ll need to do to expose facets to our frontend.
+The first is construct the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> we want to use. We should have
+that from the previous step. The second is to switch to the
+<tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt>. This view is useful because it prepares the facet counts
+and provides them in the context as <tt class="docutils literal"><span class="pre">facets</span></tt>.</p>
+<p>Optionally, the third step is to switch to the <tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt>. As it
+currently stands, this is only useful if you want to provide drill-down, though
+it may provide more functionality in the future. We&#8217;ll do it for the sake of
+having it in place but know that it&#8217;s not required.</p>
+<p>In your URLconf, you&#8217;ll need to switch to the <tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt>. Your
+URLconf should resemble:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">haystack.forms</span> <span class="kn">import</span> <span class="n">FacetedSearchForm</span>
+<span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+<span class="kn">from</span> <span class="nn">haystack.views</span> <span class="kn">import</span> <span class="n">FacetedSearchView</span>
+
+
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">facet</span><span class="p">(</span><span class="s">&#39;author&#39;</span><span class="p">)</span>
+
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;haystack.views&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">FacetedSearchView</span><span class="p">(</span><span class="n">form_class</span><span class="o">=</span><span class="n">FacetedSearchForm</span><span class="p">,</span> <span class="n">searchqueryset</span><span class="o">=</span><span class="n">sqs</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;haystack_search&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt> will now instantiate the <tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt> and use
+the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> we provided. Now, a <tt class="docutils literal"><span class="pre">facets</span></tt> variable will be present
+in the context. This is added in an overridden <tt class="docutils literal"><span class="pre">extra_context</span></tt> method.</p>
+</div>
+<div class="section" id="display-the-facets-in-the-template">
+<h2>3. Display The Facets In The Template<a class="headerlink" href="#display-the-facets-in-the-template" title="Permalink to this headline">¶</a></h2>
+<p>Templating facets involves simply adding an extra bit of processing to display
+the facets (and optionally to link to provide drill-down). An example template
+might look like this:</p>
+<div class="highlight-python"><pre>&lt;form method="get" action="."&gt;
+    &lt;table&gt;
+        &lt;tbody&gt;
+            {{ form.as_table }}
+            &lt;tr&gt;
+                &lt;td&gt;&amp;nbsp;&lt;/td&gt;
+                &lt;td&gt;&lt;input type="submit" value="Search"&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/form&gt;
+
+{% if query %}
+    &lt;!-- Begin faceting. --&gt;
+    &lt;h2&gt;By Author&lt;/h2&gt;
+
+    &lt;div&gt;
+        &lt;dl&gt;
+            {% if facets.fields.author %}
+                &lt;dt&gt;Author&lt;/dt&gt;
+                {# Provide only the top 5 authors #}
+                {% for author in facets.fields.author|slice:":5" %}
+                    &lt;dd&gt;&lt;a href="{{ request.get_full_path }}&amp;amp;selected_facets=author_exact:{{ author.0|urlencode }}"&gt;{{ author.0 }}&lt;/a&gt; ({{ author.1 }})&lt;/dd&gt;
+                {% endfor %}
+            {% else %}
+                &lt;p&gt;No author facets.&lt;/p&gt;
+            {% endif %}
+        &lt;/dl&gt;
+    &lt;/div&gt;
+    &lt;!-- End faceting --&gt;
+
+    &lt;!-- Display results... --&gt;
+    {% for result in results %}
+        &lt;div class="search_result"&gt;
+            &lt;h3&gt;&lt;a href="{{ result.object.get_absolute_url }}"&gt;{{ result.object.title }}&lt;/a&gt;&lt;/h3&gt;
+
+            &lt;p&gt;{{ result.object.body|truncatewords:80 }}&lt;/p&gt;
+        &lt;/div&gt;
+    {% empty %}
+        &lt;p&gt;Sorry, no results found.&lt;/p&gt;
+    {% endfor %}
+{% endif %}</pre>
+</div>
+<p>Displaying the facets is a matter of looping through the facets you want and
+providing the UI to suit. The <tt class="docutils literal"><span class="pre">author.0</span></tt> is the facet text from the backend
+and the <tt class="docutils literal"><span class="pre">author.1</span></tt> is the facet count.</p>
+</div>
+<div class="section" id="narrowing-the-search">
+<h2>4. Narrowing The Search<a class="headerlink" href="#narrowing-the-search" title="Permalink to this headline">¶</a></h2>
+<p>We&#8217;ve also set ourselves up for the last bit, the drill-down aspect. By
+appending on the <tt class="docutils literal"><span class="pre">selected_facets</span></tt> to the URLs, we&#8217;re informing the
+<tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt> that we want to narrow our results to only those
+containing the author we provided.</p>
+<p>For a concrete example, if the facets on author come back as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&#39;dates&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s">&#39;fields&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;author&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s">&#39;john&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">&#39;daniel&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">&#39;sally&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">&#39;terry&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s">&#39;queries&#39;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You should present a list similar to:</p>
+<div class="highlight-python"><pre>&lt;ul&gt;
+    &lt;li&gt;&lt;a href="/search/?q=Haystack&amp;selected_facets=author_exact:john"&gt;john&lt;/a&gt; (4)&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/search/?q=Haystack&amp;selected_facets=author_exact:daniel"&gt;daniel&lt;/a&gt; (2)&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/search/?q=Haystack&amp;selected_facets=author_exact:sally"&gt;sally&lt;/a&gt; (1)&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/search/?q=Haystack&amp;selected_facets=author_exact:terry"&gt;terry&lt;/a&gt; (1)&lt;/li&gt;
+&lt;/ul&gt;</pre>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Haystack can automatically handle most details around faceting. However,
+since <tt class="docutils literal"><span class="pre">selected_facets</span></tt> is passed directly to narrow, it must use the
+duplicated field name. Improvements to this are planned but incomplete.</p>
+</div>
+<p>This is simply the default behavior but it is possible to override or provide
+your own form which does additional processing. You could also write your own
+faceted <tt class="docutils literal"><span class="pre">SearchView</span></tt>, which could provide additional/different facets based
+on facets chosen. There is a wide range of possibilities available to help the
+user navigate your content.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Faceting</a><ul>
+<li><a class="reference internal" href="#what-is-faceting">What Is Faceting?</a></li>
+<li><a class="reference internal" href="#determine-facets-and-searchqueryset">1. Determine Facets And <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a></li>
+<li><a class="reference internal" href="#switch-to-the-facetedsearchview-and-facetedsearchform">2. Switch to the <tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt> and <tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt></a></li>
+<li><a class="reference internal" href="#display-the-facets-in-the-template">3. Display The Facets In The Template</a></li>
+<li><a class="reference internal" href="#narrowing-the-search">4. Narrowing The Search</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="highlighting.html"
+                        title="previous chapter">Highlighting</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="autocomplete.html"
+                        title="next chapter">Autocomplete</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/faceting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="autocomplete.html" title="Autocomplete"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="highlighting.html" title="Highlighting"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

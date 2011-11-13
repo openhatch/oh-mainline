@@ -16,22 +16,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import lxml.etree
+from mysite.base.depends import lxml
 import twisted.web.error
 import twisted.web.http
 import urlparse
+import logging
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
 from mysite.customs.bugimporters.base import BugImporter
 import mysite.search.models
+import mysite.customs.bugtrackers.bugzilla
 
 class BugzillaBugImporter(BugImporter):
     def __init__(self, *args, **kwargs):
-        # Create a list to store bug ids obtained from queries.
-        self.bug_ids = []
         # Call the parent __init__.
         super(BugzillaBugImporter, self).__init__(*args, **kwargs)
+
+        if self.bug_parser is None:
+            self.bug_parser = BugzillaBugParser
+
+        # Create a list to store bug ids obtained from queries.
+        self.bug_ids = []
 
     def process_queries(self, queries):
         # Add all the queries to the waiting list.
@@ -150,6 +156,7 @@ class BugzillaBugImporter(BugImporter):
         self.push_urls_onto_reactor()
 
     def errback_bug_xml(self, failure, bug_id_list):
+        logging.info("STARTING ERRBACK")
         # Check if the failure was related to the size of the request.
         size_related_errors = [
                 twisted.web.http.REQUEST_ENTITY_TOO_LARGE,
@@ -163,7 +170,6 @@ class BugzillaBugImporter(BugImporter):
             # Split bug_id_list into pieces, and turn each piece into a URL.
             # Note that (floor division)+1 is used to ensure that for
             # odd-numbered lists we don't end up with one bug id left over.
-            split_bug_id_list = []
             num_ids = len(bug_id_list)
             step = (num_ids//2)+1
             for i in xrange(0, num_ids, step):
@@ -191,14 +197,42 @@ class BugzillaBugImporter(BugImporter):
             return failure
 
     def handle_bug_xml(self, bug_list_xml_string):
+        logging.info("STARTING XML")
         # Turn the string into an XML tree.
-        bug_list_xml = lxml.etree.XML(bug_list_xml_string)
+        try:
+            bug_list_xml = lxml.etree.XML(bug_list_xml_string)
+        except Exception:
+            logging.exception("Eek, XML parsing failed. Jumping to the errback.")
+            logging.error("If this keeps happening, you might want to "
+                          "delete/disable the bug tracker causing this.")
+            raise
+
+        return self.handle_bug_list_xml_parsed(bug_list_xml)
+
+    def handle_bug_list_xml_parsed(self, bug_list_xml):
         for bug_xml in bug_list_xml.xpath('bug'):
             # Create a BugzillaBugParser with the XML data.
-            bbp = BugzillaBugParser(bug_xml)
+            bbp = self.bug_parser(bug_xml)
 
             # Get the parsed data dict from the BugzillaBugParser.
-            data = bbp.get_parsed_data_dict(self.tm)
+            data = bbp.get_parsed_data_dict(base_url=self.tm.get_base_url(),
+                                            bitesized_type=self.tm.bitesized_type,
+                                            bitesized_text=self.tm.bitesized_text,
+                                            documentation_type=self.tm.documentation_type,
+                                            documentation_text=self.tm.documentation_text)
+
+            # Make a project to put into the Bug object
+            project_name = bbp.generate_bug_project_name(
+                bug_project_name_format=self.tm.bug_project_name_format,
+                tracker_name=self.tm.tracker_name)
+            project_from_name, _ = mysite.search.models.Project.objects.get_or_create(
+                    name=project_name)
+
+            # Manually save() the Project to ensure that if it was
+            # created then it has a display_name. Then add that to the
+            # data to be saved in the bug.
+            project_from_name.save()
+            data['project'] = project_from_name
 
             # Get or create a Bug object to put the parsed data in.
             try:
@@ -212,26 +246,10 @@ class BugzillaBugImporter(BugImporter):
                 value = data[key]
                 setattr(bug, key, value)
 
-            # Save the project onto it
-            # Project name is generated from the bug_project_name_format property
-            # of the TrackerModel.
-            project_from_name, _ = mysite.search.models.Project.objects.get_or_create(
-                    name=self.generate_bug_project_name(bbp))
-            # Manually save() the Project to ensure that if it was created then it has
-            # a display_name.
-            project_from_name.save()
-            bug.project = project_from_name
-
             # Store the tracker that generated the Bug, update last_polled and save it!
             bug.tracker = self.tm
             bug.last_polled = datetime.datetime.utcnow()
             bug.save()
-
-    def generate_bug_project_name(self, bbp):
-        return self.tm.bug_project_name_format.format(
-                tracker_name=self.tm.tracker_name,
-                product=bbp.product,
-                component=bbp.component)
 
     def determine_if_finished(self):
         # If we got here then there are no more URLs in the waiting list.
@@ -245,10 +263,17 @@ class BugzillaBugParser:
     @staticmethod
     def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
         """Given an object representing <bug><tag>text</tag></bug>,
-        and tag_name = 'tag', returns 'text'."""
+        and tag_name = 'tag', returns 'text'.
+
+        If someone carelessly passes us something else, we bail
+        with ValueError."""
+        if xml_doc.tag != 'bug':
+            error_msg = "You passed us a %s tag. We wanted a <bug> object." % (
+                xml_doc.tag,)
+            raise ValueError, error_msg
         tags = xml_doc.xpath(tag_name)
         try:
-            return tags[index].text
+            return tags[index].text or u''
         except IndexError:
             return ''
 
@@ -286,10 +311,12 @@ class BugzillaBugParser:
     def bugzilla_date_to_datetime(date_string):
         return mysite.base.helpers.string2naive_datetime(date_string)
 
-    def get_parsed_data_dict(self, tm):
+    def get_parsed_data_dict(self,
+                             base_url, bitesized_type, bitesized_text,
+                             documentation_type, documentation_text):
         # Generate the bug_url.
         self.bug_url = urlparse.urljoin(
-                tm.get_base_url(),
+                base_url,
                 'show_bug.cgi?id=%d' % self.bug_id)
 
         xml_data = self.bug_xml
@@ -314,34 +341,136 @@ class BugzillaBugParser:
             'canonical_bug_link': self.bug_url,
             'looks_closed': looks_closed
             }
-        keywords_text = self.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords_text = self.get_tag_text_from_xml(xml_data, 'keywords') or ''
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         # Check for the bitesized keyword
-        if tm.bitesized_type:
-            ret_dict['bite_size_tag_name'] = tm.bitesized_text
-            b_list = tm.bitesized_text.split(',')
-            if tm.bitesized_type == 'key':
+        if bitesized_type:
+            ret_dict['bite_size_tag_name'] = bitesized_text
+            b_list = bitesized_text.split(',')
+            if bitesized_type == 'key':
                 ret_dict['good_for_newcomers'] = any(b in keywords for b in b_list)
-            elif tm.bitesized_type == 'wboard':
+            elif bitesized_type == 'wboard':
                 whiteboard_text = self.get_tag_text_from_xml(xml_data, 'status_whiteboard')
                 ret_dict['good_for_newcomers'] = any(b in whiteboard_text for b in b_list)
             else:
                 ret_dict['good_for_newcomers'] = False
         else:
             ret_dict['good_for_newcomers'] = False
-        # Check whether this is a documentation bug.
-        if tm.documentation_type:
-            d_list = tm.documentation_text.split(',')
-            if tm.documentation_type == 'key':
+        # Chemck whether this is a documentation bug.
+        if documentation_type:
+            d_list = documentation_text.split(',')
+            if documentation_type == 'key':
                 ret_dict['concerns_just_documentation'] = any(d in keywords for d in d_list)
-            elif tm.documentation_type == 'comp':
+            elif documentation_type == 'comp':
                 ret_dict['concerns_just_documentation'] = any(d == self.component for d in d_list)
-            elif tm.documentation_type == 'prod':
+            elif documentation_type == 'prod':
                 ret_dict['concerns_just_documentation'] = any(d == self.product for d in d_list)
             else:
                 ret_dict['concerns_just_documentation'] = False
         else:
             ret_dict['concerns_just_documentation'] = False
+
+        # If being called in a subclass, open ourselves up to some overriding
+        self.extract_tracker_specific_data(xml_data, ret_dict)
+
         # And pass ret_dict on.
         return ret_dict
+
+    def extract_tracker_specific_data(self, xml_data, ret_dict):
+        pass # Override me
+
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        return bug_project_name_format.format(
+                tracker_name=tracker_name,
+                product=self.product,
+                component=self.component)
+
+### Custom bug parsers
+class KDEBugzilla(BugzillaBugParser):
+
+    def extract_tracker_specific_data(self, xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        keywords_text = self.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('junior-jobs' in keywords)
+        ret_dict['bite_size_tag_name'] = 'junior-jobs'
+        # Remove 'JJ:' from title if present
+        if ret_dict['title'].startswith("JJ:"):
+            ret_dict['title'] = ret_dict['title'][3:].strip()
+        # Check whether documentation bug
+        product = self.get_tag_text_from_xml(xml_data, 'product')
+        ret_dict['concerns_just_documentation'] = (product == 'docs')
+        # Then pass ret_dict back
+        return ret_dict
+
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        product = self.product
+        reasonable_products = set([
+            'Akonadi',
+            'Phonon'
+            'kmail',
+            'Rocs',
+            'akregator',
+            'amarok',
+            'ark',
+            'cervisia',
+            'k3b',
+            'kappfinder',
+            'kbabel',
+            'kdeprint',
+            'kdesktop',
+            'kfile',
+            'kfourinline',
+            'khotkeys',
+            'kio',
+            'kmail',
+            'kmplot',
+            'koffice',
+            'kompare',
+            'konquerorr',
+            'kopete',
+            'kpat',
+            'kphotoalbum',
+            'krita',
+            'ksmserver',
+            'kspread',
+            'ksysguard',
+            'ktimetracker',
+            'kwin',
+            'kword',
+            'marble',
+            'okular',
+            'plasma',
+            'printer-applet',
+            'rsibreak',
+            'step',
+            'systemsettings',
+            'kdelibs',
+            'kcontrol',
+            'korganizer',
+            'kipiplugins',
+            'Phonon',
+            'dolphin',
+            'umbrello']
+            )
+        products_to_be_renamed = {
+            'konqueror': 'boomski',
+            'digikamimageplugins': 'digikam image plugins',
+            'Network Management': 'KDE Network Management',
+            'telepathy': 'telepathy for KDE',
+            'docs': 'KDE documentation',
+            }
+        component = self.component
+        things = (product, component)
+
+        if product in reasonable_products:
+            bug_project_name = product
+        else:
+            if product in products_to_be_renamed:
+                bug_project_name = products_to_be_renamed[product]
+            else:
+                logging.info("Guessing on KDE subproject name. Found %s" %  repr(things))
+                bug_project_name = product
+        return bug_project_name

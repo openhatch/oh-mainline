@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import twisted.web.client
+import logging
 
 from mysite.customs.models import TrackerModel
 from mysite.search.models import Bug
@@ -89,7 +90,7 @@ class BugImporter(object):
     ###################################################
     # Importer functions that may require overloading #
     ###################################################
-    def __init__(self, tracker_model, reactor_manager):
+    def __init__(self, tracker_model, reactor_manager, bug_parser=None):
         # Store the tracker model
         self.tm = tracker_model
         # Store the reactor manager
@@ -106,6 +107,8 @@ class BugImporter(object):
         # e.g. if somehow we attempt to download a bug URL both in the initial
         # tracker refresh and the later Bug refresh.
         self.deferred_urls= {}
+        # Take an optional bug_parser to usee with this importer.
+        self.bug_parser = bug_parser
 
     def finish_import(self):
         # This importer has finished, so let the reactor manager know that it
@@ -128,7 +131,7 @@ class BugImporter(object):
         raise NotImplementedError
 
 class AddTrackerForeignKeysToBugs(object):
-    def __init__(self, tracker_model, reactor_manager):
+    def __init__(self, tracker_model, reactor_manager, bug_parser=None):
         # Store the tracker model
         self.tm = tracker_model
         # Store the reactor manager

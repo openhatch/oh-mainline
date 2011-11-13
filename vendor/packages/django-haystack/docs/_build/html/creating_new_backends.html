@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Creating New Backends &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Utilities" href="utils.html" />
+    <link rel="prev" title="Running Tests" href="running_tests.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="utils.html" title="Utilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="running_tests.html" title="Running Tests"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="creating-new-backends">
+<span id="ref-creating-new-backends"></span><h1>Creating New Backends<a class="headerlink" href="#creating-new-backends" title="Permalink to this headline">¶</a></h1>
+<p>The process should be fairly simple.</p>
+<ol class="arabic simple">
+<li>Create new backend file. Name is important.</li>
+<li>Two classes inside.<ol class="arabic">
+<li>SearchBackend (inherit from haystack.backends.BaseSearchBackend)</li>
+<li>SearchQuery (inherit from haystack.backends.BaseSearchQuery)</li>
+</ol>
+</li>
+</ol>
+<div class="section" id="searchbackend">
+<h2>SearchBackend<a class="headerlink" href="#searchbackend" title="Permalink to this headline">¶</a></h2>
+<p>Responsible for the actual connection and low-level details of interacting with
+the backend.</p>
+<ul class="simple">
+<li>Connects to search engine</li>
+<li>Method for saving new docs to index</li>
+<li>Method for removing docs from index</li>
+<li>Method for performing the actual query</li>
+</ul>
+</div>
+<div class="section" id="searchquery">
+<h2>SearchQuery<a class="headerlink" href="#searchquery" title="Permalink to this headline">¶</a></h2>
+<p>Responsible for taking structured data about the query and converting it into a
+backend appropriate format.</p>
+<ul class="simple">
+<li>Method for creating the backend specific query - <tt class="docutils literal"><span class="pre">build_query</span></tt>.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Creating New Backends</a><ul>
+<li><a class="reference internal" href="#searchbackend">SearchBackend</a></li>
+<li><a class="reference internal" href="#searchquery">SearchQuery</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="running_tests.html"
+                        title="previous chapter">Running Tests</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">Utilities</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/creating_new_backends.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="utils.html" title="Utilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="running_tests.html" title="Running Tests"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

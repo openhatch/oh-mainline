@@ -864,7 +864,11 @@ class UnsubscribeToken(mysite.search.models.OpenHatchModel):
 
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_person_tag_cache
-    update_person_tag_cache.delay(person__pk=instance.person.pk)
+    try:
+        person__pk = instance.person.pk
+    except Person.DoesNotExist:
+        return
+    update_person_tag_cache.delay(person__pk=person__pk)
     mysite.base.models.Timestamp.update_timestamp_for_string(str(Link_Person_Tag))
 
 def update_pf_cache(sender, instance, **kwargs):

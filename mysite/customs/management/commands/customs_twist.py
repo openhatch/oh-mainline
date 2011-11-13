@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
+import importlib
 from django.core.management.base import BaseCommand
 import twisted.web.client
 import twisted.internet
@@ -23,6 +24,7 @@ import mysite.customs.profile_importers
 import datetime
 import logging
 from types import NoneType
+import django.db.models
 
 import mysite.customs.models
 import mysite.customs.bugimporters.base
@@ -39,6 +41,11 @@ tracker2importer = {
         NoneType:
             mysite.customs.bugimporters.base.AddTrackerForeignKeysToBugs,
 
+        # This second one is specifically for Bugs belonging to trackers
+        # that are hard-coded in for one reason or another.
+        #mysite.customs.models.HardCodedTrackerModel:
+        #    mysite.customs.bugimporters.base.HandleHardCodedBugTracker,
+
         # The rest of these link specific subclasses of TrackerModel to the
         # relevant BugImporter class. This includes the hard-coded special
         # cases, where the TrackerModel is just a shell linking to the location
@@ -51,7 +58,7 @@ tracker2importer = {
         # Google Code Issue Tracker
         mysite.customs.models.GoogleTrackerModel:
             mysite.customs.bugimporters.google.GoogleBugImporter,
-        # Roundup1
+        # Roundup
         mysite.customs.models.RoundupTrackerModel:
             mysite.customs.bugimporters.roundup.RoundupBugImporter,
         # Trac
@@ -62,68 +69,99 @@ tracker2importer = {
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
+    def _get_importer_instance_for_tracker_model(self, tracker_model):
+        '''This takes a TrackerModel as input, and returns an instantiated
+        BugImporter subclass.'''
+        # Some TrackerModel values have no corresponding BugImporter. Test
+        # for that first so that we can bail early if needed.
+        if tracker_model.__class__ not in tracker2importer:
+            raise ValueError, "That tracker_model has no corresponding importer"
+
+        # Okay, so success is possible.
+        # We keep the collection of running importers indexed by the type of
+        # TrackerModel. If we already such an importer running, we can
+        # look it up and grab it from that collection.
+        custom_parser = getattr(tracker_model, 'custom_parser', None)
+        key = (tracker_model, custom_parser)
+        if key not in self.running_importers:
+            # Find the custom parser class, if specified.
+            custom_parser_class = None
+            if custom_parser:
+                try:
+                    module_part, custom_parser_class_name = (
+                        tracker_model.custom_parser.rsplit('.', 1))
+                    module = importlib.import_module(
+                        'mysite.customs.bugimporters.' + module_part)
+                    custom_parser_class = getattr(module, custom_parser_class_name)
+                except Exception:
+                    logging.error("Uh oh, failed trying to grab %s", custom_parser_class_name)
+                    logging.exception("We failed to import the requested custom importer.")
+
+            # Okay, at this point we're going to have to create it. Note that
+            # when we create it, we store it in the self.running_importers dict
+            # so that later calls to this will find it.
+            bug_importer_subclass = tracker2importer[tracker_model.__class__]
+            bug_importer_instance = bug_importer_subclass(
+                tracker_model, self, bug_parser=custom_parser_class)
+            self.running_importers[key] = bug_importer_instance
+
+        return self.running_importers[key]
+
     def update_trackers(self):
         print "For all tracker queries we know about, enqueue the stale ones."
         # Fetch a list of Queries that are stale.
         queries = mysite.customs.models.TrackerQueryModel.objects.filter(
                 last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)
                 ).select_subclasses()
-        # Convert this list to a dictionary of TrackerModules.
+        # Convert this list to a dictionary of TrackerModels.
         tm_list = [(query, query.tracker) for query in queries if hasattr(query, 'tracker')]
         tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
         # For each TrackerModel, process its stale Queries.
         for tm, queries in tm_dict.items():
             try:
-                icls = tracker2importer[tm.__class__]
-            except KeyError:
-                # This TrackerModule doesn't have a BugImporter yet.
+                importer = self._get_importer_instance_for_tracker_model(tm)
+            except ValueError:
                 continue
-            else:
-                # See if there is already an importer running for this tracker.
-                im = self.running_importers.get(tm, None)
-                if not im:
-                    # There isn't, so create one.
-                    im = icls(tm, self)
-                    # And store it.
-                    self.running_importers[tm] = im
-                # Give the importer queries to process.
-                im.process_queries(queries)
+            importer.process_queries(queries)
+
+    def update_bugs_without_a_bug_tracker(self, bug_list=None):
+        '''This method enqueues work to refresh bugs that have no bug_tracker
+        object attached.'''
+        if bug_list is None:
+            bug_list = Bug.all_bugs.filter(
+                last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)).filter(
+                django.db.models.Q(tracker_id=None))
+        return self.update_bugs(bug_list=bug_list)
 
     def update_bugs(self, bug_list = None):
-        print "For all Bugs we know of, enqueue the stale ones."
+        print "For all Bugs we know of, enqueue the stale ones...",
         # Check if we have been specifically passed Bugs to update.
         if bug_list:
             bugs = bug_list
         else:
             # Fetch a list of all Bugs that are stale.
             bugs = Bug.all_bugs.filter(
-                    last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1))
-        # Convert this list to a dictionary of TrackerModules.
+                    last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)).filter(
+                    ~django.db.models.Q(tracker_id=None))
+        print "%d bugs enqueued." % (len(bugs),)
+        # Convert this list to a dictionary of TrackerModels.
         tm_list = [(bug, bug.tracker) for bug in bugs]
         tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
         # For each TrackerModel, process its stale Bugs.
         for tm, bugs in tm_dict.items():
             try:
-                icls = tracker2importer[tm.__class__]
-            except KeyError:
-                # This TrackerModule doesn't have a BugImporter yet.
+                importer = self._get_importer_instance_for_tracker_model(tm)
+            except ValueError:
                 continue
-            else:
-                # See if there is already an importer running for this tracker.
-                im = self.running_importers.get(tm, None)
-                if not im:
-                    # There isn't, so create one.
-                    im = icls(tm, self)
-                    # And store it.
-                    self.running_importers[tm] = im
-                # Give the importer bug URLs to process.
-                bug_urls = [bug.canonical_bug_link for bug in bugs]
-                # Put the bug list in the form required for process_bugs.
-                # The second entry of the tuple is None as we obviously have no data yet.
-                bug_list = [(bug_url, None) for bug_url in bug_urls]
-                im.process_bugs(bug_list)
+
+            # Give the importer bug URLs to process.
+            bug_urls = [bug.canonical_bug_link for bug in bugs]
+            # Put the bug list in the form required for process_bugs.
+            # The second entry of the tuple is None as we obviously have no data yet.
+            bug_list = [(bug_url, None) for bug_url in bug_urls]
+            importer.process_bugs(bug_list)
 
     def create_tasks_from_dias(self, max = 8):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
@@ -159,16 +197,16 @@ class Command(BaseCommand):
             url = url.encode('utf-8')
         callback = data_dict['callback']
         errback = data_dict.get('errback', None)
-        
+
         logging.debug("Creating getPage for " + url)
 
         # First, actually create the Deferred.
         d = twisted.web.client.getPage(url)
-        
+
         # Then, keep track of it.
         state_manager.urls_we_are_waiting_on[url] += 1
         self.running_deferreds += 1
-        
+
         # wrap the callback
         wrapped_callback = mysite.customs.profile_importers.ImportActionWrapper(
             url=url,
@@ -206,14 +244,23 @@ class Command(BaseCommand):
             self.already_enqueued_stop_command = True
             twisted.internet.reactor.callWhenRunning(lambda *args: twisted.internet.reactor.stop())
 
-    def handle(self, use_reactor=True, *args, **options):
+    def __init__(self, *args, **kwargs):
+        super(Command, self).__init__(*args, **kwargs)
         self.running_deferreds = 0
         self.running_importers = {}
         self.already_enqueued_stop_command = False
         self.active_dia_pks = set()
 
+    def handle(self, use_reactor=True, *args, **options):
+        # Hack: This tells our update_the_person_index_from_project()
+        # to skip its work. Some of the work we do during bug import updates the
+        # Project objects, but we do not need to reindex the Person objects.
+        # So we store a flag in the settings object saying we should skip that.
+        django.conf.settings.SKIP_PERSON_REINDEX_ON_PROJECT_SAVE = True
+
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
+        self.update_bugs_without_a_bug_tracker()
         self.update_trackers()
         self.update_bugs()
         if self.running_deferreds:

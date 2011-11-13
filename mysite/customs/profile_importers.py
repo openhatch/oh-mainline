@@ -15,12 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import mysite.base.unicode_sanity
-import lxml.html
+
 import urllib
-import urllib2
 import cStringIO as StringIO
 import re
-import simplejson
+from django.utils import simplejson
 import datetime
 import collections
 import logging
@@ -36,6 +35,8 @@ import mysite.profile.models
 import mysite.base.helpers
 
 import twisted.web
+
+from mysite.base.depends import lxml
 
 ### Generic error handler
 class ProfileImporter(object):
@@ -319,7 +320,7 @@ class DebianQA(ProfileImporter):
         file_descriptor_wrapping_contents = StringIO.StringIO(contents)
 
         parsed = lxml.html.parse(file_descriptor_wrapping_contents).getroot()
-        
+
         package_names = self._package_names_from_parsed_document(parsed)
         self._create_citations_from_package_names(package_names)
 
@@ -331,7 +332,7 @@ class DebianQA(ProfileImporter):
 
         for relevant_table in parsed.cssselect('h3+table'):
             num_added = 0
-        
+
             h3 = relevant_table.getprevious()
             table = relevant_table
 
@@ -374,7 +375,7 @@ class DebianQA(ProfileImporter):
                                                  project_description=package_description)
                 portfolio_entry.save()
             portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-    
+
             citation = mysite.profile.models.Citation()
             citation.languages = "" # FIXME ", ".join(result['languages'])
             citation.contributor_role='Maintainer'
@@ -657,7 +658,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         try:
             s = xml_string
             tree = ET.parse(StringIO.StringIO(s))
-        except xml.parsers.expat.ExpatError:
+        except (xml.parsers.expat.ExpatError, ET.ParseError):
             # well, I'll be. it doesn't parse.
             # There's nothing to do.
             return None

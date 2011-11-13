@@ -1,4 +1,13 @@
 # This file is part of OpenHatch.
+
+#####################################################
+########## THIS IS DEPRECATED #######################
+########## WE INTEND TO MOVE THIS CODE ##############
+########## INTO A SUBCLASS OF BUGPARSER OR ##########
+########## BUGIMPORTER. IT WILL GO AWAY WITHIN ######
+########## A MONTH OR SO. ###########################
+########## INFO: http://lists.openhatch.org/pipermail/devel/2011-November/002466.html #
+
 # Copyright (C) 2010 Jack Grigg
 # Copyright (C) 2010 OpenHatch, Inc.
 #
@@ -17,7 +26,7 @@
 
 import urllib2
 import re
-import lxml.html # scraper library
+from mysite.base.depends import lxml
 import itertools
 import csv
 import datetime

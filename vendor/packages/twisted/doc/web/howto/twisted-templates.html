@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html  PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'><html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+<title>Twisted Documentation: HTML Templating with twisted.web.template</title>
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
+  </head>
+
+  <body bgcolor="white">
+    <h1 class="title">HTML Templating with twisted.web.template</h1>
+    <div class="toc"><ol><li><a href="#auto0">A Very Quick Introduction To Templating In Python</a></li><li><a href="#auto1">twisted.web.template - Why And How you Might Want to Use It</a></li><ul><li><a href="#auto2">Template Attributes</a></li><li><a href="#auto3">Slots</a></li><li><a href="#auto4">A nice example of Slots and Attributes</a></li><li><a href="#auto5">Transparent</a></li></ul><li><a href="#auto6">Quoting</a></li><li><a href="#auto7">Deferreds</a></li><li><a href="#auto8">A Brief Note on Formats and DOCTYPEs</a></li><li><a href="#auto9">A Bit of History</a></li></ol></div>
+    <div class="content">
+<span/>
+<h2>A Very Quick Introduction To Templating In Python<a name="auto0"/></h2>
+<p>
+HTML templating is the process of transforming a template document (one which
+describes style and structure, but does not itself include any content) into
+some HTML output which includes information about objects in your application.
+There are many, many libraries for doing this in Python: to name a few, <a href="http://jinja.pocoo.org/" shape="rect">jinja2</a>, <a href="http://docs.djangoproject.com/en/dev/ref/templates/" shape="rect">django templates</a>,
+and <a href="http://www.clearsilver.net/" shape="rect">clearsilver</a>.  You can easily use
+any of these libraries in your Twisted Web application, either by running them
+as <a href="web-in-60/wsgi.html" shape="rect">WSGI applications</a> or by calling your
+preferred templating system's APIs to produce their output as strings, and then
+writing those strings to <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.request.Request.write.html" title="twisted.web.request.Request.write">Request.write</a></code>.
+</p>
+<p>Before we begin explaining how to use it, I'd like to stress that you
+don't <i>need</i> to use Twisted's templating system if you prefer some other
+way to generate HTML.  Use it if it suits your personal style or your
+application, but feel free to use other things.  Twisted includes templating for
+its own use, because the <code>twisted.web</code> server needs to produce HTML
+in various places, and we didn't want to add another large dependency for that.
+Twisted is <em>not</em> in any way incompatible with other systems, so that has
+nothing to do with the fact that we use our own.</p>
+<p>
+</p>
+<h2>twisted.web.template - Why And How you Might Want to Use It<a name="auto1"/></h2>
+<p>
+Twisted includes a templating system, <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.html" title="twisted.web.template">twisted.web.template</a></code>.  This can be convenient for Twisted
+applications that want to produce some basic HTML for a web interface without an
+additional dependency.
+</p>
+<p>
+<code>twisted.web.template</code> also includes
+support for <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.internet.defer.Deferred.html" title="twisted.internet.defer.Deferred">Deferred</a></code>s, so
+you can incrementally render the output of a page based on the results of <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.internet.defer.Deferred.html" title="twisted.internet.defer.Deferred">Deferred</a></code>s that your application
+has returned.  This feature is fairly unique among templating libraries.
+</p>
+<p>
+In <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.html" title="twisted.web.template">twisted.web.template</a></code>, templates are XHTML files
+which also contain a special namespace for indicating dynamic portions of the
+document. For example:
+</p>
+<div class="html-listing"><pre class="htmlsource">
+&lt;html xmlns:t=&quot;http://twistedmatrix.com/ns/twisted.web.template/0.1&quot;&gt;
+&lt;body&gt;
+  &lt;div t:render=&quot;header&quot; /&gt;
+  &lt;div id=&quot;content&quot;&gt;
+    &lt;p&gt;Content goes here.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div t:render=&quot;footer&quot; /&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><div class="caption">template example - <a href="listings/template-1.xml"><span class="filename">listings/template-1.xml</span></a></div></div>
+The basic unit of templating is <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.Element.html" title="twisted.web.template.Element">twisted.web.template.Element</a></code>. An Element is given a way of
+loading a bit of markup like the above example, and knows how to
+correlate <code>render</code> attributes within that markup to Python methods
+exposed with <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.renderer.html" title="twisted.web.template.renderer">twisted.web.template.renderer</a></code>:
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">XMLFile</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ExampleElement</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-variable">loader</span> = <span class="py-src-variable">XMLFile</span>(<span class="py-src-string">'template-1.xml'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">header</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-string">'Header.'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">footer</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-string">'Footer.'</span>)
+</pre><div class="caption">element example - <a href="listings/element_1.py"><span class="filename">listings/element_1.py</span></a></div></div>
+In order to combine the two, we must render the element.  For this simple
+example, we can use the <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.flattenString.html" title="twisted.web.template.flattenString">flattenString</a></code> API, which will convert a
+single template object - such as an <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.Element.html" title="twisted.web.template.Element">Element</a></code> - into a <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.internet.defer.Deferred.html" title="twisted.internet.defer.Deferred">Deferred</a></code> which fires with a single string,
+the HTML output of the rendering process.
+<div class="py-listing"><pre><p class="py-linenumber">1
+2
+3
+4
+5
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flattenString</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">element_1</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">ExampleElement</span>
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">renderDone</span>(<span class="py-src-parameter">output</span>):
+    <span class="py-src-keyword">print</span> <span class="py-src-variable">output</span>
+<span class="py-src-variable">flattenString</span>(<span class="py-src-variable">None</span>, <span class="py-src-variable">ExampleElement</span>()).<span class="py-src-variable">addCallback</span>(<span class="py-src-variable">renderDone</span>)
+</pre><div class="caption">rendering snippet - <a href="listings/render_1.py"><span class="filename">listings/render_1.py</span></a></div></div>
+<p>This short program cheats a little bit; we know that there are no <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.internet.defer.Deferred.html" title="twisted.internet.defer.Deferred">Deferred</a></code>s in the template which
+require the reactor to eventually fire; therefore, we can simply add a callback
+which outputs the result.  Also, none of the <code>renderer</code> functions
+require the <code>request</code> object, so it's acceptable to
+pass <code>None</code> through here.  (The 'request' object here is used only to
+relay information about the rendering process to each renderer, so you may
+always use whatever object makes sense for your application.  Note, however,
+that renderers from library code may require an <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.iweb.IRequest.html" title="twisted.web.iweb.IRequest">IRequest</a></code>.)</p>
+<p>
+If you run it yourself, you can see that it produces the following output:
+</p>
+<div class="html-listing"><pre class="htmlsource">
+&lt;html&gt;
+&lt;body&gt;
+  &lt;div&gt;Header.&lt;/div&gt;
+  &lt;div id=&quot;content&quot;&gt;
+    &lt;p&gt;Content goes here.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div&gt;Footer.&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><div class="caption">rendering output 1 - <a href="listings/output-1.html"><span class="filename">listings/output-1.html</span></a></div></div>
+The third parameter to a renderer method is a <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.Tag.html" title="twisted.web.template.Tag">Tag</a></code> object which represents the XML element
+with the <code>t:render</code> attribute in the template. Calling a <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.Tag.html" title="twisted.web.template.Tag">Tag</a></code> adds children to the element
+in the DOM, which may be strings, more <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.Tag.html" title="twisted.web.template.Tag">Tag</a></code>s, or other renderables such as <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.Element.html" title="twisted.web.template.Element">Element</a></code>s.
+For example, to make the header and footer bold:
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">XMLFile</span>, <span class="py-src-variable">tags</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ExampleElement</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-variable">loader</span> = <span class="py-src-variable">XMLFile</span>(<span class="py-src-string">'template-1.xml'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">header</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-variable">tags</span>.<span class="py-src-variable">b</span>(<span class="py-src-string">'Header.'</span>))
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">footer</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-variable">tags</span>.<span class="py-src-variable">b</span>(<span class="py-src-string">'Footer.'</span>))
+</pre><div class="caption">tag manipulation example - <a href="listings/element_2.py"><span class="filename">listings/element_2.py</span></a></div></div>
+
+Rendering this in a similar way to the first example would produce:
+
+<div class="html-listing"><pre class="htmlsource">
+&lt;html&gt;
+&lt;body&gt;
+  &lt;div&gt;&lt;b&gt;Header.&lt;/b&gt;&lt;/div&gt;
+  &lt;div id=&quot;content&quot;&gt;
+    &lt;p&gt;Content goes here.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div&gt;&lt;b&gt;Footer.&lt;/b&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><div class="caption">tag manipulation output - <a href="listings/output-2.html"><span class="filename">listings/output-2.html</span></a></div></div>
+
+In addition to adding children, call syntax can be used to set attributes on a
+tag. For example, to change the <code>id</code> on the <code>div</code> while
+adding children:
+
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">XMLFile</span>, <span class="py-src-variable">tags</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ExampleElement</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-variable">loader</span> = <span class="py-src-variable">XMLFile</span>(<span class="py-src-string">'template-1.xml'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">header</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-variable">tags</span>.<span class="py-src-variable">p</span>(<span class="py-src-string">'Header.'</span>), <span class="py-src-variable">id</span>=<span class="py-src-string">'header'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">footer</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-variable">tags</span>.<span class="py-src-variable">p</span>(<span class="py-src-string">'Footer.'</span>), <span class="py-src-variable">id</span>=<span class="py-src-string">'footer'</span>)
+</pre><div class="caption">attributes example - <a href="listings/element_3.py"><span class="filename">listings/element_3.py</span></a></div></div>
+
+And this would produce the following page:
+
+<div class="html-listing"><pre class="htmlsource">
+&lt;html&gt;
+&lt;body&gt;
+  &lt;div id=&quot;header&quot;&gt;&lt;p&gt;Header.&lt;/p&gt;&lt;/div&gt;
+  &lt;div id=&quot;content&quot;&gt;
+    &lt;p&gt;Content goes here.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div id=&quot;footer&quot;&gt;&lt;p&gt;Footer.&lt;/p&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><div class="caption">attributes output - <a href="listings/output-3.html"><span class="filename">listings/output-3.html</span></a></div></div>
+
+<p>
+Calling a tag mutates it, it and returns the tag itself, so you can pass it
+forward and call it multiple times if you have multiple children or attributes
+to add to it. <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.html" title="twisted.web.template">twisted.web.template</a></code> also exposes some
+convenient objects for building more complex markup structures from within
+renderer methods in the <code>tags</code> object.  In the examples above, we've
+only used <code>tags.p</code> and <code>tags.b</code>, but there should be a <code>tags.x</code> for each <em>x</em> which is a valid HTML tag.  There may be
+some omissions, but if you find one, please feel free to file a bug.
+</p>
+
+<h3>Template Attributes<a name="auto2"/></h3>
+
+<code>t:attr</code> tags allow you to set HTML attributes
+(like <code>href</code> in an <code>&lt;a href=&quot;...</code>) on an enclosing
+element.
+
+<h3>Slots<a name="auto3"/></h3>
+
+<code>t:slot</code> tags allow you to specify &quot;slots&quot; which you can
+conveniently fill with multiple pieces of data straight from your Python
+program.
+
+<h3>A nice example of Slots and Attributes<a name="auto4"/></h3>
+
+The following example demonstrates both <code>t:attr</code>
+and <code>t:slot</code> in action. Here we have a layout which displays a person's
+profile on your snazzy new Twisted-powered social networking site. We use
+the <code>t:attr</code> tag to drop in the &quot;src&quot; attribute on the profile picture,
+where the actual value of src attribute gets specified by a <code>t:slot</code>
+tag <em>within</em> the <code>t:attr</code> tag. Confused? It should make more
+sense when you see the code:
+
+<div class="html-listing"><pre class="htmlsource">
+&lt;div xmlns:t=&quot;http://twistedmatrix.com/ns/twisted.web.template/0.1&quot;
+    t:render=&quot;person_profile&quot;
+    class=&quot;profile&quot;&gt;
+&lt;img&gt;&lt;t:attr name=&quot;src&quot;&gt;&lt;t:slot name=&quot;profile_image_url&quot; /&gt;&lt;/t:attr&gt;&lt;/img&gt; 
+&lt;p&gt;&lt;t:slot name=&quot;person_name&quot; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+</pre><div class="caption">slots and attributes template - <a href="listings/slots-attributes-1.xml"><span class="filename">listings/slots-attributes-1.xml</span></a></div></div>
+
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">XMLFile</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ExampleElement</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-variable">loader</span> = <span class="py-src-variable">XMLFile</span>(<span class="py-src-string">'slots-attributes-1.xml'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">person_profile</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-comment"># Note how convenient it is to pass these attributes in!</span>
+        <span class="py-src-variable">tag</span>.<span class="py-src-variable">fillSlots</span>(<span class="py-src-variable">person_name</span>=<span class="py-src-string">'Luke'</span>,
+                      <span class="py-src-variable">profile_image_url</span>=<span class="py-src-string">'http://example.com/user.png'</span>)
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>
+</pre><div class="caption">slots and attributes element - <a href="listings/slots_attributes_1.py"><span class="filename">listings/slots_attributes_1.py</span></a></div></div>
+<div class="html-listing"><pre class="htmlsource">
+&lt;div class=&quot;profile&quot;&gt;
+&lt;img src=&quot;http://example.com/user.png&quot; /&gt; 
+&lt;p&gt;Luke&lt;/p&gt;
+&lt;/div&gt;
+</pre><div class="caption">slots and attributes output - <a href="listings/slots-attributes-output.html"><span class="filename">listings/slots-attributes-output.html</span></a></div></div>
+
+<h3>Transparent<a name="auto5"/></h3>
+
+Note how renderers, slots and attributes require you to specify a renderer on
+some outer HTML element. What if you don't want to be forced to add an element
+to your DOM just to drop some content into it? Maybe it messes with your
+layout, and you can't get it to work in IE with that extra <code>div</code>
+tag? Perhaps you need <code>t:transparent</code>, which allows you to drop some
+content in without any surrounding &quot;container&quot; tag. For example:
+
+<div class="html-listing"><pre class="htmlsource">
+&lt;div xmlns:t=&quot;http://twistedmatrix.com/ns/twisted.web.template/0.1&quot;&gt;
+&lt;!-- layout decision - these things need to be *siblings* --&gt;
+&lt;t:transparent t:render=&quot;renderer1&quot; /&gt;
+&lt;t:transparent t:render=&quot;renderer2&quot; /&gt;
+&lt;/div&gt;
+
+</pre><div class="caption">transparent template - <a href="listings/transparent-1.xml"><span class="filename">listings/transparent-1.xml</span></a></div></div>
+
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">XMLFile</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ExampleElement</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-variable">loader</span> = <span class="py-src-variable">XMLFile</span>(<span class="py-src-string">'transparent-1.xml'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">renderer1</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-string">&quot;hello&quot;</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">renderer2</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-string">&quot;world&quot;</span>)
+</pre><div class="caption">transparent element - <a href="listings/transparent_element.py"><span class="filename">listings/transparent_element.py</span></a></div></div>
+
+<div class="html-listing"><pre class="htmlsource">
+&lt;div&gt;
+&lt;!-- layout decision - these things need to be *siblings* --&gt;
+hello
+world
+&lt;/div&gt;
+</pre><div class="caption">transparent rendering output - <a href="listings/transparent-output.html"><span class="filename">listings/transparent-output.html</span></a></div></div>
+
+<h2>Quoting<a name="auto6"/></h2>
+
+<code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.html" title="twisted.web.template">twisted.web.template</a></code> will quote any strings that place
+into the DOM.  This provides protection against <a href="http://en.wikipedia.org/wiki/Cross-site_scripting" shape="rect">XSS attacks</a>, in
+addition to just generally making it easy to put arbitrary strings onto a web
+page, without worrying about what they might have in them.  This can easily be
+demonstrated with an element using the same template from our earlier examples.
+Here's an element that returns some &quot;special&quot; characters in HTML ('&lt;', '&gt;',
+and '&quot;', which is special in attribute values):
+
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+</p><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">XMLFile</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ExampleElement</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-variable">loader</span> = <span class="py-src-variable">XMLFile</span>(<span class="py-src-string">'template-1.xml'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">header</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-string">'&lt;&lt;&lt;Header&gt;&gt;&gt;!'</span>)
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">footer</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">tag</span>(<span class="py-src-string">'&gt;&gt;&gt;&quot;Footer!&quot;&lt;&lt;&lt;'</span>, <span class="py-src-variable">id</span>=<span class="py-src-string">'&lt;&quot;fun&quot;&gt;'</span>)
+</pre><div class="caption">renderers returning &quot;special&quot; characters - <a href="listings/quoting_element.py"><span class="filename">listings/quoting_element.py</span></a></div></div>
+
+Note that they are all safely quoted in the output, and will appear in a web
+browser just as you returned them from your Python method:
+
+<div class="html-listing"><pre class="htmlsource">
+&lt;html&gt;
+&lt;body&gt;
+  &lt;div&gt;&amp;lt;&amp;lt;&amp;lt;Header&amp;gt;&amp;gt;&amp;gt;!&lt;/div&gt;
+  &lt;div id=&quot;content&quot;&gt;
+    &lt;p&gt;Content goes here.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div id=&quot;&amp;lt;&amp;quot;fun&amp;quot;&amp;gt;&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&quot;Footer!&quot;&amp;lt;&amp;lt;&amp;lt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><div class="caption">output containing &quot;special&quot; characters - <a href="listings/quoting-output.html"><span class="filename">listings/quoting-output.html</span></a></div></div>
+
+<h2>Deferreds<a name="auto7"/></h2>
+
+Finally, a simple demonstration of Deferred support, the unique feature of <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.html" title="twisted.web.template">twisted.web.template</a></code>.  Simply put, any renderer may
+return a Deferred which fires with some template content instead of the template
+content itself.  As shown above, <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.flattenString.html" title="twisted.web.template.flattenString">flattenString</a></code> will return a Deferred that
+fires with the full content of the string.  But if there's a lot of content, you
+might not want to wait before starting to send some of it to your HTTP client:
+for that case, you can use <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.flatten.html" title="twisted.web.template.flatten">flatten</a></code>.
+It's difficult to demonstrate this directly in a browser-based application;
+unless you insert very long delays before firing your Deferreds, it just looks
+like your browser is instantly displaying everything.  Here's an example that
+just prints out some HTML template, with markers inserted for where certain
+events happen:
+
+<div class="py-listing"><pre><p class="py-linenumber"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</p><span class="py-src-keyword">import</span> <span class="py-src-variable">sys</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">template</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">XMLString</span>, <span class="py-src-variable">Element</span>, <span class="py-src-variable">renderer</span>, <span class="py-src-variable">flatten</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span>.<span class="py-src-variable">defer</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Deferred</span>
+
+<span class="py-src-variable">sample</span> = <span class="py-src-variable">XMLString</span>(
+    <span class="py-src-string">&quot;&quot;&quot;
+    &lt;div xmlns:t=&quot;http://twistedmatrix.com/ns/twisted.web.template/0.1&quot;&gt;
+    Before waiting ...
+    &lt;span t:render=&quot;wait&quot;&gt;&lt;/span&gt;
+    ... after waiting.
+    &lt;/div&gt;
+    &quot;&quot;&quot;</span>)
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">WaitForIt</span>(<span class="py-src-parameter">Element</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">Element</span>.<span class="py-src-variable">__init__</span>(<span class="py-src-variable">self</span>, <span class="py-src-variable">loader</span>=<span class="py-src-variable">sample</span>)
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">deferred</span> = <span class="py-src-variable">Deferred</span>()
+
+    @<span class="py-src-variable">renderer</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wait</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">tag</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">deferred</span>.<span class="py-src-variable">addCallback</span>(
+            <span class="py-src-keyword">lambda</span> <span class="py-src-variable">aValue</span>: <span class="py-src-variable">tag</span>(<span class="py-src-string">&quot;A value: &quot;</span> + <span class="py-src-variable">repr</span>(<span class="py-src-variable">aValue</span>)))
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">done</span>(<span class="py-src-parameter">ignore</span>):
+    <span class="py-src-keyword">print</span>(<span class="py-src-string">&quot;[[[Deferred fired.]]]&quot;</span>)
+
+<span class="py-src-keyword">print</span>(<span class="py-src-string">'[[[Rendering the template.]]]'</span>)
+<span class="py-src-variable">it</span> = <span class="py-src-variable">WaitForIt</span>()
+<span class="py-src-variable">flatten</span>(<span class="py-src-variable">None</span>, <span class="py-src-variable">it</span>, <span class="py-src-variable">sys</span>.<span class="py-src-variable">stdout</span>.<span class="py-src-variable">write</span>).<span class="py-src-variable">addCallback</span>(<span class="py-src-variable">done</span>)
+<span class="py-src-keyword">print</span>(<span class="py-src-string">'[[[In progress... now firing the Deferred.]]]'</span>)
+<span class="py-src-variable">it</span>.<span class="py-src-variable">deferred</span>.<span class="py-src-variable">callback</span>(<span class="py-src-string">&quot;&lt;value&gt;&quot;</span>)
+<span class="py-src-keyword">print</span>(<span class="py-src-string">'[[[All done.]]]'</span>)
+</pre><div class="caption">deferred example - <a href="listings/wait_for_it.py"><span class="filename">listings/wait_for_it.py</span></a></div></div>
+
+If you run this example, you should get the following output:
+
+<div class="html-listing"><pre class="htmlsource">
+[[[Rendering the template.]]]
+&lt;div&gt;
+    Before waiting ...
+    [[[In progress... now firing the Deferred.]]]
+&lt;span&gt;A value: '&amp;lt;value&amp;gt;'&lt;/span&gt;
+    ... after waiting.
+    &lt;/div&gt;[[[Deferred fired.]]]
+[[[All done.]]]
+</pre><div class="caption">output from deferred example - <a href="listings/waited-for-it.html"><span class="filename">listings/waited-for-it.html</span></a></div></div>
+
+This demonstrates that part of the output (everything up to
+&quot;<code>[[[In progress...</code>&quot;) is written out immediately as it's rendered.
+But once it hits the Deferred, <code>WaitForIt</code>'s rendering needs to pause
+until <code>.callback(...)</code> is called on that Deferred.  You can see that
+no further output is produced until the message indicating that the Deferred is
+being fired is complete.  By returning Deferreds and using <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.web.template.flatten.html" title="twisted.web.template.flatten">flatten</a></code>, you can avoid buffering large
+amounts of data.
+
+<h2>A Brief Note on Formats and DOCTYPEs<a name="auto8"/></h2>
+
+<p>
+The goal of <code>twisted.web.template</code> is to emit both valid <a href="http://whatwg.org/html" shape="rect">HTML</a> or <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-xhtml-syntax.html#the-xhtml-syntax" shape="rect">XHTML</a>.
+However, in order to get the maximally standards-compliant output format you
+desire, you have to know which one you want, and take a few simple steps to emit
+it correctly.  Many browsers will probably work with most output if you ignore
+this section entirely, but <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/syntax.html#the-doctype" shape="rect">the
+    HTML specification recommends that you specify an appropriate DOCTYPE</a>.
+</p>
+
+<p>
+As a <code>DOCTYPE</code> declaration in your template would describe the
+template itself, rather than its output, it won't be included in your output.
+If you wish to annotate your template output with a DOCTYPE, you will have to
+write it to the browser out of band.  One way to do this would be to simply
+do <code>request.write('&lt;!DOCTYPE html&gt;\n')</code> when you are ready to
+begin emitting your response.  The same goes for an XML <code>DOCTYPE</code>
+declaration.
+</p>
+
+<p>
+<code>twisted.web.template</code> will remove the <code>xmlns</code> attributes
+used to declare
+the <code>http://twistedmatrix.com/ns/twisted.web.template/0.1</code> namespace,
+but it will not modify other namespace declaration attributes.  Therefore if you
+wish to serialize in HTML format, you should not use other namespaces; if you
+wish to serialize to XML, feel free to insert any namespace declarations that
+are appropriate, and they will appear in your output.
+</p>
+
+<div class="note"><strong>Note: </strong>
+This relaxed approach is correct in many cases.  However, in certain contexts -
+especially &lt;script&gt; and &lt;style&gt; tags - quoting rules differ in
+significant ways between HTML and XML, and between different browsers' parsers
+in HTML.  If you want to generate dynamic content inside a script or stylesheet,
+the best option is to load the resource externally so you don't have to worry
+about quoting rules.  The second best option is to strictly configure your
+content-types and DOCTYPE declarations for XML, whose quoting rules are simple
+and compatible with the approach that <code>twisted.web.template</code> takes.
+And, please remember: regardless of how you put it there, any user input placed
+inside a &lt;script&gt; or &lt;style&gt; tag is a potential security issue.
+</div>
+
+<h2>A Bit of History<a name="auto9"/></h2>
+<p>
+Those of you who used Divmod Nevow may notice some
+similarities.  <code>twisted.web.template</code> is in fact derived from the
+latest version of Nevow, but includes only the latest components from Nevow's
+rendering pipeline, and does not have any of the legacy compatibility layers
+that Nevow grew over time.  This should make
+using <code>twisted.web.template</code> a similar experience for many long-time
+users of Twisted who have previously used Nevow for its twisted-friendly
+templating, but more straightforward for new users.
+</p>
+</div>
+
+    <p><a href="index.html">Index</a></p>
+    <span class="version">Version: 11.0.0</span>
+  </body>
+</html>

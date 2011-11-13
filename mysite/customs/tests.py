@@ -29,14 +29,17 @@ from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
 from mysite.customs import ohloh
 import mysite.customs.views
+import mysite.base.depends
+
+import xml.etree.ElementTree as ET
 
 from django.core.urlresolvers import reverse
 
+import logging
 import mock
 import os
 import time
 import twill
-import lxml
 import urlparse
 
 import django.test
@@ -55,6 +58,8 @@ import twisted.internet.defer
 import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
+
+from django.utils.unittest import skipIf
 
 import mysite.customs.models
 import mysite.customs.bugimporters.trac
@@ -77,13 +82,13 @@ class FakeGetPage(object):
         self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-personal-feed.json')).read()
         self.url2data['https://api.launchpad.net/1.0/people?ws.op=find&text=asheesh%40asheesh.org'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'people?ws.op=find&text=asheesh@asheesh.org')).read()
+            settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'people__ws.op=find&text=asheesh@asheesh.org')).read()
         self.url2data['https://launchpad.net/~paulproteus'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~paulproteus')).read()
         self.url2data['https://launchpad.net/~Mozilla'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~Mozilla')).read()
         self.url2data['http://api.bitbucket.org/1.0/users/paulproteus/'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'bitbucket', 'paulproteus.json')).read()
-        self.url2data['http://www.ohloh.net/contributors.xml?query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'contributors.xml?query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw')).read()
+        self.url2data['http://www.ohloh.net/contributors.xml?query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'contributors.xml__query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw')).read()
         self.url2data['https://www.ohloh.net/accounts/paulproteus'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'paulproteus')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '65837553699824.xml')).read()
@@ -167,15 +172,17 @@ def twill_quiet():
     twill.set_output(StringIO())
 # }}}
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
+
+    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in README.mkd for information.")
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
         icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
+        image = mysite.base.depends.Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
 
     def test_ohloh_errors_on_nonexistent_project(self):
@@ -216,6 +223,7 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -266,6 +274,7 @@ class ImportFromDebianQA(django.test.TestCase):
     def test_404(self):
         pass # uhhh
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LaunchpadProfileImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -331,6 +340,7 @@ class LaunchpadProfileImport(django.test.TestCase):
         # And Asheesh should have no new projects available.
         self.assertFalse(mysite.profile.models.Citation.objects.all())
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class ImportFromBitbucket(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -385,6 +395,7 @@ class ImportFromBitbucket(django.test.TestCase):
             "Fix crash in kwallet handling code",
             self.long_kwallet_thing.portfolio_entry.project_description)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestAbstractOhlohAccountImporter(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -483,6 +494,7 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         self.assertEqual(1, len(output))
         self.assertEqual(17, output[0]['analysis_id'])
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohRepositorySearch(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -518,6 +530,7 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         self.assertEqual(projects,
                          set([u'Creative Commons search engine', u'ccHost']))
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohAccountImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -550,6 +563,7 @@ class TestOhlohAccountImport(django.test.TestCase):
         self.assertEqual(set(['Debian GNU/Linux', 'ccHost']),
                          projects)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -562,12 +576,32 @@ class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(
             person=asheesh, source='oh', query='paulproteus.ohloh@asheesh.org')
 
+############################################################
+# Generator of sub-classes from data
+
+def generate_bugzilla_tracker_classes(tracker_name=None):
+    # If a tracker name was passed in then return the
+    # specific sub-class for that tracker.
+    if tracker_name:
+        try:
+            bt = mysite.customs.models.BugzillaTrackerModel.all_trackers.get(tracker_name=tracker_name)
+            bt_class = mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
+        except mysite.customs.models.BugzillaTrackerModel.DoesNotExist:
+            bt_class = None
+        yield bt_class
+        return
+    else:
+        # Create a generator that yields all sub-classes.
+        for bt in mysite.customs.models.BugzillaTrackerModel.all_trackers.all():
+            yield mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde(self, mock_xml_opener):
         Project.create_dummy(name='kmail')
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = ET.parse(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
         kde.update()
@@ -611,7 +645,7 @@ class BugzillaTests(django.test.TestCase):
                 tracker=miro_tracker,
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -656,7 +690,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker,
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -695,7 +729,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -730,7 +764,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -761,7 +795,7 @@ Keywords: Torrent unittest""")
                 tracker=miro_tracker
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
         miro = gen_miro.next()
         self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
         miro_instance = miro()
@@ -783,6 +817,61 @@ Keywords: Torrent unittest""")
         bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
+class TestCustomBugParser(django.test.TestCase):
+    ### First, test that if we create the bug importer correctly, the
+    ### right thing would happen.
+    def test_bugzilla_bug_importer_uses_bugzilla_parser_by_default(self):
+        bbi = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(
+            tracker_model=None, reactor_manager=None,
+            bug_parser=None)
+        self.assertEqual(bbi.bug_parser, mysite.customs.bugimporters.bugzilla.BugzillaBugParser)
+
+    def test_bugzilla_bug_importer_accepts_bug_parser(self):
+        bbi = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(
+            tracker_model=None, reactor_manager=None,
+            bug_parser=mysite.customs.bugimporters.bugzilla.KDEBugzilla)
+        self.assertEqual(bbi.bug_parser, mysite.customs.bugimporters.bugzilla.KDEBugzilla)
+
+    @mock.patch('mysite.customs.bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data')
+    def test_kdebugparser_uses_tracker_specific_method(self, mock_specific):
+        bugzilla_data = lxml.etree.XML(open(os.path.join(
+                    settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
+        bug_data = bugzilla_data.xpath('bug')[0]
+
+        kdebugzilla = mysite.customs.bugimporters.bugzilla.KDEBugzilla(bug_data)
+        kdebugzilla.get_parsed_data_dict(base_url='http://bugs.kde.org/',
+                                         bitesized_type=None,
+                                         bitesized_text='',
+                                         documentation_type=None,
+                                         documentation_text='')
+        self.assertTrue(mock_specific.called)
+
+    ### Now, test that the customs_twist class will create an importer
+    ### configured to use the right class.
+    def test_customs_twist_creates_importers_correctly(self):
+        tm = mysite.customs.models.BugzillaTrackerModel.all_trackers.create(
+                tracker_name='KDE Bugzilla',
+                base_url='http://bugs.kde.org/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='key',
+                bitesized_text='bitesized',
+                documentation_type='key',
+                custom_parser='bugzilla.KDEBugzilla',
+                )
+        twister = mysite.customs.management.commands.customs_twist.Command()
+        importer = twister._get_importer_instance_for_tracker_model(tm)
+        self.assertEqual(mysite.customs.bugimporters.bugzilla.KDEBugzilla,
+                         importer.bug_parser)
+
+    ### Now, test that the customs_twist class will create an importer
+    ### configured to use the right class.
+    def test_customs_twist_creates_importers_correctly_for_none(self):
+        twister = mysite.customs.management.commands.customs_twist.Command()
+        importer = twister._get_importer_instance_for_tracker_model(None)
+        self.assertTrue(importer)
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaBugImporterTests(django.test.TestCase):
     fixtures = ['miro-project']
     def setUp(self):
@@ -906,6 +995,7 @@ Keywords: Torrent unittest""")
         bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
@@ -929,6 +1019,7 @@ def raise_504(*args, **kwargs):
     raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
 mock_browser_open = mock.Mock()
 mock_browser_open.side_effect = raise_504
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class UserGetsMessagesDuringImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -942,6 +1033,7 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class RoundupBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1015,6 +1107,7 @@ the module to the output. (Long live lambda.)""")
         time.sleep(2)
         self.test_new_mercurial_bug_import(second_run=True)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class RoundupBugsFromPythonProjectTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1064,6 +1157,7 @@ sample_launchpad_data_snapshot.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class AutoCrawlTests(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project',
                 sample_launchpad_data_snapshot)
@@ -1093,6 +1187,7 @@ class AutoCrawlTests(django.test.TestCase):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LaunchpadImporterTests(django.test.TestCase):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
@@ -1217,6 +1312,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
     def test(self):
         '''Start with a bug that is "Fix Released"
@@ -1259,6 +1355,7 @@ class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
             lp_data_dict)
         self.assertEqual(new_data['status'], 'Unknown')
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
@@ -1335,6 +1432,7 @@ def tracbug_tests_extract_tracker_specific_data(trac_data, ret_dict):
     # Then pass ret_dict back
     return ret_dict
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TracBug(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
     def test_create_bug_object_data_dict_more_recent(self, m):
@@ -1555,6 +1653,7 @@ class TracBug(django.test.TestCase):
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TracBugParser(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1783,6 +1882,7 @@ class TracBugParser(django.test.TestCase):
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TracBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1871,6 +1971,7 @@ class TracBugImporterTests(django.test.TestCase):
         cmd.handle(use_reactor=False)
         self.assert_(Bug.all_bugs.count() == 0)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 
@@ -1912,6 +2013,7 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
     def test_url_is_more_fresh_than_one_day(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
@@ -1936,51 +2038,7 @@ def do_list_of_work(l):
     for thing in l:
         thing()
 
-class DailyBugImporter(django.test.TestCase):
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    def test_roundup_http_error_408_does_not_break(self, mock_error):
-        mock_error.side_effect = generate_408
-        do_list_of_work(mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers())
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    @mock.patch('feedparser.parse')
-    def test_roundup_generic_error_does_break(self, mock_timeline_error, mock_error):
-        mock_error.side_effect = ValueError()
-        mock_timeline_error.side_effect = ValueError()
-        self.assertRaises(ValueError,
-                          do_list_of_work, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers())
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    @mock.patch('feedparser.parse')
-    def test_trac_http_error_408_does_not_break(self, mock_timeline_error, mock_error):
-        mock_error.side_effect = generate_408
-        mock_timeline_error.side_effect = generate_408
-        do_list_of_work(mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances())
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    def test_trac_generic_error_does_break(self, mock_error):
-        mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, do_list_of_work, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances())
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    def test_bugzilla_http_error_504_does_not_break(self, mock_error):
-        mock_error.side_effect = generate_504
-        do_list_of_work(mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances())
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    def test_bugzilla_generic_error_does_break(self, mock_error):
-        mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, do_list_of_work, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances())
-
-    def test_management_command_does_not_explode_in_the_face_of_errors(self):
-        def list_of_explosive_functions():
-            def explosive_function():
-                raise ValueError()
-            return [explosive_function]
-        cmd = mysite.customs.management.commands.customs_daily_tasks.Command()
-        cmd.handle(override_cdt_fns = {'explosive': list_of_explosive_functions})
-
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class GoogleCodeBugImporter(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -2184,6 +2242,7 @@ I don't see for example the solvers module""",
                   }
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class DataExport(django.test.TestCase):
     def test_snapshot_user_table_without_passwords(self):
         # We'll pretend we're running the snapshot_public_data management command. But
@@ -2477,6 +2536,7 @@ class DataExport(django.test.TestCase):
 
 # vim: set nu:
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohAccountImportWithException(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2507,6 +2567,7 @@ class TestOhlohAccountImportWithException(django.test.TestCase):
 
         self.assertTrue(all(d.completed for d in mysite.profile.models.DataImportAttempt.objects.all()))
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCase):
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
@@ -2536,36 +2597,11 @@ class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCas
                 tracker=miro_tracker,
                 )
         miro_tracker_query_url.save()
-        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro video player')
+        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro video player')
         miro = gen_miro.next()
         self.miro_instance = miro()
 
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_miro_bugs(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-                    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-
-        # self.miro_instance is the BugzillaTrackerModel instance that corresponds to the Miro bug tracker
-        self.miro_instance.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-
-        self.assertEqual(1, mock_xml_opener.call_count)
-
-        # Okay, so now that the BugzillaTrackerModel created a Bug object,
-        # push its polled_date back into the distant past. We will
-        # then ask it to refresh itself.
-        #
-        # We check the mock_xml_opener to make sure that the
-        # BugzillaTrackerModel tried to download the bug data.
-        bug.last_polled = datetime.datetime(1970, 1, 1, 0, 0, 0)
-        bug.save()
-
-        bug.bug_tracker.make_instance().refresh_one_bug(bug)
-
-        self.assertEqual(2, mock_xml_opener.call_count)
-
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2581,3 +2617,52 @@ class BugTrackerEditingViews(TwillTests):
         response = client.get(url)
         self.assertEqual(self.twisted,
                          response.context['tracker_form'].initial['created_for_project'])
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
+class BugzillaTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(BugzillaTrackerEditingViews, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+    def test_form_create_bugzilla_tracker(self):
+        # We start with no BugzillaTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.BugzillaTrackerForm({
+                'tracker_name': 'KDE Bugzilla',
+                'base_url': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'query_url_type': 'xml',
+                'max_connections': '8',
+                'bug_project_name_format': 'format'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+
+    def test_form_create_bugzilla_tracker_with_custom_parser(self):
+        # We start with no BugzillaTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.BugzillaTrackerForm({
+                'tracker_name': 'KDE Bugzilla',
+                'base_url': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'query_url_type': 'xml',
+                'max_connections': '8',
+                'custom_parser': 'bugzilla.KDEBugzilla',
+                'bug_project_name_format': 'format'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
+        self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)

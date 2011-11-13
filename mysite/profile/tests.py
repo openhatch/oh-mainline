@@ -33,8 +33,9 @@ import mysite.profile.controllers
 from mysite.profile.management.commands import send_weekly_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
+from django.utils.unittest import skipIf
 
-import simplejson
+from django.utils import simplejson
 import BeautifulSoup
 import datetime
 import tasks
@@ -1298,12 +1299,14 @@ class ProjectGetMentors(TwillTests):
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test(self):
         data = {}
         data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
         """We wrote this test because MaxMind gives us back a city in Iceland. That city
         has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
@@ -2093,11 +2096,11 @@ class Notifications(TwillTests):
             how_to_add_people = [Notifications.add_contributor,
                     Notifications.add_contributor]
 
-        for add_person in how_to_add_people:
+        for index, add_person_function in enumerate(how_to_add_people):
             participant = Person.create_dummy(
-                    first_name=str(add_person),
+                    first_name=str(index),
                     email_me_weekly_re_projects=people_want_emails)
-            add_person(participant, project_with_two_participants)
+            add_person_function(participant, project_with_two_participants)
             participants_who_are_news_to_each_other.append(participant)
 
         self.assertEqual(len(participants_who_are_news_to_each_other), 2)

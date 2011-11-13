@@ -31,17 +31,28 @@ TEST_DATABASE_OPTIONS = {
 DATABASE_CHARSET = 'utf8'           # omg I hate you MySQL
 TEST_DATABASE_CHARSET = 'utf8'      # have to apply it to the test database, too
 
-DATABASE_ENGINE = 'mysql'           # Other options:
-                                    # 'postgresql_psycopg2', 'postgresql', 'mysql',
-                                    # 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'oh_milestone_a'    # Or path to database file if using sqlite3.
+DATABASES = {
+    'default': {
+        'NAME': os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'site.db'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'CHARSET': 'utf8',
+    },
+}
 
-# NB: None of the following DATABASE_ options are used with sqlite3.
-DATABASE_USER = 'oh_milestone_a'    
-DATABASE_PASSWORD = 'ahmaC0Th'      
-DATABASE_HOST = 'renaissance.local' # Set to empty string for localhost. 
-DATABASE_HOST = 'localhost'         # Set to empty string for localhost. 
-DATABASE_PORT = ''                  # Set to empty string for default. 
+OTHER_DATABASES = {
+    'mysql': {
+        'NAME': 'oh_milestone_a',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'USER': 'oh_milestone_a',
+        'PASSWORD': 'ahmaC0Th',
+        'OPTIONS': {'read_default_file': './my.cnf'},
+        'CHARSET': 'utf8',
+    },
+}
+
+if os.environ.get('USE_MYSQL', ''):
+    DATABASES['default'] = OTHER_DATABASES['mysql']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -61,6 +72,7 @@ SITE_ID = 1
 USE_I18N = True
 
 HAYSTACK_XAPIAN_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
+HAYSTACK_WHOOSH_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -132,7 +144,7 @@ SESSION_ENGINE="django.contrib.sessions.backends.db"
 
 ## Django search via Haystack
 HAYSTACK_SITECONF='mysite.haystack_configuration'
-HAYSTACK_SEARCH_ENGINE='xapian'
+HAYSTACK_SEARCH_ENGINE='whoosh'
 
 INSTALLED_APPS = (
     'ghettoq',
@@ -146,7 +158,6 @@ INSTALLED_APPS = (
     'registration',
     'django_authopenid',
     'django_extensions',
-    'windmill',
     'south',
     'django_assets',
     'celery',
@@ -264,3 +275,29 @@ GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you cl
 ### Initialize celery
 import djcelery
 djcelery.setup_loader()
+
+# By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
+# that off.
+#
+# If you want to see all SQL queries (e.g., when running a management command
+# locally), remove the stanza related to django.db.backends.
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class':'django.utils.log.NullHandler',
+            },
+        },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['null'],  # Quiet by default!
+            'propagate': False,
+            'level':'DEBUG',
+            },
+        }
+}
+
+DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
+                                           '../../downloads/GeoLiteCity.dat')
+

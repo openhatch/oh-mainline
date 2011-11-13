@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Views &amp; Forms &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Template Tags" href="templatetags.html" />
+    <link rel="prev" title="Glossary" href="glossary.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="templatetags.html" title="Template Tags"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="views-forms">
+<span id="ref-views-and-forms"></span><h1>Views &amp; Forms<a class="headerlink" href="#views-forms" title="Permalink to this headline">¶</a></h1>
+<p>Haystack comes with some default, simple views &amp; forms to help you get started
+and to cover the common cases. Included is a way to provide:</p>
+<blockquote>
+<ul class="simple">
+<li>Basic, query-only search.</li>
+<li>Search by models.</li>
+<li>Search with basic highlighted results.</li>
+<li>Faceted search.</li>
+<li>Search by models with basic highlighted results.</li>
+</ul>
+</blockquote>
+<p>Most processing is done by the forms provided by Haystack via the <tt class="docutils literal"><span class="pre">search</span></tt>
+method. As a result, all but the faceted types (see <a class="reference internal" href="faceting.html"><em>Faceting</em></a>) use the
+standard <tt class="docutils literal"><span class="pre">SearchView</span></tt>.</p>
+<p>There is very little coupling between the forms &amp; the views (other than relying
+on the existence of a <tt class="docutils literal"><span class="pre">search</span></tt> method on the form), so you may interchangeably
+use forms and/or views anywhere within your own code.</p>
+<div class="section" id="forms">
+<h2>Forms<a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="searchform">
+<h3><tt class="docutils literal"><span class="pre">SearchForm</span></tt><a class="headerlink" href="#searchform" title="Permalink to this headline">¶</a></h3>
+<p>The most basic of the form types, this form consists of a single field, the
+<tt class="docutils literal"><span class="pre">q</span></tt> field (for query). Upon searching, the form will take the cleaned contents
+of the <tt class="docutils literal"><span class="pre">q</span></tt> field and perform an <tt class="docutils literal"><span class="pre">auto_query</span></tt> on either the custom
+<tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> you provide or off a default <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+<p>To customize the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> the form will use, pass it a
+<tt class="docutils literal"><span class="pre">searchqueryset</span></tt> parameter to the constructor with the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>
+you&#8217;d like to use. If using this form in conjunction with a <tt class="docutils literal"><span class="pre">SearchView</span></tt>,
+the form will receive whatever <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> you provide to the view with
+no additional work needed.</p>
+<p>The <tt class="docutils literal"><span class="pre">SearchForm</span></tt> also accepts a <tt class="docutils literal"><span class="pre">load_all</span></tt> parameter (<tt class="xref docutils literal"><span class="pre">True</span></tt> or
+<tt class="xref docutils literal"><span class="pre">False</span></tt>), which determines how the database is queried when iterating through
+the results. This also is received automatically from the <tt class="docutils literal"><span class="pre">SearchView</span></tt>.</p>
+<p>All other forms in Haystack inherit (either directly or indirectly) from this
+form.</p>
+</div>
+<div class="section" id="highlightedsearchform">
+<h3><tt class="docutils literal"><span class="pre">HighlightedSearchForm</span></tt><a class="headerlink" href="#highlightedsearchform" title="Permalink to this headline">¶</a></h3>
+<p>Identical to the <tt class="docutils literal"><span class="pre">SearchForm</span></tt> except that it tags the <tt class="docutils literal"><span class="pre">highlight</span></tt> method on
+to the end of the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> to enable highlighted results.</p>
+</div>
+<div class="section" id="modelsearchform">
+<h3><tt class="docutils literal"><span class="pre">ModelSearchForm</span></tt><a class="headerlink" href="#modelsearchform" title="Permalink to this headline">¶</a></h3>
+<p>This form adds new fields to form. It iterates through all registered models for
+the current <tt class="docutils literal"><span class="pre">SearchSite</span></tt> and provides a checkbox for each one. If no models
+are selected, all types will show up in the results.</p>
+</div>
+<div class="section" id="highlightedmodelsearchform">
+<h3><tt class="docutils literal"><span class="pre">HighlightedModelSearchForm</span></tt><a class="headerlink" href="#highlightedmodelsearchform" title="Permalink to this headline">¶</a></h3>
+<p>Identical to the <tt class="docutils literal"><span class="pre">ModelSearchForm</span></tt> except that it tags the <tt class="docutils literal"><span class="pre">highlight</span></tt>
+method on to the end of the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> to enable highlighted results on
+the selected models.</p>
+</div>
+<div class="section" id="facetedsearchform">
+<h3><tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt><a class="headerlink" href="#facetedsearchform" title="Permalink to this headline">¶</a></h3>
+<p>Identical to the <tt class="docutils literal"><span class="pre">SearchForm</span></tt> except that it adds a hidden <tt class="docutils literal"><span class="pre">selected_facets</span></tt>
+field onto the form, allowing the form to narrow the results based on the facets
+chosen by the user.</p>
+</div>
+<div class="section" id="creating-your-own-form">
+<h3>Creating Your Own Form<a class="headerlink" href="#creating-your-own-form" title="Permalink to this headline">¶</a></h3>
+<p>The simplest way to go about creating your own form is to inherit from
+<tt class="docutils literal"><span class="pre">SearchForm</span></tt> (or the desired parent) and extend the <tt class="docutils literal"><span class="pre">search</span></tt> method. By
+doing this, you save yourself most of the work of handling data correctly and
+stay API compatible with the <tt class="docutils literal"><span class="pre">SearchView</span></tt>.</p>
+<p>For example, let&#8217;s say you&#8217;re providing search with a user-selectable date range
+associated with it. You might create a form that looked as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">haystack.forms</span> <span class="kn">import</span> <span class="n">SearchForm</span>
+
+
+<span class="k">class</span> <span class="nc">DateRangeSearchForm</span><span class="p">(</span><span class="n">SearchForm</span><span class="p">):</span>
+    <span class="n">start_date</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">end_date</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># First, store the SearchQuerySet received from other processing.</span>
+        <span class="n">sqs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DateRangeSearchForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+
+        <span class="c"># Check to see if a start_date was chosen.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;start_date&#39;</span><span class="p">]:</span>
+            <span class="n">sqs</span> <span class="o">=</span> <span class="n">sqs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__gte</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;start_date&#39;</span><span class="p">])</span>
+
+        <span class="c"># Check to see if an end_date was chosen.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;end_date&#39;</span><span class="p">]:</span>
+            <span class="n">sqs</span> <span class="o">=</span> <span class="n">sqs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;end_date&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">sqs</span>
+</pre></div>
+</div>
+<p>This form adds two new fields for (optionally) choosing the start and end dates.
+Within the <tt class="docutils literal"><span class="pre">search</span></tt> method, we grab the results from the parent form&#8217;s
+processing. Then, if a user has selected a start and/or end date, we apply that
+filtering. Finally, we simply return the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="views">
+<h2>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+<p>Haystack comes bundled with three views, the class-based views (<tt class="docutils literal"><span class="pre">SearchView</span></tt> &amp;
+<tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt>) and a traditional functional view (<tt class="docutils literal"><span class="pre">basic_search</span></tt>).</p>
+<p>The class-based views provide for easy extension should you need to alter the
+way a view works. Except in the case of faceting (again, see <a class="reference internal" href="faceting.html"><em>Faceting</em></a>),
+the <tt class="docutils literal"><span class="pre">SearchView</span></tt> works interchangeably with all other forms provided by
+Haystack.</p>
+<p>The functional view provides an example of how Haystack can be used in more
+traditional settings or as an example of how to write a more complex custom
+view. It is also thread-safe.</p>
+<div class="section" id="searchview-template-none-load-all-true-form-class-none-searchqueryset-none-context-class-requestcontext-results-per-page-none">
+<h3><tt class="docutils literal"><span class="pre">SearchView(template=None,</span> <span class="pre">load_all=True,</span> <span class="pre">form_class=None,</span> <span class="pre">searchqueryset=None,</span> <span class="pre">context_class=RequestContext,</span> <span class="pre">results_per_page=None)</span></tt><a class="headerlink" href="#searchview-template-none-load-all-true-form-class-none-searchqueryset-none-context-class-requestcontext-results-per-page-none" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">SearchView</span></tt> is designed to be easy/flexible enough to override common
+changes as well as being internally abstracted so that only altering a specific
+portion of the code should be easy to do.</p>
+<p>Without touching any of the internals of the <tt class="docutils literal"><span class="pre">SearchView</span></tt>, you can modify
+which template is used, which form class should be instantiated to search with,
+what <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> to use in the event you wish to pre-filter the results.
+what <tt class="docutils literal"><span class="pre">Context</span></tt>-style object to use in the response and the <tt class="docutils literal"><span class="pre">load_all</span></tt>
+performance optimization to reduce hits on the database. These options can (and
+generally should) be overridden at the URLconf level. For example, to have a
+custom search limited to the &#8216;John&#8217; author, displaying all models to search by
+and specifying a custom template (<tt class="docutils literal"><span class="pre">my/special/path/john_search.html</span></tt>), your
+URLconf should look something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">haystack.forms</span> <span class="kn">import</span> <span class="n">ModelSearchForm</span>
+<span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SearchQuerySet</span>
+<span class="kn">from</span> <span class="nn">haystack.views</span> <span class="kn">import</span> <span class="n">SearchView</span>
+
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="s">&#39;john&#39;</span><span class="p">)</span>
+
+<span class="c"># Without threading...</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;haystack.views&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">SearchView</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="s">&#39;my/special/path/john_search.html&#39;</span><span class="p">,</span>
+        <span class="n">searchqueryset</span><span class="o">=</span><span class="n">sqs</span><span class="p">,</span>
+        <span class="n">form_class</span><span class="o">=</span><span class="n">SearchForm</span>
+    <span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;haystack_search&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="c"># With threading...</span>
+<span class="kn">from</span> <span class="nn">haystack.views</span> <span class="kn">import</span> <span class="n">SearchView</span><span class="p">,</span> <span class="n">search_view_factory</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;haystack.views&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">search_view_factory</span><span class="p">(</span>
+        <span class="n">view_class</span><span class="o">=</span><span class="n">SearchView</span><span class="p">,</span>
+        <span class="n">template</span><span class="o">=</span><span class="s">&#39;my/special/path/john_search.html&#39;</span><span class="p">,</span>
+        <span class="n">searchqueryset</span><span class="o">=</span><span class="n">sqs</span><span class="p">,</span>
+        <span class="n">form_class</span><span class="o">=</span><span class="n">ModelSearchForm</span>
+    <span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;haystack_search&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The standard <tt class="docutils literal"><span class="pre">SearchView</span></tt> is not thread-safe. Use the
+<tt class="docutils literal"><span class="pre">search_view_factory</span></tt> function, which returns thread-safe instances of
+<tt class="docutils literal"><span class="pre">SearchView</span></tt>.</p>
+</div>
+<p>By default, if you don&#8217;t specify a <tt class="docutils literal"><span class="pre">form_class</span></tt>, the view will use the
+<tt class="docutils literal"><span class="pre">haystack.forms.ModelSearchForm</span></tt> form.</p>
+<p>Beyond this customizations, you can create your own <tt class="docutils literal"><span class="pre">SearchView</span></tt> and
+extend/override the following methods to change the functionality.</p>
+<div class="section" id="call-self-request">
+<h4><tt class="docutils literal"><span class="pre">__call__(self,</span> <span class="pre">request)</span></tt><a class="headerlink" href="#call-self-request" title="Permalink to this headline">¶</a></h4>
+<p>Generates the actual response to the search.</p>
+<p>Relies on internal, overridable methods to construct the response. You generally
+should avoid altering this method unless you need to change the flow of the
+methods or to add a new method into the processing.</p>
+</div>
+<div class="section" id="build-form-self-form-kwargs-none">
+<h4><tt class="docutils literal"><span class="pre">build_form(self,</span> <span class="pre">form_kwargs=None)</span></tt><a class="headerlink" href="#build-form-self-form-kwargs-none" title="Permalink to this headline">¶</a></h4>
+<p>Instantiates the form the class should use to process the search query.</p>
+<p>Optionally accepts a dictionary of parameters that are passed on to the
+form&#8217;s <tt class="docutils literal"><span class="pre">__init__</span></tt>. You can use this to lightly customize the form.</p>
+<p>You should override this if you write a custom form that needs special
+parameters for instantiation.</p>
+</div>
+<div class="section" id="get-query-self">
+<h4><tt class="docutils literal"><span class="pre">get_query(self)</span></tt><a class="headerlink" href="#get-query-self" title="Permalink to this headline">¶</a></h4>
+<p>Returns the query provided by the user.</p>
+<p>Returns an empty string if the query is invalid. This pulls the cleaned query
+from the form, via the <tt class="docutils literal"><span class="pre">q</span></tt> field, for use elsewhere within the <tt class="docutils literal"><span class="pre">SearchView</span></tt>.
+This is used to populate the <tt class="docutils literal"><span class="pre">query</span></tt> context variable.</p>
+</div>
+<div class="section" id="get-results-self">
+<h4><tt class="docutils literal"><span class="pre">get_results(self)</span></tt><a class="headerlink" href="#get-results-self" title="Permalink to this headline">¶</a></h4>
+<p>Fetches the results via the form.</p>
+<p>Returns an empty list if there&#8217;s no query to search with. This method relies on
+the form to do the heavy lifting as much as possible.</p>
+</div>
+<div class="section" id="build-page-self">
+<h4><tt class="docutils literal"><span class="pre">build_page(self)</span></tt><a class="headerlink" href="#build-page-self" title="Permalink to this headline">¶</a></h4>
+<p>Paginates the results appropriately.</p>
+<p>In case someone does not want to use Django&#8217;s built-in pagination, it
+should be a simple matter to override this method to do what they would
+like.</p>
+</div>
+<div class="section" id="extra-context-self">
+<h4><tt class="docutils literal"><span class="pre">extra_context(self)</span></tt><a class="headerlink" href="#extra-context-self" title="Permalink to this headline">¶</a></h4>
+<p>Allows the addition of more context variables as needed. Must return a
+dictionary whose contents will add to or overwrite the other variables in the
+context.</p>
+</div>
+<div class="section" id="create-response-self">
+<h4><tt class="docutils literal"><span class="pre">create_response(self)</span></tt><a class="headerlink" href="#create-response-self" title="Permalink to this headline">¶</a></h4>
+<p>Generates the actual HttpResponse to send back to the user. It builds the page,
+creates the context and renders the response for all the aforementioned
+processing.</p>
+</div>
+</div>
+<div class="section" id="basic-search-request-template-search-search-html-load-all-true-form-class-modelsearchform-searchqueryset-none-context-class-requestcontext-extra-context-none-results-per-page-none">
+<h3><tt class="docutils literal"><span class="pre">basic_search(request,</span> <span class="pre">template='search/search.html',</span> <span class="pre">load_all=True,</span> <span class="pre">form_class=ModelSearchForm,</span> <span class="pre">searchqueryset=None,</span> <span class="pre">context_class=RequestContext,</span> <span class="pre">extra_context=None,</span> <span class="pre">results_per_page=None)</span></tt><a class="headerlink" href="#basic-search-request-template-search-search-html-load-all-true-form-class-modelsearchform-searchqueryset-none-context-class-requestcontext-extra-context-none-results-per-page-none" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">basic_search</span></tt> tries to provide most of the same functionality as the
+class-based views but resembles a more traditional generic view. It&#8217;s both a
+working view if you prefer not to use the class-based views as well as a good
+starting point for writing highly custom views.</p>
+<p>Since it is all one function, the only means of extension are passing in
+kwargs, similar to the way generic views work.</p>
+</div>
+<div class="section" id="creating-your-own-view">
+<h3>Creating Your Own View<a class="headerlink" href="#creating-your-own-view" title="Permalink to this headline">¶</a></h3>
+<p>As with the forms, inheritance is likely your best bet. In this case, the
+<tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt> is a perfect example of how to extend the existing
+<tt class="docutils literal"><span class="pre">SearchView</span></tt>. The complete code for the <tt class="docutils literal"><span class="pre">FacetedSearchView</span></tt> looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FacetedSearchView</span><span class="p">(</span><span class="n">SearchView</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__name__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;FacetedSearchView&quot;</span>
+
+    <span class="k">def</span> <span class="nf">extra_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FacetedSearchView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">extra_context</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">extra</span><span class="p">[</span><span class="s">&#39;facets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">search</span><span class="p">()</span><span class="o">.</span><span class="n">facet_counts</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">extra</span><span class="p">[</span><span class="s">&#39;facets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">facet_counts</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">extra</span>
+</pre></div>
+</div>
+<p>It updates the name of the class (generally for documentation purposes) and
+adds the facets from the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> to the context as the <tt class="docutils literal"><span class="pre">facets</span></tt>
+variable. As with the custom form example above, it relies on the parent class
+to handle most of the processing and extends that only where needed.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Views &amp; Forms</a><ul>
+<li><a class="reference internal" href="#forms">Forms</a><ul>
+<li><a class="reference internal" href="#searchform"><tt class="docutils literal"><span class="pre">SearchForm</span></tt></a></li>
+<li><a class="reference internal" href="#highlightedsearchform"><tt class="docutils literal"><span class="pre">HighlightedSearchForm</span></tt></a></li>
+<li><a class="reference internal" href="#modelsearchform"><tt class="docutils literal"><span class="pre">ModelSearchForm</span></tt></a></li>
+<li><a class="reference internal" href="#highlightedmodelsearchform"><tt class="docutils literal"><span class="pre">HighlightedModelSearchForm</span></tt></a></li>
+<li><a class="reference internal" href="#facetedsearchform"><tt class="docutils literal"><span class="pre">FacetedSearchForm</span></tt></a></li>
+<li><a class="reference internal" href="#creating-your-own-form">Creating Your Own Form</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#views">Views</a><ul>
+<li><a class="reference internal" href="#searchview-template-none-load-all-true-form-class-none-searchqueryset-none-context-class-requestcontext-results-per-page-none"><tt class="docutils literal"><span class="pre">SearchView(template=None,</span> <span class="pre">load_all=True,</span> <span class="pre">form_class=None,</span> <span class="pre">searchqueryset=None,</span> <span class="pre">context_class=RequestContext,</span> <span class="pre">results_per_page=None)</span></tt></a><ul>
+<li><a class="reference internal" href="#call-self-request"><tt class="docutils literal"><span class="pre">__call__(self,</span> <span class="pre">request)</span></tt></a></li>
+<li><a class="reference internal" href="#build-form-self-form-kwargs-none"><tt class="docutils literal"><span class="pre">build_form(self,</span> <span class="pre">form_kwargs=None)</span></tt></a></li>
+<li><a class="reference internal" href="#get-query-self"><tt class="docutils literal"><span class="pre">get_query(self)</span></tt></a></li>
+<li><a class="reference internal" href="#get-results-self"><tt class="docutils literal"><span class="pre">get_results(self)</span></tt></a></li>
+<li><a class="reference internal" href="#build-page-self"><tt class="docutils literal"><span class="pre">build_page(self)</span></tt></a></li>
+<li><a class="reference internal" href="#extra-context-self"><tt class="docutils literal"><span class="pre">extra_context(self)</span></tt></a></li>
+<li><a class="reference internal" href="#create-response-self"><tt class="docutils literal"><span class="pre">create_response(self)</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#basic-search-request-template-search-search-html-load-all-true-form-class-modelsearchform-searchqueryset-none-context-class-requestcontext-extra-context-none-results-per-page-none"><tt class="docutils literal"><span class="pre">basic_search(request,</span> <span class="pre">template='search/search.html',</span> <span class="pre">load_all=True,</span> <span class="pre">form_class=ModelSearchForm,</span> <span class="pre">searchqueryset=None,</span> <span class="pre">context_class=RequestContext,</span> <span class="pre">extra_context=None,</span> <span class="pre">results_per_page=None)</span></tt></a></li>
+<li><a class="reference internal" href="#creating-your-own-view">Creating Your Own View</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="glossary.html"
+                        title="previous chapter">Glossary</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="templatetags.html"
+                        title="next chapter">Template Tags</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/views_and_forms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="templatetags.html" title="Template Tags"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

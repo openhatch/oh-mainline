@@ -1,0 +1,222 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Management Commands &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Architecture Overview" href="architecture_overview.html" />
+    <link rel="prev" title="Template Tags" href="templatetags.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="architecture_overview.html" title="Architecture Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="templatetags.html" title="Template Tags"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="management-commands">
+<span id="ref-management-commands"></span><h1>Management Commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h1>
+<p>Haystack comes with several management commands to make working with Haystack
+easier.</p>
+<div class="section" id="clear-index">
+<h2><tt class="docutils literal"><span class="pre">clear_index</span></tt><a class="headerlink" href="#clear-index" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">clear_index</span></tt> command wipes out your entire search index. Use with
+caution. In addition to the standard management command options, it accepts the
+following arguments:</p>
+<div class="highlight-python"><pre>``--noinput``:
+    If provided, the interactive prompts are skipped and the index is
+    uncerimoniously wiped out.
+``--verbosity``:
+    Accepted but ignored.</pre>
+</div>
+<p>By default, this is an <strong>INTERACTIVE</strong> command and assumes that you do <strong>NOT</strong>
+wish to delete the entire index.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Depending on the backend you&#8217;re using, this may simply delete the entire
+directory, so be sure your <tt class="docutils literal"><span class="pre">HAYSTACK_&lt;ENGINE&gt;_PATH</span></tt> setting is correctly
+pointed at just the index directory.</p>
+</div>
+</div>
+<div class="section" id="update-index">
+<h2><tt class="docutils literal"><span class="pre">update_index</span></tt><a class="headerlink" href="#update-index" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">update_index</span></tt> command will freshen all of the content in your index. It
+iterates through all indexed models and updates the records in the index. In
+addition to the standard management command options, it accepts the following
+arguments:</p>
+<div class="highlight-python"><pre>``--age``:
+    Number of hours back to consider objects new. Useful for nightly
+    reindexes (``--age=24``). Requires ``SearchIndexes`` to implement
+    the ``get_updated_field`` method.
+``--batch-size``:
+    Number of items to index at once. Default is 1000.
+``--site``:
+    The site object to use when reindexing (like `search_sites.mysite`).
+``--remove``:
+    Remove objects from the index that are no longer present in the
+    database.
+``--workers``:
+    Allows for the use multiple workers to parallelize indexing. Requires
+    ``multiprocessing``.
+``--verbosity``:
+    If provided, dumps out more information about what's being done.
+
+      * ``0`` = No output
+      * ``1`` = Minimal output describing what models were indexed
+        and how many records.
+      * ``2`` = Full output, including everything from ``1`` plus output
+        on each batch that is indexed, which is useful when debugging.</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This command <em>ONLY</em> updates records in the index. It does <em>NOT</em> handle
+deletions unless the <tt class="docutils literal"><span class="pre">--remove</span></tt> flag is provided. You might consider
+a queue consumer if the memory requirements for <tt class="docutils literal"><span class="pre">--remove</span></tt> don&#8217;t
+fit your needs. Alternatively, you can use the
+<tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt>, which will automatically handle deletions.</p>
+</div>
+</div>
+<div class="section" id="rebuild-index">
+<h2><tt class="docutils literal"><span class="pre">rebuild_index</span></tt><a class="headerlink" href="#rebuild-index" title="Permalink to this headline">¶</a></h2>
+<p>A shortcut for <tt class="docutils literal"><span class="pre">clear_index</span></tt> followed by <tt class="docutils literal"><span class="pre">update_index</span></tt>. It accepts any/all
+of the arguments of the following arguments:</p>
+<div class="highlight-python"><pre>``--age``:
+    Number of hours back to consider objects new. Useful for nightly
+    reindexes (``--age=24``). Requires ``SearchIndexes`` to implement
+    the ``get_updated_field`` method.
+``--batch-size``:
+    Number of items to index at once. Default is 1000.
+``--site``:
+    The site object to use when reindexing (like `search_sites.mysite`).
+``--noinput``:
+    If provided, the interactive prompts are skipped and the index is
+    uncerimoniously wiped out.
+``--remove``:
+    Remove objects from the index that are no longer present in the
+    database.
+``--verbosity``:
+    If provided, dumps out more information about what's being done.
+
+      * ``0`` = No output
+      * ``1`` = Minimal output describing what models were indexed
+        and how many records.
+      * ``2`` = Full output, including everything from ``1`` plus output
+        on each batch that is indexed, which is useful when debugging.</pre>
+</div>
+<p>For when you really, really want a completely rebuilt index.</p>
+</div>
+<div class="section" id="build-solr-schema">
+<h2><tt class="docutils literal"><span class="pre">build_solr_schema</span></tt><a class="headerlink" href="#build-solr-schema" title="Permalink to this headline">¶</a></h2>
+<p>Once all of your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes are in place, this command can be used
+to generate the XML schema Solr needs to handle the search data. It accepts no
+arguments.</p>
+</div>
+<div class="section" id="haystack-info">
+<h2><tt class="docutils literal"><span class="pre">haystack_info</span></tt><a class="headerlink" href="#haystack-info" title="Permalink to this headline">¶</a></h2>
+<p>Provides some basic information about how Haystack is setup and what models it
+is handling. It accepts no arguments. Useful when debugging or when using
+Haystack-enabled third-party apps.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Management Commands</a><ul>
+<li><a class="reference internal" href="#clear-index"><tt class="docutils literal"><span class="pre">clear_index</span></tt></a></li>
+<li><a class="reference internal" href="#update-index"><tt class="docutils literal"><span class="pre">update_index</span></tt></a></li>
+<li><a class="reference internal" href="#rebuild-index"><tt class="docutils literal"><span class="pre">rebuild_index</span></tt></a></li>
+<li><a class="reference internal" href="#build-solr-schema"><tt class="docutils literal"><span class="pre">build_solr_schema</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-info"><tt class="docutils literal"><span class="pre">haystack_info</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="templatetags.html"
+                        title="previous chapter">Template Tags</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="architecture_overview.html"
+                        title="next chapter">Architecture Overview</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/management_commands.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="architecture_overview.html" title="Architecture Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="templatetags.html" title="Template Tags"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

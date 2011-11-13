@@ -1,0 +1,47 @@
+================
+ Change history
+================
+
+0.9.4
+=====
+:release-date: 2011-08-01 16:00 A.M CEST
+
+* Fixed distribution installation problems if README.rst
+  could not be found.
+
+0.9.3
+=====
+:release-date: 2011-08-01 16:00 A.M CEST
+
+* Now works with Kombu 1.2.1.
+
+0.9.2
+=====
+:release-date: 2011-02-28 16:00 A.M CEST
+
+* Old messages are now automatically deleted.
+
+    Finally a fix for infamous issue #2
+    (https://github.com/ask/ghettoq/issues#issue/2)
+
+    The cleanup is run for every 10 messages received.
+
+    If you did not already manually clean processed messages,
+    then this cleanup may take a very long time, so you are encouraged
+    to do this manually the first time by running the ``clean_kombu_messages``
+    management command::
+
+        $ python manage.py clean_kombu_messages
+
+* Default polling interval is now 5 seconds.
+
+    This is the time to sleep between SELECTs when there are no messages
+    in any of the queues being consumed from.  The default value of 5.0 seconds
+    can be changed by the ``DJKOMBU_POLLING_INTERVAL`` setting.
+
+    Previously it would issue 10 selects a second, so this will result in
+    considerably less CPU usage, but also it means that it can take a lot
+    longer for a task to be processed.  If this is not acceptable to your
+    needs you should increase the polling interval accordingly.
+
+

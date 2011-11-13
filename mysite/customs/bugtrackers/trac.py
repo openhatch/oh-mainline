@@ -1,4 +1,13 @@
 # This file is part of OpenHatch.
+
+#####################################################
+########## THIS IS DEPRECATED #######################
+########## WE INTEND TO MOVE THIS CODE ##############
+########## INTO A SUBCLASS OF BUGPARSER OR ##########
+########## BUGIMPORTER. IT WILL GO AWAY WITHIN ######
+########## A MONTH OR SO. ###########################
+########## INFO: http://lists.openhatch.org/pipermail/devel/2011-November/002466.html #
+
 # Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2010 OpenHatch, Inc.
 #
@@ -24,8 +33,7 @@ import urlparse
 import urllib2
 
 import dateutil.parser
-import lxml.html
-import lxml.html.clean
+from mysite.base.depends import lxml
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers

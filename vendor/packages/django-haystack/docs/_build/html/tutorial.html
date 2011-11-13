@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started with Haystack &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Creating New Backends" href="creating_new_backends.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="creating_new_backends.html" title="Creating New Backends"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-started-with-haystack">
+<span id="ref-tutorial"></span><h1>Getting Started with Haystack<a class="headerlink" href="#getting-started-with-haystack" title="Permalink to this headline">¶</a></h1>
+<p>Search is a topic of ever increasing importance. Users increasing rely on search
+to separate signal from noise and find what they&#8217;re looking for quickly. In
+addition, search can provide insight into what things are popular (many
+searches), what things are difficult to find on the site and ways you can
+improve the site better.</p>
+<p>To this end, Haystack tries to make integrating custom search as easy as
+possible while being flexible/powerful enough to handle more advanced use cases.</p>
+<p>Haystack is a reusable app (that is, it relies only on it&#8217;s own code and focuses
+on providing just search) that plays nicely with both apps you control as well as
+third-party apps (such as <tt class="docutils literal"><span class="pre">django.contrib.*</span></tt>) without having to modify the
+sources.</p>
+<p>Haystack also does pluggable backends (much like Django&#8217;s database
+layer), so virtually all of the code you write ought to be portable between
+which ever search engine you choose.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you hit a stumbling block, there is both a <a class="reference external" href="http://groups.google.com/group/django-haystack">mailing list</a> and
+<a class="reference external" href="irc://irc.freenode.net/haystack">#haystack on irc.freenode.net</a> to get help.</p>
+</div>
+<p>This tutorial assumes that you have a basic familiarity with the various major
+parts of Django (models/forms/views/settings/URLconfs) and tailored to the
+typical use case. There are shortcuts available as well as hooks for much
+more advanced setups, but those will not be covered here.</p>
+<p>For example purposes, we&#8217;ll be adding search functionality to a simple
+note-taking application. Here is <tt class="docutils literal"><span class="pre">myapp/models.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+
+<span class="k">class</span> <span class="nc">Note</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+</pre></div>
+</div>
+<p>Finally, before starting with Haystack, you will want to choose a search
+backend to get started. There is a quick-start guide to
+<a class="reference internal" href="installing_search_engines.html"><em>Installing Search Engines</em></a>, though you may want to defer to each engine&#8217;s
+official instructions.</p>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="add-haystack-to-installed-apps">
+<h3>Add Haystack To <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt><a class="headerlink" href="#add-haystack-to-installed-apps" title="Permalink to this headline">¶</a></h3>
+<p>As with most Django applications, you should add Haystack to the
+<tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt> within your settings file (usually <tt class="docutils literal"><span class="pre">settings.py</span></tt>).</p>
+</div>
+<div class="section" id="modify-your-settings-py">
+<h3>Modify Your <tt class="docutils literal"><span class="pre">settings.py</span></tt><a class="headerlink" href="#modify-your-settings-py" title="Permalink to this headline">¶</a></h3>
+<p>Within your <tt class="docutils literal"><span class="pre">settings.py</span></tt>, you&#8217;ll need to add a setting to indicate where your
+site configuration file will live and which backend to use, as well as other
+settings for that backend.</p>
+<p><tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt> is a required settings and should provide a Python import
+path to a file where you keep your <tt class="docutils literal"><span class="pre">SearchSite</span></tt> configurations in. This will
+be explained in the next step, but for now, add the following settings
+(substituting your correct information) and create an empty file at that path:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SITECONF</span> <span class="o">=</span> <span class="s">&#39;myproject.search_sites&#39;</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_ENGINE</span></tt> is a required setting and should be one of the
+following:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">solr</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">whoosh</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xapian</span></tt> (if you installed <tt class="docutils literal"><span class="pre">xapian-haystack</span></tt>)</li>
+<li><tt class="docutils literal"><span class="pre">simple</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">dummy</span></tt></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SEARCH_ENGINE</span> <span class="o">=</span> <span class="s">&#39;whoosh&#39;</span>
+</pre></div>
+</div>
+<p>Additionally, backends may require additional information.</p>
+<div class="section" id="solr">
+<h4>Solr<a class="headerlink" href="#solr" title="Permalink to this headline">¶</a></h4>
+<p>Requires setting <tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_URL</span></tt> to be the URL where your Solr is running at.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SOLR_URL</span> <span class="o">=</span> <span class="s">&#39;http://127.0.0.1:8983/solr&#39;</span>
+<span class="c"># ...or for multicore...</span>
+<span class="n">HAYSTACK_SOLR_URL</span> <span class="o">=</span> <span class="s">&#39;http://127.0.0.1:8983/solr/mysite&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="whoosh">
+<h4>Whoosh<a class="headerlink" href="#whoosh" title="Permalink to this headline">¶</a></h4>
+<p>Requires setting <tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_PATH</span></tt> to the place on your filesystem where the
+Whoosh index should be located. Standard warnings about permissions and keeping
+it out of a place your webserver may serve documents out of apply.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_WHOOSH_PATH</span> <span class="o">=</span> <span class="s">&#39;/home/whoosh/mysite_index&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="xapian">
+<h4>Xapian<a class="headerlink" href="#xapian" title="Permalink to this headline">¶</a></h4>
+<p>First, install the Xapian backend (via
+<a class="reference external" href="http://github.com/notanumber/xapian-haystack/tree/master">http://github.com/notanumber/xapian-haystack/tree/master</a>) per the instructions
+included with the backend.</p>
+<p>Requires setting <tt class="docutils literal"><span class="pre">HAYSTACK_XAPIAN_PATH</span></tt> to the place on your filesystem where the
+Xapian index should be located. Standard warnings about permissions and keeping
+it out of a place your webserver may serve documents out of apply.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_XAPIAN_PATH</span> <span class="o">=</span> <span class="s">&#39;/home/xapian/mysite_index&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="simple">
+<h4>Simple<a class="headerlink" href="#simple" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="docutils literal"><span class="pre">simple</span></tt> backend using very basic matching via the database itself. It&#8217;s
+not recommended for production use but is more useful than the <tt class="docutils literal"><span class="pre">dummy</span></tt> backend
+in that it will return results. No extra settings are needed.</p>
+</div>
+</div>
+<div class="section" id="create-a-searchsite">
+<h3>Create A <tt class="docutils literal"><span class="pre">SearchSite</span></tt><a class="headerlink" href="#create-a-searchsite" title="Permalink to this headline">¶</a></h3>
+<p>Within the empty file you created corresponding to your <tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt>,
+add the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">haystack</span>
+<span class="n">haystack</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will create a default <tt class="docutils literal"><span class="pre">SearchSite</span></tt> instance, search through all of your
+INSTALLED_APPS for <tt class="docutils literal"><span class="pre">search_indexes.py</span></tt> and register all <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>
+classes with the default <tt class="docutils literal"><span class="pre">SearchSite</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can configure more than one <tt class="docutils literal"><span class="pre">SearchSite</span></tt> as well as manually
+registering/unregistering indexes with them. However, these are rarely done
+in practice and are available for advanced use.</p>
+</div>
+</div>
+</div>
+<div class="section" id="handling-data">
+<h2>Handling Data<a class="headerlink" href="#handling-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-searchindexes">
+<h3>Creating <tt class="docutils literal"><span class="pre">SearchIndexes</span></tt><a class="headerlink" href="#creating-searchindexes" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">SearchIndex</span></tt> objects are the way Haystack determines what data should be
+placed in the search index and handles the flow of data in. You can think of
+them as being similar to Django <tt class="docutils literal"><span class="pre">Models</span></tt> or <tt class="docutils literal"><span class="pre">Forms</span></tt> in that they are
+field-based and manipulate/store data.</p>
+<p>You generally create a unique <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> for each type of <tt class="docutils literal"><span class="pre">Model</span></tt> you
+wish to index, though you can reuse the same <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> between different
+models if you take care in doing so and your field names are very standardized.</p>
+<p>To use a <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>, you need to register it with the <tt class="docutils literal"><span class="pre">Model</span></tt> it applies
+to and the <tt class="docutils literal"><span class="pre">SearchSite</span></tt> it ought to belong to. Registering indexes in Haystack
+is very similar to the way you register models and <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt> classes with
+the <a class="reference external" href="http://docs.djangoproject.com/en/dev/ref/contrib/admin/">Django admin site</a>.</p>
+<p>To build a <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>, all that&#8217;s necessary is to subclass <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>,
+define the fields you want to store data with and register it.</p>
+<p>We&#8217;ll create the following <tt class="docutils literal"><span class="pre">NoteIndex</span></tt> to correspond to our <tt class="docutils literal"><span class="pre">Note</span></tt>
+model. This code generally goes in a <tt class="docutils literal"><span class="pre">search_indexes.py</span></tt> file within the app
+it applies to, though that is not required. This allows
+<tt class="docutils literal"><span class="pre">haystack.autodiscover()</span></tt> to automatically pick it up. The
+<tt class="docutils literal"><span class="pre">NoteIndex</span></tt> should look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">haystack.indexes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">haystack</span> <span class="kn">import</span> <span class="n">site</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Note</span>
+
+
+<span class="k">class</span> <span class="nc">NoteIndex</span><span class="p">(</span><span class="n">SearchIndex</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">document</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_template</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">model_attr</span><span class="o">=</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">index_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used when the entire index for model is updated.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+
+<span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Note</span><span class="p">,</span> <span class="n">NoteIndex</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Every <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> requires there be one (and only one) field with
+<tt class="docutils literal"><span class="pre">document=True</span></tt>. This indicates to both Haystack and the search engine about
+which field is the primary field for searching within.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>When you choose a <tt class="docutils literal"><span class="pre">document=True</span></tt> field, it should be consistently named
+across all of your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes to avoid confusing the backend.
+The convention is to name this field <tt class="docutils literal"><span class="pre">text</span></tt>.</p>
+<p class="last">There is nothing special about the <tt class="docutils literal"><span class="pre">text</span></tt> field name used in all of the
+examples. It could be anything; you could call it <tt class="docutils literal"><span class="pre">pink_polka_dot</span></tt> and
+it won&#8217;t matter. It&#8217;s simply a convention to call it <tt class="docutils literal"><span class="pre">text</span></tt>.</p>
+</div>
+<p>Additionally, we&#8217;re providing <tt class="docutils literal"><span class="pre">use_template=True</span></tt> on the <tt class="docutils literal"><span class="pre">text</span></tt> field. This
+allows us to use a data template (rather than error prone concatenation) to
+build the document the search engine will use in searching. You’ll need to
+create a new template inside your template directory called
+<tt class="docutils literal"><span class="pre">search/indexes/myapp/note_text.txt</span></tt> and place the following inside:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{{</span> <span class="nb">object</span><span class="o">.</span><span class="n">title</span> <span class="p">}}</span>
+<span class="p">{{</span> <span class="nb">object</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span> <span class="p">}}</span>
+<span class="p">{{</span> <span class="nb">object</span><span class="o">.</span><span class="n">body</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p>In addition, we added several other fields (<tt class="docutils literal"><span class="pre">author</span></tt> and <tt class="docutils literal"><span class="pre">pub_date</span></tt>). These
+are useful when you want to provide additional filtering options. Haystack comes
+with a variety of <tt class="docutils literal"><span class="pre">SearchField</span></tt> classes to handle most types of data.</p>
+<p>A common theme is to allow admin users to add future content but have it not
+display on the site until that future date is reached. We specify a custom
+<tt class="docutils literal"><span class="pre">index_queryset</span></tt> method to prevent those future items from being indexed.</p>
+</div>
+</div>
+<div class="section" id="setting-up-the-views">
+<h2>Setting Up The Views<a class="headerlink" href="#setting-up-the-views" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="add-the-searchview-to-your-urlconf">
+<h3>Add The <tt class="docutils literal"><span class="pre">SearchView</span></tt> To Your URLconf<a class="headerlink" href="#add-the-searchview-to-your-urlconf" title="Permalink to this headline">¶</a></h3>
+<p>Within your URLconf, add the following line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^search/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;haystack.urls&#39;</span><span class="p">)),</span>
+</pre></div>
+</div>
+<p>This will pull in the default URLconf for Haystack. It consists of a single
+URLconf that points to a <tt class="docutils literal"><span class="pre">SearchView</span></tt> instance. You can change this class&#8217;s
+behavior by passing it any of several keyword arguments or override it entirely
+with your own view.</p>
+</div>
+<div class="section" id="search-template">
+<h3>Search Template<a class="headerlink" href="#search-template" title="Permalink to this headline">¶</a></h3>
+<p>Your search template (<tt class="docutils literal"><span class="pre">search/search.html</span></tt> for the default case) will likely
+be very simple. The following is enough to get going (your template/block names
+will likely differ):</p>
+<div class="highlight-python"><pre>{% extends 'base.html' %}
+
+{% block content %}
+    &lt;h2&gt;Search&lt;/h2&gt;
+
+    &lt;form method="get" action="."&gt;
+        &lt;table&gt;
+            {{ form.as_table }}
+            &lt;tr&gt;
+                &lt;td&gt;&amp;nbsp;&lt;/td&gt;
+                &lt;td&gt;
+                    &lt;input type="submit" value="Search"&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/table&gt;
+
+        {% if query %}
+            &lt;h3&gt;Results&lt;/h3&gt;
+
+            {% for result in page.object_list %}
+                &lt;p&gt;
+                    &lt;a href="{{ result.object.get_absolute_url }}"&gt;{{ result.object.title }}&lt;/a&gt;
+                &lt;/p&gt;
+            {% empty %}
+                &lt;p&gt;No results found.&lt;/p&gt;
+            {% endfor %}
+
+            {% if page.has_previous or page.has_next %}
+                &lt;div&gt;
+                    {% if page.has_previous %}&lt;a href="?q={{ query }}&amp;amp;page={{ page.previous_page_number }}"&gt;{% endif %}&amp;laquo; Previous{% if page.has_previous %}&lt;/a&gt;{% endif %}
+                    |
+                    {% if page.has_next %}&lt;a href="?q={{ query }}&amp;amp;page={{ page.next_page_number }}"&gt;{% endif %}Next &amp;raquo;{% if page.has_next %}&lt;/a&gt;{% endif %}
+                &lt;/div&gt;
+            {% endif %}
+        {% else %}
+            {# Show some example queries to run, maybe query syntax, something else? #}
+        {% endif %}
+    &lt;/form&gt;
+{% endblock %}</pre>
+</div>
+<p>Note that the <tt class="docutils literal"><span class="pre">page.object_list</span></tt> is actually a list of <tt class="docutils literal"><span class="pre">SearchResult</span></tt>
+objects instead of individual models. These objects have all the data returned
+from that record within the search index as well as score. They can also
+directly access the model for the result via <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">result.object</span> <span class="pre">}}</span></tt>. So the
+<tt class="docutils literal"><span class="pre">{{</span> <span class="pre">result.object.title</span> <span class="pre">}}</span></tt> uses the actual <tt class="docutils literal"><span class="pre">Note</span></tt> object in the database
+and accesses its <tt class="docutils literal"><span class="pre">title</span></tt> field.</p>
+</div>
+<div class="section" id="reindex">
+<h3>Reindex<a class="headerlink" href="#reindex" title="Permalink to this headline">¶</a></h3>
+<p>The final step, now that you have everything setup, is to put your data in
+from your database into the search index. Haystack ships with a management
+command to make this process easy.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you&#8217;re using the Solr backend, you have an extra step. Solr&#8217;s
+configuration is XML-based, so you&#8217;ll need to manually regenerate the
+schema. You should run
+<tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">build_solr_schema</span></tt> first, drop the XML output in your
+Solr&#8217;s <tt class="docutils literal"><span class="pre">schema.xml</span></tt> file and restart your Solr server.</p>
+</div>
+<p>Simply run <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">rebuild_index</span></tt>. You&#8217;ll get some totals of how many
+models were processed and placed in the index.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Using the standard <tt class="docutils literal"><span class="pre">SearchIndex</span></tt>, your search index content is only
+updated whenever you run either <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">update_index</span></tt> or start
+afresh with <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">rebuild_index</span></tt>.</p>
+<p>You should cron up a <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">update_index</span></tt> job at whatever interval
+works best for your site (using <tt class="docutils literal"><span class="pre">--age=&lt;num_hours&gt;</span></tt> reduces the number of
+things to update).</p>
+<p class="last">Alternatively, if you have low traffic and/or your search engine can handle
+it, the <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt> automatically handles updates/deletes
+for you.</p>
+</div>
+</div>
+</div>
+<div class="section" id="complete">
+<h2>Complete!<a class="headerlink" href="#complete" title="Permalink to this headline">¶</a></h2>
+<p>You can now visit the search section of your site, enter a search query and
+receive search results back for the query! Congratulations!</p>
+</div>
+<div class="section" id="what-s-next">
+<h2>What&#8217;s Next?<a class="headerlink" href="#what-s-next" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial just scratches the surface of what Haystack provides. The
+<tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> is the underpinning of all search in Haystack and provides
+a powerful, <tt class="docutils literal"><span class="pre">QuerySet</span></tt>-like API (see <a class="reference internal" href="searchqueryset_api.html#ref-searchqueryset-api"><em>SearchQuerySet API</em></a>). You can
+use much more complicated <tt class="docutils literal"><span class="pre">SearchForms</span></tt>/<tt class="docutils literal"><span class="pre">SearchViews</span></tt> to give users a better
+UI (see <a class="reference internal" href="views_and_forms.html#ref-views-and-forms"><em>Views &amp; Forms</em></a>). And the <a class="reference internal" href="best_practices.html#ref-best-practices"><em>Best Practices</em></a> provides
+insight into non-obvious or advanced usages of Haystack.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting Started with Haystack</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#add-haystack-to-installed-apps">Add Haystack To <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a></li>
+<li><a class="reference internal" href="#modify-your-settings-py">Modify Your <tt class="docutils literal"><span class="pre">settings.py</span></tt></a><ul>
+<li><a class="reference internal" href="#solr">Solr</a></li>
+<li><a class="reference internal" href="#whoosh">Whoosh</a></li>
+<li><a class="reference internal" href="#xapian">Xapian</a></li>
+<li><a class="reference internal" href="#simple">Simple</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-a-searchsite">Create A <tt class="docutils literal"><span class="pre">SearchSite</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#handling-data">Handling Data</a><ul>
+<li><a class="reference internal" href="#creating-searchindexes">Creating <tt class="docutils literal"><span class="pre">SearchIndexes</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#setting-up-the-views">Setting Up The Views</a><ul>
+<li><a class="reference internal" href="#add-the-searchview-to-your-urlconf">Add The <tt class="docutils literal"><span class="pre">SearchView</span></tt> To Your URLconf</a></li>
+<li><a class="reference internal" href="#search-template">Search Template</a></li>
+<li><a class="reference internal" href="#reindex">Reindex</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#complete">Complete!</a></li>
+<li><a class="reference internal" href="#what-s-next">What&#8217;s Next?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="creating_new_backends.html"
+                        title="previous chapter">Creating New Backends</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="glossary.html"
+                        title="next chapter">Glossary</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tutorial.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="creating_new_backends.html" title="Creating New Backends"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

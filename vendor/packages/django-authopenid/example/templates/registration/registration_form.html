@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+{% block content %}
+{% if form.errors %}
+    <div class="errors">
+        <p>Error while submitting form</p>
+        
+    </div>
+    <br>
+{% endif %}
+
+<h2>Make a choice:</h2>
+<p> <a href="{% url registration_register %}">Register</a> | <a href="{% url user_signin %}">Log-In</a></p>
+
+<form action="" method="post">
+    <fieldset>
+	    <legend>{% trans "Sign In Using Your Account ID" %}</legend>
+	    <table>
+		    {{ form.as_table }}
+	    </table>
+	    <p><input type="submit" name="bsignup'" value="{% trans "Sign up" %}"> </p>
+	 </fieldset>
+</form>
+{% endblock %}

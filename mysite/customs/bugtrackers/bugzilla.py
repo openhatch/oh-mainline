@@ -1,4 +1,13 @@
 # This file is part of OpenHatch.
+
+#####################################################
+########## THIS IS DEPRECATED #######################
+########## WE INTEND TO MOVE THIS CODE ##############
+########## INTO A SUBCLASS OF BUGPARSER OR ##########
+########## BUGIMPORTER. IT WILL GO AWAY WITHIN ######
+########## A MONTH OR SO. ###########################
+########## INFO: http://lists.openhatch.org/pipermail/devel/2011-November/002466.html #
+
 # Copyright (C) 2010 Jack Grigg
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 #
@@ -19,7 +28,7 @@ import datetime
 import hashlib
 import logging
 
-import lxml.etree
+from mysite.base.depends import lxml
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
@@ -249,10 +258,6 @@ class BugzillaBugTracker(object):
             # This is a new bug
             bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
-        # If the Bug does not know who made it, tell it:
-        if not bug.bug_tracker:
-            bug.set_bug_tracker_class_from_instance(self)
-
         # Looks like we have some refreshing to do.
         logging.info("[Bugzilla] Refreshing bug %d from tracker named %s." % (bug_id, self.tracker_name))
         # Get the dictionary of data to put into the bug. The function for
@@ -415,25 +420,6 @@ def bugzilla_tracker_factory(bt):
     # Return the generated sub-class.
     subclass_name = '%sBugzilla' % bt.tracker_name.replace(' ', '')
     return type(subclass_name.encode('ascii'), (BugzillaBugTracker,), class_dict)
-
-############################################################
-# Generator of sub-classes from data
-
-def generate_bugzilla_tracker_classes(tracker_name=None):
-    # If a tracker name was passed in then return the
-    # specific sub-class for that tracker.
-    if tracker_name:
-        try:
-            bt = mysite.customs.models.BugzillaTrackerModel.all_trackers.get(tracker_name=tracker_name)
-            bt_class = bugzilla_tracker_factory(bt)
-        except mysite.customs.models.BugzillaTrackerModel.DoesNotExist:
-            bt_class = None
-        yield bt_class
-        return
-    else:
-        # Create a generator that yields all sub-classes.
-        for bt in mysite.customs.models.BugzillaTrackerModel.all_trackers.all():
-            yield bugzilla_tracker_factory(bt)
 
 ############################################################
 # Specific sub-classes for individual bug trackers

@@ -1,4 +1,13 @@
 # This file is part of OpenHatch.
+
+#####################################################
+########## THIS IS DEPRECATED #######################
+########## WE INTEND TO MOVE THIS CODE ##############
+########## INTO A SUBCLASS OF BUGPARSER OR ##########
+########## BUGIMPORTER. IT WILL GO AWAY WITHIN ######
+########## A MONTH OR SO. ###########################
+########## INFO: http://lists.openhatch.org/pipermail/devel/2011-November/002466.html #
+
 # Copyright (C) 2009 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,40 +25,6 @@
 
 # This is an extremely skeletal bug tracker-like class,
 # used by the mysite.search.tests.BugCanRefreshItself test.
-import mysite.customs.models
-import mysite.customs.forms
-
 class BugTracker(object):
     def refresh_one_bug(self, bug):
         pass
-
-all_trackers = {
-        'bugzilla': {
-            'namestr': 'Bugzilla',
-            'model': mysite.customs.models.BugzillaTrackerModel,
-            'form': mysite.customs.forms.BugzillaTrackerForm,
-            'urlmodel': mysite.customs.models.BugzillaQueryModel,
-            'urlform': mysite.customs.forms.BugzillaQueryForm,
-            },
-        'google': {
-            'namestr': 'Google Code',
-            'model': mysite.customs.models.GoogleTrackerModel,
-            'form': mysite.customs.forms.GoogleTrackerForm,
-            'urlmodel': mysite.customs.models.GoogleQueryModel,
-            'urlform': mysite.customs.forms.GoogleQueryForm,
-            },
-        'roundup': {
-            'namestr': 'Roundup',
-            'model': mysite.customs.models.RoundupTrackerModel,
-            'form': mysite.customs.forms.RoundupTrackerForm,
-            'urlmodel': mysite.customs.models.RoundupQueryModel,
-            'urlform': mysite.customs.forms.RoundupQueryForm,
-            },
-        'trac': {
-            'namestr': 'Trac',
-            'model': mysite.customs.models.TracTrackerModel,
-            'form': mysite.customs.forms.TracTrackerForm,
-            'urlmodel': mysite.customs.models.TracQueryModel,
-            'urlform': mysite.customs.forms.TracQueryForm,
-            },
-        }

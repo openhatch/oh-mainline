@@ -18,7 +18,10 @@
 from south.db import db
 from django.db import models
 from mysite.search.models import *
-import MySQLdb
+try:
+    from MySQLdb import OperationalError
+except ImportError:
+    OperationalError = None
 
 class Migration:
     
@@ -29,7 +32,7 @@ class Migration:
         try:
             # Adding field 'Bug.bize_size_tag_name'
             db.add_column('search_bug', 'bize_size_tag_name', orm['search.bug:bize_size_tag_name'])
-        except MySQLdb.OperationalError, args:
+        except OperationalError, args:
             if args[0] == 1060:
                 pass
             else:

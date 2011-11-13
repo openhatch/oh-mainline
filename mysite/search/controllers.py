@@ -21,7 +21,8 @@ import mysite.base.unicode_sanity
 import mysite.base.decorators
 import re
 import hashlib
-from django.core.cache import cache
+import django.core.cache
+from django.db import connection
 from django.db.models import Q
 import logging
 
@@ -134,10 +135,19 @@ class Query:
                 and not exclude_contribution_type):
             q &= Q(concerns_just_documentation=True)
 
+        # NOTE: This is a terrible hack. We should stop doing this and
+        # just ditch this entire class and swap it out for something like
+        # haystack.
+        if connection.vendor == 'sqlite':
+            use_regexes = False
+        else:
+            use_regexes = True
+
         for word in self.terms:
-            whole_word = "[[:<:]]%s($|[[:>:]])" % (
+            if use_regexes:
+                whole_word = "[[:<:]]%s($|[[:>:]])" % (
                     mysite.base.controllers.mysql_regex_escape(word))
-            terms_disjunction = (
+                terms_disjunction = (
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |
                     Q(description__iregex=whole_word) |
@@ -146,6 +156,17 @@ class Query:
                     # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__iregex=whole_word)
                     )
+            else:
+                terms_disjunction = (
+                    Q(project__language__icontains=word) |
+                    Q(title__icontains=word) |
+                    Q(description__icontains=word) |
+                    Q(as_appears_in_distribution__icontains=word) |
+
+                    # 'firefox' grabs 'mozilla firefox'.
+                    Q(project__name__icontains=word)
+                    )
+
             q &= terms_disjunction
 
         return q
@@ -359,7 +380,7 @@ class Query:
         # Get the cache key used to store the hit count.
         hit_count_cache_key = self.get_hit_count_cache_key()
         # Fetch the hit count from the cache.
-        hit_count = cache.get(hit_count_cache_key)
+        hit_count = django.core.cache.cache.get(hit_count_cache_key)
         logging.debug( "Cached hit count: " + str(hit_count))
         # We need to be careful to check if the count is None, rather than just if the
         # count is a false value. That's because a value of zero is still a cached value;
@@ -371,7 +392,7 @@ class Query:
             # been refreshed due to a change in the Bug objects. So get
             # a new count.
             hit_count = self.get_bugs_unordered().count()
-            cache.set(hit_count_cache_key, hit_count)
+            django.core.cache.cache.set(hit_count_cache_key, hit_count)
             logging.info("Set hit count: " + str(hit_count))
         # TODO: Add sql query in the logging
         logging.info("Hit Count:" + str(hit_count))

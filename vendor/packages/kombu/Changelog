@@ -1,0 +1,705 @@
+================
+ Change history
+================
+
+.. _version-1.4.3:
+
+1.4.3
+=====
+:release-date: 2011-10-27 10:00 P.M BST
+
+* Fixes bug in ProducerPool where too many resources would be acquired.
+
+.. _version-1.4.2:
+
+1.4.2
+=====
+:release-date: 2011-10-26 05:00 P.M BST
+:by: Ask Solem
+
+* Eventio: Polling should ignore `errno.EINTR`
+
+* SQS: str.encode did only start accepting kwargs after Py2.7.
+
+* simple_task_queue example didn't run correctly (Issue #72).
+
+    Fix contributed by Stefan Eletzhofer.
+
+* Empty messages would not raise an exception not able to be handled
+  by `on_decode_error` (Issue #72)
+
+    Fix contributed by Christophe Chauvet.
+
+* CouchDB: Properly authenticate if user/password set (Issue #70)
+
+    Fix contributed by Rafael Duran Castaneda
+
+* BrokerConnection.Consumer had the wrong signature.
+
+    Fix contributed by Pavel Skvazh
+
+.. _version-1.4.1:
+
+1.4.1
+=====
+:release-date: 2011-09-26 04:00 P.M BST
+:by: Ask Solem
+
+* 1.4.0 broke the producer pool, resulting in new connections being
+  established for every acquire.
+
+
+.. _version-1.4.0:
+
+1.4.0
+=====
+:release-date: 2011-09-22 05:00 P.M BST
+:by: Ask Solem
+
+* Adds module :mod:`kombu.mixins`.
+
+    This module contains a :class:`~kombu.mixins.ConsumerMixin` class
+    that can be used to easily implement a message consumer
+    thread that consumes messages from one or more
+    :class:`kombu.messaging.Consumer` instances.
+
+* New example: :ref:`task-queue-example`
+
+    Using the ``ConsumerMixin``, default channels and
+    the global connection pool to demonstrate new Kombu features.
+
+* MongoDB transport did not work with MongoDB >= 2.0 (Issue #66)
+
+    Fix contributed by James Turk.
+
+* Redis-py version check did not account for beta identifiers
+  in version string.
+
+    Fix contributed by David Ziegler.
+
+* Producer and Consumer now accepts a connection instance as the
+  first argument.
+
+    The connections default channel will then be used.
+
+    In addition shortcut methods has been added to BrokerConnection::
+
+        >>> connection.Producer(exchange)
+        >>> connection.Consumer(queues=..., callbacks=...)
+
+* BrokerConnection has aquired a ``connected`` attribute that
+  can be used to check if the connection instance has established
+  a connection.
+
+* ``ConnectionPool.acquire_channel`` now returns the connections
+  default channel rather than establising a new channel that
+  must be manually handled.
+
+* Added ``kombu.common.maybe_declare``
+
+    ``maybe_declare(entity)`` declares an entity if it has
+    not previously been declared in the same process.
+
+* :func:`kombu.compat.entry_to_queue` has been moved to :mod:`kombu.common`
+
+* New module :mod:`kombu.clocks` now contains an implementation
+  of Lamports logical clock.
+
+.. _version-1.3.5:
+
+1.3.5
+=====
+:release-date: 2011-09-16 06:00 P.M BST
+:by: Ask Solem
+
+* Python 3: AMQP_PROTOCOL_HEADER must be bytes, not str.
+
+.. _version-1.3.4:
+
+1.3.4
+=====
+:release-date: 2011-09-16 06:00 P.M BST
+:by: Ask Solem
+
+* Fixes syntax error in pools.reset
+
+
+.. _version-1.3.3:
+
+1.3.3
+=====
+:release-date: 2011-09-15 02:00 P.M BST
+:by: Ask Solem
+
+* pools.reset did not support after forker arguments.
+
+.. _version-1.3.2:
+
+1.3.2
+=====
+:release-date: 2011-09-10 01:00 P.M BST
+:by: Mher Movsisyan
+
+* Broke Python 2.5 compatibility by importing ``parse_qsl`` from ``urlparse``
+
+* Connection.default_channel is now closed when connection is revived
+  after connection failures.
+
+* Pika: Channel now supports the ``connection.client`` attribute
+  as required by the simple interface.
+
+* pools.set_limit now raises an exception if the limit is lower
+  than the previous limit.
+
+* pools.set_limit no longer resets the pools.
+
+.. _version-1.3.1:
+
+1.3.1
+=====
+:release-date: 2011-10-07 03:00 P.M BST
+
+* Last release broke after fork for pool reinitialization.
+
+* Producer/Consumer now has a ``connection`` attribute,
+  giving access to the :class:`BrokerConnection` of the
+  instance.
+
+* Pika: Channels now have access to the underlying
+  :class:`BrokerConnection` instance using ``channel.connection.client``.
+
+    This was previously required by the ``Simple`` classes and is now
+    also required by :class:`Consumer` and :class:`Producer`.
+
+* Connection.default_channel is now closed at object revival.
+
+* Adds kombu.clocks.LamportClock.
+
+* compat.entry_to_queue has been moved to new module :mod:`kombu.common`.
+
+.. _version-1.3.0:
+
+1.3.0
+=====
+:release-date: 2011-10-05 01:00 P.M BST
+
+* Broker connection info can be now be specified using URLs
+
+    The broker hostname can now be given as an URL instead, of the format::
+
+        transport://user:password@hostname:port/virtual_host
+
+    for example the default broker is expressed as::
+
+        >>> BrokerConnection("amqp://guest:guest@localhost:5672//")
+
+    Transport defaults to amqp, and is not required.
+    user, password, port and virtual_host is also not mandatory and
+    will default to the corresponding transports default.
+
+    .. note::
+
+        Note that the path component (virtual_host) always starts with a
+        forward-slash.  This is necessary to distinguish between the virtual
+        host '' (empty) and '/', which are both acceptable virtual host names.
+
+        A virtual host of '/' becomes:
+
+            amqp://guest:guest@localhost:5672//
+
+        and a virtual host of '' (empty) becomes::
+
+            amqp://guest:guest@localhost:5672/
+
+        So the leading slash in the path component is **always required**.
+
+* Now comes with default global connection and producer pools.
+
+    The acquire a connection using the connection parameters
+    from a :class:`BrokerConnection`::
+
+        >>> from kombu import BrokerConnection, connections
+        >>> connection = BrokerConnection("amqp://guest:guest@localhost//")
+        >>> with connections[connection].acquire(block=True):
+        ...     # do something with connection
+
+    To acquire a producer using the connection parameters
+    from a :class:`BrokerConnection`::
+
+        >>> from kombu import BrokerConnection, producers
+        >>> connection = BrokerConnection("amqp://guest:guest@localhost//")
+        >>> with producers[connection].acquire(block=True):
+        ...     producer.publish({"hello": "world"}, exchange="hello")
+
+    Acquiring a producer will in turn also acquire a connection
+    from the associated pool in ``connections``, so you the number
+    of producers is bound the same limit as number of connections.
+
+    The default limit of 100 connections per connection instance
+    can be changed by doing::
+
+        >>> from kombu import pools
+        >>> pools.set_limit(10)
+
+    The pool can also be forcefully closed by doing::
+
+        >>> from kombu import pools
+        >>> pool.reset()
+
+* SQS Transport: Persistence using SimpleDB is now disabled by default,
+  after reports of unstable SimpleDB connections leading to errors.
+
+* :class:`Producer` can now be used as a context manager.
+
+* ``Producer.__exit__`` now properly calls ``release`` instead of close.
+
+    The previous behavior would lead to a memory leak when using
+    the :class:`kombu.pools.ProducerPool`
+
+* Now silences all exceptions from `import ctypes` to match behaviour
+  of the standard Python uuid module, and avoid passing on MemoryError
+  exceptions on SELinux-enabled systems (Issue #52 + Issue #53)
+
+* ``amqp`` is now an alias to the ``amqplib`` transport.
+
+* ``kombu.syn.detect_environment`` now returns 'default', 'eventlet', or
+  'gevent' depending on what monkey patches have been installed.
+
+* Serialization registry has new attribute ``type_to_name`` so it is
+  possible to lookup serializater name by content type.
+
+* Exchange argument to ``Producer.publish`` can now be an :class:`Exchange`
+  instance.
+
+* ``compat.Publisher`` now supports the ``channel`` keyword argument.
+
+* Acking a message on some transports could lead to :exc:`KeyError` being
+  raised (Issue #57).
+
+* Connection pool:  Connections are no long instantiated when the pool is
+  created, but instantiated as needed instead.
+
+* Tests now pass on PyPy.
+
+* ``Connection.as_uri`` now includes the password if the keyword argument
+  ``include_password`` is set.
+
+* Virtual transports now comes with a default ``default_connection_params``
+  attribute.
+
+.. _version-1.2.1:
+
+1.2.1
+=====
+:release-date: 2011-07-29 12:52 P.M BST
+
+* Now depends on amqplib >= 1.0.0.
+
+* Redis: Now automatically deletes auto_delete queues at ``basic_cancel``.
+
+* ``serialization.unregister`` added so it is possible to remove unwanted
+  seralizers.
+
+* Fixes MemoryError while importing ctypes on SELinux (Issue #52).
+
+* ``BrokerConnection.autoretry`` is a version of ``ensure`` that works
+  with arbitrary functions (i.e. it does not need an associated object
+  that implements the ``revive`` method.
+
+  Example usage:
+
+  .. code-block:: python
+
+        channel = connection.channel()
+        try:
+            ret, channel = connection.autoretry(send_messages, channel=channel)
+        finally:
+            channel.close()
+
+* ``ConnectionPool.acquire`` no longer force establishes the connection.
+
+    The connection will be established as needed.
+
+* ``BrokerConnection.ensure`` now supports an ``on_revive`` callback
+  that is applied whenever the connection is re-established.
+
+* ``Consumer.consuming_from(queue)`` returns True if the Consumer is
+  consuming from ``queue``.
+
+* ``Consumer.cancel_by_queue`` did not remove the queue from ``queues``.
+
+* ``compat.ConsumerSet.add_queue_from_dict`` now automatically declared
+  the queue if ``auto_declare`` set.
+
+.. _version-1.2.0:
+
+1.2.0
+=====
+:release-date: 2011-07-15 12:00 P.M BST
+
+* Virtual: Fixes cyclic reference in Channel.close (Issue #49).
+
+* Producer.publish: Can now set additional properties using keyword
+  arguments (Issue #48).
+
+* Adds Queue.no_ack option to control the no_ack option for individual queues.
+
+* Recent versions broke pylibrabbitmq support.
+
+* SimpleQueue and SimpleBuffer can now be used as contexts.
+
+* Test requirements specifies PyYAML==3.09 as 3.10 dropped Python 2.4 support
+
+* Now properly reports default values in Connection.info/.as_uri
+
+.. _version-1.1.6:
+
+1.1.6
+=====
+:release-date: 2011-06-13 04:00 P.M BST
+
+* Redis: Fixes issue introduced in 1.1.4, where a redis connection
+  failure could leave consumer hanging forever.
+
+* SQS: Now supports fanout messaging by using SimpleDB to store routing
+  tables.
+
+    This can be disabled by setting the `supports_fanout` transport option:
+
+        >>> BrokerConnection(transport="SQS",
+        ...                  transport_options={"supports_fanout": False})
+
+* SQS: Now properly deletes a message when a message is acked.
+
+* SQS: Can now set the Amazon AWS region, by using the ``region``
+  transport option.
+
+* amqplib: Now uses `localhost` as default hostname instead of raising an
+  error.
+
+.. _version-1.1.5:
+
+1.1.5
+=====
+:release-date: 2011-06-07 06:00 P.M BST
+
+* Fixes compatibility with redis-py 2.4.4.
+
+.. _version-1.1.4:
+
+1.1.4
+=====
+:release-date: 2011-06-07 04:00 P.M BST
+
+* Redis transport: Now requires redis-py version 2.4.4 or later.
+
+* New Amazon SQS transport added.
+
+    Usage:
+
+        >>> conn = BrokerConnection(transport="SQS",
+        ...                         userid=aws_access_key_id,
+        ...                         password=aws_secret_access_key)
+
+    The environment variables :envvar:`AWS_ACCESS_KEY_ID` and
+    :envvar:`AWS_SECRET_ACCESS_KEY` are also supported.
+
+* librabbitmq transport: Fixes default credentials support.
+
+* amqplib transport: Now supports `login_method` for SSL auth.
+
+    :class:`BrokerConnection` now supports the `login_method`
+    keyword argument.
+
+    Default `login_method` is ``AMQPLAIN``.
+
+.. _version-1.1.3:
+
+1.1.3
+=====
+:release-date: 2011-04-21 16:00 P.M CEST
+
+* Redis: Consuming from multiple connections now works with Eventlet.
+
+* Redis: Can now perform channel operations while the channel is in
+  BRPOP/LISTEN mode (Issue #35).
+
+    Also the async BRPOP now times out after 1 second, this means that
+    cancelling consuming from a queue/starting consuming from additional queues
+    has a latency of up to one second (BRPOP does not support subsecond
+    timeouts).
+
+* Virtual: Allow channel objects to be closed multiple times without error.
+
+* amqplib: ``AttributeError`` has been added to the list of known
+  connection related errors (:attr:`Connection.connection_errors`).
+
+* amqplib: Now converts :exc:`SSLError` timeout errors to
+  :exc:`socket.timeout` (http://bugs.python.org/issue10272)
+
+* Ensures cyclic references are destroyed when the connection is closed.
+
+.. _version-1.1.2:
+
+1.1.2
+=====
+:release-date: 2011-04-06 16:00 P.M CEST
+
+* Redis: Fixes serious issue where messages could be lost.
+
+    The issue could happen if the message exceeded a certain number
+    of kilobytes in size.
+
+    It is recommended that all users of the Redis transport should
+    upgrade to this version, even if not currently experiencing any
+    issues.
+
+.. _version-1.1.1:
+
+1.1.1
+=====
+:release-date: 2011-04-05 15:51 P.M CEST
+
+* 1.1.0 started using ``Queue.LifoQueue`` which is only available
+  in Python 2.6+ (Issue #33).  We now ship with our own LifoQueue.
+
+
+.. _version-1.1.0:
+
+1.1.0
+=====
+:release-date: 2011-04-05 01:05 P.M CEST
+
+.. _v110-important:
+
+Important Notes
+---------------
+
+* Virtual transports: Message body is now base64 encoded by default
+  (Issue #27).
+
+    This should solve problems sending binary data with virtual
+    transports.
+
+    Message compatibility is handled by adding a ``body_encoding``
+    property, so messages sent by older versions is compatible
+    with this release.  However -- If you are accessing the messages
+    directly not using Kombu, then you have to respect
+    the ``body_encoding`` property.
+
+    If you need to disable base64 encoding then you can do so
+    via the transport options::
+
+        BrokerConnection(transport="...",
+                         transport_options={"body_encoding": None})
+
+    **For transport authors**:
+
+        You don't have to change anything in your custom transports,
+        as this is handled automatically by the base class.
+
+        If you want to use a different encoder you can do so by adding
+        a key to ``Channel.codecs``.  Default encoding is specified
+        by the ``Channel.body_encoding`` attribute.
+
+        A new codec must provide two methods: ``encode(data)`` and
+        ``decode(data)``.
+
+* ConnectionPool/ChannelPool/Resource: Setting ``limit=None`` (or 0)
+  now disables pool semantics, and will establish and close
+  the resource whenever acquired or released.
+
+* ConnectionPool/ChannelPool/Resource: Is now using a LIFO queue
+  instead of the previous FIFO behavior.
+
+    This means that the last resource released will be the one
+    acquired next.  I.e. if only a single thread is using the pool
+    this means only a single connection will ever be used.
+
+* BrokerConnection: Cloned connections did not inherit transport_options
+  (``__copy__``).
+
+* contrib/requirements is now located in the top directory
+  of the distribution.
+
+* MongoDB: Now supports authentication using the ``userid`` and ``password``
+  arguments to :class:`BrokerConnection` (Issue #30).
+
+* BrokerConnection: Default autentication credentials are now delegated to
+  the individual transports.
+ 
+    This means that the ``userid`` and ``password`` arguments to
+    BrokerConnection is no longer *guest/guest* by default.
+
+    The amqplib and pika transports will still have the default
+    credentials.
+
+* :meth:`Consumer.__exit__` did not have the correct signature (Issue #32).
+
+* Channel objects now have a ``channel_id`` attribute.
+
+* MongoDB: Version sniffing broke with development versions of
+	mongod (Issue #29).
+
+* New environment variable :envvar:`KOMBU_LOG_CONNECTION` will now emit debug
+  log messages for connection related actions.
+
+  :envvar:`KOMBU_LOG_DEBUG` will also enable :envvar:`KOMBU_LOG_CONNECTION`.
+
+.. _version-1.0.7:
+
+1.0.7
+=====
+:release-date: 2011-03-28 05:45 P.M CEST
+
+* Now depends on anyjson 0.3.1
+
+    cjson is no longer a recommended json implementation, and anyjson
+    will now emit a deprecation warning if used.
+
+* Please note that the Pika backend only works with version 0.5.2.
+
+    The latest version (0.9.x) drastically changed API, and it is not
+    compatible yet.
+
+* on_decode_error is now called for exceptions in message_to_python
+  (Issue #24).
+
+* Redis: did not respect QoS settings.
+
+* Redis: Creating a connection now ensures the connection is established.
+
+    This means ``BrokerConnection.ensure_connection`` works properly with
+    Redis.
+
+* consumer_tag argument to ``Queue.consume`` can't be :const:`None`
+  (Issue #21).
+
+    A None value is now automatically converted to empty string.
+    An empty string will make the server generate a unique tag.
+
+* BrokerConnection now supports a ``transport_options`` argument.
+
+    This can be used to pass additional arguments to transports.
+
+* Pika: ``drain_events`` raised :exc:`socket.timeout` even if no timeout
+  set (Issue #8).
+
+.. version-1.0.6:
+
+1.0.6
+=====
+:release-date: 2011-03-22 04:00 P.M CET
+
+* The ``delivery_mode`` aliases (persistent/transient) were not automatically
+  converted to integer, and would cause a crash if using the amqplib
+  transport.
+
+* Redis: The redis-py :exc:`InvalidData` exception suddenly changed name to
+  :exc:`DataError`.
+
+* The :envvar:`KOMBU_LOG_DEBUG` environment variable can now be set to log all
+  channel method calls.
+
+  Support for the following environment variables have been added:
+
+    * :envvar:`KOMBU_LOG_CHANNEL` will wrap channels in an object that
+      logs every method call.
+
+    * :envvar:`KOMBU_LOG_DEBUG` both enables channel logging and configures the
+      root logger to emit messages to standard error.
+
+    **Example Usage**::
+
+        $ KOMBU_LOG_DEBUG=1 python
+        >>> from kombu import BrokerConnection
+        >>> conn = BrokerConnection()
+        >>> channel = conn.channel()
+        Start from server, version: 8.0, properties:
+            {u'product': 'RabbitMQ',..............  }
+        Open OK! known_hosts []
+        using channel_id: 1
+        Channel open
+        >>> channel.queue_declare("myq", passive=True)
+        [Kombu channel:1] queue_declare('myq', passive=True)
+        (u'myq', 0, 1)
+
+.. _version-1.0.5:
+
+1.0.5
+=====
+:release-date: 2011-03-17 04:00 P.M CET
+
+* Fixed memory leak when creating virtual channels.  All virtual transports
+  affected (redis, mongodb, memory, django, sqlalchemy, couchdb, beanstalk).
+
+* Virtual Transports: Fixed potential race condition when acking messages.
+
+    If you have been affected by this, the error would show itself as an
+    exception raised by the OrderedDict implementation. (``object no longer
+    exists``).
+
+* MongoDB transport requires the ``findandmodify`` command only available in
+  MongoDB 1.3+, so now raises an exception if connected to an incompatible
+  server version.
+
+* Virtual Transports: ``basic.cancel`` should not try to remove unknown
+  consumer tag.
+
+.. _version-1.0.4:
+
+1.0.4
+=====
+:release-date: 2011-02-28 04:00 P.M CET
+
+* Added Transport.polling_interval
+
+    Used by django-kombu to increase the time to sleep between SELECTs when
+    there are no messages in the queue.
+
+    Users of django-kombu should upgrade to django-kombu v0.9.2.
+
+.. _version-1.0.3:
+
+1.0.3
+=====
+:release-date: 2011-02-12 04:00 P.M CET
+
+* ConnectionPool: Re-connect if amqplib connection closed
+
+* Adds ``Queue.as_dict`` + ``Exchange.as_dict``.
+
+* Copyright headers updated to include 2011.
+
+.. _version-1.0.2:
+
+1.0.2
+=====
+:release-date: 2011-01-31 10:45 P.M CET
+
+* amqplib: Message properties were not set properly.
+* Ghettoq backend names are now automatically translated to the new names.
+
+.. _version-1.0.1:
+
+1.0.1
+=====
+:release-date: 2011-01-28 12:00 P.M CET
+
+* Redis: Now works with Linux (epoll)
+
+.. _version-1.0.0:
+
+1.0.0
+=====
+:release-date: 2011-01-27 12:00 P.M CET
+
+* Initial release
+
+.. _version-0.1.0:
+
+0.1.0
+=====
+:release-date: 2010-07-22 04:20 P.M CET
+
+* Initial fork of carrot

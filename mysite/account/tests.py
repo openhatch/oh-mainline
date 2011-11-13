@@ -34,13 +34,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.utils.unittest import skipIf
 
 from twill import commands as tc
-
-try:
-    import Image
-except:
-    from PIL import Image
+import mysite.base.depends
 #}}}
 
 class Login(TwillTests):
@@ -228,6 +225,7 @@ def photo(f):
     assert os.path.exists(filename)
     return filename
 
+@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in README.mkd for information.")
 class EditPhoto(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -250,7 +248,7 @@ class EditPhoto(TwillTests):
                     "Test that once you've uploaded a photo via the photo editor, "
                     "the template's photo_url variable is correct.")
             self.assert_(p.photo_thumbnail)
-            thumbnail_as_stored = Image.open(p.photo_thumbnail.file)
+            thumbnail_as_stored = mysite.base.depends.Image.open(p.photo_thumbnail.file)
             w, h = thumbnail_as_stored.size
             self.assertEqual(w, 40)
 
@@ -265,7 +263,7 @@ class EditPhoto(TwillTests):
             tc.submit()
             # Now check that the photo is 200px wide
             p = Person.objects.get(user__username='paulproteus')
-            image_as_stored = Image.open(p.photo.file)
+            image_as_stored = mysite.base.depends.Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
 
@@ -326,6 +324,7 @@ class EditPhoto(TwillTests):
 
     #}}}
 
+@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in README.mkd for information.")
 class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
@@ -347,8 +346,10 @@ class EditPhotoWithOldPerson(TwillTests):
 class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
     mock_ip = mock.Mock()
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_login(self):
         person = Person.objects.get(user__username="paulproteus")

@@ -21,7 +21,7 @@ from mysite.search.models import Bug, Project
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 from mysite.base.models import Timestamp
 import sys
-import simplejson
+from django.utils import simplejson
 from django.core.management.base import BaseCommand
 import django.core.serializers
 import django.core.serializers.json
@@ -90,14 +90,6 @@ class Command(BaseCommand):
 
         data = []
 
-        # location_confirmed should be hidden -- that's private data
-        # location_display_name should be set to the result of Person.get_public_location_or_default()
-        everyone = Person.objects.all()
-        for dude in everyone:
-            dude.location_display_name = dude.get_public_location_or_default()
-        public_person_data = self.serialize_all_objects(query_set=everyone)
-        data.extend(public_person_data)
-
         # Save the User objects, anonymizing the email address if necessary
         all_user_objects = User.objects.all()
         for user in all_user_objects:
@@ -113,6 +105,14 @@ class Command(BaseCommand):
                                 whitelisted_columns = ['id', 'username', 'first_name', 'last_name', 'email'])
         data.extend(public_user_data)
 
+        # location_confirmed should be hidden -- that's private data
+        # location_display_name should be set to the result of Person.get_public_location_or_default()
+        everyone = Person.objects.all()
+        for dude in everyone:
+            dude.location_display_name = dude.get_public_location_or_default()
+        public_person_data = self.serialize_all_objects(query_set=everyone)
+        data.extend(public_person_data)
+
         # exporting Project data
         public_project_data = self.serialize_objects_except(
             query_set=Project.objects.all(),
@@ -127,13 +127,13 @@ class Command(BaseCommand):
         public_bug_data = self.serialize_all_objects(query_set=Bug.all_bugs.all())
         data.extend(public_bug_data)
 
-        #exporting tags
-        public_tags_data = self.serialize_all_objects(query_set=Tag.objects.all())
-        data.extend(public_tags_data)
-
         #exporting tagtypes
         public_tagtypes_data = self.serialize_all_objects(query_set=TagType.objects.all())
         data.extend(public_tagtypes_data)
+
+        #exporting tags
+        public_tags_data = self.serialize_all_objects(query_set=Tag.objects.all())
+        data.extend(public_tags_data)
 
         #exporting tags-persons links
         public_persons_tags_links = self.serialize_all_objects(query_set=Link_Person_Tag.objects.all())

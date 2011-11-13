@@ -1,0 +1,13 @@
+Metadata-Version: 1.0
+Name: python-otp
+Version: 1.0
+Summary: Python module for one-time passwords
+Home-page: http://moin.conectiva.com.br/PythonOtp
+Author: Gustavo Niemeyer
+Author-email: niemeyer@conectiva.com
+License: GPL
+Description: python-otp is a module which implements support for all requirements,
+        recommendations, and optional features described in RFC2289. This RFC
+        defines a standard for the implementation of OTP, or one-time passwords.
+        
+Platform: UNKNOWN

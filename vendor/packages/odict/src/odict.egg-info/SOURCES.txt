@@ -1,0 +1,15 @@
+LICENSE.rst
+MANIFEST.in
+README.rst
+setup.py
+src/odict/__init__.py
+src/odict/bench.py
+src/odict/pyodict.py
+src/odict/tests.py
+src/odict.egg-info/PKG-INFO
+src/odict.egg-info/SOURCES.txt
+src/odict.egg-info/dependency_links.txt
+src/odict.egg-info/namespace_packages.txt
+src/odict.egg-info/requires.txt
+src/odict.egg-info/top_level.txt
+src/odict.egg-info/zip-safe

@@ -1,0 +1,180 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchResult API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchSite API" href="searchsite_api.html" />
+    <link rel="prev" title="SearchField API" href="searchfield_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchsite_api.html" title="SearchSite API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchfield_api.html" title="SearchField API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchresult-api">
+<span id="ref-searchresult-api"></span><h1><tt class="docutils literal"><span class="pre">SearchResult</span></tt> API<a class="headerlink" href="#searchresult-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchResult">
+<em class="property">class </em><tt class="descname">SearchResult</tt><big>(</big><em>app_label</em>, <em>model_name</em>, <em>pk</em>, <em>score</em>, <em>searchsite=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchResult" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchResult</span></tt> class provides structure to the results that come back from
+the search index. These objects are what a <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> will return when
+evaluated.</p>
+<div class="section" id="attribute-reference">
+<h2>Attribute Reference<a class="headerlink" href="#attribute-reference" title="Permalink to this headline">¶</a></h2>
+<p>The class exposes the following useful attributes/properties:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">app_label</span></tt> - The application the model is attached to.</li>
+<li><tt class="docutils literal"><span class="pre">model_name</span></tt> - The model&#8217;s name.</li>
+<li><tt class="docutils literal"><span class="pre">pk</span></tt> - The primary key of the model.</li>
+<li><tt class="docutils literal"><span class="pre">score</span></tt> - The score provided by the search engine.</li>
+<li><tt class="docutils literal"><span class="pre">object</span></tt> - The actual model instance (lazy loaded).</li>
+<li><tt class="docutils literal"><span class="pre">model</span></tt> - The model class.</li>
+<li><tt class="docutils literal"><span class="pre">verbose_name</span></tt> - A prettier version of the model&#8217;s class name for display.</li>
+<li><tt class="docutils literal"><span class="pre">searchsite</span></tt> - The <tt class="docutils literal"><span class="pre">SearchSite</span></tt> the record is associated with.</li>
+</ul>
+</div>
+<div class="section" id="method-reference">
+<h2>Method Reference<a class="headerlink" href="#method-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="content-type">
+<h3><tt class="docutils literal"><span class="pre">content_type</span></tt><a class="headerlink" href="#content-type" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchResult.content_type">
+<tt class="descclassname">SearchResult.</tt><tt class="descname">content_type</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchResult.content_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the content type for the result&#8217;s model instance.</p>
+</div>
+<div class="section" id="get-additional-fields">
+<h3><tt class="docutils literal"><span class="pre">get_additional_fields</span></tt><a class="headerlink" href="#get-additional-fields" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchResult.get_additional_fields">
+<tt class="descclassname">SearchResult.</tt><tt class="descname">get_additional_fields</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchResult.get_additional_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns a dictionary of all of the fields from the raw result.</p>
+<p>Useful for serializing results. Only returns what was seen from the
+search engine, so it may have extra fields Haystack&#8217;s indexes aren&#8217;t
+aware of.</p>
+</div>
+<div class="section" id="get-stored-fields">
+<h3><tt class="docutils literal"><span class="pre">get_stored_fields</span></tt><a class="headerlink" href="#get-stored-fields" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchResult.get_stored_fields">
+<tt class="descclassname">SearchResult.</tt><tt class="descname">get_stored_fields</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchResult.get_stored_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns a dictionary of all of the stored fields from the SearchIndex.</p>
+<p>Useful for serializing results. Only returns the fields Haystack&#8217;s
+indexes are aware of as being &#8216;stored&#8217;.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchResult</span></tt> API</a><ul>
+<li><a class="reference internal" href="#attribute-reference">Attribute Reference</a></li>
+<li><a class="reference internal" href="#method-reference">Method Reference</a><ul>
+<li><a class="reference internal" href="#content-type"><tt class="docutils literal"><span class="pre">content_type</span></tt></a></li>
+<li><a class="reference internal" href="#get-additional-fields"><tt class="docutils literal"><span class="pre">get_additional_fields</span></tt></a></li>
+<li><a class="reference internal" href="#get-stored-fields"><tt class="docutils literal"><span class="pre">get_stored_fields</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchfield_api.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">SearchField</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchsite_api.html"
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">SearchSite</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchresult_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchsite_api.html" title="SearchSite API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchfield_api.html" title="SearchField API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

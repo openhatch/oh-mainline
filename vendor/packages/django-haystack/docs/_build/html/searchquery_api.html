@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchQuery API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchBackend API" href="searchbackend_api.html" />
+    <link rel="prev" title="SearchSite API" href="searchsite_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchbackend_api.html" title="SearchBackend API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchsite_api.html" title="SearchSite API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchquery-api">
+<span id="ref-searchquery-api"></span><h1><tt class="docutils literal"><span class="pre">SearchQuery</span></tt> API<a class="headerlink" href="#searchquery-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchQuery">
+<em class="property">class </em><tt class="descname">SearchQuery</tt><big>(</big><em>backend=None</em><big>)</big><a class="headerlink" href="#SearchQuery" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> class acts as an intermediary between <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>&#8216;s
+abstraction and <tt class="docutils literal"><span class="pre">SearchBackend</span></tt>&#8216;s actual search. Given the metadata provided
+by <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>, <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> build the actual query and interacts
+with the <tt class="docutils literal"><span class="pre">SearchBackend</span></tt> on <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>&#8216;s behalf.</p>
+<p>This class must be at least partially implemented on a per-backend basis, as portions
+are highly specific to the backend. It usually is bundled with the accompanying
+<tt class="docutils literal"><span class="pre">SearchBackend</span></tt>.</p>
+<p>Most people will <strong>NOT</strong> have to use this class directly. <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>
+handles all interactions with <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> objects and provides a nicer
+interface to work with.</p>
+<p>Should you need advanced/custom behavior, you can supply your version of
+<tt class="docutils literal"><span class="pre">SearchQuery</span></tt> that overrides/extends the class in the manner you see fit.
+<tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> objects take a kwarg parameter <tt class="docutils literal"><span class="pre">query</span></tt> where you can pass
+in your class.</p>
+<div class="section" id="sq-objects">
+<h2><tt class="docutils literal"><span class="pre">SQ</span></tt> Objects<a class="headerlink" href="#sq-objects" title="Permalink to this headline">¶</a></h2>
+<p>For expressing more complex queries, especially involving AND/OR/NOT in
+different combinations, you should use <tt class="docutils literal"><span class="pre">SQ</span></tt> objects. Like
+<tt class="docutils literal"><span class="pre">django.db.models.Q</span></tt> objects, <tt class="docutils literal"><span class="pre">SQ</span></tt> objects can be passed to
+<tt class="docutils literal"><span class="pre">SearchQuerySet.filter</span></tt> and use the familiar unary operators (<tt class="docutils literal"><span class="pre">&amp;</span></tt>, <tt class="docutils literal"><span class="pre">|</span></tt> and
+<tt class="docutils literal"><span class="pre">~</span></tt>) to generate complex parts of the query.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Any data you pass to <tt class="docutils literal"><span class="pre">SQ</span></tt> objects is passed along <strong>unescaped</strong>. If
+you don&#8217;t trust the data you&#8217;re passing along, you should use
+the <tt class="docutils literal"><span class="pre">clean</span></tt> method on your <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> to sanitize the data.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack.query</span> <span class="kn">import</span> <span class="n">SQ</span>
+
+<span class="c"># We want &quot;title: Foo AND (tags:bar OR tags:moof)&quot;</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">SQ</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="n">SQ</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="s">&#39;moof&#39;</span><span class="p">))</span>
+
+<span class="c"># To clean user-provided data:</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">SearchQuerySet</span><span class="p">()</span>
+<span class="n">clean_query</span> <span class="o">=</span> <span class="n">sqs</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="n">user_query</span><span class="p">)</span>
+<span class="n">sqs</span> <span class="o">=</span> <span class="n">sqs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">SQ</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">clean_query</span><span class="p">)</span> <span class="o">|</span> <span class="n">SQ</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="n">clean_query</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Internally, the <tt class="docutils literal"><span class="pre">SearchQuery</span></tt> object maintains a tree of <tt class="docutils literal"><span class="pre">SQ</span></tt> objects. Each
+<tt class="docutils literal"><span class="pre">SQ</span></tt> object supports what field it looks up against, what kind of lookup (i.e.
+the <tt class="docutils literal"><span class="pre">__</span></tt> filters), what value it&#8217;s looking for, if it&#8217;s a AND/OR/NOT and
+tracks any children it may have. The <tt class="docutils literal"><span class="pre">SearchQuery.build_query</span></tt> method starts
+with the root of the tree, building part of the final query at each node until
+the full final query is ready for the <tt class="docutils literal"><span class="pre">SearchBackend</span></tt>.</p>
+</div>
+<div class="section" id="backend-specific-methods">
+<h2>Backend-Specific Methods<a class="headerlink" href="#backend-specific-methods" title="Permalink to this headline">¶</a></h2>
+<p>When implementing a new backend, the following methods will need to be created:</p>
+<div class="section" id="build-query-fragment">
+<h3><tt class="docutils literal"><span class="pre">build_query_fragment</span></tt><a class="headerlink" href="#build-query-fragment" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.build_query_fragment">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">build_query_fragment</tt><big>(</big><em>self</em>, <em>field</em>, <em>filter_type</em>, <em>value</em><big>)</big><a class="headerlink" href="#SearchQuery.build_query_fragment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Generates a query fragment from a field, filter type and a value.</p>
+<p>Must be implemented in backends as this will be highly backend specific.</p>
+</div>
+</div>
+<div class="section" id="inheritable-methods">
+<h2>Inheritable Methods<a class="headerlink" href="#inheritable-methods" title="Permalink to this headline">¶</a></h2>
+<p>The following methods have a complete implementation in the base class and
+can largely be used unchanged.</p>
+<div class="section" id="build-query">
+<h3><tt class="docutils literal"><span class="pre">build_query</span></tt><a class="headerlink" href="#build-query" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.build_query">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">build_query</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.build_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Interprets the collected query metadata and builds the final query to
+be sent to the backend.</p>
+</div>
+<div class="section" id="build-params">
+<h3><tt class="docutils literal"><span class="pre">build_params</span></tt><a class="headerlink" href="#build-params" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.build_params">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">build_params</tt><big>(</big><em>self</em>, <em>spelling_query=None</em><big>)</big><a class="headerlink" href="#SearchQuery.build_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Generates a list of params to use when searching.</p>
+</div>
+<div class="section" id="clean">
+<h3><tt class="docutils literal"><span class="pre">clean</span></tt><a class="headerlink" href="#clean" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.clean">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">clean</tt><big>(</big><em>self</em>, <em>query_fragment</em><big>)</big><a class="headerlink" href="#SearchQuery.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides a mechanism for sanitizing user input before presenting the
+value to the backend.</p>
+<p>A basic (override-able) implementation is provided.</p>
+</div>
+<div class="section" id="run">
+<h3><tt class="docutils literal"><span class="pre">run</span></tt><a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.run">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">run</tt><big>(</big><em>self</em>, <em>spelling_query=None</em><big>)</big><a class="headerlink" href="#SearchQuery.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Builds and executes the query. Returns a list of search results.</p>
+<p>Optionally passes along an alternate query for spelling suggestions.</p>
+</div>
+<div class="section" id="run-mlt">
+<h3><tt class="docutils literal"><span class="pre">run_mlt</span></tt><a class="headerlink" href="#run-mlt" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.run_mlt">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">run_mlt</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.run_mlt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Executes the More Like This. Returns a list of search results similar
+to the provided document (and optionally query).</p>
+</div>
+<div class="section" id="run-raw">
+<h3><tt class="docutils literal"><span class="pre">run_raw</span></tt><a class="headerlink" href="#run-raw" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.run_raw">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">run_raw</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.run_raw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Executes a raw query. Returns a list of search results.</p>
+</div>
+<div class="section" id="get-count">
+<h3><tt class="docutils literal"><span class="pre">get_count</span></tt><a class="headerlink" href="#get-count" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.get_count">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">get_count</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.get_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the number of results the backend found for the query.</p>
+<p>If the query has not been run, this will execute the query and store
+the results.</p>
+</div>
+<div class="section" id="get-results">
+<h3><tt class="docutils literal"><span class="pre">get_results</span></tt><a class="headerlink" href="#get-results" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.get_results">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">get_results</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.get_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the results received from the backend.</p>
+<p>If the query has not been run, this will execute the query and store
+the results.</p>
+</div>
+<div class="section" id="get-facet-counts">
+<h3><tt class="docutils literal"><span class="pre">get_facet_counts</span></tt><a class="headerlink" href="#get-facet-counts" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.get_facet_counts">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">get_facet_counts</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.get_facet_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Returns the results received from the backend.</p>
+<p>If the query has not been run, this will execute the query and store
+the results.</p>
+</div>
+<div class="section" id="boost-fragment">
+<h3><tt class="docutils literal"><span class="pre">boost_fragment</span></tt><a class="headerlink" href="#boost-fragment" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.boost_fragment">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">boost_fragment</tt><big>(</big><em>self</em>, <em>boost_word</em>, <em>boost_value</em><big>)</big><a class="headerlink" href="#SearchQuery.boost_fragment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Generates query fragment for boosting a single word/value pair.</p>
+</div>
+<div class="section" id="matching-all-fragment">
+<h3><tt class="docutils literal"><span class="pre">matching_all_fragment</span></tt><a class="headerlink" href="#matching-all-fragment" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.matching_all_fragment">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">matching_all_fragment</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.matching_all_fragment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Generates the query that matches all documents.</p>
+</div>
+<div class="section" id="add-filter">
+<h3><tt class="docutils literal"><span class="pre">add_filter</span></tt><a class="headerlink" href="#add-filter" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_filter">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_filter</tt><big>(</big><em>self</em>, <em>expression</em>, <em>value</em>, <em>use_not=False</em>, <em>use_or=False</em><big>)</big><a class="headerlink" href="#SearchQuery.add_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Narrows the search by requiring certain conditions.</p>
+</div>
+<div class="section" id="add-order-by">
+<h3><tt class="docutils literal"><span class="pre">add_order_by</span></tt><a class="headerlink" href="#add-order-by" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_order_by">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_order_by</tt><big>(</big><em>self</em>, <em>field</em><big>)</big><a class="headerlink" href="#SearchQuery.add_order_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Orders the search result by a field.</p>
+</div>
+<div class="section" id="clear-order-by">
+<h3><tt class="docutils literal"><span class="pre">clear_order_by</span></tt><a class="headerlink" href="#clear-order-by" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.clear_order_by">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">clear_order_by</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.clear_order_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Clears out all ordering that has been already added, reverting the
+query to relevancy.</p>
+</div>
+<div class="section" id="add-model">
+<h3><tt class="docutils literal"><span class="pre">add_model</span></tt><a class="headerlink" href="#add-model" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_model">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_model</tt><big>(</big><em>self</em>, <em>model</em><big>)</big><a class="headerlink" href="#SearchQuery.add_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Restricts the query requiring matches in the given model.</p>
+<p>This builds upon previous additions, so you can limit to multiple models
+by chaining this method several times.</p>
+</div>
+<div class="section" id="set-limits">
+<h3><tt class="docutils literal"><span class="pre">set_limits</span></tt><a class="headerlink" href="#set-limits" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.set_limits">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">set_limits</tt><big>(</big><em>self</em>, <em>low=None</em>, <em>high=None</em><big>)</big><a class="headerlink" href="#SearchQuery.set_limits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Restricts the query by altering either the start, end or both offsets.</p>
+</div>
+<div class="section" id="clear-limits">
+<h3><tt class="docutils literal"><span class="pre">clear_limits</span></tt><a class="headerlink" href="#clear-limits" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.clear_limits">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">clear_limits</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.clear_limits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Clears any existing limits.</p>
+</div>
+<div class="section" id="add-boost">
+<h3><tt class="docutils literal"><span class="pre">add_boost</span></tt><a class="headerlink" href="#add-boost" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_boost">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_boost</tt><big>(</big><em>self</em>, <em>term</em>, <em>boost_value</em><big>)</big><a class="headerlink" href="#SearchQuery.add_boost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds a boosted term and the amount to boost it to the query.</p>
+</div>
+<div class="section" id="raw-search">
+<h3><tt class="docutils literal"><span class="pre">raw_search</span></tt><a class="headerlink" href="#raw-search" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.raw_search">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">raw_search</tt><big>(</big><em>self</em>, <em>query_string</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#SearchQuery.raw_search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Runs a raw query (no parsing) against the backend.</p>
+<p>This method causes the SearchQuery to ignore the standard query
+generating facilities, running only what was provided instead.</p>
+<p>Note that any kwargs passed along will override anything provided
+to the rest of the <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>.</p>
+</div>
+<div class="section" id="more-like-this">
+<h3><tt class="docutils literal"><span class="pre">more_like_this</span></tt><a class="headerlink" href="#more-like-this" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.more_like_this">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">more_like_this</tt><big>(</big><em>self</em>, <em>model_instance</em><big>)</big><a class="headerlink" href="#SearchQuery.more_like_this" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Allows backends with support for &#8220;More Like This&#8221; to return results
+similar to the provided instance.</p>
+</div>
+<div class="section" id="add-highlight">
+<h3><tt class="docutils literal"><span class="pre">add_highlight</span></tt><a class="headerlink" href="#add-highlight" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_highlight">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_highlight</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchQuery.add_highlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds highlighting to the search results.</p>
+</div>
+<div class="section" id="add-field-facet">
+<h3><tt class="docutils literal"><span class="pre">add_field_facet</span></tt><a class="headerlink" href="#add-field-facet" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_field_facet">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_field_facet</tt><big>(</big><em>self</em>, <em>field</em><big>)</big><a class="headerlink" href="#SearchQuery.add_field_facet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds a regular facet on a field.</p>
+</div>
+<div class="section" id="add-date-facet">
+<h3><tt class="docutils literal"><span class="pre">add_date_facet</span></tt><a class="headerlink" href="#add-date-facet" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_date_facet">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_date_facet</tt><big>(</big><em>self</em>, <em>field</em>, <em>start_date</em>, <em>end_date</em>, <em>gap_by</em>, <em>gap_amount</em><big>)</big><a class="headerlink" href="#SearchQuery.add_date_facet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds a date-based facet on a field.</p>
+</div>
+<div class="section" id="add-query-facet">
+<h3><tt class="docutils literal"><span class="pre">add_query_facet</span></tt><a class="headerlink" href="#add-query-facet" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_query_facet">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_query_facet</tt><big>(</big><em>self</em>, <em>field</em>, <em>query</em><big>)</big><a class="headerlink" href="#SearchQuery.add_query_facet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adds a query facet on a field.</p>
+</div>
+<div class="section" id="add-narrow-query">
+<h3><tt class="docutils literal"><span class="pre">add_narrow_query</span></tt><a class="headerlink" href="#add-narrow-query" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.add_narrow_query">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">add_narrow_query</tt><big>(</big><em>self</em>, <em>query</em><big>)</big><a class="headerlink" href="#SearchQuery.add_narrow_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Narrows a search to a subset of all documents per the query.</p>
+<p>Generally used in conjunction with faceting.</p>
+</div>
+<div class="section" id="set-result-class">
+<h3><tt class="docutils literal"><span class="pre">set_result_class</span></tt><a class="headerlink" href="#set-result-class" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchQuery.set_result_class">
+<tt class="descclassname">SearchQuery.</tt><tt class="descname">set_result_class</tt><big>(</big><em>self</em>, <em>klass</em><big>)</big><a class="headerlink" href="#SearchQuery.set_result_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Sets the result class to use for results.</p>
+<p>Overrides any previous usages. If <tt class="xref docutils literal"><span class="pre">None</span></tt> is provided, Haystack will
+revert back to the default <tt class="docutils literal"><span class="pre">SearchResult</span></tt> object.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchQuery</span></tt> API</a><ul>
+<li><a class="reference internal" href="#sq-objects"><tt class="docutils literal"><span class="pre">SQ</span></tt> Objects</a></li>
+<li><a class="reference internal" href="#backend-specific-methods">Backend-Specific Methods</a><ul>
+<li><a class="reference internal" href="#build-query-fragment"><tt class="docutils literal"><span class="pre">build_query_fragment</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inheritable-methods">Inheritable Methods</a><ul>
+<li><a class="reference internal" href="#build-query"><tt class="docutils literal"><span class="pre">build_query</span></tt></a></li>
+<li><a class="reference internal" href="#build-params"><tt class="docutils literal"><span class="pre">build_params</span></tt></a></li>
+<li><a class="reference internal" href="#clean"><tt class="docutils literal"><span class="pre">clean</span></tt></a></li>
+<li><a class="reference internal" href="#run"><tt class="docutils literal"><span class="pre">run</span></tt></a></li>
+<li><a class="reference internal" href="#run-mlt"><tt class="docutils literal"><span class="pre">run_mlt</span></tt></a></li>
+<li><a class="reference internal" href="#run-raw"><tt class="docutils literal"><span class="pre">run_raw</span></tt></a></li>
+<li><a class="reference internal" href="#get-count"><tt class="docutils literal"><span class="pre">get_count</span></tt></a></li>
+<li><a class="reference internal" href="#get-results"><tt class="docutils literal"><span class="pre">get_results</span></tt></a></li>
+<li><a class="reference internal" href="#get-facet-counts"><tt class="docutils literal"><span class="pre">get_facet_counts</span></tt></a></li>
+<li><a class="reference internal" href="#boost-fragment"><tt class="docutils literal"><span class="pre">boost_fragment</span></tt></a></li>
+<li><a class="reference internal" href="#matching-all-fragment"><tt class="docutils literal"><span class="pre">matching_all_fragment</span></tt></a></li>
+<li><a class="reference internal" href="#add-filter"><tt class="docutils literal"><span class="pre">add_filter</span></tt></a></li>
+<li><a class="reference internal" href="#add-order-by"><tt class="docutils literal"><span class="pre">add_order_by</span></tt></a></li>
+<li><a class="reference internal" href="#clear-order-by"><tt class="docutils literal"><span class="pre">clear_order_by</span></tt></a></li>
+<li><a class="reference internal" href="#add-model"><tt class="docutils literal"><span class="pre">add_model</span></tt></a></li>
+<li><a class="reference internal" href="#set-limits"><tt class="docutils literal"><span class="pre">set_limits</span></tt></a></li>
+<li><a class="reference internal" href="#clear-limits"><tt class="docutils literal"><span class="pre">clear_limits</span></tt></a></li>
+<li><a class="reference internal" href="#add-boost"><tt class="docutils literal"><span class="pre">add_boost</span></tt></a></li>
+<li><a class="reference internal" href="#raw-search"><tt class="docutils literal"><span class="pre">raw_search</span></tt></a></li>
+<li><a class="reference internal" href="#more-like-this"><tt class="docutils literal"><span class="pre">more_like_this</span></tt></a></li>
+<li><a class="reference internal" href="#add-highlight"><tt class="docutils literal"><span class="pre">add_highlight</span></tt></a></li>
+<li><a class="reference internal" href="#add-field-facet"><tt class="docutils literal"><span class="pre">add_field_facet</span></tt></a></li>
+<li><a class="reference internal" href="#add-date-facet"><tt class="docutils literal"><span class="pre">add_date_facet</span></tt></a></li>
+<li><a class="reference internal" href="#add-query-facet"><tt class="docutils literal"><span class="pre">add_query_facet</span></tt></a></li>
+<li><a class="reference internal" href="#add-narrow-query"><tt class="docutils literal"><span class="pre">add_narrow_query</span></tt></a></li>
+<li><a class="reference internal" href="#set-result-class"><tt class="docutils literal"><span class="pre">set_result_class</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchsite_api.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">SearchSite</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchbackend_api.html"
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">SearchBackend</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchquery_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchbackend_api.html" title="SearchBackend API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchsite_api.html" title="SearchSite API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

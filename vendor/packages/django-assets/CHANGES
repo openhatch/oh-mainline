@@ -1,0 +1,15 @@
+0.2 (2009-12-08)
+	- Compatibility with Django >= 1.0.
+	- Added some actual documentation.
+	- Allow assets to be defined in code, through ``Bundles``.
+	- Improved, more powerful way to define filters.
+	- Support for Jinja2 templates; support for Coffin, if installed.
+	- New CleverCSS filter (thanks to Florian Schachter).
+	- New less filter.
+	- Various bug fixes.
+
+	This release introduces some backwards-incompatible changes. See
+	the ``Upgrading`` page in the documentation for details.
+
+0.1 (2008-07-27)
+	Initial release.

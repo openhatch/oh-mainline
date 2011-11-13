@@ -28,8 +28,6 @@ from django.utils.datastructures import SortedDict
 from itertools import ifilter, takewhile
 import re
 from django.utils.html import escape
-import lxml.html
-import lxml.html.builder
 import cgi # raffi and asheesh added this
 
 register = template.Library()
