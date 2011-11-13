@@ -86,7 +86,7 @@ def home(request):
 
         # For performance reasons, we do not send bug recommendations here.
         
-        completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
+        completed_missions = dict((c.step.name, True) for c in mysite.missions.models.StepCompletion.objects.filter(person=request.user.get_profile()))
         data[u'completed_missions'] = completed_missions
         
         data[u'projects_i_wanna_help'] = person.projects_i_wanna_help.all()
