@@ -43,3 +43,4 @@ packages/python-launchpad-bugs
 packages/gdata/src
 packages/python-openid
 packages/whoosh/src
+packages/BeautifulSoup
