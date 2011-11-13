@@ -58,6 +58,8 @@ import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
 
+from django.utils.unittest import skipIf
+
 import mysite.customs.models
 import mysite.customs.bugimporters.trac
 import mysite.customs.bugtrackers.roundup
@@ -169,6 +171,7 @@ def twill_quiet():
     twill.set_output(StringIO())
 # }}}
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
@@ -218,6 +221,7 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -268,6 +272,7 @@ class ImportFromDebianQA(django.test.TestCase):
     def test_404(self):
         pass # uhhh
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LaunchpadProfileImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -333,6 +338,7 @@ class LaunchpadProfileImport(django.test.TestCase):
         # And Asheesh should have no new projects available.
         self.assertFalse(mysite.profile.models.Citation.objects.all())
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class ImportFromBitbucket(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -387,6 +393,7 @@ class ImportFromBitbucket(django.test.TestCase):
             "Fix crash in kwallet handling code",
             self.long_kwallet_thing.portfolio_entry.project_description)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestAbstractOhlohAccountImporter(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -485,6 +492,7 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         self.assertEqual(1, len(output))
         self.assertEqual(17, output[0]['analysis_id'])
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohRepositorySearch(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -520,6 +528,7 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         self.assertEqual(projects,
                          set([u'Creative Commons search engine', u'ccHost']))
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohAccountImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -552,6 +561,7 @@ class TestOhlohAccountImport(django.test.TestCase):
         self.assertEqual(set(['Debian GNU/Linux', 'ccHost']),
                          projects)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -583,6 +593,7 @@ def generate_bugzilla_tracker_classes(tracker_name=None):
         for bt in mysite.customs.models.BugzillaTrackerModel.all_trackers.all():
             yield mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
@@ -804,6 +815,7 @@ Keywords: Torrent unittest""")
         bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestCustomBugParser(django.test.TestCase):
     ### First, test that if we create the bug importer correctly, the
     ### right thing would happen.
@@ -857,6 +869,7 @@ class TestCustomBugParser(django.test.TestCase):
         importer = twister._get_importer_instance_for_tracker_model(None)
         self.assertTrue(importer)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaBugImporterTests(django.test.TestCase):
     fixtures = ['miro-project']
     def setUp(self):
@@ -980,6 +993,7 @@ Keywords: Torrent unittest""")
         bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
@@ -1003,6 +1017,7 @@ def raise_504(*args, **kwargs):
     raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
 mock_browser_open = mock.Mock()
 mock_browser_open.side_effect = raise_504
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class UserGetsMessagesDuringImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -1016,6 +1031,7 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class RoundupBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1089,6 +1105,7 @@ the module to the output. (Long live lambda.)""")
         time.sleep(2)
         self.test_new_mercurial_bug_import(second_run=True)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class RoundupBugsFromPythonProjectTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1138,6 +1155,7 @@ sample_launchpad_data_snapshot.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class AutoCrawlTests(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project',
                 sample_launchpad_data_snapshot)
@@ -1167,6 +1185,7 @@ class AutoCrawlTests(django.test.TestCase):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LaunchpadImporterTests(django.test.TestCase):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
@@ -1291,6 +1310,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
     def test(self):
         '''Start with a bug that is "Fix Released"
@@ -1333,6 +1353,7 @@ class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
             lp_data_dict)
         self.assertEqual(new_data['status'], 'Unknown')
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
@@ -1409,6 +1430,7 @@ def tracbug_tests_extract_tracker_specific_data(trac_data, ret_dict):
     # Then pass ret_dict back
     return ret_dict
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TracBug(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
     def test_create_bug_object_data_dict_more_recent(self, m):
@@ -1629,6 +1651,7 @@ class TracBug(django.test.TestCase):
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TracBugParser(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1857,6 +1880,7 @@ class TracBugParser(django.test.TestCase):
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TracBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1945,6 +1969,7 @@ class TracBugImporterTests(django.test.TestCase):
         cmd.handle(use_reactor=False)
         self.assert_(Bug.all_bugs.count() == 0)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 
@@ -1986,6 +2011,7 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
     def test_url_is_more_fresh_than_one_day(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
@@ -2010,6 +2036,7 @@ def do_list_of_work(l):
     for thing in l:
         thing()
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class GoogleCodeBugImporter(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -2213,6 +2240,7 @@ I don't see for example the solvers module""",
                   }
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class DataExport(django.test.TestCase):
     def test_snapshot_user_table_without_passwords(self):
         # We'll pretend we're running the snapshot_public_data management command. But
@@ -2506,6 +2534,7 @@ class DataExport(django.test.TestCase):
 
 # vim: set nu:
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class TestOhlohAccountImportWithException(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2536,6 +2565,7 @@ class TestOhlohAccountImportWithException(django.test.TestCase):
 
         self.assertTrue(all(d.completed for d in mysite.profile.models.DataImportAttempt.objects.all()))
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCase):
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
@@ -2569,6 +2599,7 @@ class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCas
         miro = gen_miro.next()
         self.miro_instance = miro()
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2585,6 +2616,7 @@ class BugTrackerEditingViews(TwillTests):
         self.assertEqual(self.twisted,
                          response.context['tracker_form'].initial['created_for_project'])
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
 class BugzillaTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
