@@ -110,7 +110,7 @@ class UntarMissionTests(TestCase):
 
 
 class UntarViewTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         TwillTests.setUp(self)
@@ -141,7 +141,7 @@ class UntarViewTests(TwillTests):
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)
 
 class MissionPageStateTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus',]
+    fixtures = ['user-paulproteus', 'person-paulproteus',]
     
     def setUp(self):
         TwillTests.setUp(self)

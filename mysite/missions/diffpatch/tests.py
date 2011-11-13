@@ -34,7 +34,7 @@ from mysite.missions.base.tests import (
 from mysite.missions.diffpatch import views, controllers
 
 class PatchSingleFileTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         TwillTests.setUp(self)
@@ -98,7 +98,7 @@ class PatchSingleFileTests(TwillTests):
 
 
 class DiffSingleFileTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         TwillTests.setUp(self)
