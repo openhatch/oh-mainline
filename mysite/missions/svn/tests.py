@@ -31,7 +31,11 @@ from mysite.profile.models import Person
 from mysite.base.tests import TwillTests
 from mysite.missions.base.tests import TestCase, subproc_check_output, make_testdata_filename
 from mysite.missions.svn import views, controllers
+from django.utils.unittest import skipIf
+import mysite.base.depends
 
+@skipIf(not mysite.base.depends.svnadmin_available(),
+        "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
 class SvnBackendTests(TestCase):
 
     def get_info(self, path):
@@ -59,6 +63,8 @@ class SvnBackendTests(TestCase):
             if os.path.isdir(repo_path):
                 shutil.rmtree(repo_path)
 
+@skipIf(not mysite.base.depends.svnadmin_available(),
+        "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
 class SvnViewTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -160,6 +166,8 @@ class SvnViewTests(TwillTests):
         response = self.client.get(reverse(views.main_page))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
+@skipIf(not mysite.base.depends.svnadmin_available(),
+        "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
 class SvnViewTestsWhileLoggedOut(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -216,6 +224,8 @@ def mock_get_log_good(repo, txn):
 def mock_get_log_bad(repo, txn):
     return ''
 
+@skipIf(not mysite.base.depends.svnadmin_available(),
+        "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
 class SvnCommitHookTests(DjangoTestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
