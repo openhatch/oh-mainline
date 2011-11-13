@@ -22,7 +22,7 @@ from django.http import HttpResponse
 import re
 import collections
 import mysite.base.helpers
-import simplejson
+from django.utils import simplejson
 import django.core.cache
 import hashlib
 from functools import partial

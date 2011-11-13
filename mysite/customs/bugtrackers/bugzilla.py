@@ -28,7 +28,7 @@ import datetime
 import hashlib
 import logging
 
-import lxml.etree
+from mysite.base.depends import lxml
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers

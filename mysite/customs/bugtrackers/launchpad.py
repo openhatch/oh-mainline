@@ -24,14 +24,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import codecs
 import datetime
-import glob
 import logging
-import os
 
-from celery.registry import tasks
-from celery.task import Task
 import celery.decorators
 
 import mysite.customs.models
@@ -39,21 +34,21 @@ import mysite.search.models
 from mysite.base.helpers import sanitize_wide_unicode
 
 # Initialize Launchpad scraper thing
-from launchpadbugs.connector import ConnectBug, ConnectBugList
-from launchpadbugs.basebuglistfilter import URLBugListFilter
+import mysite.base.depends
+if mysite.base.depends.launchpadbugs:
+    from mysite.base.depends.launchpadbugs.connector import ConnectBug, ConnectBugList
+    from mysite.base.depends.launchpadbugs.basebuglistfilter import URLBugListFilter
+else:
+    pass
 
 # Initialize data dumpers
 import mysite.search.lpb2json
-import simplejson
 
 ##################################################
 # Crawler functions for Launchpad
 
 #FIXME: Add only those of the following that actually use Launchpad for development.
 #u'apache-mod-digest' : u'apache-mod-digest' , u'bws-upload' : u'BWS-Upload' , u'pyjunitxml' : u'pyjunitxml' , u'bzr-search' : u'bzr search plugin' , u'bzr-email' : u'bzr email commit hook' , u'check' : u'check' , u'libsyncml' : u'libsyncml' , u'config-manager' : u'config-manager' , u'testscenarios' : u'testscenarios' , u'liburl' : u'liburl' , u'liblockdir' : u'lockdir' , u'bzr-guess' : u'bzr-guess' , u'etap' : u'etap' , u'gforth' : u'Gforth' , u'bitten' : u'Bitten' , u'sqlobject' : u'SQLObject' , u'bzr-ping' : u'Ping plugin for Bazaar' , u'unittest-ext' : u'unittest-ext' , u'pytz' : u'pytz' , u'funkload' : u'FunkLoad' , u'slony-i' : u'Slony-I' , u'zoneinfo' : u'The tz Database' , u'py-radius' : u'py-radius' , u'pypi' : u'Python Package Index' , u'pybabel' : u'Python Babel' , u'feedvalidator' : u'Feed Validator' , u'sphinx' : u'Sphinx' , u'mammoth-replicator' : u'Mammoth Replicator' , u'dbapi-compliance' : u'Python DBAPI Compliance Tests' , u'wget' : u'wget' , u'redhatcluster' : u'Red Hat Cluster' , u'bugzilla' : u'Bugzilla' , u'grepmap' : u'grepmap' , u'live-f1' : u'Live F1' , u'libnih' : u'libnih' , u'hct' : u'HCT' , u'upstart' : u'upstart ' , u'module-init-tools' : u'module-init-tools' , u'ubuntu-seeds' : u'Ubuntu Seeds' , u'usplash' : u'usplash' , u'merge-o-matic' : u'Merge-o-Matic' , u'uds-intrepid' : u'UDS Intrepid' , u'watershed' : u'watershed' , u'udev-extras' : u'Udev extras' , u'sreadahead' : u'sreadahead' , u'pybootchartgui' : u'pybootchartgui' , u'bootchart-collector' : u'bootchart-collector' , u'bootchart' : u'bootchart' , u'ubiquity' : u'ubiquity' , u'man-db' : u'man-db'}
-
-TextBugList = ConnectBugList("text")
-TextBug = ConnectBug("text")
 
 def dump_data_from_project(project):
 
@@ -188,6 +183,7 @@ def import_bugs_from_one_project(launchpad_project_name,
     url = "https://bugs.launchpad.net/%s/+bugs" % launchpad_project_name
     bug_filter = URLBugListFilter()
     # no filtering; dump everything
+    TextBugList = ConnectBugList("text")
     l = TextBugList(bug_filter(url))
     # convert elements into Bug objects
     for bug in l:
@@ -243,6 +239,7 @@ def refresh_one_launchpad_bug(canonical_bug_link,
     assert canonical_bug_link.startswith(prefix)
     bug_id_str = canonical_bug_link.split(prefix, 1)[1]
     bug_id = int(bug_id_str)
+    TextBug = ConnectBug("text")
     tb = TextBug(bug_id)
     data_dict = mysite.search.lpb2json.obj2serializable(tb)
     _, new_data = clean_lp_data_dict(data_dict)

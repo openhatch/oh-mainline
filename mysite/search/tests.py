@@ -34,8 +34,7 @@ import mysite.project.views
 from django.utils.unittest import skipIf
 import django.db
 
-import hashlib
-import simplejson
+from django.utils import simplejson
 import mock
 from twill import commands as tc
 
@@ -44,10 +43,6 @@ import django.core.cache
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-
-from django.db.models import Q
-
-import MySQLdb
 
 class SearchTest(TwillTests):
 
@@ -373,6 +368,8 @@ class SplitIntoTerms(TestCase):
                 ['c#'])
 
 class IconGetsScaled(SearchTest):
+
+    @skipIf(not mysite.base.depends.Image, "Skipping this test. Install PIL to run it; see README.mkd.")
     def test_project_scales_its_icon_down_for_use_in_badge(self):
         '''This test shows that the Project class successfully stores
         a scaled-down version of its icon in the icon_smaller_for_badge
@@ -399,6 +396,7 @@ class IconGetsScaled(SearchTest):
         self.assertEqual(p.icon_smaller_for_badge.width, 40,
                          "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
+    @skipIf(not mysite.base.depends.Image, "Skipping this test. Install PIL to run it; see README.mkd.")
     def test_short_icon_is_scaled_correctly(self):
         '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
         # Step 1: Create a project with an icon

@@ -33,8 +33,7 @@ import urlparse
 import urllib2
 
 import dateutil.parser
-import lxml.html
-import lxml.html.clean
+from mysite.base.depends import lxml
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers

@@ -72,6 +72,7 @@ SITE_ID = 1
 USE_I18N = True
 
 HAYSTACK_XAPIAN_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
+HAYSTACK_WHOOSH_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -143,7 +144,7 @@ SESSION_ENGINE="django.contrib.sessions.backends.db"
 
 ## Django search via Haystack
 HAYSTACK_SITECONF='mysite.haystack_configuration'
-HAYSTACK_SEARCH_ENGINE='xapian'
+HAYSTACK_SEARCH_ENGINE='whoosh'
 
 INSTALLED_APPS = (
     'ghettoq',
@@ -299,3 +300,4 @@ LOGGING = {
 
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')
+

@@ -21,27 +21,16 @@
 import mysite.base.unicode_sanity
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
-import sys, urllib, hashlib
+import urllib
 import urllib2
 import cStringIO as StringIO
-from urlparse import urlparse
-from urllib2 import HTTPError
-from httplib import BadStatusLine
 from django.conf import settings
 import mysite.customs.models
-import logging
 
 def uni_text(s):
     if type(s) == unicode:
         return s
     return s.decode('utf-8')
-
-import lxml.html
-import mechanize
-import re
-
-from typecheck import accepts, returns
-from typecheck import Any as __
 
 import mysite.customs.mechanize_helpers
 

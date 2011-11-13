@@ -34,7 +34,7 @@ from mysite.base.helpers import render_response
 import datetime
 from dateutil import tz
 import pytz
-import simplejson
+from django.utils import simplejson
 import mysite.search.forms
 import mysite.base.decorators
 

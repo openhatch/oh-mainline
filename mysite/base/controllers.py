@@ -18,7 +18,7 @@
 
 import mysite.base.unicode_sanity
 import mysite.base.disk_cache
-import simplejson
+from django.utils import simplejson
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
 from django.core.cache import cache

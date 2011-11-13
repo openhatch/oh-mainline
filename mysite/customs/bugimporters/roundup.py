@@ -17,7 +17,7 @@
 
 import csv
 import datetime
-import lxml.html
+from mysite.base.depends import lxml
 import re
 import urlparse
 

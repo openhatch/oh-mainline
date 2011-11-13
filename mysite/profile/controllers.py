@@ -20,7 +20,7 @@ import os.path
 import hashlib
 from itertools import izip, cycle, islice
 
-import simplejson
+from django.utils import simplejson
 
 import pygeoip
 

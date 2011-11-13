@@ -14,8 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import launchpadbugs.text_bug
-import launchpadbugs.lphelper
+import mysite.base.depends
 import types
 
 ## Note that this sucks, and is not directly tested.
@@ -27,9 +26,9 @@ def obj2serializable(obj):
         return unicode(obj, 'utf-8')
     elif type(obj) == set:
         return list(obj)
-    elif type(obj) == launchpadbugs.lphelper.product:
+    elif type(obj) == mysite.base.depends.launchpadbugs.lphelper.product:
         return unicode(obj.title())
-    elif type(obj) == launchpadbugs.text_bug.Bug:
+    elif type(obj) == mysite.base.depends.launchpadbugs.text_bug.Bug:
         growing = {}
         keys = ['affects', 'assignee', 'bugnumber',
                 # skip attachments for now; kinda tough
@@ -48,23 +47,23 @@ def obj2serializable(obj):
             except AttributeError:
                 growing[key] = None
         return growing
-    elif type(obj) == launchpadbugs.lphelper.user:
+    elif type(obj) == mysite.base.depends.launchpadbugs.lphelper.user:
         growing = {}
         keys = ['realname', 'lplogin']
         for key in keys:
             growing[key] = obj2serializable(getattr(obj, key))
         return growing
-    elif type(obj) == launchpadbugs.text_bug.Comments:
+    elif type(obj) == mysite.base.depends.launchpadbugs.text_bug.Comments:
         growing = []
         for thing in obj:
             growing.append(obj2serializable(thing))
         return growing
-    elif type(obj) == launchpadbugs.text_bug.Comment:
+    elif type(obj) == mysite.base.depends.launchpadbugs.text_bug.Comment:
         growing = {}
         for key in ['text', 'user', 'date', 'number']:
             growing[key] = obj2serializable(getattr(obj, key))
         return growing
-    elif type(obj) == launchpadbugs.lptime.LPTime:
+    elif type(obj) == mysite.base.depends.launchpadbugs.lptime.LPTime:
         return list(obj.timetuple())
     elif type(obj) == list:
         return [unicode(k) for k in obj]
