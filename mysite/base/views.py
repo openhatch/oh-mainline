@@ -20,16 +20,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, \
-        HttpResponseRedirect, HttpResponseServerError, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from mysite.base.helpers import render_response
-from django_authopenid.forms import OpenidSigninForm
 from django.utils import simplejson
-from django.template import RequestContext, loader, Context
-from django.core.urlresolvers import reverse
-from django.contrib.auth.forms import AuthenticationForm
 
-import mysite.profile as profile
 import mysite.account
 import mysite.profile.controllers
 import mysite.account.forms
@@ -38,10 +32,7 @@ import mysite.customs.feed
 import mysite.search.controllers
 import mysite.search.models
 import mysite.missions.models 
-from mysite.missions.models import Step, StepCompletion
 
-import feedparser
-import lxml.html
 import random
 import datetime
 
