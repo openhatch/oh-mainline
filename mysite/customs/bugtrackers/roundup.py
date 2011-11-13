@@ -26,7 +26,7 @@
 
 import urllib2
 import re
-import lxml.html # scraper library
+from mysite.base.depends import lxml
 import itertools
 import csv
 import datetime

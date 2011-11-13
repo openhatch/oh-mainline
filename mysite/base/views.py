@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 # This file is part of OpenHatch.
@@ -23,6 +22,7 @@
 from django.http import HttpResponse, HttpResponseBadRequest
 from mysite.base.helpers import render_response
 from django.utils import simplejson
+from django.template import loader, Context
 
 import mysite.account
 import mysite.profile.controllers

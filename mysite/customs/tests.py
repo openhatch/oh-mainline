@@ -30,6 +30,8 @@ import mysite.profile.views
 from mysite.customs import ohloh
 import mysite.customs.views
 
+import xml.etree.ElementTree as ET
+
 from django.core.urlresolvers import reverse
 
 import logging
@@ -37,7 +39,6 @@ import mock
 import os
 import time
 import twill
-import lxml
 import urlparse
 
 import django.test
@@ -587,7 +588,7 @@ class BugzillaTests(django.test.TestCase):
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde(self, mock_xml_opener):
         Project.create_dummy(name='kmail')
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = ET.parse(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
         kde.update()

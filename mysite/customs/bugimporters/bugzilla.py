@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import lxml.etree
+from mysite.base.depends import lxml
 import twisted.web.error
 import twisted.web.http
 import urlparse
