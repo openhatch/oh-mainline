@@ -47,3 +47,4 @@ packages/BeautifulSoup
 packages/feedparser/feedparser
 packages/zope.interface/src
 packages/importlib
+packages/ordereddict
