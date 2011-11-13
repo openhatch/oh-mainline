@@ -41,3 +41,4 @@ packages/twisted
 packages/zope.interface
 packages/python-launchpad-bugs
 packages/gdata/src
+packages/python-openid
