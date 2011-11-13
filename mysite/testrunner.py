@@ -24,7 +24,6 @@ import datetime
 import random
 import subprocess
 import signal
-import mock
 import logging
 
 def override_settings_for_testing():
