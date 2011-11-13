@@ -301,3 +301,7 @@ LOGGING = {
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')
 
+try:
+    from local_settings import *
+except:
+    pass
