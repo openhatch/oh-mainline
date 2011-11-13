@@ -23,10 +23,6 @@ import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import PIL.Image
-from django.conf import settings
-from invitation.models import InvitationKey
-from models import InvitationRequest
-import django_authopenid.forms
 
 RESERVED_USERNAMES =  (
         'admin',
