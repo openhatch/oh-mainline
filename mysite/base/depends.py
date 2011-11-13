@@ -40,3 +40,12 @@ except:
         import sys
         sys.modules['Image'] = sys.modules['sys']
 
+try:
+    import launchpadbugs
+    import launchpadbugs.connector
+    import launchpadbugs.basebuglistfilter
+    import launchpadbugs.text_bug
+    import launchpadbugs.lphelper
+except ImportError: # usually because python2libxml2 is missing
+    launchpadbugs = None
+    logging.warning("launchpadbugs did not import. Install python-libxml2.")
