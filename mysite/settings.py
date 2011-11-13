@@ -303,5 +303,5 @@ DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
 
 try:
     from local_settings import *
-except:
+except ImportError:
     pass
