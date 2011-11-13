@@ -657,7 +657,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         try:
             s = xml_string
             tree = ET.parse(StringIO.StringIO(s))
-        except xml.parsers.expat.ExpatError:
+        except (xml.parsers.expat.ExpatError, ET.ParseError):
             # well, I'll be. it doesn't parse.
             # There's nothing to do.
             return None

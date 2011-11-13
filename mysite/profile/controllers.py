@@ -126,6 +126,9 @@ _pm = PeopleMatcher()
 people_matching = _pm.people_matching
 
 geoip_database = None
+def geoip_city_database_available():
+    return os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH)
+
 def get_geoip_guess_for_ip(ip_as_string):
     # initialize database
     global geoip_database

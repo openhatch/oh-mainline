@@ -34,6 +34,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.utils.unittest import skipIf
 
 from twill import commands as tc
 
@@ -347,8 +348,10 @@ class EditPhotoWithOldPerson(TwillTests):
 class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
     mock_ip = mock.Mock()
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_login(self):
         person = Person.objects.get(user__username="paulproteus")
