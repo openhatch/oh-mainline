@@ -14,16 +14,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import lxml.html
+import BeautifulSoup
+
 import feedparser
 from django.core.cache import cache
 
 OPENHATCH_BLOG_FEED_URL='http://openhatch.org/blog/feed/atom/'
 
 def summary2html(html_string):
-    decoded = lxml.html.fragment_fromstring('<div>' + html_string + '</div>')
-    text = decoded.text_content()
-    return unicode(text)
+    soup = BeautifulSoup.BeautifulSoup(html_string)
+    return u' '.join(soup.findAll(text=True))
 
 def _blog_entries():
     parsed = feedparser.parse(OPENHATCH_BLOG_FEED_URL)
