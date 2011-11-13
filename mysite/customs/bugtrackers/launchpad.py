@@ -24,14 +24,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import codecs
 import datetime
-import glob
 import logging
-import os
 
-from celery.registry import tasks
-from celery.task import Task
 import celery.decorators
 
 import mysite.customs.models
@@ -44,7 +39,6 @@ from launchpadbugs.basebuglistfilter import URLBugListFilter
 
 # Initialize data dumpers
 import mysite.search.lpb2json
-from django.utils import simplejson
 
 ##################################################
 # Crawler functions for Launchpad
