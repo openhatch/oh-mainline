@@ -28,6 +28,7 @@ from django.contrib.contenttypes import generic
 from django.conf import settings
 import datetime
 import StringIO
+import logging
 import uuid
 from urlparse import urljoin
 import random
@@ -36,10 +37,7 @@ import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
 import mysite.customs.ohloh
-try:
-    import Image
-except:
-    from PIL import Image
+import mysite.base.depends
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -48,9 +46,15 @@ class OpenHatchModel(models.Model):
         abstract = True
 
 def get_image_data_scaled(image_data, width):
+    ### NOTE: We refuse to scale images if we do not
+    ### have the Python Imaging Library.
+    if not mysite.base.depends.Image:
+        logging.warning("NOTE: We cannot resize this image, so we are going to pass it through. See README.mkd for information on PIL.")
+        return image_data
+
     # scale it
     image_fd = StringIO.StringIO(image_data)
-    im = Image.open(image_fd)
+    im = mysite.base.depends.Image.open(image_fd)
     image_fd.seek(0)
 
     w, h = get_image_dimensions(image_fd)
@@ -59,7 +63,7 @@ def get_image_data_scaled(image_data, width):
     new_h = int((h * 1.0 / w) * width)
 
     smaller = im.resize((new_w, new_h),
-                        Image.ANTIALIAS)
+                        mysite.base.depends.Image.ANTIALIAS)
 
     # "Save" it to memory
     new_image_fd = StringIO.StringIO()

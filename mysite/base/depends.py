@@ -23,3 +23,20 @@ def svnadmin_available():
     # by settings.py.
     SVNADMIN_PATH = '/usr/bin/svnadmin'
     return os.path.exists(SVNADMIN_PATH)
+
+
+### Here we try to import "Image", from the Python Imaging Library.
+### If we fail, Image is None.
+Image = None
+try:
+    import Image
+except:
+    try:
+        from PIL import Image
+    except ImportError:
+        ### Okay, for a good time, let's hack sys.modules.
+        ### This permits Django to think ImageFields might
+        ### possibly work.
+        import sys
+        sys.modules['Image'] = sys.modules['sys']
+

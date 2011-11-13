@@ -29,6 +29,7 @@ from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
 from mysite.customs import ohloh
 import mysite.customs.views
+import mysite.base.depends
 
 import xml.etree.ElementTree as ET
 
@@ -175,12 +176,13 @@ def twill_quiet():
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
+
+    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in README.mkd for information.")
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
         icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
+        image = mysite.base.depends.Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
 
     def test_ohloh_errors_on_nonexistent_project(self):

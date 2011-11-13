@@ -37,11 +37,7 @@ from django.core.urlresolvers import reverse
 from django.utils.unittest import skipIf
 
 from twill import commands as tc
-
-try:
-    import Image
-except:
-    from PIL import Image
+import mysite.base.depends
 #}}}
 
 class Login(TwillTests):
@@ -229,6 +225,7 @@ def photo(f):
     assert os.path.exists(filename)
     return filename
 
+@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in README.mkd for information.")
 class EditPhoto(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -251,7 +248,7 @@ class EditPhoto(TwillTests):
                     "Test that once you've uploaded a photo via the photo editor, "
                     "the template's photo_url variable is correct.")
             self.assert_(p.photo_thumbnail)
-            thumbnail_as_stored = Image.open(p.photo_thumbnail.file)
+            thumbnail_as_stored = mysite.base.depends.Image.open(p.photo_thumbnail.file)
             w, h = thumbnail_as_stored.size
             self.assertEqual(w, 40)
 
@@ -266,7 +263,7 @@ class EditPhoto(TwillTests):
             tc.submit()
             # Now check that the photo is 200px wide
             p = Person.objects.get(user__username='paulproteus')
-            image_as_stored = Image.open(p.photo.file)
+            image_as_stored = mysite.base.depends.Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
 
@@ -327,6 +324,7 @@ class EditPhoto(TwillTests):
 
     #}}}
 
+@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in README.mkd for information.")
 class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
