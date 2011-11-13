@@ -28,7 +28,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
 import os
-import simplejson
+from django.utils import simplejson
 import collections
 
 # Other missions use this helper.

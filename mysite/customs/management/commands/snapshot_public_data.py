@@ -21,7 +21,7 @@ from mysite.search.models import Bug, Project
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 from mysite.base.models import Timestamp
 import sys
-import simplejson
+from django.utils import simplejson
 from django.core.management.base import BaseCommand
 import django.core.serializers
 import django.core.serializers.json

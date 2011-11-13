@@ -20,7 +20,7 @@ import urllib
 import urllib2
 import cStringIO as StringIO
 import re
-import simplejson
+from django.utils import simplejson
 import datetime
 import collections
 import logging

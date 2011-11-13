@@ -24,7 +24,7 @@ from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError, HttpResponseBadRequest
 from mysite.base.helpers import render_response
 from django_authopenid.forms import OpenidSigninForm
-import simplejson
+from django.utils import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
 from django.contrib.auth.forms import AuthenticationForm

@@ -35,7 +35,7 @@ from django.utils.unittest import skipIf
 import django.db
 
 import hashlib
-import simplejson
+from django.utils import simplejson
 import mock
 from twill import commands as tc
 

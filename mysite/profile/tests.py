@@ -35,7 +35,7 @@ from mysite.profile import views
 from mysite.customs.models import WebResponse
 from django.utils.unittest import skipIf
 
-import simplejson
+from django.utils import simplejson
 import BeautifulSoup
 import datetime
 import tasks

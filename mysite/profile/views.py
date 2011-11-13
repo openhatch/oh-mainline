@@ -24,7 +24,7 @@
 import StringIO
 import datetime
 import urllib
-import simplejson
+from django.utils import simplejson
 import re
 import collections
 import logging

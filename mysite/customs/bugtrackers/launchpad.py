@@ -44,7 +44,7 @@ from launchpadbugs.basebuglistfilter import URLBugListFilter
 
 # Initialize data dumpers
 import mysite.search.lpb2json
-import simplejson
+from django.utils import simplejson
 
 ##################################################
 # Crawler functions for Launchpad
