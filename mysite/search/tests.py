@@ -34,7 +34,6 @@ import mysite.project.views
 from django.utils.unittest import skipIf
 import django.db
 
-import hashlib
 from django.utils import simplejson
 import mock
 from twill import commands as tc
@@ -44,10 +43,6 @@ import django.core.cache
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-
-from django.db.models import Q
-
-import MySQLdb
 
 class SearchTest(TwillTests):
 
