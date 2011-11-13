@@ -33,6 +33,7 @@ import mysite.profile.controllers
 from mysite.profile.management.commands import send_weekly_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
+from django.utils.unittest import skipIf
 
 import simplejson
 import BeautifulSoup
@@ -1298,12 +1299,14 @@ class ProjectGetMentors(TwillTests):
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test(self):
         data = {}
         data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
         """We wrote this test because MaxMind gives us back a city in Iceland. That city
         has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
