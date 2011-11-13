@@ -45,3 +45,4 @@ packages/python-openid
 packages/whoosh/src
 packages/BeautifulSoup
 packages/feedparser/feedparser
+packages/zope.interface/src
