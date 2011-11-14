@@ -12,6 +12,9 @@ COPYING
     This file explains what permissions you have, if you want to re-use
     source code you find in this repository.
 
+vendor/
+    This directory contains code from other projects that we rely on.
+
 mysite/
     This directory contains the OpenHatch website and all the "apps" that
     are part of it. Each subdirectory is an app.
