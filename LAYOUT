@@ -71,11 +71,3 @@ bin/
 
         (sqlite_mysite is a version of the above that uses an in-memory SQLite database
         instead of the MySQL database. You can use that to run the test suite faster.)
-
-Unimportant files
------------------
-
-apt_pkg/
-    This is pseudo-Python package that makes it so "import apt_pkg" works.
-
-    One of our dependencies requires that, so we provide a fake one.
