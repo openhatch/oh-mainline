@@ -52,8 +52,9 @@ def create_project_page_do(request):
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
+    wanna_helpers = p.people_who_wanna_help.all()
     if (request.user.is_authenticated() and
-        request.user.get_profile() in p.people_who_wanna_help.all()):
+        request.user.get_profile() in wanna_helpers):
         user_wants_to_help = True
     else:
         user_wants_to_help = False
@@ -90,11 +91,28 @@ def project(request, project__name = None):
         context['cookies_disabled'] = True
 
     if wanna_help:
-        people_to_show = list(p.people_who_wanna_help.exclude(user=request.user))
+        people_to_show = list(wanna_helpers.exclude(user=request.user))
         people_to_show.insert(0, request.user.get_profile())
     else:
-        people_to_show = p.people_who_wanna_help.all()
+        people_to_show = wanna_helpers
 
+    contact_form_list = []
+    for person in people_to_show:
+        # a WannaHelperNote should always exist for all Person objects in people_to_show
+        try:
+            note = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p)
+            contact_form_list.append({
+                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,), 
+                                                                initial= { 'project' : p, 
+                                                                           'person' : person, 
+                                                                           'checked' : True if note.contacted_on else False,
+                                                                         }),
+                'person' : person,
+                'note' : note,
+            })
+        except:
+            pass
+        
     button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
             request)
     button_widget_data['project'] = p
@@ -113,6 +131,7 @@ def project(request, project__name = None):
         'user_just_signed_up_as_wants_to_help': wanna_help,
         'people_to_show': people_to_show,
         'button_as_widget_source': button_as_widget_source,
+        'mark_contacted_forms' : contact_form_list,
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
@@ -256,6 +275,22 @@ def suggest_question_do(request):
     template = "project/project.html"
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
 
+def mark_contacted_do(request):
+    import pdb;pdb.set_trace()
+    
+    #extract person_ids from request.POST.keys()
+    #for each prefix, validate form
+        #if not already contacted, update WannaHelperNote
+    mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helped")
+    if mark_contacted_form.is_valid():
+        project = mark_contacted_form.cleaned_data['project']
+    else:
+        return HttpResponseBadRequest("No project id submitted.")
+
+    if request.user.us_authenticated():
+        person = request.user.get_profile()
+
+        
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():

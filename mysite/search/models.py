@@ -611,6 +611,8 @@ class WannaHelperNote(OpenHatchModel):
         unique_together = [('project', 'person')]
     person = models.ForeignKey('profile.Person')
     project = models.ForeignKey(Project)
+    contacted_by = models.ForeignKey(User, related_name="contacted_by_user", blank=True, null=True)
+    contacted_on = models.DateField(blank=True, null=True)
 
     @staticmethod
     def add_person_project(person, project):

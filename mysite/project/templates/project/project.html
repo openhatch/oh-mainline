@@ -105,6 +105,11 @@ about how you can help {{ project.display_name }}
                         <h3><a href='#buildhelper'>Buildhelper</a></h3>
                     </li>
                     {% endif %}
+                    {% if people_to_show %}
+                    <li >
+                        <h3><a href='#iwh_handler'>IWH Handler</a></h3>
+                    </li>
+                    {% endif %}
             </ul>
         <div id="chatter" class='body tab'>
             <div style="font-size: 1.3em" class="you-are-missing-things">
@@ -217,6 +222,26 @@ about how you can help {{ project.display_name }}
             </li>
             {% endfor %}
             </ul>
+        </div>
+    {% endif %}
+    {% if people_to_show %}
+        <div id="ipw_handler" class="body tab {% if not user %}hidden{% endif %}">
+            <div class="explanation">
+                <p>The following people have expressed interest in helping with this project</p>
+            </div>
+            <form id='mark_contacted_do_form' action="{% url mysite.project.views.mark_contacted_do %}" method="POST">
+                {% csrf_token %}
+                <ul>
+                    <li>
+                    {% for person in mark_contacted_forms %}
+                        {{ person.person.user.username }}
+                        {{ person.form }} 
+                        {{ person.note.contacted_on }} {{ person.note.contacted_by }}
+                    {% endfor %}
+                    </li>
+                </ul>
+                <input type='submit' id='mark_contact-button' rel='tipsy-south' title='Click to mark that the selected individuals have been contacted!' value='Contacted!'>
+            </form>
         </div>
     {% endif %}
 </div><!-- /.module #requests -->
