@@ -75,7 +75,7 @@ Step 2: Run the "migrations" to create the OpenHatch tables
 
 Run this command:
 
-    python manage.py migratee
+    python manage.py migrate
 
 This will print out *lots* of text, at the end of which, your tables
 should be ready. You're ready to run the site!
