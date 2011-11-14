@@ -112,6 +112,38 @@ ul#links { margin-left: 20px; }
 
 #footer a { color: white; } 
 
+.tab_nav {
+    display: inline;
+    padding: 0;
+    margin-bottom: -3px;
+}
+
+.tab_nav a, .tab_nav a:hover {
+    color: #555; text-decoration: none;
+    font-size: 1.2em;
+}
+
+.tab_nav li {
+    float: left;
+    padding: 5px 15px 6px 15px;
+    margin-right: 10px;
+    background: rgba(200, 255, 100,.3);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-bottom: -3px;
+}
+
+.tab_nav a li#active-tab {
+    color: #222;
+    background: rgba(100, 200, 255,.3);
+}
+
+.tab {
+    float: none;
+    width: 100%;
+    clear: both;
+}
+
 h3 { margin-bottom: 0px; text-align: left; clear: left; font-weight: normal; font-size: 1.1em; color: #222; letter-spacing: 0; margin: 0; }
 
 h3.nofloat { float: none; }

@@ -1,4 +1,4 @@
-{% extends 'base/two_columns.html' %}
+{% extends 'base/one_column.html' %}
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
@@ -57,21 +57,6 @@ about how you can help {{ project.display_name }}
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>&laquo; Projects</a></h3>
     <h1>{{ project.display_name }}</h1>
 
-    <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'> {% comment %} CSSTODO {% endcomment %}
-        <div class='module-head'>
-            <h3>Next steps for helpers
-                <a id='show' style='font-weight: normal;' href='#'>(show)</a>
-		<form style="display: none;" id="show_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
-		  <input type="hidden" name="value" value="True" />
-		</form>
-                <a id='hide' style='font-weight: normal;' href='#'>(hide)</a>
-		<form style="display: none;" id="hide_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
-		  <input type="hidden" name="value" value="False" />
-		</form>
-            </h3>
-        </div>
-    </div>
-
     <div class='next_steps_for_helpers contains_just_the_body {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='module-body'>
                 <ul class='raquo_bullets'>
@@ -95,20 +80,87 @@ about how you can help {{ project.display_name }}
 
 {% endblock pagetop %}
 
-{% block left %}
-    <div id='project-tab-container' class='module contains_questions'>
-            <ul class='module-head tab_nav'>
-                    <li class='ui-state-active'>
-                        <h3><a href='#chatter'>Chatter</a></h3>
-                    </li>
-                    {% if buildhelper_steps %}
-                    <li >
-                        <h3><a href='#buildhelper'>Buildhelper</a></h3>
-                    </li>
+{% block content %}
+    <ul class="tab_nav">
+    <a href="#summary"><li id="active-tab">Summary</li></a>
+    <a href="#getstarted"><li>Get started</li></a>
+    <a href="#buildhelper"><li>Buildhelper</li></a>
+    <a href="#helpers"><li>Prospective helpers</li></a>
+    </ul>
+    
+    <div id="project-info" class='module'>
+        <div id="summary" class='module-body tab'>
+            <div id="project-info" class="submodule">
+                <img src="{% version project.get_url_of_icon_or_generic %}" align='left' width='64' alt="logo" />
+                {% if not user_wants_to_help %}
+                <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
+                    <input type='hidden' name='project' value='{{project.id}}'>
+                    <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
+                </form>
+                {% endif %}
+                {% if project.homepage %}
+                <div {% comment %}CSSTODO{% endcomment %} style='margin-top: 10px;'>
+                    Homepage: <a href="{{ project.homepage }}">{{ project.homepage }}</a>
+                </div>
+                {% endif %}
+                <div>
+                    Bugtracker: None yet. <a href="#">Edit</a>
+                </div>
+                {% if project.language %}
+                <div {% comment %}CSSTODO{% endcomment %}style='margin-top: 10px;'>
+                    The code is mostly written in <strong>{{ project.language }}</strong>.
+                </div>
+                {% endif %}
+                <div>
+                Tags: None yet. <a href="#">Edit</a>
+                </div>
+            </div>
+            <div id="project-summary-content">
+                <h3>About {{ project.display_name }}</h3>
+                    <a href='{{ project.get_edit_page_url }}'>Edit</a>
+            <div {% comment %}CSSTODO{% endcomment %}style='float: left; width: 70%;'>
+                {% if random_pfentry %}
+                    <h2 {% comment %}CSSTODO{% endcomment %}style='font-size: 1.3em; font-weight: normal;'>
+                        {% spaceless %}
+                            <span>{{ random_pfentry.project_description|urlize|linebreaks}}</span>
+                        {% endspaceless %}
+                    </h2>
+                    <p {% comment %}CSSTODO{% endcomment %}style='font-size: .9em; margin: 5px 0 0 40px;'>
+                        from the profile of
+                        <a href='{{ random_pfentry.person.profile_url }}'>
+                            {% with random_pfentry.person.user as user %}
+                            {% include 'name.html' %}
+                            {% endwith %}
+                        </a>
+                    </p>
+                {% else %}
+                    <div style='color: #777; font-size: .85em;'>No one has described this project yet. To describe the project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.display_name|urlencode }}'>add it to your profile</a>.
+                    </div>
+                {% endif %}
+                
+                <h3>Registered contributors ({% firstof project.cached_contributor_count "none listed yet" %})</h3>
+            <ul>
+                <li>
+                    {% if project.cached_contributor_count %}
+                        <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all</a>
+                    {% else %}
+                        <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'
+                                style='float: right; font-weight: normal;'>Add yourself</a>
                     {% endif %}
+                </li>
             </ul>
-        <div id="chatter" class='module-body tab'>
-            <div style="font-size: 1.3em" class="you-are-missing-things">
+    {% if project.cached_contributor_count %}
+            <ul id='people-list'>
+                {% for person in contributors %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endfor %}
+            </ul>
+    {% endif %}
+            </div>
+        </div>
+        
+        <div id="getstarted" class='module-body tab'>
+            <div {% comment %}CSSTODO{% endcomment %}style="font-size: 1.3em" class="you-are-missing-things">
             {% if cookies_disabled %}
             <div>Please enable cookies in order to post answers.</div>
             {% endif %}
@@ -182,8 +234,8 @@ about how you can help {{ project.display_name }}
         </a>
     </strong>
     </div>
-    {% if buildhelper_steps %}
-        <div id="buildhelper" class='module-body tab invisible_if_js'>
+    <div id="buildhelper" class='module-body tab invisible_if_js'>
+        {% if buildhelper_steps %}
             <div class="explanation">
                 <p>This is the buildhelper for the {{ project.display_name }} project. It should help you get a working {{ project.display_name }} developer environment up and running on your computer. Click the checkboxes to track your progress!</p> 
                 <p>If you run into trouble with a certain step, look for a <span class="hint">hint</span> link for more information, or if you're stumped, a <span class="frustration">frustration</span> link to get help from {{ project.display_name }} volunteers.</p>
@@ -218,104 +270,13 @@ about how you can help {{ project.display_name }}
             </li>
             {% endfor %}
             </ul>
+            {% else %}
+            No buildhelpers yet.
+            {% endif %}
         </div>
-    {% endif %}
-</div><!-- /.module #requests -->
-
-{% endblock left %}
-
-{% block main %}
-    <div class='module' id='about'>
-        <div class='module-head'>
-            <h3>About {{ project.display_name }}</h3>
-            <ul>
-                <li>
-                    <a href='{{ project.get_edit_page_url }}'>Edit</a>
-                </li>
-            </ul>
-        </div>
-        <div class='module-body'>
-            <div class='project_icon' 
-                    style="float: left; width: 64px; margin-right: 20px;
-                    background-image: url({% version project.get_url_of_icon_or_generic %})"
-                    ><span class='alt-text'>
-                        (logo)
-                    </span></div>
-            <div style='float: left; width: 70%;'>
-                {% if random_pfentry %}
-                    <h2 style='font-size: 1.3em; font-weight: normal;'>
-                        {% spaceless %}
-                            <span>{{ random_pfentry.project_description|urlize|linebreaks}}</span>
-                        {% endspaceless %}
-                    </h2>
-                    <p style='font-size: .9em; margin: 5px 0 0 40px;'>
-                        from the profile of
-                        <a href='{{ random_pfentry.person.profile_url }}'>
-                            {% with random_pfentry.person.user as user %}
-                            {% include 'name.html' %}
-                            {% endwith %}
-                        </a>
-                    </p>
-                {% else %}
-                    <div style='color: #777; font-size: .85em;'>
-                        No one has described this project yet. To describe the
-                        project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.display_name|urlencode }}'>
-                            add it to your profile</a>.
-                    </div>
-                {% endif %}
-
-                {% if project.homepage %}
-                    <div style='margin-top: 10px;'>
-                        Homepage: <a href="{{ project.homepage }}">{{ project.homepage }}</a>
-                    </div>
-                {% endif %}
-
-                {% if project.language %}
-                    <div style='margin-top: 10px;'>
-                        The code is mostly written in <strong>{{ project.language }}</strong>.
-                    </div>
-                {% endif %}
-
-            </div>
-        </div>
+    <div id="helpers" class='module-body tab invisible_if_js'>
+        People who want to help go here.
     </div>
-
-    <div class='module' id='wannahelp'>
-        {% if not user_wants_to_help %}
-        <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
-            <input type='hidden' name='project' value='{{project.id}}'>
-            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
-        </form>
-        {% endif %}
-    </div>
-
-<div class='module' id='wanna_help'>
-{% include 'project/project-wanna-help-box.html' %}
-</div>
-
-<div class='module' id='contributors'>
-    <div class='module-head'>
-        <h3>Registered contributors ({% firstof project.cached_contributor_count "none listed yet" %})</h3>
-            <ul>
-                <li>
-                    {% if project.cached_contributor_count %}
-                        <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all</a>
-                    {% else %}
-                        <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'
-                                style='float: right; font-weight: normal;'>Add yourself</a>
-                    {% endif %}
-                </li>
-            </ul>
-    </div>
-    {% if project.cached_contributor_count %}
-        <div class='module-body'>
-            <ul id='people-list'>
-                {% for person in contributors %}
-                    {% include 'profile/person-summary-li.html' %}
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
 </div>
 
 <div class='module' id='bugs'>
@@ -368,7 +329,7 @@ about how you can help {{ project.display_name }}
     </div>
 </div><!-- /.module #bugs -->
 
-{% endblock main %}
+{% endblock content %}
 
 {% block js %}
 <script type='text/javascript'>
