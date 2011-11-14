@@ -90,8 +90,11 @@ about how you can help {{ project.display_name }}
     
     <div id="project-info" class='module'>
         <div id="summary" class='module-body tab'>
+            <div class="column two-column-left">
             <div id="project-info" class="submodule">
-                <img src="{% version project.get_url_of_icon_or_generic %}" align='left' width='64' alt="logo" />
+                <img src="{% version project.get_url_of_icon_or_generic %}" class='project-page-logo' alt="logo" />
+                <h2 class='project-page-name'>{{ project.display_name }}</h2>
+                <div class="clearer"></div>
                 {% if not user_wants_to_help %}
                 <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
                     <input type='hidden' name='project' value='{{project.id}}'>
@@ -114,7 +117,11 @@ about how you can help {{ project.display_name }}
                 <div>
                 Tags: None yet. <a href="#">Edit</a>
                 </div>
+                &nbsp;
             </div>
+            &nbsp;
+            </div>
+            <div class='column two-column-right'>
             <div id="project-summary-content">
                 <h3>About {{ project.display_name }}</h3>
                     <a href='{{ project.get_edit_page_url }}'>Edit</a>
@@ -156,6 +163,7 @@ about how you can help {{ project.display_name }}
                 {% endfor %}
             </ul>
     {% endif %}
+            </div>
             </div>
         </div>
         

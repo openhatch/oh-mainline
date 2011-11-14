@@ -37,9 +37,6 @@ body#project .voting { float: right; width: 8%; margin-right: 2%; text-align: ce
 body#project .voting .score { color: #444; font-size: .8em; margin-bottom: 3px; width: 100%;  }
 body#project form.is_edit_form { display: none; }
 
-body#project .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }
-body#project .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
-
 body#project #other-questions { display: block; margin-bottom: 10px; }
 body#project li:target { background-color: #ffd; }
 body#project .quotemark { color: #555; }
@@ -69,6 +66,29 @@ body#project .next_steps_for_helpers.collapsed #show { display: inline; }
 body#project .next_steps_for_helpers.collapsed #hide { display: none; }
 
 body#project .next_steps_for_helpers li { text-indent: -1em; width: 25%; float: left; margin-right: 5%; font-size: 1.3em; }
+
+body#project img.project-page-logo {
+    float: left;
+    width: 64px;
+    padding: 0px 10px 5px 0px;
+}
+body#project h2.project-page-name {
+    float: left;
+    clear: none;
+}
+
+body#project .two-column-right {
+    width: 55%;
+    margin-right: 0;
+}
+
+body#project .two-column-right div {
+    clear: none;
+}
+
+body#project #project-info {
+    width: 90%;
+}
 
 body#project #copypastebox { display: none; }
 
