@@ -130,7 +130,10 @@ def _geocode(address):
                     'latitude': latitude,
                     'longitude': longitude}
         return None
-    except Exception, e:
+    except IOError:
+        logging.exception("While attempting to geocode, got an error.")
+        logging.warning("If you are online and still get this message, something is wrong.")
+    except Exception:
         stack = traceback.extract_stack()
         logging.debug('An error occurred: %s' % stack)
         raise
