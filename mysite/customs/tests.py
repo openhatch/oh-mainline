@@ -64,7 +64,6 @@ from django.utils.unittest import skipIf
 import mysite.customs.models
 import mysite.customs.bugimporters.trac
 import mysite.customs.bugtrackers.roundup
-import mysite.customs.bugtrackers.launchpad
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
@@ -1157,7 +1156,7 @@ sample_launchpad_data_snapshot.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
+@skipIf(True, "Disabling old-style Launchpad tests.")
 class AutoCrawlTests(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project',
                 sample_launchpad_data_snapshot)
@@ -1187,7 +1186,7 @@ class AutoCrawlTests(django.test.TestCase):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
+@skipIf(True, "Disabling old-style Launchpad tests.")
 class LaunchpadImporterTests(django.test.TestCase):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
@@ -1312,7 +1311,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See README.mkd for more.")
+@skipIf(True, "Disabling old-style Launchpad tests.")
 class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
     def test(self):
         '''Start with a bug that is "Fix Released"

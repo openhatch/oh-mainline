@@ -34,12 +34,7 @@ import mysite.search.models
 from mysite.base.helpers import sanitize_wide_unicode
 
 # Initialize Launchpad scraper thing
-import mysite.base.depends
-if mysite.base.depends.launchpadbugs:
-    from mysite.base.depends.launchpadbugs.connector import ConnectBug, ConnectBugList
-    from mysite.base.depends.launchpadbugs.basebuglistfilter import URLBugListFilter
-else:
-    pass
+ConnectBug, ConnectBugList, URLBugListFilter = (None, None, None)
 
 # Initialize data dumpers
 import mysite.search.lpb2json
