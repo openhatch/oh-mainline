@@ -600,7 +600,7 @@ class BugzillaTests(django.test.TestCase):
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde(self, mock_xml_opener):
         Project.create_dummy(name='kmail')
-        mock_xml_opener.return_value = ET.parse(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
         kde.update()
@@ -613,7 +613,7 @@ class BugzillaTests(django.test.TestCase):
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde_harder_bug(self, mock_xml_opener):
         Project.create_dummy(name='kphotoalbum')
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-182054-2010-04-09.xml')).read())
         kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
         kde.update()
@@ -626,7 +626,7 @@ class BugzillaTests(django.test.TestCase):
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_miro_bug_object(self, mock_xml_opener):
         # Parse XML document as if we got it from the web
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTrackerModel(
@@ -671,7 +671,7 @@ Keywords: Torrent unittest""")
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_full_grab_miro_bugs(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTrackerModel(
@@ -711,7 +711,7 @@ Keywords: Torrent unittest""")
             settings.MEDIA_ROOT, 'sample-data',
             'miro-2294-2009-08-06.xml')).read().replace(
             'NEW', 'CLOSED')
-        mock_xml_opener.return_value = lxml.etree.XML(cooked_xml)
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(cooked_xml)
 
         miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
@@ -745,7 +745,7 @@ Keywords: Torrent unittest""")
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_full_grab_resolved_miro_bug(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTrackerModel(
@@ -777,7 +777,7 @@ Keywords: Torrent unittest""")
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
         miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
@@ -806,7 +806,7 @@ Keywords: Torrent unittest""")
         bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
         bug.save()
 
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+        mock_xml_opener.return_value = mysite.base.depends.lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         # Now refresh
@@ -834,7 +834,7 @@ class TestCustomBugParser(django.test.TestCase):
 
     @mock.patch('mysite.customs.bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data')
     def test_kdebugparser_uses_tracker_specific_method(self, mock_specific):
-        bugzilla_data = lxml.etree.XML(open(os.path.join(
+        bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
                     settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         bug_data = bugzilla_data.xpath('bug')[0]
 
