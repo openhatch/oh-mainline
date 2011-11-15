@@ -30,13 +30,14 @@ import os
 import logging
 
 # Wrap lxml and the modules that are part of it
+class nothing(object):
+        pass
+
 try:
     import lxml
     import lxml.etree
     import lxml.html
 except:
-    class nothing(object):
-        pass
     lxml = nothing()
     lxml.etree = None
     lxml.html = None
@@ -80,5 +81,9 @@ try:
     import launchpadbugs.text_bug
     import launchpadbugs.lphelper
 except ImportError: # usually because python-libxml2 is missing
-    launchpadbugs = None
+    launchpadbugs = nothing()
+    launchpadbugs.connector = None
+    launchpadbugs.basebuglistfilter = None
+    launchpadbugs.text_bug = None
+    launchpadbugs.lphelper = None
     logging.warning("launchpadbugs did not import. Install python-libxml2.")

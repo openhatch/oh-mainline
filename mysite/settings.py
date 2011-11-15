@@ -181,7 +181,10 @@ INSTALLED_APPS = (
 )
 
 # testrunner allows us to control which testrunner to use
-TEST_RUNNER = 'mysite.testrunner.run'
+TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
+# Optionally, use XML reporting
+if os.environ.get('USE_XML_TEST_REPORTING', None):
+    TEST_RUNNER = 'mysite.testrunner.OpenHatchXMLTestRunner'
 
 # Make test names prettier 
 TEST_OUTPUT_DESCRIPTIONS = True
