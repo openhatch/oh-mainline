@@ -30,13 +30,14 @@ import os
 import logging
 
 # Wrap lxml and the modules that are part of it
+class nothing(object):
+        pass
+
 try:
     import lxml
     import lxml.etree
     import lxml.html
 except:
-    class nothing(object):
-        pass
     lxml = nothing()
     lxml.etree = None
     lxml.html = None
