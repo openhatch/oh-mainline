@@ -31,8 +31,6 @@ from mysite.customs import ohloh
 import mysite.customs.views
 import mysite.base.depends
 
-import xml.etree.ElementTree as ET
-
 from django.core.urlresolvers import reverse
 
 import logging
