@@ -81,5 +81,9 @@ try:
     import launchpadbugs.text_bug
     import launchpadbugs.lphelper
 except ImportError: # usually because python-libxml2 is missing
-    launchpadbugs = None
+    launchpadbugs = nothing()
+    launchpadbugs.connector = None
+    launchpadbugs.basebuglistfilter = None
+    launchpadbugs.text_bug = None
+    launchpadbugs.lphelper = None
     logging.warning("launchpadbugs did not import. Install python-libxml2.")
