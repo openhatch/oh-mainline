@@ -53,10 +53,10 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 class StarlingTests(TwillTests):
-	def test_page(self):
-		url = 'http://openhatch.org/starlings'
-		place = make_twill_url(url)
-		tc.go(place)
+    def test_page(self):
+        url = 'http://openhatch.org/starlings'
+        place = make_twill_url(url)
+        tc.go(place)
 
 class ProfileTests(TwillTests):
     # {{{
