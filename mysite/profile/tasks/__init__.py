@@ -29,7 +29,7 @@ import mysite.profile.controllers
 import shutil
 import staticgenerator
 
-from django.conf import settings
+import django.conf.settings
 import django.core.cache
 
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
@@ -76,7 +76,7 @@ class RegeneratePostfixAliasesForForwarder(Task):
         # Generate the table...
         lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
         # Save it where Postfix expects it...
-        fd = open(settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
+        fd = open(django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
         fd.write('\n'.join(lines))
         fd.close()
         # Update the Postfix forwarder database. Note that we do not need
@@ -182,7 +182,7 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
 
 @task
 def clear_people_page_cache(*args, **kwargs):
-    shutil.rmtree(os.path.join(settings.WEB_ROOT,
+    shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
                                'people'),
                   ignore_errors=True)
 
