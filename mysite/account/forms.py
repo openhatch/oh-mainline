@@ -124,8 +124,8 @@ class EditPhotoForm(django.forms.ModelForm):
         if not mysite.base.depends.Image:
             ## FIXME This is fail-safe, not fail-secure, behavior.
             ## If an image is too big, and the Python Imaging Library
-            ## is not installed, we simply do not resize it.
-            logging.warning("NOTE: We cannot resize this image, so we are going to pass it through. See README.mkd for information on PIL.")
+            ## is not installed, we simply do not resize it.E
+            logging.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
             return self.cleaned_data['photo']
 
         # Safe copy of data...

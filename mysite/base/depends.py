@@ -43,8 +43,8 @@ except:
     lxml.html = None
 
 if lxml.html is None:
-    logging.warning("Some parts of the OpenHatch site may fail because the lxml"
-                    " library is not installed. Look in README.mkd for"
+    logging.info("Some parts of the OpenHatch site may fail because the lxml"
+                    " library is not installed. Look in ADVANCED_INSTALLATION.mkd for"
                     " information about lxml.")
 
 # Provide a helper to check if svnadmin is available. If not,
@@ -86,4 +86,4 @@ except ImportError: # usually because python-libxml2 is missing
     launchpadbugs.basebuglistfilter = None
     launchpadbugs.text_bug = None
     launchpadbugs.lphelper = None
-    logging.warning("launchpadbugs did not import. Install python-libxml2.")
+    logging.info("launchpadbugs did not import. Install python-libxml2. See ADVANCED_INSTALLATION.mkd for more info.")

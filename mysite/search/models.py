@@ -49,7 +49,7 @@ def get_image_data_scaled(image_data, width):
     ### NOTE: We refuse to scale images if we do not
     ### have the Python Imaging Library.
     if not mysite.base.depends.Image:
-        logging.warning("NOTE: We cannot resize this image, so we are going to pass it through. See README.mkd for information on PIL.")
+        logging.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
         return image_data
 
     # scale it
