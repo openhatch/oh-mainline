@@ -16,21 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import logging
 import os
-from datetime import timedelta
-import datetime
-import urllib2
-import urllib
 import mysite.base.models
 import mysite.profile.models
-from mysite.search.models import Project
 from celery.decorators import task
 from celery.task import Task
 import celery.registry
-import time
-import random
 import traceback
 import mysite.profile.search_indexes
 import mysite.profile.controllers
