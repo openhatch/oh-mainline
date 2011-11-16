@@ -29,7 +29,7 @@ import mysite.profile.controllers
 import shutil
 import staticgenerator
 
-import django.conf.settings
+import django.conf
 import django.core.cache
 
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
