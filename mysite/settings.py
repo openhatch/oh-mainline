@@ -107,7 +107,7 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
     'staticgenerator.middleware.StaticGeneratorMiddleware',
@@ -120,7 +120,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     # Django debug toolbar
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+]
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -303,6 +303,15 @@ LOGGING = {
 
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')
+
+### Windows fix-ups
+if sys.platform.startswith('win'):
+    # staticgenerator seems to act weirdly on Windows, so we disable it.
+    MIDDLEWARE_CLASSES.remove(
+        'staticgenerator.middleware.StaticGeneratorMiddleware')
+
+
+### Include a user's customizations
 
 try:
     from local_settings import *
