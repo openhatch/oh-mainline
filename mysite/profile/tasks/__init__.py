@@ -73,6 +73,10 @@ class GarbageCollectForwarders(Task):
 
 class RegeneratePostfixAliasesForForwarder(Task):
     def run(self, **kwargs):
+        if django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH:
+            self.update_table()
+
+    def update_table(self):
         # Generate the table...
         lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
         # Save it where Postfix expects it...
