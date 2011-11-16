@@ -304,6 +304,15 @@ LOGGING = {
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')
 
+### Windows fix-ups
+if sys.platform.startswith('win'):
+    # staticgenerator seems to act weirdly on Windows, so we disable it.
+    MIDDLEWARE_CLASSES.remove(
+        'staticgenerator.middleware.StaticGeneratorMiddleware')
+
+
+### Include a user's customizations
+
 try:
     from local_settings import *
 except ImportError:
