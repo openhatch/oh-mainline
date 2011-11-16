@@ -107,7 +107,7 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
     'staticgenerator.middleware.StaticGeneratorMiddleware',
@@ -120,7 +120,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     # Django debug toolbar
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+]
 
 ROOT_URLCONF = 'mysite.urls'
 
