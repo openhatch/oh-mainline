@@ -39,11 +39,8 @@ import logging
 
 def get_mission_data_path(mission_type):
     base_path = os.path.abspath(os.path.dirname(__file__))
-    logging.info("Base path: %s", base_path)
     new_path = os.path.join(base_path, '..', mission_type, 'data')
-    logging.info("New path: %s", new_path)
     absolute_ified = os.path.abspath(new_path)
-    logging.info("Absolute path: %s", absolute_ified)
     return absolute_ified
 
 def set_mission_completed(profile, mission_name):
