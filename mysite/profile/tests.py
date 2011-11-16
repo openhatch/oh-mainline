@@ -47,16 +47,17 @@ import quopri
 from django.core import mail
 from django.conf import settings
 import django.test
+import django.conf
 from django.core import serializers
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 class StarlingTests(TwillTests):
-	def test_page(self):
-		url = 'http://openhatch.org/starlings'
-		place = make_twill_url(url)
-		tc.go(place)
+    def test_page(self):
+        url = 'http://openhatch.org/starlings'
+        place = make_twill_url(url)
+        tc.go(place)
 
 class ProfileTests(TwillTests):
     # {{{
@@ -1586,10 +1587,23 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['query_type'], 'all_tags')
 
 
+class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
+    def setUp(self):
+        self.original_value = django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH
+        django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = None
+
+    @mock.patch('mysite.profile.tasks.RegeneratePostfixAliasesForForwarder.update_table')
+    def test(self, mock_update_table):
+        task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
+        task.run()
+        self.assertFalse(mock_update_table.called)
+
+    def tearDown(self):
+        django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = self.original_value
+
 class PostFixGeneratorList(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus']
-
 
     def test(self):
         # create two people

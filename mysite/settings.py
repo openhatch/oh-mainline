@@ -252,7 +252,7 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5) # how long the forward
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
 # at worst, we run a postfixifying celery job once every two days for each user
 
-POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
+POSTFIX_FORWARDER_TABLE_PATH = None # Disabled by default
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 

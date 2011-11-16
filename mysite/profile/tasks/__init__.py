@@ -16,28 +16,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import logging
 import os
-from datetime import timedelta
-import datetime
-import urllib2
-import urllib
 import mysite.base.models
 import mysite.profile.models
-from mysite.search.models import Project
 from celery.decorators import task
 from celery.task import Task
 import celery.registry
-import time
-import random
 import traceback
 import mysite.profile.search_indexes
 import mysite.profile.controllers
 import shutil
 import staticgenerator
 
-from django.conf import settings
+import django.conf
 import django.core.cache
 
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
@@ -81,16 +73,20 @@ class GarbageCollectForwarders(Task):
 
 class RegeneratePostfixAliasesForForwarder(Task):
     def run(self, **kwargs):
+        if django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH:
+            self.update_table()
+
+    def update_table(self):
         # Generate the table...
         lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
         # Save it where Postfix expects it...
-        fd = open(settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
+        fd = open(django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
         fd.write('\n'.join(lines))
         fd.close()
         # Update the Postfix forwarder database. Note that we do not need
         # to ask Postfix to reload. Yay!
         # FIXME stop using os.system()
-        os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps') 
+        os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps')
 
 class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
@@ -190,7 +186,7 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
 
 @task
 def clear_people_page_cache(*args, **kwargs):
-    shutil.rmtree(os.path.join(settings.WEB_ROOT,
+    shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
                                'people'),
                   ignore_errors=True)
 

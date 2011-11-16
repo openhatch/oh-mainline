@@ -27,6 +27,11 @@ import signal
 import logging
 import mysite.base.depends
 
+def generate_safe_temp_file_name():
+    fd, name = tempfile.mkstemp()
+    os.close(fd)
+    return name
+
 def override_settings_for_testing():
     settings.CELERY_ALWAYS_EAGER = True
     settings.SVN_REPO_PATH = tempfile.mkdtemp(
@@ -34,6 +39,7 @@ def override_settings_for_testing():
         datetime.datetime.now().isoformat().replace(':', '.'))
     settings.GITHUB_USERNAME='openhatch-api-testing'
     settings.GITHUB_API_TOKEN='4a48b94a0f16c4483fee4cf6c46425e8'
+    settings.POSTFIX_FORWARDER_TABLE_PATH = generate_safe_temp_file_name()
 
     svnserve_port = random.randint(50000, 50100)
     if mysite.base.depends.svnadmin_available():
@@ -51,6 +57,11 @@ def cleanup_after_tests():
         pid = int(open(pidfile).read().strip())
         os.kill(pid, signal.SIGTERM)
         os.unlink(pidfile)
+    try:
+        os.unlink(settings.POSTFIX_FORWARDER_TABLE_PATH)
+    except IOError:
+        pass
+
 
 class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
     def run_tests(self, *args, **kwargs):
