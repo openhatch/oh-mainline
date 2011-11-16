@@ -52,9 +52,6 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-def do_nothing(*args, **kwargs):
-    return ''
-
 class StarlingTests(TwillTests):
 	def test_page(self):
 		url = 'http://openhatch.org/starlings'
@@ -831,7 +828,7 @@ class AddCitationManually(TwillTests):
 
         # Send this data to the appropriate view.
         url = reverse(mysite.profile.views.add_citation_manually_do)
-        response = self.login_with_client().post(url, input_data)
+        self.login_with_client().post(url, input_data)
 
         # Check that a citation was created.
         c = Citation.untrashed.get(url=input_data['url'])
