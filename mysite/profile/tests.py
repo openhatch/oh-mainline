@@ -52,9 +52,6 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-def do_nothing(*args, **kwargs):
-    return ''
-
 class StarlingTests(TwillTests):
 	def test_page(self):
 		url = 'http://openhatch.org/starlings'
