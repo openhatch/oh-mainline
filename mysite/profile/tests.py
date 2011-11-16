@@ -1605,7 +1605,6 @@ class PostFixGeneratorList(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus']
 
-
     def test(self):
         # create two people
         #  one who has an email address list in our database
