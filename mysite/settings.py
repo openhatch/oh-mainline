@@ -216,10 +216,12 @@ INVITATIONS_PER_USER=100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
-# If you want to clear the cache, restart memcached.  Don't set the cache to dummy (unless you're trying to edit an unsafely cached page, lol)
-#CACHE_BACKEND = 'file:///tmp/django_cache_belonging_to_%s' % os.environ.get('USER', 'unknown')
-CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
-#CACHE_BACKEND = 'dummy://'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'openhatch'
+    }
+}
 
 # Launchpad credentials
 LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0tKMGtwYmNQTkJXOHRQMWR2Ygpjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2ggbGl2ZSBzaXRlCmFjY2Vzc19zZWNyZXQgPSBSNWtrcXBmUERiUjRiWFFQWGJIMkdoc3ZQamw2SjlOc1ZwMzViN0g2d3RjME56Q3R2Z3JKeGhNOVc5a2swU25CSnRHV1hYckdrOFFaMHZwSgoK'
