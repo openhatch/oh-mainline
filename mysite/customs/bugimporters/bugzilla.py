@@ -389,7 +389,7 @@ class BugzillaBugParser:
 ### Custom bug parsers
 class GnomeBugzilla(BugzillaBugParser):
     def generate_bug_project_name(self, bug_project_name_format, tracker_name):
-        bug_project_name = bb.product
+        bug_project_name = self.product
         gnome2openhatch = {'general': 'GNOME (general)',
                            'website': 'GNOME (website)'}
         if bug_project_name in gnome2openhatch:
