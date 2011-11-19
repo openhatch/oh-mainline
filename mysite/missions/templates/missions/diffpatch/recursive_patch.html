@@ -28,7 +28,7 @@
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
       <li>Download <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}">this patch</a>.</li>
-      <li>Unpack the tarball and apply the patch using <code>patch -p1</code> from the <code>hats</code> directory.</li>
+      <li>Unpack the tarball and apply the patch using <code>patch -p1 &lt; patch_file</code> from the <code>hats</code> directory.</li>
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
