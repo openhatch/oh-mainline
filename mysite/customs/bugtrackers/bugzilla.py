@@ -571,49 +571,6 @@ class MediaWikiBugzilla(BugzillaBugTracker):
             bug_project_name = product
         return bug_project_name
 
-class GnomeBugzilla(BugzillaBugTracker):
-    enabled = True
-
-    def __init__(self):
-        BugzillaBugTracker.__init__(self,
-                                    base_url='https://bugzilla.gnome.org/',
-                                    tracker_name='Gnome',
-                                    bug_project_name_format='')
-
-    def generate_current_bug_xml(self):
-        # Get all bugs that contain any of the keywords 'gnome-love'
-        # or 'documentation'
-        queries = {
-                'Easy bugs':
-                    'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---',
-                # FIXME: Query with documentation keyword causes XML syntax errors
-                #'Documentation bugs':
-                    #'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love%2Cdocumentation&query_format=advanced&resolution=---'
-                }
-        return self.generate_bug_xml_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(xml_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
-        keywords = map(lambda s: s.strip(),
-                       keywords_text.split(','))
-        ret_dict['good_for_newcomers'] = ('gnome-love' in keywords)
-        ret_dict['bite_size_tag_name'] = 'gnome-love'
-        # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('documentation' in keywords)
-        # Then pass ret_dict back
-        return ret_dict
-
-    def generate_bug_project_name(self, bb):
-        bug_project_name = bb.product
-        gnome2openhatch = {'general': 'GNOME (general)',
-                           'website': 'GNOME (website)'}
-        if bug_project_name in gnome2openhatch:
-            bug_project_name=gnome2openhatch[bug_project_name]
-        return bug_project_name
-
 class MozillaBugzilla(BugzillaBugTracker):
     enabled = True
 

@@ -387,6 +387,15 @@ class BugzillaBugParser:
                 component=self.component)
 
 ### Custom bug parsers
+class GnomeBugzilla(BugzillaBugParser):
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        bug_project_name = bb.product
+        gnome2openhatch = {'general': 'GNOME (general)',
+                           'website': 'GNOME (website)'}
+        if bug_project_name in gnome2openhatch:
+            bug_project_name=gnome2openhatch[bug_project_name]
+        return bug_project_name
+
 class KDEBugzilla(BugzillaBugParser):
 
     def extract_tracker_specific_data(self, xml_data, ret_dict):
