@@ -355,7 +355,7 @@ class PatchRecursiveTests(TwillTests):
             tar_process.communicate(controllers.PatchRecursiveMission.synthesize_tarball())
             self.assertEqual(tar_process.returncode, 0)
 
-            patch_process = subprocess.Popen(['patch', '-d', os.path.join(tempdir, controllers.PatchRecursiveMission.BASE_NAME), '-p1'], stdin=subprocess.PIPE)
+            patch_process = subprocess.Popen(['patch', '-d', tempdir, '-p1'], stdin=subprocess.PIPE)
             patch_process.communicate(controllers.PatchRecursiveMission.get_patch())
             self.assertEqual(patch_process.returncode, 0)
 

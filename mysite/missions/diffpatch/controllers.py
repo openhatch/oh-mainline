@@ -227,6 +227,6 @@ class PatchRecursiveMission(object):
 
             oldlines = open(oldname).readlines()
             newlines = open(newname).readlines()
-            patchfile.writelines(difflib.unified_diff(oldlines, newlines, '%s-orig/%s' % (cls.BASE_NAME, name), '%s/%s' % (cls.BASE_NAME, name)))
+            patchfile.writelines(difflib.unified_diff(oldlines, newlines, 'a/%s/%s' % (cls.BASE_NAME, name), 'b/%s/%s' % (cls.BASE_NAME, name)))
 
         return patchfile.getvalue()

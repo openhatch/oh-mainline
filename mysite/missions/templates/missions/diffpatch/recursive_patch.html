@@ -27,8 +27,10 @@
     <p>Sometimes you might have to apply a patch that affects more than one file.  The patch program can tell what parts of the patch apply to what files by examining the headers, but you might need to help it out by giving the <code>-p</code> option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li>Download <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}">this patch</a>.</li>
-      <li>Unpack the tarball and apply the patch using <code>patch -p1 &lt; patch_file</code> from the <code>hats</code> directory.</li>
+      <li>Download <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}">this patch</a> to the same directory.</li>
+      <li>Unpack the tarball. This will create a <code>hats</code> directory.</li>
+      <li>Look at the <code>hats.patch</code> patch file. Note the odd file paths in the headers.</li>
+      <li>Apply the patch. You can do this by running <code>patch -p1 &lt; hats.patch</code>. The <code>-p1</code> says to ignore up through the first "/" in the paths in the patch headers when trying to find files to patch.</li>
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
