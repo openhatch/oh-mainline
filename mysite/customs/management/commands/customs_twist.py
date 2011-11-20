@@ -94,7 +94,7 @@ class Command(BaseCommand):
                         'mysite.customs.bugimporters.' + module_part)
                     custom_parser_class = getattr(module, custom_parser_class_name)
                 except Exception:
-                    logging.error("Uh oh, failed trying to grab %s", custom_parser_class_name)
+                    logging.error("Uh oh, failed trying to grab %s", custom_parser)
                     logging.exception("We failed to import the requested custom importer.")
 
             # Okay, at this point we're going to have to create it. Note that
