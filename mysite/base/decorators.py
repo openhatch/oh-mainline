@@ -167,7 +167,6 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
         if type(value) == django.db.models.query.ValuesListQuerySet:
             value = list(value)
         cached_json = simplejson.dumps({'value': value})
-        import logging
 
         # Then cache the input/output mapping.
         django.core.cache.cache.set(cache_key, cached_json, 864000)
