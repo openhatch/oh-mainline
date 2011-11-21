@@ -7,7 +7,6 @@ mysite/static/images/icons/projects/**
 *.swp
 *.patch
 .installed.cfg
-bin
 develop-eggs
 dist
 downloads
