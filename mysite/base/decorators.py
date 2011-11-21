@@ -171,7 +171,7 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
         # Then cache the input/output mapping.
         django.core.cache.cache.set(cache_key, cached_json, 864000)
 
-        logging.info('cached output of %s: %s' % (func.__name__, cached_json))
+        logging.debug('cached output of %s: %s' % (func.__name__, cached_json))
     else:
         # Sweet, no need to run the expensive method. Just use the cached output.
         value = simplejson.loads(cached_json)['value']
