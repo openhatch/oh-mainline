@@ -92,7 +92,7 @@ ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'k%&pic%c5%6$%(h&eynhgwhibe9-h!_iq&(@ktx#@1-5g2+he)'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-            'django.core.context_processors.auth',
+            'django.contrib.auth.context_processors.auth',
             'django.core.context_processors.debug',
             'django.core.context_processors.i18n',
             'django.core.context_processors.media',
