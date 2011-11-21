@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: celery
-Version: 2.4.1
+Version: 2.4.2
 Summary: Distributed Task Queue
 Home-page: http://celeryproject.org
 Author: Ask Solem
@@ -12,7 +12,7 @@ Description: =================================
         
         .. image:: http://cloud.github.com/downloads/ask/celery/celery_128.png
         
-        :Version: 2.4.1
+        :Version: 2.4.2
         :Web: http://celeryproject.org/
         :Download: http://pypi.python.org/pypi/celery/
         :Source: http://github.com/ask/celery/
