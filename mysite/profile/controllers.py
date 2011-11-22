@@ -18,7 +18,7 @@
 
 import os.path
 import hashlib
-from itertools import izip, cycle, islice
+from itertools import cycle, islice
 
 from django.utils import simplejson
 
@@ -77,14 +77,14 @@ class RecommendBugs(object):
     @mysite.base.decorators.cache_method('get_cache_key')
     def _recommend_as_list(self):
         return list(self._recommend_as_generator())
-    
+
     def _recommend_as_generator(self):
         '''Input: A list of terms, like ['Python', 'C#'], designed for use in the search engine.
 
         I am a generator that yields Bug objects.
         I yield up to n Bugs in a round-robin fashion.
         I don't yield a Bug more than once.'''
-        
+
         distinct_ids = set()
 
         lists_of_bugs = [
