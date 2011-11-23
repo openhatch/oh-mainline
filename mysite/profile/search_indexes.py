@@ -17,7 +17,6 @@
 from haystack import indexes
 from haystack import site
 import mysite.profile.models
-from django.db.models import Q
 
 class PersonIndex(indexes.SearchIndex):
     def _pull_lowercase_tag_texts(self, tag_type_name, person_instance):
@@ -27,7 +26,7 @@ class PersonIndex(indexes.SearchIndex):
     def prepare_null_document(self, person_instance):
         return '' # lollerskates
 
-    studying_lowercase_exact = indexes.MultiValueField() 
+    studying_lowercase_exact = indexes.MultiValueField()
     def prepare_studying_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('studying', person_instance)
 
