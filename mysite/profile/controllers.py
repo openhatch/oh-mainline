@@ -331,3 +331,50 @@ def get_most_popular_tags():
         cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
     return popular_tags
 
+### This code finds the right people to show on /people/, gathering a list
+### of people and optional extra template data for the map.
+class PeopleFinder(object):
+    '''Subclasses of PeopleFinder take a query string as the only argument
+    to __init__.py, and they create the self.template_data and self.people
+    attributes.'''
+    def __init__(self, search_string):
+        raise NotImplementedError
+
+    def add_query_summary(self):
+        raise NotImplementedError
+
+class ProjectQuery(PeopleFinder):
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.people = []
+        # We never got faceting working properly with Haystack, while doing
+        # exact searches, so we do the queries via the ORM.
+
+        self.calculate_project(search_string)
+        self.add_query_summary()
+
+        if self.project:
+            self.calculate_people_for_project()
+            self.add_wanna_help_count()
+
+    def calculate_project(self, search_string):
+        orm_projects = mysite.search.models.Project.objects.filter(name__iexact=search_string)
+        if orm_projects:
+            self.project = orm_projects[0]
+            self.template_data['queried_project'] = self.project
+        else:
+            self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
+
+    def calculate_people_for_project(self):
+        person_ids = mysite.profile.models.PortfolioEntry.published_ones.filter(
+            project=self.project).values_list('person_id', flat=True)
+        self.people = mysite.profile.models.Person.objects.filter(
+            pk__in=person_ids).select_related().order_by('user__username')
+
+    def add_wanna_help_count(self):
+        self.template_data['icanhelp_count'] = self.project.people_who_wanna_help.count()
+
+    def add_query_summary(self):
+        self.template_data['this_query_summary'] = 'who have contributed to '
+        self.template_data['query_is_a_project_name'] = True
+

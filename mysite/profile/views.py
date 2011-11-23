@@ -492,69 +492,8 @@ def people_who_want_to_help(parsed_query):
 def project_query2mappable_orm_people(parsed_query):
     assert parsed_query['query_type'] == 'project'
 
-    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-    haystack_field_name = 'all_public_projects_lowercase_exact'
-    mappable_people_from_haystack = mappable_people_from_haystack.filter(
-        **{haystack_field_name: parsed_query['q'].lower()})
-    mappable_people = set(
-        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack))
-
-    mappable_people = list(
-        sorted(mappable_people,
-               key=lambda x: x.user.username))
-
-    extra_data = {}
-
-    mentor_people = mappable_people_from_haystack.filter(**{'can_mentor_lowercase_exact': parsed_query['q'].lower()})
-    can_pitch_in_people = mappable_people_from_haystack.filter(**{'can_pitch_in_lowercase_exact': parsed_query['q'].lower()})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
-
-    ## How many possible mentors
-    if mentor_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
-            {'query': parsed_query['q'].lower(),
-             'count': len(mentor_people)})
-
-    ## Does this relate to people who can pitch in?
-    if can_pitch_in_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
-            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
-
-    orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
-
-    ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
-    ## that expects a {'query': X, 'count': Y} dict
-    suggestions_for_searches_regarding_people_who_can_pitch_in = []
-    for orm_project in orm_projects:
-        people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_pitch_in_lowercase_exact=orm_project.language.lower())
-        if people_who_can_pitch_in_with_project_language:
-            suggestions_for_searches_regarding_people_who_can_pitch_in.append(
-                {'query': orm_project.language,
-                 'count': len(people_who_can_pitch_in_with_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
-
-
-    # Suggestions for possible mentors
-    suggestions_for_searches_regarding_people_who_can_mentor = []
-    for orm_project in orm_projects:
-        people_who_could_mentor_in_the_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_mentor_lowercase_exact=orm_project.language.lower())
-        if people_who_could_mentor_in_the_project_language:
-            suggestions_for_searches_regarding_people_who_can_mentor.append(
-                {'query': orm_project.language,
-                 'count': len(people_who_could_mentor_in_the_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
-               ].extend(suggestions_for_searches_regarding_people_who_can_pitch_in)
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'
-               ].extend(suggestions_for_searches_regarding_people_who_can_mentor)
-
-    return mappable_people, extra_data
+    pf = mysite.profile.controllers.ProjectQuery(parsed_query['q'])
+    return pf.people, pf.template_data
 
 def person_id2data_as_javascript(request):
     # The point of this view is to provide a JSON dump of the public
