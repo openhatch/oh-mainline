@@ -58,7 +58,7 @@ class PersonIndex(indexes.SearchIndex):
                         person_instance.get_list_of_all_project_names()))
 
     def get_queryset(self):
-        everybody = mysite.profile.models.Person.objects.all()
+        everybody = mysite.profile.models.Person.objects.all().select_related()
         return everybody
 
 site.register(mysite.profile.models.Person, PersonIndex)
