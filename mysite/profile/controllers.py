@@ -26,6 +26,7 @@ import pygeoip
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Q
 
 import logging
 import mysite.search.controllers
@@ -35,6 +36,10 @@ import mysite.profile.models
 import mysite.base.decorators
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
+
+# Name constants
+SUGGESTION_COUNT = 6
+DEFAULT_CACHE_TIMESPAN = 86400 * 7
 
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
@@ -283,4 +288,46 @@ def provide_project_query_hint(parsed_query):
 
     return output_dict
 
+def get_most_popular_projects():
+    # FIXME: This code is presumably terrible.
+    key_name = 'most_popular_projects_last_flushed_on_20100325'
+    popular_projects = cache.get(key_name)
+    if popular_projects is None:
+        projects = mysite.search.models.Project.objects.all()
+        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
+        #extract just the names from the projects
+        popular_projects = [project.name for project in popular_projects]
+        # cache it for a week
+        cache.set(key_name, popular_projects, DEFAULT_CACHE_TIMESPAN)
+    return popular_projects
+
+def get_matching_project_suggestions(search_text):
+    # FIXME: This code is presumably terrible.
+    mps1 = mysite.search.models.Project.objects.filter(
+        cached_contributor_count__gt=0, name__icontains=search_text).filter(
+        ~Q(name__iexact=search_text)).order_by(
+            '-cached_contributor_count')
+    mps2 = mysite.search.models.Project.objects.filter(
+            cached_contributor_count__gt=0, display_name__icontains=search_text).filter(
+            ~Q(name__iexact=search_text)).order_by(
+                '-cached_contributor_count')
+    return mps1 | mps2
+
+def get_most_popular_tags():
+    # FIXME: This code is presumably terrible.
+    key_name = 'most_popular_tags'
+    popular_tags = cache.get(key_name)
+    if popular_tags is None:
+        # to get the most popular tags:
+        # get all tags
+        # order them by the number of people that list them
+        # remove duplicates
+        # lowercase them all and then remove duplicates
+        # take the popular ones
+        # cache it for a week
+        tags = mysite.profile.models.Tag.objects.all()
+        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
+        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(mysite.profile.models.Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
+        cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
+    return popular_tags
 
