@@ -300,6 +300,7 @@ People Search
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+var person_ids = {{ person_ids|safe }};
 $(init);
 </script>
 {% endblock js %}

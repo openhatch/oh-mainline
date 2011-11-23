@@ -647,6 +647,7 @@ def people(request):
     #if settings.DEBUG:
     #    cache_timespan = 0
 
+    data['person_ids'] = simplejson.dumps(','.join([str(x.id) for x in data['people']]))
     key_name = 'most_popular_projects_last_flushed_on_20100325'
     popular_projects = cache.get(key_name)
     if popular_projects is None:
