@@ -1552,6 +1552,29 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [])
 
+class PeopleFinderClasses(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self, *args, **kwargs):
+        super(PeopleFinderClasses, self).setUp(*args, **kwargs)
+        self.person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        self.project = Project.create_dummy(name='Banshee')
+
+    def test_wannahelp_query_with_zero_hits(self):
+        whq = mysite.profile.controllers.WannaHelpQuery('banshee')
+        self.assertEqual([], list(whq.people))
+
+    def test_wannahelp_query_with_one_hit(self):
+        # This time, set Asheesh up as a Banshee wannahelper.
+        self.project.people_who_wanna_help.add(self.person)
+        note = WannaHelperNote.add_person_project(self.person, self.project)
+        note.save()
+        self.project.save()
+
+        whq = mysite.profile.controllers.WannaHelpQuery('banshee')
+        self.assertEqual(1, len(whq.people))
+        self.assertEqual(self.person, whq.people[0])
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
