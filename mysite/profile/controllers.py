@@ -26,6 +26,7 @@ import pygeoip
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Q
 
 import logging
 import mysite.search.controllers
@@ -35,6 +36,10 @@ import mysite.profile.models
 import mysite.base.decorators
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
+
+# Name constants
+SUGGESTION_COUNT = 6
+DEFAULT_CACHE_TIMESPAN = 86400 * 7
 
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
@@ -283,4 +288,93 @@ def provide_project_query_hint(parsed_query):
 
     return output_dict
 
+def get_most_popular_projects():
+    # FIXME: This code is presumably terrible.
+    key_name = 'most_popular_projects_last_flushed_on_20100325'
+    popular_projects = cache.get(key_name)
+    if popular_projects is None:
+        projects = mysite.search.models.Project.objects.all()
+        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
+        #extract just the names from the projects
+        popular_projects = [project.name for project in popular_projects]
+        # cache it for a week
+        cache.set(key_name, popular_projects, DEFAULT_CACHE_TIMESPAN)
+    return popular_projects
+
+def get_matching_project_suggestions(search_text):
+    # FIXME: This code is presumably terrible.
+    mps1 = mysite.search.models.Project.objects.filter(
+        cached_contributor_count__gt=0, name__icontains=search_text).filter(
+        ~Q(name__iexact=search_text)).order_by(
+            '-cached_contributor_count')
+    mps2 = mysite.search.models.Project.objects.filter(
+            cached_contributor_count__gt=0, display_name__icontains=search_text).filter(
+            ~Q(name__iexact=search_text)).order_by(
+                '-cached_contributor_count')
+    return mps1 | mps2
+
+def get_most_popular_tags():
+    # FIXME: This code is presumably terrible.
+    key_name = 'most_popular_tags'
+    popular_tags = cache.get(key_name)
+    if popular_tags is None:
+        # to get the most popular tags:
+        # get all tags
+        # order them by the number of people that list them
+        # remove duplicates
+        # lowercase them all and then remove duplicates
+        # take the popular ones
+        # cache it for a week
+        tags = mysite.profile.models.Tag.objects.all()
+        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
+        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(mysite.profile.models.Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
+        cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
+    return popular_tags
+
+### This code finds the right people to show on /people/, gathering a list
+### of people and optional extra template data for the map.
+class PeopleFinder(object):
+    '''Subclasses of PeopleFinder take a query string as the only argument
+    to __init__.py, and they create the self.template_data and self.people
+    attributes.'''
+    def __init__(self, search_string):
+        raise NotImplementedError
+
+    def add_query_summary(self):
+        raise NotImplementedError
+
+class ProjectQuery(PeopleFinder):
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.people = []
+        # We never got faceting working properly with Haystack, while doing
+        # exact searches, so we do the queries via the ORM.
+
+        self.calculate_project(search_string)
+        self.add_query_summary()
+
+        if self.project:
+            self.calculate_people_for_project()
+            self.add_wanna_help_count()
+
+    def calculate_project(self, search_string):
+        orm_projects = mysite.search.models.Project.objects.filter(name__iexact=search_string)
+        if orm_projects:
+            self.project = orm_projects[0]
+            self.template_data['queried_project'] = self.project
+        else:
+            self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
+
+    def calculate_people_for_project(self):
+        person_ids = mysite.profile.models.PortfolioEntry.published_ones.filter(
+            project=self.project).values_list('person_id', flat=True)
+        self.people = mysite.profile.models.Person.objects.filter(
+            pk__in=person_ids).select_related().order_by('user__username')
+
+    def add_wanna_help_count(self):
+        self.template_data['icanhelp_count'] = self.project.people_who_wanna_help.count()
+
+    def add_query_summary(self):
+        self.template_data['this_query_summary'] = 'who have contributed to '
+        self.template_data['query_is_a_project_name'] = True
 

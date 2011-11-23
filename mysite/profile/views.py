@@ -41,7 +41,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import django.views.generic
@@ -65,9 +64,6 @@ import mysite.profile.tasks
 from mysite.base.helpers import render_response
 
 # }}}
-
-# Name constants
-SUGGESTION_COUNT = 6
 
 @login_required
 def add_citation_manually_do(request):
@@ -492,69 +488,8 @@ def people_who_want_to_help(parsed_query):
 def project_query2mappable_orm_people(parsed_query):
     assert parsed_query['query_type'] == 'project'
 
-    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-    haystack_field_name = 'all_public_projects_lowercase_exact'
-    mappable_people_from_haystack = mappable_people_from_haystack.filter(
-        **{haystack_field_name: parsed_query['q'].lower()})
-    mappable_people = set(
-        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack))
-
-    mappable_people = list(
-        sorted(mappable_people,
-               key=lambda x: x.user.username))
-
-    extra_data = {}
-
-    mentor_people = mappable_people_from_haystack.filter(**{'can_mentor_lowercase_exact': parsed_query['q'].lower()})
-    can_pitch_in_people = mappable_people_from_haystack.filter(**{'can_pitch_in_lowercase_exact': parsed_query['q'].lower()})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
-
-    ## How many possible mentors
-    if mentor_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
-            {'query': parsed_query['q'].lower(),
-             'count': len(mentor_people)})
-
-    ## Does this relate to people who can pitch in?
-    if can_pitch_in_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
-            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
-
-    orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
-
-    ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
-    ## that expects a {'query': X, 'count': Y} dict
-    suggestions_for_searches_regarding_people_who_can_pitch_in = []
-    for orm_project in orm_projects:
-        people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_pitch_in_lowercase_exact=orm_project.language.lower())
-        if people_who_can_pitch_in_with_project_language:
-            suggestions_for_searches_regarding_people_who_can_pitch_in.append(
-                {'query': orm_project.language,
-                 'count': len(people_who_can_pitch_in_with_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
-
-
-    # Suggestions for possible mentors
-    suggestions_for_searches_regarding_people_who_can_mentor = []
-    for orm_project in orm_projects:
-        people_who_could_mentor_in_the_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_mentor_lowercase_exact=orm_project.language.lower())
-        if people_who_could_mentor_in_the_project_language:
-            suggestions_for_searches_regarding_people_who_can_mentor.append(
-                {'query': orm_project.language,
-                 'count': len(people_who_could_mentor_in_the_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
-               ].extend(suggestions_for_searches_regarding_people_who_can_pitch_in)
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'
-               ].extend(suggestions_for_searches_regarding_people_who_can_mentor)
-
-    return mappable_people, extra_data
+    pf = mysite.profile.controllers.ProjectQuery(parsed_query['q'])
+    return pf.people, pf.template_data
 
 def person_id2data_as_javascript(request):
     # The point of this view is to provide a JSON dump of the public
@@ -643,91 +578,8 @@ def people(request):
     # filter by query, if it is set
     data['people'] = everybody
 
-    cache_timespan = 86400 * 7
-    #if settings.DEBUG:
-    #    cache_timespan = 0
-
+    # Add JS-friendly version of people data to template
     data['person_ids'] = simplejson.dumps(','.join([str(x.id) for x in data['people']]))
-    key_name = 'most_popular_projects_last_flushed_on_20100325'
-    popular_projects = cache.get(key_name)
-    if popular_projects is None:
-        projects = Project.objects.all()
-        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
-        #extract just the names from the projects
-        popular_projects = [project.name for project in popular_projects]
-        # cache it for a week
-        cache.set(key_name, popular_projects, cache_timespan)
-
-    key_name = 'most_popular_tags'
-    popular_tags = cache.get(key_name)
-    if popular_tags is None:
-        # to get the most popular tags:
-            # get all tags
-            # order them by the number of people that list them
-            # remove duplicates
-        tags = Tag.objects.all()
-        #lowercase them all and then remove duplicates
-        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
-        #take the popular ones
-        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
-        # cache it for a week
-        cache.set(key_name, popular_tags, cache_timespan)
-
-    # Populate matching_project_suggestions
-    # (unless query is icanhelp, in which case it's not relevant enough)
-    if data['query_type'] == "icanhelp":
-        data['matching_project_suggestions'] = []
-    else:
-        mps1 = Project.objects.filter(
-            cached_contributor_count__gt=0, name__icontains=data['q']).filter(
-            ~Q(name__iexact=data['q'])).order_by(
-            '-cached_contributor_count')
-        mps2 = Project.objects.filter(
-            cached_contributor_count__gt=0, display_name__icontains=data['q']).filter(
-            ~Q(name__iexact=data['q'])).order_by(
-            '-cached_contributor_count')
-        data['matching_project_suggestions'] = mps1 | mps2
-
-    if data['people']:
-        data['a_few_matching_project_suggestions'] = data['matching_project_suggestions'][:3]
-
-    # What kind of people are these?
-    if data['q']:
-        data.update(
-            mysite.profile.controllers.query_type2query_summary(data))
-
-    try:
-        data['queried_project'] = Project.objects.get(name=data['q'])
-    except Project.DoesNotExist:
-        try:
-            # See if what they have typed in matches a display name
-            data['queried_project'] = Project.objects.get(display_name=data['q'])
-        except Project.DoesNotExist:
-            data['queried_project'] = None
-            data['multiple_projects_matching'] = False
-        except Project.MultipleObjectsReturned:
-            data['queried_project'] = None
-            data['multiple_projects_matching'] = True
-
-    # If this is a project, determine how many people are listed as willing to
-    # contribute to that project.
-    if data['query_type'] == 'project' and data['queried_project']:
-        data['icanhelp_count'] = data['queried_project'].people_who_wanna_help.all().count()
-
-    if data['query_type'] == 'icanhelp' and not data['queried_project']:
-        if data['multiple_projects_matching']:
-            data['total_query_summary'] = "Your query <strong>%s</strong> matched multiple projects, which is incompatible with this search type." % data['q']
-        else:
-            data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
-
-    data['suggestions'] = [
-        dict(display_name='projects',
-             values=popular_projects,
-             query_prefix='project:'),
-        dict(display_name='profile tags',
-             values=popular_tags,
-             query_prefix='')]
-
     return (request, 'profile/search_people.html', data)
 
 def gimme_json_for_portfolio(request):
