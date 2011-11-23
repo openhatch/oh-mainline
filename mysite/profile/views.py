@@ -476,14 +476,10 @@ def people_who_want_to_help(parsed_query):
     """Get a list of people who say they want to help a given project. This
     function gathers a list of people in response to the search query
     'want2help:PROJECTNAME'."""
-    haystack_results = haystack.query.SearchQuerySet().all()
-    haystack_field_name = 'all_wanna_help_projects_lowercase_exact'
-    haystack_results = haystack_results.filter(
-        **{haystack_field_name: parsed_query['q'].lower()})
-    mappable_people = set(
-        mysite.base.controllers.haystack_results2db_objects(haystack_results))
-    extra_data = {}
-    return mappable_people, extra_data
+    assert parsed_query['query_type'] == 'icanhelp'
+
+    pf = mysite.profile.controllers.WannaHelpQuery(parsed_query['q'])
+    return pf.people, pf.template_data
 
 def project_query2mappable_orm_people(parsed_query):
     assert parsed_query['query_type'] == 'project'
