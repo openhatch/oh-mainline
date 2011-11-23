@@ -330,7 +330,7 @@ class Person(models.Model):
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
-        my_tag_texts = (link.tag.text for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me)
+        my_tag_texts = (link.tag.text for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me)
         #eliminate duplicates, case-sensitively, then return
         already_added = set()
         to_return = []
@@ -346,7 +346,7 @@ class Person(models.Model):
 
     def get_tags_as_dict(self):
         ret = collections.defaultdict(set)
-        for link in Link_Person_Tag.objects.filter(person=self):
+        for link in self.link_person_tag_set.all():
             ret[link.tag.tag_type.name].add(link.tag.text.lower())
         return ret
 
@@ -359,7 +359,7 @@ class Person(models.Model):
     def get_tags_for_recommendations(self):
         """Return a list of Tags linked to this Person.  For use with bug recommendations."""
         exclude_me = TagType.objects.filter(name='understands_not')
-        return [link.tag for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
+        return [link.tag for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me]
 
     def get_full_name(self):
         # {{{
