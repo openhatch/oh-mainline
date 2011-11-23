@@ -38,6 +38,7 @@ from django.views.generic.simple import direct_to_template
 from voting.views import vote_on_object
 
 import mysite.account.views
+import mysite.profile.views
 
 from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
 
@@ -176,6 +177,9 @@ urlpatterns = patterns('',
 
         (r'^\+cacheable/\+people/location_data/$',
             'mysite.profile.views.person_id2data_as_javascript'),
+
+        (r'^\+profile_api/location_data/$',
+            mysite.profile.views.LocationDataApiView.as_view()),
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
 

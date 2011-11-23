@@ -44,6 +44,7 @@ from django.db.models import Q
 from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import django.views.generic
 
 # Haystack
 import haystack.query
@@ -646,6 +647,7 @@ def people(request):
     #if settings.DEBUG:
     #    cache_timespan = 0
 
+    data['person_ids'] = simplejson.dumps(','.join([str(x.id) for x in data['people']]))
     key_name = 'most_popular_projects_last_flushed_on_20100325'
     popular_projects = cache.get(key_name)
     if popular_projects is None:
@@ -1159,5 +1161,39 @@ def bug_recommendation_list_as_template_fragment(request):
         response_data['result'] = 'NO_BUGS'
 
     return HttpResponse(simplejson.dumps(response_data), mimetype='application/json')
+
+### API-y views go below here
+class LocationDataApiView(django.views.generic.View):
+    ### Entry point for requests from the web
+    def get(self, request):
+        person_ids = self.extract_person_ids(request.GET)
+        data_dict = self.raw_data_for_person_ids(person_ids)
+        as_json = simplejson.dumps(data_dict)
+        return HttpResponse(as_json, mimetype='application/javascript')
+
+    ### Helper functions
+    @staticmethod
+    def raw_data_for_person_ids(person_ids):
+        persons = mysite.profile.models.Person.objects.filter(
+            id__in=person_ids).select_related()
+        return mysite.profile.controllers.get_people_location_data_as_dict(
+            persons, include_latlong=True)
+
+    @staticmethod
+    def extract_person_ids(get_data):
+        person_ids_as_string = get_data.get('person_ids', '')
+        id_set = set()
+        if not person_ids_as_string:
+            return id_set
+
+        splitted_from_commas = person_ids_as_string.split(',')
+        for item in splitted_from_commas:
+            try:
+                as_int = int(item)
+            except ValueError:
+                continue
+            id_set.add(as_int)
+        return id_set
+
 
 # vim: ai ts=3 sts=4 et sw=4 nu
