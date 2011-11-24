@@ -235,7 +235,6 @@
         <script type='text/javascript' src="{% version '/static/js/jquery.form.js' %}"></script>
         <script type='text/javascript' src="{% version '/static/js/jquery.jgrowl.js' %}"></script>
         <script type='text/javascript' src="{% version '/static/js/jquery.cookie.js' %}"></script>
-        <script type='text/javascript' src="{% version '/static/piwik.js' %}"></script>
         <script type='text/javascript' src="{% version '/static/js/base.js' %}"></script>
         <script type='text/javascript' src="{% version '/static/js/base/locationDialog.js' %}"></script>
         <script type='text/javascript' src="{% version '/static/js/search/defaultText.js' %}"></script>
@@ -259,20 +258,6 @@
         {% endif %}
         {% block piwik_js %}
 {% googleanalyticsjs %}
-<script type="text/javascript">
-if (document.location.hostname == 'openhatch.org') {
-var pkBaseURL = (("https:" == document.location.protocol) ? "https://openhatch.org/piwik/" : "http://openhatch.org/piwik/");
-document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-}
-</script><script type="text/javascript">
-  if (document.location.hostname == 'openhatch.org') {
-  try {
-  var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
-  piwikTracker.trackPageView();
-  piwikTracker.enableLinkTracking();
-  } catch( err ) {}
-}
-</script><noscript><p><img src="/piwik/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
         {% endblock %}
 
     </body>
