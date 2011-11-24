@@ -28,7 +28,6 @@ from django.utils import simplejson
 import re
 import collections
 import logging
-import os.path
 
 # Django
 from django.template.loader import render_to_string
@@ -40,13 +39,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 import django.views.generic
-
-# Haystack
-import haystack.query
 
 # OpenHatch apps
 import mysite.base.controllers
