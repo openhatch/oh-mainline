@@ -231,8 +231,7 @@ class Feed(TwillTests):
         expected_answer_pks = [answer.pk for answer in recent_feed_items]
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
-    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
-    def test_feed_shows_wanna_help(self, mock_whatever):
+    def test_feed_shows_wanna_help(self):
         ### set things up so there was a wanna help button click
         person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
         p_before = mysite.search.models.Project.create_dummy()
