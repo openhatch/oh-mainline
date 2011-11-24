@@ -343,9 +343,7 @@ def get_most_popular_tags():
         # lowercase them all and then remove duplicates
         # take the popular ones
         # cache it for a week
-        tags = mysite.profile.models.Tag.objects.all()
-        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
-        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(mysite.profile.models.Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
+        popular_tags = [] # FIXME: I removed the implementation of this.
         cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
     return popular_tags
 
