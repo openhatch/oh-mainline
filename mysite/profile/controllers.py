@@ -340,8 +340,33 @@ class PeopleFinder(object):
     def __init__(self, search_string):
         raise NotImplementedError
 
+    def get_person_instances_from_person_ids(self, person_ids):
+        return mysite.profile.models.Person.objects.filter(
+            pk__in=person_ids).select_related().order_by('user__username')
+
+    def calculate_project(self, search_string):
+        orm_projects = mysite.search.models.Project.objects.filter(name__iexact=search_string)
+        if orm_projects:
+            self.project = orm_projects[0]
+            self.template_data['queried_project'] = self.project
+        else:
+            self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
+
     def add_query_summary(self):
         raise NotImplementedError
+
+class WannaHelpQuery(PeopleFinder):
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.calculate_project(search_string)
+        self.people = []
+        if self.project:
+            self.people = self.project.people_who_wanna_help.all()
+        self.add_query_summary()
+
+    def add_query_summary(self):
+        self.template_data['this_query_summary'] = 'willing to contribute to the project '
+        self.template_data['query_is_a_project_name'] = True
 
 class ProjectQuery(PeopleFinder):
     def __init__(self, search_string):
@@ -357,19 +382,10 @@ class ProjectQuery(PeopleFinder):
             self.calculate_people_for_project()
             self.add_wanna_help_count()
 
-    def calculate_project(self, search_string):
-        orm_projects = mysite.search.models.Project.objects.filter(name__iexact=search_string)
-        if orm_projects:
-            self.project = orm_projects[0]
-            self.template_data['queried_project'] = self.project
-        else:
-            self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
-
     def calculate_people_for_project(self):
         person_ids = mysite.profile.models.PortfolioEntry.published_ones.filter(
             project=self.project).values_list('person_id', flat=True)
-        self.people = mysite.profile.models.Person.objects.filter(
-            pk__in=person_ids).select_related().order_by('user__username')
+        self.people = self.get_person_instances_from_person_ids(person_ids)
 
     def add_wanna_help_count(self):
         self.template_data['icanhelp_count'] = self.project.people_who_wanna_help.count()
