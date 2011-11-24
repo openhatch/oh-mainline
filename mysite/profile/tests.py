@@ -1960,16 +1960,6 @@ class EditYourName(TwillTests):
         tc.find('Gottfried Leibniz')
         tc.notfind('Asheesh Laroia')
 
-class PersonCanReindexHimself(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('mysite.profile.tasks.ReindexPerson.delay')
-    def test(self, mock_delay):
-        p = Person.objects.get(user__username='paulproteus')
-        p.reindex_for_person_search()
-        self.assertEqual(mock_delay.call_args,
-                         ( (), {'person_id': p.id}))
-
 class PersonCanSetHisExpandNextStepsOption(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

@@ -269,9 +269,6 @@ def wanna_help_do(request):
         mysite.search.models.WannaHelperNote.add_person_project(person, project)
         project.save()
 
-        # Reindex the guy
-        person.reindex_for_person_search()
-
         if request.is_ajax():
             people_to_show = list(project.people_who_wanna_help.exclude(user=request.user))
             people_to_show.insert(0, person)
@@ -319,7 +316,6 @@ def unlist_self_from_wanna_help_do(request):
         project = wanna_help_form.cleaned_data['project']
         project.people_who_wanna_help.remove(request.user.get_profile())
         mysite.search.models.WannaHelperNote.remove_person_project(request.user.get_profile(), project)
-        request.user.get_profile().reindex_for_person_search()
         return HttpResponseRedirect(project.get_url())
     else:
         return HttpResponseBadRequest("No project id submitted.")
