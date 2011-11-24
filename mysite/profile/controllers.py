@@ -350,6 +350,7 @@ class PeopleFinder(object):
             self.project = orm_projects[0]
             self.template_data['queried_project'] = self.project
         else:
+            self.project = None
             self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
 
     def add_query_summary(self):
