@@ -1587,6 +1587,13 @@ class PeopleFinderClasses(TwillTests):
         self.assertEqual(1, len(pq.people))
         self.assertEqual(self.person, pq.people[0])
 
+class PeopleFinderTagQueryTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_tag_type_query_with_zero_hits(self):
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([], list(tq.people))
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
