@@ -369,6 +369,29 @@ class WannaHelpQuery(PeopleFinder):
         self.template_data['this_query_summary'] = 'willing to contribute to the project '
         self.template_data['query_is_a_project_name'] = True
 
+class TagQuery(PeopleFinder):
+    # FIXME: Probably we should add a add_query_summary() method.
+    def __init__(self, tag_short_name, search_string):
+        self.template_data = {}
+        self.people = []
+        tag_type = self.get_tag_type(tag_short_name)
+        if tag_type:
+            self.people = self.get_persons_by_tag_type_and_text(
+                tag_type, search_string)
+
+    def get_tag_type(self, tag_short_name):
+        tag_types = mysite.profile.models.TagType.objects.filter(name=tag_short_name)
+        if not tag_types:
+            return None
+        return tag_types[0]
+
+    def get_persons_by_tag_type_and_text(self, tag_type, search_string):
+        tag_ids = mysite.profile.models.Tag.objects.filter(
+            tag_type=tag_type, text__iexact=search_string).values_list('id', flat=True)
+        person_ids = mysite.profile.models.Link_Person_Tag.objects.filter(
+            tag__id__in=tag_ids).values_list('person_id', flat=True)
+        return self.get_person_instances_from_person_ids(person_ids)
+
 class ProjectQuery(PeopleFinder):
     def __init__(self, search_string):
         self.template_data = {}

@@ -1587,6 +1587,60 @@ class PeopleFinderClasses(TwillTests):
         self.assertEqual(1, len(pq.people))
         self.assertEqual(self.person, pq.people[0])
 
+class PeopleFinderTagQueryTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self, *args, **kwargs):
+        super(PeopleFinderTagQueryTests, self).setUp(*args, **kwargs)
+        self.person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+
+    def test_tag_type_query_with_zero_hits(self):
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([], list(tq.people))
+
+    def test_tag_type_query_with_zero_hits_and_busted_tag(self):
+        tq = mysite.profile.controllers.TagQuery('lol_no_such_tag', 'python')
+        self.assertEqual([], list(tq.people))
+
+    def test_tag_type_query_with_one_hit_case_insensitive(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([self.person], list(tq.people))
+
+    def test_tag_type_query_with_one_hit_with_distraction_tags(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        understands, _ = TagType.objects.get_or_create(name='understands')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        understands_unit_testing, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='unit testing')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_banshee)
+        link.save()
+        link = Link_Person_Tag(person=self.person,
+                               tag=understands_unit_testing)
+        link.save()
+
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([self.person], list(tq.people))
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
