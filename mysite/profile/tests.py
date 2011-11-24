@@ -1590,9 +1590,26 @@ class PeopleFinderClasses(TwillTests):
 class PeopleFinderTagQueryTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
+    def setUp(self, *args, **kwargs):
+        super(PeopleFinderTagQueryTests, self).setUp(*args, **kwargs)
+        self.person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+
     def test_tag_type_query_with_zero_hits(self):
         tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
         self.assertEqual([], list(tq.people))
+
+    def test_tag_type_query_with_one_hit_case_insensitive(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([self.person], list(tq.people))
 
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
