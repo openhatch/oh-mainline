@@ -105,10 +105,8 @@ def project(request, project__name = None):
         'project': p,
         'buildhelper_steps' : buildhelper_steps,
         'contributors': p.get_contributors()[:3],
-        'mentors': (mysite.profile.controllers.people_matching(
-            'can_mentor', project__name)),
-        'language_mentors': (mysite.profile.controllers.people_matching(
-            'can_mentor', p.language)),
+        'mentors': mysite.profile.controllers.TagQuery('can_mentor', project__name).people,
+        'language_mentors': mysite.profile.controllers.TagQuery('can_mentor', p.language).people,
         'explain_to_anonymous_users': True,
         'wanna_help_form': mysite.project.forms.WannaHelpForm(),
         'user_wants_to_help': request.user.is_authenticated() and request.user.get_profile() in p.people_who_wanna_help.all(),
