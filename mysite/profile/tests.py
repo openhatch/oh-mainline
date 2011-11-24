@@ -1575,6 +1575,18 @@ class PeopleFinderClasses(TwillTests):
         self.assertEqual(1, len(whq.people))
         self.assertEqual(self.person, whq.people[0])
 
+    def test_project_query_with_zero_hits(self):
+        pq = mysite.profile.controllers.ProjectQuery('banshee')
+        self.assertEqual([], list(pq.people))
+
+    def test_project_query_with_one_hit(self):
+        # This time, set Asheesh up as a Banshee contributor.
+        PortfolioEntry(project=self.project, person=self.person, is_published=True).save()
+
+        pq = mysite.profile.controllers.ProjectQuery('banshee')
+        self.assertEqual(1, len(pq.people))
+        self.assertEqual(self.person, pq.people[0])
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
