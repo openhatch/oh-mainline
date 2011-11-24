@@ -1611,6 +1611,32 @@ class PeopleFinderTagQueryTests(TwillTests):
         tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
         self.assertEqual([self.person], list(tq.people))
 
+    def test_tag_type_query_with_one_hit_with_distraction_tags(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        understands, _ = TagType.objects.get_or_create(name='understands')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        understands_unit_testing, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='unit testing')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_banshee)
+        link.save()
+        link = Link_Person_Tag(person=self.person,
+                               tag=understands_unit_testing)
+        link.save()
+
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([self.person], list(tq.people))
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
