@@ -335,10 +335,6 @@ def edit_person_info_do(request):
 
     person.save()
 
-    # Enqueue a background task to re-index the person
-    task = mysite.profile.tasks.ReindexPerson()
-    task.delay(person_id=person.id)
-
     if errors_occurred:
         return edit_info(request,
                          edit_info_form=edit_info_form,
