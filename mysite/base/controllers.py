@@ -19,11 +19,8 @@
 import mysite.base.unicode_sanity
 import mysite.base.disk_cache
 from django.utils import simplejson
-from django.core.urlresolvers import reverse
-import django.contrib.auth.views
 from django.core.cache import cache
 from django.conf import settings
-import pprint
 import hashlib
 import re
 import traceback
@@ -32,7 +29,6 @@ import mysite.base.decorators
 import datetime
 import base64
 import os
-import string
 import random
 
 class HaystackIsDown(Exception):
