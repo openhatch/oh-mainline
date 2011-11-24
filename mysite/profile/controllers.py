@@ -108,28 +108,6 @@ class RecommendBugs(object):
             distinct_ids.add(bug.id)
             yield bug.id
 
-class PeopleMatcher(object):
-    def get_cache_key(self, *args, **kwargs):
-        keys = (mysite.base.models.Timestamp.get_timestamp_for_string(
-            str(mysite.profile.models.Link_Person_Tag)),
-                args)
-        return hashlib.sha1(repr(keys)).hexdigest()
-
-    def people_matching(self, property, value):
-        return mysite.profile.models.Person.objects.filter(
-            pk__in=self._people_matching_ids(property, value))
-
-    @mysite.base.decorators.cache_method('get_cache_key')
-    def _people_matching_ids(self, property, value):
-        links = mysite.profile.models.Link_Person_Tag.objects.filter(
-            tag__tag_type__name=property, tag__text__iexact=value)
-        peeps = [l.person for l in links]
-        sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-        return [person.id for person in sorted_peeps]
-
-_pm = PeopleMatcher()
-people_matching = _pm.people_matching
-
 geoip_database = None
 def geoip_city_database_available():
     return os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH)
