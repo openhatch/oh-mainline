@@ -175,9 +175,6 @@ urlpatterns = patterns('',
         (r'^people/$',
             'mysite.profile.views.people'),
 
-        (r'^\+cacheable/\+people/location_data/$',
-            'mysite.profile.views.person_id2data_as_javascript'),
-
         (r'^\+profile_api/location_data/$',
             mysite.profile.views.LocationDataApiView.as_view()),
 

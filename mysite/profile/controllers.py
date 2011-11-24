@@ -209,7 +209,25 @@ def parse_string_query(s):
     # that directly match the input, provide that info to the template.
     parsed.update(provide_project_query_hint(parsed))
 
+    # Add a key to the structure called "callable_searcher" -- upon calling
+    # this, you can access its .people and .template_data values.
+    def callable_searcher(query_type=parsed['query_type'], search_string=parsed['q']):
+        return _query2results(query_type, search_string)
+    parsed['callable_searcher'] = callable_searcher
     return parsed
+
+def _query2results(query_type, search_string):
+    if query_type == 'project':
+        return ProjectQuery(search_string=search_string)
+
+    if query_type == 'icanhelp':
+        return WannaHelpQuery(search_string=search_string)
+
+    if query_type == 'all_tags':
+        return AllTagsQuery(search_string=search_string)
+
+    return TagQuery(tag_short_name=query_type,
+                    search_string=search_string)
 
 ### This is a helper used by the map to pull out just the information that the map can use
 def get_person_data_for_map(person, include_latlong=False):
