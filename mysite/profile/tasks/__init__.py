@@ -24,7 +24,6 @@ from celery.decorators import task
 from celery.task import Task
 import celery.registry
 import traceback
-import mysite.profile.search_indexes
 import mysite.profile.controllers
 import shutil
 import staticgenerator
@@ -54,12 +53,6 @@ source2result_handler = {
         'rs': do_nothing_because_this_functionality_moved_to_twisted,
         'ou': do_nothing_because_this_functionality_moved_to_twisted,
         }
-
-class ReindexPerson(Task):
-    def run(self, person_id, **kwargs):
-        person = mysite.profile.models.Person.objects.get(id=person_id)
-        pi = mysite.profile.search_indexes.PersonIndex(person)
-        pi.update_object(person)
 
 class GarbageCollectForwarders(Task):
     def run(self, **kwargs):
@@ -128,7 +121,6 @@ class FetchPersonDataFromOhloh(Task):
 try:
     celery.registry.tasks.register(RegeneratePostfixAliasesForForwarder)
     celery.registry.tasks.register(FetchPersonDataFromOhloh)
-    celery.registry.tasks.register(ReindexPerson)
     celery.registry.tasks.register(GarbageCollectForwarders)
 except celery.registry.AlreadyRegistered:
     pass

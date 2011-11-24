@@ -152,8 +152,7 @@ class ProjectPageCreation(TwillTests):
 class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
-    def test_mark_as_wanna_help(self, mock_reindex_person_method):
+    def test_mark_as_wanna_help(self):
         person = Person.objects.get(user__username='paulproteus')
         p_before = Project.create_dummy()
         self.assertFalse(mysite.search.models.WannaHelperNote.objects.all())
@@ -163,7 +162,6 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
         client = self.login_with_client()
         post_to = reverse(mysite.project.views.wanna_help_do)
         client.post(post_to, {u'project': unicode(p_before.pk)})
-        self.assert_(mock_reindex_person_method.called)
 
         p_after = Project.objects.get(pk=p_before.pk)
 
@@ -175,8 +173,7 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
         self.assertEqual(note.person, person)
         self.assertEqual(note.project, p_after)
 
-    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
-    def test_unmark_as_wanna_help(self, mock_reindex_person_method):
+    def test_unmark_as_wanna_help(self):
         # We're in there...
         person = Person.objects.get(user__username='paulproteus')
         p_before = Project.create_dummy()
@@ -191,7 +188,6 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
 
         # Are we gone yet?
         p_after = Project.objects.get(pk=p_before.pk)
-        self.assert_(mock_reindex_person_method.called)
 
         self.assertFalse(p_after.people_who_wanna_help.all())
 

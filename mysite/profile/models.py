@@ -168,11 +168,6 @@ class Person(models.Model):
         # one (location_is_public)
         return Person.objects.filter(Q(location_confirmed=False) | Q(location_display_name=''))
 
-    def reindex_for_person_search(self):
-        import mysite.profile.tasks
-        task = mysite.profile.tasks.ReindexPerson()
-        task.delay(person_id=self.id)
-
     def get_public_location_or_default(self):
         if self.location_is_public():
             return self.location_display_name
@@ -525,13 +520,6 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
 
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
     instance.project.update_cached_contributor_count_and_save()
-
-def update_the_person_index(sender, instance, **kwargs):
-    person = instance.person
-    # Enqueue a background task to re-index the person
-    import mysite.profile.tasks
-    task = mysite.profile.tasks.ReindexPerson()
-    task.delay(person_id=person.id)
 
 models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
 
