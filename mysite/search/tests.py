@@ -1050,8 +1050,8 @@ class TestPotentialMentors(TwillTests):
             tag=willing_to_mentor_c_sharp)
         link.save()
 
-        banshee_mentors = banshee.potential_mentors
-        self.assertEqual(len(banshee_mentors), 2)
+        banshee_mentor_count = banshee.potential_mentor_count
+        self.assertEqual(2, banshee_mentor_count)
 
 class SuggestAlertOnLastResultsPage(TwillTests):
     fixtures = ['user-paulproteus']

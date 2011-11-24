@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import importlib
-
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
@@ -109,15 +107,17 @@ class Project(OpenHatchModel):
         return self.name
 
     @mysite.base.decorators.cached_property
-    def potential_mentors(self):
-        """Return the union of the people who can mentor in this project,
-        or who can mentor in the project's language."""
+    def potential_mentor_count(self):
+        '''Return a number of potential mentors, counted as the
+        number of people who can mentor in the project by name unioned
+        with those who can mentor in the project's language.'''
+        all_mentor_person_ids = set()
         import mysite.profile.controllers
-        mentor_set = set(mysite.profile.controllers.people_matching(
-            'can_mentor', self.name))
-        mentor_set.update(mysite.profile.controllers.people_matching(
-                'can_mentor', self.language))
-        return mentor_set
+        for way_a_mentor_can_help in (self.name, self.language):
+            tq = mysite.profile.controllers.TagQuery('can_mentor',
+                                                     way_a_mentor_can_help)
+            all_mentor_person_ids.update(tq.people.values_list('id', flat=True))
+        return len(all_mentor_person_ids)
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -314,11 +314,11 @@ class Project(OpenHatchModel):
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
         import mysite.profile.controllers
-        mentor_count = len(set(mysite.profile.controllers.people_matching(
-            'can_mentor', self.name)))
-        if mentor_count > 0 or self.language:
+        mentors_available = bool(mysite.profile.controllers.TagQuery(
+                'can_mentor', self.name).people)
+        if mentors_available or self.language:
             query_var = self.name
-            if mentor_count == 0:
+            if not mentors_available:
                 query_var = self.language
             query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
                                              query_var})

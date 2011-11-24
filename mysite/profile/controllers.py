@@ -108,28 +108,6 @@ class RecommendBugs(object):
             distinct_ids.add(bug.id)
             yield bug.id
 
-class PeopleMatcher(object):
-    def get_cache_key(self, *args, **kwargs):
-        keys = (mysite.base.models.Timestamp.get_timestamp_for_string(
-            str(mysite.profile.models.Link_Person_Tag)),
-                args)
-        return hashlib.sha1(repr(keys)).hexdigest()
-
-    def people_matching(self, property, value):
-        return mysite.profile.models.Person.objects.filter(
-            pk__in=self._people_matching_ids(property, value))
-
-    @mysite.base.decorators.cache_method('get_cache_key')
-    def _people_matching_ids(self, property, value):
-        links = mysite.profile.models.Link_Person_Tag.objects.filter(
-            tag__tag_type__name=property, tag__text__iexact=value)
-        peeps = [l.person for l in links]
-        sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-        return [person.id for person in sorted_peeps]
-
-_pm = PeopleMatcher()
-people_matching = _pm.people_matching
-
 geoip_database = None
 def geoip_city_database_available():
     return os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH)
@@ -209,7 +187,25 @@ def parse_string_query(s):
     # that directly match the input, provide that info to the template.
     parsed.update(provide_project_query_hint(parsed))
 
+    # Add a key to the structure called "callable_searcher" -- upon calling
+    # this, you can access its .people and .template_data values.
+    def callable_searcher(query_type=parsed['query_type'], search_string=parsed['q']):
+        return _query2results(query_type, search_string)
+    parsed['callable_searcher'] = callable_searcher
     return parsed
+
+def _query2results(query_type, search_string):
+    if query_type == 'project':
+        return ProjectQuery(search_string=search_string)
+
+    if query_type == 'icanhelp':
+        return WannaHelpQuery(search_string=search_string)
+
+    if query_type == 'all_tags':
+        return AllTagsQuery(search_string=search_string)
+
+    return TagQuery(tag_short_name=query_type,
+                    search_string=search_string)
 
 ### This is a helper used by the map to pull out just the information that the map can use
 def get_person_data_for_map(person, include_latlong=False):
@@ -325,9 +321,7 @@ def get_most_popular_tags():
         # lowercase them all and then remove duplicates
         # take the popular ones
         # cache it for a week
-        tags = mysite.profile.models.Tag.objects.all()
-        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
-        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(mysite.profile.models.Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
+        popular_tags = [] # FIXME: I removed the implementation of this.
         cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
     return popular_tags
 

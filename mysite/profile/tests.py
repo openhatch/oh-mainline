@@ -1960,17 +1960,6 @@ class EditYourName(TwillTests):
         tc.find('Gottfried Leibniz')
         tc.notfind('Asheesh Laroia')
 
-class FixAllTagsQueryWhenHaystackReturnsHalfPeople(TwillTests):
-
-    def test(self):
-        things = UserList.UserList([
-            ObjectFromDict({'object': None}),
-            ObjectFromDict({'object': 'a real thing'})])
-        things.load_all = mock.Mock()
-        just_real_thing = mysite.base.controllers.haystack_results2db_objects(things)
-        self.assertEqual(just_real_thing, ['a real thing'])
-        self.assert_(things.load_all.called)
-
 class PersonCanReindexHimself(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2014,18 +2003,14 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
 class PeopleMapForNonexistentProject(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
-    def test(self, make_empty_list):
-        make_empty_list.return_value = ([], {})
+    def test(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
-    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
-    def test_icanhelp(self, make_empty_list):
-        make_empty_list.return_value = ([], {})
+    def test_icanhelp(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'icanhelp:Phorum'},
              u'user': User.objects.get(username='paulproteus')})

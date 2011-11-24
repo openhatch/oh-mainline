@@ -28,7 +28,6 @@ from django.utils import simplejson
 import re
 import collections
 import logging
-import os.path
 
 # Django
 from django.template.loader import render_to_string
@@ -40,13 +39,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 import django.views.generic
-
-# Haystack
-import haystack.query
 
 # OpenHatch apps
 import mysite.base.controllers
@@ -387,112 +381,6 @@ def permanent_redirect_to_people_search(request, property, value):
                        mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
-def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
-    # ask haystack...
-    tag_type_according_to_haystack = tag_type_short_name + "_lowercase_exact"
-    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-    mappable_people_from_haystack = mappable_people_from_haystack.filter(**{
-            tag_type_according_to_haystack: parsed_query['q'].lower()})
-
-    mappable_people = mysite.base.controllers.haystack_results2db_objects(
-        mappable_people_from_haystack)
-
-    ### and sort it the way everyone expects
-    mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())
-
-    return mappable_people, {}
-
-def all_tags_query2mappable_orm_people(parsed_query):
-    atq = mysite.profile.controllers.AllTagsQuery(
-        search_string=parsed_query['q'])
-    return atq.people, atq.template_data
-
-def query2results(parsed_query):
-    query_type2executor = {
-        'project': project_query2mappable_orm_people,
-        'all_tags': all_tags_query2mappable_orm_people,
-        'icanhelp': people_who_want_to_help
-        }
-
-    # Now add to that the TagType-based queries
-    if parsed_query['query_type'] in mysite.profile.models.TagType.short_name2long_name:
-        tq = mysite.profile.controllers.TagQuery(
-            tag_short_name=parsed_query['query_type'],
-            search_string=parsed_query['q'])
-        return tq.people, tq.template_data
-
-    desired_query_type = parsed_query['query_type']
-    return query_type2executor[desired_query_type](parsed_query)
-
-def people_who_want_to_help(parsed_query):
-    """Get a list of people who say they want to help a given project. This
-    function gathers a list of people in response to the search query
-    'want2help:PROJECTNAME'."""
-    assert parsed_query['query_type'] == 'icanhelp'
-
-    pf = mysite.profile.controllers.WannaHelpQuery(parsed_query['q'])
-    return pf.people, pf.template_data
-
-def project_query2mappable_orm_people(parsed_query):
-    assert parsed_query['query_type'] == 'project'
-
-    pf = mysite.profile.controllers.ProjectQuery(parsed_query['q'])
-    return pf.people, pf.template_data
-
-def person_id2data_as_javascript(request):
-    # The point of this view is to provide a JSON dump of the public
-    # locations for people relevant to this request.
-    #
-    # (Before we wrote this, location data was part of every request to
-    # the map page, which made that page extremely large. I prefer to have t
-    # be a separate request, like this. Plus, one day, we can apply
-    # reasonable caching to this request.)
-    #
-    # Caching-wise: The output of this depends on:
-    # * Person
-    # * PortfolioEntry (just the published ones, really)
-    # * LinkPersonTag
-    #
-    # For now, we simply use django-staticgenerator to generate a static version,
-    # and we have ad-hoc post-save hooks on those three models to clear the
-    # cache that this generates.
-
-    # XXX: Total hack to speed up the page load for logged-in users
-    # When we use If-Modified-Since, we can throw this away.
-    if not request.GET.get('q', ''):
-        cached_path = os.path.join(settings.WEB_ROOT, reverse(person_id2data_as_javascript)[1:] + '/index.html')
-        if os.path.exists(cached_path):
-            with open(cached_path) as f:
-                as_json = f.read()
-                return HttpResponse(as_json,
-                                    mimetype='application/javascript')
-
-    # So, the user might have requested just a subset of the people. Let's grab
-    # just that subset.
-    query = request.GET.get('q', '')
-    parsed_query = mysite.profile.controllers.parse_string_query(query)
-
-    # If there is a query constraint, the relevant_people are just those
-    # that are returned by query2results.
-    if parsed_query['q'].strip():
-        try:
-            # query2results returns some "extra_data" that we don't
-            # use in this view.
-            relevant_people, extra_data = query2results(parsed_query)
-        except mysite.base.controllers.HaystackIsDown:
-            relevant_people = []
-    else:
-        # If there is no query constraint, then everyone is a relevant person!
-        relevant_people = Person.objects.all().order_by('user__username')
-
-    # The map only needs a subset of the data about each person. This subset, in fact:
-    person_id2data = mysite.profile.controllers.get_people_location_data_as_dict(
-        relevant_people, include_latlong=True)
-
-    as_json = simplejson.dumps(person_id2data)
-    return HttpResponse(as_json,
-                        mimetype='application/javascript')
-
 @view
 def people(request):
     """Display a list of people."""
@@ -510,20 +398,12 @@ def people(request):
 
     # Get the list of people to display.
     if parsed_query['q'].strip():
-        try:
-            # "everybody" means everyone matching this query
-            everybody, extra_data = query2results(parsed_query)
-            data.update(extra_data)
-        except mysite.base.controllers.HaystackIsDown:
-            data['haystack_is_down'] = True
-            return (request, 'profile/search_people.html', data)
-            # Note that if the search engine is down, nothing in this function
-            # below this point will be incorporated into the template context.
-
+        search_results = parsed_query['callable_searcher']()
+        everybody, extra_data = search_results.people, search_results.template_data
+        data.update(extra_data)
     else:
         everybody = Person.objects.all().order_by('user__username')
 
-    # filter by query, if it is set
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template
