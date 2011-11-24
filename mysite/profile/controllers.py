@@ -370,6 +370,7 @@ class WannaHelpQuery(PeopleFinder):
         self.template_data['query_is_a_project_name'] = True
 
 class TagQuery(PeopleFinder):
+    # FIXME: Probably we should add a add_query_summary() method.
     def __init__(self, tag_short_name, search_string):
         self.template_data = {}
         self.people = []

@@ -1598,6 +1598,10 @@ class PeopleFinderTagQueryTests(TwillTests):
         tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
         self.assertEqual([], list(tq.people))
 
+    def test_tag_type_query_with_zero_hits_and_busted_tag(self):
+        tq = mysite.profile.controllers.TagQuery('lol_no_such_tag', 'python')
+        self.assertEqual([], list(tq.people))
+
     def test_tag_type_query_with_one_hit_case_insensitive(self):
         # This time, set up Asheesh as a python mentor
         can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
