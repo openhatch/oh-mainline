@@ -374,8 +374,6 @@ urlpatterns = patterns('',
 
         (r'^\+geocode$', 'mysite.base.views.geocode'),
 
-                       (r'^hearch/', include('haystack.urls')),
-
         (r'^edit/name$', lambda x: redirect(to=mysite.account.views.edit_name, permanent=True)),
 
         (r'^\+v/nextsteps4helpers/$', 'mysite.project.views.nextsteps4helpers'),
