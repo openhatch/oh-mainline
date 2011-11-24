@@ -865,7 +865,6 @@ def make_forwarder_actually_work(sender, instance, **kwargs):
     RegeneratePostfixAliasesForForwarder().run()
 
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
-models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
 models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
 models.signals.post_save.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
 models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
