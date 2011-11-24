@@ -294,7 +294,7 @@ about how you can help {{ project.display_name }}
 
 <div class='module' id='contributors'>
     <div class='head'>
-        <h3>Registered contributors ({% firstof project.cached_contributor_count "none listed yet" %})</h3>
+        <h3>Registered contributors ({% firstof project.get_contributor_count "none listed yet" %})</h3>
             <ul>
                 <li>
                     {% if project.cached_contributor_count %}

@@ -275,6 +275,10 @@ class Project(OpenHatchModel):
                 portfolioentry__is_published=True
                 ).distinct()
 
+    def get_contributor_count(self):
+        """Return the number of Person objects who are contributors to
+        this Project."""
+        return self.get_contributors().count()
 
     def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
