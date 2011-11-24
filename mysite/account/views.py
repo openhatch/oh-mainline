@@ -252,10 +252,6 @@ def edit_name_do(request):
     if edit_name_form.is_valid():
         edit_name_form.save()
 
-        # Enqueue a background task to re-index the person
-        task = mysite.profile.tasks.ReindexPerson()
-        task.delay(person_id=user.get_profile().id)
-
         return HttpResponseRedirect(reverse(edit_name) +
                                     '?notification_id=success')
     else:
@@ -298,10 +294,6 @@ def set_location_do(request):
         user_profile.location_confirmed = True
         user_profile.save()
         edit_location_form.save()
-
-        # Enqueue a background task to re-index the person
-        task = mysite.profile.tasks.ReindexPerson()
-        task.delay(person_id=user_profile.id)
 
         return HttpResponseRedirect(reverse(set_location) +
                                     '?notification_id=success')
