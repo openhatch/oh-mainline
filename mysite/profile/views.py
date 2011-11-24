@@ -403,58 +403,9 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
     return mappable_people, {}
 
 def all_tags_query2mappable_orm_people(parsed_query):
-    # do three queries...
-    # the values are set()s containing ID numbers of Django ORM Person objects
-    queries_in_order = ['can_mentor_lowercase_exact',
-                        'can_pitch_in_lowercase_exact',
-                        'understands_lowercase_exact']
-    query2results = {queries_in_order[0]: set(),
-                     queries_in_order[1]: set(),
-                     queries_in_order[2]: set()}
-    for query in query2results:
-        # ask haystack...
-        mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-        mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q'].lower()})
-
-        results = mysite.base.controllers.haystack_results2db_objects(
-            mappable_people_from_haystack)
-        query2results[query] = results
-
-        ### mappable_people
-        mappable_people_set = set()
-        for result_set in query2results.values():
-            mappable_people_set.update(result_set)
-
-        ### and sort it the way everyone expects
-        mappable_people = sorted(mappable_people_set, key=lambda p: p.user.username.lower())
-
-        ### Justify your existence time: Why is each person a valid match?
-        for person in mappable_people:
-            person.reasons = [query for query in queries_in_order
-                              if person in query2results[query]]
-
-            # now we have to clean this up. First, remove teh _lowercase_exact from the end
-            person.reasons = [ s.replace('_lowercase_exact', '') for s in person.reasons]
-            # then make it the human readable form as said by the TagType dict
-            person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
-
-    extra_data = {}
-    ## How many possible mentors
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
-    mentor_people = query2results['can_mentor_lowercase_exact']
-    if mentor_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
-            {'query': parsed_query['q'].lower(),
-             'count': len(mentor_people)})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
-    ## Does this relate to people who can pitch in?
-    can_pitch_in_people = query2results['can_pitch_in_lowercase_exact']
-    if can_pitch_in_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
-            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
-
-    return mappable_people, extra_data
+    atq = mysite.profile.controllers.AllTagsQuery(
+        search_string=parsed_query['q'])
+    return atq.people, atq.template_data
 
 def query2results(parsed_query):
     query_type2executor = {

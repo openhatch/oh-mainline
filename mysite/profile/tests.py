@@ -1641,6 +1641,23 @@ class PeopleFinderTagQueryTests(TwillTests):
         tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
         self.assertEqual([self.person], list(tq.people))
 
+    def test_all_tags_query_with_zero_hits(self):
+        atq = mysite.profile.controllers.AllTagsQuery('python')
+        self.assertEqual([], list(atq.people))
+
+    def test_all_tags_query_with_one_hit(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+
+        atq = mysite.profile.controllers.AllTagsQuery('python')
+        self.assertEqual([self.person], list(atq.people))
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
