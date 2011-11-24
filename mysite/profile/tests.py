@@ -2014,18 +2014,14 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
 class PeopleMapForNonexistentProject(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
-    def test(self, make_empty_list):
-        make_empty_list.return_value = ([], {})
+    def test(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
-    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
-    def test_icanhelp(self, make_empty_list):
-        make_empty_list.return_value = ([], {})
+    def test_icanhelp(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'icanhelp:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
