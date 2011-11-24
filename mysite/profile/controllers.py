@@ -392,6 +392,21 @@ class TagQuery(PeopleFinder):
             tag__id__in=tag_ids).values_list('person_id', flat=True)
         return self.get_person_instances_from_person_ids(person_ids)
 
+class AllTagsQuery(PeopleFinder):
+    # FIXME: Probably we should add a add_query_summary() method.
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.people = []
+        self.people = self.get_persons_by_tag_text(
+            search_string)
+
+    def get_persons_by_tag_text(self, search_string):
+        tag_ids = mysite.profile.models.Tag.objects.filter(
+            text__iexact=search_string).values_list('id', flat=True)
+        person_ids = mysite.profile.models.Link_Person_Tag.objects.filter(
+            tag__id__in=tag_ids).values_list('person_id', flat=True)
+        return self.get_person_instances_from_person_ids(person_ids)
+
 class ProjectQuery(PeopleFinder):
     def __init__(self, search_string):
         self.template_data = {}
