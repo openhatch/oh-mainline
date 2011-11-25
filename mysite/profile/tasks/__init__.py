@@ -20,8 +20,7 @@ import logging
 import os
 import mysite.base.models
 import mysite.profile.models
-from celery.decorators import task
-from celery.task import Task
+from celery.task import Task, task
 import celery.registry
 import traceback
 import mysite.profile.controllers
@@ -142,7 +141,7 @@ def update_someones_pf_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_cache_key_for_projects()
     django.core.cache.cache.delete(cache_key)
-    
+
     # This getter will populate the cache
     return person.get_display_names_of_nonarchived_projects()
 
@@ -177,7 +176,7 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
     logging.info("Done syncing bug timestamp.")
 
 @task
-def clear_people_page_cache(*args, **kwargs):
+def clear_people_page_cache():
     shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
                                'people'),
                   ignore_errors=True)
