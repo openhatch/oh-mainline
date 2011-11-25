@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.mail import send_mail
-import datetime
 import celery.task
 
 @celery.task.task
