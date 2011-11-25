@@ -19,8 +19,7 @@
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task
-import celery.decorators
+from celery.task import Task, task
 
 import mysite.base.helpers
 
@@ -66,7 +65,7 @@ class PopulateProjectLanguageFromOhloh(Task):
 ### The first such situation has an entry in profile_hourly_tasks.py
 
 ### The second circumstance is if a bug gets marked as closed.
-@celery.decorators.task
+@task
 def clear_search_cache():
     logging.info("Clearing the search cache.")
     mysite.base.helpers.clear_static_cache('search')
