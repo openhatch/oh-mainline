@@ -27,8 +27,6 @@
 import datetime
 import logging
 
-import celery.decorators
-
 import mysite.customs.models
 import mysite.search.models
 from mysite.base.helpers import sanitize_wide_unicode
@@ -171,7 +169,6 @@ def refresh_bugs_from_all_indexed_launchpad_projects():
         import_bugs_from_one_project(launchpad_project_name,
                                      openhatch_project_name)
 
-@celery.decorators.task
 def import_bugs_from_one_project(launchpad_project_name,
                                  openhatch_project_name):
     logging.info("Looking at bugs %s on Launchpad" % launchpad_project_name)
@@ -198,7 +195,6 @@ def refresh_all_launchpad_bugs():
             canonical_bug_link=lp_bug.canonical_bug_link,
             openhatch_project_name=None)
 
-@celery.decorators.task
 def refresh_one_launchpad_bug(canonical_bug_link,
                               openhatch_project_name):
     logging.info("Checking on %s..." % canonical_bug_link)
