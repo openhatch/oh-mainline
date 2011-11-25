@@ -16,18 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task, PeriodicTask
-import shutil
-import os
-import os.path
+from celery.task import Task
 import celery.decorators
-import datetime
-
-from django.conf import settings
 
 import mysite.base.helpers
 
