@@ -29,7 +29,7 @@ class PopulateProjectIconFromOhloh(Task):
         project = mysite.search.models.Project.objects.get(id=project_id)
         project.populate_icon_from_ohloh()
         project.save()
-    
+
 class PopulateProjectLanguageFromOhloh(Task):
     def run(self, project_id, **kwargs):
         logger = self.get_logger(**kwargs)
@@ -49,7 +49,7 @@ class PopulateProjectLanguageFromOhloh(Task):
             try:
                 data, _ = oh.analysis_id2analysis_data(analysis_id)
             except KeyError:
-                logger.info("No Ohloh analysis found for %s" % 
+                logger.info("No Ohloh analysis found for %s" %
                             p.name)
                 return
             if ('main_language_name' in data and
