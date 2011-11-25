@@ -17,9 +17,9 @@
 
 from django.core.mail import send_mail
 import datetime
-import celery.decorators
+import celery.task
 
-@celery.decorators.task
+@celery.task.task
 def send_email_to_all_because_project_icon_was_marked_as_wrong(project__pk, project__name, project_icon_url):
     # links you to the project page
     # links you to the secret, wrong project icon
