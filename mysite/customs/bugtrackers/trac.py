@@ -481,34 +481,6 @@ class OLPCTrac(TracBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class SSSDTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='SSSD',
-                                base_url='https://fedorahosted.org/sssd/',
-                                bug_project_name_format='{tracker_name}',
-                                old_trac=True)
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        queries = {
-                'All bugs':
-                    'https://fedorahosted.org/sssd/query?status=new&status=assigned&status=reopened&order=priority&format=csv',
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = 'trivial'
-        ret_dict['good_for_newcomers'] = ('trivial' in trac_data['priority'])
-        # Check whether this is a documentation bug.
-        #ret_dict['concerns_just_documentation'] = ('doc' in trac_data['keywords'])
-        # Then pass ret_dict back
-        return ret_dict
-
 class TangoTrac(TracBugTracker):
     enabled = True
 
