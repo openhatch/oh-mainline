@@ -481,37 +481,6 @@ class OLPCTrac(TracBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class TangoTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='Tango',
-                                base_url='http://dsource.org/projects/tango/',
-                                bug_project_name_format='{tracker_name}',
-                                old_trac=True)
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        # Can replace both entries below with an 'All bugs' query.
-        queries = {
-                'Easy bugs':
-                    'http://dsource.org/projects/tango/query?status=assigned&status=new&status=reopened&owner=community&format=csv&order=priority',
-                'Documentation bugs':
-                    'http://dsource.org/projects/tango/query?status=assigned&status=new&status=reopened&component=Documentation&format=csv&order=priority'
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = 'community'
-        ret_dict['good_for_newcomers'] = ('community' in trac_data['owner'])
-        # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('Documentation' in trac_data['component'])
-        # Then pass ret_dict back
-        return ret_dict
-
 class QEasyBackupTrac(TracBugTracker):
     enabled = True
 
