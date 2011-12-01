@@ -481,34 +481,6 @@ class OLPCTrac(TracBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class QEasyBackupTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='QEasyBackup',
-                                base_url='http://trac.deder.at/qeasybackup/',
-                                bug_project_name_format='{tracker_name}')
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        # Can replace both entries below with an 'All bugs' query.
-        queries = {
-                'All bugs':
-                'http://trac.deder.at/qeasybackup/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = 'trivial'
-        ret_dict['good_for_newcomers'] = ('trivial' in trac_data['priority'])
-        # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('documentation' in trac_data['component'])
-        # Then pass ret_dict back
-        return ret_dict
-
 # Copy this generic class to add a new Trac bugtracker
 # Remember to set 'enabled' to True
 # Notes:
