@@ -627,29 +627,6 @@ class MozillaBugzilla(BugzillaBugTracker):
             bug_project_name = mozilla2openhatch[bb.product]
         return bug_project_name
 
-class LocamotionBugzilla(BugzillaBugTracker):
-    enabled = False # FIXME: Throws XML encoding error.
-
-    def __init__(self):
-        BugzillaBugTracker.__init__(self,
-                                    base_url='http://bugs.locamotion.org/',
-                                    tracker_name='Locamotion',
-                                    bug_project_name_format='{product}')
-
-    def generate_current_bug_xml(self):
-        queries = {
-                'All bugs':
-                    'http://bugs.locamotion.org/buglist.cgi?query_format=advanced&resolution=---'
-                }
-        return self.generate_bug_xml_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(xml_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
-        # Then pass ret_dict back
-        return ret_dict
-
 # The generic class for Bugzilla trackers. Copy it.
 # If the project has a tracker bug for the bugs to be imported,
 # set bug_id_list_only=True in BugzillaBugTracker.__init__ and
