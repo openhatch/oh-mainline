@@ -627,40 +627,6 @@ class MozillaBugzilla(BugzillaBugTracker):
             bug_project_name = mozilla2openhatch[bb.product]
         return bug_project_name
 
-class FedoraBugzilla(BugzillaBugTracker):
-    enabled = True
-
-    def __init__(self):
-        BugzillaBugTracker.__init__(self,
-                                    base_url='https://bugzilla.redhat.com/',
-                                    tracker_name='Fedora',
-                                    bug_project_name_format='{component}',
-                                    bug_id_list_only=True)
-
-    def get_current_bug_id_list(self):
-        tracker_bug_urls = [
-                'https://bugzilla.redhat.com/show_bug.cgi?ctype=xml&id=509829'
-                ]
-        return self.get_bug_id_list_from_tracker_bug_urls(tracker_bug_urls)
-
-    @staticmethod
-    def extract_tracker_specific_data(xml_data, ret_dict):
-        # FIXME: This is wrong. It ignores the data in the xml_data function,
-        # which means that as remote bugs get updated, we might accidentally
-        # still mark a bug as bitesized when it is no longer!
-        #
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
-        keywords = map(lambda s: s.strip(),
-                       keywords_text.split(','))
-        ret_dict['good_for_newcomers'] = True # Since they are 'fit and finish'
-        ret_dict['bite_size_tag_name'] = 'fitandfinish'
-        # Set the distribution tag
-        ret_dict['as_appears_in_distribution'] = 'Fedora'
-        # Then pass ret_dict back
-        return ret_dict
-
 class LocamotionBugzilla(BugzillaBugTracker):
     enabled = False # FIXME: Throws XML encoding error.
 
