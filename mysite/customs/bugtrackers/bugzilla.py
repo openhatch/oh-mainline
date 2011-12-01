@@ -424,49 +424,6 @@ def bugzilla_tracker_factory(bt):
 ############################################################
 # Specific sub-classes for individual bug trackers
 
-class MediaWikiBugzilla(BugzillaBugTracker):
-    enabled = True
-
-    def __init__(self):
-        BugzillaBugTracker.__init__(self,
-                                    base_url='https://bugzilla.wikimedia.org/',
-                                    tracker_name='MediaWiki',
-                                    bug_project_name_format='')
-
-    def generate_current_bug_xml(self):
-        queries = {
-                'Easy bugs':
-                    'https://bugzilla.wikimedia.org/buglist.cgi?keywords=easy&query_format=advanced&resolution=LATER&resolution=---',
-                'Documentation bugs':
-                    'https://bugzilla.wikimedia.org/buglist.cgi?query_format=advanced&component=Documentation&resolution=---'
-                }
-        return self.generate_bug_xml_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(xml_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
-        keywords = map(lambda s: s.strip(),
-                       keywords_text.split(','))
-        ret_dict['good_for_newcomers'] = ('easy' in keywords)
-        ret_dict['bite_size_tag_name'] = 'easy'
-        # Check whether documentation bug
-        component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
-        ret_dict['concerns_just_documentation'] = (component == 'Documentation')
-        # Then pass ret_dict back
-        return ret_dict
-
-    def generate_bug_project_name(self, bb):
-        product = bb.product
-        if product == 'MediaWiki extensions':
-            bug_project_name = bb.component
-            if bug_project_name in ('FCKeditor', 'Gadgets'):
-                bug_project_name += ' for MediaWiki'
-        else:
-            bug_project_name = product
-        return bug_project_name
-
 class MozillaBugzilla(BugzillaBugTracker):
     enabled = True
 

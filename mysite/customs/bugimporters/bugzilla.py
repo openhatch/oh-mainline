@@ -396,6 +396,17 @@ class GnomeBugzilla(BugzillaBugParser):
             bug_project_name=gnome2openhatch[bug_project_name]
         return bug_project_name
 
+class MediaWikiBugParser(BugzillaBugParser):
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        product = self.product
+        if product == 'MediaWiki extensions':
+            bug_project_name = self.component
+            if bug_project_name in ('FCKeditor', 'Gadgets'):
+                bug_project_name += ' for MediaWiki'
+        else:
+            bug_project_name = product
+        return bug_project_name
+
 class KDEBugzilla(BugzillaBugParser):
 
     def extract_tracker_specific_data(self, xml_data, ret_dict):
