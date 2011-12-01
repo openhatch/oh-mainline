@@ -452,21 +452,6 @@ class SugarLabsTrac(TracBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class StatusNetTrac(TracBugTracker):
-    enabled = False # No longer Bugzilla?
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='StatusNet',
-                                base_url='http://status.net/trac/',
-                                bug_project_name_format='{tracker_name}')
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        # Only gives a list of bitesized bugs - confirm if devels want all bugs indexed
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://status.net/trac/query?status=accepted&status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=%7Eeasy'))
-
 class OLPCTrac(TracBugTracker):
     enabled = True
 
