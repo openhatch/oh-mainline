@@ -61,7 +61,6 @@ from django.utils.unittest import skipIf
 
 import mysite.customs.models
 import mysite.customs.bugimporters.trac
-import mysite.customs.bugtrackers.roundup
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
