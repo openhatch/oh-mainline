@@ -35,7 +35,8 @@ class BugzillaTrackerForm(django.forms.ModelForm):
 class TrackerFormThatHidesCreatedForProject(django.forms.ModelForm):
     created_for_project = django.forms.ModelChoiceField(
             queryset=mysite.search.models.Project.objects.all(),
-            widget=django.forms.HiddenInput())
+            widget=django.forms.HiddenInput(),
+            required=False)
 
 class BugzillaQueryForm(django.forms.ModelForm):
     class Meta:
