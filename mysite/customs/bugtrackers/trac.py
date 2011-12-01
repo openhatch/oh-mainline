@@ -481,33 +481,6 @@ class OLPCTrac(TracBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class GHCTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='GHC',
-                                base_url='http://hackage.haskell.org/trac/ghc/',
-                                bug_project_name_format='{tracker_name}')
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        queries = {
-                'All bugs':
-                    'http://hackage.haskell.org/trac/ghc/query?status=new&status=assigned&status=reopened&group=priority&order=id&desc=1&format=csv',
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = 'Easy (less than 1 hour)'
-        ret_dict['good_for_newcomers'] = ('Easy (less than 1 hour)' in trac_data['difficulty'])
-        # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('Documentation' in trac_data['component'])
-        # Then pass ret_dict back
-        return ret_dict
-
 class SSSDTrac(TracBugTracker):
     enabled = True
 
