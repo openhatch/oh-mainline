@@ -26,7 +26,6 @@ from mysite.base.decorators import cached_property
 import mysite.base.helpers
 from mysite.customs.bugimporters.base import BugImporter
 import mysite.search.models
-import mysite.customs.bugtrackers.bugzilla
 
 class BugzillaBugImporter(BugImporter):
     def __init__(self, *args, **kwargs):
@@ -394,6 +393,46 @@ class GnomeBugzilla(BugzillaBugParser):
                            'website': 'GNOME (website)'}
         if bug_project_name in gnome2openhatch:
             bug_project_name=gnome2openhatch[bug_project_name]
+        return bug_project_name
+
+class MozillaBugParser(BugzillaBugParser):
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        ### Special-case the project names we know about
+        mozilla2openhatch = {'Core': 'Mozilla Core',
+                             'Firefox': 'Firefox',
+                             'MailNews Core': 'Mozilla Messaging',
+                             'addons.mozilla.org': 'addons.mozilla.org',
+                             'Thunderbird': 'Thunderbird',
+                             'Testing': 'Mozilla automated testing',
+                             'Directory': 'Mozilla LDAP',
+                             'mozilla.org': 'mozilla.org',
+                             'SeaMonkey': 'SeaMonkey',
+                             'Toolkit': 'Mozilla Toolkit',
+                             'support.mozilla.com': 'support.mozilla.com',
+                             'Camino': 'Camino',
+                             'Calendar': 'Mozilla Calendar',
+                             'Mozilla Localizations': 'Mozilla Localizations',
+                             'Mozilla QA': 'Mozilla QA',
+                             'Mozilla Services': 'Mozilla Services',
+                             'Webtools': 'Mozilla Webtools',
+                             'Input': 'Mozilla Input',
+                             'Fennec': 'Fennec',
+                             }
+        if self.product == 'Other Applications':
+            bug_project_name = 'Mozilla ' + self.component
+        else:
+            bug_project_name = mozilla2openhatch[self.product]
+        return bug_project_name
+
+class MediaWikiBugParser(BugzillaBugParser):
+    def generate_bug_project_name(self, bug_project_name_format, tracker_name):
+        product = self.product
+        if product == 'MediaWiki extensions':
+            bug_project_name = self.component
+            if bug_project_name in ('FCKeditor', 'Gadgets'):
+                bug_project_name += ' for MediaWiki'
+        else:
+            bug_project_name = product
         return bug_project_name
 
 class KDEBugzilla(BugzillaBugParser):
