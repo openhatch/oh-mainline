@@ -424,62 +424,6 @@ def bugzilla_tracker_factory(bt):
 ############################################################
 # Specific sub-classes for individual bug trackers
 
-class MozillaBugzilla(BugzillaBugTracker):
-    enabled = True
-
-    def __init__(self):
-        BugzillaBugTracker.__init__(self,
-                                    base_url='https://bugzilla.mozilla.org/',
-                                    tracker_name='Mozilla',
-                                    bug_project_name_format='')
-
-    def generate_current_bug_xml(self):
-        queries = {
-                'Easy bugs':
-                    'https://bugzilla.mozilla.org/buglist.cgi?resolution=---;status_whiteboard_type=substring;query_format=advanced;status_whiteboard=[good%20first%20bug]',
-                #'Documentation bugs':
-                    #''
-                }
-        return self.generate_bug_xml_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(xml_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        whiteboard_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'status_whiteboard')
-        ret_dict['good_for_newcomers'] = (whiteboard_text == '[good first bug]')
-        ret_dict['bite_size_tag_name'] = '[good first bug]'
-        # Then pass ret_dict back
-        return ret_dict
-
-    def generate_bug_project_name(self, bb):
-        ### Special-case the project names we know about
-        mozilla2openhatch = {'Core': 'Mozilla Core',
-                             'Firefox': 'Firefox',
-                             'MailNews Core': 'Mozilla Messaging',
-                             'addons.mozilla.org': 'addons.mozilla.org',
-                             'Thunderbird': 'Thunderbird',
-                             'Testing': 'Mozilla automated testing',
-                             'Directory': 'Mozilla LDAP',
-                             'mozilla.org': 'mozilla.org',
-                             'SeaMonkey': 'SeaMonkey',
-                             'Toolkit': 'Mozilla Toolkit',
-                             'support.mozilla.com': 'support.mozilla.com',
-                             'Camino': 'Camino',
-                             'Calendar': 'Mozilla Calendar',
-                             'Mozilla Localizations': 'Mozilla Localizations',
-                             'Mozilla QA': 'Mozilla QA',
-                             'Mozilla Services': 'Mozilla Services',
-                             'Webtools': 'Mozilla Webtools',
-                             'Input': 'Mozilla Input',
-                             'Fennec': 'Fennec',
-                             }
-        if bb.product == 'Other Applications':
-            bug_project_name = 'Mozilla ' + bb.component
-        else:
-            bug_project_name = mozilla2openhatch[bb.product]
-        return bug_project_name
-
 # The generic class for Bugzilla trackers. Copy it.
 # If the project has a tracker bug for the bugs to be imported,
 # set bug_id_list_only=True in BugzillaBugTracker.__init__ and
