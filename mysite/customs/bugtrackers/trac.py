@@ -412,46 +412,6 @@ class TracBugTracker(object):
 ############################################################
 # Specific sub-classes for individual bug trackers
 
-class SugarLabsTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='Sugar Labs',
-                                base_url='http://bugs.sugarlabs.org/',
-                                bug_project_name_format='{component}')
-
-    def generate_bug_project_name(self, trac_bug):
-        if trac_bug.component == 'SoaS':
-            return 'Sugar on a Stick'
-        else:
-            return self.bug_project_name_format.format(tracker_name=self.tracker_name,
-                                                       component=trac_bug.component)
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        queries = {
-                'Easy bugs':
-                    'http://bugs.sugarlabs.org/query?status=accepted&status=new&status=assigned&status=reopened&format=csv&keywords=%7Esugar-love&order=priority',
-                'Documentation bugs':
-                    'http://bugs.sugarlabs.org/query?status=accepted&status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation',
-                'Sugar on a Stick bugs':
-                    'http://bugs.sugarlabs.org/query?status=accepted&status=assigned&status=new&status=reopened&format=csv&component=SoaS&order=priority'
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = 'sugar-love'
-        ret_dict['good_for_newcomers'] = ('sugar-love' in trac_data['keywords'])
-        # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('documentation' in trac_data['keywords'])
-        # Set as_appears_in_distribution.
-        ret_dict['as_appears_in_distribution'] = 'Sugar'
-        # Then pass ret_dict back
-        return ret_dict
-
 class OLPCTrac(TracBugTracker):
     enabled = True
 
