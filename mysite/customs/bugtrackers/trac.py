@@ -412,35 +412,6 @@ class TracBugTracker(object):
 ############################################################
 # Specific sub-classes for individual bug trackers
 
-class OLPCTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                tracker_name='OLPC',
-                                base_url='http://dev.laptop.org/',
-                                bug_project_name_format='{component}')
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        queries = {
-                'All bugs':
-                    'http://dev.laptop.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv',
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = 'easy'
-        ret_dict['good_for_newcomers'] = ('easy' in trac_data['keywords']) or ('sugar-love' in trac_data['keywords'])
-        # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('doc' in trac_data['keywords'])
-        # Set as_appears_in_distribution.
-        ret_dict['as_appears_in_distribution'] = 'OLPC'
-        # Then pass ret_dict back
-        return ret_dict
-
 # Copy this generic class to add a new Trac bugtracker
 # Remember to set 'enabled' to True
 # Notes:
