@@ -26,7 +26,6 @@ from mysite.base.decorators import cached_property
 import mysite.base.helpers
 from mysite.customs.bugimporters.base import BugImporter
 import mysite.search.models
-import mysite.customs.bugtrackers.bugzilla
 
 class BugzillaBugImporter(BugImporter):
     def __init__(self, *args, **kwargs):
