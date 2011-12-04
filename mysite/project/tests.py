@@ -31,6 +31,7 @@ from mysite.base.tests import better_make_twill_url
 
 import mock
 import urlparse
+import datetime
 
 from django.core.urlresolvers import reverse
 
@@ -190,6 +191,25 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
         p_after = Project.objects.get(pk=p_before.pk)
 
         self.assertFalse(p_after.people_who_wanna_help.all())
+
+    def test_mark_as_contacted(self):
+        person = Person.objects.get(user__username='paulproteus')
+        p_before = Project.create_dummy()
+        p_before.people_who_wanna_help.add(person)
+        p_before.save()
+        mysite.search.models.WannaHelperNote.add_person_project(person, p_before)
+
+        client = self.login_with_client()
+        post_to = reverse(mysite.project.views.mark_contacted_do)
+        vars = {u'mark_contact-project': unicode(p_before.pk),
+                u'helper-%s-checked' % (person.pk,) : unicode('on'),
+                u'helper-%s-person' % (person.pk) : unicode(person.pk),
+                u'helper-%s-project' % (person.pk) : unicode(p_before.pk)}
+        client.post(post_to, vars)
+
+        whn_after = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p_before)
+        self.assertTrue(whn_after.contacted_on)
+        self.assertTrue(whn_after.contacted_by, datetime.date.today())
 
 class WannaHelpSubmitHandlesNoProjectIdGracefully(TwillTests):
     def test(self):

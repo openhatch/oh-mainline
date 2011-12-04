@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
@@ -52,8 +53,9 @@ def create_project_page_do(request):
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
+    wanna_helpers = p.people_who_wanna_help.all()
     if (request.user.is_authenticated() and
-        request.user.get_profile() in p.people_who_wanna_help.all()):
+        request.user.get_profile() in wanna_helpers):
         user_wants_to_help = True
     else:
         user_wants_to_help = False
@@ -90,11 +92,27 @@ def project(request, project__name = None):
         context['cookies_disabled'] = True
 
     if wanna_help:
-        people_to_show = list(p.people_who_wanna_help.exclude(user=request.user))
+        people_to_show = list(wanna_helpers.exclude(user=request.user))
         people_to_show.insert(0, request.user.get_profile())
     else:
-        people_to_show = p.people_who_wanna_help.all()
+        people_to_show = wanna_helpers
 
+    contact_form_list = []
+    for person in people_to_show:
+        # a WannaHelperNote should always exist for all Person objects in people_to_show
+        try:
+            note = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p)
+            contact_form_list.append({
+                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,),
+                                                                initial= { 'project' : p,
+                                                                           'person' : person,
+                                                                           'checked' : bool(note.contacted_on) }),
+                'person' : person,
+                'note' : note,
+            })
+        except:
+            pass
+        
     button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
             request)
     button_widget_data['project'] = p
@@ -113,6 +131,7 @@ def project(request, project__name = None):
         'user_just_signed_up_as_wants_to_help': wanna_help,
         'people_to_show': people_to_show,
         'button_as_widget_source': button_as_widget_source,
+        'mark_contacted_forms' : contact_form_list,
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
@@ -255,6 +274,26 @@ def suggest_question_do(request):
         question_suggestion_response = "failure"
     template = "project/project.html"
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
+
+def mark_contacted_do(request):
+    #extract person_ids from request.POST.keys()
+    project = django.shortcuts.get_object_or_404(Project, pk=request.POST.get('mark_contact-project'))
+    for key in request.POST.keys():
+        if key.endswith('checked'):
+            person_pk = key[7:-8]
+            #for each prefix, validate form
+            mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helper-%s" % (person_pk))
+            if mark_contacted_form.is_valid():
+                project = mark_contacted_form.cleaned_data['project']
+                person = mark_contacted_form.cleaned_data['person']
+                whn = mysite.search.models.WannaHelperNote.objects.get(person=person, project=project)
+                # add contacted by and date if not already set.
+                if not whn.contacted_by:
+                    whn.contacted_by = request.user
+                    whn.contacted_on = datetime.date.today()
+                    whn.save()
+    return HttpResponseRedirect(reverse(mysite.project.views.project,
+                                        kwargs={'project__name': project.name}) + '#iwh_handler')
 
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
