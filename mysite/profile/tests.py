@@ -1768,9 +1768,16 @@ class EmailForwarderGarbageCollection(TwillTests):
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
         # invalid should not be in the database
         self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
-        # there should be 3 forwarders in total: we gained one and we lost one
+        # there should be 2 forwarders in total: we lost one
         forwarders = mysite.profile.models.Forwarder.objects.all()
-        self.assertEqual(3, forwarders.count())
+        self.assertEqual(2, forwarders.count())
+
+        ## Now if we delete both those forwarders, and re-generate, we get one
+        ## in the DB.
+        mysite.profile.models.Forwarder.objects.all().delete()
+        mysite.profile.tasks.GarbageCollectForwarders.apply()
+        forwarders = mysite.profile.models.Forwarder.objects.all()
+        self.assertEqual(1, forwarders.count())
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
