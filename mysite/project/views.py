@@ -103,7 +103,10 @@ def project(request, project__name = None):
         try:
             note = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p)
             contact_form_list.append({
-                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,), initial= { 'project' : p, 'person' : person,'checked' : True if note.contacted_on else False }),
+                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,),
+                                                                initial= { 'project' : p,
+                                                                           'person' : person,
+                                                                           'checked' : bool(note.contacted_on) }),
                 'person' : person,
                 'note' : note,
             })
@@ -279,7 +282,6 @@ def mark_contacted_do(request):
         if key.endswith('checked'):
             person_pk = key[7:-8]
             #for each prefix, validate form
-            #if not already contacted, update get_
             mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helper-%s" % (person_pk))
             if mark_contacted_form.is_valid():
                 project = mark_contacted_form.cleaned_data['project']
@@ -290,8 +292,8 @@ def mark_contacted_do(request):
                     whn.contacted_by = request.user
                     whn.contacted_on = datetime.date.today()
                     whn.save()
-    
-    return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '#iwh_handler')
+    return HttpResponseRedirect(reverse(mysite.project.views.project,
+                                        kwargs={'project__name': project.name}) + '#iwh_handler')
 
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)

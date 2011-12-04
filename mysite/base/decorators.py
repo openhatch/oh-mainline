@@ -35,9 +35,8 @@ import django.contrib.auth.decorators
 
 def as_view(request, template, data, slug):
     ### add settings to the request so that the template
-    ### can adjst what it displays depending on settings.
+    ### can adjust what it displays depending on settings.
     data['settings'] = django.conf.settings
-    
     if request.user.is_authenticated() or 'cookies_work' in request.session:
         # Great! Cookies work.
         pass

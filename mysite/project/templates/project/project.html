@@ -105,12 +105,10 @@ about how you can help {{ project.display_name }}
                         <h3><a href='#buildhelper'>Buildhelper</a></h3>
                     </li>
                     {% endif %}
-                     {% if settings.ENABLE_NEW_IWH_HANDLER %}
-                        {% if people_to_show %}
-                            <li >
-                                <h3><a href='#iwh_handler'>IWH Handler</a></h3>
-                            </li>
-                        {% endif %}
+                     {% if settings.ENABLE_NEW_IWH_HANDLER and people_to_show%}
+                        <li >
+                            <h3><a href='#iwh_handler'>IWH Handler</a></h3>
+                        </li>
                     {% endif %}
             </ul>
         <div id="chatter" class='body tab'>
