@@ -826,8 +826,10 @@ class Forwarder(models.Model):
         # them one.
         user_ids_that_need_forwarders = Person.objects.filter(
             contact_blurb__contains='$fwd').values_list('user_id', flat=True)
+
         user_ids_with_up_to_date_forwarders = Forwarder.objects.filter(
-            stops_being_listed_on__gt=now).values_list('user_id', flat=True)
+            user__id__in=user_ids_that_need_forwarders,
+            stops_being_listed_on__gt=now).values_list('user__id', flat=True)
 
         user_ids_needing_regeneration = (set(
                 user_ids_that_need_forwarders).difference(
