@@ -127,17 +127,16 @@ class DiffRecursiveMission(object):
     def validate_patch(cls, patchdata):
         the_patch = patch.fromstring(patchdata)
 
-
         # Strip one level of directories from the left of the filenames.
         for i, filename in enumerate(the_patch.source):
 
             if not '/' in filename:
                 raise IncorrectPatch, 'Attempting to strip one level of slashes from header line "--- %s" left nothing.' % filename
-            the_patch.source[i] = re.sub('^[^/]*/', '', filename)
+            the_patch.source[i] = re.sub('^[^/]*/+', '', filename)
         for i, filename in enumerate(the_patch.target):
             if not '/' in filename:
                 raise IncorrectPatch, 'Attempting to strip one level of slashes from header line "+++ %s" left nothing.' % filename
-            the_patch.target[i] = re.sub('^[^/]*/', '', filename)
+            the_patch.target[i] = re.sub('^[^/]*/+', '', filename)
 
         # Go through the files and check that ones that should be mentioned in the patch are so mentioned.
         path_to_mission_files = os.path.join(get_mission_data_path('diffpatch'), cls.ORIG_DIR)
