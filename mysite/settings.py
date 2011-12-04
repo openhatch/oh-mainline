@@ -313,8 +313,8 @@ if sys.platform.startswith('win'):
         'staticgenerator.middleware.StaticGeneratorMiddleware')
 
 
+ENABLE_NEW_IWH_HANDLER = False
 ### Include a user's customizations
-
 try:
     from local_settings import *
 except ImportError:
