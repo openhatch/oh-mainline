@@ -61,7 +61,7 @@ class GarbageCollectForwarders(Task):
         if deleted_any:
             # Well, in that case, we should purge the staticgenerator-generated cache of the people pages.
             clear_people_page_cache()
-
+        return deleted_any
 
 class RegeneratePostfixAliasesForForwarder(Task):
     def run(self, **kwargs):

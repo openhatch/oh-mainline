@@ -40,7 +40,6 @@ import BeautifulSoup
 import datetime
 import tasks
 import mock
-import UserList
 from twill import commands as tc
 import quopri
 
@@ -1756,22 +1755,33 @@ class EmailForwarderGarbageCollection(TwillTests):
         sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
         sheesh.contact_blurb = u'$fwd'
         sheesh.save()
+
+        # Create a distraction user who does not want a forwarder
+        mysite.profile.models.Person.create_dummy()
+
         valid_new = create_forwarder('orange@domain.com', 1, 1)
         valid_old = create_forwarder('red@domain.com', 1, 0)
         invalid = create_forwarder('purple@domain.com', 0, 0)
         # with any luck, the below will call this: mysite.profile.models.Forwarder.garbage_collect()
         mysite.profile.tasks.GarbageCollectForwarders.apply()
-# valid_new should still be in the database
-# there should be no other forwarders for the address that valid_new has
+        # valid_new should still be in the database
+        # there should be no other forwarders for the address that valid_new has
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(address=valid_new.address).count())
-# valid_old should still be in the database
+        # valid_old should still be in the database
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
-# invalid should not be in the database
+        # invalid should not be in the database
         self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
-# there should be 3 forwarders in total: we gained one and we lost one
+        # there should be 2 forwarders in total: we lost one
         forwarders = mysite.profile.models.Forwarder.objects.all()
-        self.assertEqual(3, forwarders.count())
+        self.assertEqual(2, forwarders.count())
+
+        ## Now if we delete both those forwarders, and re-generate, we get one
+        ## in the DB.
+        mysite.profile.models.Forwarder.objects.all().delete()
+        mysite.profile.tasks.GarbageCollectForwarders.apply()
+        forwarders = mysite.profile.models.Forwarder.objects.all()
+        self.assertEqual(1, forwarders.count())
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
