@@ -40,7 +40,6 @@ import BeautifulSoup
 import datetime
 import tasks
 import mock
-import UserList
 from twill import commands as tc
 import quopri
 
