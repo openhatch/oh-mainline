@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.management.base import BaseCommand
+import django.db.models
 
 import logging
 import mysite.profile.tasks
@@ -27,6 +28,19 @@ class Command(BaseCommand):
         # Garbage collect forwarders
         root_logger = logging.getLogger('')
         root_logger.setLevel(logging.WARN)
+
+        ### Note: This Forwarder.garbage_collect() method potentially
+        ### modifies a lot of Forwarder objects, which means that it
+        ### would repeatedly call the make_forwarder_actually_work()
+        ### function due to a post-save signal. That would incur
+        ### massive overhead, so we temporarily disable it.
+        django.db.models.signals.post_save.disconnect(
+            mysite.profile.models.make_forwarder_actually_work,
+            sender=mysite.profile.models.Forwarder)
+        ### We do not bother to reconnect it because this is a management
+        ### command, and it will exit when it is done processing.
+
+        ### Now we ask the forwarders to garbage collect.
         mysite.profile.tasks.GarbageCollectForwarders().run()
 
         # Try to send the emails. The command will only actually send emails at
