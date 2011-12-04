@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import django.forms
+import re
 
 class ConfigForm(django.forms.Form):
     BAD_ENDINGS = ['local', 'none', 'host']
@@ -34,6 +35,15 @@ class CheckoutForm(django.forms.Form):
 
 class DiffForm(django.forms.Form):
     diff = django.forms.CharField(error_messages={'required': 'No git diff output was given.'}, widget=django.forms.Textarea())
+
+    def clean_diff(self):
+        REGEX_DIFF_LINE = '\+print "[H,h]ello,?[ ]+[w,W]orld\!'
+        success_count = re.search(REGEX_DIFF_LINE, self.cleaned_data['diff'])
+        if success_count == None :
+            raise django.forms.ValidationError, (
+                "Something doesn't look right.The expected line is '+print... ' Give it another try!")
+        return self.cleaned_data['diff']
+               
 
 class RebaseForm(django.forms.Form):
     secret_word = django.forms.CharField(error_messages={'required': 'The password was incorrect.'})
