@@ -1755,6 +1755,10 @@ class EmailForwarderGarbageCollection(TwillTests):
         sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
         sheesh.contact_blurb = u'$fwd'
         sheesh.save()
+
+        # Create a distraction user who does not want a forwarder
+        mysite.profile.models.Person.create_dummy()
+
         valid_new = create_forwarder('orange@domain.com', 1, 1)
         valid_old = create_forwarder('red@domain.com', 1, 0)
         invalid = create_forwarder('purple@domain.com', 0, 0)
