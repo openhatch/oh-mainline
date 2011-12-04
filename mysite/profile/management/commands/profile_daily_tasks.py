@@ -41,7 +41,11 @@ class Command(BaseCommand):
         ### command, and it will exit when it is done processing.
 
         ### Now we ask the forwarders to garbage collect.
-        mysite.profile.tasks.GarbageCollectForwarders().run()
+        made_any_changes = mysite.profile.tasks.GarbageCollectForwarders().run()
+        ### Since we disabled the post-save signal, we manually call
+        ### the function to make sure forwarders are working.
+        if made_any_changes:
+            mysite.profile.models.make_forwarder_actually_work()
 
         # Try to send the emails. The command will only actually send emails at
         # most once per week.
