@@ -273,23 +273,16 @@ class DiffRecursiveTests(TwillTests):
         # If you pass weird-looking directory names to diff, with extra slashes
         # (for example: diff -urN old_dir/// new_dir// )
         # you should still be able to pass the mission.
-        orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
-        tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
-        diff = StringIO()
-        for fileinfo in tfile:
-            if not fileinfo.isfile():
-                continue
-            oldlines = tfile.extractfile(fileinfo).readlines()
-            newlines = []
-            for line in oldlines:
-                for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
-                    line = line.replace(old, new)
-                newlines.append(line)
-            diff.writelines(difflib.unified_diff(oldlines, newlines, 'orig-'+fileinfo.name, fileinfo.name))
 
-        diff.seek(0)
-        diff.name = 'foo.patch'
-        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
+        # First we calculcate a normal diff.
+        correct_diff = self._calculate_correct_recursive_diff()
+
+        # Then we mutate it to have extra slashes.
+        as_string = correct_diff.getvalue()
+        as_string = as_string.replace('recipes/', 'recipes//')
+        as_stringio = StringIO(as_string)
+        as_stringio.name = 'foo.patch'
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': as_stringio})
         self.assert_(submit_response.context['diffrecursive_success'])
 
         paulproteus = Person.objects.get(user__username='paulproteus')
