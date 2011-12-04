@@ -103,11 +103,7 @@ def project(request, project__name = None):
         try:
             note = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p)
             contact_form_list.append({
-                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,), 
-                                                                initial= { 'project' : p, 
-                                                                           'person' : person, 
-                                                                           'checked' : True if note.contacted_on else False,
-                                                                         }),
+                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,), initial= { 'project' : p, 'person' : person,'checked' : True if note.contacted_on else False }),
                 'person' : person,
                 'note' : note,
             })
