@@ -238,11 +238,7 @@ class DiffSingleFileTests(TwillTests):
 class DiffRecursiveTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
-        TwillTests.setUp(self)
-        self.client = self.login_with_client()
-
-    def test_do_mission_correctly(self):
+    def _calculate_correct_recursive_diff(self):
         orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
         tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
         diff = StringIO()
@@ -259,7 +255,15 @@ class DiffRecursiveTests(TwillTests):
 
         diff.seek(0)
         diff.name = 'foo.patch'
-        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
+        return diff
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
+
+    def test_do_mission_correctly(self):
+        correct_diff = self._calculate_correct_recursive_diff()
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': correct_diff})
         self.assert_(submit_response.context['diffrecursive_success'])
 
         paulproteus = Person.objects.get(user__username='paulproteus')
