@@ -276,9 +276,8 @@ def suggest_question_do(request):
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
 
 def mark_contacted_do(request):
-    import pdb;pdb.set_trace()
-    
     #extract person_ids from request.POST.keys()
+    print request.POST.keys()
     #for each prefix, validate form
         #if not already contacted, update WannaHelperNote
     mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helped")
@@ -287,7 +286,7 @@ def mark_contacted_do(request):
     else:
         return HttpResponseBadRequest("No project id submitted.")
 
-    if request.user.us_authenticated():
+    if request.user.is_authenticated():
         person = request.user.get_profile()
 
         
