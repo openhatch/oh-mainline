@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
@@ -277,19 +278,27 @@ def suggest_question_do(request):
 
 def mark_contacted_do(request):
     #extract person_ids from request.POST.keys()
-    print request.POST.keys()
-    #for each prefix, validate form
-        #if not already contacted, update WannaHelperNote
-    mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helped")
-    if mark_contacted_form.is_valid():
-        project = mark_contacted_form.cleaned_data['project']
-    else:
-        return HttpResponseBadRequest("No project id submitted.")
+    for key in request.POST.keys():
+        if key.endswith('checked'):
+            person_pk = key[7:-8]
+            #for each prefix, validate form
+            #if not already contacted, update WannaHelperNote
+            mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helper-%s" % (person_pk))
+            if mark_contacted_form.is_valid():
+                project = mark_contacted_form.cleaned_data['project']
+                person = mark_contacted_form.cleaned_data['person']
+                whn = mysite.search.models.WannaHelperNote.objects.get(person=person, project=project)
+                whn.contacted_by = request.user
+                whn.contacted_on = datetime.date.today()
+                whn.save()
+            else:
+                return HttpResponseBadRequest("No project id submitted.")
 
     if request.user.is_authenticated():
         person = request.user.get_profile()
 
-        
+    return HttpResponse("return")
+
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():
