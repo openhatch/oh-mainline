@@ -24,7 +24,7 @@ class WannaHelpForm(django.forms.Form):
 class MarkContactedForm(django.forms.Form):
     project = django.forms.ModelChoiceField(queryset=mysite.search.models.Project.objects.all(), widget=django.forms.HiddenInput())
     person = django.forms.ModelChoiceField(queryset=mysite.profile.models.Person.objects.all(), widget=django.forms.HiddenInput())
-    checked = django.forms.BooleanField(required=True)
+    checked = django.forms.BooleanField(label="Mark person as contacted", required=True)
 
 class ProjectForm(django.forms.ModelForm):
 

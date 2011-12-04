@@ -278,26 +278,24 @@ def suggest_question_do(request):
 
 def mark_contacted_do(request):
     #extract person_ids from request.POST.keys()
+    project = django.shortcuts.get_object_or_404(Project, pk=request.POST.get('mark_contact-project'))
     for key in request.POST.keys():
         if key.endswith('checked'):
             person_pk = key[7:-8]
             #for each prefix, validate form
-            #if not already contacted, update WannaHelperNote
+            #if not already contacted, update get_
             mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helper-%s" % (person_pk))
             if mark_contacted_form.is_valid():
                 project = mark_contacted_form.cleaned_data['project']
                 person = mark_contacted_form.cleaned_data['person']
                 whn = mysite.search.models.WannaHelperNote.objects.get(person=person, project=project)
-                whn.contacted_by = request.user
-                whn.contacted_on = datetime.date.today()
-                whn.save()
-            else:
-                return HttpResponseBadRequest("No project id submitted.")
-
-    if request.user.is_authenticated():
-        person = request.user.get_profile()
-
-    return HttpResponse("return")
+                # add contacted by and date if not already set.
+                if not whn.contacted_by:
+                    whn.contacted_by = request.user
+                    whn.contacted_on = datetime.date.today()
+                    whn.save()
+    
+    return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '#iwh_handler')
 
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
