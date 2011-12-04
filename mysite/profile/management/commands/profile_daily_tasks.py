@@ -45,7 +45,7 @@ class Command(BaseCommand):
         ### Since we disabled the post-save signal, we manually call
         ### the function to make sure forwarders are working.
         if made_any_changes:
-            mysite.profile.models.make_forwarder_actually_work()
+            mysite.profile.tasks.RegeneratePostfixAliasesForForwarder().run()
 
         # Try to send the emails. The command will only actually send emails at
         # most once per week.

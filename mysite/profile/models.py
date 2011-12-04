@@ -812,17 +812,33 @@ class Forwarder(models.Model):
 
     @staticmethod
     def garbage_collect():
-        deleted_one = False
-        for forwarder in Forwarder.objects.all():
-            # if it's expired delete it
-            now = datetime.datetime.utcnow()
-            if forwarder.expires_on < now:
-                forwarder.delete()
-                deleted_one = True
-            # else if it's too old to be displayed and they still want a forwarder: make a fresh new one
-            elif forwarder.stops_being_listed_on < now and '$fwd' in forwarder.user.get_profile().contact_blurb:
-                mysite.base.controllers.generate_forwarder(forwarder.user)
-        return deleted_one
+        made_any_changes = False
+
+        # First, delete any Forwarders that ought to be destroyed.
+        now = datetime.datetime.utcnow()
+        expirable = Forwarder.objects.filter(expires_on__lt=now)
+        if expirable:
+            made_any_changes = True
+            expirable.delete()
+
+        # Second, for users who have '$fwd' in their blurb, if they have no
+        # corresonding Forwarder object that we can list on the site, give
+        # them one.
+        user_ids_that_need_forwarders = Person.objects.filter(
+            contact_blurb__contains='$fwd').values_list('user_id', flat=True)
+        user_ids_with_up_to_date_forwarders = Forwarder.objects.filter(
+            stops_being_listed_on__gt=now).values_list('user_id', flat=True)
+
+        user_ids_needing_regeneration = (set(
+                user_ids_that_need_forwarders).difference(
+                set(user_ids_with_up_to_date_forwarders)))
+        users_needing_regeneration = [User.objects.get(pk=pk)
+                                      for pk in user_ids_needing_regeneration]
+        for user in users_needing_regeneration:
+            mysite.base.controllers.generate_forwarder(user)
+            made_any_changes = True
+
+        return made_any_changes
 
     @staticmethod
     def generate_list_of_lines_for_postfix_table():
