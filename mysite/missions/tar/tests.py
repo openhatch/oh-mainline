@@ -165,3 +165,53 @@ class MissionPageStateTests(TwillTests):
         self.assert_('Operation successful' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus, is_currently_completed=True)), 0)
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 0)                  
+
+    def get_extracted_tarball(self):
+        """
+        Get and extract a tar_extract misssion tarball.
+        """
+        download_response = self.client.get(reverse(views.download_tarball_for_extract_mission))
+        tfile = tarfile.open(fileobj=StringIO(download_response.content), mode='r:gz')
+        return tfile.extractfile(tfile.getmember(controllers.UntarMission.FILE_WE_WANT))
+
+    def test_extract_mission_reset_redo(self):
+        """
+        Once the tar_extract mission has been reset, it can be completed again.
+        """
+        paulproteus = Person.objects.get(user__username='paulproteus')
+
+        # Complete the tar_extract mission the first time.
+        upload_response = self.client.post(reverse(views.extract_mission_upload), {'extracted_file': self.get_extracted_tarball()})
+        self.assert_('unpack status: success' in upload_response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 1)
+
+        # Reset the mission.
+        response = self.client.post(reverse(views.reset), {'mission_parts': 'tar_extract' })
+        self.assert_('Operation successful' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus, is_currently_completed=False)), 1)
+
+        # Complete the tar_extract missions a second time
+        upload_response = self.client.post(reverse(views.extract_mission_upload), {'extracted_file': self.get_extracted_tarball()})
+        self.assert_('unpack status: success' in upload_response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 1)
+
+    def test_upload_mission_reset_redo(self):
+        """
+        Once the tar (upload) mission has been reset, it can be completed again.
+        """
+        paulproteus = Person.objects.get(user__username='paulproteus')
+
+        # Complete the tar mission the first time.
+        response = self.client.post(reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+        self.assert_('create status: success' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus, is_currently_completed=True)), 1)
+
+        # Reset the mission.
+        response = self.client.post(reverse(views.reset), {'mission_parts': 'tar' })
+        self.assert_('Operation successful' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus, is_currently_completed=False)), 1)
+
+        # Complete the tar missions a second time.
+        response = self.client.post(reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+        self.assert_('create status: success' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus, is_currently_completed=True)), 1)
