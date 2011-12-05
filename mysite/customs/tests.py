@@ -2208,3 +2208,32 @@ class LaunchpadBugImport(django.test.TestCase):
 
         self.assertEqual('vila', bug_model.submitter_username)
         self.assertEqual('Vincent Ladeuil', bug_model.submitter_realname)
+
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class LaunchpadTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(LaunchpadTrackerEditingViews, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+    def test_form_create_launchpad_tracker(self):
+        # We start with no LaunchpadTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.LaunchpadTrackerForm({
+                'tracker_name': 'KDE Bugzill',
+                'launchpad_name': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'bitsized_tag': 'easy',
+                'max_connections': '8',
+                'documentation_tag': 'doc',
+                'bug_project_name_format': 'format'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())

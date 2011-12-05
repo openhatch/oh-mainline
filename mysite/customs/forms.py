@@ -23,6 +23,7 @@ class TrackerTypesForm(django.forms.Form):
     TRACKER_TYPES = (
             ('bugzilla', 'Bugzilla'),
             ('google', 'Google Code'),
+            ('launchpad', 'Launchpad'),
             ('roundup', 'Roundup'),
             ('trac', 'Trac'),
             )
@@ -68,4 +69,17 @@ class RoundupTrackerForm(TrackerFormThatHidesCreatedForProject):
 class RoundupQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.RoundupQueryModel
+        exclude = ('tracker', 'last_polled',)
+
+class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
+    max_connections = django.forms.IntegerField(
+        widget=django.forms.HiddenInput(), initial=8)
+    custom_parser = django.forms.CharField(
+        widget=django.forms.HiddenInput(), required=False)
+    class Meta:
+        model = mysite.customs.models.LaunchpadTrackerModel
+
+class LaunchpadQueryForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.LaunchpadQueryModel
         exclude = ('tracker', 'last_polled',)

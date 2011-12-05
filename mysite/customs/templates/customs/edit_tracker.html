@@ -43,6 +43,7 @@
 {% endblock form_body %}
 
 {% block content_below_form %}
+{% if tracker_urlmodel %}
 <table>
     <tr>
         <th>Tracker URL</th>
@@ -58,4 +59,5 @@
     </tr>
     {% endfor %}
 </table>
+    {% endif %}
 {% endblock content_below_form %}

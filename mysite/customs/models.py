@@ -362,18 +362,22 @@ class LaunchpadTrackerModel(TrackerModel):
 
 class LaunchpadQueryModel(TrackerQueryModel):
     '''This model stores query URLs for LaunchpadTracker objects.'''
-    url = models.URLField(max_length=400,
-                          blank=False, null=False)
-    description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(LaunchpadTrackerModel)
 
     def get_query_url(self):
-        pr = urlparse.urlparse(self.url)
-        qs = urlparse.parse_qsl(pr.query)
-        qs.append(('created_since', self.last_polled.isoformat()))
+        qs = [
+            ('ws.op', 'searchTasks'),
+            ('created_since', self.last_polled.isoformat())
+        ]
         qs = urllib.urlencode(qs)
-        pr = (pr.scheme, pr.netloc, pr.path, pr.params, qs, pr.fragment)
-        url = urlparse.urlunparse(pr)
+        parts = (
+            'http',
+            'api.launchpad.net',
+            urlparse.urljoin('/1.0/', self.tracker.launchpad_name),
+            '',
+            qs,
+            '')
+        url = urlparse.urlunparse(parts)
         return url
 
 reversion.register(LaunchpadTrackerModel, follow=["launchpadquerymodel_set"])
