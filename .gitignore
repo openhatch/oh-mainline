@@ -7,7 +7,6 @@ mysite/static/images/icons/projects/**
 *.swp
 *.patch
 .installed.cfg
-bin
 develop-eggs
 dist
 downloads
@@ -29,3 +28,5 @@ deactivate/
 mysite/indexes/
 mysite/static/twisted-ping-dir/twisted-ping-file
 mysite/missions-userdata/git/*
+mysite/site.db
+mysite/local_settings.py

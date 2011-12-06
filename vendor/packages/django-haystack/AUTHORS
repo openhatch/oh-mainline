@@ -1,0 +1,54 @@
+Primary Authors:
+
+    * Daniel Lindsley
+    * Matt Croydon (some documentation, sanity checks and the sweet name)
+    * Travis Cline (the original SQ implementation, improvements to ModelSearchIndex)
+    * David Sauve (notanumber) for the Xapian backend, the simple backend and various patches.
+
+
+Thanks to
+    * Jacob Kaplan-Moss & Joseph Kocherhans for the original implementation of
+      djangosearch, of which portions were used, as well as basic API feedback.
+    * Christian Metts for designing the logo and building a better site.
+    * Nathan Borror for testing and advanced form usage.
+    * Malcolm Tredinnick for API feedback.
+    * Mediaphormedia for funding the development on More Like This and faceting.
+    * Travis Cline for API feedback, Git help and improvements to the reindex command.
+    * Brian Rosner for various patches.
+    * Richard Boulton for feedback and suggestions.
+    * Cyberdelia for feedback and patches.
+    * Jannis Leidel for consistently "walking behind the elephant" and cleaning up the setup.py.
+    * Ask Solem for for patching the setup.py.
+    * Ben Spaulding for feedback and documentation patches.
+    * smulloni for various patches.
+    * JoeGermuska for various patches.
+    * SmileyChris for various patches.
+    * sk1p for various patches.
+    * Ryszard Szopa (ryszard) for various patches.
+    * Patryk Zawadzki (patrys) for various patches and feedback.
+    * Frank Wiles for documentation patches.
+    * Chris Adams (acdha) for various patches.
+    * Kyle MacFarlane for various patches.
+    * Alex Gaynor (alex) for help with handling deferred models with More Like This.
+    * RobertGawron for a patch to the Highlighter.
+    * Simon Willison (simonw) for various proposals and patches.
+    * Ben Firshman (bfirsh) for faceting improvements and suggestions.
+    * Peter Bengtsson for a patch regarding passing a customized site.
+    * Sam Bull (osirius) for a patch regarding initial data on SearchForms.
+    * slai for a patch regarding Whoosh and fetching all documents of a certain model type.
+    * alanwj for a patch regarding Whoosh and empty MultiValueFields.
+    * alanzoppa for a patch regarding highlighting.
+    * piquadrat for a patch regarding the more_like_this template tag.
+    * dedsm for a patch regarding the pickling of SearchResult objects.
+    * EmilStenstrom for a patch to the Highlighter.
+    * symroe for a patch regarding the more_like_this template tag.
+    * ghostrocket for a patch regarding the simple backend.
+    * Rob Hudson (robhudson) for improvements to the admin search.
+    * apollo13 for simplifying ``SearchForm.__init__``.
+    * Carl Meyer (carljm) for a patch regarding character primary keys.
+    * oyiptong for a patch regarding pickling.
+    * alfredo for a patch to generate epub docs.
+    * Luke Hatcher (lukeman) for documentation patches.
+    * Trey Hunner (treyhunner) for a Whoosh field boosting patch.
+    * CMGdigital for funding the development on multiprocessing update_index.
+    * Travis Swicegood (tswicegood) for patches to the management commands.

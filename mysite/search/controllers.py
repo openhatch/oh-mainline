@@ -22,6 +22,7 @@ import mysite.base.decorators
 import re
 import hashlib
 import django.core.cache
+from django.db import connection
 from django.db.models import Q
 import logging
 
@@ -134,10 +135,19 @@ class Query:
                 and not exclude_contribution_type):
             q &= Q(concerns_just_documentation=True)
 
+        # NOTE: This is a terrible hack. We should stop doing this and
+        # just ditch this entire class and swap it out for something like
+        # haystack.
+        if connection.vendor == 'sqlite':
+            use_regexes = False
+        else:
+            use_regexes = True
+
         for word in self.terms:
-            whole_word = "[[:<:]]%s($|[[:>:]])" % (
+            if use_regexes:
+                whole_word = "[[:<:]]%s($|[[:>:]])" % (
                     mysite.base.controllers.mysql_regex_escape(word))
-            terms_disjunction = (
+                terms_disjunction = (
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |
                     Q(description__iregex=whole_word) |
@@ -146,6 +156,17 @@ class Query:
                     # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__iregex=whole_word)
                     )
+            else:
+                terms_disjunction = (
+                    Q(project__language__icontains=word) |
+                    Q(title__icontains=word) |
+                    Q(description__icontains=word) |
+                    Q(as_appears_in_distribution__icontains=word) |
+
+                    # 'firefox' grabs 'mozilla firefox'.
+                    Q(project__name__icontains=word)
+                    )
+
             q &= terms_disjunction
 
         return q

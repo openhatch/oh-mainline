@@ -1,0 +1,7 @@
+html2text.py
+setup.py
+html2text.egg-info/PKG-INFO
+html2text.egg-info/SOURCES.txt
+html2text.egg-info/dependency_links.txt
+html2text.egg-info/not-zip-safe
+html2text.egg-info/top_level.txt

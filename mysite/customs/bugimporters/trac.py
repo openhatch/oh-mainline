@@ -19,7 +19,9 @@ import cgi
 import csv
 import datetime
 import feedparser
-import lxml.html
+
+from mysite.base.depends import lxml
+
 import twisted.web.error
 import twisted.web.http
 import urlparse

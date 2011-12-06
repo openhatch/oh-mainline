@@ -1,0 +1,169 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Template Tags &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Management Commands" href="management_commands.html" />
+    <link rel="prev" title="Views &amp; Forms" href="views_and_forms.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="management_commands.html" title="Management Commands"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="views_and_forms.html" title="Views &amp; Forms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="template-tags">
+<span id="ref-templatetags"></span><h1>Template Tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h1>
+<p>Haystack comes with a couple common template tags to make using some of its
+special features available to templates.</p>
+<div class="section" id="highlight">
+<h2><tt class="docutils literal"><span class="pre">highlight</span></tt><a class="headerlink" href="#highlight" title="Permalink to this headline">¶</a></h2>
+<p>Takes a block of text and highlights words from a provided query within that
+block of text. Optionally accepts arguments to provide the HTML tag to wrap
+highlighted word in, a CSS class to use with the tag and a maximum length of
+the blurb in characters.</p>
+<p>The defaults are <tt class="docutils literal"><span class="pre">span</span></tt> for the HTML tag, <tt class="docutils literal"><span class="pre">highlighted</span></tt> for the CSS class
+and 200 characters for the excerpt.</p>
+<p>Syntax:</p>
+<div class="highlight-python"><pre>{% highlight &lt;text_block&gt; with &lt;query&gt; [css_class "class_name"] [html_tag "span"] [max_length 200] %}</pre>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><pre># Highlight summary with default behavior.
+{% highlight result.summary with request.query %}
+
+# Highlight summary but wrap highlighted words with a div and the
+# following CSS class.
+{% highlight result.summary with request.query html_tag "div" class "highlight_me_please" %}
+
+# Highlight summary but only show 40 words.
+{% highlight result.summary with request.query max_length 40 %}</pre>
+</div>
+<p>The highlighter used by this tag can be overridden as needed. See the
+<a class="reference internal" href="highlighting.html"><em>Highlighting</em></a> documentation for more information.</p>
+</div>
+<div class="section" id="more-like-this">
+<h2><tt class="docutils literal"><span class="pre">more_like_this</span></tt><a class="headerlink" href="#more-like-this" title="Permalink to this headline">¶</a></h2>
+<p>Fetches similar items from the search index to find content that is similar
+to the provided model&#8217;s content.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This requires a backend that has More Like This built-in.</p>
+</div>
+<p>Syntax:</p>
+<div class="highlight-python"><pre>{% more_like_this model_instance as varname [for app_label.model_name,app_label.model_name,...] [limit n] %}</pre>
+</div>
+<p>Example:</p>
+<div class="highlight-python"><pre># Pull a full SearchQuerySet (lazy loaded) of similar content.
+{% more_like_this entry as related_content %}
+
+# Pull just the top 5 similar pieces of content.
+{% more_like_this entry as related_content limit 5  %}
+
+# Pull just the top 5 similar entries or comments.
+{% more_like_this entry as related_content for "blog.entry,comments.comment" limit 5  %}</pre>
+</div>
+<p>This tag behaves exactly like <cite>SearchQuerySet.more_like_this`</cite>, so all notes in
+that regard apply here as well.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Template Tags</a><ul>
+<li><a class="reference internal" href="#highlight"><tt class="docutils literal"><span class="pre">highlight</span></tt></a></li>
+<li><a class="reference internal" href="#more-like-this"><tt class="docutils literal"><span class="pre">more_like_this</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="views_and_forms.html"
+                        title="previous chapter">Views &amp; Forms</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="management_commands.html"
+                        title="next chapter">Management Commands</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/templatetags.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="management_commands.html" title="Management Commands"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="views_and_forms.html" title="Views &amp; Forms"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

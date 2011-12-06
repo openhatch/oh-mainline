@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Running Tests &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Creating New Backends" href="creating_new_backends.html" />
+    <link rel="prev" title="SearchBackend API" href="searchbackend_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="creating_new_backends.html" title="Creating New Backends"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchbackend_api.html" title="SearchBackend API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="running-tests">
+<span id="ref-running-tests"></span><h1>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="core-haystack-functionality">
+<h2>Core Haystack Functionality<a class="headerlink" href="#core-haystack-functionality" title="Permalink to this headline">¶</a></h2>
+<p>In order to test Haystack with the minimum amount of unnecessary mocking and to
+stay as close to real-world use as possible, <tt class="docutils literal"><span class="pre">Haystack</span></tt> ships with a test
+app (called <tt class="docutils literal"><span class="pre">core</span></tt>) within the <tt class="docutils literal"><span class="pre">django-haystack/tests</span></tt> directory.</p>
+<p>In the event you need to run <tt class="docutils literal"><span class="pre">Haystack</span></tt>&#8216;s tests (such as testing
+bugfixes/modifications), here are the steps to getting them running:</p>
+<div class="highlight-python"><pre>cd django-haystack/tests
+export PYTHONPATH=`pwd`
+django-admin.py test core --settings=settings</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">Haystack</span></tt> is maintained with all tests passing at all times, so if you
+receive any errors during testing, please check your setup and file a report if
+the errors persist.</p>
+</div>
+<div class="section" id="backends">
+<h2>Backends<a class="headerlink" href="#backends" title="Permalink to this headline">¶</a></h2>
+<p>If you want to test a backend, the steps are the same with the exception of
+the settings module and the app to test. To test an engine, use the
+<tt class="docutils literal"><span class="pre">engine_settings</span></tt> module within the <tt class="docutils literal"><span class="pre">tests</span></tt> directory, substituting the
+<tt class="docutils literal"><span class="pre">engine</span></tt> for the name of the proper backend. You&#8217;ll also need to specify the
+app for that engine. For instance, to run the Solr backend&#8217;s tests:</p>
+<div class="highlight-python"><pre>cd django-haystack/tests
+export PYTHONPATH=`pwd`
+django-admin.py test solr_tests --settings=solr_settings</pre>
+</div>
+<p>Or, to run the Whoosh backend&#8217;s tests:</p>
+<div class="highlight-python"><pre>cd django-haystack/tests
+export PYTHONPATH=`pwd`
+django-admin.py test whoosh_tests --settings=whoosh_settings</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Running Tests</a><ul>
+<li><a class="reference internal" href="#core-haystack-functionality">Core Haystack Functionality</a></li>
+<li><a class="reference internal" href="#backends">Backends</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchbackend_api.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">SearchBackend</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="creating_new_backends.html"
+                        title="next chapter">Creating New Backends</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/running_tests.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="creating_new_backends.html" title="Creating New Backends"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchbackend_api.html" title="SearchBackend API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

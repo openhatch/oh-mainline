@@ -277,7 +277,7 @@ People Search
 {% block js_in_head %}
 {{ block.super }}
     <script src="http://openlayers.org/api/OpenLayers.js"></script>
-    <script src="/static/js/profile/map-v2.js"></script>
+    <script src="/static/js/profile/map-v2.js?1322161889"></script>
 {% endblock %}
 
 
@@ -300,6 +300,7 @@ People Search
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+var person_ids = {{ person_ids|safe }};
 $(init);
 </script>
 {% endblock js %}

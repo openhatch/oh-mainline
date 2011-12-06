@@ -22,11 +22,8 @@ from mysite.profile.models import Person
 import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import PIL.Image
-from django.conf import settings
-from invitation.models import InvitationKey
-from models import InvitationRequest
-import django_authopenid.forms
+import logging
+import mysite.base.depends
 
 RESERVED_USERNAMES =  (
         'admin',
@@ -122,6 +119,15 @@ class EditPhotoForm(django.forms.ModelForm):
         fields = ('photo',)
     
     def clean_photo(self):
+        ### If PIL is missing, proceed by providing the default
+        ### profile image.
+        if not mysite.base.depends.Image:
+            ## FIXME This is fail-safe, not fail-secure, behavior.
+            ## If an image is too big, and the Python Imaging Library
+            ## is not installed, we simply do not resize it.E
+            logging.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
+            return self.cleaned_data['photo']
+
         # Safe copy of data...
         self.cleaned_data['photo'].seek(0)
         data = self.cleaned_data['photo'].read()
@@ -131,13 +137,13 @@ class EditPhotoForm(django.forms.ModelForm):
         w, h = get_image_dimensions(data_fd)
         if w > 200:
             # Scale it down.
-            too_big = PIL.Image.open(StringIO.StringIO(data))
+            too_big = mysite.base.depends.Image.open(StringIO.StringIO(data))
             format = too_big.format
-            new_w = 200
-            new_h = (h * 1.0 / w) * 200
+            new_w = int(200)
+            new_h = int((h * 1.0 / w) * 200)
 
             smaller = too_big.resize((new_w, new_h),
-                                     PIL.Image.ANTIALIAS)
+                                     mysite.base.depends.Image.ANTIALIAS)
 
             # "Save" it to memory
             new_image_fd = StringIO.StringIO()

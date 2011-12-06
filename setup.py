@@ -35,7 +35,7 @@ dependency_path = 'http://linode.openhatch.org/~paulproteus/'
 # The call to setup() is the important part of the file.
 setup(
     name = "mysite",
-    version = "3", # We don't really do releases, so every version is version 3.
+    version = "0.11.11", # We don't really do releases, so every version is version 3.
     packages = ['mysite',],
     url = 'https://openhatch.org/',
     license = 'AGPLv3',

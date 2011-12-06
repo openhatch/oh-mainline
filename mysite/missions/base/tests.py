@@ -48,7 +48,7 @@ def list_of_true_keys(d):
     return ret
 
 class MainPageTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         TwillTests.setUp(self)

@@ -31,17 +31,28 @@ TEST_DATABASE_OPTIONS = {
 DATABASE_CHARSET = 'utf8'           # omg I hate you MySQL
 TEST_DATABASE_CHARSET = 'utf8'      # have to apply it to the test database, too
 
-DATABASE_ENGINE = 'mysql'           # Other options:
-                                    # 'postgresql_psycopg2', 'postgresql', 'mysql',
-                                    # 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'oh_milestone_a'    # Or path to database file if using sqlite3.
+DATABASES = {
+    'default': {
+        'NAME': os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'site.db'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'CHARSET': 'utf8',
+    },
+}
 
-# NB: None of the following DATABASE_ options are used with sqlite3.
-DATABASE_USER = 'oh_milestone_a'    
-DATABASE_PASSWORD = 'ahmaC0Th'      
-DATABASE_HOST = 'renaissance.local' # Set to empty string for localhost. 
-DATABASE_HOST = 'localhost'         # Set to empty string for localhost. 
-DATABASE_PORT = ''                  # Set to empty string for default. 
+OTHER_DATABASES = {
+    'mysql': {
+        'NAME': 'oh_milestone_a',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'USER': 'oh_milestone_a',
+        'PASSWORD': 'ahmaC0Th',
+        'OPTIONS': {'read_default_file': './my.cnf'},
+        'CHARSET': 'utf8',
+    },
+}
+
+if os.environ.get('USE_MYSQL', ''):
+    DATABASES['default'] = OTHER_DATABASES['mysql']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -61,6 +72,7 @@ SITE_ID = 1
 USE_I18N = True
 
 HAYSTACK_XAPIAN_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
+HAYSTACK_WHOOSH_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -80,7 +92,7 @@ ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'k%&pic%c5%6$%(h&eynhgwhibe9-h!_iq&(@ktx#@1-5g2+he)'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-            'django.core.context_processors.auth',
+            'django.contrib.auth.context_processors.auth',
             'django.core.context_processors.debug',
             'django.core.context_processors.i18n',
             'django.core.context_processors.media',
@@ -90,12 +102,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.load_template_source',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
     'staticgenerator.middleware.StaticGeneratorMiddleware',
@@ -108,7 +120,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     # Django debug toolbar
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+]
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -132,7 +144,7 @@ SESSION_ENGINE="django.contrib.sessions.backends.db"
 
 ## Django search via Haystack
 HAYSTACK_SITECONF='mysite.haystack_configuration'
-HAYSTACK_SEARCH_ENGINE='xapian'
+HAYSTACK_SEARCH_ENGINE='whoosh'
 
 INSTALLED_APPS = (
     'ghettoq',
@@ -146,7 +158,6 @@ INSTALLED_APPS = (
     'registration',
     'django_authopenid',
     'django_extensions',
-    'windmill',
     'south',
     'django_assets',
     'celery',
@@ -170,7 +181,10 @@ INSTALLED_APPS = (
 )
 
 # testrunner allows us to control which testrunner to use
-TEST_RUNNER = 'mysite.testrunner.run'
+TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
+# Optionally, use XML reporting
+if os.environ.get('USE_XML_TEST_REPORTING', None):
+    TEST_RUNNER = 'mysite.testrunner.OpenHatchXMLTestRunner'
 
 # Make test names prettier 
 TEST_OUTPUT_DESCRIPTIONS = True
@@ -202,10 +216,12 @@ INVITATIONS_PER_USER=100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
-# If you want to clear the cache, restart memcached.  Don't set the cache to dummy (unless you're trying to edit an unsafely cached page, lol)
-#CACHE_BACKEND = 'file:///tmp/django_cache_belonging_to_%s' % os.environ.get('USER', 'unknown')
-CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
-#CACHE_BACKEND = 'dummy://'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'openhatch'
+    }
+}
 
 # Launchpad credentials
 LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0tKMGtwYmNQTkJXOHRQMWR2Ygpjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2ggbGl2ZSBzaXRlCmFjY2Vzc19zZWNyZXQgPSBSNWtrcXBmUERiUjRiWFFQWGJIMkdoc3ZQamw2SjlOc1ZwMzViN0g2d3RjME56Q3R2Z3JKeGhNOVc5a2swU25CSnRHV1hYckdrOFFaMHZwSgoK'
@@ -238,7 +254,7 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5) # how long the forward
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
 # at worst, we run a postfixifying celery job once every two days for each user
 
-POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
+POSTFIX_FORWARDER_TABLE_PATH = None # Disabled by default
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
@@ -286,3 +302,20 @@ LOGGING = {
             },
         }
 }
+
+DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
+                                           '../../downloads/GeoLiteCity.dat')
+
+### Windows fix-ups
+if sys.platform.startswith('win'):
+    # staticgenerator seems to act weirdly on Windows, so we disable it.
+    MIDDLEWARE_CLASSES.remove(
+        'staticgenerator.middleware.StaticGeneratorMiddleware')
+
+
+ENABLE_NEW_IWH_HANDLER = False
+### Include a user's customizations
+try:
+    from local_settings import *
+except ImportError:
+    pass

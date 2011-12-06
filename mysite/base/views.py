@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 # This file is part of OpenHatch.
@@ -20,16 +19,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, \
-        HttpResponseRedirect, HttpResponseServerError, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from mysite.base.helpers import render_response
-from django_authopenid.forms import OpenidSigninForm
-import simplejson
-from django.template import RequestContext, loader, Context
-from django.core.urlresolvers import reverse
-from django.contrib.auth.forms import AuthenticationForm
+from django.utils import simplejson
+from django.template import loader, Context
 
-import mysite.profile as profile
 import mysite.account
 import mysite.profile.controllers
 import mysite.account.forms
@@ -38,10 +32,7 @@ import mysite.customs.feed
 import mysite.search.controllers
 import mysite.search.models
 import mysite.missions.models 
-from mysite.missions.models import Step, StepCompletion
 
-import feedparser
-import lxml.html
 import random
 import datetime
 
@@ -95,7 +86,7 @@ def home(request):
 
         # For performance reasons, we do not send bug recommendations here.
         
-        completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
+        completed_missions = dict((c.step.name, True) for c in mysite.missions.models.StepCompletion.objects.filter(person=request.user.get_profile()))
         data[u'completed_missions'] = completed_missions
         
         data[u'projects_i_wanna_help'] = person.projects_i_wanna_help.all()

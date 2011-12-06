@@ -1,0 +1,142 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced Topics &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchQuerySet API" href="searchqueryset_api.html" />
+    <link rel="prev" title="Boost" href="boost.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchqueryset_api.html" title="SearchQuerySet API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="boost.html" title="Boost"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-topics">
+<span id="ref-advanced-topics"></span><h1>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="swapping-backends">
+<h2>Swapping Backends<a class="headerlink" href="#swapping-backends" title="Permalink to this headline">¶</a></h2>
+<p>As part of the backend loading infrastructure, you can load more than one
+search backend at a time or dynamically swap out the backend being used. The
+following code demonstrates loading the <tt class="docutils literal"><span class="pre">simple</span></tt> backend:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">haystack</span>
+<span class="n">simple_backend</span> <span class="o">=</span> <span class="n">haystack</span><span class="o">.</span><span class="n">load_backend</span><span class="p">(</span><span class="s">&#39;simple&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If no argument is provided, Haystack will load whatever is in the
+<tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_ENGINE</span></tt> setting. Otherwise, any of the following strings
+will load their respective backend.</p>
+<blockquote>
+<ul class="simple">
+<li>solr</li>
+<li>xapian</li>
+<li>whoosh</li>
+<li>simple</li>
+<li>dummy</li>
+</ul>
+</blockquote>
+<p>You can also provide the &#8220;short&#8221; portion of the name (before the <tt class="docutils literal"><span class="pre">_backend</span></tt>)
+of a custom backend. Haystack will attempt to load that backend instead from
+your <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced Topics</a><ul>
+<li><a class="reference internal" href="#swapping-backends">Swapping Backends</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="boost.html"
+                        title="previous chapter">Boost</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchqueryset_api.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/do_not_try_this_at_home.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchqueryset_api.html" title="SearchQuerySet API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="boost.html" title="Boost"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

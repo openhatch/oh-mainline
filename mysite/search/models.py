@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import importlib
-
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
@@ -28,6 +26,7 @@ from django.contrib.contenttypes import generic
 from django.conf import settings
 import datetime
 import StringIO
+import logging
 import uuid
 from urlparse import urljoin
 import random
@@ -36,10 +35,7 @@ import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
 import mysite.customs.ohloh
-try:
-    import Image
-except:
-    from PIL import Image
+import mysite.base.depends
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -48,18 +44,24 @@ class OpenHatchModel(models.Model):
         abstract = True
 
 def get_image_data_scaled(image_data, width):
+    ### NOTE: We refuse to scale images if we do not
+    ### have the Python Imaging Library.
+    if not mysite.base.depends.Image:
+        logging.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
+        return image_data
+
     # scale it
     image_fd = StringIO.StringIO(image_data)
-    im = Image.open(image_fd)
+    im = mysite.base.depends.Image.open(image_fd)
     image_fd.seek(0)
 
     w, h = get_image_dimensions(image_fd)
 
-    new_w = width
-    new_h = (h * 1.0 / w) * width
+    new_w = int(width)
+    new_h = int((h * 1.0 / w) * width)
 
     smaller = im.resize((new_w, new_h),
-                        Image.ANTIALIAS)
+                        mysite.base.depends.Image.ANTIALIAS)
 
     # "Save" it to memory
     new_image_fd = StringIO.StringIO()
@@ -105,15 +107,17 @@ class Project(OpenHatchModel):
         return self.name
 
     @mysite.base.decorators.cached_property
-    def potential_mentors(self):
-        """Return the union of the people who can mentor in this project,
-        or who can mentor in the project's language."""
+    def potential_mentor_count(self):
+        '''Return a number of potential mentors, counted as the
+        number of people who can mentor in the project by name unioned
+        with those who can mentor in the project's language.'''
+        all_mentor_person_ids = set()
         import mysite.profile.controllers
-        mentor_set = set(mysite.profile.controllers.people_matching(
-            'can_mentor', self.name))
-        mentor_set.update(mysite.profile.controllers.people_matching(
-                'can_mentor', self.language))
-        return mentor_set
+        for way_a_mentor_can_help in (self.name, self.language):
+            tq = mysite.profile.controllers.TagQuery('can_mentor',
+                                                     way_a_mentor_can_help)
+            all_mentor_person_ids.update(tq.people.values_list('id', flat=True))
+        return len(all_mentor_person_ids)
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -271,6 +275,10 @@ class Project(OpenHatchModel):
                 portfolioentry__is_published=True
                 ).distinct()
 
+    def get_contributor_count(self):
+        """Return the number of Person objects who are contributors to
+        this Project."""
+        return self.get_contributors().count()
 
     def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
@@ -310,11 +318,11 @@ class Project(OpenHatchModel):
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
         import mysite.profile.controllers
-        mentor_count = len(set(mysite.profile.controllers.people_matching(
-            'can_mentor', self.name)))
-        if mentor_count > 0 or self.language:
+        mentors_available = bool(mysite.profile.controllers.TagQuery(
+                'can_mentor', self.name).people)
+        if mentors_available or self.language:
             query_var = self.name
-            if mentor_count == 0:
+            if not mentors_available:
                 query_var = self.language
             query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
                                              query_var})
@@ -603,6 +611,8 @@ class WannaHelperNote(OpenHatchModel):
         unique_together = [('project', 'person')]
     person = models.ForeignKey('profile.Person')
     project = models.ForeignKey(Project)
+    contacted_by = models.ForeignKey(User, related_name="contacted_by_user", blank=True, null=True)
+    contacted_on = models.DateField(blank=True, null=True)
 
     @staticmethod
     def add_person_project(person, project):
@@ -650,17 +660,5 @@ models.signals.post_save.connect(
 models.signals.pre_delete.connect(
     post_bug_save_delete_increment_hit_count_cache_timestamp,
     Bug)
-
-# Re-index the person when he says he likes a new project
-def update_the_person_index_from_project(sender, instance, **kwargs):
-    if getattr(settings, 'SKIP_PERSON_REINDEX_ON_PROJECT_SAVE', None):
-        return
-
-    import mysite.profile.tasks
-    for person in instance.people_who_wanna_help.all():
-        task = mysite.profile.tasks.ReindexPerson()
-        task.delay(person.id)
-
-models.signals.post_save.connect(update_the_person_index_from_project, sender=Project)
 
 # vim: set ai ts=4 nu:

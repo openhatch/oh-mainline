@@ -1,0 +1,167 @@
+* Ongoing -- all releases
+    + Include a full specification document, covering all aspects of the
+        module and its members.    
+
+* Being debated -- future releases
+    + Change the behaviour of the enable_checking flag to affect
+        "compile-time", rather than "run-time"
+    + Have the typechecker find all errors, not just the first one.
+    + Add an OrderedIteratorMixin to complement UnorderedIteratorMixin
+    + Add a way to generate random objects of a type (for unit testing)
+
+* v0.4.0 -- target release date: 2006-06-XX
+    + Compatibility with Python 2.3 
+    
+    + Compatibility issues:
+        - Rename Single to AtomicType
+        - Rename CheckType to TypeAnnotation
+        - Drop the typecheck_* aliases for accepts, returns, yields
+        - All __-private attributes have been changed to single-underscore
+            names
+        - Rename 0.3.x's Function internal class to CheckerFunction
+        - Rename 0.3.x's _TC_FunctionError to _TC_CheckerFunctionError
+        - Drop the TypeCheckException used for backwards compatibility with 0.1.6
+            and prior versions
+        - Move the Empty() utility class to tests/test_examples.py
+        - Move the Length() utility class to tests/test_examples.py
+        - Merge typecheck.sets back into the main typecheck module
+        - Drop typecheck as an alias for typecheck_args
+        - Drop built-in support for patterned lists
+            > Move this to tests/test_examples.py
+        - Make type annotations optional and keyword-based
+            > Positional types are now illegal
+        
+    + New functionality:
+        - Add a Function utility class
+        - Add Union and Intersection aliases for Or and And, respectively
+        - Added support for zope.interfaces to contrib/zope_interfaces
+            (cheers to Marc Rijken)
+        - Add an assert_type function for in-code type assertions
+        - Add a Nothing() utility class to complement Any()
+        - Add a Generator complement to Function
+        - Add an is_sent decorator to work with Python 2.5's generator.send
+            method
+        
+### Anything above here is a roadmap
+### Anything below here is the actual changelog
+
+* v0.3.5 -- released: 2006-05-28
+    + Now compatible with Python 2.5
+
+    + Compatibility issues:
+        - Typeclass instances are no longer callable. This means that
+            "Number() is not Number" is True
+    
+    + Bug fixes:
+        - Add an __all__ list to typecheck/__init__.py
+        - Instances with __call__ methods can now be used as 
+            functions (ie, in conjunction with Function)
+        - Unicode can now be used to specify type variables
+        - Rename all message() methods on the internal _TC_* extensions
+            to error_message() (Python 2.5's exceptions already have message
+            attribute)
+        - Add repr() and str() support to Typeclass instances
+        - Fix a bug related to typecheck_args()'s checking of the number of
+            arguments passed to the typechecked function
+        - Fix SF #1495358; typeclasses can now actually be used.
+
+* v0.3.4 -- released: 2006-01-22
+    + Add a Typeclass() utility class
+    + Add a Number typeclass
+    + Add a String typeclass
+    + Add a MSequence typeclass
+    + Add a Mapping typeclass
+    + Add an ImSequence typeclass
+
+* v0.3.3 -- released: 2006-01-15
+    + Add an Exact() utility class
+    + Add a Length() utility class
+    + Improve the stringification of TypeCheckErrors dramatically
+    + Add the following aliases:
+        - accepts -> typecheck_args
+        - returns -> typecheck_return
+        - yields -> typecheck_yield
+        - IsNoneOf -> Not
+        - IsAllOf -> And
+        - IsOneOf -> Or
+        - IsOnlyOneOf -> Xor
+    + Add the ability to use functions and methods to do typechecking
+    + Add a Class() utility class (for including not-yet-declared classes in
+        signatures)
+
+* v0.3.2 -- released: 2005-12-29
+    + Add a YieldSeq utility type to cope with sequential yields of different
+        types
+    + Add an example of Xor() being implemented in terms of the included And,
+        Not and Or utility classes (tests/test_examples)
+    + Add an Xor() utility class to complement the other binary expression
+        classes
+    + Add an example of IsIterable being implemented in terms of HasAttr and
+        IsCallable (tests/test_examples)
+    + Two boolean classes (And and Or) have gained some limited intelligence
+        about boolean equivalence;
+        And(And(int, float), str) == And(int, float, str)
+    + Have Empty() support any iterator
+    + Add support for Empty() sets
+
+    + Bug fix: add __eq__ to IsCallable, IsIterable
+    + Bug fix: add __hash__ to IsCallable, IsIterable
+    + Bug fix: add __str__, __repr__ to IsIterable
+    + Bug fix: fix the __eq__ methods of And, Not and Or to be based on ==,
+        rather than subsets
+    + Bug fix: And and Or now require at least two unique conditions
+    + Bug fix: Dict's __hash__ method previously threw an error
+    + Bug fix: List's __hash__ method previously threw an error
+    + Bug fix: add __hash__ to typecheck.sets.Set
+    + Bug fix: Set's __eq__ is now based on ==, rather than issubset; all
+        instances that compare equal now hash to the same value
+    + Bug fix: there was an error in Set.__init__ related to the handling of
+        empty input lists
+    + Bug fix: HasAttr gets __hash__ and __eq__ methods
+    + Bug fix: TypeVariables gets __hash__ and __eq__ methods
+
+* v0.3.1 -- released: 2005-12-18
+    + Add an IsCallable utility type to assert callability
+    + Convert Self to a callable, like all other utility types
+    + Add a HasAttr utility type to add duck-typing support
+    + Add an IsIterable utility type to assert that the object implements the
+        iterator protocol
+
+* v0.3.0 -- released: 2005-12-05
+    + Bring Self closer to actually working
+    + Move some of the rarely-used pieces of the machinery into separate
+        modules
+        - UnorderedIteratorMixin and friends -> typecheck.mixins
+        - Set -> typecheck.sets
+    + Remove the "requirement" that __typecheck__ methods return True if
+        successful
+    + Find a way to mimic Haskell's type variables
+    + Allow user-created typechecker classes to register hooks to tell them
+        when the system starts and stops typechecking a function
+    + Incorporate a framework for allowing user-created container classes to
+        typecheck their contents
+        - Type{Signature,Check}Error classes now allow their internal helper
+            classes to control stringification
+    + Add a typecheck_yield that works with generators
+    + Add a mixin class to supply easy typechecking for iterators
+    + Have typechecked functions store their type information
+    + Incorporate a new testing framework that supports TODO tests
+    + Add a Not() helper class to complement And() and Or()
+    + Add better error messages to TypeSignatureError
+    + Code cleanup (more members get _-prefixes, etc)
+    + Incorporate a framework for registering special helper-classes with the
+        Type() dispatcher
+    + Add a typechecked set class that covers the built-in set type
+    + Bug fixes:
+        - Some instances of Or() and And() would not compare equal when they
+            should have
+
+* v0.2.0 -- released: 2005-11-22
+    + Replace the code in 0.1.6 with new code by Collin Winter. Too many
+        changes from 0.1.6 to summarise.
+
+* v0.1.6 -- released: 2005-09-29
+    + Add support for typechecking of old-style classes
+	
+* v0.1.4 -- released: 2005-09-28
+    + Add typecheck.doctest_support

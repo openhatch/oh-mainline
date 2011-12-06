@@ -16,18 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task, PeriodicTask
-import shutil
-import os
-import os.path
-import celery.decorators
-import datetime
-
-from django.conf import settings
+from celery.task import Task, task
 
 import mysite.base.helpers
 
@@ -36,7 +28,7 @@ class PopulateProjectIconFromOhloh(Task):
         project = mysite.search.models.Project.objects.get(id=project_id)
         project.populate_icon_from_ohloh()
         project.save()
-    
+
 class PopulateProjectLanguageFromOhloh(Task):
     def run(self, project_id, **kwargs):
         logger = self.get_logger(**kwargs)
@@ -56,7 +48,7 @@ class PopulateProjectLanguageFromOhloh(Task):
             try:
                 data, _ = oh.analysis_id2analysis_data(analysis_id)
             except KeyError:
-                logger.info("No Ohloh analysis found for %s" % 
+                logger.info("No Ohloh analysis found for %s" %
                             p.name)
                 return
             if ('main_language_name' in data and
@@ -73,7 +65,7 @@ class PopulateProjectLanguageFromOhloh(Task):
 ### The first such situation has an entry in profile_hourly_tasks.py
 
 ### The second circumstance is if a bug gets marked as closed.
-@celery.decorators.task
+@task
 def clear_search_cache():
     logging.info("Clearing the search cache.")
     mysite.base.helpers.clear_static_cache('search')

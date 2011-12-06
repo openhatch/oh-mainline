@@ -1,0 +1,5 @@
+Hi,
+
+Thank you for your registration. To activate your account lick on the link below :
+
+<a href="{% url registration_activate activation_key %}">{% url registration_activate activation_key %}</a>.

@@ -7,8 +7,10 @@
 from settings import *
 # ...and then we override some values.
 
+# Use MySQL in production
+DATABASES['default'] = OTHER_DATABASES['mysql']
 # But use the linode as our MySQL server
-DATABASE_HOST='linode.openhatch.org'
+DATABASES['default']['HOST'] ='linode.openhatch.org'
 
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
@@ -27,7 +29,12 @@ SEND_BROKEN_LINK_EMAILS=True
 MANAGERS=ADMINS
 SERVER_EMAIL='mr_website@linode.openhatch.org'
 
-CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
@@ -44,3 +51,11 @@ except ImportError:
 PATH_TO_MANAGEMENT_SCRIPT = '/home/deploy/milestone-a/bin/production'
 GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
+
+### Use Xapian, not Whoosh, on the deployment
+HAYSTACK_SEARCH_ENGINE='xapian'
+
+### Set the logging level to just WARNING or above
+import logging
+logger = logging.getLogger('')
+logger.setLevel(logging.WARNING)

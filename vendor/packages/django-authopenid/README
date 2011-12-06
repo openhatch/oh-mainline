@@ -1,0 +1,11 @@
+#django_authopenid 
+
+Author : Benoît Chesneau <benoitc@metavers.net>
+Url : [http://bitbucket.org/benoitc/django-authopenid/](http://bitbucket.org/benoitc/django-authopenid/)
+License: Apache License 2
+
+This package provide the django-authopenid application that allow you to authenticate your users with OpenID in Django.
+
+For more information go [here](http://bitbucket.org/benoitc/django-authopenid/).
+
+

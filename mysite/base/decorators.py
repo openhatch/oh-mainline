@@ -22,7 +22,7 @@ from django.http import HttpResponse
 import re
 import collections
 import mysite.base.helpers
-import simplejson
+from django.utils import simplejson
 import django.core.cache
 import hashlib
 from functools import partial
@@ -34,6 +34,9 @@ from django.core.urlresolvers import reverse, resolve
 import django.contrib.auth.decorators
 
 def as_view(request, template, data, slug):
+    ### add settings to the request so that the template
+    ### can adjust what it displays depending on settings.
+    data['settings'] = django.conf.settings
     if request.user.is_authenticated() or 'cookies_work' in request.session:
         # Great! Cookies work.
         pass
@@ -167,12 +170,11 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
         if type(value) == django.db.models.query.ValuesListQuerySet:
             value = list(value)
         cached_json = simplejson.dumps({'value': value})
-        import logging
 
         # Then cache the input/output mapping.
         django.core.cache.cache.set(cache_key, cached_json, 864000)
 
-        logging.info('cached output of %s: %s' % (func.__name__, cached_json))
+        logging.debug('cached output of %s: %s' % (func.__name__, cached_json))
     else:
         # Sweet, no need to run the expensive method. Just use the cached output.
         value = simplejson.loads(cached_json)['value']

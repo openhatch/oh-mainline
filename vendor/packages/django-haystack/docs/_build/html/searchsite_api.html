@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SearchSite API &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="SearchQuery API" href="searchquery_api.html" />
+    <link rel="prev" title="SearchResult API" href="searchresult_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="searchquery_api.html" title="SearchQuery API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="searchresult_api.html" title="SearchResult API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="searchsite-api">
+<span id="ref-searchsite-api"></span><h1><tt class="docutils literal"><span class="pre">SearchSite</span></tt> API<a class="headerlink" href="#searchsite-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="SearchSite">
+<em class="property">class </em><tt class="descname">SearchSite</tt><a class="headerlink" href="#SearchSite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">SearchSite</span></tt> provides a way to collect the <tt class="docutils literal"><span class="pre">SearchIndexes</span></tt> that are
+relevant to the current site, much like <tt class="docutils literal"><span class="pre">ModelAdmins</span></tt> in the <tt class="docutils literal"><span class="pre">admin</span></tt> app.</p>
+<p>This allows you to register indexes on models you don&#8217;t control (reusable
+apps, <tt class="docutils literal"><span class="pre">django.contrib</span></tt>, etc.) as well as customize on a per-site basis what
+indexes should be available (different indexes for different sites, same
+codebase).</p>
+<p>A <tt class="docutils literal"><span class="pre">SearchSite</span></tt> instance(s) should be configured within a configuration file, which gets specified in your settings file as <tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt>. An example of this setting might be <tt class="docutils literal"><span class="pre">myproject.search_sites</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">For a long time before the 1.0 release of Haystack, the convention was to
+place this configuration within your URLconf. This is no longer recommended
+as it can cause issues in certain production setups (Django 1.1+/mod_wsgi
+for example).</p>
+</div>
+<div class="section" id="autodiscovery">
+<h2>Autodiscovery<a class="headerlink" href="#autodiscovery" title="Permalink to this headline">¶</a></h2>
+<p>Since the common use case is to simply grab everything that is indexed for
+search, there is an autodiscovery mechanism which will pull in and register
+all indexes it finds within your project. To enable this, place the following
+code inside the file you specified as your <tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">haystack</span>
+<span class="n">haystack</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will fully flesh-out the default <tt class="docutils literal"><span class="pre">SearchSite</span></tt> (at
+<tt class="docutils literal"><span class="pre">haystack.sites.site</span></tt>) for use. Since this site is used by default throughout
+Haystack, very little (if any) additional configuration will be needed.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>If you need to narrow the indexes that get registered, you will need to
+manipulate a <tt class="docutils literal"><span class="pre">SearchSite</span></tt>. There are two ways to go about this, via either
+<tt class="docutils literal"><span class="pre">register</span></tt> or <tt class="docutils literal"><span class="pre">unregister</span></tt>.</p>
+<p>If you want most of the indexes but want to forgo a specific one(s), you can
+setup the main <tt class="docutils literal"><span class="pre">site</span></tt> via <tt class="docutils literal"><span class="pre">autodiscover</span></tt> then simply unregister the one(s)
+you don&#8217;t want.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">haystack</span>
+<span class="n">haystack</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
+
+<span class="c"># Unregister the Rating index.</span>
+<span class="kn">from</span> <span class="nn">ratings.models</span> <span class="kn">import</span> <span class="n">Rating</span>
+<span class="n">haystack</span><span class="o">.</span><span class="n">sites</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">Rating</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, you can manually register only the indexes you want.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">haystack</span> <span class="kn">import</span> <span class="n">site</span>
+<span class="kn">from</span> <span class="nn">ratings.models</span> <span class="kn">import</span> <span class="n">Rating</span>
+<span class="kn">from</span> <span class="nn">ratings.search_indexes</span> <span class="kn">import</span> <span class="n">RatingIndex</span>
+
+<span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Rating</span><span class="p">,</span> <span class="n">RatingIndex</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="method-reference">
+<h2>Method Reference<a class="headerlink" href="#method-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="register">
+<h3><tt class="docutils literal"><span class="pre">register</span></tt><a class="headerlink" href="#register" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.register">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">register</tt><big>(</big><em>self</em>, <em>model</em>, <em>index_class=None</em><big>)</big><a class="headerlink" href="#SearchSite.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Registers a model with the site.</p>
+<p>The model should be a Model class, not instances.</p>
+<p>If no custom index is provided, a generic SearchIndex will be applied
+to the model.</p>
+</div>
+<div class="section" id="unregister">
+<h3><tt class="docutils literal"><span class="pre">unregister</span></tt><a class="headerlink" href="#unregister" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.unregister">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">unregister</tt><big>(</big><em>self</em>, <em>model</em><big>)</big><a class="headerlink" href="#SearchSite.unregister" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Unregisters a model&#8217;s corresponding index from the site.</p>
+</div>
+<div class="section" id="get-index">
+<h3><tt class="docutils literal"><span class="pre">get_index</span></tt><a class="headerlink" href="#get-index" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.get_index">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">get_index</tt><big>(</big><em>self</em>, <em>model</em><big>)</big><a class="headerlink" href="#SearchSite.get_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides the index that&#8217;s registered for a particular model.</p>
+</div>
+<div class="section" id="get-indexes">
+<h3><tt class="docutils literal"><span class="pre">get_indexes</span></tt><a class="headerlink" href="#get-indexes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.get_indexes">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">get_indexes</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchSite.get_indexes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides a dictionary of all indexes that&#8217;re being used.</p>
+</div>
+<div class="section" id="get-indexed-models">
+<h3><tt class="docutils literal"><span class="pre">get_indexed_models</span></tt><a class="headerlink" href="#get-indexed-models" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.get_indexed_models">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">get_indexed_models</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchSite.get_indexed_models" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides a list of all models being indexed.</p>
+</div>
+<div class="section" id="all-searchfields">
+<h3><tt class="docutils literal"><span class="pre">all_searchfields</span></tt><a class="headerlink" href="#all-searchfields" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.all_searchfields">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">all_searchfields</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#SearchSite.all_searchfields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Builds a dictionary of all fields appearing in any of the <cite>SearchIndex</cite>
+instances registered with a site.</p>
+<p>This is useful when building a schema for an engine. A dictionary is
+returned, with each key being a fieldname (or index_fieldname) and the
+value being the <cite>SearchField</cite> class assigned to it.</p>
+</div>
+<div class="section" id="update-object">
+<h3><tt class="docutils literal"><span class="pre">update_object</span></tt><a class="headerlink" href="#update-object" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.update_object">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">update_object</tt><big>(</big><em>self</em>, <em>instance</em><big>)</big><a class="headerlink" href="#SearchSite.update_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Updates the instance&#8217;s data in the index.</p>
+<p>A shortcut for updating on the instance&#8217;s index. Errors from <cite>get_index</cite>
+and <cite>update_object</cite> will be allowed to propogate.</p>
+</div>
+<div class="section" id="remove-object">
+<h3><tt class="docutils literal"><span class="pre">remove_object</span></tt><a class="headerlink" href="#remove-object" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="SearchSite.remove_object">
+<tt class="descclassname">SearchSite.</tt><tt class="descname">remove_object</tt><big>(</big><em>self</em>, <em>instance</em><big>)</big><a class="headerlink" href="#SearchSite.remove_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Removes the instance&#8217;s data in the index.</p>
+<p>A shortcut for removing on the instance&#8217;s index. Errors from <cite>get_index</cite>
+and <cite>remove_object</cite> will be allowed to propogate.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">SearchSite</span></tt> API</a><ul>
+<li><a class="reference internal" href="#autodiscovery">Autodiscovery</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#method-reference">Method Reference</a><ul>
+<li><a class="reference internal" href="#register"><tt class="docutils literal"><span class="pre">register</span></tt></a></li>
+<li><a class="reference internal" href="#unregister"><tt class="docutils literal"><span class="pre">unregister</span></tt></a></li>
+<li><a class="reference internal" href="#get-index"><tt class="docutils literal"><span class="pre">get_index</span></tt></a></li>
+<li><a class="reference internal" href="#get-indexes"><tt class="docutils literal"><span class="pre">get_indexes</span></tt></a></li>
+<li><a class="reference internal" href="#get-indexed-models"><tt class="docutils literal"><span class="pre">get_indexed_models</span></tt></a></li>
+<li><a class="reference internal" href="#all-searchfields"><tt class="docutils literal"><span class="pre">all_searchfields</span></tt></a></li>
+<li><a class="reference internal" href="#update-object"><tt class="docutils literal"><span class="pre">update_object</span></tt></a></li>
+<li><a class="reference internal" href="#remove-object"><tt class="docutils literal"><span class="pre">remove_object</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="searchresult_api.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">SearchResult</span></tt> API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="searchquery_api.html"
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">SearchQuery</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/searchsite_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="searchquery_api.html" title="SearchQuery API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="searchresult_api.html" title="SearchResult API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

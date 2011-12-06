@@ -56,7 +56,7 @@ class Migration:
         },
         'customs.bugzillaurl': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'tracker': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['customs.BugzillaTracker']"}),
+            'tracker': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['customs.BugzillaTracker']", 'null': True}),
             'url': ('django.db.models.fields.URLField', [], {'unique': 'True', 'max_length': '200'})
         },
         'customs.recentmessagefromcia': {

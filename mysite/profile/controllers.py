@@ -18,14 +18,15 @@
 
 import os.path
 import hashlib
-from itertools import izip, cycle, islice
+from itertools import cycle, islice
 
-import simplejson
+from django.utils import simplejson
 
 import pygeoip
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Q
 
 import logging
 import mysite.search.controllers
@@ -35,6 +36,10 @@ import mysite.profile.models
 import mysite.base.decorators
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
+
+# Name constants
+SUGGESTION_COUNT = 6
+DEFAULT_CACHE_TIMESPAN = 86400 * 7
 
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
@@ -77,14 +82,14 @@ class RecommendBugs(object):
     @mysite.base.decorators.cache_method('get_cache_key')
     def _recommend_as_list(self):
         return list(self._recommend_as_generator())
-    
+
     def _recommend_as_generator(self):
         '''Input: A list of terms, like ['Python', 'C#'], designed for use in the search engine.
 
         I am a generator that yields Bug objects.
         I yield up to n Bugs in a round-robin fashion.
         I don't yield a Bug more than once.'''
-        
+
         distinct_ids = set()
 
         lists_of_bugs = [
@@ -103,42 +108,36 @@ class RecommendBugs(object):
             distinct_ids.add(bug.id)
             yield bug.id
 
-class PeopleMatcher(object):
-    def get_cache_key(self, *args, **kwargs):
-        keys = (mysite.base.models.Timestamp.get_timestamp_for_string(
-            str(mysite.profile.models.Link_Person_Tag)),
-                args)
-        return hashlib.sha1(repr(keys)).hexdigest()
-
-    def people_matching(self, property, value):
-        return mysite.profile.models.Person.objects.filter(
-            pk__in=self._people_matching_ids(property, value))
-
-    @mysite.base.decorators.cache_method('get_cache_key')
-    def _people_matching_ids(self, property, value):
-        links = mysite.profile.models.Link_Person_Tag.objects.filter(
-            tag__tag_type__name=property, tag__text__iexact=value)
-        peeps = [l.person for l in links]
-        sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-        return [person.id for person in sorted_peeps]
-
-_pm = PeopleMatcher()
-people_matching = _pm.people_matching
-
 geoip_database = None
+def geoip_city_database_available():
+    return os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH)
+
 def get_geoip_guess_for_ip(ip_as_string):
     # initialize database
     global geoip_database
     if geoip_database is None:
-        # FIXME come up with reliable path place
-        try:
-            geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
-                                                        '../../downloads/GeoLiteCity.dat'))
-        except IOError:
-            logging.warn("Uh, we could not find the GeoIP database.")
-            return False, u''
-    
-    all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
+        system_geoip_path = '/usr/share/GeoIP/GeoIP.dat'
+        downloaded_geolitecity_path = os.path.join(
+            settings.MEDIA_ROOT,
+            '../../downloads/GeoLiteCity.dat')
+        if os.path.exists(system_geoip_path):
+            geoip_database = pygeoip.GeoIP(system_geoip_path)
+        if os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH):
+            geoip_database = pygeoip.GeoIP(downloaded_geolitecity_path)
+
+    if geoip_database is None: # still?
+        logging.warn("Uh, we could not find the GeoIP database.")
+        return False, u''
+
+    # First, get the country. This works on both the GeoCountry
+    # and the GeoLiteCity database.
+    country_name = geoip_database.country_name_by_addr(ip_as_string)
+
+    # Try to increase our accuracy if we have the GeoLiteCity database.
+    try:
+        all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
+    except pygeoip.GeoIPError:
+        return True, unicode(country_name, 'latin-1')
 
     if all_data_about_this_ip is None:
         return False, ''
@@ -188,7 +187,25 @@ def parse_string_query(s):
     # that directly match the input, provide that info to the template.
     parsed.update(provide_project_query_hint(parsed))
 
+    # Add a key to the structure called "callable_searcher" -- upon calling
+    # this, you can access its .people and .template_data values.
+    def callable_searcher(query_type=parsed['query_type'], search_string=parsed['q']):
+        return _query2results(query_type, search_string)
+    parsed['callable_searcher'] = callable_searcher
     return parsed
+
+def _query2results(query_type, search_string):
+    if query_type == 'project':
+        return ProjectQuery(search_string=search_string)
+
+    if query_type == 'icanhelp':
+        return WannaHelpQuery(search_string=search_string)
+
+    if query_type == 'all_tags':
+        return AllTagsQuery(search_string=search_string)
+
+    return TagQuery(tag_short_name=query_type,
+                    search_string=search_string)
 
 ### This is a helper used by the map to pull out just the information that the map can use
 def get_person_data_for_map(person, include_latlong=False):
@@ -267,4 +284,146 @@ def provide_project_query_hint(parsed_query):
 
     return output_dict
 
+def get_most_popular_projects():
+    # FIXME: This code is presumably terrible.
+    key_name = 'most_popular_projects_last_flushed_on_20100325'
+    popular_projects = cache.get(key_name)
+    if popular_projects is None:
+        projects = mysite.search.models.Project.objects.all()
+        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
+        #extract just the names from the projects
+        popular_projects = [project.name for project in popular_projects]
+        # cache it for a week
+        cache.set(key_name, popular_projects, DEFAULT_CACHE_TIMESPAN)
+    return popular_projects
+
+def get_matching_project_suggestions(search_text):
+    # FIXME: This code is presumably terrible.
+    mps1 = mysite.search.models.Project.objects.filter(
+        cached_contributor_count__gt=0, name__icontains=search_text).filter(
+        ~Q(name__iexact=search_text)).order_by(
+            '-cached_contributor_count')
+    mps2 = mysite.search.models.Project.objects.filter(
+            cached_contributor_count__gt=0, display_name__icontains=search_text).filter(
+            ~Q(name__iexact=search_text)).order_by(
+                '-cached_contributor_count')
+    return mps1 | mps2
+
+def get_most_popular_tags():
+    # FIXME: This code is presumably terrible.
+    key_name = 'most_popular_tags'
+    popular_tags = cache.get(key_name)
+    if popular_tags is None:
+        # to get the most popular tags:
+        # get all tags
+        # order them by the number of people that list them
+        # remove duplicates
+        # lowercase them all and then remove duplicates
+        # take the popular ones
+        # cache it for a week
+        popular_tags = [] # FIXME: I removed the implementation of this.
+        cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
+    return popular_tags
+
+### This code finds the right people to show on /people/, gathering a list
+### of people and optional extra template data for the map.
+class PeopleFinder(object):
+    '''Subclasses of PeopleFinder take a query string as the only argument
+    to __init__.py, and they create the self.template_data and self.people
+    attributes.'''
+    def __init__(self, search_string):
+        raise NotImplementedError
+
+    def get_person_instances_from_person_ids(self, person_ids):
+        return mysite.profile.models.Person.objects.filter(
+            pk__in=person_ids).select_related().order_by('user__username')
+
+    def calculate_project(self, search_string):
+        orm_projects = mysite.search.models.Project.objects.filter(name__iexact=search_string)
+        if orm_projects:
+            self.project = orm_projects[0]
+            self.template_data['queried_project'] = self.project
+        else:
+            self.project = None
+            self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
+
+    def add_query_summary(self):
+        raise NotImplementedError
+
+class WannaHelpQuery(PeopleFinder):
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.calculate_project(search_string)
+        self.people = []
+        if self.project:
+            self.people = self.project.people_who_wanna_help.all()
+        self.add_query_summary()
+
+    def add_query_summary(self):
+        self.template_data['this_query_summary'] = 'willing to contribute to the project '
+        self.template_data['query_is_a_project_name'] = True
+
+class TagQuery(PeopleFinder):
+    # FIXME: Probably we should add a add_query_summary() method.
+    def __init__(self, tag_short_name, search_string):
+        self.template_data = {}
+        self.people = []
+        tag_type = self.get_tag_type(tag_short_name)
+        if tag_type:
+            self.people = self.get_persons_by_tag_type_and_text(
+                tag_type, search_string)
+
+    def get_tag_type(self, tag_short_name):
+        tag_types = mysite.profile.models.TagType.objects.filter(name=tag_short_name)
+        if not tag_types:
+            return None
+        return tag_types[0]
+
+    def get_persons_by_tag_type_and_text(self, tag_type, search_string):
+        tag_ids = mysite.profile.models.Tag.objects.filter(
+            tag_type=tag_type, text__iexact=search_string).values_list('id', flat=True)
+        person_ids = mysite.profile.models.Link_Person_Tag.objects.filter(
+            tag__id__in=tag_ids).values_list('person_id', flat=True)
+        return self.get_person_instances_from_person_ids(person_ids)
+
+class AllTagsQuery(PeopleFinder):
+    # FIXME: Probably we should add a add_query_summary() method.
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.people = []
+        self.people = self.get_persons_by_tag_text(
+            search_string)
+
+    def get_persons_by_tag_text(self, search_string):
+        tag_ids = mysite.profile.models.Tag.objects.filter(
+            text__iexact=search_string).values_list('id', flat=True)
+        person_ids = mysite.profile.models.Link_Person_Tag.objects.filter(
+            tag__id__in=tag_ids).values_list('person_id', flat=True)
+        return self.get_person_instances_from_person_ids(person_ids)
+
+class ProjectQuery(PeopleFinder):
+    def __init__(self, search_string):
+        self.template_data = {}
+        self.people = []
+        # We never got faceting working properly with Haystack, while doing
+        # exact searches, so we do the queries via the ORM.
+
+        self.calculate_project(search_string)
+        self.add_query_summary()
+
+        if self.project:
+            self.calculate_people_for_project()
+            self.add_wanna_help_count()
+
+    def calculate_people_for_project(self):
+        person_ids = mysite.profile.models.PortfolioEntry.published_ones.filter(
+            project=self.project).values_list('person_id', flat=True)
+        self.people = self.get_person_instances_from_person_ids(person_ids)
+
+    def add_wanna_help_count(self):
+        self.template_data['icanhelp_count'] = self.project.people_who_wanna_help.count()
+
+    def add_query_summary(self):
+        self.template_data['this_query_summary'] = 'who have contributed to '
+        self.template_data['query_is_a_project_name'] = True
 

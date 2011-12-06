@@ -29,6 +29,7 @@ from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
 from mysite.customs import ohloh
 import mysite.customs.views
+import mysite.base.depends
 
 from django.core.urlresolvers import reverse
 
@@ -37,7 +38,6 @@ import mock
 import os
 import time
 import twill
-import lxml
 import urlparse
 
 import django.test
@@ -57,10 +57,10 @@ import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
 
+from django.utils.unittest import skipIf
+
 import mysite.customs.models
 import mysite.customs.bugimporters.trac
-import mysite.customs.bugtrackers.roundup
-import mysite.customs.bugtrackers.launchpad
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
@@ -168,15 +168,17 @@ def twill_quiet():
     twill.set_output(StringIO())
 # }}}
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
+
+    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
         icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
+        image = mysite.base.depends.Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
 
     def test_ohloh_errors_on_nonexistent_project(self):
@@ -217,6 +219,7 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -267,6 +270,7 @@ class ImportFromDebianQA(django.test.TestCase):
     def test_404(self):
         pass # uhhh
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class LaunchpadProfileImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -332,6 +336,7 @@ class LaunchpadProfileImport(django.test.TestCase):
         # And Asheesh should have no new projects available.
         self.assertFalse(mysite.profile.models.Citation.objects.all())
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class ImportFromBitbucket(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -386,6 +391,7 @@ class ImportFromBitbucket(django.test.TestCase):
             "Fix crash in kwallet handling code",
             self.long_kwallet_thing.portfolio_entry.project_description)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestAbstractOhlohAccountImporter(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -484,6 +490,7 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         self.assertEqual(1, len(output))
         self.assertEqual(17, output[0]['analysis_id'])
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestOhlohRepositorySearch(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -519,6 +526,7 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         self.assertEqual(projects,
                          set([u'Creative Commons search engine', u'ccHost']))
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestOhlohAccountImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -551,6 +559,7 @@ class TestOhlohAccountImport(django.test.TestCase):
         self.assertEqual(set(['Debian GNU/Linux', 'ccHost']),
                          projects)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -563,246 +572,7 @@ class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(
             person=asheesh, source='oh', query='paulproteus.ohloh@asheesh.org')
 
-############################################################
-# Generator of sub-classes from data
-
-def generate_bugzilla_tracker_classes(tracker_name=None):
-    # If a tracker name was passed in then return the
-    # specific sub-class for that tracker.
-    if tracker_name:
-        try:
-            bt = mysite.customs.models.BugzillaTrackerModel.all_trackers.get(tracker_name=tracker_name)
-            bt_class = mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
-        except mysite.customs.models.BugzillaTrackerModel.DoesNotExist:
-            bt_class = None
-        yield bt_class
-        return
-    else:
-        # Create a generator that yields all sub-classes.
-        for bt in mysite.customs.models.BugzillaTrackerModel.all_trackers.all():
-            yield mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(bt)
-
-class BugzillaTests(django.test.TestCase):
-    fixtures = ['miro-project']
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_kde(self, mock_xml_opener):
-        Project.create_dummy(name='kmail')
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
-        kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
-        kde.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        self.assertEqual(bug.submitter_username, 'hasso kde org')
-        self.assertEqual(bug.submitter_realname, 'Hasso Tepper')
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_kde_harder_bug(self, mock_xml_opener):
-        Project.create_dummy(name='kphotoalbum')
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'kde-182054-2010-04-09.xml')).read())
-        kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
-        kde.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        self.assertEqual(bug.submitter_username, 'jedd progsoc org')
-        self.assertEqual(bug.submitter_realname, '')
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_miro_bug_object(self, mock_xml_opener):
-        # Parse XML document as if we got it from the web
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-
-        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
-                tracker_name='Miro',
-                base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{tracker_name}',
-                query_url_type='xml',
-                bitesized_type='key',
-                bitesized_text='bitesized',
-                documentation_type='key',
-                )
-        miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
-                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                tracker=miro_tracker,
-                )
-        miro_tracker_query_url.save()
-        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
-        miro = gen_miro.next()
-        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
-        miro_instance = miro()
-        miro_instance.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        self.assertEqual(bug.project.name, 'Miro')
-        self.assertEqual(bug.title, "Add test for torrents that use gzip'd urls")
-        self.assertEqual(bug.description, """This broke. We should make sure it doesn't break again.
-Trac ticket id: 2294
-Owner: wguaraldi
-Reporter: nassar
-Keywords: Torrent unittest""")
-        self.assertEqual(bug.status, 'NEW')
-        self.assertEqual(bug.importance, 'normal')
-        self.assertEqual(bug.people_involved, 5)
-        self.assertEqual(bug.date_reported, datetime.datetime(2006, 6, 9, 12, 49))
-        self.assertEqual(bug.last_touched, datetime.datetime(2008, 6, 11, 23, 56, 27))
-        self.assertEqual(bug.submitter_username, 'nassar@pculture.org')
-        self.assertEqual(bug.submitter_realname, 'Nick Nassar')
-        self.assertEqual(bug.canonical_bug_link, 'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
-        self.assert_(bug.good_for_newcomers)
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_miro_bugs(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-
-        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
-                tracker_name='Miro',
-                base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{tracker_name}',
-                query_url_type='xml',
-                bitesized_type='key',
-                bitesized_text='bitesized',
-                documentation_type='key',
-            )
-        miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
-                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                tracker=miro_tracker,
-                )
-        miro_tracker_query_url.save()
-        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
-        miro = gen_miro.next()
-        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
-        miro_instance = miro()
-        miro_instance.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        self.assertEqual(bug.canonical_bug_link,
-                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
-        self.assertFalse(bug.looks_closed)
-
-        # And the new manager does find it
-        self.assertEqual(Bug.open_ones.all().count(), 1)
-
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_miro_bugzilla_detects_closedness(self, mock_xml_opener):
-        cooked_xml = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data',
-            'miro-2294-2009-08-06.xml')).read().replace(
-            'NEW', 'CLOSED')
-        mock_xml_opener.return_value = lxml.etree.XML(cooked_xml)
-
-        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
-                tracker_name='Miro',
-                base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{tracker_name}',
-                query_url_type='xml',
-                bitesized_type='key',
-                bitesized_text='bitesized',
-                documentation_type='key',
-                )
-        miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
-                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                tracker=miro_tracker
-                )
-        miro_tracker_query_url.save()
-        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
-        miro = gen_miro.next()
-        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
-        miro_instance = miro()
-        miro_instance.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        self.assertEqual(bug.canonical_bug_link,
-                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
-        self.assert_(bug.looks_closed)
-
-        # And the new manager successfully does NOT find it!
-        self.assertEqual(Bug.open_ones.all().count(), 0)
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_resolved_miro_bug(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
-
-        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
-                tracker_name='Miro',
-                base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{tracker_name}',
-                query_url_type='xml',
-                bitesized_type='key',
-                bitesized_text='bitesized',
-                documentation_type='key',
-                )
-        miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
-                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                tracker=miro_tracker
-                )
-        miro_tracker_query_url.save()
-        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
-        miro = gen_miro.next()
-        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
-        miro_instance = miro()
-        miro_instance.update()
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        self.assertEqual(bug.canonical_bug_link,
-                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
-        self.assert_(bug.looks_closed)
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
-                tracker_name='Miro',
-                base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{tracker_name}',
-                query_url_type='xml',
-                bitesized_type='key',
-                bitesized_text='bitesized',
-                documentation_type='key',
-                )
-        miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
-                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                tracker=miro_tracker
-                )
-        miro_tracker_query_url.save()
-        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro')
-        miro = gen_miro.next()
-        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
-        miro_instance = miro()
-        miro_instance.update()
-
-        # Pretend there's old data lying around:
-        bug = Bug.all_bugs.get()
-        bug.people_involved = 1
-        bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
-        bug.save()
-
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-
-        # Now refresh
-        miro_instance.update()
-
-        # Now verify there is only one bug, and its people_involved is 5
-        bug = Bug.all_bugs.get()
-        self.assertEqual(bug.people_involved, 5)
-
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestCustomBugParser(django.test.TestCase):
     ### First, test that if we create the bug importer correctly, the
     ### right thing would happen.
@@ -820,7 +590,7 @@ class TestCustomBugParser(django.test.TestCase):
 
     @mock.patch('mysite.customs.bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data')
     def test_kdebugparser_uses_tracker_specific_method(self, mock_specific):
-        bugzilla_data = lxml.etree.XML(open(os.path.join(
+        bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
                     settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         bug_data = bugzilla_data.xpath('bug')[0]
 
@@ -856,6 +626,7 @@ class TestCustomBugParser(django.test.TestCase):
         importer = twister._get_importer_instance_for_tracker_model(None)
         self.assertTrue(importer)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BugzillaBugImporterTests(django.test.TestCase):
     fixtures = ['miro-project']
     def setUp(self):
@@ -979,6 +750,7 @@ Keywords: Torrent unittest""")
         bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
@@ -1002,6 +774,7 @@ def raise_504(*args, **kwargs):
     raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
 mock_browser_open = mock.Mock()
 mock_browser_open.side_effect = raise_504
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class UserGetsMessagesDuringImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -1015,6 +788,7 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class RoundupBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1088,6 +862,7 @@ the module to the output. (Long live lambda.)""")
         time.sleep(2)
         self.test_new_mercurial_bug_import(second_run=True)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class RoundupBugsFromPythonProjectTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1137,6 +912,7 @@ sample_launchpad_data_snapshot.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
+@skipIf(True, "Disabling old-style Launchpad tests.")
 class AutoCrawlTests(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project',
                 sample_launchpad_data_snapshot)
@@ -1166,6 +942,7 @@ class AutoCrawlTests(django.test.TestCase):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
+@skipIf(True, "Disabling old-style Launchpad tests.")
 class LaunchpadImporterTests(django.test.TestCase):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
@@ -1290,6 +1067,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
+@skipIf(True, "Disabling old-style Launchpad tests.")
 class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
     def test(self):
         '''Start with a bug that is "Fix Released"
@@ -1332,6 +1110,7 @@ class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
             lp_data_dict)
         self.assertEqual(new_data['status'], 'Unknown')
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
@@ -1400,234 +1179,7 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
-def tracbug_tests_extract_tracker_specific_data(trac_data, ret_dict):
-    # Make modifications to ret_dict using provided metadata
-    # Check for the bitesized keyword
-    ret_dict['bite_size_tag_name'] = 'easy'
-    ret_dict['good_for_newcomers'] = ('easy' in trac_data['keywords'])
-    # Then pass ret_dict back
-    return ret_dict
-
-class TracBug(django.test.TestCase):
-    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
-    def test_create_bug_object_data_dict_more_recent(self, m):
-        m.return_value = {
-            'branch': '',
-            'branch_author': '',
-            'cc': 'thijs_ exarkun',
-            'component': 'core',
-            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-            'id': '4298',
-            'keywords': 'easy',
-            'launchpad_bug': '',
-            'milestone': '',
-            'owner': 'djfroofy',
-            'priority': 'normal',
-            'reporter': 'thijs',
-            'resolution': '',
-            'status': 'new',
-            'summary': 'Deprecate twisted.persisted.journal',
-            'type': 'task'}
-        tb = mysite.customs.bugtrackers.trac.TracBug(
-            bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
-        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
-        tb._bug_html_page = unicode(
-            open(cached_html_filename).read(), 'utf-8')
-        self.assertEqual(tb.component, 'core')
-
-        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
-        del got['last_polled']
-        wanted = {'title': 'Deprecate twisted.persisted.journal',
-                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-                  'status': 'new',
-                  'importance': 'normal',
-                  'people_involved': 4,
-                  # FIXME: Need time zone
-                  'date_reported': datetime.datetime(2010, 2, 23, 0, 46, 30),
-                  'last_touched': datetime.datetime(2010, 3, 12, 18, 43, 5),
-                  'looks_closed': False,
-                  'submitter_username': 'thijs',
-                  'submitter_realname': '',
-                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
-                  'good_for_newcomers': True,
-                  'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
-                  'concerns_just_documentation': False,
-                  'as_appears_in_distribution': '',
-                  }
-        self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
-    def test_create_bug_object_data_dict(self, m):
-        m.return_value = {
-            'branch': '',
-            'branch_author': '',
-            'cc': 'thijs_ exarkun',
-            'component': 'core',
-            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-            'id': '4298',
-            'keywords': 'easy',
-            'launchpad_bug': '',
-            'milestone': '',
-            'owner': 'djfroofy',
-            'priority': 'normal',
-            'reporter': 'thijs',
-            'resolution': '',
-            'status': 'new',
-            'summary': 'Deprecate twisted.persisted.journal',
-            'type': 'task'}
-        tb = mysite.customs.bugtrackers.trac.TracBug(
-            bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
-        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298.html')
-        tb._bug_html_page = unicode(
-            open(cached_html_filename).read(), 'utf-8')
-
-        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
-        del got['last_polled']
-        wanted = {'title': 'Deprecate twisted.persisted.journal',
-                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-                  'status': 'new',
-                  'importance': 'normal',
-                  'people_involved': 5,
-                  # FIXME: Need time zone
-                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
-                  'last_touched': datetime.datetime(2010, 2, 24, 0, 8, 47),
-                  'looks_closed': False,
-                  'submitter_username': 'thijs',
-                  'submitter_realname': '',
-                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
-                  'good_for_newcomers': True,
-                  'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
-                  'concerns_just_documentation': False,
-                  'as_appears_in_distribution': '',
-                  }
-        self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
-    def test_create_bug_that_lacks_modified_date(self, m):
-        m.return_value = {
-            'branch': '',
-            'branch_author': '',
-            'cc': 'thijs_ exarkun',
-            'component': 'core',
-            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-            'id': '4298',
-            'keywords': 'easy',
-            'launchpad_bug': '',
-            'milestone': '',
-            'owner': 'djfroofy',
-            'priority': 'normal',
-            'reporter': 'thijs',
-            'resolution': '',
-            'status': 'new',
-            'summary': 'Deprecate twisted.persisted.journal',
-            'type': 'task'}
-        tb = mysite.customs.bugtrackers.trac.TracBug(
-            bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
-        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified.html')
-        tb._bug_html_page = unicode(
-            open(cached_html_filename).read(), 'utf-8')
-
-        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
-        del got['last_polled']
-        wanted = {'title': 'Deprecate twisted.persisted.journal',
-                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-                  'status': 'new',
-                  'importance': 'normal',
-                  'people_involved': 5,
-                  # FIXME: Need time zone
-                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
-                  'last_touched': datetime.datetime(2010, 2, 22, 19, 46, 30),
-                  'looks_closed': False,
-                  'submitter_username': 'thijs',
-                  'submitter_realname': '',
-                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
-                  'good_for_newcomers': True,
-                  'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
-                  'concerns_just_documentation': False,
-                  'as_appears_in_distribution': '',
-                  }
-        self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
-    def test_create_bug_that_lacks_modified_date_and_uses_owned_by_instead_of_assigned_to(self, m):
-        m.return_value = {
-            'branch': '',
-            'branch_author': '',
-            'cc': 'thijs_ exarkun',
-            'component': 'core',
-            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-            'id': '4298',
-            'keywords': 'easy',
-            'launchpad_bug': '',
-            'milestone': '',
-            'owner': 'djfroofy',
-            'priority': 'normal',
-            'reporter': 'thijs',
-            'resolution': '',
-            'status': 'new',
-            'summary': 'Deprecate twisted.persisted.journal',
-            'type': 'task'}
-        tb = mysite.customs.bugtrackers.trac.TracBug(
-            bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
-        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified-using-owned-instead-of-assigned.html')
-        tb._bug_html_page = unicode(
-            open(cached_html_filename).read(), 'utf-8')
-
-        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
-        del got['last_polled']
-        wanted = {'title': 'Deprecate twisted.persisted.journal',
-                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
-                  'status': 'new',
-                  'importance': 'normal',
-                  'people_involved': 5,
-                  # FIXME: Need time zone
-                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
-                  'last_touched': datetime.datetime(2010, 2, 22, 19, 46, 30),
-                  'looks_closed': False,
-                  'submitter_username': 'thijs',
-                  'submitter_realname': '',
-                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
-                  'good_for_newcomers': True,
-                  'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
-                  'concerns_just_documentation': False,
-                  'as_appears_in_distribution': '',
-                  }
-        self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
-    def test_create_bug_that_has_new_date_format(self, m):
-        m.return_value = {
-                  'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
-                  'status': 'new',
-                  'keywords': '',
-                  'summary': 'Show line numbers when embedding source code in wiki pages',
-                  'priority': '',
-                  'reporter': 'erik@\xe2\x80\xa6',
-                  'id': '3275'}
-        tb = mysite.customs.bugtrackers.trac.TracBug(
-            bug_id=3275,
-            BASE_URL='http://trac.edgewall.org/')
-        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'trac-3275.html')
-        tb._bug_html_page = unicode(
-            open(cached_html_filename).read(), 'utf-8')
-
-        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
-        del got['last_polled']
-        wanted = {'status': 'new', 'as_appears_in_distribution': '',
-                  'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
-                  'importance': '', 'bite_size_tag_name': 'easy', 'canonical_bug_link': 'http://trac.edgewall.org/ticket/3275', 'date_reported': datetime.datetime(2006, 6, 16, 15, 1, 52),
-                  'submitter_realname': '', 'title': 'Show line numbers when embedding source code in wiki pages', 'people_involved': 3, 'last_touched': datetime.datetime(2010, 11, 26, 13, 45, 45),
-                  'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
-        self.assertEqual(wanted, got)
-
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TracBugParser(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1856,6 +1408,7 @@ class TracBugParser(django.test.TestCase):
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TracBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1944,6 +1497,7 @@ class TracBugImporterTests(django.test.TestCase):
         cmd.handle(use_reactor=False)
         self.assert_(Bug.all_bugs.count() == 0)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 
@@ -1985,23 +1539,6 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []
 
-class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
-    def test_url_is_more_fresh_than_one_day(self):
-        # What the heck, let's demo this function out with the Songbird documentation query.
-        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---'
-        originally_not_fresh = mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL)
-        self.assertFalse(originally_not_fresh)
-        # But now it should be fresh!
-        self.assert_(mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL))
-
-    def test_url_is_more_fresh_than_one_day_with_really_long_url(self):
-        # What the heck, let's demo this function out with the Songbird documentation query.
-        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---&look=at_me_I_am_really_long_oh_no_what_will_we_do&really=long_very_long_yes_long_so_long_you_will_fall_asleep_of_boredom_reading_this&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong'
-        originally_not_fresh = mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL)
-        self.assertFalse(originally_not_fresh)
-        # But now it should be fresh!
-        self.assert_(mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL))
-
 def do_list_of_work(l):
     '''Some helper methods in mysite.customs.management.commands.customs_daily_tasks
        return a list of worker functions to call. This wrapper simply executes all
@@ -2009,6 +1546,7 @@ def do_list_of_work(l):
     for thing in l:
         thing()
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class GoogleCodeBugImporter(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -2212,6 +1750,7 @@ I don't see for example the solvers module""",
                   }
         self.assertEqual(wanted, got)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class DataExport(django.test.TestCase):
     def test_snapshot_user_table_without_passwords(self):
         # We'll pretend we're running the snapshot_public_data management command. But
@@ -2505,6 +2044,7 @@ class DataExport(django.test.TestCase):
 
 # vim: set nu:
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestOhlohAccountImportWithException(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2535,39 +2075,7 @@ class TestOhlohAccountImportWithException(django.test.TestCase):
 
         self.assertTrue(all(d.completed for d in mysite.profile.models.DataImportAttempt.objects.all()))
 
-class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCase):
-
-    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def setUp(self, mock_xml_opener):
-        # This is a lot of jiggery-pokery to create a BugzillaTrackerModel
-        # corresponding to Miro.  In the actual test, we mock out the
-        # network activity so that when we download bug data, we use
-        # data from a file.
-        #
-        # This setUp() method creates self.miro_instance, which is an
-        # instance of the Miro BugzillaTrackerModel model.
-        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
-                    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-
-        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
-                tracker_name='Miro video player',
-                base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{tracker_name}',
-                query_url_type='xml',
-                bitesized_type='key',
-                bitesized_text='bitesized',
-                documentation_type='key',
-            )
-        miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
-                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                tracker=miro_tracker,
-                )
-        miro_tracker_query_url.save()
-        gen_miro = generate_bugzilla_tracker_classes(tracker_name='Miro video player')
-        miro = gen_miro.next()
-        self.miro_instance = miro()
-
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BugTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2584,6 +2092,7 @@ class BugTrackerEditingViews(TwillTests):
         self.assertEqual(self.twisted,
                          response.context['tracker_form'].initial['created_for_project'])
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BugzillaTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

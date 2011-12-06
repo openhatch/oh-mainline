@@ -24,11 +24,10 @@
 import StringIO
 import datetime
 import urllib
-import simplejson
+from django.utils import simplejson
 import re
 import collections
 import logging
-import os.path
 
 # Django
 from django.template.loader import render_to_string
@@ -40,13 +39,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-
-# Haystack
-import haystack.query
+import django.views.generic
 
 # OpenHatch apps
 import mysite.base.controllers
@@ -64,9 +58,6 @@ import mysite.profile.tasks
 from mysite.base.helpers import render_response
 
 # }}}
-
-# Name constants
-SUGGESTION_COUNT = 6
 
 @login_required
 def add_citation_manually_do(request):
@@ -344,10 +335,6 @@ def edit_person_info_do(request):
 
     person.save()
 
-    # Enqueue a background task to re-index the person
-    task = mysite.profile.tasks.ReindexPerson()
-    task.delay(person_id=person.id)
-
     if errors_occurred:
         return edit_info(request,
                          edit_info_form=edit_info_form,
@@ -390,225 +377,6 @@ def permanent_redirect_to_people_search(request, property, value):
                        mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
-def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
-    # ask haystack...
-    tag_type_according_to_haystack = tag_type_short_name + "_lowercase_exact"
-    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-    mappable_people_from_haystack = mappable_people_from_haystack.filter(**{
-            tag_type_according_to_haystack: parsed_query['q'].lower()})
-
-    mappable_people = mysite.base.controllers.haystack_results2db_objects(
-        mappable_people_from_haystack)
-
-    ### and sort it the way everyone expects
-    mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())
-
-    return mappable_people, {}
-
-def all_tags_query2mappable_orm_people(parsed_query):
-    # do three queries...
-    # the values are set()s containing ID numbers of Django ORM Person objects
-    queries_in_order = ['can_mentor_lowercase_exact',
-                        'can_pitch_in_lowercase_exact',
-                        'understands_lowercase_exact']
-    query2results = {queries_in_order[0]: set(),
-                     queries_in_order[1]: set(),
-                     queries_in_order[2]: set()}
-    for query in query2results:
-        # ask haystack...
-        mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-        mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q'].lower()})
-
-        results = mysite.base.controllers.haystack_results2db_objects(
-            mappable_people_from_haystack)
-        query2results[query] = results
-
-        ### mappable_people
-        mappable_people_set = set()
-        for result_set in query2results.values():
-            mappable_people_set.update(result_set)
-
-        ### and sort it the way everyone expects
-        mappable_people = sorted(mappable_people_set, key=lambda p: p.user.username.lower())
-
-        ### Justify your existence time: Why is each person a valid match?
-        for person in mappable_people:
-            person.reasons = [query for query in queries_in_order
-                              if person in query2results[query]]
-
-            # now we have to clean this up. First, remove teh _lowercase_exact from the end
-            person.reasons = [ s.replace('_lowercase_exact', '') for s in person.reasons]
-            # then make it the human readable form as said by the TagType dict
-            person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
-
-    extra_data = {}
-    ## How many possible mentors
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
-    mentor_people = query2results['can_mentor_lowercase_exact']
-    if mentor_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
-            {'query': parsed_query['q'].lower(),
-             'count': len(mentor_people)})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
-    ## Does this relate to people who can pitch in?
-    can_pitch_in_people = query2results['can_pitch_in_lowercase_exact']
-    if can_pitch_in_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
-            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
-
-    return mappable_people, extra_data
-
-def query2results(parsed_query):
-    query_type2executor = {
-        'project': project_query2mappable_orm_people,
-        'all_tags': all_tags_query2mappable_orm_people,
-        'icanhelp': people_who_want_to_help
-        }
-
-    # Now add to that the TagType-based queries
-    for short_name in mysite.profile.models.TagType.short_name2long_name:
-        def thingamabob(parsed_query, short_name=short_name):
-            return tag_type_query2mappable_orm_people(short_name, parsed_query)
-        query_type2executor[short_name] = thingamabob
-
-    desired_query_type = parsed_query['query_type']
-    return query_type2executor[desired_query_type](parsed_query)
-
-def people_who_want_to_help(parsed_query):
-    """Get a list of people who say they want to help a given project. This
-    function gathers a list of people in response to the search query
-    'want2help:PROJECTNAME'."""
-    haystack_results = haystack.query.SearchQuerySet().all()
-    haystack_field_name = 'all_wanna_help_projects_lowercase_exact'
-    haystack_results = haystack_results.filter(
-        **{haystack_field_name: parsed_query['q'].lower()})
-    mappable_people = set(
-        mysite.base.controllers.haystack_results2db_objects(haystack_results))
-    extra_data = {}
-    return mappable_people, extra_data
-
-def project_query2mappable_orm_people(parsed_query):
-    assert parsed_query['query_type'] == 'project'
-
-    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-    haystack_field_name = 'all_public_projects_lowercase_exact'
-    mappable_people_from_haystack = mappable_people_from_haystack.filter(
-        **{haystack_field_name: parsed_query['q'].lower()})
-    mappable_people = set(
-        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack))
-
-    mappable_people = list(
-        sorted(mappable_people,
-               key=lambda x: x.user.username))
-
-    extra_data = {}
-
-    mentor_people = mappable_people_from_haystack.filter(**{'can_mentor_lowercase_exact': parsed_query['q'].lower()})
-    can_pitch_in_people = mappable_people_from_haystack.filter(**{'can_pitch_in_lowercase_exact': parsed_query['q'].lower()})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
-
-    ## How many possible mentors
-    if mentor_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
-            {'query': parsed_query['q'].lower(),
-             'count': len(mentor_people)})
-
-    ## Does this relate to people who can pitch in?
-    if can_pitch_in_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
-            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
-
-    orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
-
-    ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
-    ## that expects a {'query': X, 'count': Y} dict
-    suggestions_for_searches_regarding_people_who_can_pitch_in = []
-    for orm_project in orm_projects:
-        people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_pitch_in_lowercase_exact=orm_project.language.lower())
-        if people_who_can_pitch_in_with_project_language:
-            suggestions_for_searches_regarding_people_who_can_pitch_in.append(
-                {'query': orm_project.language,
-                 'count': len(people_who_can_pitch_in_with_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
-
-
-    # Suggestions for possible mentors
-    suggestions_for_searches_regarding_people_who_can_mentor = []
-    for orm_project in orm_projects:
-        people_who_could_mentor_in_the_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_mentor_lowercase_exact=orm_project.language.lower())
-        if people_who_could_mentor_in_the_project_language:
-            suggestions_for_searches_regarding_people_who_can_mentor.append(
-                {'query': orm_project.language,
-                 'count': len(people_who_could_mentor_in_the_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
-               ].extend(suggestions_for_searches_regarding_people_who_can_pitch_in)
-
-    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'
-               ].extend(suggestions_for_searches_regarding_people_who_can_mentor)
-
-    return mappable_people, extra_data
-
-def person_id2data_as_javascript(request):
-    # The point of this view is to provide a JSON dump of the public
-    # locations for people relevant to this request.
-    #
-    # (Before we wrote this, location data was part of every request to
-    # the map page, which made that page extremely large. I prefer to have t
-    # be a separate request, like this. Plus, one day, we can apply
-    # reasonable caching to this request.)
-    #
-    # Caching-wise: The output of this depends on:
-    # * Person
-    # * PortfolioEntry (just the published ones, really)
-    # * LinkPersonTag
-    #
-    # For now, we simply use django-staticgenerator to generate a static version,
-    # and we have ad-hoc post-save hooks on those three models to clear the
-    # cache that this generates.
-
-    # XXX: Total hack to speed up the page load for logged-in users
-    # When we use If-Modified-Since, we can throw this away.
-    if not request.GET.get('q', ''):
-        cached_path = os.path.join(settings.WEB_ROOT, reverse(person_id2data_as_javascript)[1:] + '/index.html')
-        if os.path.exists(cached_path):
-            with open(cached_path) as f:
-                as_json = f.read()
-                return HttpResponse(as_json,
-                                    mimetype='application/javascript')
-
-    # So, the user might have requested just a subset of the people. Let's grab
-    # just that subset.
-    query = request.GET.get('q', '')
-    parsed_query = mysite.profile.controllers.parse_string_query(query)
-
-    # If there is a query constraint, the relevant_people are just those
-    # that are returned by query2results.
-    if parsed_query['q'].strip():
-        try:
-            # query2results returns some "extra_data" that we don't
-            # use in this view.
-            relevant_people, extra_data = query2results(parsed_query)
-        except mysite.base.controllers.HaystackIsDown:
-            relevant_people = []
-    else:
-        # If there is no query constraint, then everyone is a relevant person!
-        relevant_people = Person.objects.all().order_by('user__username')
-
-    # The map only needs a subset of the data about each person. This subset, in fact:
-    person_id2data = mysite.profile.controllers.get_people_location_data_as_dict(
-        relevant_people, include_latlong=True)
-
-    as_json = simplejson.dumps(person_id2data)
-    return HttpResponse(as_json,
-                        mimetype='application/javascript')
-
 @view
 def people(request):
     """Display a list of people."""
@@ -626,106 +394,16 @@ def people(request):
 
     # Get the list of people to display.
     if parsed_query['q'].strip():
-        try:
-            # "everybody" means everyone matching this query
-            everybody, extra_data = query2results(parsed_query)
-            data.update(extra_data)
-        except mysite.base.controllers.HaystackIsDown:
-            data['haystack_is_down'] = True
-            return (request, 'profile/search_people.html', data)
-            # Note that if the search engine is down, nothing in this function
-            # below this point will be incorporated into the template context.
-
+        search_results = parsed_query['callable_searcher']()
+        everybody, extra_data = search_results.people, search_results.template_data
+        data.update(extra_data)
     else:
         everybody = Person.objects.all().order_by('user__username')
 
-    # filter by query, if it is set
     data['people'] = everybody
 
-    cache_timespan = 86400 * 7
-    #if settings.DEBUG:
-    #    cache_timespan = 0
-
-    key_name = 'most_popular_projects_last_flushed_on_20100325'
-    popular_projects = cache.get(key_name)
-    if popular_projects is None:
-        projects = Project.objects.all()
-        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
-        #extract just the names from the projects
-        popular_projects = [project.name for project in popular_projects]
-        # cache it for a week
-        cache.set(key_name, popular_projects, cache_timespan)
-
-    key_name = 'most_popular_tags'
-    popular_tags = cache.get(key_name)
-    if popular_tags is None:
-        # to get the most popular tags:
-            # get all tags
-            # order them by the number of people that list them
-            # remove duplicates
-        tags = Tag.objects.all()
-        #lowercase them all and then remove duplicates
-        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
-        #take the popular ones
-        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
-        # cache it for a week
-        cache.set(key_name, popular_tags, cache_timespan)
-
-    # Populate matching_project_suggestions
-    # (unless query is icanhelp, in which case it's not relevant enough)
-    if data['query_type'] == "icanhelp":
-        data['matching_project_suggestions'] = []
-    else:
-        mps1 = Project.objects.filter(
-            cached_contributor_count__gt=0, name__icontains=data['q']).filter(
-            ~Q(name__iexact=data['q'])).order_by(
-            '-cached_contributor_count')
-        mps2 = Project.objects.filter(
-            cached_contributor_count__gt=0, display_name__icontains=data['q']).filter(
-            ~Q(name__iexact=data['q'])).order_by(
-            '-cached_contributor_count')
-        data['matching_project_suggestions'] = mps1 | mps2
-
-    if data['people']:
-        data['a_few_matching_project_suggestions'] = data['matching_project_suggestions'][:3]
-
-    # What kind of people are these?
-    if data['q']:
-        data.update(
-            mysite.profile.controllers.query_type2query_summary(data))
-
-    try:
-        data['queried_project'] = Project.objects.get(name=data['q'])
-    except Project.DoesNotExist:
-        try:
-            # See if what they have typed in matches a display name
-            data['queried_project'] = Project.objects.get(display_name=data['q'])
-        except Project.DoesNotExist:
-            data['queried_project'] = None
-            data['multiple_projects_matching'] = False
-        except Project.MultipleObjectsReturned:
-            data['queried_project'] = None
-            data['multiple_projects_matching'] = True
-
-    # If this is a project, determine how many people are listed as willing to
-    # contribute to that project.
-    if data['query_type'] == 'project' and data['queried_project']:
-        data['icanhelp_count'] = data['queried_project'].people_who_wanna_help.all().count()
-
-    if data['query_type'] == 'icanhelp' and not data['queried_project']:
-        if data['multiple_projects_matching']:
-            data['total_query_summary'] = "Your query <strong>%s</strong> matched multiple projects, which is incompatible with this search type." % data['q']
-        else:
-            data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
-
-    data['suggestions'] = [
-        dict(display_name='projects',
-             values=popular_projects,
-             query_prefix='project:'),
-        dict(display_name='profile tags',
-             values=popular_tags,
-             query_prefix='')]
-
+    # Add JS-friendly version of people data to template
+    data['person_ids'] = simplejson.dumps(','.join([str(x.id) for x in data['people']]))
     return (request, 'profile/search_people.html', data)
 
 def gimme_json_for_portfolio(request):
@@ -1159,5 +837,39 @@ def bug_recommendation_list_as_template_fragment(request):
         response_data['result'] = 'NO_BUGS'
 
     return HttpResponse(simplejson.dumps(response_data), mimetype='application/json')
+
+### API-y views go below here
+class LocationDataApiView(django.views.generic.View):
+    ### Entry point for requests from the web
+    def get(self, request):
+        person_ids = self.extract_person_ids(request.GET)
+        data_dict = self.raw_data_for_person_ids(person_ids)
+        as_json = simplejson.dumps(data_dict)
+        return HttpResponse(as_json, mimetype='application/javascript')
+
+    ### Helper functions
+    @staticmethod
+    def raw_data_for_person_ids(person_ids):
+        persons = mysite.profile.models.Person.objects.filter(
+            id__in=person_ids).select_related()
+        return mysite.profile.controllers.get_people_location_data_as_dict(
+            persons, include_latlong=True)
+
+    @staticmethod
+    def extract_person_ids(get_data):
+        person_ids_as_string = get_data.get('person_ids', '')
+        id_set = set()
+        if not person_ids_as_string:
+            return id_set
+
+        splitted_from_commas = person_ids_as_string.split(',')
+        for item in splitted_from_commas:
+            try:
+                as_int = int(item)
+            except ValueError:
+                continue
+            id_set.add(as_int)
+        return id_set
+
 
 # vim: ai ts=3 sts=4 et sw=4 nu

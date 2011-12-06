@@ -1,0 +1,420 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Haystack Settings &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="(In)Frequently Asked Questions" href="faq.html" />
+    <link rel="prev" title="Installing Search Engines" href="installing_search_engines.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="faq.html" title="(In)Frequently Asked Questions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installing_search_engines.html" title="Installing Search Engines"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="haystack-settings">
+<span id="ref-settings"></span><h1>Haystack Settings<a class="headerlink" href="#haystack-settings" title="Permalink to this headline">¶</a></h1>
+<p>As a way to extend/change the default behavior within Haystack, there are
+several settings you can alter within your <tt class="docutils literal"><span class="pre">settings.py</span></tt>. This is a
+comprehensive list of the settings Haystack recognizes.</p>
+<div class="section" id="haystack-default-operator">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_DEFAULT_OPERATOR</span></tt><a class="headerlink" href="#haystack-default-operator" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls what the default behavior for chaining <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>
+filters together is.</p>
+<p>Valid options are:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_DEFAULT_OPERATOR</span> <span class="o">=</span> <span class="s">&#39;AND&#39;</span>
+<span class="n">HAYSTACK_DEFAULT_OPERATOR</span> <span class="o">=</span> <span class="s">&#39;OR&#39;</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="docutils literal"><span class="pre">AND</span></tt>.</p>
+</div>
+<div class="section" id="haystack-siteconf">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt><a class="headerlink" href="#haystack-siteconf" title="Permalink to this headline">¶</a></h2>
+<p><strong>Required</strong></p>
+<p>This setting controls what module should be loaded to setup your <tt class="docutils literal"><span class="pre">SearchSite</span></tt>.
+The module should be on your <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt> and should contain only the calls
+necessary to setup Haystack to your needs.</p>
+<p>The convention is to name this file <tt class="docutils literal"><span class="pre">search_sites</span></tt> and place it in the same
+directory as your <tt class="docutils literal"><span class="pre">settings.py</span></tt> and/or <tt class="docutils literal"><span class="pre">urls.py</span></tt>.</p>
+<p>Valid options are:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SITECONF</span> <span class="o">=</span> <span class="s">&#39;myproject.search_sites&#39;</span>
+</pre></div>
+</div>
+<p>No default is provided.</p>
+</div>
+<div class="section" id="haystack-search-engine">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_ENGINE</span></tt><a class="headerlink" href="#haystack-search-engine" title="Permalink to this headline">¶</a></h2>
+<p><strong>Required</strong></p>
+<p>This setting controls which backend should be used. You should provide the
+short name (e.g. <tt class="docutils literal"><span class="pre">solr</span></tt>), not the full filename of the backend (e.g.
+<tt class="docutils literal"><span class="pre">solr_backend.py</span></tt>).</p>
+<p>Valid options are:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SEARCH_ENGINE</span> <span class="o">=</span> <span class="s">&#39;solr&#39;</span>
+<span class="n">HAYSTACK_SEARCH_ENGINE</span> <span class="o">=</span> <span class="s">&#39;whoosh&#39;</span>
+<span class="n">HAYSTACK_SEARCH_ENGINE</span> <span class="o">=</span> <span class="s">&#39;xapian&#39;</span>
+<span class="n">HAYSTACK_SEARCH_ENGINE</span> <span class="o">=</span> <span class="s">&#39;simple&#39;</span>
+<span class="n">HAYSTACK_SEARCH_ENGINE</span> <span class="o">=</span> <span class="s">&#39;dummy&#39;</span>
+</pre></div>
+</div>
+<p>No default is provided.</p>
+</div>
+<div class="section" id="haystack-search-results-per-page">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_RESULTS_PER_PAGE</span></tt><a class="headerlink" href="#haystack-search-results-per-page" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls how many results are shown per page when using the
+included <tt class="docutils literal"><span class="pre">SearchView</span></tt> and its subclasses.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SEARCH_RESULTS_PER_PAGE</span> <span class="o">=</span> <span class="mi">50</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="docutils literal"><span class="pre">20</span></tt>.</p>
+</div>
+<div class="section" id="haystack-include-spelling">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_INCLUDE_SPELLING</span></tt><a class="headerlink" href="#haystack-include-spelling" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls if spelling suggestions should be included in search
+results. This can potentially have performance implications so it is disabled
+by default.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_INCLUDE_SPELLING</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>Works for the <tt class="docutils literal"><span class="pre">solr</span></tt>, <tt class="docutils literal"><span class="pre">xapian</span></tt> and <tt class="docutils literal"><span class="pre">whoosh</span></tt> backends.</p>
+</div>
+<div class="section" id="haystack-solr-url">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_URL</span></tt><a class="headerlink" href="#haystack-solr-url" title="Permalink to this headline">¶</a></h2>
+<p><strong>Required when using the ``solr`` backend</strong></p>
+<p>This setting controls what URL the <tt class="docutils literal"><span class="pre">solr</span></tt> backend should be connecting to.
+This depends on how the user sets up their Solr daemon.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SOLR_URL</span> <span class="o">=</span> <span class="s">&#39;http://localhost:9000/solr/test&#39;</span>
+<span class="n">HAYSTACK_SOLR_URL</span> <span class="o">=</span> <span class="s">&#39;http://solr.mydomain.com/solr/mysite&#39;</span>
+</pre></div>
+</div>
+<p>No default is provided.</p>
+</div>
+<div class="section" id="haystack-solr-timeout">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_TIMEOUT</span></tt><a class="headerlink" href="#haystack-solr-timeout" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional when using the ``solr`` backend</strong></p>
+<p>This setting controls the time to wait for a response from Solr in seconds.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SOLR_TIMEOUT</span> <span class="o">=</span> <span class="mi">30</span>
+</pre></div>
+</div>
+<p>The default is 10 seconds.</p>
+</div>
+<div class="section" id="haystack-whoosh-path">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_PATH</span></tt><a class="headerlink" href="#haystack-whoosh-path" title="Permalink to this headline">¶</a></h2>
+<p><strong>Required when using the ``whoosh`` backend</strong></p>
+<p>This setting controls where on the filesystem the Whoosh indexes will be stored.
+The user must have the appropriate permissions for reading and writing to this
+directory.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This should be it&#8217;s own directory, with nothing else in it. Pointing this
+at a directory (like your project root) could cause you to lose data when
+clearing the index.</p>
+</div>
+<p>Any trailing slashes should be left off.</p>
+<p>Finally, you should ensure that this directory is not located within the
+document root of your site and that you take appropriate security precautions.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_WHOOSH_PATH</span> <span class="o">=</span> <span class="s">&#39;/home/mysite/whoosh_index&#39;</span>
+</pre></div>
+</div>
+<p>No default is provided.</p>
+</div>
+<div class="section" id="haystack-whoosh-storage">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_STORAGE</span></tt><a class="headerlink" href="#haystack-whoosh-storage" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls whether Whoosh uses either the standard file-based
+storage or the RAM-based storage.</p>
+<p>Note that the RAM-based storage is not permanent and disappears when the
+process is ended. This is mostly useful for testing.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_WHOOSH_STORAGE</span> <span class="o">=</span> <span class="s">&#39;file&#39;</span>
+<span class="n">HAYSTACK_WHOOSH_STORAGE</span> <span class="o">=</span> <span class="s">&#39;ram&#39;</span>
+</pre></div>
+</div>
+<p>The default is &#8216;file&#8217;.</p>
+</div>
+<div class="section" id="haystack-whoosh-post-limit">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_POST_LIMIT</span></tt><a class="headerlink" href="#haystack-whoosh-post-limit" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls how large of a document Whoosh will accept when writing.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_WHOOSH_POST_LIMIT</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+</pre></div>
+</div>
+<p>The default is 128 * 1024 * 1024.</p>
+</div>
+<div class="section" id="haystack-xapian-path">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_XAPIAN_PATH</span></tt><a class="headerlink" href="#haystack-xapian-path" title="Permalink to this headline">¶</a></h2>
+<p><strong>Required when using the ``xapian`` backend</strong></p>
+<p>This setting controls where on the filesystem the Xapian indexes will be stored.
+The user must have the appropriate permissions for reading and writing to this
+directory.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This should be it&#8217;s own directory, with nothing else in it. Pointing this
+at a directory (like your project root) could cause you to lose data when
+clearing the index.</p>
+</div>
+<p>Any trailing slashes should be left off.</p>
+<p>Finally, you should ensure that this directory is not located within the
+document root of your site and that you take appropriate security precautions.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_XAPIAN_PATH</span> <span class="o">=</span> <span class="s">&#39;/home/mysite/xapian_index&#39;</span>
+</pre></div>
+</div>
+<p>No default is provided.</p>
+</div>
+<div class="section" id="haystack-batch-size">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_BATCH_SIZE</span></tt><a class="headerlink" href="#haystack-batch-size" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls the number of model instances loaded at a time while
+reindexing. This affects how often the search indexes must merge (an intensive
+operation).</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>The default is 1000 models per commit.</p>
+</div>
+<div class="section" id="haystack-custom-highlighter">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_CUSTOM_HIGHLIGHTER</span></tt><a class="headerlink" href="#haystack-custom-highlighter" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to specify your own custom <tt class="docutils literal"><span class="pre">Highlighter</span></tt>
+implementation for use with the <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">highlight</span> <span class="pre">%}</span></tt> template tag. It should be
+the full path to the class.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_CUSTOM_HIGHLIGHTER</span> <span class="o">=</span> <span class="s">&#39;myapp.utils.BorkHighlighter&#39;</span>
+</pre></div>
+</div>
+<p>No default is provided. Haystack automatically falls back to the default
+implementation.</p>
+</div>
+<div class="section" id="haystack-enable-registrations">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_ENABLE_REGISTRATIONS</span></tt><a class="headerlink" href="#haystack-enable-registrations" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to control whether or not Haystack will manage it&#8217;s own
+registrations at start-up. It should be a boolean.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_ENABLE_REGISTRATIONS</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>Default is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Setting this to <tt class="xref docutils literal"><span class="pre">False</span></tt> prevents Haystack from doing any imports, which
+means that no <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes will get registered, no signals will
+get hooked up and any use of <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> without further work will
+yield no results. You can manually import your <tt class="docutils literal"><span class="pre">SearchIndex</span></tt> classes in
+other files (like your views or elsewhere). In short, Haystack will still
+be available but essentially in an un-initialized state.</p>
+<p class="last">You should ONLY use this setting if you&#8217;re using another third-party
+application that causes tracebacks/import errors when used in conjunction
+with Haystack.</p>
+</div>
+</div>
+<div class="section" id="haystack-iterator-load-per-query">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_ITERATOR_LOAD_PER_QUERY</span></tt><a class="headerlink" href="#haystack-iterator-load-per-query" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls the number of results that are pulled at once when
+iterating through a <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>. If you generally consume large portions
+at a time, you can bump this up for better performance.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is not used in the case of a slice on a <tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt>, which
+already overrides the number of results pulled at once.</p>
+</div>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_ITERATOR_LOAD_PER_QUERY</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>The default is 10 results at a time.</p>
+</div>
+<div class="section" id="haystack-limit-to-registered-models">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_LIMIT_TO_REGISTERED_MODELS</span></tt><a class="headerlink" href="#haystack-limit-to-registered-models" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to control whether or not Haystack will limit the
+search results seen to just the models registered. It should be a boolean.</p>
+<p>If your search index is never used for anything other than the models
+registered with Haystack, you can turn this off and get a small to moderate
+performance boost.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_LIMIT_TO_REGISTERED_MODELS</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>Default is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+</div>
+<div class="section" id="haystack-silently-fail">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_SILENTLY_FAIL</span></tt><a class="headerlink" href="#haystack-silently-fail" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to control whether or not Haystack will silently
+fail when querying the index or not. On by default, this allows big
+reindexes that simply lost a connection to mostly succeed, given the
+time involved.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_SILENTLY_FAIL</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>Default is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+</div>
+<div class="section" id="haystack-id-field">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_ID_FIELD</span></tt><a class="headerlink" href="#haystack-id-field" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to control what the unique field name used internally
+by Haystack is called. Rarely needed unless your field names collide with
+Haystack&#8217;s defaults.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_ID_FIELD</span> <span class="o">=</span> <span class="s">&#39;my_id&#39;</span>
+</pre></div>
+</div>
+<p>Default is <tt class="docutils literal"><span class="pre">id</span></tt>.</p>
+</div>
+<div class="section" id="haystack-django-ct-field">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_CT_FIELD</span></tt><a class="headerlink" href="#haystack-django-ct-field" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to control what the content type field name used
+internally by Haystack is called. Rarely needed unless your field names
+collide with Haystack&#8217;s defaults.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_DJANGO_CT_FIELD</span> <span class="o">=</span> <span class="s">&#39;my_django_ct&#39;</span>
+</pre></div>
+</div>
+<p>Default is <tt class="docutils literal"><span class="pre">django_ct</span></tt>.</p>
+</div>
+<div class="section" id="haystack-django-id-field">
+<h2><tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_ID_FIELD</span></tt><a class="headerlink" href="#haystack-django-id-field" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to control what the primary key field name used
+internally by Haystack is called. Rarely needed unless your field names
+collide with Haystack&#8217;s defaults.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">HAYSTACK_DJANGO_ID_FIELD</span> <span class="o">=</span> <span class="s">&#39;my_django_id&#39;</span>
+</pre></div>
+</div>
+<p>Default is <tt class="docutils literal"><span class="pre">django_id</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Haystack Settings</a><ul>
+<li><a class="reference internal" href="#haystack-default-operator"><tt class="docutils literal"><span class="pre">HAYSTACK_DEFAULT_OPERATOR</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-siteconf"><tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-search-engine"><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_ENGINE</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-search-results-per-page"><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_RESULTS_PER_PAGE</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-include-spelling"><tt class="docutils literal"><span class="pre">HAYSTACK_INCLUDE_SPELLING</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-solr-url"><tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_URL</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-solr-timeout"><tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_TIMEOUT</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-whoosh-path"><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_PATH</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-whoosh-storage"><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_STORAGE</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-whoosh-post-limit"><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_POST_LIMIT</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-xapian-path"><tt class="docutils literal"><span class="pre">HAYSTACK_XAPIAN_PATH</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-batch-size"><tt class="docutils literal"><span class="pre">HAYSTACK_BATCH_SIZE</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-custom-highlighter"><tt class="docutils literal"><span class="pre">HAYSTACK_CUSTOM_HIGHLIGHTER</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-enable-registrations"><tt class="docutils literal"><span class="pre">HAYSTACK_ENABLE_REGISTRATIONS</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-iterator-load-per-query"><tt class="docutils literal"><span class="pre">HAYSTACK_ITERATOR_LOAD_PER_QUERY</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-limit-to-registered-models"><tt class="docutils literal"><span class="pre">HAYSTACK_LIMIT_TO_REGISTERED_MODELS</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-silently-fail"><tt class="docutils literal"><span class="pre">HAYSTACK_SILENTLY_FAIL</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-id-field"><tt class="docutils literal"><span class="pre">HAYSTACK_ID_FIELD</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-django-ct-field"><tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_CT_FIELD</span></tt></a></li>
+<li><a class="reference internal" href="#haystack-django-id-field"><tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_ID_FIELD</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installing_search_engines.html"
+                        title="previous chapter">Installing Search Engines</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="faq.html"
+                        title="next chapter">(In)Frequently Asked Questions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/settings.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="faq.html" title="(In)Frequently Asked Questions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installing_search_engines.html" title="Installing Search Engines"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

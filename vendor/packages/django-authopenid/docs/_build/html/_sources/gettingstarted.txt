@@ -1,0 +1,147 @@
+.. _gettingstarted:
+
+Getting Started
+===============
+
+This tutorial exposes key features of this library and how to setup the default settings.
+
+If you have not installed django-authopenid yet, the :ref:`installation docs <installation>`
+will get you started.
+
+Basic use
+=========
+
+To use django-authopenid with all the default settings, you will need to do the following:
+
+1. Add `registration` and `django_authopenid` to ``INSTALLED_APPS`` setting of 
+your django project:
+
+.. code-block:: python
+
+	INSTALLED_APPS = (
+	    'django.contrib.auth',
+	    'django.contrib.contenttypes',
+	    'django.contrib.sessions',
+	    'django.contrib.sites',
+	    'django.contrib.admin',
+	    'registration',
+	    'django_authopenid',
+	)
+
+2. Add `django_authopenid.context_processors.authopenid` to ``TEMPLATE_CONTEXT_PROCESSORS`` 
+setting:
+
+.. code-block:: python
+
+	TEMPLATE_CONTEXT_PROCESSORS = (
+	    'django.core.context_processors.auth',
+	    'django.core.context_processors.debug',
+	    'django.core.context_processors.i18n',
+	    'django.core.context_processors.media',
+	    'django.core.context_processors.request',
+	    'django_authopenid.context_processors.authopenid',
+	)
+	
+3. Add `django_authopenid.middleware.OpenIDMiddleware` to ``MIDDLEWARE_CLASSES`` setting:
+
+.. code-block:: python
+
+	MIDDLEWARE_CLASSES = (
+	    'django.middleware.common.CommonMiddleware',
+	    'django.contrib.sessions.middleware.SessionMiddleware',
+	    'django.contrib.auth.middleware.AuthenticationMiddleware',
+	    'django.middleware.doc.XViewMiddleware',
+	    'django_authopenid.middleware.OpenIDMiddleware',
+	)
+
+4. Set `LOGIN_REDIRECT_URL` settings for default redirection of user after user edit. For example `/account/profile` (witch is the default).
+
+5. Create the necessary templates (see the section on templates below
+	   for details).
+	
+6. Add this line to your site's root URLConf::
+
+	(r'^account/', include('django_authopenid.urls')),
+
+7. Link people to ``accounts/signin`` so they can start signing or create a new account.
+
+
+Templates used by django-authopenid
+===================================
+
+The views included in django-authopenid make use of height templates:
+
+
+* ``authopenid/associate.html`` display the form to associate new openids to a registered account.
+
+* ``authopenid/associate_email.txt`` is used for the body of the email sent when you associate an account to a new openid.
+
+* ``authopenid/associate_email_subject.txt`` is used for the subject of the email sent when you associate an account to a new openid.
+
+* ``authopenid/complete.html`` display the final register form for user that signed with their openid.
+
+* ``authopenid/dissociate.html`` display the form to confirm dissociation of an openid from an account.
+
+* ``authopenid/failure.html`` display basic failure page
+
+* ``authopenid/password_change_form.html`` display the form allowing a user to create a password for his account or change the password.
+
+
+You have also to create the `registration` templates :
+
+* ``registration/registration_form.html`` displays the registration
+  form for users to sign up.
+
+* ``registration/registration_complete.html`` is displayed after the
+  activation email has been sent, to tell the new user to check
+  his/her email.
+
+* ``registration/activation_email_subject.txt`` is used for the
+  subject of the activation email.
+
+* ``registration/activation_email.txt`` is used for the body of the
+  activation email.
+
+* ``registration/activate.html`` is displayed when a user attempts to
+  activate his/her account.
+
+
+Examples of all of these templates could be found in example folder from 
+django-authopenid sources.
+
+Additionally, the URLConf provided with django-authopenid includes
+URL patterns for useful views in Django's built-in authentication
+application and django-regisytraion -- this means that a single ``include`` 
+in your root URLConf can wire up registration and the auth application's signin,
+signout, and password change/reset views. 
+
+
+.. seealso:: :ref:`views-ref` and consult `the Django authentication documentation <http://www.djangoproject.com/documentation/authentication/>`_  and `django-registration documentation <http://bitbucket.org/ubernostrum/django-registration/>`_ for details on the templates and contexts used by views of these modules.
+	
+.. warning:: Don't forget to setup your mail server access if you want to send mail.
+
+
+How it works
+============
+
+Using the recommanded default configuration, the url `/account/signin` will map to the view ``django_authopenid.views.signin`` which display a signin form using instances of ``django.contrib.auth.forms.AuthenticationForm`` for legacy authentification (username/password) and ``django_authopenid.forms.OpenidSigninForm`` for openid authentidcation. This will ask for a legacy account that could be registred by going on `/account/signup` (which will use django-registration module for registration) or an openid. Signing with openid will redirect the user to its openid provider and after he processed authentification to `/account/complete`
+
+If the user signin with its openid and is already registred he will be finally redirected to its home page (the one defined in `settings.LOGIN_REDIRECT_URL` by default). If not he will be redirected to `account/register` page.
+
+On `account/register` page the user could choose to create a new user or associate this openid to a "legacy" account (one registered with username/password). If he chooses to create a new user a new instance of ``django.contrib.models.auth.User`` is created with a non usable password which mean that at this step the user could only signin to your django project with its openid. He could later add a password if he wants.
+
+.. seealso:: `django-registration documentation <http://bitbucket.org/ubernostrum/django-registration/>`_ for details of legacy account registration.
+
+Where to go from here
+=====================
+
+Full documentation for all included components is bundled in the
+packaged release; see the following files for details:
+
+* :ref:`forms-ref`
+* :ref:`models-ref`
+* :ref:`views-ref`
+
+
+
+

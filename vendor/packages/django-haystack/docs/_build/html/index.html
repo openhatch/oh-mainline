@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Haystack! &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="#" />
+    <link rel="next" title="Getting Started with Haystack" href="tutorial.html" />
+    <link rel="prev" title="Table Of Contents" href="toc.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="Getting Started with Haystack"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="toc.html" title="Table Of Contents"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-haystack">
+<h1>Welcome to Haystack!<a class="headerlink" href="#welcome-to-haystack" title="Permalink to this headline">¶</a></h1>
+<p>Haystack provides modular search for Django. It features a unified, familiar
+API that allows you to plug in different search backends (such as <a class="reference external" href="http://lucene.apache.org/solr/">Solr</a>,
+<a class="reference external" href="http://whoosh.ca/">Whoosh</a>, <a class="reference external" href="http://xapian.org/">Xapian</a>, etc.) without having to modify your code.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This documentation represents the development version of Haystack. For
+old versions of the documentation: <a class="reference external" href="http://docs.haystacksearch.org/1.0/">1.0</a>, <a class="reference external" href="http://docs.haystacksearch.org/1.1/">1.1</a>.</p>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re new to Haystack, you may want to start with these documents to get
+you up and running:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Getting Started with Haystack</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#handling-data">Handling Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#setting-up-the-views">Setting Up The Views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#complete">Complete!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#what-s-next">What&#8217;s Next?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="views_and_forms.html">Views &amp; Forms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="templatetags.html">Template Tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_commands.html">Management Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">(In)Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="who_uses.html">Sites Using Haystack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_apps.html">Haystack-Related Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing_search_engines.html">Installing Search Engines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Haystack</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="advanced-uses">
+<h2>Advanced Uses<a class="headerlink" href="#advanced-uses" title="Permalink to this headline">¶</a></h2>
+<p>Once you&#8217;ve got Haystack working, here are some of the more complex features
+you may want to include in your application.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="highlighting.html">Highlighting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faceting.html">Faceting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autocomplete.html">Autocomplete</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boost.html">Boost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="do_not_try_this_at_home.html">Advanced Topics</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re an experienced user and are looking for a reference, you may be
+looking for API documentation and advanced usage as detailed in:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="searchqueryset_api.html"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#why-follow-queryset">Why Follow <tt class="docutils literal"><span class="pre">QuerySet</span></tt>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#searchqueryset"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#the-content-shortcut">The <tt class="docutils literal"><span class="pre">content</span></tt> Shortcut</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#searchqueryset-methods"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt> Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#emptysearchqueryset"><tt class="docutils literal"><span class="pre">EmptySearchQuerySet</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchqueryset_api.html#relatedsearchqueryset"><tt class="docutils literal"><span class="pre">RelatedSearchQuerySet</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searchindex_api.html"><tt class="docutils literal"><span class="pre">SearchIndex</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#keeping-the-index-fresh">Keeping The Index Fresh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#advanced-data-preparation">Advanced Data Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#adding-new-fields">Adding New Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#search-index"><tt class="docutils literal"><span class="pre">Search</span> <span class="pre">Index</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#realtimesearchindex"><tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchindex_api.html#modelsearchindex"><tt class="docutils literal"><span class="pre">ModelSearchIndex</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searchfield_api.html"><tt class="docutils literal"><span class="pre">SearchField</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchfield_api.html#subclasses">Subclasses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchfield_api.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchfield_api.html#field-options">Field Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchfield_api.html#method-reference">Method Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searchresult_api.html"><tt class="docutils literal"><span class="pre">SearchResult</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchresult_api.html#attribute-reference">Attribute Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchresult_api.html#method-reference">Method Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searchsite_api.html"><tt class="docutils literal"><span class="pre">SearchSite</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchsite_api.html#autodiscovery">Autodiscovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchsite_api.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchsite_api.html#method-reference">Method Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searchquery_api.html"><tt class="docutils literal"><span class="pre">SearchQuery</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchquery_api.html#sq-objects"><tt class="docutils literal"><span class="pre">SQ</span></tt> Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchquery_api.html#backend-specific-methods">Backend-Specific Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="searchquery_api.html#inheritable-methods">Inheritable Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searchbackend_api.html"><tt class="docutils literal"><span class="pre">SearchBackend</span></tt> API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="searchbackend_api.html#method-reference">Method Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture_overview.html">Architecture Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture_overview.html#searchqueryset"><tt class="docutils literal"><span class="pre">SearchQuerySet</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture_overview.html#searchquery"><tt class="docutils literal"><span class="pre">SearchQuery</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture_overview.html#searchbackend"><tt class="docutils literal"><span class="pre">SearchBackend</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture_overview.html#searchsite"><tt class="docutils literal"><span class="pre">SearchSite</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture_overview.html#searchindex"><tt class="docutils literal"><span class="pre">SearchIndex</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backend_support.html">Backend Support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backend_support.html#supported-backends">Supported Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend_support.html#backend-capabilities">Backend Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend_support.html#wishlist">Wishlist</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Haystack Settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-default-operator"><tt class="docutils literal"><span class="pre">HAYSTACK_DEFAULT_OPERATOR</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-siteconf"><tt class="docutils literal"><span class="pre">HAYSTACK_SITECONF</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-search-engine"><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_ENGINE</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-search-results-per-page"><tt class="docutils literal"><span class="pre">HAYSTACK_SEARCH_RESULTS_PER_PAGE</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-include-spelling"><tt class="docutils literal"><span class="pre">HAYSTACK_INCLUDE_SPELLING</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-solr-url"><tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_URL</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-solr-timeout"><tt class="docutils literal"><span class="pre">HAYSTACK_SOLR_TIMEOUT</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-whoosh-path"><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_PATH</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-whoosh-storage"><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_STORAGE</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-whoosh-post-limit"><tt class="docutils literal"><span class="pre">HAYSTACK_WHOOSH_POST_LIMIT</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-xapian-path"><tt class="docutils literal"><span class="pre">HAYSTACK_XAPIAN_PATH</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-batch-size"><tt class="docutils literal"><span class="pre">HAYSTACK_BATCH_SIZE</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-custom-highlighter"><tt class="docutils literal"><span class="pre">HAYSTACK_CUSTOM_HIGHLIGHTER</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-enable-registrations"><tt class="docutils literal"><span class="pre">HAYSTACK_ENABLE_REGISTRATIONS</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-iterator-load-per-query"><tt class="docutils literal"><span class="pre">HAYSTACK_ITERATOR_LOAD_PER_QUERY</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-limit-to-registered-models"><tt class="docutils literal"><span class="pre">HAYSTACK_LIMIT_TO_REGISTERED_MODELS</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-silently-fail"><tt class="docutils literal"><span class="pre">HAYSTACK_SILENTLY_FAIL</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-id-field"><tt class="docutils literal"><span class="pre">HAYSTACK_ID_FIELD</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-django-ct-field"><tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_CT_FIELD</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#haystack-django-id-field"><tt class="docutils literal"><span class="pre">HAYSTACK_DJANGO_ID_FIELD</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#get-identifier"><tt class="docutils literal"><span class="pre">get_identifier</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="developing">
+<h2>Developing<a class="headerlink" href="#developing" title="Permalink to this headline">¶</a></h2>
+<p>Finally, if you&#8217;re looking to help out with the development of Haystack,
+the following links should help guide you on running tests and creating
+additional backends:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="creating_new_backends.html">Creating New Backends</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Haystack has a relatively easily-met set of requirements.</p>
+<ul class="simple">
+<li>Python 2.4+ (may work on 2.3 but untested)</li>
+<li>Django 1.0+</li>
+</ul>
+<p>Additionally, each backend has its own requirements. You should refer to
+<a class="reference internal" href="installing_search_engines.html"><em>Installing Search Engines</em></a> for more details.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Haystack!</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-uses">Advanced Uses</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference">Reference</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#developing">Developing</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="toc.html"
+                        title="previous chapter">Table Of Contents</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="next chapter">Getting Started with Haystack</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="Getting Started with Haystack"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="toc.html" title="Table Of Contents"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

@@ -33,32 +33,30 @@ import mysite.profile.controllers
 from mysite.profile.management.commands import send_weekly_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
+from django.utils.unittest import skipIf
 
-import simplejson
+from django.utils import simplejson
 import BeautifulSoup
 import datetime
 import tasks
 import mock
-import UserList
 from twill import commands as tc
 import quopri
 
 from django.core import mail
 from django.conf import settings
 import django.test
+import django.conf
 from django.core import serializers
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-def do_nothing(*args, **kwargs):
-    return ''
-
 class StarlingTests(TwillTests):
-	def test_page(self):
-		url = 'http://openhatch.org/starlings'
-		place = make_twill_url(url)
-		tc.go(place)
+    def test_page(self):
+        url = 'http://openhatch.org/starlings'
+        place = make_twill_url(url)
+        tc.go(place)
 
 class ProfileTests(TwillTests):
     # {{{
@@ -830,7 +828,7 @@ class AddCitationManually(TwillTests):
 
         # Send this data to the appropriate view.
         url = reverse(mysite.profile.views.add_citation_manually_do)
-        response = self.login_with_client().post(url, input_data)
+        self.login_with_client().post(url, input_data)
 
         # Check that a citation was created.
         c = Citation.untrashed.get(url=input_data['url'])
@@ -1298,12 +1296,14 @@ class ProjectGetMentors(TwillTests):
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test(self):
         data = {}
         data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
         """We wrote this test because MaxMind gives us back a city in Iceland. That city
         has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
@@ -1551,6 +1551,112 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [])
 
+class PeopleFinderClasses(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self, *args, **kwargs):
+        super(PeopleFinderClasses, self).setUp(*args, **kwargs)
+        self.person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        self.project = Project.create_dummy(name='Banshee')
+
+    def test_wannahelp_query_with_zero_hits(self):
+        whq = mysite.profile.controllers.WannaHelpQuery('banshee')
+        self.assertEqual([], list(whq.people))
+
+    def test_wannahelp_query_with_one_hit(self):
+        # This time, set Asheesh up as a Banshee wannahelper.
+        self.project.people_who_wanna_help.add(self.person)
+        note = WannaHelperNote.add_person_project(self.person, self.project)
+        note.save()
+        self.project.save()
+
+        whq = mysite.profile.controllers.WannaHelpQuery('banshee')
+        self.assertEqual(1, len(whq.people))
+        self.assertEqual(self.person, whq.people[0])
+
+    def test_project_query_with_zero_hits(self):
+        pq = mysite.profile.controllers.ProjectQuery('banshee')
+        self.assertEqual([], list(pq.people))
+
+    def test_project_query_with_one_hit(self):
+        # This time, set Asheesh up as a Banshee contributor.
+        PortfolioEntry(project=self.project, person=self.person, is_published=True).save()
+
+        pq = mysite.profile.controllers.ProjectQuery('banshee')
+        self.assertEqual(1, len(pq.people))
+        self.assertEqual(self.person, pq.people[0])
+
+class PeopleFinderTagQueryTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self, *args, **kwargs):
+        super(PeopleFinderTagQueryTests, self).setUp(*args, **kwargs)
+        self.person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+
+    def test_tag_type_query_with_zero_hits(self):
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([], list(tq.people))
+
+    def test_tag_type_query_with_zero_hits_and_busted_tag(self):
+        tq = mysite.profile.controllers.TagQuery('lol_no_such_tag', 'python')
+        self.assertEqual([], list(tq.people))
+
+    def test_tag_type_query_with_one_hit_case_insensitive(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([self.person], list(tq.people))
+
+    def test_tag_type_query_with_one_hit_with_distraction_tags(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        understands, _ = TagType.objects.get_or_create(name='understands')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        understands_unit_testing, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='unit testing')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_banshee)
+        link.save()
+        link = Link_Person_Tag(person=self.person,
+                               tag=understands_unit_testing)
+        link.save()
+
+        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        self.assertEqual([self.person], list(tq.people))
+
+    def test_all_tags_query_with_zero_hits(self):
+        atq = mysite.profile.controllers.AllTagsQuery('python')
+        self.assertEqual([], list(atq.people))
+
+    def test_all_tags_query_with_one_hit(self):
+        # This time, set up Asheesh as a python mentor
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        willing_to_mentor_python, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Python')
+        link = Link_Person_Tag(person=self.person,
+                               tag=willing_to_mentor_python)
+        link.save()
+
+        atq = mysite.profile.controllers.AllTagsQuery('python')
+        self.assertEqual([self.person], list(atq.people))
+
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
@@ -1586,10 +1692,23 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['query_type'], 'all_tags')
 
 
+class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
+    def setUp(self):
+        self.original_value = django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH
+        django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = None
+
+    @mock.patch('mysite.profile.tasks.RegeneratePostfixAliasesForForwarder.update_table')
+    def test(self, mock_update_table):
+        task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
+        task.run()
+        self.assertFalse(mock_update_table.called)
+
+    def tearDown(self):
+        django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = self.original_value
+
 class PostFixGeneratorList(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus']
-
 
     def test(self):
         # create two people
@@ -1636,22 +1755,33 @@ class EmailForwarderGarbageCollection(TwillTests):
         sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
         sheesh.contact_blurb = u'$fwd'
         sheesh.save()
+
+        # Create a distraction user who does not want a forwarder
+        mysite.profile.models.Person.create_dummy()
+
         valid_new = create_forwarder('orange@domain.com', 1, 1)
         valid_old = create_forwarder('red@domain.com', 1, 0)
         invalid = create_forwarder('purple@domain.com', 0, 0)
         # with any luck, the below will call this: mysite.profile.models.Forwarder.garbage_collect()
         mysite.profile.tasks.GarbageCollectForwarders.apply()
-# valid_new should still be in the database
-# there should be no other forwarders for the address that valid_new has
+        # valid_new should still be in the database
+        # there should be no other forwarders for the address that valid_new has
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(address=valid_new.address).count())
-# valid_old should still be in the database
+        # valid_old should still be in the database
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
-# invalid should not be in the database
+        # invalid should not be in the database
         self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
-# there should be 3 forwarders in total: we gained one and we lost one
+        # there should be 2 forwarders in total: we lost one
         forwarders = mysite.profile.models.Forwarder.objects.all()
-        self.assertEqual(3, forwarders.count())
+        self.assertEqual(2, forwarders.count())
+
+        ## Now if we delete both those forwarders, and re-generate, we get one
+        ## in the DB.
+        mysite.profile.models.Forwarder.objects.all().delete()
+        mysite.profile.tasks.GarbageCollectForwarders.apply()
+        forwarders = mysite.profile.models.Forwarder.objects.all()
+        self.assertEqual(1, forwarders.count())
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -1840,27 +1970,6 @@ class EditYourName(TwillTests):
         tc.find('Gottfried Leibniz')
         tc.notfind('Asheesh Laroia')
 
-class FixAllTagsQueryWhenHaystackReturnsHalfPeople(TwillTests):
-
-    def test(self):
-        things = UserList.UserList([
-            ObjectFromDict({'object': None}),
-            ObjectFromDict({'object': 'a real thing'})])
-        things.load_all = mock.Mock()
-        just_real_thing = mysite.base.controllers.haystack_results2db_objects(things)
-        self.assertEqual(just_real_thing, ['a real thing'])
-        self.assert_(things.load_all.called)
-
-class PersonCanReindexHimself(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('mysite.profile.tasks.ReindexPerson.delay')
-    def test(self, mock_delay):
-        p = Person.objects.get(user__username='paulproteus')
-        p.reindex_for_person_search()
-        self.assertEqual(mock_delay.call_args,
-                         ( (), {'person_id': p.id}))
-
 class PersonCanSetHisExpandNextStepsOption(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -1894,18 +2003,14 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
 class PeopleMapForNonexistentProject(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
-    def test(self, make_empty_list):
-        make_empty_list.return_value = ([], {})
+    def test(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
-    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
-    def test_icanhelp(self, make_empty_list):
-        make_empty_list.return_value = ([], {})
+    def test_icanhelp(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'icanhelp:Phorum'},
              u'user': User.objects.get(username='paulproteus')})

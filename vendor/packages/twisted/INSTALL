@@ -1,0 +1,33 @@
+Requirements
+
+  Python 2.5, 2.6 or 2.7; or, Python 2.4 on any non-Windows operating system.
+
+  Zope Interfaces 3.3.0 or better (http://pypi.python.org/pypi/zope.interface)
+
+  pyOpenSSL (<http://launchpad.net/pyopenssl>) is required for any SSL APIs.  On
+  Windows, version 0.10 or newer is required.  pyOpenSSL 0.10 or newer is also
+  preferred on other platforms, but older versions will work as well.
+
+  On Windows pywin32 (<http://sourceforge.net/projects/pywin32/files/>) is
+  recommended (this is already included in ActivePython).  The Windows IOCP
+  reactor requires pywin32 build 205 or later.
+
+  If you would like to use Trial's subunit reporter, then you will need to
+  install Subunit 0.0.2 or later (https://launchpad.net/subunit).
+
+Installation
+
+  * Debian and Ubuntu
+    Packages are included in the main distribution.
+
+  * FreeBSD, Gentoo
+    Twisted is in their package repositories.
+
+  * Win32
+    Installers are available from http://twistedmatrix.com/
+
+  * Other
+    As with other Python packages, the standard way of installing from source
+    is:
+
+      python setup.py install

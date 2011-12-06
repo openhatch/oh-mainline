@@ -12,6 +12,9 @@ COPYING
     This file explains what permissions you have, if you want to re-use
     source code you find in this repository.
 
+vendor/
+    This directory contains code from other projects that we rely on.
+
 mysite/
     This directory contains the OpenHatch website and all the "apps" that
     are part of it. Each subdirectory is an app.
@@ -71,11 +74,3 @@ bin/
 
         (sqlite_mysite is a version of the above that uses an in-memory SQLite database
         instead of the MySQL database. You can use that to run the test suite faster.)
-
-Unimportant files
------------------
-
-apt_pkg/
-    This is pseudo-Python package that makes it so "import apt_pkg" works.
-
-    One of our dependencies requires that, so we provide a fake one.

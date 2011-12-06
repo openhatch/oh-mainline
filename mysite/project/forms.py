@@ -21,6 +21,11 @@ class WannaHelpForm(django.forms.Form):
     project = django.forms.ModelChoiceField(mysite.search.models.Project.objects.all())
     from_offsite = django.forms.BooleanField(required=False)
 
+class MarkContactedForm(django.forms.Form):
+    project = django.forms.ModelChoiceField(queryset=mysite.search.models.Project.objects.all(), widget=django.forms.HiddenInput())
+    person = django.forms.ModelChoiceField(queryset=mysite.profile.models.Person.objects.all(), widget=django.forms.HiddenInput())
+    checked = django.forms.BooleanField(label="Mark person as contacted", required=True)
+
 class ProjectForm(django.forms.ModelForm):
 
     def clean_name(self):

@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Haystack-Related Applications &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Debugging Haystack" href="debugging.html" />
+    <link rel="prev" title="Sites Using Haystack" href="who_uses.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="debugging.html" title="Debugging Haystack"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="who_uses.html" title="Sites Using Haystack"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="haystack-related-applications">
+<h1>Haystack-Related Applications<a class="headerlink" href="#haystack-related-applications" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sub-apps">
+<h2>Sub Apps<a class="headerlink" href="#sub-apps" title="Permalink to this headline">¶</a></h2>
+<p>These are apps that build on top of the infrastructure provided by Haystack.
+Useful for essentially extending what Haystack can do.</p>
+<div class="section" id="queued-search">
+<h3>queued_search<a class="headerlink" href="#queued-search" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://github.com/toastdriven/queued_search">http://github.com/toastdriven/queued_search</a></p>
+<p>Provides a queue-based setup as an alternative to <tt class="docutils literal"><span class="pre">RealTimeSearchIndex</span></tt> or
+constantly running the <tt class="docutils literal"><span class="pre">update_index</span></tt> command. Useful for high-load, short
+update time situations.</p>
+</div>
+<div class="section" id="django-celery-haystack">
+<h3>django-celery-haystack<a class="headerlink" href="#django-celery-haystack" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://github.com/mixcloud/django-celery-haystack-SearchIndex">https://github.com/mixcloud/django-celery-haystack-SearchIndex</a></p>
+<p>Also provides a queue-based setup, this time centered around Celery. Useful
+for keeping the index fresh.</p>
+</div>
+<div class="section" id="saved-searches">
+<h3>saved_searches<a class="headerlink" href="#saved-searches" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://github.com/toastdriven/saved_searches">http://github.com/toastdriven/saved_searches</a></p>
+<p>Adds personalization to search. Retains a history of queries run by the various
+users on the site (including anonymous users). This can be used to present the
+user with their search history and provide most popular/most recent queries
+on the site.</p>
+</div>
+<div class="section" id="haystack-static-pages">
+<h3>haystack-static-pages<a class="headerlink" href="#haystack-static-pages" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://github.com/trapeze/haystack-static-pages">http://github.com/trapeze/haystack-static-pages</a></p>
+<p>Provides a simple way to index flat (non-model-based) content on your site.
+By using the management command that comes with it, it can crawl all pertinent
+pages on your site and add them to search.</p>
+</div>
+<div class="section" id="django-tumbleweed">
+<h3>django-tumbleweed<a class="headerlink" href="#django-tumbleweed" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://github.com/mcroydon/django-tumbleweed">http://github.com/mcroydon/django-tumbleweed</a></p>
+<p>Provides a tumblelog-like view to any/all Haystack-enabled models on your
+site. Useful for presenting date-based views of search data. Attempts to avoid
+the database completely where possible.</p>
+</div>
+</div>
+<div class="section" id="haystack-enabled-apps">
+<h2>Haystack-Enabled Apps<a class="headerlink" href="#haystack-enabled-apps" title="Permalink to this headline">¶</a></h2>
+<p>These are reusable apps that ship with <tt class="docutils literal"><span class="pre">SearchIndexes</span></tt>, suitable for quick
+integration with Haystack.</p>
+<ul class="simple">
+<li>django-faq (freq. asked questions app) - <a class="reference external" href="http://github.com/benspaulding/django-faq">http://github.com/benspaulding/django-faq</a></li>
+<li>django-essays (blog-like essay app) - <a class="reference external" href="http://github.com/bkeating/django-essays">http://github.com/bkeating/django-essays</a></li>
+<li>gtalug (variety of apps) - <a class="reference external" href="http://github.com/myles/gtalug">http://github.com/myles/gtalug</a></li>
+<li>sciencemuseum (science museum open data) - <a class="reference external" href="http://github.com/simonw/sciencemuseum">http://github.com/simonw/sciencemuseum</a></li>
+<li>vz-wiki (wiki) - <a class="reference external" href="http://github.com/jobscry/vz-wiki">http://github.com/jobscry/vz-wiki</a></li>
+<li>ffmff (events app) - <a class="reference external" href="http://github.com/stefreak/ffmff">http://github.com/stefreak/ffmff</a></li>
+<li>Dinette (forums app) - <a class="reference external" href="http://github.com/uswaretech/Dinette">http://github.com/uswaretech/Dinette</a></li>
+<li>fiftystates_site (site) - <a class="reference external" href="http://github.com/sunlightlabs/fiftystates_site">http://github.com/sunlightlabs/fiftystates_site</a></li>
+<li>Open-Knesset (site) - <a class="reference external" href="http://github.com/ofri/Open-Knesset">http://github.com/ofri/Open-Knesset</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Haystack-Related Applications</a><ul>
+<li><a class="reference internal" href="#sub-apps">Sub Apps</a><ul>
+<li><a class="reference internal" href="#queued-search">queued_search</a></li>
+<li><a class="reference internal" href="#django-celery-haystack">django-celery-haystack</a></li>
+<li><a class="reference internal" href="#saved-searches">saved_searches</a></li>
+<li><a class="reference internal" href="#haystack-static-pages">haystack-static-pages</a></li>
+<li><a class="reference internal" href="#django-tumbleweed">django-tumbleweed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#haystack-enabled-apps">Haystack-Enabled Apps</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="who_uses.html"
+                        title="previous chapter">Sites Using Haystack</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="debugging.html"
+                        title="next chapter">Debugging Haystack</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/other_apps.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="debugging.html" title="Debugging Haystack"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="who_uses.html" title="Sites Using Haystack"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

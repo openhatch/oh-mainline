@@ -34,7 +34,7 @@ from mysite.missions.base.tests import (
 from mysite.missions.diffpatch import views, controllers
 
 class PatchSingleFileTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         TwillTests.setUp(self)
@@ -98,7 +98,7 @@ class PatchSingleFileTests(TwillTests):
 
 
 class DiffSingleFileTests(TwillTests):
-    fixtures = ['person-paulproteus', 'user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         TwillTests.setUp(self)
@@ -238,11 +238,7 @@ class DiffSingleFileTests(TwillTests):
 class DiffRecursiveTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
-        TwillTests.setUp(self)
-        self.client = self.login_with_client()
-
-    def test_do_mission_correctly(self):
+    def _calculate_correct_recursive_diff(self):
         orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
         tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
         diff = StringIO()
@@ -259,7 +255,34 @@ class DiffRecursiveTests(TwillTests):
 
         diff.seek(0)
         diff.name = 'foo.patch'
-        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
+        return diff
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
+
+    def test_do_mission_correctly(self):
+        correct_diff = self._calculate_correct_recursive_diff()
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': correct_diff})
+        self.assert_(submit_response.context['diffrecursive_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 1)
+
+    def test_do_mission_correctly_with_extra_slashes(self):
+        # If you pass weird-looking directory names to diff, with extra slashes
+        # (for example: diff -urN old_dir/// new_dir// )
+        # you should still be able to pass the mission.
+
+        # First we calculcate a normal diff.
+        correct_diff = self._calculate_correct_recursive_diff()
+
+        # Then we mutate it to have extra slashes.
+        as_string = correct_diff.getvalue()
+        as_string = as_string.replace('recipes/', 'recipes//')
+        as_stringio = StringIO(as_string)
+        as_stringio.name = 'foo.patch'
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': as_stringio})
         self.assert_(submit_response.context['diffrecursive_success'])
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -355,7 +378,7 @@ class PatchRecursiveTests(TwillTests):
             tar_process.communicate(controllers.PatchRecursiveMission.synthesize_tarball())
             self.assertEqual(tar_process.returncode, 0)
 
-            patch_process = subprocess.Popen(['patch', '-d', os.path.join(tempdir, controllers.PatchRecursiveMission.BASE_NAME), '-p1'], stdin=subprocess.PIPE)
+            patch_process = subprocess.Popen(['patch', '-d', tempdir, '-p1'], stdin=subprocess.PIPE)
             patch_process.communicate(controllers.PatchRecursiveMission.get_patch())
             self.assertEqual(patch_process.returncode, 0)
 

@@ -18,12 +18,9 @@
 
 import mysite.base.unicode_sanity
 import mysite.base.disk_cache
-import simplejson
-from django.core.urlresolvers import reverse
-import django.contrib.auth.views
+from django.utils import simplejson
 from django.core.cache import cache
 from django.conf import settings
-import pprint
 import hashlib
 import re
 import traceback
@@ -32,7 +29,6 @@ import mysite.base.decorators
 import datetime
 import base64
 import os
-import string
 import random
 
 class HaystackIsDown(Exception):
@@ -130,7 +126,10 @@ def _geocode(address):
                     'latitude': latitude,
                     'longitude': longitude}
         return None
-    except Exception, e:
+    except IOError:
+        logging.exception("While attempting to geocode, got an error.")
+        logging.warning("If you are online and still get this message, something is wrong.")
+    except Exception:
         stack = traceback.extract_stack()
         logging.debug('An error occurred: %s' % stack)
         raise
@@ -195,9 +194,3 @@ def get_uri_metadata_for_generating_absolute_links(request):
     data['uri_scheme'] = uri_scheme
     return data
 
-def haystack_results2db_objects(things):
-    try:
-        things.load_all()
-        return [x.object for x in things if x.object is not None]
-    except AttributeError:
-        raise HaystackIsDown()

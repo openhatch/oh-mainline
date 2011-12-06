@@ -1,0 +1,26 @@
+.. _models-ref:
+
+Models reference
+================
+
+User association
+----------------
+
+This class manage association between an openid and a user account.
+
+.. autoclass:: django_authopenid.models.UserAssociation
+
+
+Openid store
+------------
+
+In django-authopenid we create a special openid store (an instance of ``django_authopenid.openid_store.DjangoOpenIDStore`` using Django ORM. It use theses classes to store associations and nonces.
+
+.. autoclass:: django_authopenid.models.Nonce
+
+.. autoclass:: django_authopenid.models.Association
+
+
+.. seealso:: `python-openid documentation <http://openidenabled.com/python-openid/>`_  and `django-registration models documentation <http://bitbucket.org/ubernostrum/django-registration/src/tip/docs/models.txt>`_ for more informations
+
+	

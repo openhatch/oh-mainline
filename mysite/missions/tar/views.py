@@ -52,7 +52,7 @@ def upload(request):
             try:
                 controllers.TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
                 data['create_success'] = True
-                StepCompletion.objects.get_or_create(person=request.user.get_profile(), step=Step.objects.get(name='tar'))
+                controllers.set_mission_completed(request.user.get_profile(), 'tar')
             except controllers.IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = str(e)
         data['create_form'] = form
@@ -88,7 +88,7 @@ def extract_mission_upload(request):
         if form.is_valid():
             if form.cleaned_data['extracted_file'].read() == controllers.UntarMission.get_contents_we_want():
                 data['unpack_success'] = True
-                StepCompletion.objects.get_or_create(person=request.user.get_profile(), step=Step.objects.get(name='tar_extract'))
+                controllers.set_mission_completed(request.user.get_profile(), 'tar_extract')
             else:
                 data['what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
         data['unpack_form'] = form

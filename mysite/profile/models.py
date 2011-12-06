@@ -168,11 +168,6 @@ class Person(models.Model):
         # one (location_is_public)
         return Person.objects.filter(Q(location_confirmed=False) | Q(location_display_name=''))
 
-    def reindex_for_person_search(self):
-        import mysite.profile.tasks
-        task = mysite.profile.tasks.ReindexPerson()
-        task.delay(person_id=self.id)
-
     def get_public_location_or_default(self):
         if self.location_is_public():
             return self.location_display_name
@@ -330,7 +325,7 @@ class Person(models.Model):
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
-        my_tag_texts = (link.tag.text for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me)
+        my_tag_texts = (link.tag.text for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me)
         #eliminate duplicates, case-sensitively, then return
         already_added = set()
         to_return = []
@@ -346,7 +341,7 @@ class Person(models.Model):
 
     def get_tags_as_dict(self):
         ret = collections.defaultdict(set)
-        for link in Link_Person_Tag.objects.filter(person=self):
+        for link in self.link_person_tag_set.all():
             ret[link.tag.tag_type.name].add(link.tag.text.lower())
         return ret
 
@@ -359,7 +354,7 @@ class Person(models.Model):
     def get_tags_for_recommendations(self):
         """Return a list of Tags linked to this Person.  For use with bug recommendations."""
         exclude_me = TagType.objects.filter(name='understands_not')
-        return [link.tag for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
+        return [link.tag for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me]
 
     def get_full_name(self):
         # {{{
@@ -526,13 +521,6 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
     instance.project.update_cached_contributor_count_and_save()
 
-def update_the_person_index(sender, instance, **kwargs):
-    person = instance.person
-    # Enqueue a background task to re-index the person
-    import mysite.profile.tasks
-    task = mysite.profile.tasks.ReindexPerson()
-    task.delay(person_id=person.id)
-
 models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
 
 class TagType(models.Model):
@@ -546,6 +534,7 @@ class TagType(models.Model):
 
     def __unicode__(self):
         return self.name
+
     # }}}
 
 class Tag(models.Model):
@@ -561,13 +550,6 @@ class Tag(models.Model):
         if self.text:
             return super(Tag, self).save(*args, **kwargs)
         raise ValueError
-
-    @staticmethod
-    def get_people_by_tag_name(tag_name):
-        peeps = []
-        for tag_type in TagType.objects.all():
-            peeps.extend(mysite.profile.controllers.people_matching(tag_type.name, tag_name))
-        return peeps
 
     def __unicode__(self):
         return "%s: %s" % (self.tag_type.name, self.text)
@@ -830,17 +812,35 @@ class Forwarder(models.Model):
 
     @staticmethod
     def garbage_collect():
-        deleted_one = False
-        for forwarder in Forwarder.objects.all():
-            # if it's expired delete it
-            now = datetime.datetime.utcnow()
-            if forwarder.expires_on < now:
-                forwarder.delete()
-                deleted_one = True
-            # else if it's too old to be displayed and they still want a forwarder: make a fresh new one
-            elif forwarder.stops_being_listed_on < now and '$fwd' in forwarder.user.get_profile().contact_blurb:
-                mysite.base.controllers.generate_forwarder(forwarder.user)
-        return deleted_one
+        made_any_changes = False
+
+        # First, delete any Forwarders that ought to be destroyed.
+        now = datetime.datetime.utcnow()
+        expirable = Forwarder.objects.filter(expires_on__lt=now)
+        if expirable:
+            made_any_changes = True
+            expirable.delete()
+
+        # Second, for users who have '$fwd' in their blurb, if they have no
+        # corresonding Forwarder object that we can list on the site, give
+        # them one.
+        user_ids_that_need_forwarders = Person.objects.filter(
+            contact_blurb__contains='$fwd').values_list('user_id', flat=True)
+
+        user_ids_with_up_to_date_forwarders = Forwarder.objects.filter(
+            user__id__in=user_ids_that_need_forwarders,
+            stops_being_listed_on__gt=now).values_list('user__id', flat=True)
+
+        user_ids_needing_regeneration = (set(
+                user_ids_that_need_forwarders).difference(
+                set(user_ids_with_up_to_date_forwarders)))
+        users_needing_regeneration = [User.objects.get(pk=pk)
+                                      for pk in user_ids_needing_regeneration]
+        for user in users_needing_regeneration:
+            mysite.base.controllers.generate_forwarder(user)
+            made_any_changes = True
+
+        return made_any_changes
 
     @staticmethod
     def generate_list_of_lines_for_postfix_table():
@@ -883,7 +883,6 @@ def make_forwarder_actually_work(sender, instance, **kwargs):
     RegeneratePostfixAliasesForForwarder().run()
 
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
-models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
 models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
 models.signals.post_save.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
 models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)

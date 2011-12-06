@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Backend Support &mdash; Haystack v1.2.5-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2.5-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Haystack v1.2.5-beta documentation" href="index.html" />
+    <link rel="next" title="Installing Search Engines" href="installing_search_engines.html" />
+    <link rel="prev" title="Architecture Overview" href="architecture_overview.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installing_search_engines.html" title="Installing Search Engines"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="architecture_overview.html" title="Architecture Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="backend-support">
+<span id="ref-backend-support"></span><h1>Backend Support<a class="headerlink" href="#backend-support" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="supported-backends">
+<h2>Supported Backends<a class="headerlink" href="#supported-backends" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://lucene.apache.org/solr/">Solr</a></li>
+<li><a class="reference external" href="http://whoosh.ca/">Whoosh</a></li>
+<li><a class="reference external" href="http://xapian.org/">Xapian</a></li>
+</ul>
+</div>
+<div class="section" id="backend-capabilities">
+<h2>Backend Capabilities<a class="headerlink" href="#backend-capabilities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Solr<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>Complete &amp; included with Haystack.</strong></p>
+<ul class="simple">
+<li>Full SearchQuerySet support</li>
+<li>Automatic query building</li>
+<li>&#8220;More Like This&#8221; functionality</li>
+<li>Term Boosting</li>
+<li>Faceting</li>
+<li>Stored (non-indexed) fields</li>
+<li>Highlighting</li>
+<li>Requires: pysolr (2.0.13+) &amp; Solr 1.3+</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Whoosh<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p><strong>Complete &amp; included with Haystack.</strong></p>
+<ul class="simple">
+<li>Full SearchQuerySet support</li>
+<li>Automatic query building</li>
+<li>Term Boosting</li>
+<li>Stored (non-indexed) fields</li>
+<li>Highlighting</li>
+<li>Requires: whoosh (1.1.1+)</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Xapian<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><strong>Complete &amp; available as a third-party download.</strong></p>
+<ul class="simple">
+<li>Full SearchQuerySet support</li>
+<li>Automatic query building</li>
+<li>&#8220;More Like This&#8221; functionality</li>
+<li>Term Boosting</li>
+<li>Faceting</li>
+<li>Stored (non-indexed) fields</li>
+<li>Highlighting</li>
+<li>Requires: Xapian 1.0.5+ &amp; python-xapian 1.0.5+</li>
+<li>Backend can be downloaded here: <a class="reference external" href="http://github.com/notanumber/xapian-haystack/">xapian-haystack</a></li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="19%" />
+<col width="16%" />
+<col width="13%" />
+<col width="9%" />
+<col width="8%" />
+<col width="12%" />
+<col width="11%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Backend</th>
+<th class="head">SearchQuerySet Support</th>
+<th class="head">Auto Query Building</th>
+<th class="head">More Like This</th>
+<th class="head">Term Boost</th>
+<th class="head">Faceting</th>
+<th class="head">Stored Fields</th>
+<th class="head">Highlighting</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Solr</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr><td>Whoosh</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr><td>Xapian</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes (plugin)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="wishlist">
+<h2>Wishlist<a class="headerlink" href="#wishlist" title="Permalink to this headline">¶</a></h2>
+<p>The following are search backends that would be nice to have in Haystack but are
+licensed in a way that prevents them from being officially bundled. If the
+community expresses interest in any of these, there may be future development.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.sphinxsearch.com/">Sphinx</a></li>
+<li><a class="reference external" href="http://hyperestraier.sourceforge.net/">Hyper Estraier</a></li>
+</ul>
+<div class="section" id="id4">
+<h3>Sphinx<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Full SearchQuerySet support</li>
+<li>Automatic query building</li>
+<li>Term Boosting</li>
+<li>Stored (non-indexed) fields</li>
+<li>Highlighting</li>
+<li>Requires: sphinxapi.py (Comes with Sphinx)</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h3>Hyper Estraier<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Full SearchQuerySet support</li>
+<li>Automatic query building</li>
+<li>&#8220;More Like This&#8221; functionality</li>
+<li>Highlighting</li>
+<li>Requires: SWIG bindings</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="19%" />
+<col width="16%" />
+<col width="13%" />
+<col width="9%" />
+<col width="8%" />
+<col width="12%" />
+<col width="11%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Backend</th>
+<th class="head">SearchQuerySet Support</th>
+<th class="head">Auto Query Building</th>
+<th class="head">More Like This</th>
+<th class="head">Term Boost</th>
+<th class="head">Faceting</th>
+<th class="head">Stored Fields</th>
+<th class="head">Highlighting</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Sphinx</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr><td>Hyper Estraier</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes (plugin)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Backend Support</a><ul>
+<li><a class="reference internal" href="#supported-backends">Supported Backends</a></li>
+<li><a class="reference internal" href="#backend-capabilities">Backend Capabilities</a><ul>
+<li><a class="reference internal" href="#id1">Solr</a></li>
+<li><a class="reference internal" href="#id2">Whoosh</a></li>
+<li><a class="reference internal" href="#id3">Xapian</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wishlist">Wishlist</a><ul>
+<li><a class="reference internal" href="#id4">Sphinx</a></li>
+<li><a class="reference internal" href="#id5">Hyper Estraier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="architecture_overview.html"
+                        title="previous chapter">Architecture Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installing_search_engines.html"
+                        title="next chapter">Installing Search Engines</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/backend_support.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="installing_search_engines.html" title="Installing Search Engines"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="architecture_overview.html" title="Architecture Overview"
+             >previous</a> |</li>
+        <li><a href="toc.html">Haystack v1.2.5-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Daniel Lindsley.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>

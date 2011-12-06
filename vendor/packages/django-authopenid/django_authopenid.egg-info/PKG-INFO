@@ -1,0 +1,22 @@
+Metadata-Version: 1.0
+Name: django-authopenid
+Version: 1.0.1
+Summary: Openid authentification application for Django
+Home-page: http://hg.e-engura.org/django-authopenid/
+Author: Benoit Chesneau
+Author-email: bchesneau@gmail.com
+License: Apache License 2
+Description: Django authentification application with openid using django auth contrib.
+        This application allow a user to connect to you website with a legacy account
+        (username/password) or an openid url.
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Utilities
+Classifier: Topic :: System :: Systems Administration :: Authentication/Directory

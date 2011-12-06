@@ -1,0 +1,44 @@
+2009-05-09, v1.3.4
+
+    - Atomic file writes
+
+2008-08-19, v1.3.3
+
+    - Update to request.path_info (see Django rev #8015)
+
+2008-06-21, v1.3.2
+
+    - Bugfix for unicode paths
+    
+    - Minor performance enhancement in Middleware
+
+2008-06-03, v1.3.1
+
+    - Updated inline docs, Added DOC document
+
+2008-06-03, v1.3
+
+    - Added response Middleware
+
+2008-02-12, v1.2
+
+    - Updated syntax using actual Python args
+    
+    - Minor code effiencies
+
+2008-01-09, v1.1
+
+    - Added support for HttpRequest.get_host() using Sites framework or
+      settings.SERVER_NAME
+      
+    - Added path/file delete
+
+
+2008-01-08, v1.0.1
+
+    - Added missing Model import
+
+
+2008-01-07, v1.0
+
+    - Initial version

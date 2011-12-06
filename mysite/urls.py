@@ -38,6 +38,7 @@ from django.views.generic.simple import direct_to_template
 from voting.views import vote_on_object
 
 import mysite.account.views
+import mysite.profile.views
 
 from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
 
@@ -174,8 +175,8 @@ urlpatterns = patterns('',
         (r'^people/$',
             'mysite.profile.views.people'),
 
-        (r'^\+cacheable/\+people/location_data/$',
-            'mysite.profile.views.person_id2data_as_javascript'),
+        (r'^\+profile_api/location_data/$',
+            mysite.profile.views.LocationDataApiView.as_view()),
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
 
@@ -372,8 +373,6 @@ urlpatterns = patterns('',
         (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
 
         (r'^\+geocode$', 'mysite.base.views.geocode'),
-
-                       (r'^hearch/', include('haystack.urls')),
 
         (r'^edit/name$', lambda x: redirect(to=mysite.account.views.edit_name, permanent=True)),
 

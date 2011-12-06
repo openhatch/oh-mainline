@@ -1,0 +1,7 @@
+html2text.py
+setup.cfg
+pip-egg-info/html2text.egg-info/PKG-INFO
+pip-egg-info/html2text.egg-info/SOURCES.txt
+pip-egg-info/html2text.egg-info/dependency_links.txt
+pip-egg-info/html2text.egg-info/not-zip-safe
+pip-egg-info/html2text.egg-info/top_level.txt

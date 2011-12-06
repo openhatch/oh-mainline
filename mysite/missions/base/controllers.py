@@ -35,9 +35,13 @@ import binascii
 import otp
 import tempfile
 import pipes
+import logging
 
 def get_mission_data_path(mission_type):
-    return os.path.join(os.path.dirname(__file__), '..', mission_type, 'data')
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    new_path = os.path.join(base_path, '..', mission_type, 'data')
+    absolute_ified = os.path.abspath(new_path)
+    return absolute_ified
 
 def set_mission_completed(profile, mission_name):
     s, _ = StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
