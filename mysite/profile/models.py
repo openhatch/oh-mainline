@@ -88,6 +88,12 @@ class RepositoryCommitter(models.Model):
     class Meta:
         unique_together = ('project', 'data_import_attempt')
 
+class Location(models.Model):
+    '''A simple Location object.'''
+    display_name = models.CharField(max_length=255, blank=False, unique=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
