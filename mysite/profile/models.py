@@ -94,6 +94,10 @@ class Location(models.Model):
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
 
+    def __unicode__(self):
+        return u'pk=%d, name=%s, lat=%s, long=%s' % (
+            self.pk, self.display_name, self.latitude, self.longitude)
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
