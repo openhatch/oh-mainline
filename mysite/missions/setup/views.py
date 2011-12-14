@@ -34,3 +34,7 @@ class WindowsMainPage(WindowsMissionPage):
 class WindowsInstallGitBash(WindowsMissionPage):
     this_mission_page_short_name = 'Install Git Bash'
     template_name = 'missions/windows-setup/install-git-bash.html'
+
+class WindowsOpenPrompt(WindowsMissionPage):
+    this_mission_page_short_name = 'Open the Git Bash prompt'
+    template_name = 'missions/windows-setup/open-prompt.html'
