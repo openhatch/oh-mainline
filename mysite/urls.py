@@ -145,6 +145,7 @@ urlpatterns = patterns('',
         (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
 
         (r'^missions/windows-setup$', mysite.missions.setup.views.WindowsMainPage.as_view(), None, 'missions-windows-setup-main-page'),
+        (r'^missions/windows-setup/install-git-bash$', mysite.missions.setup.views.WindowsInstallGitBash.as_view(), None, 'missions-windows-setup-install-git-bash'),
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),

@@ -30,3 +30,7 @@ class WindowsMissionPage(django.views.generic.TemplateView):
 class WindowsMainPage(WindowsMissionPage):
     this_mission_page_short_name = 'What we recommend and why'
     template_name = 'missions/windows-setup/about.html'
+
+class WindowsInstallGitBash(WindowsMissionPage):
+    this_mission_page_short_name = 'Install Git Bash'
+    template_name = 'missions/windows-setup/install-git-bash.html'
