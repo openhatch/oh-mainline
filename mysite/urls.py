@@ -39,6 +39,7 @@ from voting.views import vote_on_object
 
 import mysite.account.views
 import mysite.profile.views
+import mysite.missions.setup.views
 
 from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
 
@@ -142,6 +143,8 @@ urlpatterns = patterns('',
         (r'^missions/git/diff/submit$', 'mysite.missions.git.views.diff_submit'),
         (r'^missions/git/rebase$', 'mysite.missions.git.views.rebase'),
         (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
+
+        (r'^missions/windows-setup$', mysite.missions.setup.views.WindowsMainPage.as_view(), None, 'missions-windows-setup-main-page'),
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
