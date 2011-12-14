@@ -19,12 +19,13 @@
 
 import django.views.generic
 
-class WindowsMainPage(django.views.generic.TemplateView):
-    template_name = 'missions/windows-setup/about.html'
-
+class WindowsMissionPage(django.views.generic.TemplateView):
     def get_context_data(self):
-        data = super(WindowsMainPage, self).get_context_data()
+        data = super(WindowsMissionPage, self).get_context_data()
         data.update({
                 'this_mission_page_short_name': 'What we recommend and why',
                 'mission_name': 'Finding the command line on Windows'})
         return data
+
+class WindowsMainPage(WindowsMissionPage):
+    template_name = 'missions/windows-setup/about.html'
