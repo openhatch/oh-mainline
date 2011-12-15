@@ -46,3 +46,7 @@ class WindowsUnderstandPrompt(WindowsMissionPage):
 class WindowsBrowseFiles(WindowsMissionPage):
     this_mission_page_short_name = 'Navigating through folders'
     template_name = 'missions/windows-setup/navigating.html'
+
+class WindowsQuickReference(WindowsMissionPage):
+    this_mission_page_short_name = 'Quick reference'
+    template_name = 'missions/windows-setup/quick-reference.html'

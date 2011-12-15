@@ -149,6 +149,7 @@ urlpatterns = patterns('',
         (r'^missions/windows-setup/open-git-bash-prompt$', mysite.missions.setup.views.WindowsOpenPrompt.as_view(), None, 'missions-windows-setup-open-git-bash-prompt'),
         (r'^missions/windows-setup/understand-prompt$', mysite.missions.setup.views.WindowsUnderstandPrompt.as_view(), None, 'missions-windows-setup-understand-prompt'),
         (r'^missions/windows-setup/navigating$', mysite.missions.setup.views.WindowsBrowseFiles.as_view(), None, 'missions-windows-setup-navigating'),
+        (r'^missions/windows-setup/quick-reference$', mysite.missions.setup.views.WindowsQuickReference.as_view(), None, 'missions-windows-setup-quick-reference'),
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
