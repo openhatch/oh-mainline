@@ -42,3 +42,7 @@ class WindowsOpenPrompt(WindowsMissionPage):
 class WindowsUnderstandPrompt(WindowsMissionPage):
     this_mission_page_short_name = 'Understanding the prompt and running programs'
     template_name = 'missions/windows-setup/understand-prompt.html'
+
+class WindowsBrowseFiles(WindowsMissionPage):
+    this_mission_page_short_name = 'Navigating through folders'
+    template_name = 'missions/windows-setup/navigating.html'

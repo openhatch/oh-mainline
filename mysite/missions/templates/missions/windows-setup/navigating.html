@@ -1,0 +1,69 @@
+{% extends 'missions/windows-setup/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load base_extras %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>{{ this_mission_page_short_name }}</h3>
+  </div>
+  <div class="body">
+    <p>When Git Bash opens, it starts "in" your user folder on your
+    computer. The bash prompt shows you the current working directory,
+    abbreviated slightly. You can see the full path by typing this and
+    pressing enter:</p>
+
+    <blockquote><tt>pwd</blockquote></tt>
+
+    <p>Short, abbreviated command names are common in bash. This
+    stands for "Print Working Directory." (Directory is another term
+    for folder.)</p>
+
+    <p>You can list the files and folders that are underneath the current working directory by typing:</p>
+
+    <blockquote><tt>ls</tt></blockquote>
+
+    <p>You'll find an entry labeled "Desktop" You can change into that directory with "cd":</p>
+
+    <blockquote><tt>cd Desktop</tt></blockquote>
+
+    <p>You should see that the prompt has changed to reflect that you
+    are "in" the Desktop. Now when you ask for a directory
+    listing:</p>
+
+    <blockquote><tt>ls</tt></blockquote>
+
+    <p>You'll see all the things on your computer's desktop. If your
+    desktop is empty, try creating a file and saving it on the
+    desktop. Once you've done that, if you run "ls" again, you will
+    see your new file.</p>
+
+    <p>You can change to the directory "above" the current working directory by using a special name, "..". Try typing these commands and pressing enter after each one:</p>
+
+    <blockquote><tt>cd ..<br>
+	ls</tt></blockquote>
+
+    <p>You should see the same directory listing as you saw first!</p>
+
+    <p>This concludes our tutorial. You might enjoy referring to the quick reference later on. For now, we suggest you go...</p>
+
+    <p class="next_mission_link">
+	<a href="{% url mysite.missions.base.views.main_page %}">On to the training missions! &raquo;</a></p>
+
+{% endblock mission_main %}
