@@ -50,3 +50,7 @@ class WindowsBrowseFiles(WindowsMissionPage):
 class WindowsQuickReference(WindowsMissionPage):
     this_mission_page_short_name = 'Quick reference'
     template_name = 'missions/windows-setup/quick-reference.html'
+
+class WindowsAlternatives(WindowsMissionPage):
+    this_mission_page_short_name = 'Alternatives'
+    template_name = 'missions/windows-setup/alternatives.html'
