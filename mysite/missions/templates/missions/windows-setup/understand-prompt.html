@@ -1,0 +1,52 @@
+{% extends 'missions/windows-setup/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load base_extras %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>{{ this_mission_page_short_name }}</h3>
+  </div>
+  <div class="body">
+    <p>With Git Bash open, you see a black box with white text. It will look something like
+      <a target="_blank" href="http://www.prosoftstudio.com/wp-content/uploads/2011/05/01-Open-Git-Bash.png">this screenshot.</a></p>
+
+    <p>The prompt, provided by bash, shows you:</p>
+    <ul class="raquo_bullets">
+      <li>Your username on your computer</li>
+      <li>Your computer's name</li>
+      <li>The current working directory</li>
+    </ul>
+
+    <p>It is called a "prompt" because bash is waiting for you to tell it what to do!</p>
+
+    <p>You can type commands into this prompt and it will print the result. For example, type the following command and press enter. The program you execute will print your username and then exit; once it exits, the prompt awaits your next instruction.</p>
+
+    <blockquote><tt>whoami</tt></blockquote>
+
+    <p>Because this runs in the same environment as your other Windows apps, you can even launch graphical Windows programs from this prompt. For example, type just:</p>
+
+    <blockquote><tt>control</tt></blockquote>
+
+    <p>into the prompt, and press enter. You should see the Windows Control Panel open up in a separate window!</p>
+
+    <p class="next_mission_link">
+	<a href="{% url missions-windows-setup-understand-prompt %}">Read on to learn about browsing files and folders &raquo;</a></p>
+
+{% endblock mission_main %}
