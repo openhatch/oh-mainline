@@ -33,17 +33,17 @@
         <p><strong>You have successfully completed this mission.</strong></p>
         <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset its state</a> and try again.</p>
         {% block js %}
-        {{ block.super }}        
+        {{ block.super }}
         <script type='text/javascript' src="{% version '/static/js/missions/base.js' %}"></script>
         <script type='text/javascript'>
         if (typeof OH === 'undefined') OH = {};
-        if (typeof OH.Page === 'undefined') OH.Page = {};        
+        if (typeof OH.Page === 'undefined') OH.Page = {};
         OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
         OH.Page['mission_parts'] = 'tar,tar_extract';
         </script>
         {% endblock %}
       </div>
-      {% endif %}          
+      {% endif %}
       <p class="next_mission_link">
 	<a href="{% url mysite.missions.tar.views.unpacking %}">Get started with unpacking &raquo;</a></p>
 

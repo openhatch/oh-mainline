@@ -29,11 +29,14 @@ $(function() {
                     var items = ['#success-msg', '#next-mission-link'];
                     var len = items.length;
                     var obj = null;
-                    
+
                     for (var i = 0; i < len; i++) {;
                       obj = $(items[i]);
                       if (obj) obj.fadeOut(500);
                     }
+
+		    // Now, update the mission status indicators.
+		    $('.tick-progress').removeClass('tick-progress').addClass('cross-progress');
                 }
             )
         }
