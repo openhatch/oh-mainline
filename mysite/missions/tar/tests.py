@@ -60,6 +60,15 @@ class TarMissionTests(TestCase):
         else:
             self.fail('no exception raised')
 
+    def test_bad_tarball_5(self):
+        # should fail due to silly ._ files from a Mac
+        try:
+            controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-5.tar.gz')).read())
+        except controllers.IncorrectTarFile, e:
+            self.assert_('Mac OS X' in e.args[0])
+        else:
+            self.fail('no exception raised')
+
 
 class TarUploadTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
