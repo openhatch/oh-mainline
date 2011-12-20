@@ -354,6 +354,10 @@ class LaunchpadTrackerModel(TrackerModel):
     launchpad_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
             help_text="This is the name that Launchpad.net uses to identify the project.")
+    bitesized_tag = models.CharField(max_length=50, blank=True,
+            help_text="This is the value of the tag that indicates a bite-sized bug.")
+    documentation_tag = models.CharField(max_length=50, blank=True,
+            help_text="This is the value of the tag that indicates documentation bug.")
 
     all_trackers = models.Manager()
 

@@ -81,7 +81,7 @@ class LaunchpadBugImporter(BugImporter):
             self.determine_if_finished()
             return
         for bug_url, task_data in bug_list:
-            lp_bug = LaunchpadBug()
+            lp_bug = LaunchpadBug(self.tm)
             if task_data:
                 self.handle_task_data_json(task_data, lp_bug)
             else:
@@ -179,7 +179,8 @@ class LaunchpadBugImporter(BugImporter):
 
 
 class LaunchpadBug(object):
-    def __init__(self):
+    def __init__(self, tracker):
+        self._tracker = tracker
         self._data = {}
         self._data['last_polled'] =  datetime.datetime.utcnow()
 
@@ -199,6 +200,10 @@ class LaunchpadBug(object):
         self.owner_link = data['owner_link']
         self._data['last_touched'] = self._parse_datetime(data['date_last_updated'])
         self._data['description'] = data['description']
+        self._data['concerns_just_documentation'] = \
+            self._tracker.documentation_tag in data['tags']
+        self._data['good_for_newcomers'] = \
+            self._tracker.bitesized_tag in data['tags']
 
     def parse_subscriptions(self, data):
         self._data['people_involved'] = int(data['total_size'])

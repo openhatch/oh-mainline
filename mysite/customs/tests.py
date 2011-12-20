@@ -108,6 +108,10 @@ class FakeGetPage(object):
         self.url2data['https://api.launchpad.net/1.0/~vila']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
         self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461')).read()
         self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461closed']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461closed')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461doc']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461doc')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461doc']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461doc')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461bite']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461bite')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461bite']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461bite')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -2152,7 +2156,9 @@ class LaunchpadBugImport(django.test.TestCase):
     def setUp(self):
         self.tm = mysite.customs.models.LaunchpadTrackerModel.all_trackers.create(
                 tracker_name='bzr',
-                launchpad_name='bzr',)
+                launchpad_name='bzr',
+                bitesized_tag='easy',
+                documentation_tag='doc')
         self.dm = mock.Mock(name='dm')
         self.dm.running_deferreds = 0
         self.im = mysite.customs.bugimporters.launchpad.LaunchpadBugImporter(self.tm, self.dm)
@@ -2169,6 +2175,8 @@ class LaunchpadBugImport(django.test.TestCase):
         bug_model.save.assert_called_with()
         self.assert_bug(bug_model)
         self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
 
     @mock.patch('mysite.search.models.Bug.all_bugs.get')
     @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
@@ -2181,6 +2189,8 @@ class LaunchpadBugImport(django.test.TestCase):
         bug_model.save.assert_called_with()
         self.assert_bug(bug_model)
         self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
 
     @mock.patch('mysite.search.models.Bug.all_bugs.get')
     @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
@@ -2192,7 +2202,38 @@ class LaunchpadBugImport(django.test.TestCase):
 
         bug_model.save.assert_called_with()
         self.assert_bug(bug_model)
+
         self.assertEqual(True, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs_doc(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461doc', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(True, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs_bitsized(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461bite', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(True, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
 
     def assert_bug(self, bug_model):
         self.assertEqual('Confirmed', bug_model.status)
