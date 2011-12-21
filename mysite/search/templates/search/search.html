@@ -123,6 +123,7 @@ Volunteer opportunities in free and open source software
                 </div>
 
                 <div id='personal_recommendations'>
+		  {% if settings.RECOMMEND_BUGS %}
                     <h3>Recommended searches</h3>
                     {% if user.is_authenticated %}
                     {% if suggestions %}
@@ -157,6 +158,7 @@ Volunteer opportunities in free and open source software
                         </li>
                     </ul>
                     {% endif %}
+		    {% endif %}
                 </div>
 
             {% endif %}
