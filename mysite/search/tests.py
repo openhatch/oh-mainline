@@ -33,6 +33,7 @@ import mysite.project.views
 
 from django.utils.unittest import skipIf
 import django.db
+import django.conf
 
 from django.utils import simplejson
 import mock
@@ -243,6 +244,33 @@ class SearchResults(TwillTests):
 
         for bug in bugs:
             tc.find(bug.description)
+
+class RecommendationsCanBeDisabled(SearchTest):
+    fixtures = ['user-paulproteus.json',
+            'person-paulproteus.json',
+            'cchost-data-imported-from-ohloh.json',
+            'bugs-for-two-projects.json',
+            'extra-fake-cchost-related-citations.json']
+
+    def setUp(self, *args, **kwargs):
+        super(RecommendationsCanBeDisabled, self).setUp(*args, **kwargs)
+        self.old_recommend_bugs = django.conf.settings.RECOMMEND_BUGS
+        django.conf.settings.RECOMMEND_BUGS = False
+
+    def tearDown(self, *args, **kwargs):
+        super(RecommendationsCanBeDisabled, self).tearDown(*args, **kwargs)
+        django.conf.settings.RECOMMEND_BUGS = self.old_recommend_bugs
+
+    @mock.patch('mysite.profile.models.Person._get_recommended_search_terms')
+    def test(self, mock):
+        # Create the Person object
+        p = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        # Call the method to get recommendations
+        terms = p.get_recommended_search_terms()
+        # Assert it is empty, but moreover, assert that the real worker function
+        # was never called.
+        self.assertFalse(terms)
+        self.assertFalse(mock.called)
 
 class Recommend(SearchTest):
     fixtures = ['user-paulproteus.json',
