@@ -55,6 +55,8 @@ SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary
 ### Use Xapian, not Whoosh, on the deployment
 HAYSTACK_SEARCH_ENGINE='xapian'
 
+RECOMMEND_BUGS=False
+
 ### Set the logging level to just WARNING or above
 import logging
 logger = logging.getLogger('')

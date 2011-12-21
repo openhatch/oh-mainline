@@ -312,6 +312,8 @@ if sys.platform.startswith('win'):
     MIDDLEWARE_CLASSES.remove(
         'staticgenerator.middleware.StaticGeneratorMiddleware')
 
+### Enable the low-quality, high-load bug recommendation system
+RECOMMEND_BUGS=True
 
 ENABLE_NEW_IWH_HANDLER = False
 ### Include a user's customizations

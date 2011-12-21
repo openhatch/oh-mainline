@@ -288,6 +288,11 @@ class Person(models.Model):
         return terms_with_results
 
     def get_recommended_search_terms(self):
+        if settings.RECOMMEND_BUGS:
+            return self._get_recommended_search_terms()
+        return []
+
+    def _get_recommended_search_terms(self):
         # {{{
         terms = []
 
