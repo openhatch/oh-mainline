@@ -103,6 +103,7 @@ class FakeGetPage(object):
         self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
         self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks&created_since=1970-01-01T00%3A00%3A00']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
         self.url2data['https://api.launchpad.net/1.0/bugs/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
         self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
         self.url2data['https://api.launchpad.net/1.0/~vila']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
@@ -1974,6 +1975,22 @@ class LaunchpadBugImport(django.test.TestCase):
         self.im.process_queries([query])
 
         query.save.assert_called_with()
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_queries_with_real_query(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        query = mysite.customs.models.LaunchpadQueryModel.objects.create(tracker=self.tm)
+        old_last_polled = query.last_polled
+        self.im.process_queries([query])
+
+        self.assertGreater(mysite.customs.models.LaunchpadQueryModel.objects.get().last_polled,
+                           old_last_polled)
         bug_model.save.assert_called_with()
         self.assert_bug(bug_model)
         self.assertEqual(False, bug_model.looks_closed)
