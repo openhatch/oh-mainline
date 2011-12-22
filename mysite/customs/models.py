@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import urlparse
+import urllib
 import reversion
 
 from django.db import models
@@ -343,3 +345,36 @@ class RoundupQueryModel(TrackerQueryModel):
 
 reversion.register(RoundupTrackerModel, follow=["roundupquerymodel_set"])
 reversion.register(RoundupQueryModel)
+
+class LaunchpadTrackerModel(TrackerModel):
+    '''This model stores the data for individual launchpad tracker'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False,
+            help_text="This is the name that OpenHatch will use to identify the project.")
+    launchpad_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False,
+            help_text="This is the name that Launchpad.net uses to identify the project.")
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+class LaunchpadQueryModel(TrackerQueryModel):
+    '''This model stores query URLs for LaunchpadTracker objects.'''
+    url = models.URLField(max_length=400,
+                          blank=False, null=False)
+    description = models.CharField(max_length=200, blank=True, default='')
+    tracker = models.ForeignKey(LaunchpadTrackerModel)
+
+    def get_query_url(self):
+        pr = urlparse.urlparse(self.url)
+        qs = urlparse.parse_qsl(pr.query)
+        qs.append(('created_since', self.last_polled.isoformat()))
+        qs = urllib.urlencode(qs)
+        pr = (pr.scheme, pr.netloc, pr.path, pr.params, qs, pr.fragment)
+        url = urlparse.urlunparse(pr)
+        return url
+
+reversion.register(LaunchpadTrackerModel, follow=["launchpadquerymodel_set"])
+reversion.register(LaunchpadQueryModel)

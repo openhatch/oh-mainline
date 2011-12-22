@@ -50,6 +50,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 from urllib2 import HTTPError
 import datetime
+from dateutil.tz import tzutc
 
 import twisted.internet.defer
 
@@ -101,6 +102,12 @@ class FakeGetPage(object):
         self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
+        self.url2data['https://api.launchpad.net/1.0/~vila']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461closed']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461closed')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -2140,3 +2147,64 @@ class BugzillaTrackerEditingViews(TwillTests):
                          mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
+
+class LaunchpadBugImport(django.test.TestCase):
+    def setUp(self):
+        self.tm = mysite.customs.models.LaunchpadTrackerModel.all_trackers.create(
+                tracker_name='bzr',
+                launchpad_name='bzr',)
+        self.dm = mock.Mock(name='dm')
+        self.dm.running_deferreds = 0
+        self.im = mysite.customs.bugimporters.launchpad.LaunchpadBugImporter(self.tm, self.dm)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_queries(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        query = mock.Mock(name='query')
+        query.get_query_url.return_value = 'https://api.launchpad.net/1.0/bzr?ws.op=searchTasks'
+        self.im.process_queries([query])
+
+        query.save.assert_called_with()
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs_closed(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461closed', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(True, bug_model.looks_closed)
+
+    def assert_bug(self, bug_model):
+        self.assertEqual('Confirmed', bug_model.status)
+        self.assertEqual(datetime.datetime(2011, 9, 2, 10, 42, 43, 883929, tzinfo=tzutc()), bug_model.date_reported)
+        self.assertEqual(u'Bug #839461 in Bazaar: "can\'t run selftest for 2.2 with recent subunit/testtools"', bug_model.title)
+        self.assertEqual('Critical', bug_model.importance)
+        self.assertEqual('https://bugs.launchpad.net/bzr/+bug/839461', bug_model.canonical_bug_link)
+
+        self.assertEqual(datetime.datetime(2011, 12, 16, 9, 21, 28, 695637, tzinfo=tzutc()),  bug_model.last_touched)
+        self.assertEqual("While freezing bzr-2.2.5 from a natty machine with python-2.7.1+,\nlp:testtools revno 244 and lp:subunit revno 151 I wasn't able to\nrun 'make check-dist-tarball'.\n\nI had to revert to testtools-0.9.2 and subunit 0.0.6 and use\npython2.6 to successfully run:\n\n  BZR_PLUGIN_PATH=-site make check-dist-tarball PYTHON=python2.6 | subunit2pyunit\n\nAlso, I've checked the versions used on pqm:\n\n(pqm-amd64-new)pqm@cupuasso:~/pqm-workdir/bzr+ssh/new-pqm-test$ dpkg -l | grep subunit\nii  libsubunit-perl                                 0.0.6-1~bazaar1.0.IS.10.04            perl parser and diff for Subunit streams\nii  python-subunit                                  0.0.6-1~bazaar1.0.IS.10.04            unit testing protocol - Python bindings to g\nii  subunit                                         0.0.6-1~bazaar1.0.IS.10.04            command line tools for processing Subunit st\n(pqm-amd64-new)pqm@cupuasso:~/pqm-workdir/bzr+ssh/new-pqm-test$ dpkg -l | grep testtools\nii  python-testtools                                0.9.6-0~bazaar1.0.IS.8.04             Extensions to the Python unittest library", bug_model.description)
+
+        self.assertEqual(1, bug_model.people_involved)
+
+        self.assertEqual('vila', bug_model.submitter_username)
+        self.assertEqual('Vincent Ladeuil', bug_model.submitter_realname)
