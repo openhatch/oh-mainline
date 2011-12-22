@@ -2097,3 +2097,5 @@ class LaunchpadTrackerEditingViews(TwillTests):
 
         self.assertEqual(1,
                          mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(1,
+                         mysite.customs.models.LaunchpadQueryModel.objects.all().count())

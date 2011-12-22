@@ -79,6 +79,16 @@ class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
     class Meta:
         model = mysite.customs.models.LaunchpadTrackerModel
 
+    def save(self, *args, **kwargs):
+        # Call out to superclass
+        obj = super(LaunchpadTrackerForm, self).save(*args, **kwargs)
+
+        # In our case, now is a good time to make sure that a QueryModel gets created
+        lqm, _ = mysite.customs.models.LaunchpadQueryModel.objects.get_or_create(tracker=obj)
+
+        # Return the "upstream" return value
+        return obj
+
 class LaunchpadQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.LaunchpadQueryModel
