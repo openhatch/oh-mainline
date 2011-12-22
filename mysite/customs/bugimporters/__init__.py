@@ -50,6 +50,6 @@ all_trackers = {
             'model': mysite.customs.models.LaunchpadTrackerModel,
             'form':  mysite.customs.forms.LaunchpadTrackerForm,
             'urlmodel': mysite.customs.models.LaunchpadQueryModel,
-            'urlform': mysite.customs.forms.LaunchpadQueryForm,
+            'urlform': None,
             },
         }

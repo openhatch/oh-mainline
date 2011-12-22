@@ -88,8 +88,3 @@ class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
 
         # Return the "upstream" return value
         return obj
-
-class LaunchpadQueryForm(django.forms.ModelForm):
-    class Meta:
-        model = mysite.customs.models.LaunchpadQueryModel
-        exclude = ('tracker', 'last_polled',)
