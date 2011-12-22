@@ -25,8 +25,12 @@ class BugImporter(object):
     #####################################################
     # Importer functions that don't require overloading #
     #####################################################
+    def log_error(self, failure):
+        failure.printTraceback()
+
     def add_url_to_waiting_list(self, url, callback, c_args={}, errback=None, e_args={}):
         # FIXME: change default errback to a basic logging one.
+        errback = errback or self.log_error
         self.waiting_urls[url] = (callback, c_args, errback, e_args)
 
     def get_next_waiting_url(self):
