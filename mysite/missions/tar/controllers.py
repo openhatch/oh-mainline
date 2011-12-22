@@ -54,7 +54,11 @@ int main(void)
                 elif member.isdir() and member.name != cls.WRAPPER_DIR_NAME:
                     raise IncorrectTarFile, 'Wrapper directory name is incorrect: "%s"' % member.name
             if member.name not in filenames_wanted:
-                raise IncorrectTarFile, 'An unexpected entry "%s" is present' % member.name
+                msg = 'An unexpected entry "%s" is present' % member.name
+                if '/._' in member.name:
+                    # This is an Apple Double file.
+                    msg += '. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.'
+                raise IncorrectTarFile, msg
             filenames_wanted.remove(member.name)
             if member.name == cls.WRAPPER_DIR_NAME:
                 if not member.isdir():
