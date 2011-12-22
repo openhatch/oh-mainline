@@ -375,7 +375,7 @@ class LaunchpadQueryModel(TrackerQueryModel):
         ]
         qs = urllib.urlencode(qs)
         parts = (
-            'http',
+            'https',
             'api.launchpad.net',
             urlparse.urljoin('/1.0/', self.tracker.launchpad_name),
             '',
