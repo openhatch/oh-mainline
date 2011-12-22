@@ -65,7 +65,7 @@ class TarMissionTests(TestCase):
         try:
             controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-5.tar.gz')).read())
         except controllers.IncorrectTarFile, e:
-            self.assert_('Mac OS X' in e.args[0])
+            self.assert_('Mac_OS_X' in e.args[0])
         else:
             self.fail('no exception raised')
 
