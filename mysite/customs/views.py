@@ -118,7 +118,8 @@ def add_tracker_do(request, tracker_type):
 @login_required
 def add_tracker_url(request, tracker_type, tracker_name, url_form=None):
     data = {}
-    if tracker_type in all_trackers:
+    if tracker_type in all_trackers and (
+        url_form or all_trackers[tracker_type].get('urlform', None)):
         if url_form is None:
             try:
                 tracker_obj = all_trackers[tracker_type]['model'].all_trackers.get(
@@ -181,8 +182,12 @@ def edit_tracker(request, tracker_type, tracker_name, tracker_form=None):
             if tracker_form is None:
                 tracker_form = all_trackers[tracker_type]['form'](
                         instance=tracker_obj, prefix='edit_tracker')
-            tracker_urls = all_trackers[tracker_type]['urlmodel'].objects.filter(
+            tracker_urlmodel = all_trackers[tracker_type]['urlmodel']
+            if tracker_urlmodel:
+                tracker_urls = tracker_urlmodel.objects.filter(
                     tracker=tracker_obj)
+            else:
+                tracker_urls = []
         except all_trackers[tracker_type]['model'].DoesNotExist:
             return HttpResponseRedirect(reverse(list_trackers) +
                                         '?notification_id=tracker-existence-fail')
@@ -190,6 +195,7 @@ def edit_tracker(request, tracker_type, tracker_name, tracker_form=None):
         data['tracker_type'] = tracker_type
         data['tracker_form'] = tracker_form
         data['tracker_urls'] = tracker_urls
+        data['tracker_urlmodel'] = tracker_urlmodel
         return mysite.base.decorators.as_view(request, 'customs/edit_tracker.html', data, None)
     else:
         return HttpResponseRedirect(reverse(list_trackers))

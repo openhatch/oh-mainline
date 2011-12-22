@@ -32,6 +32,8 @@ import mysite.customs.bugimporters.bugzilla
 import mysite.customs.bugimporters.google
 import mysite.customs.bugimporters.roundup
 import mysite.customs.bugimporters.trac
+import mysite.customs.bugimporters.launchpad
+
 import mysite.profile.models
 from mysite.search.models import Bug
 
@@ -64,6 +66,9 @@ tracker2importer = {
         # Trac
         mysite.customs.models.TracTrackerModel:
             mysite.customs.bugimporters.trac.TracBugImporter,
+        # Launchpad
+        mysite.customs.models.LaunchpadTrackerModel:
+            mysite.customs.bugimporters.launchpad.LaunchpadBugImporter,
         }
 
 class Command(BaseCommand):

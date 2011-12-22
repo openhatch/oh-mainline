@@ -23,6 +23,7 @@ class TrackerTypesForm(django.forms.Form):
     TRACKER_TYPES = (
             ('bugzilla', 'Bugzilla'),
             ('google', 'Google Code'),
+            ('launchpad', 'Launchpad'),
             ('roundup', 'Roundup'),
             ('trac', 'Trac'),
             )
@@ -69,3 +70,21 @@ class RoundupQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.RoundupQueryModel
         exclude = ('tracker', 'last_polled',)
+
+class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
+    max_connections = django.forms.IntegerField(
+        widget=django.forms.HiddenInput(), initial=8)
+    custom_parser = django.forms.CharField(
+        widget=django.forms.HiddenInput(), required=False)
+    class Meta:
+        model = mysite.customs.models.LaunchpadTrackerModel
+
+    def save(self, *args, **kwargs):
+        # Call out to superclass
+        obj = super(LaunchpadTrackerForm, self).save(*args, **kwargs)
+
+        # In our case, now is a good time to make sure that a QueryModel gets created
+        lqm, _ = mysite.customs.models.LaunchpadQueryModel.objects.get_or_create(tracker=obj)
+
+        # Return the "upstream" return value
+        return obj

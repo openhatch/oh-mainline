@@ -45,4 +45,11 @@ all_trackers = {
             'urlmodel': mysite.customs.models.TracQueryModel,
             'urlform': mysite.customs.forms.TracQueryForm,
             },
+        'launchpad': {
+            'namestr': 'Launchpad',
+            'model': mysite.customs.models.LaunchpadTrackerModel,
+            'form':  mysite.customs.forms.LaunchpadTrackerForm,
+            'urlmodel': mysite.customs.models.LaunchpadQueryModel,
+            'urlform': None,
+            },
         }

@@ -50,6 +50,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 from urllib2 import HTTPError
 import datetime
+from dateutil.tz import tzutc
 
 import twisted.internet.defer
 
@@ -101,6 +102,17 @@ class FakeGetPage(object):
         self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks&created_since=1970-01-01T00%3A00%3A00']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
+        self.url2data['https://api.launchpad.net/1.0/~vila']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461closed']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461closed')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461doc']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461doc')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461doc']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461doc')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461bite']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461bite')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461bite']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461bite')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -911,204 +923,6 @@ sample_launchpad_data_snapshot.return_value = [dict(
         tags=[], comments=[], date_updated=time.localtime(),
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
-
-@skipIf(True, "Disabling old-style Launchpad tests.")
-class AutoCrawlTests(django.test.TestCase):
-    @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project',
-                sample_launchpad_data_snapshot)
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def testSearch(self, do_nothing):
-        # Verify that we can't find a bug with the right description
-        self.assertRaises(mysite.search.models.Bug.DoesNotExist,
-                          mysite.search.models.Bug.all_bugs.get,
-                          title="Joi's Lab AFS")
-        # Now get all the bugs about rose
-        mysite.customs.bugtrackers.launchpad.grab_lp_bugs(lp_project='rose',
-                                            openhatch_project_name=
-                                            u'rose.makesad.us')
-        # Now see, we have one!
-        b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
-        self.assertEqual(b.project.name, u'rose.makesad.us')
-        # Ta-da.
-        return b
-
-    def test_running_job_twice_does_update(self):
-        b = self.testSearch()
-        b.description = u'Eat more potato starch'
-        b.title = u'Yummy potato paste'
-        b.save()
-
-        new_b = self.testSearch()
-        self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
-        # thanks to fresh import
-
-@skipIf(True, "Disabling old-style Launchpad tests.")
-class LaunchpadImporterTests(django.test.TestCase):
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_lp_update_handler(self, do_nothing):
-        '''Test the Launchpad import handler with some fake data.'''
-        some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
-        query_data = dict(project='GNOME-Do',
-                          canonical_bug_link='http://example.com/1')
-        new_data = dict(title='Title', status='Godforsaken',
-                        description='Everything should be better',
-                        importance='High',
-                        people_involved=1000 * 1000,
-                        submitter_username='yourmom',
-                        submitter_realname='Your Mom',
-                        date_reported=some_date,
-                        last_touched=some_date,
-                        last_polled=some_date)
-
-        # Create the bug...
-        mysite.customs.bugtrackers.launchpad.handle_launchpad_bug_update(
-                project_name=query_data['project'],
-                canonical_bug_link=query_data['canonical_bug_link'],
-                new_data=new_data)
-        # Verify that the bug was stored.
-        bug = Bug.all_bugs.get(canonical_bug_link=
-                                       query_data['canonical_bug_link'])
-        for key in new_data:
-            self.assertEqual(getattr(bug, key), new_data[key])
-
-        # Now re-do the update, this time with more people involved
-        new_data['people_involved'] = 1000 * 1000 * 1000
-        # pass the data in...
-        mysite.customs.bugtrackers.launchpad.handle_launchpad_bug_update(
-                project_name=query_data['project'],
-                canonical_bug_link=query_data['canonical_bug_link'],
-                new_data=new_data)
-        # Do a get; this will explode if there's more than one with the
-        # canonical_bug_link, so it tests duplicate finding.
-        bug = Bug.all_bugs.get(canonical_bug_link=
-                                       query_data[u'canonical_bug_link'])
-
-        for key in new_data:
-            self.assertEqual(getattr(bug, key), new_data[key])
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_lp_data_clean(self, do_nothing):
-        now_t = (2009, 4, 1, 5, 13, 2) # partial time tuple
-        now_d = datetime.datetime(2009, 4, 1, 5, 13, 2)
-        # NOTE: We do not test for time zone correctness.
-        sample_in = dict(project='GNOME-Do', url='http://example.com/1',
-                         title='Title', text='Some long text',
-                         importance=None, status='Ready for take-off',
-                         comments=[{'user': {
-                             'lplogin': 'jones', 'realname': 'Jones'}}],
-                         reporter={'lplogin': 'bob', 'realname': 'Bob'},
-                         date_reported=now_t,
-                         date_updated=now_t,
-                         )
-        sample_out_query = dict(canonical_bug_link='http://example.com/1')
-        sample_out_data = dict(title='Title', description='Some long text',
-                               importance='Unknown', status='Ready for take-off',
-                               people_involved=2, submitter_realname='Bob',
-                               submitter_username='bob',
-                               date_reported=now_d,
-                               last_touched=now_d)
-        out_q, out_d = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(sample_in)
-        self.assertEqual(sample_out_query, out_q)
-        # Make sure last_polled is at least in the same year
-        self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
-        del out_d['last_polled']
-        self.assertEqual(sample_out_data, out_d)
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_lp_data_wide_utf8(self, do_nothing):
-        sample_in = dict(affects=u'Do',
-                         assignee=u'',
-                         bugnumber=657268,
-                         comments=[{'date': [2010, 10, 9, 10, 24, 48, 5, 282, -1],
-                                    'number': 1,
-                                    'text': u'Above characters may need a shaw font to be viewed, such as Andagii\n(7k):\nhttp://svn.gna.org/viewcvs/*checkout*/wesnoth/trunk/fonts/Andagii.ttf',
-                                    'user': {'lplogin': u'arcriley',
-                                             'realname': u'Arc "warthog" Riley'
-                                             }
-                                    }],
-                         date=[2010, 10, 9, 10, 22, 6, 5, 282, -1],
-                         date_reported=[2010, 10, 9, 10, 22, 6, 5, 282, -1],
-                         date_updated=[2010, 10, 9, 10, 24, 49, 5, 282, -1],
-                         description=u'Gnome-Do crashes randomly... enter a few keys such as \U00010451\U0001047b\U00010465\n("term" with en@shaw locale) then backspace...',
-                         duplicate_of=None,
-                         duplicates=[],
-                         importance=u'Undecided',
-                         milestone=u'',
-                         private=False,
-                         reporter={'lplogin': u'arcriley', 'realname': u'Arc "warthog" Riley'},
-                         security=False,
-                         sourcepackage=u'do',
-                         status=u'New',
-                         summary=u'crashes on wide utf-8 input',
-                         tags=[],
-                         text=u'Gnome-Do crashes randomly... enter a few keys such as \U00010451\U0001047b\U00010465\n("term" with en@shaw locale) then backspace...',
-                         title=u'crashes on wide utf-8 input',
-                         url=u'https://bugs.launchpad.net/bugs/657268'
-                         )
-        bug_dr = datetime.datetime(2010, 10, 9, 10, 22, 6)
-        bug_du = datetime.datetime(2010, 10, 9, 10, 24, 49)
-        # NOTE: We do not test for time zone correctness.
-        sample_out_query = dict(canonical_bug_link='https://bugs.launchpad.net/bugs/657268')
-        sample_out_data = dict(title=u'crashes on wide utf-8 input',
-                               description=u'Gnome-Do crashes randomly... enter a few keys such as ���\n("term" with en@shaw locale) then backspace...',
-                               importance=u'Undecided',
-                               status=u'New',
-                               people_involved=1,
-                               submitter_realname=u'Arc "warthog" Riley',
-                               submitter_username=u'arcriley',
-                               date_reported=bug_dr,
-                               last_touched=bug_du
-                               )
-        out_q, out_d = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(sample_in)
-        self.assertEqual(sample_out_query, out_q)
-        # Make sure last_polled is at least in the same year
-        self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
-        del out_d['last_polled']
-        self.assertEqual(sample_out_data, out_d)
-
-@skipIf(True, "Disabling old-style Launchpad tests.")
-class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
-    def test(self):
-        '''Start with a bug that is "Fix Released"
-
-        Verify that we set looks_closed to True'''
-        # retry this with committed->released
-        lp_data_dict = {'project': '',
-                        'url': '',
-                        'title': '',
-                        'text': '',
-                        'status': 'Fix Committed',
-                        'importance': '',
-                        'reporter': {'lplogin': '', 'realname': ''},
-                        'comments': '',
-                        'date_updated': datetime.datetime.now().timetuple(),
-                        'date_reported': datetime.datetime.now().timetuple()}
-        # maybe I could have done this with a defaultdict of str with
-        # just the non-str exceptions
-        query_data, new_data = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(
-            lp_data_dict)
-        self.assertTrue(new_data['looks_closed'])
-
-    def test_with_status_missing(self):
-        '''Verify we do not explode if Launchpad gives us a bug with no Status
-
-        Verify that we set looks_closed to True'''
-        # retry this with committed->released
-        lp_data_dict = {'project': '',
-                        'url': '',
-                        'title': '',
-                        'text': '',
-                        'importance': '',
-                        'reporter': {'lplogin': '', 'realname': ''},
-                        'comments': '',
-                        'date_updated': datetime.datetime.now().timetuple(),
-                        'date_reported': datetime.datetime.now().timetuple()}
-        # maybe I could have done this with a defaultdict of str with
-        # just the non-str exceptions
-        query_data, new_data = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(
-            lp_data_dict)
-        self.assertEqual(new_data['status'], 'Unknown')
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class ParseCiaMessage(django.test.TestCase):
@@ -2140,3 +1954,148 @@ class BugzillaTrackerEditingViews(TwillTests):
                          mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
+
+class LaunchpadBugImport(django.test.TestCase):
+    def setUp(self):
+        self.tm = mysite.customs.models.LaunchpadTrackerModel.all_trackers.create(
+                tracker_name='bzr',
+                launchpad_name='bzr',
+                bitesized_tag='easy',
+                documentation_tag='doc')
+        self.dm = mock.Mock(name='dm')
+        self.dm.running_deferreds = 0
+        self.im = mysite.customs.bugimporters.launchpad.LaunchpadBugImporter(self.tm, self.dm)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_queries(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        query = mock.Mock(name='query')
+        query.get_query_url.return_value = 'https://api.launchpad.net/1.0/bzr?ws.op=searchTasks'
+        self.im.process_queries([query])
+
+        query.save.assert_called_with()
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_queries_with_real_query(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        query = mysite.customs.models.LaunchpadQueryModel.objects.create(tracker=self.tm)
+        old_last_polled = query.last_polled
+        self.im.process_queries([query])
+
+        self.assertGreater(mysite.customs.models.LaunchpadQueryModel.objects.get().last_polled,
+                           old_last_polled)
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs_closed(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461closed', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+
+        self.assertEqual(True, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs_doc(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461doc', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(False, bug_model.good_for_newcomers)
+        self.assertEqual(True, bug_model.concerns_just_documentation)
+
+    @mock.patch('mysite.search.models.Bug.all_bugs.get')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs_bitsized(self, bugs_get):
+        bug_model = bugs_get.return_value = mock.Mock(name='bug_model')
+        bug_list = [('https://bugs.launchpad.net/bzr/+bug/839461bite', None)]
+
+        self.im.process_bugs(bug_list)
+
+        bug_model.save.assert_called_with()
+        self.assert_bug(bug_model)
+        self.assertEqual(False, bug_model.looks_closed)
+        self.assertEqual(True, bug_model.good_for_newcomers)
+        self.assertEqual(False, bug_model.concerns_just_documentation)
+
+    def assert_bug(self, bug_model):
+        self.assertEqual('Confirmed', bug_model.status)
+        self.assertEqual(datetime.datetime(2011, 9, 2, 10, 42, 43, 883929, tzinfo=tzutc()), bug_model.date_reported)
+        self.assertEqual(u'Bug #839461 in Bazaar: "can\'t run selftest for 2.2 with recent subunit/testtools"', bug_model.title)
+        self.assertEqual('Critical', bug_model.importance)
+        self.assertEqual('https://bugs.launchpad.net/bzr/+bug/839461', bug_model.canonical_bug_link)
+
+        self.assertEqual(datetime.datetime(2011, 12, 16, 9, 21, 28, 695637, tzinfo=tzutc()),  bug_model.last_touched)
+        self.assertEqual("While freezing bzr-2.2.5 from a natty machine with python-2.7.1+,\nlp:testtools revno 244 and lp:subunit revno 151 I wasn't able to\nrun 'make check-dist-tarball'.\n\nI had to revert to testtools-0.9.2 and subunit 0.0.6 and use\npython2.6 to successfully run:\n\n  BZR_PLUGIN_PATH=-site make check-dist-tarball PYTHON=python2.6 | subunit2pyunit\n\nAlso, I've checked the versions used on pqm:\n\n(pqm-amd64-new)pqm@cupuasso:~/pqm-workdir/bzr+ssh/new-pqm-test$ dpkg -l | grep subunit\nii  libsubunit-perl                                 0.0.6-1~bazaar1.0.IS.10.04            perl parser and diff for Subunit streams\nii  python-subunit                                  0.0.6-1~bazaar1.0.IS.10.04            unit testing protocol - Python bindings to g\nii  subunit                                         0.0.6-1~bazaar1.0.IS.10.04            command line tools for processing Subunit st\n(pqm-amd64-new)pqm@cupuasso:~/pqm-workdir/bzr+ssh/new-pqm-test$ dpkg -l | grep testtools\nii  python-testtools                                0.9.6-0~bazaar1.0.IS.8.04             Extensions to the Python unittest library", bug_model.description)
+
+        self.assertEqual(1, bug_model.people_involved)
+
+        self.assertEqual('vila', bug_model.submitter_username)
+        self.assertEqual('Vincent Ladeuil', bug_model.submitter_realname)
+
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class LaunchpadTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(LaunchpadTrackerEditingViews, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+    def test_form_create_launchpad_tracker(self):
+        # We start with no LaunchpadTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.LaunchpadTrackerForm({
+                'tracker_name': 'KDE Bugzill',
+                'launchpad_name': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'bitsized_tag': 'easy',
+                'max_connections': '8',
+                'documentation_tag': 'doc',
+                'bug_project_name_format': 'format'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(1,
+                         mysite.customs.models.LaunchpadQueryModel.objects.all().count())
