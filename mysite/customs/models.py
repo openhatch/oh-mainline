@@ -365,7 +365,12 @@ class LaunchpadTrackerModel(TrackerModel):
         return smart_str('%s' % (self.tracker_name))
 
 class LaunchpadQueryModel(TrackerQueryModel):
-    '''This model stores query URLs for LaunchpadTracker objects.'''
+    '''This model stores query URLs for LaunchpadTracker objects.
+
+    For bugs in projects hosted on Launchpad, we always download all bugs
+    from them. So this model is only really used to store timestamps.
+
+    It does not need to be user-editable.'''
     tracker = models.ForeignKey(LaunchpadTrackerModel)
 
     def get_query_url(self):
