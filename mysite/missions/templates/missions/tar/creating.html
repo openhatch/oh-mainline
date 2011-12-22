@@ -50,7 +50,7 @@
           <a name="create-form"></a>
           After you make the tarball, upload it here:
           {% if what_was_wrong_with_the_tarball %}
-          <ul class="errorlist"><li>{{ what_was_wrong_with_the_tarball }}</li></ul>
+          <ul class="errorlist"><li>{{ what_was_wrong_with_the_tarball|safe}}</li></ul>
           {% endif %}
           {{ create_form.tarfile.errors }}
           <div class="file-upload">
