@@ -141,19 +141,27 @@ class Command(BaseCommand):
 
     def update_bugs(self, bug_list = None):
         print "For all Bugs we know of, enqueue the stale ones...",
-        # Check if we have been specifically passed Bugs to update.
+
+        # Initialize mapping of TrackerModel => list of Bug objects to work on
+        tm_dict = defaultdict(list)
+
+        # If we have been specifically passed Bugs to update, add those to tm_dict
         if bug_list:
             bugs = bug_list
+            # Convert this list to a dictionary of TrackerModels.
+            for bug in bug_list:
+                tm_dict[bug.tracker].append(bug)
         else:
-            # Fetch a list of all Bugs that are stale.
-            bugs = Bug.all_bugs.filter(
-                    last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)).filter(
-                    ~django.db.models.Q(tracker_id=None))
-        print "%d bugs enqueued." % (len(bugs),)
-        # Convert this list to a dictionary of TrackerModels.
-        tm_list = [(bug, bug.tracker) for bug in bugs]
-        tm_dict = defaultdict(list)
-        [tm_dict[k].append(v) for v, k in tm_list]
+            # For each TrackerModel, get a list of Bugs that need refreshing
+            tracker_models = mysite.customs.models.TrackerModel.objects.all()
+            for tracker_model in tracker_models:
+                # Fetch a list of all Bugs that are stale.
+                bugs = Bug.all_bugs.filter(last_polled__lt=
+                                           datetime.datetime.utcnow()-datetime.timedelta(days=-1)
+                                           ).filter(tracker_id=tracker_model.id)
+                tm_dict[tracker_model] = bugs
+                logging.info("Enqueued %d bugs for tracker", len(bugs))
+
         # For each TrackerModel, process its stale Bugs.
         for tm, bugs in tm_dict.items():
             try:
@@ -167,6 +175,7 @@ class Command(BaseCommand):
             # The second entry of the tuple is None as we obviously have no data yet.
             bug_list = [(bug_url, None) for bug_url in bug_urls]
             importer.process_bugs(bug_list)
+            print "%d bugs enqueued." % (len(bug_list),)
 
     def create_tasks_from_dias(self, max = 8):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'

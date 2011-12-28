@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import StringIO
 import cgi
 import csv
 import datetime
@@ -32,6 +33,7 @@ import mysite.base.helpers
 from mysite.customs.bugimporters.base import BugImporter
 from mysite.customs.models import TracTimeline, TracBugTimes
 import mysite.search.models
+import mysite.base.unicode_sanity
 
 class TracBugImporter(BugImporter):
     def __init__(self, *args, **kwargs):
@@ -132,10 +134,27 @@ class TracBugImporter(BugImporter):
             tb_times.save()
 
     def handle_query_csv(self, query_csv):
+        # Remove any Unicode oddities before we process query_csv
+        in_stream = StringIO.StringIO(query_csv)
+        out_stream = mysite.base.unicode_sanity.wrap_file_object_in_utf8_check(in_stream)
+        query_csv = out_stream.read()
+
+        # If the "csv" starts with an HTML stanza, log that and die.
+        if query_csv.lower().strip().startswith('<!doctype'):
+            logging.error("We got HTML instead of actual CSV data.")
+            return
+
         # Turn the string into a list so csv.DictReader can handle it.
         query_csv_list = query_csv.split('\n')
         dictreader = csv.DictReader(query_csv_list)
-        self.bug_ids.extend([int(line['id']) for line in dictreader])
+        bug_ids = []
+        for line in dictreader:
+            if 'id' in line:
+                bug_ids.append(int(line['id']))
+            else:
+                logging.warning("Curious: We ran into a really odd line in Roundup.")
+                logging.warning("%s", line)
+        self.bug_ids.extend(bug_ids)
 
     def prepare_bug_urls(self):
         # Pull bug_ids our of the internal storage. This is done in case the

@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import csv
 import datetime
 from mysite.base.depends import lxml
@@ -214,10 +215,20 @@ class RoundupBugParser(object):
     def get_parsed_data_dict(self, tm):
         metadata_dict = RoundupBugParser.roundup_tree2metadata_dict(self.bug_html)
 
-        date_reported, submitter_username, last_touched, last_toucher = [
+        data = [
                 x.text_content() for x in self.bug_html.cssselect(
                     'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b, ' +
                     'form[name=itemSynopsis] + p > strong, form[name=itemSynopsis] + hr + p > strong')]
+        if len(data) > 4:
+            if data[-1] == metadata_dict['Status']:
+                data = data[:4]
+        try:
+            date_reported, submitter_username, last_touched, last_toucher = data
+        except ValueError:
+            date_reported, submitter_username, last_touched, last_toucher = data
+            logging.error("Big problem parsing some Roundup data.")
+            logging.error("It was: %s", data)
+            date_reported, submitter_username, last_touched, last_toucher = [None] * 4
 
         # For description, just grab the first "message"
         try:
