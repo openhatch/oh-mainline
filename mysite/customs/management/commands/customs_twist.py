@@ -152,8 +152,9 @@ class Command(BaseCommand):
             for bug in bug_list:
                 tm_dict[bug.tracker].append(bug)
         else:
+            logging.info("Calculating tracker<->bug refreshes that need to happen...")
             # For each TrackerModel, get a list of Bugs that need refreshing
-            tracker_models = mysite.customs.models.TrackerModel.objects.all()
+            tracker_models = mysite.customs.models.TrackerModel.objects.select_subclasses()
             for tracker_model in tracker_models:
                 # Fetch a list of all Bugs that are stale.
                 bugs = Bug.all_bugs.filter(last_polled__lt=
@@ -167,6 +168,7 @@ class Command(BaseCommand):
             try:
                 importer = self._get_importer_instance_for_tracker_model(tm)
             except ValueError:
+                logging.info("Skipping this tracker model: %s", tm)
                 continue
 
             # Give the importer bug URLs to process.
