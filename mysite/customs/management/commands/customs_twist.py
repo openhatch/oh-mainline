@@ -153,7 +153,7 @@ class Command(BaseCommand):
                 tm_dict[bug.tracker].append(bug)
         else:
             # For each TrackerModel, get a list of Bugs that need refreshing
-            tracker_models = mysite.customs.models.TrackerModel.objects.all()
+            tracker_models = mysite.customs.models.TrackerModel.objects.select_subclasses()
             for tracker_model in tracker_models:
                 # Fetch a list of all Bugs that are stale.
                 bugs = Bug.all_bugs.filter(last_polled__lt=
