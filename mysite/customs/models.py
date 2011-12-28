@@ -364,6 +364,9 @@ class LaunchpadTrackerModel(TrackerModel):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def get_base_url(self):
+        return '__impossible_to_use_with_launchpad'
+
 class LaunchpadQueryModel(TrackerQueryModel):
     '''This model stores query URLs for LaunchpadTracker objects.
 
