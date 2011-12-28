@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from atom.core import Parse
 import datetime
 from gdata.projecthosting.data import IssuesFeed, IssueEntry
@@ -46,8 +47,13 @@ class GoogleBugImporter(BugImporter):
 
     def handle_query_atom(self, query_atom):
         # Turn the query_atom into an IssuesFeed.
-        query_feed = Parse(query_atom, IssuesFeed)
-        # And store it.
+        try:
+            query_feed = Parse(query_atom, IssuesFeed)
+        except SyntaxError:
+            logging.warn("For what it is worth, query_atom caused us to crash.")
+            # FIXME: We should log the string that made us crash.
+            return
+        # If we got data, we store it.
         self.query_feeds.append(query_feed)
 
     def prepare_bug_urls(self):
