@@ -269,6 +269,7 @@ class TracTrackerModel(TrackerModel):
             help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     BITESIZED_TYPES = (
             ('keywords', 'Keyword'),
+            ('priority', 'Priority'),
             )
     bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
