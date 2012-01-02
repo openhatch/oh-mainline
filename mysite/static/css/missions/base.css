@@ -47,7 +47,7 @@ body.missions .tick-progress {
   margin-left: 30px;
 }
 body.missions .cross-progress {
-  list-style-image: url("/static/images/light-tick.png");
+  list-style-image: url("/static/images/no-tick.png");
   margin-left: 30px;
 }
 body.missions .bump-over {
