@@ -123,11 +123,12 @@ def subproc_check_output(*args, **kw):
     return output
 
 def int_list2ranges(int_list):
-    ### Taken from here: http://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
+    ### Based on code here: http://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
     q = sorted(int_list)
-    i = 0
-    for j in xrange(1,len(q)):
-        if q[j] > 1+q[j-1]:
-            yield (q[i],q[j-1])
-            i = j
-    yield (q[i], q[-1])
+    if q:
+        i = 0
+        for j in xrange(1,len(q)):
+            if q[j] > 1+q[j-1]:
+                yield (q[i],q[j-1])
+                i = j
+        yield (q[i], q[-1])
