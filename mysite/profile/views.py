@@ -403,7 +403,15 @@ def people(request):
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template
-    data['person_ids'] = simplejson.dumps(','.join([str(x.id) for x in data['people']]))
+    person_id_ranges = mysite.base.helpers.int_list2ranges([x.id for x in data['people']])
+    person_ids = ''
+    for stop, start in person_id_ranges:
+        if stop == start:
+            person_ids += '%d,' % (stop,)
+        else:
+            person_ids += '%d-%d,' % (stop, start)
+
+    data['person_ids'] = simplejson.dumps(person_ids)
     return (request, 'profile/search_people.html', data)
 
 def gimme_json_for_portfolio(request):
@@ -856,6 +864,19 @@ class LocationDataApiView(django.views.generic.View):
             persons, include_latlong=True)
 
     @staticmethod
+    def range_from_string(s):
+        on_hyphens = s.split('-')
+        if len(on_hyphens) != 2:
+            return None
+
+        try:
+            from_, to = map(int, on_hyphens)
+        except ValueError:
+            return None
+
+        return range(from_, to + 1)
+
+    @staticmethod
     def extract_person_ids(get_data):
         person_ids_as_string = get_data.get('person_ids', '')
         id_set = set()
@@ -864,6 +885,12 @@ class LocationDataApiView(django.views.generic.View):
 
         splitted_from_commas = person_ids_as_string.split(',')
         for item in splitted_from_commas:
+            if '-' in item:
+                as_ints = LocationDataApiView.range_from_string(item)
+                if as_ints is not None:
+                    id_set.update(as_ints)
+                continue
+
             try:
                 as_int = int(item)
             except ValueError:
