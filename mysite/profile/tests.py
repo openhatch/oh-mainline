@@ -2609,7 +2609,7 @@ class AfterCreatingADiaPingTwisted(TwillTests):
         self.assertTrue(mock_ping_it.called)
 
 class PeopleLocationData(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
     def setUp(self, *args, **kwargs):
         super(PeopleLocationData, self).setUp(*args, **kwargs)
         self.old_settings_debug = getattr(settings, 'DEBUG', None)
