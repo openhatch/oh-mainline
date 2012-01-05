@@ -2630,7 +2630,7 @@ class PeopleLocationData(TwillTests):
         def is_openhatchy(query):
             if 'raw_sql' not in query:
                 return False
-            if 'SELECT "django_' in query['raw_sql']:
+            if query['raw_sql'].startswith('SELECT "django_'):
                 return False
             return True
         openhatchy_queries = filter(is_openhatchy, all_queries)
