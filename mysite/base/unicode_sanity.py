@@ -52,6 +52,9 @@ def wrap_file_object_in_utf8_check(f):
     ### For now, this does the horrifying thing of reading in the whole file.
     ### Better ways would be apprediated.
     bytes = f.read()
-    as_unicode = unicode(bytes, 'utf-8-sig')
+    if type(bytes) == unicode:
+        as_unicode = bytes
+    else:
+        as_unicode = unicode(bytes, 'utf-8-sig')
     as_utf8 = as_unicode.encode('utf-8')
     return StringIO.StringIO(as_utf8)
