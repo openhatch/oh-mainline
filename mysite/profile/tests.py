@@ -2658,4 +2658,17 @@ class PeopleLocationData(TwillTests):
                 sorted(x.id for x in mysite.profile.models.Person.objects.all()))).content
         self.assertFalse(simplejson.loads(json))
 
+class PeopleLocationDict(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_backend(self):
+        persons = mysite.profile.models.Person.objects.all()
+        as_dict = mysite.profile.controllers.get_people_location_data_as_dict(
+            persons)
+        self.assertTrue(as_dict)
+
+    def test_api_view(self):
+        json = self.client.get('/+profile_api/location_data/?person_ids=%d' % (
+                mysite.profile.models.Person.objects.get().id,))
+        self.assertTrue(json)
+
 # vim: set ai et ts=4 sw=4 nu:
