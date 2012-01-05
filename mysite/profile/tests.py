@@ -2640,7 +2640,7 @@ class PeopleLocationData(TwillTests):
 
     def test_api_view_with_one_person(self):
         json = self.client.get('/+profile_api/location_data/?person_ids=%d' % (
-                mysite.profile.models.Person.objects.get().id,))
+                mysite.profile.models.Person.objects.get(user__username='paulproteus').id,))
         self.assertTrue(json)
 
 # vim: set ai et ts=4 sw=4 nu:
