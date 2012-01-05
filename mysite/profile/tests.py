@@ -2638,7 +2638,7 @@ class PeopleLocationData(TwillTests):
             pprint.pprint(openhatchy_queries)
             self.assertEqual(1, len(openhatchy_queries))
 
-    def test_api_view(self):
+    def test_api_view_with_one_person(self):
         json = self.client.get('/+profile_api/location_data/?person_ids=%d' % (
                 mysite.profile.models.Person.objects.get().id,))
         self.assertTrue(json)
