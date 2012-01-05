@@ -34,6 +34,7 @@ from mysite.profile.management.commands import send_weekly_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
 from django.utils.unittest import skipIf
+import pprint
 
 from django.utils import simplejson
 import BeautifulSoup
@@ -47,6 +48,7 @@ from django.core import mail
 from django.conf import settings
 import django.test
 import django.conf
+import django.db
 from django.core import serializers
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
@@ -2605,5 +2607,40 @@ class AfterCreatingADiaPingTwisted(TwillTests):
         asheesh = Person.objects.get(user__username='paulproteus')
         mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='paulproteus')
         self.assertTrue(mock_ping_it.called)
+
+class PeopleLocationData(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def setUp(self, *args, **kwargs):
+        super(PeopleLocationData, self).setUp(*args, **kwargs)
+        self.old_settings_debug = getattr(settings, 'DEBUG', None)
+        settings.DEBUG = True
+        self.query_count = len(django.db.connection.queries)
+
+    def tearDown(self, *args, **kwargs):
+        super(PeopleLocationData, self).tearDown(*args, **kwargs)
+        now_query_count = len(django.db.connection.queries)
+        settings.DEBUG = self.old_settings_debug
+
+        # If we did 1 or fewer queries, then stop here.
+        if now_query_count - self.query_count <= 1:
+            return
+
+        # Otherwise, let us examine all queries against OpenHatch models
+        all_queries = django.db.connection.queries[self.query_count:]
+        def is_openhatchy(query):
+            if 'raw_sql' not in query:
+                return False
+            if 'SELECT "django_' in query['raw_sql']:
+                return False
+            return True
+        openhatchy_queries = filter(is_openhatchy, all_queries)
+        if len(openhatchy_queries) > 1:
+            pprint.pprint(openhatchy_queries)
+            self.assertEqual(1, len(openhatchy_queries))
+
+    def test_api_view(self):
+        json = self.client.get('/+profile_api/location_data/?person_ids=%d' % (
+                mysite.profile.models.Person.objects.get().id,))
+        self.assertTrue(json)
 
 # vim: set ai et ts=4 sw=4 nu:
