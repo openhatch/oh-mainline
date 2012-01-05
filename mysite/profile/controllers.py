@@ -225,14 +225,6 @@ def get_person_data_for_map(person, include_latlong=False):
 
     return ret
 
-# This is a helper function for generating the mapping of person IDs -> location data,
-# as a dictionary, so that we can provide it to the map JavaScript.
-def get_people_location_data_as_dict(people, include_latlong=False):
-    person_id2data = dict([
-            (person.pk, get_person_data_for_map(person, include_latlong))
-            for person in people])
-    return person_id2data
-
 # These are helper functions for showing information about the query.
 def query_type2query_summary(template_data):
     output_dict = {}
