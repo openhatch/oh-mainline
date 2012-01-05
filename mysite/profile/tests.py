@@ -2648,4 +2648,9 @@ class PeopleLocationData(TwillTests):
                 x.id for x in mysite.profile.models.Person.objects.all()))
         self.assertTrue(json)
 
+    def test_api_view_with_two_persons_as_range(self):
+        json = self.client.get('/+profile_api/location_data/?person_ids=%d-%d' % tuple(
+                sorted(x.id for x in mysite.profile.models.Person.objects.all()))).content
+        self.assertTrue(simplejson.loads(json))
+
 # vim: set ai et ts=4 sw=4 nu:
