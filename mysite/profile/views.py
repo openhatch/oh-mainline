@@ -856,6 +856,19 @@ class LocationDataApiView(django.views.generic.View):
             persons, include_latlong=True)
 
     @staticmethod
+    def range_from_string(s):
+        on_hyphens = s.split('-')
+        if len(on_hyphens) != 2:
+            return None
+
+        try:
+            from_, to = map(int, on_hyphens)
+        except ValueError:
+            return None
+
+        return range(from_, to + 1)
+
+    @staticmethod
     def extract_person_ids(get_data):
         person_ids_as_string = get_data.get('person_ids', '')
         id_set = set()
@@ -864,6 +877,12 @@ class LocationDataApiView(django.views.generic.View):
 
         splitted_from_commas = person_ids_as_string.split(',')
         for item in splitted_from_commas:
+            if '-' in item:
+                as_ints = LocationDataApiView.range_from_string(item)
+                if as_ints is not None:
+                    id_set.update(as_ints)
+                continue
+
             try:
                 as_int = int(item)
             except ValueError:
