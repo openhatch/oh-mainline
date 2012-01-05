@@ -860,8 +860,33 @@ class LocationDataApiView(django.views.generic.View):
     def raw_data_for_person_ids(person_ids):
         persons = mysite.profile.models.Person.objects.filter(
             id__in=person_ids).select_related()
-        return mysite.profile.controllers.get_people_location_data_as_dict(
-            persons, include_latlong=True)
+        return LocationDataApiView.raw_data_for_person_collection(persons)
+
+    @staticmethod
+    def raw_data_for_person_collection(people):
+        person_id2data = dict([
+                (person.pk, LocationDataApiView.raw_data_for_one_person(person))
+                for person in people])
+        return person_id2data
+
+    @staticmethod
+    def raw_data_for_one_person(person):
+        location = person.get_public_location_or_default()
+        name = person.get_full_name_or_username()
+        ret = {
+            'name': name,
+            'location': location,
+            }
+        ret['lat_long_data'] = {
+            'is_inaccessible': (location == mysite.profile.models.DEFAULT_LOCATION),
+            'latitude': person.latitude,
+            'longitude': person.longitude,
+            }
+        extra_person_info = {'username': person.user.username,
+                             'photo_thumbnail_url': person.get_photo_url_or_default(),
+                             }
+        ret['extra_person_info'] = extra_person_info
+        return ret
 
     @staticmethod
     def range_from_string(s):

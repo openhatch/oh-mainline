@@ -2660,6 +2660,12 @@ class PeopleLocationData(TwillTests):
 
 class PeopleLocationDict(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_for_one_person(self):
+        paulproteus = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        data = mysite.profile.views.LocationDataApiView.raw_data_for_one_person(paulproteus)
+        self.assertTrue(data)
+        self.assertTrue(data['lat_long_data']['is_inaccessible'])
+
     def test_backend(self):
         persons = mysite.profile.models.Person.objects.all()
         as_dict = mysite.profile.controllers.get_people_location_data_as_dict(
