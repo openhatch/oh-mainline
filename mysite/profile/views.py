@@ -406,7 +406,10 @@ def people(request):
     person_id_ranges = mysite.base.helpers.int_list2ranges([x.id for x in data['people']])
     person_ids = ''
     for stop, start in person_id_ranges:
-        person_ids += '%d-%d,' % (stop, start)
+        if stop == start:
+            person_ids += '%d,' % (stop,)
+        else:
+            person_ids += '%d-%d,' % (stop, start)
 
     data['person_ids'] = simplejson.dumps(person_ids)
     return (request, 'profile/search_people.html', data)
