@@ -2669,8 +2669,7 @@ class PeopleLocationDict(TwillTests):
 
     def test_backend(self):
         persons = mysite.profile.models.Person.objects.all()
-        as_dict = mysite.profile.controllers.get_people_location_data_as_dict(
-            persons)
+        as_dict = mysite.profile.views.LocationDataApiView.raw_data_for_person_collection(persons)
         self.assertTrue(as_dict)
 
     def test_api_view(self):
