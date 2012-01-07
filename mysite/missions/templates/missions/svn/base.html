@@ -31,7 +31,7 @@
   </a>
 </li>
 <li id='link-checkout' {% if svn_checkout_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.svn.views.checkout %}'>
+  <a href='{% url svn_checkout %}'>
     Checking out a working copy
   </a>
 </li>

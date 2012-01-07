@@ -118,14 +118,15 @@ class LongDescription(SvnBaseView):
     this_mission_page_short_name = 'About Subversion'
     template_name =  'missions/svn/about_svn.html'
 
-@login_required
-@view
-def checkout(request, passed_data = None):
-    state = SvnMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Checking out'
-    data = state.as_dict_for_template_context()
-    data['svn_checkout_form'] = forms.CheckoutForm()
-    return (request, 'missions/svn/checkout.html', data)
+class Checkout(SvnBaseView):
+    login_required = True
+    this_mission_page_short_name = 'Checking out'
+    template_name = 'missions/svn/checkout.html'
+
+    def get_context_data(self, *args, **kwargs):
+        data = super(Checkout, self).get_context_data(*args, **kwargs)
+        data['svn_checkout_form'] = forms.CheckoutForm()
+        return data
 
 @login_required
 @view

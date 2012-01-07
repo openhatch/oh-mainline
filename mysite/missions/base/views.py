@@ -27,6 +27,7 @@ from mysite.missions.base import controllers
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 import django.views.generic
 
 import os
