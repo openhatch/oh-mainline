@@ -72,7 +72,7 @@ def checkout_submit(request):
             else:
                 data['svn_checkout_error_message'] = 'The secret word is incorrect.'
         data['svn_checkout_form'] = form
-    return checkout(request, data)
+    return Checkout.as_view()(request)
 
 ### State manager
 class SvnMissionPageState(MissionPageState):
