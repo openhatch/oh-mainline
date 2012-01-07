@@ -242,7 +242,7 @@ class SvnCommitHookTests(DjangoTestCase):
         try:
             controllers.SvnCommitMission.pre_commit_hook('/fake/repository/path', 'fake-transaction-id')
             self.fail('No exception was raised.')
-        except controllers.IncorrectPatch, e:
+        except controllers.IncorrectPatch:
             pass
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'svn_commit'))
