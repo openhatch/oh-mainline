@@ -33,7 +33,7 @@ from mysite.base.helpers import render_response
 from django.core.urlresolvers import reverse, resolve
 import django.contrib.auth.decorators
 
-def as_view(request, template, data, slug):
+def as_view(request, template, data, slug, just_modify_data=False):
     ### add settings to the request so that the template
     ### can adjust what it displays depending on settings.
     data['settings'] = django.conf.settings
@@ -61,7 +61,10 @@ def as_view(request, template, data, slug):
         data['go_here_after_logging_in_or_out'] = '/'
 
     data['slug'] = slug # Account settings uses this.
-    return render_response(request, template, data)
+    if just_modify_data:
+        return data
+    else:
+        return render_response(request, template, data)
 
 
 @decorator
