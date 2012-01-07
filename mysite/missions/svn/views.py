@@ -114,12 +114,9 @@ class MainPage(SvnBaseView):
     this_mission_page_short_name = 'Start page'
     template_name = 'missions/svn/main_page.html'
 
-@view
-def long_description(request, passed_data = None):
-    state = SvnMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'About Subversion'
-    return (request, 'missions/svn/about_svn.html',
-            state.as_dict_for_template_context())
+class LongDescription(SvnBaseView):
+    this_mission_page_short_name = 'About Subversion'
+    template_name =  'missions/svn/about_svn.html'
 
 @login_required
 @view
