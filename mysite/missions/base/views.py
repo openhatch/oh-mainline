@@ -20,6 +20,7 @@
 ### This is the "base" set of views for the OpenHatch missions.
 
 from mysite.base.decorators import view
+import mysite.base.decorators
 from mysite.missions.models import Step, StepCompletion
 from mysite.missions.base import controllers
 
@@ -88,7 +89,20 @@ class MissionPageState(object):
                     controllers.unset_mission_completed(profile, part_name)
 
 class MissionBaseView(django.views.generic.TemplateView):
-    pass
+    def get_context_data(self):
+        data = super(MissionBaseView, self).get_context_data()
+
+        # Add some OpenHatch-specific stuff through side-effects
+        # from a call to as_view().
+        mysite.base.decorators.as_view(self.request,
+                                       template=self.template_name,
+                                       data=data,
+                                       slug=None,
+                                       just_modify_data=True)
+        data.update({
+                'this_mission_page_short_name': self.this_mission_page_short_name,
+                'mission_name': self.mission_name})
+        return data
 
 # This is the /missions/ page.
 @view

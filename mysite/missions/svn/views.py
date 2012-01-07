@@ -19,6 +19,7 @@
 
 from mysite.missions.base.views import *
 from mysite.missions.svn import forms, controllers
+import mysite.missions.base.views
 
 ### POST handlers
 ###
@@ -100,13 +101,18 @@ class SvnMissionPageState(MissionPageState):
         return data
 
 ### Normal GET handlers. These are usually pretty short.
+class SvnBaseView(mysite.missions.base.views.MissionBaseView):
+    mission_name = 'Using Subversion'
+    def get_context_data(self, *args, **kwargs):
+        data = super(SvnBaseView, self).get_context_data(*args, **kwargs)
+        state = SvnMissionPageState(self.request, passed_data=None)
+        our_state = state.as_dict_for_template_context()
+        our_state.update(data)
+        return our_state
 
-@view
-def main_page(request, passed_data = None):
-    state = SvnMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Start page'
-    return (request, 'missions/svn/main_page.html',
-            state.as_dict_for_template_context())
+class MainPage(SvnBaseView):
+    this_mission_page_short_name = 'Start page'
+    template_name = 'missions/svn/main_page.html'
 
 @view
 def long_description(request, passed_data = None):

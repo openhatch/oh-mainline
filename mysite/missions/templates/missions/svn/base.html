@@ -21,7 +21,7 @@
 
 {% block side_nav_links %}
 <li id='link-main_page' {% if repository_exists %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.svn.views.main_page %}'>
+  <a href='{% url svn_main_page %}'>
     Mission start page
   </a>
 </li>
