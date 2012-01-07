@@ -99,7 +99,7 @@ class SvnViewTests(TwillTests):
 
     def test_do_checkout_mission_incorrectly(self):
         self.client.post(reverse(views.resetrepo))
-        response = self.client.post(reverse(views.checkout_submit), {'secret_word': 'not_the_secret_word'})
+        self.client.post(reverse(views.checkout_submit), {'secret_word': 'not_the_secret_word'})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'svn_checkout'))
 
