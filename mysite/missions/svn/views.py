@@ -35,9 +35,9 @@ def resetrepo(request):
     controllers.unset_mission_completed(request.user.get_profile(), 'svn_diff')
     controllers.unset_mission_completed(request.user.get_profile(), 'svn_commit')
     if 'stay_on_this_page' in request.GET:
-        return HttpResponseRedirect(reverse(main_page))
+        return HttpResponseRedirect(reverse('svn_main_page'))
     else:
-        return HttpResponseRedirect(reverse(checkout))
+        return HttpResponseRedirect(reverse('svn_checkout'))
 
 @login_required
 def diff_submit(request):
@@ -51,7 +51,7 @@ def diff_submit(request):
             try:
                 controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
-                return HttpResponseRedirect(reverse(diff))
+                return HttpResponseRedirect(reverse('svn_diff'))
             except controllers.IncorrectPatch, e:
                 data['svn_diff_error_message'] = str(e)
         data['svn_diff_form'] = form
@@ -68,7 +68,7 @@ def checkout_submit(request):
         if form.is_valid():
             if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
-                return HttpResponseRedirect(reverse(checkout))
+                return HttpResponseRedirect(reverse('svn_checkout'))
             else:
                 data['svn_checkout_error_message'] = 'The secret word is incorrect.'
         data['svn_checkout_form'] = form
