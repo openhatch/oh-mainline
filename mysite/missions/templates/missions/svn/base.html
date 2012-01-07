@@ -36,7 +36,7 @@
   </a>
 </li>
 <li id='link-diff' {% if svn_diff_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.svn.views.diff %}'>
+  <a href='{% url svn_diff %}'>
     Diffing your changes
   </a>
 </li>

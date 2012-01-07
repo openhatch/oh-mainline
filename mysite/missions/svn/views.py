@@ -128,15 +128,16 @@ class Checkout(SvnBaseView):
         data['svn_checkout_form'] = forms.CheckoutForm()
         return data
 
-@login_required
-@view
-def diff(request, passed_data = None):
-    state = SvnMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Diffing your changes'
-    state.mission_step_prerequisite = 'svn_checkout'
-    data = state.as_dict_for_template_context()
-    data['svn_diff_form'] = forms.DiffForm()
-    return (request, 'missions/svn/diff.html', data)
+class Diff(SvnBaseView):
+    login_required = True
+    this_mission_page_short_name = 'Diffing your changes'
+    mission_step_prerequisite = 'svn_checkout'
+    template_name = 'missions/svn/diff.html'
+
+    def get_context_data(self, *args, **kwargs):
+        data = super(Diff, self).get_context_data(*args, **kwargs)
+        data['svn_diff_form'] = forms.DiffForm()
+        return data
 
 @login_required
 @view
