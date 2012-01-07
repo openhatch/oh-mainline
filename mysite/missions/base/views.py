@@ -26,6 +26,7 @@ from mysite.missions.base import controllers
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+import django.views.generic
 
 import os
 from django.utils import simplejson
@@ -85,6 +86,9 @@ class MissionPageState(object):
             for part_name in mission_parts:
                 if part_name in self.mission_parts:
                     controllers.unset_mission_completed(profile, part_name)
+
+class MissionBaseView(django.views.generic.TemplateView):
+    pass
 
 # This is the /missions/ page.
 @view
