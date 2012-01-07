@@ -89,6 +89,8 @@ class MissionPageState(object):
                     controllers.unset_mission_completed(profile, part_name)
 
 class MissionBaseView(django.views.generic.TemplateView):
+    login_required = False
+
     def get_context_data(self):
         data = super(MissionBaseView, self).get_context_data()
 
@@ -103,6 +105,14 @@ class MissionBaseView(django.views.generic.TemplateView):
                 'this_mission_page_short_name': self.this_mission_page_short_name,
                 'mission_name': self.mission_name})
         return data
+
+    @classmethod
+    def as_view(cls, *args, **kwargs):
+        do_it = lambda: super(MissionBaseView, cls).as_view()
+        if cls.login_required:
+            return login_required(do_it())
+        else:
+            return do_it()
 
 # This is the /missions/ page.
 @view
