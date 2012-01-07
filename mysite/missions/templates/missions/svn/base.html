@@ -41,7 +41,7 @@
   </a>
 </li>
 <li id='link-commit' {% if svn_commit_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.svn.views.commit %}'>
+  <a href='{% url svn_commit %}'>
     Committing your changes
   </a>
 </li>

@@ -139,14 +139,10 @@ class Diff(SvnBaseView):
         data['svn_diff_form'] = forms.DiffForm()
         return data
 
-@login_required
-@view
-def commit(request, passed_data = None):
-    state = SvnMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Committing your changes'
-    state.mission_step_prerequisite = 'svn_diff'
-    return (request, 'missions/svn/commit.html',
-            state.as_dict_for_template_context())
+class Commit(SvnBaseView):
+    login_required = True
+    this_mission_page_short_name = 'Committing your changes'
+    mission_step_prerequisite = 'svn_diff'
 
 @login_required
 def commit_poll(request):
