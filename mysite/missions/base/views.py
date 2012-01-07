@@ -70,21 +70,21 @@ class MissionPageState(object):
             else:
                 data['mission_step_prerequisites_passed'] = True
         return (data, person)
-    
+
     def reset(self, mission_parts=None):
         ''' Resets whole mission or selected steps.
-        
+
         Args:
             mission_parts: A list of names for mission steps to reset.
         '''
         mission_parts = mission_parts and mission_parts or self.mission_parts
-        
+
         if mission_parts:
-            profile = self.request.user.get_profile()        
-            
+            profile = self.request.user.get_profile()
+
             for part_name in mission_parts:
                 if part_name in self.mission_parts:
-                    controllers.unset_mission_completed(profile, part_name)    
+                    controllers.unset_mission_completed(profile, part_name)
 
 # This is the /missions/ page.
 @view
