@@ -86,7 +86,7 @@ class SvnViewTests(TwillTests):
 
     def test_do_checkout_mission_correctly(self):
         self.client.post(reverse(views.resetrepo))
-        response = self.client.get(reverse(views.checkout))
+        response = self.client.get(reverse('svn_checkout'))
         checkoutdir = tempfile.mkdtemp()
         try:
             subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
@@ -105,7 +105,7 @@ class SvnViewTests(TwillTests):
 
     def test_do_diff_mission_correctly(self):
         self.client.post(reverse(views.resetrepo))
-        response = self.client.get(reverse(views.checkout))
+        response = self.client.get(reverse('svn_checkout'))
         checkoutdir = tempfile.mkdtemp()
         try:
             # Check the repository out and make the required change.
@@ -129,7 +129,7 @@ class SvnViewTests(TwillTests):
 
     def test_do_diff_mission_correctly_except_omit_the_final_whitespace(self):
         self.client.post(reverse(views.resetrepo))
-        response = self.client.get(reverse(views.checkout))
+        response = self.client.get(reverse('svn_checkout'))
         checkoutdir = tempfile.mkdtemp()
         try:
             # Check the repository out and make the required change.
@@ -163,7 +163,7 @@ class SvnViewTests(TwillTests):
         self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
 
     def test_main_page_does_not_complain_about_prereqs(self):
-        response = self.client.get(reverse(views.main_page))
+        response = self.client.get(reverse('svn_main_page'))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
