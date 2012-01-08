@@ -23,7 +23,7 @@ import re
 import hashlib
 import django.core.cache
 from django.db import connection
-from django.db.models import Q
+from django.db.models import Q, Count
 import logging
 
 CCT = 'hit_count_cache_timestamp'
@@ -411,13 +411,12 @@ def get_project_count():
     return bugs.values(u'project').distinct().count()
 
 def get_projects_with_bugs():
-    bugs = mysite.search.models.Bug.all_bugs.all()
-    one_bug_dict_per_project = bugs.values(u'project').distinct().order_by(u'project__display_name')
-    #project_names = [b[u'project__name'] for b in one_bug_dict_per_project]
-    projects = []
-    for bug_dict in one_bug_dict_per_project:
-        pk = bug_dict[u'project']
-        projects.append(mysite.search.models.Project.objects.get(pk=pk))
+    """
+    Return a sorted list of all the Projects for which we've indexed bugs.
+    """
+    projects = mysite.search.models.Project.objects.annotate(
+        bug_count=Count('bug')).filter(
+        bug_count__gt=0).order_by(u'display_name')
     return projects
 
 def get_cited_projects_lacking_bugs():
