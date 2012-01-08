@@ -92,7 +92,7 @@ class MissionPageState(object):
 class MissionBaseView(django.views.generic.TemplateView):
     login_required = False
 
-    def get_context_data(self):
+    def get_context_data(self, *args, **kwargs):
         data = super(MissionBaseView, self).get_context_data()
 
         # Add some OpenHatch-specific stuff through side-effects
@@ -105,6 +105,12 @@ class MissionBaseView(django.views.generic.TemplateView):
         data.update({
                 'this_mission_page_short_name': self.this_mission_page_short_name,
                 'mission_name': self.mission_name})
+
+        # If a dictionary was passed in to us, either via __init__() or
+        # as_view(), then incorporate that into the template data as well.
+        if 'extra_context_data' in kwargs:
+            data.update(kwargs['extra_context_data'])
+
         return data
 
     @classmethod

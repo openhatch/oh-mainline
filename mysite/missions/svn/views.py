@@ -72,7 +72,10 @@ def checkout_submit(request):
             else:
                 data['svn_checkout_error_message'] = 'The secret word is incorrect.'
         data['svn_checkout_form'] = form
-    return Checkout.as_view()(request)
+    # If we get here, just hack up the request object to pretend it is a GET
+    # so the dispatch system in the class-based view can use the GET handler.
+    request.method = 'GET'
+    return Checkout.as_view()(request, extra_context_data=data)
 
 ### State manager
 class SvnMissionPageState(MissionPageState):
