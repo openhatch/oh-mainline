@@ -46,7 +46,9 @@ OTHER_DATABASES = {
         'HOST': 'localhost',
         'USER': 'oh_milestone_a',
         'PASSWORD': 'ahmaC0Th',
-        'OPTIONS': {'read_default_file': './my.cnf'},
+        'OPTIONS': {'read_default_file': os.path.join(os.path.dirname(__file__), 'my.cnf'),
+                    'init_command': 'SET storage_engine=INNODB; SET NAMES utf8;',
+                   },
         'CHARSET': 'utf8',
     },
 }
