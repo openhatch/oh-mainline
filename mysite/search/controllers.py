@@ -420,13 +420,6 @@ def get_projects_with_bugs():
     return projects
 
 def get_cited_projects_lacking_bugs():
-    portfolio_entries = mysite.profile.models.PortfolioEntry.published_ones.all()
-    one_pfe_dict_per_project = portfolio_entries.values(u'project').distinct().order_by(u'project__name')
-
-    projects_with_contributors = []
-    for pfe_dict in one_pfe_dict_per_project:
-        pk = pfe_dict[u'project']
-        projects_with_contributors.append(mysite.search.models.Project.objects.get(pk=pk))
-
-    projects_with_bugs = get_projects_with_bugs()
-    return [p for p in projects_with_contributors if p not in projects_with_bugs]
+    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all().values_list('project_id', flat=True)
+    return mysite.search.models.Project.objects.filter(id__in=project_ids).annotate(
+        bug_count=Count('bug')).filter(bug_count=0)

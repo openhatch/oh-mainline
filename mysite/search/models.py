@@ -330,6 +330,11 @@ class Project(OpenHatchModel):
         else:
             return ""
 
+    def get_bug_count(self):
+        if hasattr(self, 'bug_count'):
+            return self.bug_count
+        return Bug.all_bugs.filter(project=self).count()
+
     def get_open_bugs(self):
         return Bug.open_ones.filter(project=self)
 
