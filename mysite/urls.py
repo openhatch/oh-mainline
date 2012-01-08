@@ -39,6 +39,7 @@ from voting.views import vote_on_object
 
 import mysite.account.views
 import mysite.profile.views
+import mysite.missions.svn.views
 import mysite.missions.setup.views
 
 from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
@@ -123,14 +124,14 @@ urlpatterns = patterns('',
         (r'^missions/diffpatch/patchrecursive/hats.patch$', 'mysite.missions.diffpatch.views.patchrecursive_get_patch'),
         (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.diffpatch.views.patchrecursive_submit'),
 
-        (r'^missions/svn$', 'mysite.missions.svn.views.main_page'),
-        (r'^missions/svn/description$', 'mysite.missions.svn.views.long_description'),
+        (r'^missions/svn$', mysite.missions.svn.views.MainPage.as_view(), None, 'svn_main_page'),
+        (r'^missions/svn/description$', mysite.missions.svn.views.LongDescription.as_view(), None, 'svn_long_description'),
+        (r'^missions/svn/checkout$', mysite.missions.svn.views.Checkout.as_view(), None, 'svn_checkout'),
+        (r'^missions/svn/diff$', mysite.missions.svn.views.Diff.as_view(), None, 'svn_diff'),
+        (r'^missions/svn/commit$', mysite.missions.svn.views.Commit.as_view(), None, 'svn_commit'),
         (r'^missions/svn/resetrepo$', 'mysite.missions.svn.views.resetrepo'),
-        (r'^missions/svn/checkout$', 'mysite.missions.svn.views.checkout'),
         (r'^missions/svn/checkout/submit$', 'mysite.missions.svn.views.checkout_submit'),
-        (r'^missions/svn/diff$', 'mysite.missions.svn.views.diff'),
         (r'^missions/svn/diff/submit$', 'mysite.missions.svn.views.diff_submit'),
-        (r'^missions/svn/commit$', 'mysite.missions.svn.views.commit'),
         (r'^missions/svn/commit/poll$', 'mysite.missions.svn.views.commit_poll'),
 
         (r'^missions/git$', 'mysite.missions.git.views.main_page'),

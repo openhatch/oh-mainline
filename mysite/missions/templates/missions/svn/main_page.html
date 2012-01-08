@@ -29,7 +29,7 @@
 
 <p>You'll learn how to use a Subversion repository: you'll check things out, create patches, and commit.</p>
 
-<p>If you want to know why people use Subversion, read <a href="{% url mysite.missions.svn.views.long_description %}">more about Subversion</a>.</p>
+<p>If you want to know why people use Subversion, read <a href="{% url svn_long_description %}">more about Subversion</a>.</p>
 
 <h3>Get started</h3>
 
@@ -43,7 +43,7 @@
   <input type="submit" value="Reset your repository" />
 </form><br style="clear: left;" />
 <p class="next_mission_link">
-  <a href="{% url mysite.missions.svn.views.checkout %}">Checking out a working copy &raquo;</a></p>
+  <a href="{% url svn_checkout %}">Checking out a working copy &raquo;</a></p>
 {% else %}
 <p>To do these missions, you will need to make a personal repository.  Your repository will reside on the OpenHatch server, specifically for your use in these missions.  Then you can go on and interact with it.</p>
 

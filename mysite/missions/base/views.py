@@ -20,12 +20,15 @@
 ### This is the "base" set of views for the OpenHatch missions.
 
 from mysite.base.decorators import view
+import mysite.base.decorators
 from mysite.missions.models import Step, StepCompletion
 from mysite.missions.base import controllers
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+import django.views.generic
 
 import os
 from django.utils import simplejson
@@ -70,21 +73,53 @@ class MissionPageState(object):
             else:
                 data['mission_step_prerequisites_passed'] = True
         return (data, person)
-    
+
     def reset(self, mission_parts=None):
         ''' Resets whole mission or selected steps.
-        
+
         Args:
             mission_parts: A list of names for mission steps to reset.
         '''
         mission_parts = mission_parts and mission_parts or self.mission_parts
-        
+
         if mission_parts:
-            profile = self.request.user.get_profile()        
-            
+            profile = self.request.user.get_profile()
+
             for part_name in mission_parts:
                 if part_name in self.mission_parts:
-                    controllers.unset_mission_completed(profile, part_name)    
+                    controllers.unset_mission_completed(profile, part_name)
+
+class MissionBaseView(django.views.generic.TemplateView):
+    login_required = False
+
+    def get_context_data(self, *args, **kwargs):
+        data = super(MissionBaseView, self).get_context_data()
+
+        # Add some OpenHatch-specific stuff through side-effects
+        # from a call to as_view().
+        mysite.base.decorators.as_view(self.request,
+                                       template=self.template_name,
+                                       data=data,
+                                       slug=None,
+                                       just_modify_data=True)
+        data.update({
+                'this_mission_page_short_name': self.this_mission_page_short_name,
+                'mission_name': self.mission_name})
+
+        # If a dictionary was passed in to us, either via __init__() or
+        # as_view(), then incorporate that into the template data as well.
+        if 'extra_context_data' in kwargs:
+            data.update(kwargs['extra_context_data'])
+
+        return data
+
+    @classmethod
+    def as_view(cls, *args, **kwargs):
+        do_it = lambda: super(MissionBaseView, cls).as_view()
+        if cls.login_required:
+            return login_required(do_it())
+        else:
+            return do_it()
 
 # This is the /missions/ page.
 @view
