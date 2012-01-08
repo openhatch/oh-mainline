@@ -77,7 +77,8 @@ def checkout_submit(request):
     request.method = 'GET'
     return Checkout.as_view()(request, extra_context_data=data)
 
-### Normal GET handlers. These are usually pretty short.
+### All GET handlers are subclasses of this so that tedious template
+### context variable generation is handled elsewhere.
 class SvnBaseView(mysite.missions.base.views.MissionBaseView):
     mission_name = 'Using Subversion'
     def get_context_data(self, *args, **kwargs):
@@ -106,6 +107,8 @@ class SvnBaseView(mysite.missions.base.views.MissionBaseView):
         data.update(new_data)
         return data
 
+### Normal GET handlers. These are usually pretty short. They are based on
+### SvnBaseView.
 class MainPage(SvnBaseView):
     this_mission_page_short_name = 'Start page'
     template_name = 'missions/svn/main_page.html'
