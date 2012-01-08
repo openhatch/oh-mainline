@@ -17,6 +17,9 @@ class Migration(SchemaMigration):
             ('latitude', self.gf('django.db.models.fields.FloatField')(null=True)),
             ('longitude', self.gf('django.db.models.fields.FloatField')(null=True)),
         ))
+        if db.backend_name == 'mysql':
+            db.execute("alter table profile_location character set utf8;")
+            db.execute("alter table profile_location  modify display_name char(255) character set utf8;")
         db.send_create_signal('profile', ['Location'])
 
 
