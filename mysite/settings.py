@@ -46,7 +46,7 @@ OTHER_DATABASES = {
         'HOST': 'localhost',
         'USER': 'oh_milestone_a',
         'PASSWORD': 'ahmaC0Th',
-        'OPTIONS': {'read_default_file': './my.cnf'},
+        'OPTIONS': {'read_default_file': os.path.join(os.path.dirname(__file__), 'my.cnf')},
         'CHARSET': 'utf8',
     },
 }
