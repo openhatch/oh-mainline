@@ -9,6 +9,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding model 'Location'
+        if db.backend_name == 'mysql':
+            db.execute("SET storage_engine=INNODB; set names utf8;")
         db.create_table('profile_location', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('display_name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
