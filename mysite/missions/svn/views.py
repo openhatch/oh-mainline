@@ -77,41 +77,34 @@ def checkout_submit(request):
     request.method = 'GET'
     return Checkout.as_view()(request, extra_context_data=data)
 
-### State manager
-class SvnMissionPageState(MissionPageState):
-    def __init__(self, request, passed_data):
-        super(SvnMissionPageState, self).__init__(request, passed_data, 'Using Subversion')
-
-    def as_dict_for_template_context(self):
-        (data, person) = self.get_base_data_dict_and_person()
+### Normal GET handlers. These are usually pretty short.
+class SvnBaseView(mysite.missions.base.views.MissionBaseView):
+    mission_name = 'Using Subversion'
+    def get_context_data(self, *args, **kwargs):
+        ### For now, we use the MissionPageState object to track a few things.
+        ### Eventually, the missions base will stop using the PageState object,
+        ### and all the work that class does will get merged into MissionBaseView.
+        data = super(SvnBaseView, self).get_context_data(*args, **kwargs)
+        state = MissionPageState(self.request, passed_data=None, mission_name=self.mission_name)
+        new_data, person = state.get_base_data_dict_and_person()
         if person:
             repo = controllers.SvnRepository(self.request.user.username)
-            data.update({
+            new_data.update({
                 'repository_exists': repo.exists(),
                 'svn_checkout_done': controllers.mission_completed(person, 'svn_checkout'),
                 'svn_diff_done': controllers.mission_completed(person, 'svn_diff'),
                 'svn_commit_done': controllers.mission_completed(person, 'svn_commit'),
             })
-            if data['repository_exists']:
-              data.update({
-                'checkout_url': repo.public_trunk_url(),
-                'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
-                'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
-                'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
-                'commit_username': self.request.user.username,
-                'commit_password': repo.get_password()
-              })
+            if new_data['repository_exists']:
+                new_data.update({
+                        'checkout_url': repo.public_trunk_url(),
+                        'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
+                        'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
+                        'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
+                        'commit_username': self.request.user.username,
+                        'commit_password': repo.get_password()})
+        data.update(new_data)
         return data
-
-### Normal GET handlers. These are usually pretty short.
-class SvnBaseView(mysite.missions.base.views.MissionBaseView):
-    mission_name = 'Using Subversion'
-    def get_context_data(self, *args, **kwargs):
-        data = super(SvnBaseView, self).get_context_data(*args, **kwargs)
-        state = SvnMissionPageState(self.request, passed_data=None)
-        our_state = state.as_dict_for_template_context()
-        our_state.update(data)
-        return our_state
 
 class MainPage(SvnBaseView):
     this_mission_page_short_name = 'Start page'
