@@ -879,8 +879,8 @@ class LocationDataApiView(django.views.generic.View):
             }
         ret['lat_long_data'] = {
             'is_inaccessible': (location == mysite.profile.models.DEFAULT_LOCATION),
-            'latitude': person.latitude,
-            'longitude': person.longitude,
+            'latitude': person.get_public_latitude_or_default(),
+            'longitude': person.get_public_longitude_or_default(),
             }
         extra_person_info = {'username': person.user.username,
                              'photo_thumbnail_url': person.get_photo_url_or_default(),
