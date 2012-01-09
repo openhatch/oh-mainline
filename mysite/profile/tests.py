@@ -1327,7 +1327,8 @@ class SuggestLocation(TwillTests):
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    def test(self):
+    @mock.patch('mysite.base.controllers._geocode')
+    def test(self, mock_geocode):
         '''
         * Goes to paulproteus's profile
         * checks that he is not in Timbuktu
@@ -1335,6 +1336,9 @@ class EditLocation(TwillTests):
         * sets the location to Timbuktu
         * saves
         * checks his location is Timbuktu'''
+        mock_geocode.return_value = {'suggested_zoom_leveel': 6,
+                                     'latitude': 16.77532,
+                                     'longitude': -3.008265}
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         # not in Timbuktu!
@@ -1348,6 +1352,15 @@ class EditLocation(TwillTests):
         # Timbuktu!
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.find('Timbuktu')
+        # Make sure latitude and longitude are sett
+        person = Person.objects.get(user__username='paulproteus')
+        self.assertEqual('Timbuktu', person.location_display_name)
+        self.assertNotEqual(person.longitude, None)
+        self.assertNotEqual(mysite.profile.models.DEFAULT_LONGITUDE,
+                            person.get_public_longitude_or_default())
+        self.assertNotEqual(person.latitude, None)
+        self.assertNotEqual(mysite.profile.models.DEFAULT_LATITUDE,
+                            person.get_public_latitude_or_default())
 
 class EditBio(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
