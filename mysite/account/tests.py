@@ -351,17 +351,17 @@ class GuessLocationOnLogin(TwillTests):
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
     @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
-    def test_guess_location_on_login(self):
+    def test_guess_location_on_accessing_edit_location_form(self):
         person = Person.objects.get(user__username="paulproteus")
         self.assertFalse(person.location_confirmed)
         self.assertEqual('Inaccessible Island',
                          person.get_public_location_or_default())
 
         client = self.login_with_client()
-        response = client.get(reverse(mysite.profile.views.people))
+        response = client.get(reverse(mysite.account.views.set_location))
         self.assertContains(response, "OpenHatch")
         person = Person.objects.get(user__username="paulproteus")
-        self.assertEqual(person.location_display_name, "Rochester, NY, United States")
+        self.assertContains(response, "Rochester, NY, United States")
 
     def test_yes_response(self):
         person = Person.objects.get(user__username="paulproteus")
