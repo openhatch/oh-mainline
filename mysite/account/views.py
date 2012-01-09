@@ -262,12 +262,18 @@ def edit_name_do(request):
 @view
 def set_location(request, edit_location_form = None):
     # {{{
+
     data = {}
     initial = {}
 
-    if request.GET.get('dont_suggest_location', None) == '1':
-        data['dont_suggest_location'] = True
-        initial['location_display_name'] = ''
+    # If the user's location is the default one, then we create a guess.
+    if (request.user.get_profile().location_display_name ==
+         mysite.profile.models.DEFAULT_LOCATION):
+        geoip_guess = mysite.profile.controllers.get_geoip_guess_for_ip(
+            mysite.base.middleware.get_user_ip(request))[1]
+        initial['location_display_name'] = geoip_guess
+    else:
+        initial['location_display_name'] = request.user.get_profile().location_display_name
 
     # Initialize edit location form
     if edit_location_form is None:
