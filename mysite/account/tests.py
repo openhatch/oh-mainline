@@ -363,6 +363,25 @@ class GuessLocationOnLogin(TwillTests):
         person = Person.objects.get(user__username="paulproteus")
         self.assertContains(response, "Rochester, NY, United States")
 
+    mock_ip = mock.Mock()
+    mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
+    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
+    def test_do_not_guess_if_have_location_set(self):
+        person = Person.objects.get(user__username="paulproteus")
+        person.location_display_name = 'The White House'
+        person.latitude=38.898748
+        person.longitude=-77.037684
+        person.location_confirmed = True
+        person.save()
+
+        client = self.login_with_client()
+        response = client.get(reverse(mysite.account.views.set_location))
+        self.assertContains(response, "OpenHatch")
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertNotContains(response, "Rochester, NY, United States")
+        self.assertContains(response, "The White House")
+
     def test_yes_response(self):
         person = Person.objects.get(user__username="paulproteus")
         #logging in
