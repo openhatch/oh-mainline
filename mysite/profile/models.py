@@ -47,6 +47,8 @@ import logging
 import hashlib
 
 DEFAULT_LOCATION='Inaccessible Island'
+DEFAULT_LATITUDE=-37.3049962
+DEFAULT_LONGITUDE=-12.6790445
 
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
@@ -176,6 +178,18 @@ class Person(models.Model):
             return self.location_display_name
         else:
             return DEFAULT_LOCATION
+
+    def get_public_latitude_or_default(self):
+        if self.location_is_public():
+            return self.latitude
+        else:
+            return DEFAULT_LATITUDE
+
+    def get_public_longitude_or_default(self):
+        if self.location_is_public():
+            return self.longitude
+        else:
+            return DEFAULT_LONGITUDE
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,

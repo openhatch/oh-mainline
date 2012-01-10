@@ -29,6 +29,7 @@ from invitation.models import InvitationKey
 
 import urllib
 import logging
+import json
 
 import mysite.base.views
 import mysite.base.controllers
@@ -262,12 +263,19 @@ def edit_name_do(request):
 @view
 def set_location(request, edit_location_form = None):
     # {{{
+
     data = {}
     initial = {}
 
-    if request.GET.get('dont_suggest_location', None) == '1':
-        data['dont_suggest_location'] = True
-        initial['location_display_name'] = ''
+    # If the user's location is the default one, then we create a guess.
+    if (not request.user.get_profile().location_display_name) or (
+        request.user.get_profile().location_display_name ==
+        mysite.profile.models.DEFAULT_LOCATION):
+        geoip_guess = mysite.profile.controllers.get_geoip_guess_for_ip(
+            mysite.base.middleware.get_user_ip(request))[1]
+        initial['location_display_name'] = geoip_guess
+    else:
+        initial['location_display_name'] = request.user.get_profile().location_display_name
 
     # Initialize edit location form
     if edit_location_form is None:
@@ -291,6 +299,11 @@ def set_location_do(request):
         request.POST,
         instance=user_profile, prefix='edit_location')
     if edit_location_form.is_valid():
+        address = edit_location_form.cleaned_data['location_display_name']
+        as_string = mysite.base.controllers.cached_geocoding_in_json(address)
+        as_dict = json.loads(as_string)
+        user_profile.latitude = as_dict['latitude']
+        user_profile.longitude = as_dict['longitude']
         user_profile.location_confirmed = True
         user_profile.save()
         edit_location_form.save()

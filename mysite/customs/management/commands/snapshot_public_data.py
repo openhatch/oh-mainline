@@ -110,6 +110,8 @@ class Command(BaseCommand):
         everyone = Person.objects.all()
         for dude in everyone:
             dude.location_display_name = dude.get_public_location_or_default()
+            dude.longitude = dude.get_public_longitude_or_default()
+            dude.latitude = dude.get_public_latitude_or_default()
         public_person_data = self.serialize_all_objects(query_set=everyone)
         data.extend(public_person_data)
 

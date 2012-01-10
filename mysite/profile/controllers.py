@@ -207,32 +207,6 @@ def _query2results(query_type, search_string):
     return TagQuery(tag_short_name=query_type,
                     search_string=search_string)
 
-### This is a helper used by the map to pull out just the information that the map can use
-def get_person_data_for_map(person, include_latlong=False):
-    location = person.get_public_location_or_default()
-    name = person.get_full_name_or_username()
-    ret = {
-        'name': name,
-        'location': location,
-        }
-    if include_latlong:
-        lat_long_data = simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(location))
-        extra_person_info = {'username': person.user.username,
-                             'photo_thumbnail_url': person.get_photo_url_or_default(),
-                             }
-        ret['lat_long_data'] = lat_long_data
-        ret['extra_person_info'] = extra_person_info
-
-    return ret
-
-# This is a helper function for generating the mapping of person IDs -> location data,
-# as a dictionary, so that we can provide it to the map JavaScript.
-def get_people_location_data_as_dict(people, include_latlong=False):
-    person_id2data = dict([
-            (person.pk, get_person_data_for_map(person, include_latlong))
-            for person in people])
-    return person_id2data
-
 # These are helper functions for showing information about the query.
 def query_type2query_summary(template_data):
     output_dict = {}

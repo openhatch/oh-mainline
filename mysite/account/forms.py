@@ -106,7 +106,17 @@ class EditLocationForm(django.forms.ModelForm):
         model = Person
         fields = ('location_display_name',)
     def clean_location_display_name(self):
-        return self.cleaned_data['location_display_name'].strip()
+        address = self.cleaned_data['location_display_name'].strip()
+        # Synchronously try to geocode it. This will prime the cache, and
+        # make sure the geocoding would succeed, so this method does not
+        # have to be the one to store it.
+        try:
+            mysite.base.controllers.cached_geocoding_in_json(address)
+        except Exception:
+            logging.exception("When geocoding, caught an exception")
+            raise django.forms.ValidationError(
+                "An error occurred while geocoding. Make sure the address is a valid place. If you think this is our error, contact us.")
+        return address
 
 class EditNameForm(django.forms.ModelForm):
     class Meta:
