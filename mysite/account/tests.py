@@ -354,8 +354,9 @@ class GuessLocationOnLogin(TwillTests):
     def test_guess_location_on_login(self):
         person = Person.objects.get(user__username="paulproteus")
         self.assertFalse(person.location_confirmed)
-        self.assertFalse(person.location_display_name)
-        
+        self.assertEqual('Inaccessible Island',
+                         person.get_public_location_or_default())
+
         client = self.login_with_client()
         response = client.get(reverse(mysite.profile.views.people))
         self.assertContains(response, "OpenHatch")
