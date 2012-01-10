@@ -1766,11 +1766,20 @@ class DataExport(django.test.TestCase):
 
         fake_stdout=StringIO()
         # make fake Person who doesn't care if people know where he is
-        zuckerberg = Person.create_dummy(first_name="mark",location_confirmed = True, location_display_name='Palo Alto')
+        zuckerberg = Person.create_dummy(
+            first_name="mark",
+            location_confirmed = True,
+            location_display_name='Palo Alto',
+            latitude=0,
+            longitude=0)
         self.assertEquals(zuckerberg.get_public_location_or_default(), 'Palo Alto')
 
         # ...and make a fake Person who REALLY cares about his location being private
-        munroe = Person.create_dummy(first_name="randall",location_confirmed = False, location_display_name='Cambridge')
+        munroe = Person.create_dummy(first_name="randall",
+                                     location_confirmed = False,
+                                     location_display_name='Cambridge',
+                                     latitude=0,
+                                     longitude=0)
         self.assertEquals(munroe.get_public_location_or_default(), 'Inaccessible Island')
 
 
@@ -1830,6 +1839,18 @@ class DataExport(django.test.TestCase):
         # check that location_display_name is appropriate
         self.assertEquals(new_zuckerberg.location_display_name, 'Palo Alto')
         self.assertEquals(new_munroe.location_display_name, 'Inaccessible Island')
+
+        # Check that Zuckerburg has a real lat/long
+        self.assertNotEqual(mysite.profile.models.DEFAULT_LATITUDE,
+                            new_zuckerberg.latitude)
+        self.assertNotEqual(mysite.profile.models.DEFAULT_LONGITUDE,
+                            new_zuckerberg.longitude)
+
+        # Check that Randall has no lat/long
+        self.assertEquals(mysite.profile.models.DEFAULT_LATITUDE,
+                          new_munroe.latitude)
+        self.assertEquals(mysite.profile.models.DEFAULT_LONGITUDE,
+                          new_munroe.longitude)
 
         # check that we display both as appropriate
         self.assertEquals(new_zuckerberg.get_public_location_or_default(), 'Palo Alto')
