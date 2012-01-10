@@ -123,7 +123,10 @@ class Person(models.Model):
     dont_guess_my_location = models.BooleanField(default=False)
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
+                                             default=DEFAULT_LOCATION,
                                              verbose_name='Location')
+    latitude = models.FloatField(null=False, default=-37.3049962)
+    longitude = models.FloatField(null=False, default=-12.6790445)
     email_me_weekly_re_projects = models.BooleanField( default=True,
             verbose_name='Email me weekly about activity in my projects')
 
