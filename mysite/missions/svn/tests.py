@@ -178,7 +178,7 @@ class SvnViewTestsWhileLoggedOut(TwillTests):
         self.client.logout()
 
     def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
-        response = self.client.get(reverse(views.main_page))
+        response = self.client.get(reverse('svn_main_page'))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
 # Mocked-up svnlook output for the pre-commit hook.
