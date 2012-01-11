@@ -161,7 +161,7 @@ def checkout(request, passed_data = None):
 @view
 def diff(request, passed_data = None):
     state = GitMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Diffing your changes'
+    state.this_mission_page_short_name = 'Creating a patch'
     state.mission_step_prerequisite = 'git_checkout'
     data = state.as_dict_for_template_context()
     data['git_diff_form'] = forms.DiffForm()
