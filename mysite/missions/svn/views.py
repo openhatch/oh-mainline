@@ -142,6 +142,7 @@ class Commit(SvnBaseView):
     login_required = True
     this_mission_page_short_name = 'Committing your changes'
     mission_step_prerequisite = 'svn_diff'
+    template_name = 'missions/svn/commit.html'
 
 @login_required
 def commit_poll(request):
