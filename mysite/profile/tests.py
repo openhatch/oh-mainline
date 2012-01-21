@@ -1602,7 +1602,8 @@ class PeopleFinderClasses(TwillTests):
         self.assertEqual(self.person, pq.people[0])
 
 class PeopleFinderTagQueryTests(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
+    #fixtures = ['user-paulproteus', 'person-paulproteus', 'person-matt']
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
 
     def setUp(self, *args, **kwargs):
         super(PeopleFinderTagQueryTests, self).setUp(*args, **kwargs)
@@ -1671,6 +1672,37 @@ class PeopleFinderTagQueryTests(TwillTests):
 
         atq = mysite.profile.controllers.AllTagsQuery('python')
         self.assertEqual([self.person], list(atq.people))
+
+    def test_all_tags_insenstive_case_search_a_name(self):
+        # query with person named 'Asheesh', case insenstive, will
+        # return the same person (also AllTagsQuery will find a person named
+        # Asheesh, even if a tag wasn't used)
+        atq1 = mysite.profile.controllers.AllTagsQuery('ASHEESH')
+        atq2 = mysite.profile.controllers.AllTagsQuery('asheesh')
+        self.assertEqual(list(atq1.people), list(atq2.people))
+
+    def test_all_tags_insensitive_case_search_multiple_names(self):
+        #persons = mysite.profile.models.Person.objects.all()
+        #print persons
+
+        # get Barry and Asheesh out of the model
+        person_last_name_spinoza = mysite.profile.models.Person.objects.get(
+            user__last_name__iexact='spinoza')
+        person_first_name_asheesh = mysite.profile.models.Person.objects.get(
+            user__first_name__iexact='asheesh')
+
+        #send query to AllTagsQuery
+        atq = mysite.profile.controllers.AllTagsQuery('asheesh spinoza')
+        atq_filter_spinoza = atq.people.filter(user__last_name__iexact="spinoza")[0]
+        atq_filter_asheesh = atq.people.filter(user__first_name__iexact="asheesh")[0]
+
+        #make sure we have people
+        self.assertNotEqual(0, len(atq.people))
+
+        #check that both Aseesh and Barry are in the AllTagsQuery result
+        self.assertEqual(atq_filter_spinoza, person_last_name_spinoza )
+        self.assertEqual(atq_filter_asheesh, person_first_name_asheesh)
+  
 
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
