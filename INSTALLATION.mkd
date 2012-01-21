@@ -65,7 +65,8 @@ Run this command:
     python manage.py syncdb --noinput
 
 This will print some messages and eventually give you your prompt
-back. If you would like to know if what you got was correct ,check in the bottom of the file in the section Output Samples
+back. If you would like to know if what you got was correct, check
+in the bottom of the file in the section Output Samples.
 
 (We have to pass "--noinput" to request that Django not ask you
 questions. This is due to a bad interaction between Django's superuser
