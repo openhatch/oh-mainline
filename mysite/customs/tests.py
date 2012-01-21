@@ -1012,6 +1012,13 @@ class TracBugParser(django.test.TestCase):
                 bitesized_type='keywords',
                 bitesized_text='bitesized',
                 documentation_type='')
+        self.tm3 = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Tracpriority',
+                base_url='http://trac.edgewall.org/priority',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='priority',
+                bitesized_text='trivial',
+                documentation_type='')
 
     def test_create_bug_object_data_dict_more_recent(self):
         tbp = mysite.customs.bugimporters.trac.TracBugParser(
@@ -1101,6 +1108,53 @@ class TracBugParser(django.test.TestCase):
                   'good_for_newcomers': True,
                   'looks_closed': False,
                   'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_bug_object_data_dict_priority_bitesized(self):
+        self.maxDiff = None
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp.bug_csv = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'trivial',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298.html')
+        tbp.set_bug_html_data(unicode(
+            open(cached_html_filename).read(), 'utf-8'))
+
+        got = tbp.get_parsed_data_dict(self.tm3)
+        del got['last_polled']
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': u"This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'trivial',
+                  'people_involved': 5,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'last_touched': datetime.datetime(2010, 2, 24, 0, 8, 47),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'trivial',
                   'concerns_just_documentation': False,
                   'as_appears_in_distribution': '',
                   }
