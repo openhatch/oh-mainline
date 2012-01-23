@@ -20,8 +20,6 @@ import os.path
 import hashlib
 from itertools import cycle, islice
 
-from django.utils import simplejson
-
 import pygeoip
 
 from django.conf import settings
