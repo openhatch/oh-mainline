@@ -20,8 +20,6 @@ import os.path
 import hashlib
 from itertools import cycle, islice
 
-from django.utils import simplejson
-
 import pygeoip
 
 from django.conf import settings
@@ -177,7 +175,7 @@ def parse_string_query(s):
         parsed['query_type'] = 'all_tags'
         parsed['q'] = s
 
-    # Now, clean up the q to parse out qutiation marks
+    # Now, clean up the q to parse out quotation marks
     parsed['q'] = parsed['q'].strip() # trim whitespace
     if len(parsed['q']) >= 2 and (
         parsed['q'][0] == '"' == parsed['q'][-1]):
@@ -363,9 +361,39 @@ class AllTagsQuery(PeopleFinder):
     # FIXME: Probably we should add a add_query_summary() method.
     def __init__(self, search_string):
         self.template_data = {}
-        self.people = []
-        self.people = self.get_persons_by_tag_text(
+        self.people = mysite.profile.models.Person.objects.none()
+
+        search_list = search_string.split(" ")
+
+        # get search based on tags
+        tag_results = mysite.profile.models.Person.objects.none()
+        tag_results = self.get_persons_by_tag_text(
             search_string)
+
+        # get search based on username
+        user_results = mysite.profile.models.Person.objects.none()
+        if len(search_list) == 1: 
+          user_results = self.get_persons_by_username(
+              search_string)
+
+        # get search based on last name
+        lastname_results = mysite.profile.models.Person.objects.none()
+        lastname_results2 = mysite.profile.models.Person.objects.none()
+        for search_word in search_list:
+          lastname_results2 = self.get_persons_by_lastname(
+              search_word)
+          lastname_results = lastname_results | lastname_results2;
+
+        # get search based on first name
+        firstname_results = mysite.profile.models.Person.objects.none()
+        firstname_results2 = mysite.profile.models.Person.objects.none()
+        for search_word in search_list:
+          firstname_results2 = self.get_persons_by_firstname(
+              search_word)
+          firstname_results =  firstname_results | firstname_results2
+
+        # Chain all the search results together
+        self.people = tag_results | user_results | lastname_results | firstname_results
 
     def get_persons_by_tag_text(self, search_string):
         tag_ids = mysite.profile.models.Tag.objects.filter(
@@ -373,6 +401,19 @@ class AllTagsQuery(PeopleFinder):
         person_ids = mysite.profile.models.Link_Person_Tag.objects.filter(
             tag__id__in=tag_ids).values_list('person_id', flat=True)
         return self.get_person_instances_from_person_ids(person_ids)
+
+    def get_persons_by_username(self, search_string):
+        return mysite.profile.models.Person.objects.filter(
+            user__username__icontains=search_string)
+
+    def get_persons_by_lastname(self, search_string):
+        return mysite.profile.models.Person.objects.filter(
+            user__last_name__icontains=search_string)
+
+    def get_persons_by_firstname(self, search_string):
+        return mysite.profile.models.Person.objects.filter(
+            user__first_name__icontains=search_string)
+
 
 class ProjectQuery(PeopleFinder):
     def __init__(self, search_string):
