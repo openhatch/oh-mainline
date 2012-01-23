@@ -1681,9 +1681,6 @@ class PeopleFinderTagQueryTests(TwillTests):
         self.assertEqual(list(atq1.people), list(atq2.people))
 
     def test_all_tags_insensitive_case_search_multiple_names(self):
-        #persons = mysite.profile.models.Person.objects.all()
-        #print persons
-
         # get Barry and Asheesh out of the model
         person_last_name_spinoza = mysite.profile.models.Person.objects.get(
             user__last_name__iexact='spinoza')
