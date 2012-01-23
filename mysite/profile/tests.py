@@ -1698,7 +1698,6 @@ class PeopleFinderTagQueryTests(TwillTests):
         #check that both Aseesh and Barry are in the AllTagsQuery result
         self.assertEqual(atq_filter_spinoza, person_last_name_spinoza )
         self.assertEqual(atq_filter_asheesh, person_first_name_asheesh)
-  
 
 class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):

@@ -394,7 +394,7 @@ class AllTagsQuery(PeopleFinder):
 
         # Chain all the search results together
         self.people = tag_results | user_results | lastname_results | firstname_results
-        
+
     def get_persons_by_tag_text(self, search_string):
         tag_ids = mysite.profile.models.Tag.objects.filter(
             text__iexact=search_string).values_list('id', flat=True)
