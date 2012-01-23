@@ -1602,7 +1602,6 @@ class PeopleFinderClasses(TwillTests):
         self.assertEqual(self.person, pq.people[0])
 
 class PeopleFinderTagQueryTests(TwillTests):
-    #fixtures = ['user-paulproteus', 'person-paulproteus', 'person-matt']
     fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
 
     def setUp(self, *args, **kwargs):
