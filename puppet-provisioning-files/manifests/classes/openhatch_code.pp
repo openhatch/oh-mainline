@@ -8,7 +8,7 @@ class openhatch_code {
   }
 
   exec { "/vagrant/bin/buildout":
-    creates => '/vagrant/bin/mysite',
+    creates => '/vagrant/manage.py',
     user => 'vagrant',
     timeout => 0,
     group => 'vagrant',

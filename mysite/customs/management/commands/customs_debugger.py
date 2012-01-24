@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
     def show_usage(self):
         print """
-usage: ./bin/mysite customs_debugger COMMAND
+usage: ./manage.py customs_debugger COMMAND
 
 The following commands are available:
     list_old_bugs           List all Bug objects older than one day plus one hour.

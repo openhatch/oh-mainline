@@ -7,7 +7,8 @@ import datetime
 import sys
 
 ## Figure out where in the filesystem we are.
-MEDIA_ROOT_BEFORE_STATIC = os.path.dirname(__file__) # This is needed for {% version %}
+DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
+MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY # This is needed for {% version %}
 
 ## Now, actual settings
 DEBUG = True
@@ -269,7 +270,7 @@ SVN_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn
 SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
 
 # The script to invoke for management commands in this environment.
-PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(sys.argv[0])
+PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
 CELERY_ALWAYS_EAGER = True
 SOUTH_TESTS_MIGRATE = False
 

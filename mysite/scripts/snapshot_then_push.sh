@@ -28,7 +28,7 @@ cd "$PREFIX"
 TEMPFILE="$(mktemp --suffix -snapshot.json.gz)"
 
 ## Do the slooow thing of snapshotting the database
-./bin/production snapshot_public_data | gzip > "$TEMPFILE"
+./manage.py snapshot_public_data | gzip > "$TEMPFILE"
 
 # Set the permissions so that, after the file gets pushed to the web,
 # the web server permits people to download these snapshots.
