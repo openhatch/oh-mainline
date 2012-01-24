@@ -1,5 +1,5 @@
-# This settings file is loaded by ./bin/production, which is
-# what we use on the main OpenHatch deployment.
+# This settings file contains custom settings used for the
+# main OpenHatch deployment.
 #
 # The live site needs some slightly different settings.
 #
@@ -48,7 +48,6 @@ try:
 except ImportError:
     pass
 
-PATH_TO_MANAGEMENT_SCRIPT = '/home/deploy/milestone-a/bin/production'
 GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
 
