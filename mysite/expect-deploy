@@ -71,11 +71,11 @@ while {true} {
 }
 
 status "\r\n*** Attempting to run migrations... ***\r\n"
-send "./bin/production migrate --merge\r"
+send "./manage.py migrate --merge\r"
 expect "$ "
 
 status "\r\n*** Syncing the un-migrated models... ***\r\n"
-send "./bin/production syncdb\r"
+send "./manage.py syncdb\r"
 expect "$ "
 
 status "\r\n*** Reloading the web site... ***\r\n"
