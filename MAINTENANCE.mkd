@@ -18,7 +18,7 @@ At present, there is no inbuilt automation of bug importing (celeryd
 was causing too many problems). Run the following command to start a
 bug import:
 
-    python manage.py customs_twist
+    ./manage.py customs_twist
 
 Since this can take a while, it is a good idea to run this somewhere
 where it won't prevent you from using your computer - for example,
@@ -36,7 +36,7 @@ To run this maintenance task hourly, run these commands:
     # but is not necessary.
     screen -RD # Create an instance of screen, or attach to an existing one.
     # Type Ctrl-a, c to open a new screen
-    while (true); do ./bin/mysite profile_hourly_tasks; sleep 1h; done
+    while (true); do ./manage.py profile_hourly_tasks; sleep 1h; done
     # Type Ctrl-a, d to hide ("detach from") the screen
 
 ## Rebuilding the people search index
@@ -47,7 +47,7 @@ engines.
 
 Sometimes that gets otu of sync with the databse. You might need to run:
 
-    python manage.py rebuild_index
+    ./manage.py rebuild_index
 
 (You can say "yes" if it asks you if you are sure.)
 
