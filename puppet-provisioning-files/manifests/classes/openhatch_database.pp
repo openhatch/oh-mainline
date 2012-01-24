@@ -7,7 +7,7 @@ class openhatch_database {
     cwd => '/root/',
   }
 
-  exec { "/vagrant/bin/mysite syncdb --noinput":
+  exec { "/vagrant/manage.py syncdb --noinput":
     user => 'vagrant',
     timeout => 0,
     group => 'vagrant',
@@ -18,14 +18,14 @@ class openhatch_database {
                 Exec['/vagrant/bin/buildout']],
   }
 
-  exec { "/vagrant/bin/mysite migrate":
+  exec { "/vagrant/manage.py migrate":
     user => 'vagrant',
     timeout => 0,
     group => 'vagrant',
     cwd => '/vagrant/',
     logoutput => on_failure,
     require => [Exec["/usr/bin/python2.6 /vagrant/bootstrap.py"],
-                Exec["/vagrant/bin/mysite syncdb --noinput"]],
+                Exec["/vagrant/manage.py syncdb --noinput"]],
   }
 
 }
