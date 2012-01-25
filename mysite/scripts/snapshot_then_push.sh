@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+## Configuration constants
+HOST="linode2.openhatch.org"
+
+
 ## change directory into the right place
 PREFIX="."
 while [ ! -d "$PREFIX/mysite" ]; do
@@ -35,7 +39,7 @@ TEMPFILE="$(mktemp --suffix -snapshot.json.gz)"
 chmod 644 "$TEMPFILE"
 
 ## push this somewhere so that we save it
-rsync -q "$TEMPFILE" inside@inside.openhatch.org:/var/web/inside.openhatch.org/snapshots/$(date -I).json.gz
+rsync -q "$TEMPFILE" inside@"$HOST":/var/web/inside.openhatch.org/snapshots/$(date -I).json.gz
 
 ## finally, delete the local temporary file.
 rm "$TEMPFILE"
