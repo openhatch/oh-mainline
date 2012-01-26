@@ -43,10 +43,7 @@ CELERY_ALWAYS_EAGER = False # srsly
 ### always use memcached on linode-one, also
 CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
-try:
-    from deployment_settings_secret_keys import GOOGLE_ANALYTICS_CODE
-except ImportError:
-    pass
+GOOGLE_ANALYTICS_CODE='UA-15096810-1'
 
 GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
