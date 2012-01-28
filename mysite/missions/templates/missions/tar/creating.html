@@ -34,15 +34,8 @@
 
       <p></p>
 
-      <p>Your mission is to:
+      <p>Your mission is to upload a tarball with these files inside, all within a directory called <tt>myproject-0.1</tt>.</p>
 
-      <ul class="raquo_bullets">
-        <li>create a <code>myproject-0.1</code> directory (<abbr title="mkdir myproject-0.1">hover for hint</abbr>)</li>
-        <li>download the files above and place them in the directory</li>
-        <li>in the parent directory, create a gzipped tarball of the <code>myproject-0.1</code> directory (<abbr
-                title="tar zcvf myproject-0.1.tar.gz myproject-0.1">hover for hint</abbr>)</li>
-        <li>upload your tarball</li>
-      </ul>
       <p></p>
 
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.upload %}#create-form">{% csrf_token %}
@@ -86,6 +79,33 @@
       <p id="next-mission-link" class="next_mission_link">
 	Congratulations! You've totally completed the tar mission. Want to go <a href="{% url mysite.missions.base.views.main_page %}">back to the list of missions</a>?</p>
       {% endif %}
+      <div id="hint_tabs">
+	<ul>
+	  <li><a href="#hints">Hints</a></li>
+	  <li><a href="#low">Low</a></li>
+	  <li><a href="#high">High</a></li>
+	</ul>
+	<div id="hints">
+	  <p>If you need help with this step, try clicking through these hints.</p>
+	  <p>The "low" hint level is perfect if you're just confused as to what to do.</p>
+	  <p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
+	</div>
+	<div id="low">
+	  <ul class="raquo_bullets">
+	    <li>create a <code>myproject-0.1</code> directory</li>
+	    <li>download the files above and place them in the directory</li>
+	    <li>in the parent directory, create a gzipped tarball of the <code>myproject-0.1</code> directory</li>
+	    <li>upload your tarball</li>
+	  </ul>
+	</div>
+	<div id="high">
+	  <p>Some commands you might need to know:</p>
+	  <ul class="raquo_bullets">
+	    <li><tt>mkdir myproject-0.1</tt></li>
+	    <li><tt>tar zcvf myproject-0.1.tar.gz myproject-0.1</tt></li>
+	  </ul>
+	</div>
+      </div>
   </div>
 </div>
 {% endblock mission_main %}
