@@ -27,8 +27,6 @@
     <p><a href="{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}">Here is a file</a> that contains a piece of code that could be implemented in a much better way.  Let's say that this file is part of a project you are working on, and somebody has come along, noticed the piece of code that could be improved, and <a href="{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}">gave you a patch with the improved code</a>.</p>
     <p>In order to review the changes, you'll need to apply the patch to the file using the <code>patch</code> program, and your mission is to do that.</p>
 
-    <p>One way to accomplish this is by running a command like <pre>patch -p0 &lt; patch_file</pre> from the command-line, in the directory containing both <code>patch_file</code> and the original file (replace <code>"patch_file"</code> with the actual name of the file you downloaded). This command says "use the patch program to apply the diff in <code>patch_file</code> to a file in the current directory". You can read more about the <code>patch</code> program in its <a href="http://linux.die.net/man/1/patch">man page</a> (or type <code>man patch</code> at the command-line).</p>
-
     <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchsingle_submit %}#patchsingle-form">{% csrf_token %}
       <div class="form-row file-upload-row">
         <a name="patchsingle-form"></a>
@@ -57,6 +55,26 @@
     <p class="next_mission_link">
       <a href="{% url mysite.missions.diffpatch.views.single_file_diff %}">On to diffing files &raquo;</a></p>
     {% endif %}
+
+    <div id="hint_tabs">
+      <ul>
+        <li><a href="#hints">Hints</a></li>
+        <li><a href="#low">Low</a></li>
+        <li><a href="#high">High</a></li>
+    </ul>
+    <div id="hints">
+        <p>If you need help with this step, try clicking through these hints.</p>
+	<p>The "low" hint level is perfect if you're just confused as to what to do.</p>
+	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
+    </div>
+    <div id="low">
+      <pre>man patch</pre>
+      <p>or
+	<a href="http://linux.die.net/man/1/patch">read the man page online</a>.</p>
+    </div>
+    <div id="high">
+	 <p>One way to accomplish this is by running a command like <pre>patch -p0 &lt; patch_file</pre> from the command-line, in the directory containing both <code>patch_file</code> and the original file (replace <code>"patch_file"</code> with the actual name of the file you downloaded). This command says "use the patch program to apply the diff in <code>patch_file</code> to a file in the current directory". You can read more about the <code>patch</code> program in its <a href="http://linux.die.net/man/1/patch">man page</a> (or type <code>man patch</code> at the command-line).</p>
+    </div>
   </div>
 </div>
 {% endblock mission_main %}

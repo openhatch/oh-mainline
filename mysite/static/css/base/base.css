@@ -3,7 +3,7 @@ html.javascript_is_enabled .invisible_if_js { display: none !important; }
 .ui-tabs-hide { display: none !important; }
 
 body { font: 10pt Helvetica, sans-serif; background-color: #fff; background-position: fixed; color: #222; max-width: 1000px; margin: 0 auto; padding: 0; }
-.link_like, a { color: #ff6d3d; text-decoration: none; cursor:pointer; cursor:hand; }
+.link_like, a , body .ui-widget-content a { color: #ff6d3d; text-decoration: none; cursor:pointer; cursor:hand; }
     /* If you change the link color, be sure to change the color of the links
      * on /static/css/search/search.css */
 
@@ -17,7 +17,7 @@ input[type="submit"]:focus, input[type="button"]:focus { outline : none; }
 
 .hidden { display: none }
 
-a:hover { text-decoration: underline; }
+a:hover, .ui-widget-content a:hover { text-decoration: underline; }
 a img { border-style: none; }
 
 abbr { border-bottom: 1px dotted #999; }
