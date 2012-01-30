@@ -55,6 +55,7 @@ def diff_submit(request):
             except controllers.IncorrectPatch, e:
                 data['svn_diff_error_message'] = str(e)
         data['svn_diff_form'] = form
+    request.method = 'GET'
     return Diff.as_view()(request, extra_context_data=data)
 
 @login_required
