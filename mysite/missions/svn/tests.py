@@ -163,6 +163,13 @@ class SvnViewTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
 
+    def test_submit_empty_diff_does_not_crash(self):
+        self.client.post(reverse(views.resetrepo))
+        response = self.client.post(reverse(views.diff_submit), {'diff': ''})
+        self.assertEqual(200, response.status_code)
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertFalse(controllers.mission_completed(paulproteus, 'svn_diff'))
+
     def test_main_page_does_not_complain_about_prereqs(self):
         response = self.client.get(reverse('svn_main_page'))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
