@@ -117,11 +117,21 @@ body#project .wannahelper_checkboxes {
     margin-bottom: 5px;
 }
 
-body#project .people-list li { width: 90%; }
+body#project .people-list li {
+    width: 90%;
+    margin-bottom: 0;
+}
 
 body#project .people-list li.wannahelper_checkbox_item {
+    padding-top: 9px;
     width: 8%;
     display: inline;
+}
+body#project .people-list li.contacted_on {
+    width: 100%;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 3px;
 }
 
 body#project .tab_nav li, body#project .tab_nav h3 {
