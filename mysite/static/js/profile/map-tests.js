@@ -24,7 +24,7 @@ function MapTests(){
         $mappablePeople.push($('#person_summary_'+person_id));
     }
 
-    tester.ok($mappablePeople.length >= 3, "There are at least three visible LIs inside #people-list.");
+    tester.ok($mappablePeople.length >= 3, "There are at least three visible LIs inside .people-list.");
 
     //first we highlight person 3
     var $dontClickMyMarker = $mappablePeople[2];
