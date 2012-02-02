@@ -104,8 +104,8 @@ def project(request, project__name = None):
             note = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p)
             contact_form_list.append({
                 'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,),
-                                                                initial= { 'project' : p,
-                                                                           'person' : person,
+                                                                initial= { 'project_id' : p.pk,
+                                                                           'person_id' : person.pk,
                                                                            'checked' : bool(note.contacted_on) }),
                 'person' : person,
                 'note' : note,
@@ -284,9 +284,9 @@ def mark_contacted_do(request):
             #for each prefix, validate form
             mark_contacted_form = mysite.project.forms.MarkContactedForm(request.POST, prefix="helper-%s" % (person_pk))
             if mark_contacted_form.is_valid():
-                project = mark_contacted_form.cleaned_data['project']
-                person = mark_contacted_form.cleaned_data['person']
-                whn = mysite.search.models.WannaHelperNote.objects.get(person=person, project=project)
+                project_id = mark_contacted_form.cleaned_data['project_id']
+                person_id = mark_contacted_form.cleaned_data['person_id']
+                whn = mysite.search.models.WannaHelperNote.objects.get(person__id=person_id, project__id=project_id)
                 # add contacted by and date if not already set.
                 if not whn.contacted_by:
                     whn.contacted_by = request.user
