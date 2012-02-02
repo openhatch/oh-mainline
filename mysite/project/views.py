@@ -97,14 +97,17 @@ def project(request, project__name = None):
     wannahelpernotes = mysite.search.models.WannaHelperNote.objects.filter(person__id__in=wanna_helpers.values_list('id', flat=True), project=p).select_related()
     for note in wannahelpernotes:
         # a WannaHelperNote should always exist for all Person objects in people_to_show
+        started_checked = bool(note.contacted_on)
         contact_form_list.append({
                 'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (note.person_id,),
                                                                 initial= { 'project_id' : p.pk,
                                                                            'person_id' : note.person_id,
-                                                                           'checked' : bool(note.contacted_on) }),
+                                                                           'checked' : started_checked}),
+                'started_checked': started_checked,
                 'person' : note.person,
                 'note' : note,
                 })
+    contact_form_list.sort(key=lambda x: (x['started_checked']))
 
     button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
             request)
