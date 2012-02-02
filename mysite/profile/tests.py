@@ -2672,6 +2672,27 @@ class PeopleMapSummariesAreCheap(TwillTests):
             Link_Person_Tag.objects.create(person=self.paulproteus, tag=tag)
         self.assertEquals(3, n)
 
+        # Give paulproteus some projects
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    is_published=True,
+                    person=self.paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                )
+        citation.save()
+
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name2')[0],
+                    is_published=True,
+                    person=self.paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                )
+        citation.save()
+
         # Now, start counting queries.
         self.old_settings_debug = getattr(settings, 'DEBUG', None)
         settings.DEBUG = True
@@ -2707,6 +2728,9 @@ class PeopleMapSummariesAreCheap(TwillTests):
 
     def test_map_tag_texts(self):
         self.paulproteus.get_tag_texts_for_map()
+
+    def test_project_list(self):
+        self.paulproteus.get_list_of_all_published_projects()
 
 class PeopleLocationData(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
