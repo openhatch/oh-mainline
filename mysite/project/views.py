@@ -94,7 +94,7 @@ def project(request, project__name = None):
     people_to_show = wanna_helpers
 
     contact_form_list = []
-    wannahelpernotes = mysite.search.models.WannaHelperNote.objects.filter(person__id__in=wanna_helpers.values_list('id', flat=True), project=p).select_related()
+    wannahelpernotes = mysite.search.models.WannaHelperNote.objects.filter(person__id__in=wanna_helpers.values_list('id', flat=True), project=p).select_related().order_by('-pk')
     for note in wannahelpernotes:
         # a WannaHelperNote should always exist for all Person objects in people_to_show
         started_checked = bool(note.contacted_on)
