@@ -29,7 +29,7 @@
     </div>
     {% if helpers %}
         <div class='body'>
-            <ul id='people-list'>
+            <ul class="people-list">
                 {% for person in people_to_show|slice:":3" %}
                     {% include 'profile/person-summary-li.html' %}
                 {% endfor %}

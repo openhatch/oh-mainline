@@ -146,7 +146,7 @@
           {% with user.get_profile.get_collaborators_for_landing_page as collaborators %}
           <div class='module' id='people'>
             <div class='body'>
-              <ul id='people-list'>
+              <ul class="people-list">
                 {% if collaborators %}
                 <li class="heading">Collaborators:</li>
                 {% for person in collaborators %}

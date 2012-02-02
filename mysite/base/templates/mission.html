@@ -79,7 +79,7 @@
                     <li><a href='#completed'>Completed missions (31)</a></li>
                 </ul>
                 <div class='tab' id='ongoing'>
-                    <ul id='people-list'>
+                    <ul class="people-list">
                         {% for person in currently_pursuing %}
 
                             <li style='margin-bottom: 1.8em;'>
@@ -123,7 +123,7 @@
                     </ul>
                 </div>
                 <div class='tab' id='completed'>
-                    <ul id='people-list'>
+                    <ul class="people-list">
                         {% for person in successfully_completed %}
                             <li style='margin-bottom: 1.8em;'>
                                 {% with person.get_photo_thumbnail_url_or_default as thumbnail_url %}
