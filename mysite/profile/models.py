@@ -346,20 +346,18 @@ class Person(models.Model):
     @mysite.base.decorators.cache_method('get_tag_texts_cache_key')
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
-        exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
-        my_tag_texts = (link.tag.text for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me)
-        #eliminate duplicates, case-sensitively, then return
-        already_added = set()
-        to_return = []
-        for tag_text in my_tag_texts:
-            lowered = tag_text.lower()
-            if lowered in already_added:
-                continue # skip if already added this
-            else:
-                to_return.append(tag_text)
-                already_added.add(lowered)
-        to_return.sort() # side-effect-y sort()
-        return to_return
+        my_tag_texts = Tag.objects.filter(link_person_tag__person=self).extra(select={'lowername': 'LOWER(text)'})
+        without_irrelevant_tags = my_tag_texts.exclude(tag_type__name__in=['understands_not', 'studying'])
+        just_distinct_lowername = without_irrelevant_tags.values('lowername').distinct().order_by('lowername')
+        text_and_lower = just_distinct_lowername.values_list('lowername', 'text')
+        lower_set_so_far = set()
+        ret = []
+        for (lower, text) in text_and_lower:
+            if lower in lower_set_so_far:
+                continue
+            ret.append(text)
+            lower_set_so_far.add(lower)
+        return ret
 
     def get_tags_as_dict(self):
         ret = collections.defaultdict(set)

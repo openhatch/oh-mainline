@@ -2655,7 +2655,7 @@ class PeopleMapSummariesAreCheap(TwillTests):
         super(PeopleMapSummariesAreCheap, self).setUp(*args, **kwargs)
 
         # Give paulproteus some tag values
-        pp = Person.objects.get(user__username='paulproteus')
+        self.paulproteus = Person.objects.get(user__username='paulproteus')
 
         understands = TagType(name='understands')
         understands.save()
@@ -2666,8 +2666,11 @@ class PeopleMapSummariesAreCheap(TwillTests):
         Tag.objects.create(tag_type=understands, text='thing3')
 
         # Link them to the Person
+        n = 0
         for tag in Tag.objects.all():
-            Link_Person_Tag.objects.create(person=pp, tag=tag)
+            n += 1
+            Link_Person_Tag.objects.create(person=self.paulproteus, tag=tag)
+        self.assertEquals(3, n)
 
         # Now, start counting queries.
         self.old_settings_debug = getattr(settings, 'DEBUG', None)
@@ -2702,8 +2705,8 @@ class PeopleMapSummariesAreCheap(TwillTests):
             pprint.pprint(openhatchy_queries)
             self.assertEqual(1, len(openhatchy_queries))
 
-    def test(self):
-        pass # FIXME: for now, do nothing.
+    def test1(self):
+        self.paulproteus.get_tag_texts_for_map()
 
 class PeopleLocationData(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
