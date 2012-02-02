@@ -2705,7 +2705,7 @@ class PeopleMapSummariesAreCheap(TwillTests):
             pprint.pprint(openhatchy_queries)
             self.assertEqual(1, len(openhatchy_queries))
 
-    def test1(self):
+    def test_map_tag_texts(self):
         self.paulproteus.get_tag_texts_for_map()
 
 class PeopleLocationData(TwillTests):
