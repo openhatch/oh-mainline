@@ -224,26 +224,6 @@ about how you can help {{ project.display_name }}
             </ul>
         </div>
     {% endif %}
-    {% if people_to_show %}
-        <div id="iwh_handler" class="body tab {% if not user %}hidden{% endif %}">
-            <div class="explanation">
-                <p>The following people have expressed interest in helping with this project</p>
-            </div>
-            <form id='mark_contacted_do_form' action="{% url mysite.project.views.mark_contacted_do %}" method="POST">
-                {% csrf_token %}
-                {% for person in mark_contacted_forms %}
-                    <p>
-                        <a href="{{ person.person.profile_url }}">{{ person.person.user.username }}</a><br>
-                        {{ person.form.person }}{{ person.form.project }}
-                        {% if not person.note.contacted_on %}{{ person.form.checked.label }} {{ person.form.checked }}<br>{% else %}
-                        Contacted on {{ person.note.contacted_on }} by {{ person.note.contacted_by }}<br>{% endif %}
-                    </p>
-                {% endfor %}
-                <input type='hidden' id='id_mark_contact-project' name='mark_contact-project' value='{{ project.pk }}'>
-                <input type='submit' id='mark_contact-button' rel='tipsy-south' title='Click to mark that the selected individuals have been contacted!' value='Contacted!'>
-            </form>
-        </div>
-    {% endif %}
 </div><!-- /.module #requests -->
 
 {% endblock left %}

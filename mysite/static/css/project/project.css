@@ -111,6 +111,18 @@ body#edit_project .tab { float: left; width: 100%; padding-top: 10px; }
 
 body#project span { word-wrap: break-word;}
 
+body#project .wannahelper_checkboxes {
+    max-height: 200px;
+    overflow: auto;
+    margin-bottom: 5px;
+}
+
+body#project .people-list li { width: 90%; }
+
+body#project .people-list li.wannahelper_checkbox_item {
+    width: 8%;
+    display: inline;
+}
 
 body#project .tab_nav li, body#project .tab_nav h3 {
     display: inline;
