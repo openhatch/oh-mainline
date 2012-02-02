@@ -51,8 +51,7 @@
 	<div class="wannahelper_checkboxes">
         {% csrf_token %}
         {% for person in mark_contacted_forms %}
-        <p>
-	  <ul class="people-list">
+	<ul class="people-list">
           {% with person.person as person %}{% include 'profile/person-summary-li.html' %}{% endwith %}
 	  {% if user.is_authenticated %}
 	  <li class="wannahelper_checkbox_item">
@@ -66,7 +65,6 @@
 	  </li>
 	  {% endif %}
 	  </ul>
-        </p>
         {% endfor %}
         <input type='hidden' id='id_mark_contact-project' name='mark_contact-project' value='{{ project.pk }}'>
 	</div>
