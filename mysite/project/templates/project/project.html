@@ -333,7 +333,7 @@ about how you can help {{ project.display_name }}
     </div>
     {% if project.cached_contributor_count %}
         <div class='body'>
-            <ul id='people-list'>
+            <ul class="people-list">
                 {% for person in contributors %}
                     {% include 'profile/person-summary-li.html' %}
                 {% endfor %}

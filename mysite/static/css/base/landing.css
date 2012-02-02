@@ -36,7 +36,7 @@ body#landing #bugs .body li { color: #999; list-style: circle; margin-left: 2em;
 body#landing #bugs li span { color: #222; position: relative; top: -7px; }
 
 body#landing #people .body, body#landing #people, body#landing #people .people-view-info { background: #fff; width: 97%;}
-body#landing #people-list li .people-view-info { float: none; width: 90%; }
+body#landing .people-list li .people-view-info { float: none; width: 90%; }
 body#landing .widget-wrapper { float: left; margin-bottom: 10px; width: 100%; }
 body#landing a.blog-feed { background-color: transparent; background-repeat: no-repeat; background-position: bottom; float: right; width: 16px; height: 16px; margin-top: 5px; margin-right: 5px; }
 body#landing a.blog-feed:hover { background-position: top; }
