@@ -2648,6 +2648,90 @@ class AfterCreatingADiaPingTwisted(TwillTests):
         mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='paulproteus')
         self.assertTrue(mock_ping_it.called)
 
+class PeopleMapSummariesAreCheap(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def setUp(self, *args, **kwargs):
+        # Call the parent setUp() method
+        super(PeopleMapSummariesAreCheap, self).setUp(*args, **kwargs)
+
+        # Give paulproteus some tag values
+        self.paulproteus = Person.objects.get(user__username='paulproteus')
+
+        understands = TagType(name='understands')
+        understands.save()
+
+        # Create 3 Tag objects
+        Tag.objects.create(tag_type=understands, text='thing1')
+        Tag.objects.create(tag_type=understands, text='thing2')
+        Tag.objects.create(tag_type=understands, text='thing3')
+
+        # Link them to the Person
+        n = 0
+        for tag in Tag.objects.all():
+            n += 1
+            Link_Person_Tag.objects.create(person=self.paulproteus, tag=tag)
+        self.assertEquals(3, n)
+
+        # Give paulproteus some projects
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    is_published=True,
+                    person=self.paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                )
+        citation.save()
+
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name2')[0],
+                    is_published=True,
+                    person=self.paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                )
+        citation.save()
+
+        # Now, start counting queries.
+        self.old_settings_debug = getattr(settings, 'DEBUG', None)
+        settings.DEBUG = True
+        self.query_count = len(django.db.connection.queries)
+
+    def tearDown(self, *args, **kwargs):
+        super(PeopleMapSummariesAreCheap, self).tearDown(*args, **kwargs)
+        now_query_count = len(django.db.connection.queries)
+        settings.DEBUG = self.old_settings_debug
+
+        # If we did 1 or fewer queries, then stop here.
+        if now_query_count - self.query_count <= 1:
+            return
+
+        # Otherwise, let us examine all queries against OpenHatch models
+        all_queries = django.db.connection.queries[self.query_count:]
+        def is_openhatchy(query):
+            if 'raw_sql' in query:
+                sql = query['raw_sql']
+            elif 'sql' in query:
+                sql = query['sql']
+            else:
+                return False # Odd, no SQL data here.
+
+            if (sql.startswith('SELECT "django_') or
+                sql.startswith('SELECT `django_')):
+                return False
+            return True
+        openhatchy_queries = filter(is_openhatchy, all_queries)
+        if len(openhatchy_queries) > 1:
+            pprint.pprint(openhatchy_queries)
+            self.assertEqual(1, len(openhatchy_queries))
+
+    def test_map_tag_texts(self):
+        self.paulproteus.get_tag_texts_for_map()
+
+    def test_project_list(self):
+        self.paulproteus.get_list_of_all_published_projects()
+
 class PeopleLocationData(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
     def setUp(self, *args, **kwargs):
