@@ -56,7 +56,7 @@
           {% with person.person as person %}{% include 'profile/person-summary-li.html' %}{% endwith %}
 	  {% if user.is_authenticated %}
 	  <li class="wannahelper_checkbox_item">
-		     {{ person.form.person }}{{ person.form.project }}
+		     {{ person.form.person_id }}{{ person.form.project_id }}
 		     {% if not person.note.contacted_on %}{{ person.form.checked }}{% endif %}
 	  </li>
 	  {% endif %}
