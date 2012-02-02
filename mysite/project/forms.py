@@ -16,15 +16,35 @@
 
 import django.forms
 import mysite.search.models
+import mysite.profile.models
 
 class WannaHelpForm(django.forms.Form):
     project = django.forms.ModelChoiceField(mysite.search.models.Project.objects.all())
     from_offsite = django.forms.BooleanField(required=False)
 
 class MarkContactedForm(django.forms.Form):
-    project = django.forms.ModelChoiceField(queryset=mysite.search.models.Project.objects.all(), widget=django.forms.HiddenInput())
-    person = django.forms.ModelChoiceField(queryset=mysite.profile.models.Person.objects.all(), widget=django.forms.HiddenInput())
+    project_id = django.forms.IntegerField(widget=django.forms.HiddenInput())
+    person_id = django.forms.IntegerField(widget=django.forms.HiddenInput())
     checked = django.forms.BooleanField(label="Mark person as contacted", required=True)
+
+    # We are avoiding the use of ModelChoiceField.
+    #
+    # We use this custom validation code instead so that we can create
+    # these form instances cheaply, without hitting the database, yet
+    # we can still return valid ForeignKey IDs to users of this class.
+    def clean_project_id(self):
+        value = self.cleaned_data['project_id']
+        if mysite.search.models.Project.objects.filter(
+            id=value):
+            return value
+        raise django.forms.ValidationError, "Invalid project ID."
+
+    def clean_person_id(self):
+        value = self.cleaned_data['person_id']
+        if mysite.profile.models.Person.objects.filter(
+            id=value).count():
+            return value
+        raise django.forms.ValidationError, "Invalid person ID."
 
 class ProjectForm(django.forms.ModelForm):
 

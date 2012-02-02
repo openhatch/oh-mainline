@@ -203,8 +203,8 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
         post_to = reverse(mysite.project.views.mark_contacted_do)
         vars = {u'mark_contact-project': unicode(p_before.pk),
                 u'helper-%s-checked' % (person.pk,) : unicode('on'),
-                u'helper-%s-person' % (person.pk) : unicode(person.pk),
-                u'helper-%s-project' % (person.pk) : unicode(p_before.pk)}
+                u'helper-%s-person_id' % (person.pk) : unicode(person.pk),
+                u'helper-%s-project_id' % (person.pk) : unicode(p_before.pk)}
         client.post(post_to, vars)
 
         whn_after = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p_before)
