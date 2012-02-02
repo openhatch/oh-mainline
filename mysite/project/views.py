@@ -91,28 +91,21 @@ def project(request, project__name = None):
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
 
-    if wanna_help:
-        people_to_show = list(wanna_helpers.exclude(user=request.user))
-        people_to_show.insert(0, request.user.get_profile())
-    else:
-        people_to_show = wanna_helpers
+    people_to_show = wanna_helpers
 
     contact_form_list = []
-    for person in people_to_show:
+    wannahelpernotes = mysite.search.models.WannaHelperNote.objects.filter(person__id__in=wanna_helpers.values_list('id', flat=True), project=p).select_related()
+    for note in wannahelpernotes:
         # a WannaHelperNote should always exist for all Person objects in people_to_show
-        try:
-            note = mysite.search.models.WannaHelperNote.objects.get(person=person, project=p)
-            contact_form_list.append({
-                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (person.pk,),
+        contact_form_list.append({
+                'form' : mysite.project.forms.MarkContactedForm(prefix="helper-%d" % (note.person_id,),
                                                                 initial= { 'project_id' : p.pk,
-                                                                           'person_id' : person.pk,
+                                                                           'person_id' : note.person_id,
                                                                            'checked' : bool(note.contacted_on) }),
-                'person' : person,
+                'person' : note.person,
                 'note' : note,
-            })
-        except:
-            pass
-        
+                })
+
     button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
             request)
     button_widget_data['project'] = p
