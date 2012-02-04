@@ -14,7 +14,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
+import json
+
 from django.core.management.base import BaseCommand
+
+import mysite.base.controllers
+import mysite.profile.models
+
+MAX_ERRORS = 5
 
 class Command(BaseCommand):
     help = ("For all people whose latitude and longitude are the default, "
@@ -22,4 +31,40 @@ class Command(BaseCommand):
             "geocode them.")
 
     def handle(self, *args, **kwargs):
-        pass
+        self.errors_so_far = 0
+        self.successes_so_far = 0
+        logging.info("Begun attempting to migrate people's locations...")
+        self.migrate_people()
+        logging.info("Succeeded at geocoding %d people", self.successes_so_far)
+
+    def migrate_people(self):
+        for person in mysite.profile.models.Person.objects.all():
+            # If we have seen too many failures, then we bail out entirely.
+            if self.errors_so_far > MAX_ERRORS:
+                return
+
+            address = person.location_display_name
+            # If someone has their location set to the Inaccessible Island,
+            # skip them.
+            if address == mysite.profile.models.DEFAULT_LOCATION:
+                continue
+
+            # If someone has their latitude or longitude set to some real place,
+            # skip them.
+            if ((person.latitude != mysite.profile.models.DEFAULT_LATITUDE) or
+                (person.longitude != mysite.profile.models.DEFAULT_LONGITUDE)):
+                continue
+
+            # Okay, this is a person we should process! Try to geocode them...
+            try:
+                as_string = mysite.base.controllers.cached_geocoding_in_json(address)
+            except Exception:
+                self.errors_so_far += 1
+                continue
+
+            as_dict = json.loads(as_string)
+            person.latitude = as_dict['latitude']
+            person.longitude = as_dict['longitude']
+            person.save()
+            logging.info("Success with %s", address)
+            self.successes_so_far += 1
