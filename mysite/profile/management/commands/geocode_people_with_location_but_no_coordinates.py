@@ -63,8 +63,15 @@ class Command(BaseCommand):
                 continue
 
             as_dict = json.loads(as_string)
-            person.latitude = as_dict['latitude']
-            person.longitude = as_dict['longitude']
-            person.save()
+            try:
+                person.latitude = as_dict['latitude']
+                person.longitude = as_dict['longitude']
+                person.save()
+            except KeyError:
+                logging.info("FYI, we hit a KeyError. Go figure.")
+                logging.info("In case you're curious, the data was: %s", as_dict)
+                self.errors_so_far += 1
+                continue
+
             logging.info("Success with %s", address)
             self.successes_so_far += 1
