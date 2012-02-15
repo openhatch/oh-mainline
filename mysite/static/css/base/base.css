@@ -54,7 +54,7 @@ clear: both;
 
 ul { padding: 0; margin: 0; list-style: none; }
 
-h1, h2, h3, h4, h5 { margin: 0; }
+h1, h2, h3, h4, h5 { margin: 0; clear: both;}
 
 h1 {
     font-weight: normal;
