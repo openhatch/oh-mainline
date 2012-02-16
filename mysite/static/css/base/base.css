@@ -29,7 +29,7 @@ h1 a:hover { text-decoration: none; }
 
 .module > .module-body { clear: both; padding: 10px 20px 20px 20px;} 
 
-.module > .module-foot { background: white; padding: 2px 20px; text-align: right; }
+.module > .module-foot { padding: 2px 20px 5px 20px; text-align: right; }
 
 .module > .module-foot .module-foot-left { 
     float: left;
