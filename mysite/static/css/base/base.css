@@ -102,9 +102,9 @@ ul#links { margin-left: 20px; }
 
 #content { width: 960px; padding: 10px 20px; padding-bottom: 30px; clear: both; }
 
-#footer-wrapper { width: 100%; clear: both; left: 0; padding-top: 20px;}
+#footer-wrapper { width: 100%; clear: both; padding-top: 40px;}
 
-#footer { width: 100%; background: #333; box-shadow: 0 0 7px #333; padding: 15px 0px; margin: 0 auto; text-align: right; }
+#footer { width: 100%; position: fixed; bottom: 0; background: #333; box-shadow: 0 0 7px #333; padding: 10px 0px; margin: 0 auto; text-align: right; z-index: 1005;}
 
 #footer ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
 
