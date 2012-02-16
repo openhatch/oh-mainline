@@ -16,6 +16,7 @@ src/*.egg-info
 .coverage
 .figleaf
 htmlcov/
+bin/
 build/
 *.orig
 *#
