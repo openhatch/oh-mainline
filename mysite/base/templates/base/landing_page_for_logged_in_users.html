@@ -129,7 +129,8 @@ document.documentElement.className = 'javascript_is_enabled';
         <p>No projects listed yet.</p>
         {% endif %}
         </div>
-        <div class="module-foot"><a href='{% url mysite.project.views.projects %}'>Find more projects to help with &raquo;</a></div>
+        <div class="module-foot"><a href='{% url mysite.search.views.fetch_bugs %}'>Find more projects to help with &raquo;</a></div>
+        {% if settings.RECOMMEND_BUGS %}
         <div class="module-body">
       <h3>Recommended bugs based on your profile
         <a class="feed" href="/+feeds/recbugs/{{ user.username }}/"><img alt="Subscribe" src="{% version '/static/images/icons/feed-icon-14x14.png' %}" ></a>
@@ -165,6 +166,7 @@ document.documentElement.className = 'javascript_is_enabled';
           </div>
           </div>
           <div class="module-foot"><a href='{% url mysite.search.views.fetch_bugs %}'>Find more recommendations and other opportunities &raquo;</a></div>
+      {% endif %}
       </div>
 {% endblock main %}
 
