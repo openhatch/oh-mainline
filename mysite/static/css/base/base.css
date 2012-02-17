@@ -231,11 +231,11 @@ dd { margin-top: .5em; margin-left: 1.2em; }
     #error #content .module .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
     #error #content .module .body { width: 90%; }
 
-ul.nudgebuttons li { float: left; width: 100%; margin-bottom: 5px;  }
+ul.nudgebuttons li { margin-bottom: 5px;  }
 ul.nudgebuttons li:last-child { margin-bottom: 0; }
-ul.nudgebuttons a .notification { width: 100%; }
+ul.nudgebuttons a .notification { }
 ul.nudgebuttons a:hover { text-decoration: none; }
-ul.nudgebuttons a:hover .notification { background: #ffc;}
+ul.nudgebuttons a:hover .notification { background: #faffaa;}
 ul.nudgebuttons a .notification { background: none; }
 ul.nudgebuttons a { width: 93%; }
 ul.nudgebuttons a .notification .arrow { font-style: italic; float: right; font-size: 6.0em; padding-left: 10px; line-height: 50%; color: orange; }
@@ -252,7 +252,7 @@ body#landing ul.nudgebuttons a:hover { text-decoration: none; }
 body#landing ul.nudgebuttons a .notification { margin: 0; }
 ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
 
-body#edit_profile_info_form #contact_blurb:target label { background-color: #ffc; float: none; }
+body#edit_profile_info_form #contact_blurb:target label { background-color: #faffaa; float: none; }
 
 .head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
 .head .more { float: right; padding: 3px; }
@@ -262,7 +262,7 @@ body ul.raquo_bullets li { margin-bottom: .4em; }
 body ul.raquo_bullets li:last-child { margin-bottom: 0; }
 body ul.raquo_bullets li:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
 
-body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc; }
+body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #faffaa; }
 
 ol > li { margin: 15px 0; }
 
