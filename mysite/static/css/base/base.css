@@ -265,3 +265,7 @@ input[rel='hint'].blur { color: #777; }
 body#people-map #search_engine_is_down_message { float: left; display: block; margin-top: 1em; margin-bottom: 0; font-size: 1.3em; }
 
 .ajax-loader-circle-txt-medium { display: inline-block; line-height: 32px; padding-left: 32px; background: url('/static/images/throbber.gif') no-repeat left; font-weight: bold; color: #444 }
+
+/* Stuff for jQuery UI Tabs */
+.ui-tabs-hide { display: none !important; }
+.tab_nav .ui-state-active { font-weight: bold; }
