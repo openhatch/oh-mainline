@@ -1,0 +1,154 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+{% block title %}
+Community tools for free and open source software
+{% endblock title %}
+
+{% block body_class %}{{ block.super }} missions{% endblock %}
+
+{% block js_in_head %}
+{{ block.super }}
+<script type="text/javascript">
+document.documentElement.className = 'javascript_is_enabled';
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="module" id="landing-module">
+  <div class='module-head'>
+    <h3>How your project can grow, with the help of OpenHatch</h3>
+    <ul>
+      <li>
+	<a href="/">&laquo; Back to front page</a>
+      </li>
+    </ul>
+  </div>
+  <div class='module-body contains-submodules two-columns'>
+    <div class='submodule skinny' style="margin-right: 1em; width: 23%;">
+      <div class='submodule-body' id="tab_me">
+        <ul class="tab_nav">
+	  <li id='link-about'>
+	    <a href='#represent'>
+	      Represent your project
+	    </a>
+	  </li>
+	  <li>
+	    <a href='#manage'>
+	      Manage and teach newcomers
+	    </a>
+	  </li>
+	  <li>
+	    <a href='#employ'>
+	      Employ our social strategies
+	    </a>
+	  </li>
+	</ul>
+	<ul>
+	  <li><hr></li>
+	  <li>
+	    <a href="/contact/">
+	      Want to chat? Visit our 'Contact us' page!
+	    </a>
+	  </li>
+        </ul>
+      </div>
+    </div>
+    <div class='submodule fat'  style="width: 72%;">
+      <div class="submodule-body" style="margin: 0.5em;">
+	<div id="represent" class="tab">
+	  <p>New contributors are browsing this site to find a good project to join.
+	    Here's how you can make your project findable and attractive.</p>
+	  <ul class="raquo_bullets fairly-big">
+	    <li>
+	      Provide answers for common questions like,
+	      "How do I get involved as a non-coder?"
+	      <span class="normal-size"><a href="/+projects/Python">(example)</a>
+		<a href="{% url mysite.project.views.projects %}">(get started)</a>
+	      </span>
+	    </li>
+	    <li>
+	      On your bug tracker, tag some bugs as good for newcomers. Then
+	      import them into our index.
+	      <span class="normal-size">
+		<a href="https://openhatch.org/wiki/Bug_trackers">(read more)</a></span>
+	    </li>
+	    <li>
+	      Within your <a href="/+me">personal profile</a> on OpenHatch, mark yourself as a mentor for your projects.
+	    </li>
+	  </ul>
+	</div>
+	<div id="manage" class="tab">
+	  <p>We've created educational and community management tools that make
+	    it easier to onboard a new contributor.</p>
+	  <ul class="raquo_bullets fairly-big">
+	    <li>
+	      Minimize the barrier to entry by embedding an "I want to help!" button on your project website
+	      <span class="normal-size">
+		<a href="http://openhatch.org/blog/2010/let-people-help-your-project-give-them-a-button-to-click/">(read more)</a>
+	      </span>
+	    </li>
+	    <li>
+	      Link to our <a href="/missions/">training missions</a> (so you don't have to teach people e.g. what a patch is)
+	    </li>
+	    <li>
+	      Browse prospective contributors, and keep track of when you contact them
+	      <span class="normal-size">
+		(available on each project's OpenHatch page)
+	      </span>
+	    </li>
+	  </ul>
+	</div>
+	<div id="employ" class="tab invisible_if_js">
+	  <p>We've thought about how to treat contributors well. Try our tips in your project.</p>
+	  <ul class="raquo_bullets fairly-big">
+	    <li>
+	      Run a <a href="//openhatch.org/wiki/Starling">Starling Bounty</a> to get that one next contributor
+	    </li>
+	    <li>
+	      Organize a <a href="//openhatch.org/wiki/Build_it"</a>Build It</a> event to encourage new contributors, a few at a time
+	    </li>
+	    <li>
+	      Represent your project at a regional <a href="http://campus.openhatch.org/">Open Source Comes to Campus</a> event
+	    </li>
+	    <li>
+	      Or <a href="//openhatch.org/about">get in touch</a> with us for advice on your project
+	    </li>
+	  </ul>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+  $(function () {$('#tab_me').tabs();});
+</script>
+{% endblock js %}
+
