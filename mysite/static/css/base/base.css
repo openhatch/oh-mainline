@@ -27,6 +27,7 @@ h1 a:hover { text-decoration: none; }
 
 .module > .module-head { background: rgba(100, 200, 255,.3); padding: 2px 20px; }
 
+.module > .module-head ul li a { float: right; padding-top: 5px; }
 .module > .module-body { clear: both; padding: 10px 20px 20px 20px;} 
 
 .module > .module-foot { padding: 2px 20px 5px 20px; text-align: right; }

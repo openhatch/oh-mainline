@@ -37,15 +37,15 @@ document.documentElement.className = 'javascript_is_enabled';
 </script>
 {% endblock %}
 
-{% block content %}
+{% block main %}
 <div class="module" id="landing-module">
   <div class='module-head'>
-    <h3>How your project can grow, with the help of OpenHatch</h3>
     <ul>
       <li>
 	<a href="/">&laquo; Back to front page</a>
       </li>
     </ul>
+    <h3>How your project can grow, with the help of OpenHatch</h3>
   </div>
   <div class='module-body contains-submodules two-columns'>
     <div class='submodule skinny' style="margin-right: 1em; width: 23%;">
@@ -143,7 +143,7 @@ document.documentElement.className = 'javascript_is_enabled';
     </div>
   </div>
 </div>
-{% endblock content %}
+{% endblock main %}
 
 {% block js %}
 {{ block.super }}
