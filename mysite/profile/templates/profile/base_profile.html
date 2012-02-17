@@ -101,9 +101,6 @@
     {% else %}
     {# Haven't uploaded a photo yet #}
     <style>
-        #avatar .notification { color: inherit; font-size: 1.2em; text-align: center; margin: 0; font-weight: bold; padding: 16px 8px ! important; margin-left: 45px; width: 100px; background-color: rgb(245, 253, 193); background-color: rgba(245, 253, 193, .8); }
-        #avatar a:hover { text-decoration: none; }
-        #avatar a:hover .notification {  background-color: rgba(245, 253, 193, 1) ! important; }
 
         #avatar .default_image { float: left; width: 200px; height: 257px; background: url({% version photo_url %}) no-repeat; }
     </style>
@@ -120,14 +117,7 @@
 <div id='info' class='module'>
 
     <div class='module-head'>
-        {% if editable and not info_edit_mode %}
-        <ul>
-            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a></li>
-        </ul>
-        {% endif %}
-
         <h3>Info</h3>
-
     </div>
 
         {% if editable and not person.bio and not person.homepage_url and not tags_flat %}
@@ -254,6 +244,13 @@
             {% endfor %}
             {% endspaceless %}
         </div>
+        {% endif %}
+    </div>
+    <div class="module-foot">
+        {% if editable and not info_edit_mode %}
+        <ul>
+            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a></li>
+        </ul>
         {% endif %}
     </div>
 </div> <!-- end of person info module -->
