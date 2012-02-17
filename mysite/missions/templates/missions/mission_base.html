@@ -37,14 +37,14 @@
 {% block main %}
 <div class='module'>
     <div class='module-head'>
-        <h3>Missions: {{ mission_name }}</h3>
-	<ul>
+    	<ul>
           <li>
             <a href="{% url mysite.missions.base.views.main_page %}">
               &laquo; Back to list of missions
             </a>
           </li>
         </ul>
+        <h3>Missions: {{ mission_name }}</h3>
     </div>
     <div class='module-body contains-submodules two-columns'>
         <div class='submodule skinny'>
@@ -88,6 +88,7 @@
 	  </div>
 	</div>
 	{% endblock mission_main %}
+</div>
 {% endblock main %}
 
 {% block title %}
