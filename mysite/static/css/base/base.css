@@ -186,7 +186,6 @@ abbr.foss {
 .notification {
     float: left;
     width: 95%;
-    background-color: #faffaa; #f5fdc1; /*#edec7f; #ffa;*/
     -webkit-border-radius: 8px; -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
     border-radius: 8px;
@@ -233,10 +232,9 @@ dd { margin-top: .5em; margin-left: 1.2em; }
 
 ul.nudgebuttons li { margin-bottom: 5px;  }
 ul.nudgebuttons li:last-child { margin-bottom: 0; }
-ul.nudgebuttons a .notification { }
+ul.nudgebuttons a .notification, .notification { background: rgba(245, 253, 193, .8); }
 ul.nudgebuttons a:hover { text-decoration: none; }
-ul.nudgebuttons a:hover .notification { background: #faffaa;}
-ul.nudgebuttons a .notification { background: none; }
+ul.nudgebuttons a:hover .notification, .notification:hover { background: #faffaa;}
 ul.nudgebuttons a { width: 93%; }
 ul.nudgebuttons a:hover strong { text-decoration: underline;  }
 ul.nudgebuttons strong { color: #FF6D3D; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
