@@ -40,7 +40,7 @@ body#profile #info .save-button { margin-top: 10px; }
 body#profile.two_columns .module > .body { width: 97%; padding: 10px; }
 
 
-body#profile #info .tags { float: left; width: 158px; margin-bottom: 15px; }
+/*body#profile #info .tags { float: left; width: 158px; margin-bottom: 15px; } */
 body#profile #info .tags:last-child { margin-bottom: 0; }
 
 #edit_info ul.example li {float: none}
