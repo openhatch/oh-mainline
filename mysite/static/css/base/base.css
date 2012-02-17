@@ -266,6 +266,22 @@ body#people-map #search_engine_is_down_message { float: left; display: block; ma
 
 .ajax-loader-circle-txt-medium { display: inline-block; line-height: 32px; padding-left: 32px; background: url('/static/images/throbber.gif') no-repeat left; font-weight: bold; color: #444 }
 
+.enormous {
+    font-size: 3em;
+}
+
+.fairly-big {
+    font-size: 1.8em;
+}
+
+.enormous > div {
+    margin-bottom: 1em;
+}
+
+.normal-size {
+    font-size: 11pt;
+}
+
 /* Stuff for jQuery UI Tabs */
 .ui-tabs-hide { display: none !important; }
 .tab_nav .ui-state-active { font-weight: bold; }
