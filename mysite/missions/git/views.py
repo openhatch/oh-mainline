@@ -84,6 +84,9 @@ def diff_submit(request):
                     return HttpResponseRedirect(reverse(diff))
                 else:
                     data['git_diff_error_message'] = "Unable to commit the patch. Please check your patch and try again "
+                    
+        else:
+            return diff(request, {'git_diff_form': form})          
         data['git_diff_form'] = form
     return diff(request, data)
 
@@ -164,7 +167,8 @@ def diff(request, passed_data = None):
     state.this_mission_page_short_name = 'Creating a patch'
     state.mission_step_prerequisite = 'git_checkout'
     data = state.as_dict_for_template_context()
-    data['git_diff_form'] = forms.DiffForm()
+    if 'git_diff_form' not in data:        
+        data['git_diff_form'] = forms.DiffForm()
     data['file_for_git_diff'] = 'hello.py'
     return (request, 'missions/git/diff.html', data)
 
