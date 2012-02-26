@@ -100,7 +100,7 @@ def rebase_submit(request):
                 controllers.set_mission_completed(request.user.get_profile(), 'git_rebase')
                 return HttpResponseRedirect(reverse(rebase))
             else:
-                data['git_rebase_error_message'] = "The author's name is incorrect."
+                data['git_rebase_error_message'] = "The password is incorrect."
         data['git_rebase_form'] = form
     return rebase(request, data)
 
