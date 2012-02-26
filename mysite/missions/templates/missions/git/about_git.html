@@ -84,6 +84,9 @@ git.</p>
           </div>
         </form>
         {% endif %}
+{% else %}
+		<p>Please <a href='{% url oh_login %}
+			?next={% url mysite.missions.git.views.long_description %}'>log in</a>.</p>
 {% endif %}
 
 {% endblock mission_main_body %}
