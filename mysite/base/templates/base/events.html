@@ -1,0 +1,96 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+{% block title %}
+Events that grow open coding communities
+{% endblock title %}
+
+{% block body_id %}landing{% endblock body_id %}
+
+{% block js_in_head %}
+{{ block.super }}
+<script type="text/javascript">
+document.documentElement.className = 'javascript_is_enabled';
+</script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="module" id="landing-module">
+        <div class="module-body">
+            <p id="landing-message">
+              OpenHatch collaborates with open communities around software
+              to organize outreach events that make them
+              more active and diverse.
+	    </p>
+
+	    <p style="font-size: 150%;">You can run these events within your community or project, and we can help you make them succeed.</p>
+	</div>
+    </div>
+
+    <div class="module">
+      <img style="float: left; margin-right: 10px;" height="300" width="300" src="/static/images/bpw-300x300.jpg" />
+      <div style="margin: 15px;">
+	<div style="font-size: 150%; margin-bottom: 2em;">
+	  Boston Python Workshop
+	</div>
+	<div>
+	  empowering women of all backgrounds to learn practical programming in a beginner-friendly environment,
+	  and creating lasting connections with the Boston Python user group
+	</div>
+      </div>
+      <div style="width: 200px; float: right;">
+	<a href="http://bostonpythonworkshop.com/">Read more &raquo;</a>
+      </div>
+    </div>
+
+<!--
+      <div class="module">
+	Open Source Comes to Campus: teaching students how to be involved in open source through hands-on workshops.
+      </div>
+
+    <div class="module">
+      Build it: growing open source projects by helping contributors with development environments, via real-time chat.
+    </div>
+-->
+
+{% endblock content %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+$(function(){
+        $('.people-list li').hoverClass('hover');
+        $('#tabbed_container_of_big_links').tabs({
+            cookie: {
+                // keeps tab choice for one day
+                expires: 1
+            }
+        });
+        $('.invisible_if_js').removeClass('invisible_if_js');
+});
+</script>
+{% endblock js %}
