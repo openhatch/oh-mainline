@@ -393,7 +393,7 @@ urlpatterns = patterns('',
 
         # the OpenHatch guide
         (r'^guide/$', direct_to_template, {'template': 'base/guide.html'}),
-        
+
         # the OpenHatch donate page
         (r'^donate/$', direct_to_template, {'template': 'base/donate.html'}),
 
