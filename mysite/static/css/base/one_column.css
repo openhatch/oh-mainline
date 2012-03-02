@@ -12,7 +12,7 @@ body.one_column #main .submodule.skinny { width: 25%; margin-right: 20px; }
     body.one_column #main .submodule.skinny .submodule-body { width: 90%; }
 
 /* FAT SUBMODULE */
-body.one_column #main .submodule.fat { width: 70%; }
+body.one_column #main .submodule.fat { width: 67%; }
     body.one_column #main .submodule.fat .submodule-head { width: 93.8%; }
         body.one_column #main .submodule.fat .submodule-head h3 { width: 100%; }
     body.one_column #main .submodule.fat .submodule-body { width: 90%; }
