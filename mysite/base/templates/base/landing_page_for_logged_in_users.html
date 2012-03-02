@@ -114,7 +114,7 @@ document.documentElement.className = 'javascript_is_enabled';
         
         <h5>I want to help with:</h5>
         {% if projects_i_wanna_help %}
-        <ul class="projects">
+        <ul class="raquo_bullets">
           {% for project in projects_i_wanna_help %}
           <li><a href='{{ project.get_url }}'>{{ project.display_name }}</a></li>
           {% endfor %}
@@ -125,7 +125,7 @@ document.documentElement.className = 'javascript_is_enabled';
 
         <h5>I have helped:</h5>
         {% if projects_i_helped %}
-        <ul class="projects">
+        <ul class="raquo_bullets">
           {% for entry in projects_i_helped %}
           <li><a href="{{ entry.project.get_url }}">{{ entry.project.display_name }}</a></li>
           {% endfor %}
