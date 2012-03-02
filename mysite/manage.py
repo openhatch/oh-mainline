@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+### We must chdir() up one level.
+import os
+import os.path
+import sys
+THIS_FILE=os.path.abspath(__file__)
+THIS_DIR=os.path.dirname(THIS_FILE)
+UP_ONE_DIR=os.path.join(THIS_DIR, '..')
+sys.path.append(UP_ONE_DIR)
+
 # Use the modules in vendor/
 import vendor
 vendor.vendorify()
