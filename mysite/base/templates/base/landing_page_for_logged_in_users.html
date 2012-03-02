@@ -37,6 +37,10 @@ document.documentElement.className = 'javascript_is_enabled';
 {% endblock %}
 
 {% block left %}
+    {% comment %}
+    (This block is disabled because there is no internal
+     OpenHatch API to list upcoming events.)
+
     <div class='module' id='events'>
       <div class="module-head">
         <h3>Upcoming events:</h3>
@@ -47,6 +51,7 @@ document.documentElement.className = 'javascript_is_enabled';
         <div class="module-foot"><a href="" class="module-foot-left">More events &raquo;</a>  <a href="{% url mysite.missions.base.views.main_page %}">Add events &raquo;</a></div>
       
     </div>
+    {% endcomment %}
 
 
     <div class="module" id="missions">
