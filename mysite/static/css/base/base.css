@@ -294,3 +294,7 @@ body#people-map #search_engine_is_down_message { float: left; display: block; ma
     float: left;
     margin-right: 10px;
 }
+
+.module .rest-of-box {
+    margin: 15px;
+}
