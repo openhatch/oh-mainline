@@ -295,6 +295,11 @@ body#people-map #search_engine_is_down_message { float: left; display: block; ma
     margin-right: 10px;
 }
 
+.module .name-of-event {
+    font-size: 180%;
+    margin-bottom: 1em;
+}
+
 .module .rest-of-box {
     margin: 15px;
 }
