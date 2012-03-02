@@ -286,3 +286,11 @@ body#people-map #search_engine_is_down_message { float: left; display: block; ma
 /* Stuff for jQuery UI Tabs */
 .ui-tabs-hide { display: none !important; }
 .tab_nav .ui-state-active { font-weight: bold; }
+
+/* Stuff initially for the events page */
+.module .left-image {
+    width: 180px;
+    height: 180px;
+    float: left;
+    margin-right: 10px;
+}
