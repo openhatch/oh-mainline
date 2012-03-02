@@ -308,3 +308,7 @@ body#people-map #search_engine_is_down_message { float: left; display: block; ma
     width: 100px;
     float: right;
 }
+
+.module .link-without-style {
+    color: inherit;
+}
