@@ -391,6 +391,15 @@ urlpatterns = patterns('',
         #regex for the robots.txt file, for search engine exclusion
         (r'^robots\.txt$', direct_to_template, {'template': 'robots.txt', 'mimetype': 'text/plain'}),
 
+        # the OpenHatch guide
+        (r'^guide/$', direct_to_template, {'template': 'base/guide.html'}),
+
+        # the OpenHatch events page
+        (r'^events/$', direct_to_template, {'template': 'base/events.html'}),
+
+        # the OpenHatch donate page
+        (r'^donate/$', direct_to_template, {'template': 'base/donate.html'}),
+
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)/$',
                 'mysite.profile.views.display_person_web'),

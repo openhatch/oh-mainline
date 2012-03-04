@@ -39,7 +39,7 @@
         <style type='text/css'> /*<![CDATA[*/
             {% block css %}
 
-            {% assets output="packed/openhatch2.css", "css/base/base.css", "css/jquery.autocomplete.css", "css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css", "openid/css/openid.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/base/landing_page_for_logged_in_users.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/account/auth.css", "css/account/settings.css", "css/account/widget.css", "css/qunit.css", "css/profile/base.css", "css/profile/portfolio.css", "css/profile/search_people.css", "css/tipsy.css", "css/facebox.css", "css/missions/base.css" %}
+            {% assets output="packed/openhatch2.css", "css/base/base.css", "css/jquery.autocomplete.css", "css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css", "openid/css/openid.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/base/landing_page_for_logged_in_users.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/base/three_columns.css", "css/account/auth.css", "css/account/settings.css", "css/account/widget.css", "css/qunit.css", "css/profile/base.css", "css/profile/portfolio.css", "css/profile/search_people.css", "css/tipsy.css", "css/facebox.css", "css/missions/base.css" %}
             @import url({{ ASSET_URL }});
             {% endassets %}
 
@@ -50,17 +50,9 @@
             {% endcomment %}
 
             body { 
-                background-image:
-                url({% version '/static/images/motif-eee.png' %}) }
-            body.beta {
-                background-image:
-                url({% version '/static/images/beta-background.png' %}) }
-            .module { 
-                background-image: 
-                url({% version '/static/images/gray-60.png' %}) }
-            .module > .body.contains-submodules { 
-                background-image:
-                url({% version '/static/images/motif.png' %}) }
+                background: #f8f8f8 url('/static/images/light-hatch.png') repeat; }
+            #nav-container {
+                background: #333 url('/static/images/dark-hatch.png') repeat; }
             #landing a.blog-feed { 
                 background-image:
                 url({% version '/static/images/base/landing/feed-icon-16x16-sprited.png' %}) }
@@ -99,6 +91,7 @@
             body#project .next_steps_for_helpers { 
                 background-image:
                 url({% version '/static/images/bg-translucent-green.png' %}); }
+            #footer { background: #333 url('/static/images/dark-hatch.png') repeat; }
 
             {% endblock css %}
             /*]]>*/
@@ -117,13 +110,15 @@
     {% comment %} body_id is used by CSS to know what page we're on{% endcomment %}
     <body id='{% block body_id %}body{% endblock %}' class='{% block body_class %}{% endblock %}'>
 
-        <div id='outermost'>
-
-            <div id='penoutermost'>
+        <div id="nav-container">
 
                 {% block nav %}
                 {% include 'base/nav.html' %}
                 {% endblock nav %}
+                
+        </div>
+        
+        <div id="container">
                 {% if notifications %}
                 <ul id='notifications'>
                     {% block notifications %}
@@ -133,73 +128,7 @@
                     {% endblock %}
                 </ul>
                 {% endif %}
-
-
-                
-                <div id='page-top'>
-
-                    {% block greeting %}
-                    {% if explain_to_anonymous_users and not user.is_authenticated %}
-                    <div id='greeting'>
-                        <div id='about-openhatch'>
-                            Hi! OpenHatch is a community of free/open source
-                            software supporters.
-                            You might like to:
-                        </div>
-                        <div id='next-steps'>
-                            <ul>
-                                <li>
-                                    {% block description_for_anonymous_users %}
-                                    {% endblock %}
-                                </li>
-
-                                <li>
-                                <a href='{% url mysite.search.views.fetch_bugs %}?q=&amp;toughness=bitesize'>
-                                    Find a
-                                    <strong>bite-sized volunteer opportunity</strong>
-                                </a>
-                                </li>
-
-                                <li>
-                                <a href='{% url oh_my_profile_redirect %}'>
-                                    List your <strong>interests and involvement</strong>
-                                </a>
-                                </li>
-
-                                <li>
-                                <a href='{% url mysite.profile.views.people%}'>
-                                    <strong>
-                                        Find FLOSS supporters
-                                    </strong>
-                                    in your neighborhood
-                                </a>
-                                </li>
-
-                                {% comment %}
-                                <li>
-                                <a href=''>
-                                    <strong>
-                                        List yourself
-                                    </strong>
-                                    in our directory of mentors
-                                </a>
-                                </li>
-
-                                <li>
-                                <a href=''>
-                                    <strong>
-                                        Find nearby
-                                    </strong>
-                                    supporters who share your interests.
-                                </a>
-                                </li>
-                                {% endcomment %}
-                            </ul>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% endblock greeting %}
-
+                <div id="pagetop">
                     {% block pagetop %}
                     {% endblock pagetop %}
                 </div>
@@ -207,8 +136,10 @@
                     {% block content %}
                     {% endblock content %}
                 </div><!-- /#content -->
-            </div><!-- /#penoutermost -->
-        </div><!-- /#outermost -->
+                
+        </div><!-- /#container -->
+        </div>
+        
         <div id='footer-wrapper'>
             <div id='footer'>
                 {% block footer %}

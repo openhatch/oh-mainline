@@ -14,12 +14,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-{% endcomment %}
-    <div class='module' id='recent_activity_feed'>
-        <div class='head'>
-            <h3>Recent activity</h3>
+{% endcomment %} 
+    <div class='module' id='recent-activity-feed'>
+        <div class='module-head'>
+            <h3>Recent site activity</h3>
         </div>
-        <div class='body'>
+        <div class='module-body'>
             <ul>
                 {% for answer in recent_feed_items %}
                 {% include answer.template_for_feed %}

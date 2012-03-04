@@ -19,21 +19,19 @@
 {% load base_extras %}
 
 <div id='nav'>
-    <div class="inner">
-        <h2>
+        <h1>
             <a href='/'>
                 <img src='{% version '/static/images/the-logo-bluegreen-87px.png' %}'
                         width='87' height='60' alt='openhatch' />
             </a>
-        </h2>
+        </h1>
+        
         <ul id='topnavlinks'>
-            <li><a href='{% url mysite.missions.base.views.main_page %}'>missions</a></li>
-            <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
-            <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
+            <li><a href='/donate/'>donate</a></li>
+            <li><a href='{% url mysite.missions.base.views.main_page %}'>training</a></li>
+            <li><a href='/events/'>events</a></li>
+            <li><a href='{% url mysite.search.views.fetch_bugs %}'>projects</a></li>
             <li><a href='{% url mysite.profile.views.people%}'>people</a></li>
-            {% if user.is_authenticated %}
-                <li><a href='{% url mysite.base.views.home %}'>home</a></li>
-            {% endif %}
         </ul>
         <ul id='account-links'>
             {% if user.is_authenticated %}
@@ -63,21 +61,7 @@
                 {% endcomment %}
             {% endif %}
         </ul>
-    </div><!-- /.inner -->
 
-    {% if notification_id %}
-    <!-- notification_id: {{ notification_id }} -->
-    {% endif %}
-
-    {% if notification %}
-        <div class='section'>
-            <div class='center'>
-                <div class='alert'>
-                    {{ notification }}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-</div><!-- /#nav -->
+</div><!-- /#nav -->&nbsp;
 
 {# vim: set filetype=htmldjango: #}

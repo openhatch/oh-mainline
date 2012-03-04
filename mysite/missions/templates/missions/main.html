@@ -21,15 +21,6 @@
 
 {% block body_id %}missions_index{% endblock %}
 
-{% block css %}
-{{ block.super }}
-.up-top {
-    padding: 0;
-    margin-bottom: -19px;
-    }
-{% endblock css %}
-
-
 {% block title %}
 Open source training missions
 {% endblock title %}
@@ -40,7 +31,7 @@ Open source training missions
 
 {% block main %}
 <div class="module">
-  <div class="body">
+  <div class="module-body">
     <h2>About the training missions</h2>
     <p>Some video games have a “training level” where you can get shot
       at without dying. These training missions are a place to learn
@@ -79,6 +70,7 @@ Open source training missions
     <p>These missions give you a tour of command-line tools you may
       run into when contributing to free software.</p>
 
+    <div class="submodule-container">
     {% with fully_completed_missions.tar as mission_completed %}
     {% with "Using tar" as mission_title %}
     {% with "Learn how to work with tar archives." as mission_description %}
@@ -98,11 +90,14 @@ Open source training missions
     {% endwith %}
     {% endwith %}
     {% endwith %}
+    <div class="clearer">&nbsp;</div>
+    </div>
 
     <h2>Practice contributing to a project</h2>
 
     <p>These missions let you practice sharing a patch with a maintainer.</p>
-
+    
+    <div class="submodule-container">
     {% with fully_completed_missions.svn as mission_completed %}
     {% with "Using Subversion" as mission_title %}
     {% with "Learn how to interact with projects that use the Subversion version control system." as mission_description %}
@@ -120,6 +115,8 @@ Open source training missions
     {% include 'missions/mission_card.html' %}
     {% endwith %}
     {% endwith %}
+    <div class="clearer">&nbsp;</div>
+    </div>
 
     <h2>Where they came from, and where they're going</h2>
     <p>You can read about

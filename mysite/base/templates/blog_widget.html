@@ -19,8 +19,8 @@
 {% load base_extras %}
 {% load profile_extras %}
 
-    <div class='module' id='blog_feed'>
-        <div class='head'>
+    <div class='module' id='blog-feed'>
+        <div class='module-head'>
             <h3>
                 <a style='color: inherit;' href='/blog/'>
                     OpenHatch news
@@ -30,7 +30,7 @@
                 <span class='alt-text'>RSS feed</span>
             </a>
         </div>
-        <div class='body'>
+        <div class='module-body'>
             <ul>
                 {% for entry in entries %}
                 <li>
@@ -42,6 +42,8 @@
                 </li>
                 {% endfor %}
             </ul>
-            <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
+         </div>
+         <div class="module-foot">
+            <a href='/blog/'>Get the whole blog &raquo;</a>
         </div>
-    </div>
+        </div>

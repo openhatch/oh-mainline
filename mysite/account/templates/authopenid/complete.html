@@ -29,6 +29,7 @@
 
 {% block css %}
 {{ block.super }}
+{% comment %} CSSTODO {% endcomment %}
 body#associate-openid .errorlist li { width: 90%; }
 #openid-associate { margin: 0 355px; width: 250px; }
 #openid-associate .head { width: 250px; }
@@ -54,7 +55,7 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
     {% with request|get_project_display_names_to_help_from_session as project_names_to_help %}
     <div class='module' id='openid-associate'>
 
-        <div class='head'>
+        <div class='module-head'>
             <h3>{% if project_names_to_help %}
                     <span style='font-weight: normal;'>One last step: </span>
                     We need a bit of info
@@ -63,7 +64,7 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
                 {% endif %}</h3>
         </div>
 
-        <div class='body'>
+        <div class='module-body'>
 
             <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
 

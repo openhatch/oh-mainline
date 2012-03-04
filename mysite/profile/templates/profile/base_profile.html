@@ -101,11 +101,8 @@
     {% else %}
     {# Haven't uploaded a photo yet #}
     <style>
-        #avatar .notification { color: inherit; font-size: 1.2em; text-align: center; margin: 0; font-weight: bold; padding: 16px 8px ! important; margin-left: 45px; width: 100px; background-color: rgb(245, 253, 193); background-color: rgba(245, 253, 193, .8); }
-        #avatar a:hover { text-decoration: none; }
-        #avatar a:hover .notification {  background-color: rgba(245, 253, 193, 1) ! important; }
 
-        #avatar .default_image { float: left; width: 200px; height: 257px; background: url({% version photo_url %}) no-repeat; }
+        #avatar .default_image { background: url({% version photo_url %}) no-repeat; }
     </style>
     <a href="/account/edit/photo/" class='default_image'>
         <div class='notification' >Upload a photo</div>
@@ -119,21 +116,14 @@
 
 <div id='info' class='module'>
 
-    <div class='head'>
-        {% if editable and not info_edit_mode %}
-        <ul>
-            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a></li>
-        </ul>
-        {% endif %}
-
+    <div class='module-head'>
         <h3>Info</h3>
-
     </div>
 
         {% if editable and not person.bio and not person.homepage_url and not tags_flat %}
-            <div class='body has_notification'>
+            <div class='module-body has_notification'>
         {% else %}
-            <div class='body'>
+            <div class='module-body'>
         {% endif %}
 
         <style>
@@ -152,8 +142,7 @@
             <li>
             <a href='{% url mysite.profile.views.edit_info %}'>
                 <div class='notification smaller'>
-                    <span class='arrow'>&rarr;</span>
-                    <strong>Add info</strong>
+                    <strong>Add info to your profile!</strong>
                     <p>We'll use it to suggest interesting projects.</p>
                 </div>
             </a>
@@ -257,12 +246,19 @@
         </div>
         {% endif %}
     </div>
+    <div class="module-foot">
+        {% if editable and not info_edit_mode %}
+        <ul>
+            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a></li>
+        </ul>
+        {% endif %}
+    </div>
 </div> <!-- end of person info module -->
 
 {% if person.contact_blurb %}
 <div id='contact_blurb' class='module'>
 
-    <div class='head'>
+    <div class='module-head'>
         {% if editable and not info_edit_mode %}
         <ul>
             <li><a class='edit' href='{% url mysite.profile.views.edit_info %}#contact_blurb'>Edit</a></li>
@@ -273,7 +269,7 @@
 
     </div>
 
-    <div class='body' style='font-size: .95em;'>
+    <div class='module-body' style='font-size: .95em;'>
         {{contact_blurb|urlizetrunc:"23"|linebreaks}}
     </div>
 </div> <!-- end of contact blurb module -->

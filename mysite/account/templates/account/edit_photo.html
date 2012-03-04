@@ -26,7 +26,7 @@
 
 {% block main %}
     <div class='module'>
-        <div class='head'>
+        <div class='module-head'>
             <ul>
                 <li>
                     <a href='{% url mysite.profile.views.display_person_web user.username %}'>&laquo; Back to portfolio</a>
@@ -34,12 +34,12 @@
             </ul>
             <h3>Profile photo settings</h3>
         </div>
-        <div class='body contains-submodules two-columns'>
+        <div class='module-body contains-submodules two-columns'>
             <div class='submodule skinny'>
-                <div class='head'>
+                <div class='submodule-head'>
                     <h3>Current profile photo</h3>
                 </div>
-                <div class='body'>
+                <div class='submodule-body'>
                     <img src="{{ photo_url }}" />
                 </div>
             </div>
