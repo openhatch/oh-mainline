@@ -34,10 +34,10 @@ form {
 
 {% block main %}
 <div id='login' class='module'>
-    <div class='head'>
+    <div class='module-head'>
         <h3>Log in with a password</h3>
     </div>
-    <div class='body'>
+    <div class='module-body'>
         <div style='float: left; width: 500px;'>
             <form method='POST' name='login' action='{% url django.contrib.auth.views.login %}'>{% csrf_token %}
                 {{ form.as_p }}
@@ -53,6 +53,8 @@ form {
             <li><a href='/account/signup'>Sign up without OpenID</a></li>
             <li><a href='/account/forgot_pass'>Forgot your password?</a></li>
         </ul>
+    </div>
+    <div class="module-foot">
     </div>
 </div>
 {% endblock main %}
