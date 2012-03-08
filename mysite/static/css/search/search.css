@@ -14,7 +14,7 @@ body#search input[type='text'].default-text-active { color: #999 ! important; }
 
 body#search #filters { width: 75%; margin-right: 1%; margin-bottom: 10px; }
     body#search #filters > .head { float: left; width: 100%; }
-    body#search #filters li { list-style: none; margin-left: 0; margin-bottom: .3em; margin-right: 0.3em; float: left;}
+    body#search #filters li { margin-left: 0; margin-bottom: .3em; margin-right: 0.3em; float: left;}
     body#search #filters > .body { padding: 1em; float: left; width: 96.5%; font-size: .9em; }
     body#search #filters > .body > ul > li { float: left; margin-right: 2em; }
 
@@ -24,12 +24,13 @@ body#search #filters { width: 75%; margin-right: 1%; margin-bottom: 10px; }
     /*      Facets
      *-------------------------------- */
 
-    body#search ul#facets { }
-        body#search ul#facets ul { margin-left: 10px; }
-            body#search ul#facets ul li, #suggested_searches li, .facet_more_options li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
-            body#search #filters > .body > ul > li > ul { margin-top: .5em; }
-    body#search #facets li.more_facet_options { list-style: none; margin-left: 2.5em; }
-    body#search #facets li.active, body#search .facet_more_options li.active { font-weight: bold; }
+    body#search #facets { }
+    body#search #facets ul { margin-left: 10px; }
+    body#search #facets .facet-list { width: 20%;}
+    body#search #facets ul li, #suggested_searches li, .facet_more_options li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
+    body#search #filters > .body > ul > li > ul { margin-top: .5em; }
+    body#search #facets div.more_facet_options { list-style: none; margin-left: 2.5em; }
+    body#search #facets div.active, body#search .facet_more_options div.active { font-weight: bold; }
 
 body#search #about_projects, #about_bug_trackers { margin-top: 0; }
 body#search #about_projects { width: 20%; padding: 10px; }
@@ -48,8 +49,8 @@ body#search .expanded .separator_betw_tags_and_desc { display: none ! important;
  *---------------------- */
 body#search #textual_search { width: 22%; }
 body#search #textual_search .body { width: 87%; padding: 1em; }
-body#search #textual_search input[type='text'] { width: 75%; }
-body#search #textual_search input[type='submit'] { width: 15%; padding: 5px; }
+body#search #textual_search input[type='text'] { width: 70%; }
+body#search #textual_search input[type='submit'] { width: 20%; padding: 5px; }
 
 /*          Results summary
  *---------------------- */

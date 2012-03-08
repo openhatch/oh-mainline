@@ -21,7 +21,7 @@
 
 
 {% load search %}
-{% load cache %}
+{% comment %}{% load cache %}{% endcomment %}
 {% load profile_extras %}
 {% load base_extras %}
 
@@ -63,7 +63,7 @@ Volunteer opportunities in free and open source software
                 </h3>
                 {% endif %}
 
-            <ul id='facets'>
+            <div id='facets'>
                 {% for facet_name, facet in query.get_possible_facets %}
                     {% comment %}
                         facets = e.g. {
@@ -73,8 +73,8 @@ Volunteer opportunities in free and open source software
                             }
                         }
                     {% endcomment %}
-                    <li>
-                        {{ facet.sidebar_heading }}
+                    <div class="submodule facet-list">
+                        <h3>{{ facet.sidebar_heading }}</h3>
                         <ul>
                             {% if query %}
                                 {% for option in facet.options|slice:':4' %}
@@ -103,9 +103,9 @@ Volunteer opportunities in free and open source software
                                 {% include 'more_facet_options.html' %}
                             {% endif %}
                         </ul>
-                    </li>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
 
             {% if not query %}
 
@@ -117,9 +117,7 @@ Volunteer opportunities in free and open source software
                         <li><a href='?q=&amp;toughness=bitesize&amp;language=C%23'>
                                 Bitesize bugs in C#</a></li>
                     </ul>
-                    <p style="margin-left: 5em;">
-                        <a href="https://openhatch.org/blog/how-can-openhatch-help-me-contribute-to-free-software/">Read more...</a>
-                    </p>
+                    
                 </div>
 
                 <div id='personal_recommendations'>
@@ -162,7 +160,13 @@ Volunteer opportunities in free and open source software
                 </div>
 
             {% endif %}
-
+        
+        </div>
+        <div class="clearer"></div>
+        <div class="module-foot">
+        <p>
+                        <a href="https://openhatch.org/blog/how-can-openhatch-help-me-contribute-to-free-software/">Read more...</a>
+                    </p>
         </div>
         {% comment %}
             {% if query.terms %}
@@ -201,6 +205,8 @@ Volunteer opportunities in free and open source software
                 {% endfor %}
                 <input type='submit' id='button' value='Go' />
             </form>
+        </div>
+        <div class="module-foot">&nbsp;
         </div>
     </div>
 
@@ -268,6 +274,7 @@ Volunteer opportunities in free and open source software
 
 
         </div>
+
     </div>
     {% endif %}
 

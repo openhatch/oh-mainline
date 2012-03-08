@@ -43,7 +43,7 @@ margin: 0 auto;
 width: 100%;
 }
 
-.submodule { background-color: #fff; margin-bottom: 20px; padding: 8px 10px; border: 2px dashed #e4e4e4; rgba(100, 200, 255,.5); float: left; }
+.submodule { background-color: #fff; margin: 0 10px 20px 0; padding: 8px 10px; border: 2px dashed #e4e4e4; rgba(100, 200, 255,.5); float: left; }
 
 .submodule-head {
     margin-bottom: 5px;
