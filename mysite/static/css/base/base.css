@@ -155,6 +155,10 @@ input[type='submit'] {
 img {
     border: 0;
 }
+
+img.left { float: left; padding: 0 10px 20px 0;}
+img.right { float: right; padding: 0 0 20px 10px;}
+
 .usernames {
     font-size: 10pt;
 }
