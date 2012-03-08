@@ -512,6 +512,7 @@ class Answer(OpenHatchModel):
             retval = ""
         return retval
 
+    #TODO: This is bull****; what the heck is this template stuff doing in the models? Need refactoring!
     @property
     def template_for_feed(self):
         return 'base/answer-in-feed.html'

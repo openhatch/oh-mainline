@@ -22,8 +22,13 @@
         <div class='module-body'>
             <ul>
                 {% for answer in recent_feed_items %}
+                {% comment %}WTF is a template include doing as a /search/ model method? (Via this app's views.py, no less.) This is absurd. #TODO: fix this.{% endcomment %}
                 {% include answer.template_for_feed %}
+                <div class="clearer"></div>
                 {% endfor %}
             </ul>
+            
+        </div>
+        <div class="module-foot">
         </div>
     </div>

@@ -19,6 +19,10 @@
 {% load base_extras %}
 {% load profile_extras %}
 
+{% comment %}
+OMG inline styles every-freaking-where. WTF. #TODO: FIX!
+{% endcomment %}
+
 {% cache 86400 recent_activity_answer_v3 answer.pk %}
                     <li style='font-size: .9em; float: left; width: 100%;'>
 		                {% if answer.author %}
