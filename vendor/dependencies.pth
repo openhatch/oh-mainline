@@ -39,7 +39,6 @@ packages/unittest-xml-reporting/src
 packages/xapian-haystack
 packages/twisted
 packages/zope.interface
-packages/python-launchpad-bugs
 packages/gdata/src
 packages/python-openid
 packages/whoosh/src
