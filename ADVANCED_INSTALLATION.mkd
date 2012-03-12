@@ -53,11 +53,6 @@ lxml: An XML and HTML parsing library
     $ sudo apt-get install python-lxml
     $ pip install lxml
 
-libxml2: A different XML parsing library, used by launchpadlib
-
-    $ sudo apt-get install python-libxml2
-    $ pip install libxml2
-
 #### Training missions: System tools ####
 
 Most of the training missions work fine without installing any extra

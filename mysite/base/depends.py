@@ -70,20 +70,3 @@ except:
         ### possibly work.
         import sys
         sys.modules['Image'] = sys.modules['sys']
-
-# Wrap launchpadbugs. We wrap it because it imports libxml2,
-# which qualifies as hard-to-install.
-
-try:
-    import launchpadbugs
-    import launchpadbugs.connector
-    import launchpadbugs.basebuglistfilter
-    import launchpadbugs.text_bug
-    import launchpadbugs.lphelper
-except ImportError: # usually because python-libxml2 is missing
-    launchpadbugs = nothing()
-    launchpadbugs.connector = None
-    launchpadbugs.basebuglistfilter = None
-    launchpadbugs.text_bug = None
-    launchpadbugs.lphelper = None
-    logging.info("launchpadbugs did not import. Install python-libxml2. See ADVANCED_INSTALLATION.mkd for more info.")
