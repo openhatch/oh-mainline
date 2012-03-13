@@ -1,0 +1,109 @@
+[
+    {
+        "pk": 1,
+        "model": "auth.user",
+        "fields":
+            {
+                "username": "paulproteus",
+                "first_name": "Asheesh",
+                "last_name": "Laroia",
+                "email": "openhatch@asheesh.org"
+            }
+    },
+    {
+        "pk": 2,
+        "model": "auth.user",
+        "fields":
+            {
+                "username": "twiggy",
+                "first_name": "",
+                "last_name": "",
+                "email": "user_id_2_has_hidden_email_address@example.com"
+            }
+    },
+    {
+        "pk": 4, "model": "auth.user", "fields":
+            {
+                "username": "skyfaller",
+                "first_name": "",
+                "last_name": "",
+                "email": "user_id_4_has_hidden_email_address@example.com"
+            }
+    },
+
+    {
+        "pk": 1,
+        "model": "profile.person",
+        "fields":
+            {
+                "dont_guess_my_location": false,
+                "bio": "I fear enormous traffic lights. On weekdays, I make a website.",
+                "contact_blurb": "For help with Debian packaging, email me at the debian-mentors mailing list. See http://people.debian.org/~mpalmer/debian-mentors_FAQ.html for information on that. If you use the mailing list, I'll be less afraid of entirely dropping the ball.\r\n\r\nFor Python or GNU/Linux help, the best thing to do is to find me on IRC. I hang out on irc.freenode.net as paulproteus a lot -- send me a note in the #jhuacm channel.",
+                "location_display_name": "Somerville, MA 02143",
+                "photo": "static/photos/profile-photos/b07e24ff34844a7484442c084ceb7ada",
+                "gotten_name_from_ohloh": true,
+                "photo_thumbnail_30px_wide": "static/photos/profile-photos/6e841cea0c344ae4a3fb2c8d087dba80-thumbnail-30px-wide",
+                "homepage_url": "http://www.asheesh.org/",
+                "photo_thumbnail": "static/photos/profile-photos/cc5e8b64268b4d218a15eafbd573b30e-thumbnail",
+                "last_polled": "2011-03-14 16:25:49",
+                "show_email": true,
+                "location_confirmed": true,
+                "irc_nick": "paulproteus",
+                "user": 1,
+                "blacklisted_repository_committers": [],
+                "email_me_weekly_re_projects": true,
+                "photo_thumbnail_20px_wide": "static/photos/profile-photos/9ba5fd4d78a54414b6b20a3377f05a77-thumbnail-20px-wide",
+                "expand_next_steps": true
+            }
+    },
+    {
+        "pk": 2,
+        "model": "profile.person",
+        "fields":
+            {
+                "dont_guess_my_location": false,
+                "bio": "",
+                "contact_blurb": "",
+                "location_display_name": "Inaccessible Island",
+                "photo": "",
+                "gotten_name_from_ohloh": false,
+                "photo_thumbnail_30px_wide": "",
+                "homepage_url": "",
+                "photo_thumbnail": "",
+                "last_polled": "1970-01-01 00:00:00",
+                "show_email": false,
+                "location_confirmed": false,
+                "irc_nick": null,
+                "user": 2,
+                "blacklisted_repository_committers": [],
+                "email_me_weekly_re_projects": true,
+                "photo_thumbnail_20px_wide": "",
+                "expand_next_steps": true
+        }
+    },
+    {
+        "pk": 3,
+        "model": "profile.person",
+        "fields":
+            {
+                "dont_guess_my_location": false,
+                "bio": "",
+                "contact_blurb": "",
+                "location_display_name": "Inaccessible Island",
+                "photo": "",
+                "gotten_name_from_ohloh": true,
+                "photo_thumbnail_30px_wide": "",
+                "homepage_url": "",
+                "photo_thumbnail": "",
+                "last_polled": "1970-01-01 00:00:00",
+                "show_email": false,
+                "location_confirmed": false,
+                "irc_nick": null,
+                "user": 4,
+                "blacklisted_repository_committers": [],
+                "email_me_weekly_re_projects": true,
+                "photo_thumbnail_20px_wide": "",
+                "expand_next_steps": true
+        }
+    }
+]
