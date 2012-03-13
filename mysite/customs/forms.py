@@ -27,7 +27,10 @@ class TrackerTypesForm(django.forms.Form):
             ('roundup', 'Roundup'),
             ('trac', 'Trac'),
             )
-    tracker_type = django.forms.ChoiceField(choices=TRACKER_TYPES)
+    tracker_type = django.forms.ChoiceField(choices=TRACKER_TYPES,
+            widget=django.forms.Select(attrs={
+                    'onchange': 'this.form.submit(); return false;'
+                }))
 
 class BugzillaTrackerForm(django.forms.ModelForm):
     class Meta:
