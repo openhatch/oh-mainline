@@ -132,3 +132,11 @@ def int_list2ranges(int_list):
                 yield (q[i],q[j-1])
                 i = j
         yield (q[i], q[-1])
+
+
+def get_object_or_none(klass, *args, **kwargs):
+    queryset = django.shortcuts_get_queryset(klass)
+    try:
+        return queryset.get(*args, **kwargs)
+    except queryset.model.DoesNotExist:
+        return None
