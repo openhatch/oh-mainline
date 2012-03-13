@@ -84,7 +84,7 @@ document.documentElement.className = 'javascript_is_enabled';
 </form>
 
     <script type="text/javascript">
-    $('#init-shirt-form').live('submit',function() {
+    $('#init-shirt-form').live('submit',function(event) {
         event.preventDefault();
         var total = 0;
         var numShirts = $("#num-shirts").val();
