@@ -1,3 +1,8 @@
+@font-face { font-family: Tuffy; src: url('/static/fonts/tuffy_regular.ttf');}
+@font-face { font-family: Tuffy; font-weight: bold; src: url('/static/fonts/tuffy_bold.ttf');}
+@font-face { font-family: Tuffy; font-style: italic; src: url('/static/fonts/tuffy_italic.ttf');}
+@font-face { font-family: Tuffy; font-weight: bold; font-style: italic; src: url('/static/fonts/tuffy_bold_italic.ttf');}
+
 body { font: 11pt Tuffy, Helvetica, sans-serif; background: #f8f8f8; color: #222; width: 100%; margin: 0 auto; padding: 0; }
 .link_like, a , body .ui-widget-content a { color: #ff6d3d; text-decoration: none; cursor:pointer; cursor:hand; }
 
