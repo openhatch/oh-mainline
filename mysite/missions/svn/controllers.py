@@ -81,58 +81,6 @@ exec %s -W ignore %s svn_precommit "$@"
     def cat(self, path):
         return subproc_check_output(['svn', 'cat', self.file_url + path])
 
-
-class SvnCheckoutMission(object):
-    SECRET_WORD_FILE = 'word.txt'
-
-    @classmethod
-    def get_secret_word(cls, username):
-        return SvnRepository(username).cat('/trunk/' + cls.SECRET_WORD_FILE).strip()
-
-
-class SvnDiffMission(object):
-    FILE_TO_BE_PATCHED = 'README'
-    NEW_CONTENT = os.path.join(get_mission_data_path('svn'), 'README-new-for-svn-diff')
-
-    @classmethod
-    def validate_diff_and_commit_if_ok(cls, username, diff):
-        the_patch = patch.fromstring(diff)
-
-        # Check that it only patches one file.
-        if len(the_patch.hunks) != 1:
-            raise IncorrectPatch, 'The patch affects more than one file.'
-
-        # Check that the filename it patches is correct.
-        if the_patch.source[0] != cls.FILE_TO_BE_PATCHED or the_patch.target[0] != cls.FILE_TO_BE_PATCHED:
-            raise IncorrectPatch, 'The patch affects the wrong file.'
-
-        # Now we need to generate a working copy to apply the patch to.
-        # We can also use this working copy to commit the patch if it's OK.
-        wcdir = tempfile.mkdtemp()
-        repo = SvnRepository(username)
-        try:
-            subproc_check_output(['svn', 'co', repo.file_trunk_url(), wcdir])
-            file_to_patch = os.path.join(wcdir, cls.FILE_TO_BE_PATCHED)
-
-            # Check that it will apply correctly to the working copy.
-            if not the_patch._match_file_hunks(file_to_patch, the_patch.hunks[0]):
-                raise IncorrectPatch, 'The patch will not apply correctly to the latest revision.'
-
-            # Check that the resulting file matches what is expected.
-            new_content = ''.join(the_patch.patch_stream(open(file_to_patch), the_patch.hunks[0]))
-            if new_content != open(cls.NEW_CONTENT).read():
-                raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
-
-            # Commit the patch.
-            open(file_to_patch, 'w').write(new_content)
-            commit_message = '''Fix a typo in %s.
-
-Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED, username)
-            subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', wcdir])
-
-        finally:
-            shutil.rmtree(wcdir)
-
 # Helpers for the hook scripts for the svn commit mission.
 # We can mock these in the tests.
 def get_username_for_svn_txn(repo_path, txn_id):
@@ -152,7 +100,6 @@ def get_file_for_svn_txn(repo_path, txn_id, filename):
 
 def get_log_for_svn_txn(repo_path, txn_id):
     return subproc_check_output(['svnlook', 'log', repo_path, '-t', txn_id])
-
 
 class SvnCommitMission(object):
     SECRET_WORD_FILE = 'word.txt'
