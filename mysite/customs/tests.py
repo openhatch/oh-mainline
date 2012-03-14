@@ -6,6 +6,7 @@
 # Copyright (C) 2010 Karen Rustad
 # Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
 # Copyright (C) 2010 Mark Freeman
+# Copyright (C) 2012 Berry Phillips
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -61,11 +62,34 @@ import mysite.customs.feed
 from django.utils.unittest import skipIf
 
 import mysite.customs.models
-import mysite.customs.bugimporters.trac
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
+from mysite.customs.data_transits import bug_data_transit, trac_data_transit
+
+
+# We don't want the tests to depend on the optional bugimporters libarary.
+try:
+    from bugimporters.bugzilla import (BugzillaBugImporter, BugzillaBugParser,
+            KDEBugzilla)
+    from bugimporters.roundup import RoundupBugImporter, RoundupBugParser
+    from bugimporters.google import GoogleBugImporter, GoogleBugParser
+    from bugimporters.trac import TracBugImporter, TracBugParser
+    from bugimporters.launchpad import LaunchpadBugImporter
+except ImportError:
+    BugzillaBugImporter = None
+    BugzillaBugParser = None
+    RoundupBugImporter = None
+    RoundupBugParser = None
+    TracBugImporter = None
+    TracBugParser = None
+    LaunchpadBugImporter = None
+    GoogleBugImporter = None
+    GoogleBugParser = None
 # }}}
+
+importer_data_transits = {'bug': bug_data_transit, 'trac': trac_data_transit}
+
 
 class FakeGetPage(object):
     '''In this function, we define the fake URLs we know about, and where
@@ -102,17 +126,17 @@ class FakeGetPage(object):
         self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks&created_since=1970-01-01T00%3A00%3A00']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
-        self.url2data['https://api.launchpad.net/1.0/~vila']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461closed']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461closed')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461doc']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461doc')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461doc']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461doc')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461bite']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461bite')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461bite']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461bite')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks&created_since=1970-01-01T00%3A00%3A00'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
+        self.url2data['https://api.launchpad.net/1.0/~vila'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461closed'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461closed')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461doc'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461doc')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461doc'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461doc')).read()
+        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461bite'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461bite')).read()
+        self.url2data['https://api.launchpad.net/1.0/bugs/839461bite'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461bite')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -282,7 +306,7 @@ class ImportFromDebianQA(django.test.TestCase):
     def test_404(self):
         pass # uhhh
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
 class LaunchpadProfileImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -584,35 +608,37 @@ class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(
             person=asheesh, source='oh', query='paulproteus.ohloh@asheesh.org')
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+
+@skipIf(BugzillaBugImporter is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
 class TestCustomBugParser(django.test.TestCase):
     ### First, test that if we create the bug importer correctly, the
     ### right thing would happen.
     def test_bugzilla_bug_importer_uses_bugzilla_parser_by_default(self):
-        bbi = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(
+        bbi = BugzillaBugImporter(
             tracker_model=None, reactor_manager=None,
             bug_parser=None)
-        self.assertEqual(bbi.bug_parser, mysite.customs.bugimporters.bugzilla.BugzillaBugParser)
+        self.assertEqual(bbi.bug_parser, BugzillaBugParser)
 
     def test_bugzilla_bug_importer_accepts_bug_parser(self):
-        bbi = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(
+        bbi = BugzillaBugImporter(
             tracker_model=None, reactor_manager=None,
-            bug_parser=mysite.customs.bugimporters.bugzilla.KDEBugzilla)
-        self.assertEqual(bbi.bug_parser, mysite.customs.bugimporters.bugzilla.KDEBugzilla)
+            bug_parser=KDEBugzilla)
+        self.assertEqual(bbi.bug_parser, KDEBugzilla)
 
-    @mock.patch('mysite.customs.bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data')
-    def test_kdebugparser_uses_tracker_specific_method(self, mock_specific):
-        bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
-                    settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
-        bug_data = bugzilla_data.xpath('bug')[0]
+    # @mock.patch('KDEBugzilla.extract_tracker_specific_data')
+    def test_kdebugparser_uses_tracker_specific_method(self):
+        with mock.patch('KDEBugzilla.extract_tracker_specific_data') as mock_specific:
+            bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
+                        settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
+            bug_data = bugzilla_data.xpath('bug')[0]
 
-        kdebugzilla = mysite.customs.bugimporters.bugzilla.KDEBugzilla(bug_data)
-        kdebugzilla.get_parsed_data_dict(base_url='http://bugs.kde.org/',
-                                         bitesized_type=None,
-                                         bitesized_text='',
-                                         documentation_type=None,
-                                         documentation_text='')
-        self.assertTrue(mock_specific.called)
+            kdebugzilla = KDEBugzilla(bug_data)
+            kdebugzilla.get_parsed_data_dict(base_url='http://bugs.kde.org/',
+                                             bitesized_type=None,
+                                             bitesized_text='',
+                                             documentation_type=None,
+                                             documentation_text='')
+            self.assertTrue(mock_specific.called)
 
     ### Now, test that the customs_twist class will create an importer
     ### configured to use the right class.
@@ -628,7 +654,7 @@ class TestCustomBugParser(django.test.TestCase):
                 )
         twister = mysite.customs.management.commands.customs_twist.Command()
         importer = twister._get_importer_instance_for_tracker_model(tm)
-        self.assertEqual(mysite.customs.bugimporters.bugzilla.KDEBugzilla,
+        self.assertEqual(KDEBugzilla,
                          importer.bug_parser)
 
     ### Now, test that the customs_twist class will create an importer
@@ -638,7 +664,7 @@ class TestCustomBugParser(django.test.TestCase):
         importer = twister._get_importer_instance_for_tracker_model(None)
         self.assertTrue(importer)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(BugzillaBugImporter is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
 class BugzillaBugImporterTests(django.test.TestCase):
     fixtures = ['miro-project']
     def setUp(self):
@@ -651,7 +677,7 @@ class BugzillaBugImporterTests(django.test.TestCase):
                 bitesized_text='bitesized',
                 documentation_type='key',
                 )
-        self.im = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(self.tm, None)
+        self.im = BugzillaBugImporter(self.tm, None, data_transits=importer_data_transits)
 
     def test_miro_bug_object(self):
         # Check the number of Bugs present.
@@ -783,7 +809,7 @@ class BlogCrawl(django.test.TestCase):
                          u'Yo \xe9')
 
 def raise_504(*args, **kwargs):
-    raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
+    raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null"))
 mock_browser_open = mock.Mock()
 mock_browser_open.side_effect = raise_504
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
@@ -800,7 +826,7 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(RoundupBugImporter is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class RoundupBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -813,9 +839,10 @@ class RoundupBugImporterTests(django.test.TestCase):
                 documentation_field='Topics',
                 documentation_text='documentation',
                 )
-        self.im = mysite.customs.bugimporters.roundup.RoundupBugImporter(self.tm, None)
+        self.im = RoundupBugImporter(self.tm, None, data_transits=importer_data_transits)
 
     def test_get_url_does_not_crash(self):
+        print self.tm
         self.assertTrue(self.tm.get_edit_url())
 
     def test_new_mercurial_bug_import(self, second_run=False):
@@ -827,11 +854,11 @@ class RoundupBugImporterTests(django.test.TestCase):
         else:
             self.assertEqual(len(all_bugs), 0)
 
-        rbp = mysite.customs.bugimporters.roundup.RoundupBugParser(
+        rbp = RoundupBugParser(
                 bug_url='http://mercurial.selenic.com/bts/issue1550')
         # Parse HTML document as if we got it from the web
         self.im.handle_bug_html(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'closed-mercurial-bug.html')).read(), rbp)
+            settings.MEDIA_ROOT, 'sample-data', 'closed-mercurial-bug.html')).read(), rbp )
 
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -874,7 +901,7 @@ the module to the output. (Long live lambda.)""")
         time.sleep(2)
         self.test_new_mercurial_bug_import(second_run=True)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(RoundupBugImporter is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class RoundupBugsFromPythonProjectTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -887,7 +914,7 @@ class RoundupBugsFromPythonProjectTests(django.test.TestCase):
                 documentation_field='Components',
                 documentation_text='Documentation',
                 )
-        self.im = mysite.customs.bugimporters.roundup.RoundupBugImporter(self.tm, None)
+        self.im = RoundupBugImporter(self.tm, None, data_transits=importer_data_transits)
 
     def test_get_url_does_not_crash(self):
         self.assertTrue(self.tm.get_edit_url())
@@ -901,7 +928,7 @@ class RoundupBugsFromPythonProjectTests(django.test.TestCase):
         else:
             self.assertEqual(len(all_bugs), 0)
 
-        rbp = mysite.customs.bugimporters.roundup.RoundupBugParser(
+        rbp = RoundupBugParser(
                 bug_url='http://bugs.python.org/issue8264')
         # Parse HTML document as if we got it from the web
         self.im.handle_bug_html(open(os.path.join(
@@ -993,8 +1020,8 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class TracBugParser(django.test.TestCase):
+@skipIf(TracBugParser is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
+class TracBugParserTests(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
@@ -1021,8 +1048,7 @@ class TracBugParser(django.test.TestCase):
                 documentation_type='')
 
     def test_create_bug_object_data_dict_more_recent(self):
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
-            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp = TracBugParser('http://twistedmatrix.com/trac/ticket/4298')
         tbp.bug_csv = {
             'branch': '',
             'branch_author': '',
@@ -1043,6 +1069,7 @@ class TracBugParser(django.test.TestCase):
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
         tbp.set_bug_html_data(unicode(
             open(cached_html_filename).read(), 'utf-8'))
+
         self.assertEqual(tbp.component, 'core')
 
         got = tbp.get_parsed_data_dict(self.tm)
@@ -1068,8 +1095,7 @@ class TracBugParser(django.test.TestCase):
         self.assertEqual(wanted, got)
 
     def test_create_bug_object_data_dict(self):
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
-            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp = TracBugParser('http://twistedmatrix.com/trac/ticket/4298')
         tbp.bug_csv = {
             'branch': '',
             'branch_author': '',
@@ -1115,8 +1141,7 @@ class TracBugParser(django.test.TestCase):
 
     def test_create_bug_object_data_dict_priority_bitesized(self):
         self.maxDiff = None
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
-            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp = TracBugParser('http://twistedmatrix.com/trac/ticket/4298')
         tbp.bug_csv = {
             'branch': '',
             'branch_author': '',
@@ -1161,8 +1186,7 @@ class TracBugParser(django.test.TestCase):
         self.assertEqual(wanted, got)
 
     def test_create_bug_that_lacks_modified_date(self):
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
-            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp = TracBugParser('http://twistedmatrix.com/trac/ticket/4298')
         tbp.bug_csv = {
             'branch': '',
             'branch_author': '',
@@ -1207,8 +1231,7 @@ class TracBugParser(django.test.TestCase):
         self.assertEqual(wanted, got)
 
     def test_create_bug_that_lacks_modified_date_and_uses_owned_by_instead_of_assigned_to(self):
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
-            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp = TracBugParser('http://twistedmatrix.com/trac/ticket/4298')
         tbp.bug_csv = {
             'branch': '',
             'branch_author': '',
@@ -1253,8 +1276,7 @@ class TracBugParser(django.test.TestCase):
         self.assertEqual(wanted, got)
 
     def test_create_bug_that_has_new_date_format(self):
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
-            bug_url='http://trac.edgewall.org/ticket/3275')
+        tbp = TracBugParser('http://trac.edgewall.org/ticket/3275')
         tbp.bug_csv = {
                   'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
                   'status': 'new',
@@ -1276,7 +1298,7 @@ class TracBugParser(django.test.TestCase):
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(TracBugImporter is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
 class TracBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
@@ -1288,7 +1310,7 @@ class TracBugImporterTests(django.test.TestCase):
                 bitesized_text='easy',
                 documentation_type='keywords',
                 documentation_text='documentation')
-        self.im = mysite.customs.bugimporters.trac.TracBugImporter(self.tm, None)
+        self.im = TracBugImporter(self.tm, None, data_transits=importer_data_transits)
 
     def test_handle_query_csv(self):
         # Zero the bug_ids list just in case.
@@ -1309,7 +1331,7 @@ class TracBugImporterTests(django.test.TestCase):
         else:
             self.assertEqual(len(all_bugs), 0)
         # Create a TracBugParser
-        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+        tbp = TracBugParser(
             bug_url='http://twistedmatrix.com/trac/ticket/4298')
         tbp.bug_csv = {
             'branch': '',
@@ -1414,8 +1436,8 @@ def do_list_of_work(l):
     for thing in l:
         thing()
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class GoogleCodeBugImporter(django.test.TestCase):
+@skipIf(GoogleBugImporter is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class GoogleBugImport(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
         self.tm = mysite.customs.models.GoogleTrackerModel.all_trackers.create(
@@ -1450,7 +1472,7 @@ I don't see for example the solvers module"""},
                 'status': {'text': 'Fixed'}
                 }
         bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
-        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+        gbp = GoogleBugParser(
                 bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
         gbp.bug_atom = bug_atom
 
@@ -1498,7 +1520,7 @@ I don't see for example the solvers module"""},
                 'status': {'text': 'Fixed'}
                 }
         bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
-        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+        gbp = GoogleBugParser(
                 bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
         gbp.bug_atom = bug_atom
 
@@ -1546,7 +1568,7 @@ I don't see for example the solvers module"""},
                 'status': {'text': 'Fixed'}
                 }
         bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
-        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+        gbp = GoogleBugParser(
                 bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
         gbp.bug_atom = bug_atom
 
@@ -1594,7 +1616,7 @@ I don't see for example the solvers module"""},
                 'status': None
                 }
         bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
-        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+        gbp = GoogleBugParser(
                 bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
         gbp.bug_atom = bug_atom
 
@@ -2044,6 +2066,8 @@ class BugzillaTrackerEditingViews(TwillTests):
         btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
 
+
+@skipIf(LaunchpadBugImporter is None, "To run these tests, you must install LaunchpadBugImporter. See ADVANCED_INSTALLATION.mkd for more.")
 class LaunchpadBugImport(django.test.TestCase):
     def setUp(self):
         self.tm = mysite.customs.models.LaunchpadTrackerModel.all_trackers.create(
@@ -2053,7 +2077,8 @@ class LaunchpadBugImport(django.test.TestCase):
                 documentation_tag='doc')
         self.dm = mock.Mock(name='dm')
         self.dm.running_deferreds = 0
-        self.im = mysite.customs.bugimporters.launchpad.LaunchpadBugImporter(self.tm, self.dm)
+        self.im = LaunchpadBugImporter(self.tm, self.dm,
+                data_transits=importer_data_transits)
 
     @mock.patch('mysite.search.models.Bug.all_bugs.get')
     @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)

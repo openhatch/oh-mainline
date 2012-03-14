@@ -79,7 +79,7 @@ class TrackerModel(models.Model):
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
 
     ### This optional attribute specifies a class name, which is intepreted as
-    ### part of the mysite.customs.bugimporters module.
+    ### part of the mysite.customs.core_bugimporters module.
     ###
     ### If the class is specified, we will use custom code from that class
     ### when doing bug parsing.
@@ -95,12 +95,12 @@ class TrackerModel(models.Model):
         It is part of this superclass so that derived classes can use the
         functionality without implementing it themselves. It relies on
         the classes being manually added to
-        mysite.customs.bugimporters.all_trackers.'''
-        import mysite.customs.bugimporters
+        mysite.customs.core_bugimporters.all_trackers.'''
+        import mysite.customs.core_bugimporters
         my_short_name = None
 
-        for short_name in mysite.customs.bugimporters.all_trackers:
-            klass = mysite.customs.bugimporters.all_trackers[short_name]['model']
+        for short_name in mysite.customs.core_bugimporters.all_trackers:
+            klass = mysite.customs.core_bugimporters.all_trackers[short_name]['model']
             if self.__class__ == klass:
                 my_short_name = short_name
                 break

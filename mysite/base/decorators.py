@@ -47,7 +47,7 @@ def as_view(request, template, data, slug, just_modify_data=False):
             request.session['cookies_work'] = True
 
 
-    # Where should the user be sent if she clicks 'logout'?  
+    # Where should the user be sent if she clicks 'logout'?
     # Depends on whether this is a login-requiring page.
     try:
         view_function, _, _ = resolve(request.path)
@@ -98,7 +98,7 @@ def unicodify_strings_when_inputted(func, *args, **kwargs):
 def no_str_in_the_dict(d):
     if not d:
         return d
-    
+
     for key in d:
         value = d[key]
         mysite.base.helpers.assert_or_pdb(type(key) != str)
@@ -108,7 +108,7 @@ def no_str_in_the_dict(d):
 def no_str_in_the_list(l):
     if not l:
         return l
-    
+
     for elt in l:
         mysite.base.helpers.assert_or_pdb(type(l) != str)
     return l
@@ -146,7 +146,7 @@ def cache_function_that_takes_request(func, *args, **kwargs):
         django.core.cache.cache.set(key_string, content, 360) # uh, six minutes, sure
     return response
 
-@decorator_factory 
+@decorator_factory
 def cache_method(cache_key_getter_name, func, *args, **kwargs):
     # The point of cache_method is to decorate expensive methods in classes
     # with a flexible way to store their input/output mappings in the cache.
@@ -196,5 +196,5 @@ def cached_property(f):
         except KeyError:
             x = self._property_cache[f] = f(self)
             return x
-        
+
     return property(get)
