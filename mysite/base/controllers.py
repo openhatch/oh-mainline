@@ -31,9 +31,6 @@ import base64
 import os
 import random
 
-class HaystackIsDown(Exception):
-    pass
-
 notifications_dictionary = {
         "edit_password_done":
         "Your password has been changed.",

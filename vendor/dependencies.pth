@@ -8,7 +8,6 @@ packages/django-authopenid
 packages/django-celery
 packages/django-debug-toolbar
 packages/django-extensions
-packages/django-haystack
 packages/django-invitation
 packages/django-kombu
 packages/django-model-utils
@@ -36,7 +35,6 @@ packages/staticgenerator
 packages/twill
 packages/typecheck
 packages/unittest-xml-reporting/src
-packages/xapian-haystack
 packages/twisted
 packages/zope.interface
 packages/gdata/src

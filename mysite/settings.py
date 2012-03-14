@@ -72,9 +72,6 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-HAYSTACK_XAPIAN_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
-HAYSTACK_WHOOSH_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
-
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'static')
@@ -142,10 +139,6 @@ STATIC_DOC_ROOT = 'static/'
 # Sessions in /tmp
 SESSION_ENGINE="django.contrib.sessions.backends.db"
 
-## Django search via Haystack
-HAYSTACK_SITECONF='mysite.haystack_configuration'
-HAYSTACK_SEARCH_ENGINE='whoosh'
-
 INSTALLED_APPS = (
     'ghettoq',
     'django.contrib.auth',
@@ -170,7 +163,6 @@ INSTALLED_APPS = (
     'mysite.project',
     'mysite.senseknocker',
     'mysite.missions',
-    'haystack',
     'voting',
     'reversion',
     'debug_toolbar',
