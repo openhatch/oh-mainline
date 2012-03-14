@@ -1931,6 +1931,20 @@ class DataExport(django.test.TestCase):
         self.assertEquals(new_tagtype_understands.name, 'understands')
         self.assertEquals(new_tagtype_can_mentor.name, 'can_mentor')
 
+    def test_load_persons_and_profiles1(self):
+        self.load_snapshot_file('snapshot1.json')
+
+    def test_load_persons_and_profiles2(self):
+        self.load_snapshot_file('snapshot2.json')
+
+    def load_snapshot_file(self, snapshot_file_name):
+        snapshot_file_path = os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'snapshots', snapshot_file_name
+        )
+        with open(snapshot_file_path) as snapshot_file:
+            for obj in django.core.serializers.deserialize('json', snapshot_file, using='default'):
+                obj.save()
+
 # vim: set nu:
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
