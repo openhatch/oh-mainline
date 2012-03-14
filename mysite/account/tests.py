@@ -62,15 +62,17 @@ class Login(TwillTests):
         tc.find('log in')
     # }}}
 
-class LoginWithOpenID(TwillTests):
-    #{{{
-    fixtures = ['user-paulproteus']
-    def test_login_creates_user_profile(self):
+class ProfileGetsCreatedWhenUserIsCreated(TwillTests):
+    """django-authopenid only creates User objects, but we need Person objects
+    in all such cases. Test that creating a User will automatically create
+    a Person in our project."""
+    def test_login_creates_person_profile(self):
+        # Create a user object
+        u = User.objects.create(username='paulproteus')
+        u.save()
         # Even though we didn't add the person-paulproteus
         # fixture, a Person object is created.
-        self.assert_(list(
-            Person.objects.filter(user__username='paulproteus')))
-    #}}}
+        self.assert_(list(Person.objects.filter(user__username='paulproteus')))
 
 class Signup(TwillTests):
     """ Tests for signup without invite code. """
