@@ -474,8 +474,11 @@ class Person(models.Model):
 
     # }}}
 
-def create_profile_when_user_created(instance, created, *args, **kwargs):
-    if created:
+def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
+    """Post-save hook for Users. raw is populated from kwargs.
+    See Django docs on Signals:
+    https://docs.djangoproject.com/en/dev/ref/signals/#post-save"""
+    if created and not raw:
         person, p_created = Person.objects.get_or_create(user=instance)
 
 models.signals.post_save.connect(create_profile_when_user_created, User)
