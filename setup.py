@@ -57,7 +57,6 @@ setup(
                         'pysolr',
                         'South>=0.7.3.1',
                         'sisynala',
-                        'django-haystack',
                         'hexagonit.recipe.download',
                         'django-registration>0.7',
                         'django-voting',

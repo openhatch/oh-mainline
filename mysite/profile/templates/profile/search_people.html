@@ -62,16 +62,6 @@ People Search
         </div>
     </form>
 
-    {% if haystack_is_down %}
-
-        <p id='search_engine_is_down_message'>
-        The people directory is currently
-        <abbr title='Specifically, one of these pieces is off or not working properly: Solr or Haystack'>down</abbr> for maintenance.  Please try again later. You can still
-        view the <a href='{% url mysite.profile.views.people %}'>global map</a>.
-        </p>
-
-    {% else %}
-
     {% if not q %}
     <ul class='suggestions'>
         {# this is cached in the view #}
@@ -271,7 +261,6 @@ People Search
     </div>
     {% endif %}
 
-    {% endif %}
 {% endblock people_main %}
 
 {% block js_in_head %}

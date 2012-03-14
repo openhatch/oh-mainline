@@ -14,9 +14,9 @@ function drawAllPeopleDivsAtOnce(list_of_people_data) {
     for (i = 0; i < list_of_people_data.length && i < MAX_TO_DISPLAY; i++) {
 	f = list_of_people_data[i];
         div = $("<div />");
-        a = $("<a href='http://openhatch.org/people/"+f.attributes.all_data.extra_person_info.username+"/'>" + f.attributes.name + "</a>");
+        a = $("<a class='person' href='http://openhatch.org/people/"+f.attributes.all_data.extra_person_info.username+"/'>" + f.attributes.name + "</a>");
         div.append(a);
-        span = $("<span>, " + f.attributes.location + "</span>");
+        span = $("<span class='geocode'>, " + f.attributes.location + "</span>");
         div.append(span);
         $results.append(div);
     }

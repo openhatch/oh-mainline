@@ -48,9 +48,6 @@ GOOGLE_ANALYTICS_CODE='UA-15096810-1'
 GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
 
-### Use Xapian, not Whoosh, on the deployment
-HAYSTACK_SEARCH_ENGINE='xapian'
-
 RECOMMEND_BUGS=False
 
 ### Set the logging level to just WARNING or above

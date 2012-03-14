@@ -1689,28 +1689,28 @@ class DataExport(django.test.TestCase):
         self.assertEquals(new_p2.user.email, 'public@example.com')
 
     def test_snapshot_bug(self):
-		# data capture, woo
-		fake_stdout = StringIO()
-		# make fake bug
-		b = Bug.create_dummy_with_project()
-		b.title = 'fire-ant'
-		b.save()
+        # data capture, woo
+        fake_stdout = StringIO()
+        # make fake bug
+        b = Bug.create_dummy_with_project()
+        b.title = 'fire-ant'
+        b.save()
 
-		# snapshot fake bug into fake stdout
-		command = mysite.customs.management.commands.snapshot_public_data.Command()
-		command.handle(output=fake_stdout)
+        # snapshot fake bug into fake stdout
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
+        command.handle(output=fake_stdout)
 
-		#now, delete bug...
-		b.delete()
+        #now, delete bug...
+        b.delete()
 
-		# let's see if we can re-import fire-ant!
-		for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
-			obj.save()
+        # let's see if we can re-import fire-ant!
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
 
-		# testing to see if there are ANY bugs
-		self.assertTrue(Bug.all_bugs.all())
-		# testing to see if fire-ant is there
-		mysite.search.models.Bug.all_bugs.get(title='fire-ant')
+        # testing to see if there are ANY bugs
+        self.assertTrue(Bug.all_bugs.all())
+        # testing to see if fire-ant is there
+        mysite.search.models.Bug.all_bugs.get(title='fire-ant')
 
     def test_snapshot_timestamp(self):
         # data capture, woo
@@ -1930,6 +1930,20 @@ class DataExport(django.test.TestCase):
 
         self.assertEquals(new_tagtype_understands.name, 'understands')
         self.assertEquals(new_tagtype_can_mentor.name, 'can_mentor')
+
+    def test_load_persons_and_profiles1(self):
+        self.load_snapshot_file('snapshot1.json')
+
+    def test_load_persons_and_profiles2(self):
+        self.load_snapshot_file('snapshot2.json')
+
+    def load_snapshot_file(self, snapshot_file_name):
+        snapshot_file_path = os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'snapshots', snapshot_file_name
+        )
+        with open(snapshot_file_path) as snapshot_file:
+            for obj in django.core.serializers.deserialize('json', snapshot_file, using='default'):
+                obj.save()
 
 # vim: set nu:
 
