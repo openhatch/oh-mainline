@@ -39,18 +39,6 @@ To run this maintenance task hourly, run these commands:
     while (true); do ./manage.py profile_hourly_tasks; sleep 1h; done
     # Type Ctrl-a, d to hide ("detach from") the screen
 
-## Rebuilding the people search index
-
-We have a map at <http://localhost:8000/people/>. To accelerate search
-on those people, we use Haystack, a Django layer on top of search
-engines.
-
-Sometimes that gets otu of sync with the databse. You might need to run:
-
-    ./manage.py rebuild_index
-
-(You can say "yes" if it asks you if you are sure.)
-
 ## Adding jQuery UI components
 
 When you want to add a jQuery UI component, go here:
