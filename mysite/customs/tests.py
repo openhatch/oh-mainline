@@ -1689,28 +1689,28 @@ class DataExport(django.test.TestCase):
         self.assertEquals(new_p2.user.email, 'public@example.com')
 
     def test_snapshot_bug(self):
-		# data capture, woo
-		fake_stdout = StringIO()
-		# make fake bug
-		b = Bug.create_dummy_with_project()
-		b.title = 'fire-ant'
-		b.save()
+        # data capture, woo
+        fake_stdout = StringIO()
+        # make fake bug
+        b = Bug.create_dummy_with_project()
+        b.title = 'fire-ant'
+        b.save()
 
-		# snapshot fake bug into fake stdout
-		command = mysite.customs.management.commands.snapshot_public_data.Command()
-		command.handle(output=fake_stdout)
+        # snapshot fake bug into fake stdout
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
+        command.handle(output=fake_stdout)
 
-		#now, delete bug...
-		b.delete()
+        #now, delete bug...
+        b.delete()
 
-		# let's see if we can re-import fire-ant!
-		for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
-			obj.save()
+        # let's see if we can re-import fire-ant!
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
 
-		# testing to see if there are ANY bugs
-		self.assertTrue(Bug.all_bugs.all())
-		# testing to see if fire-ant is there
-		mysite.search.models.Bug.all_bugs.get(title='fire-ant')
+        # testing to see if there are ANY bugs
+        self.assertTrue(Bug.all_bugs.all())
+        # testing to see if fire-ant is there
+        mysite.search.models.Bug.all_bugs.get(title='fire-ant')
 
     def test_snapshot_timestamp(self):
         # data capture, woo
