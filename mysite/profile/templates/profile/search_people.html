@@ -222,6 +222,8 @@ People Search
     <p>Loading the map...</p>
     </div>
 
+    {% endif %}
+
     {% if not user.is_authenticated and people %}
             <span style="float: right; padding: 5px 0 0 0;">
                 <a href="{% url account.views.set_location %}">
@@ -259,7 +261,6 @@ People Search
     </div>
     {% endif %}
 
-    {% endif %}
 {% endblock people_main %}
 
 {% block js_in_head %}
