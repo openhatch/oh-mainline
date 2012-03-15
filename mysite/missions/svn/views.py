@@ -20,6 +20,9 @@
 from mysite.missions.base.views import *
 from mysite.missions.svn import forms, controllers
 import mysite.missions.base.views
+import shutil
+import tempfile
+from django.shortcuts import render
 
 ### POST handlers
 ###
@@ -43,17 +46,18 @@ def resetrepo(request):
 def diff_submit(request):
     # Initialize data array and some default values.
     data = {}
-    data['svn_diff_form'] = forms.DiffForm()
+    data['svn_diff_form'] = forms.DiffForm(request.user.username)
     data['svn_diff_error_message'] = ''
     if request.method == 'POST':
-        form = forms.DiffForm(request.POST)
-        if form.is_valid():
-            try:
-                controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
+        wcdir = tempfile.mkdtemp()
+        try:
+            form = forms.DiffForm(request.user.username, wcdir, request.POST)
+            if form.is_valid():
+                form.commit_diff()
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
                 return HttpResponseRedirect(reverse('svn_diff'))
-            except controllers.IncorrectPatch, e:
-                data['svn_diff_error_message'] = str(e)
+        finally:
+            shutil.rmtree(wcdir)
         data['svn_diff_form'] = form
     request.method = 'GET'
     return Diff.as_view()(request, extra_context_data=data)
@@ -62,20 +66,19 @@ def diff_submit(request):
 def checkout_submit(request):
     # Initialize data array and some default values.
     data = {}
-    data['svn_checkout_form'] = forms.CheckoutForm()
+    data['svn_checkout_form'] = forms.CheckoutForm(request.user.username)
     data['svn_checkout_error_message'] = ''
     if request.method == 'POST':
-        form = forms.CheckoutForm(request.POST)
+        form = forms.CheckoutForm(request.user.username, request.POST)
         if form.is_valid():
-            if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
-                controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
-                return HttpResponseRedirect(reverse('svn_checkout'))
-            else:
-                data['svn_checkout_error_message'] = 'The secret word is incorrect.'
+            controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
+            return HttpResponseRedirect(reverse('svn_checkout'))
         data['svn_checkout_form'] = form
+
     # If we get here, just hack up the request object to pretend it is a GET
     # so the dispatch system in the class-based view can use the GET handler.
     request.method = 'GET'
+
     return Checkout.as_view()(request, extra_context_data=data)
 
 ### All GET handlers are subclasses of this so that tedious template
@@ -100,8 +103,8 @@ class SvnBaseView(mysite.missions.base.views.MissionBaseView):
             if new_data['repository_exists']:
                 new_data.update({
                         'checkout_url': repo.public_trunk_url(),
-                        'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
-                        'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
+                        'secret_word_file': forms.CheckoutForm.SECRET_WORD_FILE,
+                        'file_for_svn_diff': forms.DiffForm.FILE_TO_BE_PATCHED,
                         'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
                         'commit_username': self.request.user.username,
                         'commit_password': repo.get_password()})
@@ -125,8 +128,12 @@ class Checkout(SvnBaseView):
 
     def get_context_data(self, *args, **kwargs):
         data = super(Checkout, self).get_context_data(*args, **kwargs)
-        data['svn_checkout_form'] = forms.CheckoutForm()
+        if kwargs.has_key('extra_context_data'):
+            data.update(kwargs['extra_context_data'])
+        else:
+            data['svn_checkout_form'] = forms.CheckoutForm()
         return data
+
 
 class Diff(SvnBaseView):
     login_required = True
@@ -136,7 +143,10 @@ class Diff(SvnBaseView):
 
     def get_context_data(self, *args, **kwargs):
         data = super(Diff, self).get_context_data(*args, **kwargs)
-        data['svn_diff_form'] = forms.DiffForm()
+        if kwargs.has_key('extra_context_data'):
+            data.update(kwargs['extra_context_data']) 
+        else:
+            data['svn_diff_form'] = forms.DiffForm()
         return data
 
 class Commit(SvnBaseView):
