@@ -55,7 +55,8 @@ Permit us to share your work
         
         The work I contribute to OpenHatch is work I have permission to share.
         I permit anyone to re-use it under the terms of the Affero GPL,
-        version 3 or later. 
+        version 3 or later. Additionally, contributions in the docs/ directory
+        can be shared under the terms of CC Zero 1.0.
 
 
 Submitting your patch series for review
