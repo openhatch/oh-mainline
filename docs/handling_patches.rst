@@ -2,12 +2,6 @@
 How we handle patches
 =====================
 
-This is a page about improving or modifying OpenHatch. We call that
-"Hacking OpenHatch," and there is a whole `category of pages about that`_.
-
-
-.. _category of pages about that: index.html
-
 
 As a patch submitter
 ====================
