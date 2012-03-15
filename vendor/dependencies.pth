@@ -27,6 +27,7 @@ packages/pygeoip
 packages/python-dateutil
 packages/python-memcached
 packages/python-otp
+packages/python-patch
 packages/pytz
 packages/sessionprofile
 packages/six

@@ -55,8 +55,8 @@ class SingleFilePatch(object):
         to get to modifiedfile.txt, do "diff -u originalfile.txt modifiedfile.txt".'
 
         # Check that it will apply correctly to the file.
-        if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
-            raise IncorrectPatch, 'The patch will not apply correctly to the original file.'
+        #if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
+        #   raise IncorrectPatch, 'The patch will not apply correctly to the original file.'
 
 
         # Check that the resulting file matches what is expected.
