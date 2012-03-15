@@ -2,18 +2,12 @@
 Getting started with the OpenHatch code
 =======================================
 
-This is a page about improving or modifying OpenHatch. We call that
-"Hacking OpenHatch," and there is a whole `category of pages about that`_.
-
 To get your own instance of OpenHatch running, follow these steps and then get
 in touch with us.
 
 The code is written in Python. It uses the Django toolkit and tries to stick to
 good software testing practices. If you have Python experience, you should be
 able to get hacking pretty quickly even if you don't know Django or testing.
-
-
-.. _category of pages about that: index.html
 
 
 Getting the source
