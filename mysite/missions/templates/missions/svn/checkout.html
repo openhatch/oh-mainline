@@ -41,9 +41,6 @@
 <form method="post" action="{% url mysite.missions.svn.views.checkout_submit %}#svncheckout-form">{% csrf_token %}
   <div class="form-row">
     <a name="svncheckout-form"></a>
-    {% if svn_checkout_error_message %}
-    <ul class="errorlist"><li>{{ svn_checkout_error_message }}</li></ul>
-    {% endif %}
     {{ svn_checkout_form.secret_word.errors }}
     <br style="clear: left;" />
     Secret word: <br style="clear: left;" />

@@ -33,6 +33,7 @@ from mysite.missions.base.tests import TestCase, subproc_check_output, make_test
 from mysite.missions.svn import views, controllers
 from django.utils.unittest import skipIf
 import mysite.base.depends
+from mysite.missions.svn.forms import DiffForm
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
         "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
@@ -111,8 +112,9 @@ class SvnViewTests(TwillTests):
         try:
             # Check the repository out and make the required change.
             subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
-            new_contents = open(os.path.join(controllers.get_mission_data_path('svn'), controllers.SvnDiffMission.NEW_CONTENT)).read()
-            open(os.path.join(checkoutdir, controllers.SvnDiffMission.FILE_TO_BE_PATCHED), 'w').write(new_contents)
+            new_contents = open(os.path.join(controllers.get_mission_data_path('svn'),
+                              DiffForm.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED), 'w').write(new_contents)
 
             # Make the diff.
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
@@ -135,8 +137,9 @@ class SvnViewTests(TwillTests):
         try:
             # Check the repository out and make the required change.
             subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
-            new_contents = open(os.path.join(controllers.get_mission_data_path('svn'), controllers.SvnDiffMission.NEW_CONTENT)).read()
-            open(os.path.join(checkoutdir, controllers.SvnDiffMission.FILE_TO_BE_PATCHED), 'w').write(new_contents)
+            new_contents = open(os.path.join(controllers.get_mission_data_path('svn'),
+                              DiffForm.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED), 'w').write(new_contents)
 
             # Make the diff.
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)

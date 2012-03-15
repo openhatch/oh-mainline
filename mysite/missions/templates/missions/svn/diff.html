@@ -48,9 +48,6 @@
 <form method="post" action="{% url mysite.missions.svn.views.diff_submit %}#svndiff-form">{% csrf_token %}
   <div class="form-row">
     <a name="svndiff-form"></a>
-    {% if svn_diff_error_message %}
-    <ul class="errorlist"><li>{{ svn_diff_error_message }}</li></ul>
-    {% endif %}
     {{ svn_diff_form.diff.errors }}
     <br style="clear: left;" />
     <code>svn diff</code> output: <br style="clear: left;" />
