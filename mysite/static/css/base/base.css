@@ -6,6 +6,17 @@
 body { font: 11pt Tuffy, Helvetica, sans-serif; background: #f8f8f8; color: #222; width: 100%; margin: 0 auto; padding: 0; }
 .link_like, a , body .ui-widget-content a { color: #ff6d3d; text-decoration: none; cursor:pointer; cursor:hand; }
 
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+    }
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
 /* for Firefox */
 input[type="submit"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, button::-moz-focus-inner { border : 0px; }
 /* for IE8 */
