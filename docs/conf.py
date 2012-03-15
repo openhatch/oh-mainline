@@ -14,7 +14,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'OpenHatch'
-copyright = '2012, OpenHatch'
+copyright = '2012, OpenHatch contributors. Permission to re-use granted under the terms of CC Zero 1.0'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
