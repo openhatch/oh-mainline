@@ -7,6 +7,7 @@
 # Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
 # Copyright (C) 2010 Mark Freeman
 # Copyright (C) 2012 Berry Phillips
+# Copyright (C) 2012 John Morrissey
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -76,6 +77,7 @@ try:
     from bugimporters.google import GoogleBugImporter, GoogleBugParser
     from bugimporters.trac import TracBugImporter, TracBugParser
     from bugimporters.launchpad import LaunchpadBugImporter
+    from bugimporters.github import GitHubBugImporter, GitHubBugParser
 except ImportError:
     BugzillaBugImporter = None
     BugzillaBugParser = None
@@ -86,6 +88,8 @@ except ImportError:
     LaunchpadBugImporter = None
     GoogleBugImporter = None
     GoogleBugParser = None
+    GitHubBugImporter = None
+    GitHubBugParser = None
 # }}}
 
 importer_data_transits = {'bug': bug_data_transit, 'trac': trac_data_transit}
@@ -137,6 +141,9 @@ class FakeGetPage(object):
         self.url2data['https://api.launchpad.net/1.0/bugs/839461doc'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461doc')).read()
         self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461bite'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461bite')).read()
         self.url2data['https://api.launchpad.net/1.0/bugs/839461bite'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461bite')).read()
+        self.url2data['http://github.com/api/v2/json/issues/list/openhatch/misc/open']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'github', 'issue-list')).read()
+        self.url2data['http://github.com/api/v2/json/issues/list/openhatch/misc/closed']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'github', 'issue-list-closed')).read()
+        self.url2data['http://github.com/api/v2/json/issues/show/openhatch/misc/42']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'github', 'issue-show')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -1639,6 +1646,129 @@ I don't see for example the solvers module""",
                   'concerns_just_documentation': True,
                   }
         self.assertEqual(wanted, got)
+
+@skipIf(GitHubBugImporter is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
+class GitHubBugImport(django.test.TestCase):
+    def setUp(self):
+        # Set up the Twisted TrackerModels that will be used here.
+        self.tm = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
+                tracker_name="openhatch's Miscellany",
+                github_name='openhatch',
+                github_repo='misc',
+                bitesized_tag='lowfruit',
+                documentation_tag='docs')
+        self.dm = mock.Mock(name='dm')
+        self.dm.running_deferreds = 0
+        self.im = GitHubBugImporter(
+            self.tm, self.dm, GitHubBugParser, importer_data_transits
+        )
+
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_queries(self):
+        # Make sure we're starting with a clean slate.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        query = mysite.customs.models.GitHubQueryModel()
+        query.tracker = self.tm
+        query.state = 'open'
+
+        self.im.process_queries([query])
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+            'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
+        self.assertEqual(bug.title, 'yo dawg')
+        self.assertEqual(bug.description, 'this issue be all up in ya biz-nass.')
+        self.assertEqual(bug.status, 'open')
+        self.assertEqual(bug.people_involved, 1)
+        self.assertEqual(bug.date_reported,
+            datetime.datetime(2012, 3, 12, 19, 24, 42))
+        self.assertEqual(bug.last_touched,
+            datetime.datetime(2012, 3, 12, 21, 39, 42))
+        self.assertEqual(bug.submitter_username, 'openhatch')
+        self.assertEqual(bug.submitter_realname, '')
+        self.assertEqual(bug.canonical_bug_link,
+            'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
+        self.assertEqual(bug.good_for_newcomers, True)
+        self.assertEqual(bug.bize_size_tag_name, 'lowfruit')
+        self.assertEqual(bug.concerns_just_documentation, False)
+        self.assertFalse(bug.looks_closed)
+
+        # Make sure the new manager finds it.
+        self.assertEqual(Bug.open_ones.all().count(), 1)
+
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_queries_closed(self):
+        # Make sure we're starting with a clean slate.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        query = mysite.customs.models.GitHubQueryModel()
+        query.tracker = self.tm
+        query.state = 'closed'
+
+        self.im.process_queries([query])
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+            'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
+        self.assertEqual(bug.title, 'yo dawg')
+        self.assertEqual(bug.description, 'this issue be all up in ya biz-nass.')
+        self.assertEqual(bug.status, 'closed')
+        self.assertEqual(bug.people_involved, 1)
+        self.assertEqual(bug.date_reported,
+            datetime.datetime(2012, 3, 12, 19, 24, 42))
+        self.assertEqual(bug.last_touched,
+            datetime.datetime(2012, 3, 12, 21, 39, 42))
+        self.assertEqual(bug.submitter_username, 'openhatch')
+        self.assertEqual(bug.submitter_realname, '')
+        self.assertEqual(bug.canonical_bug_link,
+            'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
+        self.assertEqual(bug.good_for_newcomers, True)
+        self.assertEqual(bug.bize_size_tag_name, 'lowfruit')
+        self.assertEqual(bug.concerns_just_documentation, False)
+        self.assertTrue(bug.looks_closed)
+
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_process_bugs(self):
+        # Make sure we're starting with a clean slate.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        self.im.process_bugs((
+            ('http://github.com/api/v2/json/issues/show/openhatch/misc/42', None),
+        ))
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+            'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
+        self.assertEqual(bug.title, 'yo dawg')
+        self.assertEqual(bug.description, 'this issue be all up in ya biz-nass.')
+        self.assertEqual(bug.status, 'open')
+        self.assertEqual(bug.people_involved, 1)
+        self.assertEqual(bug.date_reported,
+            datetime.datetime(2012, 3, 12, 19, 24, 42))
+        self.assertEqual(bug.last_touched,
+            datetime.datetime(2012, 3, 12, 21, 39, 42))
+        self.assertEqual(bug.submitter_username, 'openhatch')
+        self.assertEqual(bug.submitter_realname, '')
+        self.assertEqual(bug.canonical_bug_link,
+            'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
+        self.assertEqual(bug.looks_closed, False)
+        self.assertEqual(bug.good_for_newcomers, True)
+        self.assertEqual(bug.bize_size_tag_name, 'lowfruit')
+        self.assertEqual(bug.concerns_just_documentation, False)
+        self.assertFalse(bug.looks_closed)
+
+        # Make sure the new manager finds it.
+        self.assertEqual(Bug.open_ones.all().count(), 1)
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class DataExport(django.test.TestCase):

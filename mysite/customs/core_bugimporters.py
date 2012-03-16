@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2009 OpenHatch, Inc.
 # Copyright (C) 2012 Berry Phillips
+# Copyright (C) 2012 John Morrissey
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -55,6 +56,13 @@ all_trackers = {
             'model': mysite.customs.models.LaunchpadTrackerModel,
             'form':  mysite.customs.forms.LaunchpadTrackerForm,
             'urlmodel': mysite.customs.models.LaunchpadQueryModel,
+            'urlform': None,
+            },
+        'github': {
+            'namestr': 'GitHub',
+            'model': mysite.customs.models.GitHubTrackerModel,
+            'form':  mysite.customs.forms.GitHubTrackerForm,
+            'urlmodel': mysite.customs.models.GitHubQueryModel,
             'urlform': None,
             },
         }

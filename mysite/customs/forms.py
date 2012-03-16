@@ -1,5 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010, 2011 Jack Grigg
+# Copyright (C) 2012 John Morrissey
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +23,7 @@ import mysite.customs.models
 class TrackerTypesForm(django.forms.Form):
     TRACKER_TYPES = (
             ('bugzilla', 'Bugzilla'),
+            ('github', 'GitHub'),
             ('google', 'Google Code'),
             ('launchpad', 'Launchpad'),
             ('roundup', 'Roundup'),
@@ -88,6 +90,25 @@ class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
 
         # In our case, now is a good time to make sure that a QueryModel gets created
         lqm, _ = mysite.customs.models.LaunchpadQueryModel.objects.get_or_create(tracker=obj)
+
+        # Return the "upstream" return value
+        return obj
+
+class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
+    class Meta:
+        model = mysite.customs.models.GitHubTrackerModel
+
+    def save(self, *args, **kwargs):
+        # Call out to superclass
+        obj = super(GitHubTrackerForm, self).save(*args, **kwargs)
+
+        # Create two QueryModels (one for 'open' bugs, another for 'closed'
+        # bugs), since GitHub's v2 API doesn't let us list all bugs
+        # regardless of status.
+        open_qm, _ = mysite.customs.models.GitHubQueryModel.objects.get_or_create(
+            tracker=obj)
+        closed_qm, _ = mysite.customs.models.GitHubQueryModel.objects.get_or_create(
+            tracker=obj, state='closed')
 
         # Return the "upstream" return value
         return obj
