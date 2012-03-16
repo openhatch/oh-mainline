@@ -28,6 +28,14 @@ apt-get. If you have a Debian or Ubuntu sustem, use the apt-get
 instructions. Otherwise, try pip. (And if it doesn't work, ask for
 help quickly.)
 
+Bug Importers:
+
+If you want to use the customs bug importers they will need to be installed.
+You can do this in one of the following ways;
+
+- pip install git://github.com/openhatch/oh-bugimporters.git  # (readonly)
+- Clone the repo into a folder at the same level as oh-mainline.
+
 #### Re-scaling images
 
 When you add a profile photo, and at other times, the site attempts to

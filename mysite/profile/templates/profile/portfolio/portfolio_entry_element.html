@@ -25,7 +25,7 @@
     {% else %}
         {% if edit_mode %}
             {% if pf_entry.is_published %}
-                class='portfolio_entry published' 
+                class='portfolio_entry published'
             {% else %}
                 class='portfolio_entry unpublished'
             {% endif %}
@@ -57,7 +57,7 @@
                 {% if not edit_mode and not adding_mode %}
                 </a>
                 {% endif %}
-                
+
                 {% if adding_mode %}
                     <input class='project_name' type='text' title="Type a project name" value='' />
                 {% else %}
@@ -180,6 +180,7 @@
         </div>
         {% endif %}
         {% endwith %}
+        <div class="clearer"></div>
     </div>
     {% if edit_mode %}
     <ul class='actions'>

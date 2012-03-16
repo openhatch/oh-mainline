@@ -39,16 +39,17 @@ h1 a:hover { text-decoration: none; }
 
 .clearer { width: 100%; clear: both; float: none;}
 
+
 .module { width: 100%; margin-bottom: 15px; webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; border: 3px solid rgba(100, 200, 255,.3); white; background: rgba(255,255,255,.6); float: left;}
 
 .module > .module-head { background: rgba(100, 200, 255,.3); padding: 2px 20px; }
 
 .module > .module-head ul li a { float: right; padding-top: 5px; }
-.module > .module-body { clear: both; padding: 10px 20px 20px 20px;} 
+.module > .module-body { clear: both; padding: 10px 20px 20px 20px;}
 
 .module > .module-foot { padding: 2px 20px 5px 20px; text-align: right; }
 
-.module > .module-foot .module-foot-left { 
+.module > .module-foot .module-foot-left {
     float: left;
 }
 
@@ -127,7 +128,7 @@ ul#links { margin-left: 20px; }
 
 #footer li { padding: 0 0 0 20px; display: inline; }
 
-#footer a { color: white; } 
+#footer a { color: white; }
 
 h3 { margin-bottom: 0px; text-align: left; clear: left; font-weight: normal; font-size: 1.1em; color: #222; letter-spacing: 0; margin: 0; }
 

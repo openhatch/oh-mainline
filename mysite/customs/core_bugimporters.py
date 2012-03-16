@@ -1,5 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2009 OpenHatch, Inc.
+# Copyright (C) 2012 Berry Phillips
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -15,6 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import mysite.customs.models
 import mysite.customs.forms
+
+from mysite.customs.models import TrackerModel
+from mysite.search.models import Bug
+
 
 all_trackers = {
         'bugzilla': {
@@ -53,3 +58,34 @@ all_trackers = {
             'urlform': None,
             },
         }
+
+
+class AddTrackerForeignKeysToBugs(object):
+
+    def __init__(self, tracker_model, reactor_manager, bug_parser=None, data_sinks_by_type=None, data_transits=None):
+        # Store the tracker model
+        self.tm = tracker_model
+        # Store the reactor manager
+        self.rm = reactor_manager
+
+    def process_bugs(self, list_of_url_data_pairs):
+        # Unzip the list of bugs and discard the data field.
+        bug_urls = [bug_url for (bug_url, bug_data) in list_of_url_data_pairs]
+        # Fetch a list of all Bugs that are stale.
+        bugs = Bug.all_bugs.filter(canonical_bug_link__in=bug_urls)
+        tms = TrackerModel.objects.all().select_subclasses()
+        # For each TrackerModel, process its stale Bugs.
+        bugs_to_retry = []
+        for bug in bugs:
+            tms_shortlist = [tm for tm in tms if tm.get_base_url() in bug.canonical_bug_link]
+            # Check that we actually got something back, otherwise bug.tracker would get
+            # set to None, and self.rm.update_bugs would send it right back here, causing
+            # infinite recursion.
+            if len(tms_shortlist) > 0:
+                # Ideally this should now just be one object, so just take the first.
+                bug.tracker = tms_shortlist[0]
+                bug.save()
+                bugs_to_retry.append(bug)
+        # For the Bugs that now have TrackerModels, update them.
+        if bugs_to_retry:
+            self.rm.update_bugs(bugs_to_retry)
