@@ -333,6 +333,7 @@ try:
 except ImportError:
     try:
         sys.path.append(os.path.join('..', 'oh-bugimporters'))
+        import bugimporters
     except ImportError:
         # meh.
         pass
