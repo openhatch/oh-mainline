@@ -632,7 +632,6 @@ class TestCustomBugParser(django.test.TestCase):
             bug_parser=KDEBugzilla)
         self.assertEqual(bbi.bug_parser, KDEBugzilla)
 
-    # @mock.patch('KDEBugzilla.extract_tracker_specific_data')
     def test_kdebugparser_uses_tracker_specific_method(self):
         with mock.patch('KDEBugzilla.extract_tracker_specific_data') as mock_specific:
             bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
