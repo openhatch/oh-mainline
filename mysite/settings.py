@@ -125,7 +125,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    
+
 )
 
 STATIC_GENERATOR_URLS = (
@@ -178,7 +178,7 @@ TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
 if os.environ.get('USE_XML_TEST_REPORTING', None):
     TEST_RUNNER = 'mysite.testrunner.OpenHatchXMLTestRunner'
 
-# Make test names prettier 
+# Make test names prettier
 TEST_OUTPUT_DESCRIPTIONS = True
 
 TEST_OUTPUT_DIR = "test_output"
@@ -269,6 +269,9 @@ SOUTH_TESTS_MIGRATE = False
 GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
 GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you clone
 
+# This setting is used by the customs bug importers.
+TRACKER_POLL_INTERVAL = 1  # Days
+
 ### Initialize celery
 import djcelery
 djcelery.setup_loader()
@@ -324,3 +327,13 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+try:
+    import bugimporters
+except ImportError:
+    try:
+        sys.path.append(os.path.join('..', 'oh-bugimporters'))
+        import bugimporters
+    except ImportError:
+        # meh.
+        pass

@@ -132,7 +132,7 @@ def update_person_tag_cache(person__pk):
         return
     cache_key = person.get_tag_texts_cache_key()
     django.core.cache.cache.delete(cache_key)
-    
+
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 

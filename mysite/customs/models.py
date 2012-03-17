@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
+# Copyright (C) 2012 John Morrissey
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -79,7 +80,7 @@ class TrackerModel(models.Model):
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
 
     ### This optional attribute specifies a class name, which is intepreted as
-    ### part of the mysite.customs.bugimporters module.
+    ### part of the mysite.customs.core_bugimporters module.
     ###
     ### If the class is specified, we will use custom code from that class
     ### when doing bug parsing.
@@ -95,12 +96,12 @@ class TrackerModel(models.Model):
         It is part of this superclass so that derived classes can use the
         functionality without implementing it themselves. It relies on
         the classes being manually added to
-        mysite.customs.bugimporters.all_trackers.'''
-        import mysite.customs.bugimporters
+        mysite.customs.core_bugimporters.all_trackers.'''
+        import mysite.customs.core_bugimporters
         my_short_name = None
 
-        for short_name in mysite.customs.bugimporters.all_trackers:
-            klass = mysite.customs.bugimporters.all_trackers[short_name]['model']
+        for short_name in mysite.customs.core_bugimporters.all_trackers:
+            klass = mysite.customs.core_bugimporters.all_trackers[short_name]['model']
             if self.__class__ == klass:
                 my_short_name = short_name
                 break
@@ -395,3 +396,41 @@ class LaunchpadQueryModel(TrackerQueryModel):
 
 reversion.register(LaunchpadTrackerModel, follow=["launchpadquerymodel_set"])
 reversion.register(LaunchpadQueryModel)
+
+class GitHubTrackerModel(TrackerModel):
+    '''This model stores the data for individual GitHub repositories'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+        blank=False, null=False,
+        help_text="This is the name that OpenHatch will use to identify the project.")
+    github_name = models.CharField(max_length=200, unique=True,
+        blank=False, null=False,
+        help_text="This is the user or project name on GitHub that owns the project.")
+    github_repo = models.CharField(max_length=200, unique=True,
+        blank=False, null=False,
+        help_text="This is the repository name that GitHub uses to identify the project.")
+    bitesized_tag = models.CharField(max_length=50, blank=True,
+        help_text="This is the value of the GitHub label that indicates a bite-sized bug.")
+    documentation_tag = models.CharField(max_length=50, blank=True,
+        help_text="This is the value of the GitHub label that indicates a documentation bug.")
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+    def get_base_url(self):
+        return '__impossible_to_use_with_github'
+
+class GitHubQueryModel(TrackerQueryModel):
+    '''This model stores query URLs for GitHubTracker objects.'''
+    tracker = models.ForeignKey(GitHubTrackerModel)
+    state = models.CharField(max_length=20, default='open')
+
+    def get_query_url(self):
+        return 'http://github.com/api/v2/json/issues/list/%s/%s/%s' % (
+            self.tracker.github_name, self.tracker.github_repo,
+            self.state,
+        )
+
+reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
+reversion.register(GitHubQueryModel)
