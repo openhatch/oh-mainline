@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 # vim: set ai et ts=4 sw=4:
 
 # This file is part of OpenHatch.
