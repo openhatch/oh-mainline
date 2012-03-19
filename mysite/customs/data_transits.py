@@ -131,7 +131,7 @@ def bug_delete_by_url(bug_url):
 trac_data_transit = {
     'bug_times': trac_bug_times,
     'get_timeline_url': trac_get_timeline_url,
-    'udate_timeline': trac_udate_timeline
+    'update_timeline': trac_udate_timeline
 }
 
 bug_data_transit = {
