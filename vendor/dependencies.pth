@@ -42,6 +42,7 @@ packages/staticgenerator
 packages/twill
 packages/twisted
 packages/typecheck
+packages/unicodecsv
 packages/unittest-xml-reporting/src
 packages/whoosh/src
 packages/zope.interface
