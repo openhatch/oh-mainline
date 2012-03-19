@@ -79,6 +79,7 @@ try:
     from bugimporters.trac import TracBugImporter, TracBugParser
     from bugimporters.launchpad import LaunchpadBugImporter
     from bugimporters.github import GitHubBugImporter, GitHubBugParser
+    import bugimporters.bugzilla # to make mock.patch() happy
 except ImportError:
     BugzillaBugImporter = None
     BugzillaBugParser = None
@@ -634,12 +635,12 @@ class TestCustomBugParser(django.test.TestCase):
         self.assertEqual(bbi.bug_parser, KDEBugzilla)
 
     def test_kdebugparser_uses_tracker_specific_method(self):
-        with mock.patch('KDEBugzilla.extract_tracker_specific_data') as mock_specific:
+        with mock.patch('bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data') as mock_specific:
             bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
                         settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
             bug_data = bugzilla_data.xpath('bug')[0]
 
-            kdebugzilla = KDEBugzilla(bug_data)
+            kdebugzilla = bugimporters.bugzilla.KDEBugzilla(bug_data)
             kdebugzilla.get_parsed_data_dict(base_url='http://bugs.kde.org/',
                                              bitesized_type=None,
                                              bitesized_text='',
