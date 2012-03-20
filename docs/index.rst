@@ -9,6 +9,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   README
+   installation
+   advanced_installation
+   maintenance
    getting_started
    handling_patches
    continuous_integration
