@@ -2163,6 +2163,7 @@ class BugTrackerEditingViews(TwillTests):
 
         assert response.status_code == 404
 
+
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BugzillaTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -2359,3 +2360,4 @@ class LaunchpadTrackerEditingViews(TwillTests):
                          mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
         self.assertEqual(1,
                          mysite.customs.models.LaunchpadQueryModel.objects.all().count())
+
