@@ -29,17 +29,17 @@ kind of a big repository. (Sixty megabytes, or so.)
 How to run a local site
 =======================
 
-Read INSTALLATION.mkd inside
+Read installation.rst inside
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have the repository, open up the `INSTALLATION.mkd`_ file in any text
+Once you have the repository, open up the `installation.rst`_ file in any text
 viewer (like gedit, or your favorite web browser).
 
 Read it, and follow the few short steps to getting your local site going. It
 should take about 5 minutes.
 
 
-.. _INSTALLATION.mkd: https://github.com/openhatch/oh-mainline/blob/master/INSTALLATION.mkd
+.. _installation.rst: installation.html
 
 
 Next steps
