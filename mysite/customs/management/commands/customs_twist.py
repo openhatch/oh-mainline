@@ -79,7 +79,7 @@ try:
 except ImportError:
     # The bugimporters library isn't installed.
     logging.info(("The bugimporters library could not be loaded. "
-            "It may not be installed."))
+            "It might not be installed."))
     pass
 
 
