@@ -54,6 +54,7 @@ try:
     from bugimporters.roundup import RoundupBugImporter
     from bugimporters.bugzilla import BugzillaBugImporter
     from bugimporters.launchpad import LaunchpadBugImporter
+    from bugimporters.github import GitHubBugImporter
 
     tracker2importer.update({
         mysite.customs.models.BugzillaTrackerModel:
@@ -70,10 +71,15 @@ try:
         # Launchpad
         mysite.customs.models.LaunchpadTrackerModel:
             LaunchpadBugImporter,
+        # GitHub
+        mysite.customs.models.GitHubTrackerModel:
+            GitHubBugImporter,
     })
 
 except ImportError:
     # The bugimporters library isn't installed.
+    logging.info(("The bugimporters library could not be loaded. "
+            "It might not be installed. See 'Advanced installation' in the documentation."))
     pass
 
 
