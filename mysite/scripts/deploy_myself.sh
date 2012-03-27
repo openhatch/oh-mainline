@@ -34,11 +34,15 @@ function notify_web_server() {
     touch mysite/scripts/app.wsgi
 }
 
-### Switch into the right place
+### Update the bug import code
+cd ~/oh-bugimporters
+check_for_changed_files
+update_to_latest
+
+### Update the main app
 cd ~/milestone-a
 
 check_for_changed_files
 update_to_latest
 update_database
 notify_web_server
-
