@@ -20,7 +20,7 @@ suite.
 Specifics of the OpenHatch setup
 ================================
 
-Hudson on the web: http://vm3.openhatch.org:8080/ 
+Hudson on the web: http://vm3.openhatch.org:8080/
 
 
 Configuration
@@ -33,16 +33,16 @@ from the OpenHatch codebase.
 * Test the "customs" app
 
   - The tests for the customs app often go out to the network and can
-    break if the remote servers change their APIs. 
+    break if the remote servers change their APIs.
 
 * Test the "search" app
 
   - The volunteer opportunity finder ("search") tests can take a while to
-    run, so we separate them out. 
+    run, so we separate them out.
 
 * Test all apps except customs and search
 
-  - This is the catchall that tests the rest of the code. 
+  - This is the catchall that tests the rest of the code.
 
 
 How to see the list of tests that failed or passed
@@ -50,7 +50,7 @@ How to see the list of tests that failed or passed
 
 * Go to http://linode2.openhatch.org:8080/
 * Choose a project (for example, `Test the search app`_)
-* Click on "Latest Test Result" 
+* Click on "Latest Test Result"
 
 
 .. _Test the search app: http://linode2.openhatch.org:8080/job/Test%20the%20%22search%22%20app/
