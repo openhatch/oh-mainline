@@ -8,9 +8,7 @@ Thanks for checking out our repository. We love this project, hope you do too.
 Installation instructions
 =========================
 
-If you're wondering how to get a local server going, read `installation.rst`_
-
-.. _installation.rst: installation.html
+If you're wondering how to get a local server going, read :doc:`deployment/installation`
 
 
 Thanks to
