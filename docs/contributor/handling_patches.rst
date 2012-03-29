@@ -16,7 +16,7 @@ Before creating a patch series
        that your changes address the issue they are supposed to address.
     4. Run the test suite, and make sure your unit tests pass and all tests that
        passed before your changes still pass.
-    5. Use a tool like `PyChecker`_ to check for bugs. 
+    5. Use a tool like `PyChecker`_ to check for bugs.
 
 
 .. _pep8: http://pypi.python.org/pypi/pep8
@@ -52,7 +52,7 @@ Permit us to share your work
     1. Join our Devel email list by entering your email address into the form at
        http://lists.openhatch.org/mailman/listinfo/devel
     2. Send an email to devel@lists.openhatch.org with a message like:
-        
+
         The work I contribute to OpenHatch is work I have permission to share.
         I permit anyone to re-use it under the terms of the Affero GPL,
         version 3 or later. Additionally, contributions in the docs/ directory
@@ -64,7 +64,7 @@ Submitting your patch series for review
 
     1. Attach your patches to the issue ticket at https://openhatch.org/bugs.
     2. Change the issue status to "in-review".
-    3. Join IRC and say that you have an issue ready for review. 
+    3. Join IRC and say that you have an issue ready for review.
 
 If the reviewer says it's ready to go, your patch set will get deployed in short
 order. If the reviewer has feedback he/she wants addressed, make the necessary
@@ -82,7 +82,7 @@ Apply the patch to your local repository
 
         wget -O- http://git.jackgrigg.com/openhatch/patch/?id=5645afd46de0f0b7ba3a3c7035ff0711b5db9202 | git am --3way
 
-       It's important that you pass the --3way argument to "git am". 
+       It's important that you pass the --3way argument to "git am".
 
 
 Review the patch for correctness and cleanliness
@@ -92,7 +92,7 @@ Things to think about:
 
     1. Does the patch make sense? Does it look readable?::
 
-        git log -p 
+        git log -p
 
     2. If the author hasn't already done this: tell the author
        "Please email devel@lists.openhatch.org saying that you're okay with
@@ -101,13 +101,13 @@ Things to think about:
        option'."
     3. If you have revisions you'd like to see made, change the issue status to
        "in-progress", re-assign the issue to the patch submitter if it isn't
-       already, and leave your review feedback on the ticket. 
+       already, and leave your review feedback on the ticket.
 
 
 Push and deploy
 ~~~~~~~~~~~~~~~
 
-You might need to rope someone else in for this. Anyone in the `Login team`_ 
+You might need to rope someone else in for this. Anyone in the `Login team`_
 can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the
 traditional person to do this, but it's good to ask someone else so they get
 practice!
@@ -122,10 +122,10 @@ Things to know:
         ./scripts/deploy
 
 
-    * When you deploy, check a page or two to make sure things are okay. 
+    * When you deploy, check a page or two to make sure things are okay.
 
 For more details on how we use Hudson and how to force a Hudson build, see
-`Continuous integration with Hudson`_. 
+`Continuous integration with Hudson`_.
 
 .. _Login team: https://openhatch.org/wiki/Login_team
 .. _Continuous integration with Hudson: continuous_integration.html
