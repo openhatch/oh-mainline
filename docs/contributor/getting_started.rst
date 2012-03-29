@@ -54,7 +54,7 @@ but we'll all be happier if you do)
   1. Join the `Devel mailing list`_ and say hello.
   2. `the #openhatch IRC channel in freenode`_.
 
-  We have weekly meetings, typically on Saturdays at 4pm EST (-5 UTC). 
+  We have weekly meetings, typically on Saturdays at 4pm EST (-5 UTC).
 
 
 .. _Devel mailing list: http://lists.openhatch.org/mailman/listinfo/devel
