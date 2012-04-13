@@ -1694,7 +1694,6 @@ class GitHubBugImport(django.test.TestCase):
         self.assertEqual(bug.canonical_bug_link,
             'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
         self.assertEqual(bug.good_for_newcomers, True)
-        self.assertEqual(bug.bize_size_tag_name, 'lowfruit')
         self.assertEqual(bug.concerns_just_documentation, False)
         self.assertFalse(bug.looks_closed)
 
@@ -1731,7 +1730,6 @@ class GitHubBugImport(django.test.TestCase):
         self.assertEqual(bug.canonical_bug_link,
             'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
         self.assertEqual(bug.good_for_newcomers, True)
-        self.assertEqual(bug.bize_size_tag_name, 'lowfruit')
         self.assertEqual(bug.concerns_just_documentation, False)
         self.assertTrue(bug.looks_closed)
 
@@ -1764,7 +1762,6 @@ class GitHubBugImport(django.test.TestCase):
             'http://github.com/api/v2/json/issues/show/openhatch/misc/42')
         self.assertEqual(bug.looks_closed, False)
         self.assertEqual(bug.good_for_newcomers, True)
-        self.assertEqual(bug.bize_size_tag_name, 'lowfruit')
         self.assertEqual(bug.concerns_just_documentation, False)
         self.assertFalse(bug.looks_closed)
 
