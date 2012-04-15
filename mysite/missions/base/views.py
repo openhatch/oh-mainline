@@ -3,6 +3,7 @@
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 # Copyright (C) 2010 John Stumpo
 # Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
+# Copyright (C) 2012 Nathan R. Yergler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +29,8 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-import django.views.generic
+import django.views.generic.base
+import django.views.generic.edit
 
 import os
 from django.utils import simplejson
@@ -89,11 +91,18 @@ class MissionPageState(object):
                 if part_name in self.mission_parts:
                     controllers.unset_mission_completed(profile, part_name)
 
-class MissionBaseView(django.views.generic.TemplateView):
+
+class MissionViewMixin(object):
+    """Support code for Mission Views."""
+
     login_required = False
 
+    mission = None
+    mission_name = None
+    this_mission_page_short_name = None
+
     def get_context_data(self, *args, **kwargs):
-        data = super(MissionBaseView, self).get_context_data()
+        data = super(MissionViewMixin, self).get_context_data()
 
         # Add some OpenHatch-specific stuff through side-effects
         # from a call to as_view().
@@ -115,11 +124,20 @@ class MissionBaseView(django.views.generic.TemplateView):
 
     @classmethod
     def as_view(cls, *args, **kwargs):
-        do_it = lambda: super(MissionBaseView, cls).as_view()
+        do_it = lambda: super(MissionViewMixin, cls).as_view(*args, **kwargs)
         if cls.login_required:
             return login_required(do_it())
         else:
             return do_it()
+
+
+class MissionBaseView(MissionViewMixin, django.views.generic.base.TemplateView):
+    """A Template-based Page in a Mission."""
+
+
+class MissionBaseForm(MissionViewMixin, django.views.generic.edit.BaseFormView):
+    """A Form-based Page in a Mission."""
+
 
 # This is the /missions/ page.
 @view
