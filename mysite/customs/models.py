@@ -315,7 +315,7 @@ class RoundupTrackerModel(TrackerModel):
                                blank=False, null=False, verify_exists=False,
             help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
     closed_status = models.CharField(max_length=200, blank=False,
-            help_text="This is the text that the 'Status' field will contain that indicates a bug is closed.")
+            help_text="This is the text that the 'Status' field will contain that indicates a bug is closed. For multiple values to mean 'closed', separate with commas.")
     bitesized_field = models.CharField(max_length=50, blank=True, default='',
             help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a bite-sized bug. Leave blank if none.")
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
