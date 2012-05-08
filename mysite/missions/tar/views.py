@@ -143,6 +143,6 @@ def creating(request, passed_data={}):
 @view
 def hints(request, passed_data={}):
     state = TarMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Hints'
+    state.this_mission_page_short_name = 'Quick reference'
     return (request, 'missions/tar/hints.html',
             state.as_dict_for_template_context())
