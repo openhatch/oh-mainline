@@ -26,6 +26,7 @@
   <div class="submodule-body body">
       <h3>Tools for working with tar archives</h3>
       <p>If you are running a GNU/Linux distribution, Mac OS X, or another Unix-like operating system, your system almost certainly has the tar program on it already, and you can run it by typing "tar" into a terminal.  If you are running Windows and prefer to try this the Unix way, you can get tar as part of <a href="http://sourceforge.net/projects/mingw/files/MSYS/BaseSystem/msys-1.0.11/MSYS-1.0.11.exe/download">MSYS</a>; many Windows archiving programs, such as <a href="http://www.7-zip.org/">7-Zip</a>, support working with tar archives as well.</p>
+      <p>This page is just a quick reference; see the bottom for other resources.</p>
       <h3>Unpacking (and listing)</h3>
       <p>To unpack a tarball, you can use:</p>
       <pre>tar xvzf <em>[tarball]</em></pre>
@@ -49,9 +50,12 @@
       <p>(The <code>c</code> stands for <strong>c</strong>reate, and the <code>f</code> means that the next argument is the <strong>f</strong>ile you want tar to work with.)</p>
       <p>Common option letters are <code>v</code> (<strong>v</strong>erbose) to make tar list the things it is adding as it goes along and <code>z</code> to make tar g<strong>z</strong>ip the tarball for you rather than giving you an uncompressed one.</p>
       <p>If any of the things listed to include in the tarball is a directory, tar will automatically recursively add everything inside the directory too.  This is part of the reason for the convention of using a single wrapper directory, as then that is the only thing you have to explicitly list when creating the tarball.</p>
-
-      <p>There are many more options to tar, which are detailed in tar's documentation.  The ones mentioned here, though, are the most commonly used ones.</p>
-      <p><a href="http://en.wikipedia.org/wiki/Tar_%28file_format%29">Wikipedia has some good information about the tar program and tarballs.</a></p>
+      <h3>Other resources</h3>
+      <p>There are many more options to tar, which are detailed in tar's documentation.  The ones mentioned here, though, are the most commonly used ones. For further reading:</p>
+      <ul class="raquo_bullets">
+      <li><a href="http://en.wikipedia.org/wiki/Tar_%28file_format%29">Wikipedia has some good information about the tar program and tarballs.</a></li>
+      <li>Tar comes with a user "manual". You can read that by typing <tt>man tar</tt> in a terminal, or by <a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?tar">visiting this page</a>.</li>
+      </ul>
       
   </div>
 </div>
