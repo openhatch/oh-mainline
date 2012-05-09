@@ -7,6 +7,7 @@ Contributor process
 .. toctree::
     :maxdepth: 2
 
+    about_our_community
     getting_started
     handling_patches
 
