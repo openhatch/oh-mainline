@@ -1,31 +1,36 @@
+Move this sentence to at the start of the file, ensuring that it
+starts on the first line (remember about the blank lines!).
+
 This mission is to have you make modifications to a file and submit a
 diff of them. The changes may seem a bit silly, but they will cause the
 diff to contain examples of different types of changes - additions,
 deletions, and changes. Here is what we want you to do to this file:
 
-  0.  Make an exact copy of this step and place it before #1; change the
-      copy's step number to be 0.
+First, open it in a plain text editor, like emacs, vim, gedit, nano,
+Notepad++ (not plain Notepad), TextMate, SubEthaEdit, Sublime,
+Smultron, kate, or something else that programmers typically use. Start
+by using your editor's "Save As" function to create a new file called
+diffsingle-modified.txt. You will need the original file for the
+final step!
 
-  1.  Keep an unmodified copy of this file handy; you'll need it to
-      make the diff once you're finished.
+As you change it, try to keep the formatting intact, as the result
+file will be compared character-for-character. There is exactly one
+blank line between each paragraph. There is never any space at the
+end of a line.
 
-  5.  Move this step so it comes between #1 and #2. (Again, don't
-      renumber the steps.)
+Notice how all the paragraphs have a blank line between them.
 
-  2.  Try to keep the formatting intact, as the result file will be
-      compared character-for-character. There is exactly one blank line
-      between each paragraph and bullet point, and all indentation is
-      done with spaces. There is never trailing whitespace.
+Read this sentence, and leave it alone.
 
-  4.  Leave this step the way it is.
+Take this sentence, and copy it underneath itself (remember the blank line!).
 
-  6.  Make an exact copy of this step and place it before #1; change the
-      copy's step number to be 0.
+Take this sentence, and copy it underneath itself (remember the blank line!).
 
-  7.  There is a typo in this step, which you should fix.
+There is a typo in this sentence, which you should fix.
 
-  8.  Save the changes and make a unified diff of your changes using the
-      diff command. Submit the diff on the page from which you obtained
-      this file.
+Finally, save your changes in your editor and make a unified diff
+of your changes with the diff command. (If you're not sure how,
+look at the mission page for "Hints".) Submit the diff on the page
+from which you obtained the file!
 
 Good luck!
