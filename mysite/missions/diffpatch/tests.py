@@ -238,7 +238,7 @@ class DiffSingleFileTests(TwillTests):
 class DiffRecursiveTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def _calculate_correct_recursive_diff(self):
+    def _calculate_correct_recursive_diff(self, dos_line_endings=False):
         orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
         tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
         diff = StringIO()
@@ -251,7 +251,11 @@ class DiffRecursiveTests(TwillTests):
                 for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
                     line = line.replace(old, new)
                 newlines.append(line)
-            diff.writelines(difflib.unified_diff(oldlines, newlines, 'orig-'+fileinfo.name, fileinfo.name))
+            lines_for_output = list(difflib.unified_diff(oldlines, newlines, 'orig-'+fileinfo.name, fileinfo.name))
+            bytes_for_output = ''.join(lines_for_output)
+            if dos_line_endings:
+                bytes_for_output = bytes_for_output.replace('\n', '\r\n')
+            diff.write(bytes_for_output)
 
         diff.seek(0)
         diff.name = 'foo.patch'
@@ -263,6 +267,15 @@ class DiffRecursiveTests(TwillTests):
 
     def test_do_mission_correctly(self):
         correct_diff = self._calculate_correct_recursive_diff()
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': correct_diff})
+        self.assert_(submit_response.context['diffrecursive_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 1)
+
+    def test_do_mission_correctly_with_dos_line_endings(self):
+        correct_diff = self._calculate_correct_recursive_diff(dos_line_endings=True)
+        self.assertTrue('\r\n' in correct_diff.getvalue())
         submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': correct_diff})
         self.assert_(submit_response.context['diffrecursive_success'])
 
