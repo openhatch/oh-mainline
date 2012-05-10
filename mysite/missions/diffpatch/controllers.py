@@ -90,8 +90,7 @@ class DiffRecursiveMission(object):
     TARBALL_NAME = ORIG_DIR + '.tar.gz'
     SUBSTITUTIONS = [('aubergine', 'eggplant'),
                      ('Aubergine', 'Eggplant')]
-    ALTERNATE_FILENAMES = {'Skillet.txt': 'AubergineAndChickpeaSkillet.txt',
-                           'Grilled.txt': 'GrilledAubergine.txt'}
+    ALTERNATE_FILENAMES = {'Skillet.txt': 'AubergineAndChickpeaSkillet.txt'}
 
     @staticmethod
     def name_new2old(s):
@@ -157,8 +156,8 @@ class DiffRecursiveMission(object):
             try:
                 index = the_patch.source.index(filename)
             except ValueError:
-                # Hmm. The user submitted some file with a filename
-                # we didn't really recognize.
+                # A file the user was supposed to modify was not included in
+                # the patch.
                 #
                 # We did rename a bunch of the files a little while ago.
                 # Maybe we can process their submission anyway by looking for
