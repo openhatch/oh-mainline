@@ -853,6 +853,15 @@ class RoundupBugImporterTests(django.test.TestCase):
         print self.tm
         self.assertTrue(self.tm.get_edit_url())
 
+    def test_bug_import_works_with_comma_separated_closed_status(self):
+        # First, change the environment -- pretend the user on the web interface
+        # said that there are two status values that mean 'closed' for
+        # the Mercurial project.
+        self.tm.closed_status = 'wontfix,resolved'
+        # Now, run an existing test -- this verifies that looks_closed
+        # is set to True.
+        self.test_new_mercurial_bug_import()
+
     def test_new_mercurial_bug_import(self, second_run=False):
         # Check the number of Bugs present.
         all_bugs = Bug.all_bugs.all()
