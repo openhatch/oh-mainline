@@ -40,7 +40,7 @@ body#project form.active a.collapse_answer_form { padding: 3px; margin: 10px 0 0
 body#project form.active input[type='submit'] { margin-bottom: 5px;}
 body#project form.is_edit_form { display: none; }
 
-body#project .input-note { float: right; width: 80%; font-size: .9em; color: #686868; }
+body#project .input-note { clear: both; float: right; width: 100%; font-size: .9em; color: #686868; }
 body#project .input-note .tips { float: right; width: 70%; font-size: .9em; color: #686868; }
 body#project .input-note p { margin: 3px 0 6px;  }
 body#project .input-note li { list-style: circle; margin: 3px 0 3px 20px ! important; }
