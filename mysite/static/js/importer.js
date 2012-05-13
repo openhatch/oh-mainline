@@ -286,6 +286,11 @@ $.fn.textSmart = function(text) {
     if (this.text() != text) { this.text(text); }
 };
 
+$.fn.attrSmart = function(attr, text) {
+    // Only replace attribute if attribute is different.
+    if (this.attr(attr) != text) { this.attr(attr, text) };
+};
+
 $.fn.htmlSmart = function(html) {
     // Only replace html if html is different.
     if (this.html() != html) { this.html(html); }
@@ -402,9 +407,15 @@ function updatePortfolio(response) {
             }
         }
 	    
-	    /* project_name */
-	    $(".project_name", $new_portfolio_entry).textSmart(
-                project_we_refer_to.fields.name);
+        /* project_name */
+        var $pname = $(".project_name", $new_portfolio_entry);
+        var $addto = $pname;
+        var $link = $('a', $pname);
+        if ($link && $link.length) {
+            $link.attrSmart('href', '/+projects/' + project_we_refer_to.fields.name);
+            $addto = $link;
+        }
+        $addto.textSmart(project_we_refer_to.fields.name);
 	    
 	    /* experience_description */
 	    $(".experience_description", $new_portfolio_entry).textSmart(
