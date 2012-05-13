@@ -256,10 +256,10 @@ WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
 
 SERVER_NAME='openhatch.org'
 
-SVN_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn')
+SVN_REPO_PATH = os.path.abspath(os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn'))
 
 # This should include a trailing slash.
-SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
+SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/' # For local sites, this is what you checkout
 
 # The script to invoke for management commands in this environment.
 PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
