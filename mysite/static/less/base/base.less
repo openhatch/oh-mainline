@@ -19,8 +19,8 @@
 @page-bg: @lightest-grey url('/static/images/light-hatch.png') repeat;
 
 .nav-bg {
-    @dark-grey url('/static/images/dark-hatch.png') repeat;
-    box-shadow: 0 0 7px @dark-grey;
+    background: @dark-grey url('/static/images/dark-hatch.png') repeat;
+    .box-shadow(0, 0, 7px, @dark-grey);
 }
 
 @default-text-color: @darkest-grey;
@@ -31,17 +31,35 @@
 @module-interior: rgba(255,255,255,.6);
 @emphasized-module-interior: @white;
 
-/* width and padding stuff */
+/* size, width and padding stuff */
 
 @total-width: 1000px;
+@normal-size: 11pt;
 
 .width-and-padding(@parent-width, @padding) {
     padding-left: @padding;
     padding-right: @padding;
     width: @parent-width - @padding * 2;
 }
+    
+/* CSSTODO -- do we use these actually?*/
+.enormous {
+    font-size: 3em;
+}
 
-/* other mixins */
+.fairly-big {
+    font-size: 1.7em;
+}
+
+.enormous > div {
+    margin-bottom: 1em;
+}
+
+.normal-size {
+    font-size: @normal-size;
+}
+
+/* other useful mixins */
 
 .border-radius (@radius: 8px) {
   border-radius: @radius;
@@ -49,12 +67,17 @@
   -webkit-border-radius: @radius;
 }
 
-.centered { margin: 0 auto; }
+.box-shadow (@x: 0, @y: 0, @blur: 5px, @color: #000) {
+  box-shadow: @arguments;
+  -moz-box-shadow: @arguments;
+  -webkit-box-shadow: @arguments;
 }
+
+.centered { margin: 0 auto; }
 
 /* styles */
 
-body { font: 11pt Tuffy, Helvetica, sans-serif; background: @lightest-grey; color: @default-text-color; width: 100%; margin: 0 auto; padding: 0; }
+body { font: @normal-size Tuffy, Helvetica, sans-serif; background: @lightest-grey; color: @default-text-color; width: 100%; .centered; padding: 0; }
 
 .link_like, a, body .ui-widget-content a { color: @orange; text-decoration: none; cursor:pointer; cursor:hand; }
 
@@ -86,41 +109,58 @@ a:hover, .ui-widget-content a:hover { text-decoration: underline; }
 a img { border-style: none; }
 
 abbr { border-bottom: 1px dotted #999; }
+abbr.foss { border: 0; font-variant: small-caps;}
 
 h1 a, h1 a:hover { text-decoration: none; }
 
 #container { width: @total-width; padding-bottom: 30px; .centered;}
 
-.module { width: 100%; margin-bottom: 15px; .border-radius(4px); border: @module-border; background: @module-interior; float: left;}
-
-.module > .module-head { background: @module-border-color; padding: 2px 20px; }
-
-.module > .module-head ul li a { float: right; padding-top: 5px; }
-.module > .module-body { clear: both; padding: 10px 20px 20px 20px;} 
-
-.module > .module-foot { padding: 2px 20px 5px 20px; text-align: right; }
-
-.module > .module-foot .module-foot-left { 
+.module { 
+    width: 100%; 
+    margin-bottom: 15px; 
+    .border-radius(4px); 
+    border: @module-border; 
+    background: @module-interior; 
     float: left;
+
+    .module-head { 
+        background: @module-border-color; 
+        padding: 2px 20px; 
+        ul li a { float: right; padding-top: 5px; }
+        h3 { text-shadow: 0 1px 0 #fff; float: none; padding: 4px 10px 7px 0; font-size: 1.2em;}
+    }
+    .module-body { clear: both; padding: 10px 20px 20px 20px;} 
+    .module-foot { 
+        padding: 2px 20px 5px 20px; 
+        text-align: right; 
+        .module-foot-left { 
+            float: left;
+        }
+    }
 }
 
 .submodule-container {
-float: none;
-clear: both;
-margin: 0 auto;
-width: 100%;
+    float: none;
+    clear: both;
+    width: 100%;
+    .centered;
 }
 
-.submodule { background-color: @emphasized-module-interior; margin: 0 10px 20px 0; padding: 8px 10px; border: @submodule-border; float: left; }
+.submodule {
+    background-color: @emphasized-module-interior; 
+    margin: 0 10px 20px 0; 
+    padding: 8px 10px; 
+    border: @submodule-border; 
+    float: left;
 
-.submodule-head {
-    margin-bottom: 5px;
+    .submodule-head {
+        margin-bottom: 5px;
+    }
+
+    .submodule-body {
+        clear: both;
+    }
 }
-
-.submodule-body {
-clear: both;
-}
-
 ul { padding: 0; margin: 0; list-style: none; }
 
 h1, h2, h3, h4, h5 { margin: 0; clear: both;}
@@ -137,55 +177,58 @@ h1 {
     }
 
 #nav {
-    margin: 0 auto;
+    .centered;
     padding-top: 3px;
     border-top: 0;
     .width-and-padding(@total-width, 20px);
+
+    h1 { float: left; }
+    ul { list-style: none; margin: 0; float: right; }
+    li { float: right; margin-left: 20px; margin-top: 10px; }
 }
-
-#nav h1 { float: left; }
-#nav ul { list-style: none; margin: 0; float: right; }
-#nav li { float: right; margin-left: 20px; margin-top: 10px; }
-
 
 #pagetop { padding: 0; clear: both; .width-and-padding(@total-width, 20px);}
 
-.up-top { padding: 0; margin-bottom: -15px;
-}
+.up-top { padding: 0; margin-bottom: -15px;}
 
 ul#links { margin-left: 20px; }
 
 #links li { display: inline; font-size: 12pt; margin-top: 20px; }
 
-#account-links #username { font-weight: bold; }
+#account-links, #topnavlinks { 
+    float: right; 
+    #username { font-weight: bold; }
+    li { margin: 15px 0; }
+    a { float: left; padding: 5px 10px; color: white; }
+}
 
-#account-links { float: right; }
-
-#nav ul#topnavlinks { float: left; padding-left: 10px; }
-
-#topnavlinks li, #account-links li { margin: 15px 0; }
-
-#topnavlinks li { font-size: 1.1em; }
-
-#topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: white; }
+#topnavlinks { 
+    float: left; 
+    li { font-size: 1.1em; }
+}
 
 #content { padding: 10px 0 30px 0; clear: both; .width-and-padding(@total-width, 20px); }
 
 #footer-wrapper { width: 100%; clear: both; padding-top: 40px;}
 
-#footer { width: 100%; position: fixed; bottom: 0; padding: 10px 0px; margin: 0 auto; text-align: right; z-index: 1005; .nav-bg;}
+#footer { 
+    width: 100%; 
+    position: fixed; 
+    bottom: 0; 
+    padding: 10px 0px; 
+    text-align: right; 
+    z-index: 1005; 
+    .centered; 
+    .nav-bg;
 
-#footer ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
-
-#footer li { padding: 0 0 0 20px; display: inline; }
-
-#footer a { color: white; } 
+    ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
+    li { padding: 0 0 0 20px; display: inline; }
+    a { color: @white; } 
+}
 
 h3 { margin-bottom: 0px; text-align: left; clear: left; font-weight: normal; font-size: 1.1em; color: @default-text-color; letter-spacing: 0; margin: 0; }
 
 h3.nofloat { float: none; }
-
-.module > .module-head h3 { text-shadow: 0 1px 0 #fff; float: none; padding: 4px 10px 7px 0; font-size: 1.2em;}
 
 img.show-more-link {
     float: right;
@@ -210,15 +253,16 @@ input[type='submit'] {
 }
 .alert {
     padding: 15px 0;
+    div {
+        background-color: #ffa;
+        color: #444;
+        padding: 8px 15px;
+        width: 700px;
+        font-size: 11pt;
+        .border-radius(5px);
+    }
 }
-.alert div {
-    background-color: #ffa;
-    color: #444;
-    padding: 8px 15px;
-    width: 700px;
-    font-size: 11pt;
-    .border-radius(5px);
-}
+
 img {
     border: 0;
 }
@@ -251,10 +295,12 @@ input[type='submit'] {
     color: @dark-grey;
     float: right;
 }
-abbr.foss {
-    border: 0;
-    font-variant: small-caps;
+
+#notifications {
+    text-align: center;
+    float: left;
 }
+
 .notification {
     float: left;
     width: 95%;
@@ -263,16 +309,14 @@ abbr.foss {
     color: @emphasized-text-color;
     margin-bottom: 10px;
 }
-#notifications {
-    text-align: center;
-    float: left;
-}
-.errorlist ul {
+
+.errorlist {
+    ul {
     float: left;
     margin: 0;
     padding: 0;
-}
-.errorlist li {
+    }
+    li {
     float: left;
     padding: 5px 10px;
     width: 410px;
@@ -280,7 +324,9 @@ abbr.foss {
     background-color: #ffe4e4;
     margin: 10px 0;
     .border-radius(5px);
+    }
 }
+
 #normal_login_form li {
     list-style: none;
 }
@@ -288,56 +334,53 @@ abbr.foss {
 dt { font-size: 120%; }
 dd { margin-top: .5em; margin-left: 1.2em; }
 
-#greeting { background-color: rgb(255, 255, 200); background-color: rgba(255, 255, 200, 0.5); .border-radius; padding: 2%; width: 96%; margin-top: 10px; border: 4px solid #fff; float: left; }
+#greeting { background-color: rgb(255, 255, 200); background-color: rgba(255, 255, 200, 0.5); -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 2%; width: 96%; margin-top: 10px; border: 4px solid #fff; float: left; }
     #greeting #about-openhatch { font-size: 140%; float: left; width: 100%; margin-right: 20px; }
     #greeting #invitation { font-size: 120%; margin-top: 10px; text-align: center; float: left; width: 100%; }
     #greeting #next-steps { float: left; width: 100%; }
     #greeting #next-steps li { font-size: 120%; float: left; width: 210px; margin: 10px 20px 0 0; }
 
-#error #content { padding: 0 300px; }
-    #error #content .module { width: 400px; }
-    #error #content .module .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
-    #error #content .module .body { width: 90%; }
+#error #content { padding: 0 300px; 
+    .module { width: 400px; 
+        .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
+        .body { width: 90%; }
+    }
+}
 
 .head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
 .head .more { float: right; padding: 3px; }
 
-body ul.raquo_bullets { margin-left: 0; padding-left: .6em; text-indent: -1em; list-style: none; }
-body ul.raquo_bullets li { margin-bottom: .4em; }
-body ul.raquo_bullets li:last-child { margin-bottom: 0; }
-body ul.raquo_bullets li:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
+body ul.raquo_bullets { 
+    margin-left: 0; 
+    padding-left: .6em; 
+    text-indent: -1em; 
+    list-style: none; 
+    li { margin-bottom: .4em; 
+        &:last-child { margin-bottom: 0; }
+        &:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
+    }
+}
 
-body#login .post_login_action_explanation { color: #444; font-size: 1.5em; .border-radius; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #faffaa; }
+/* CSSTODO */
+body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #faffaa; }
 
 ol > li { margin: 15px 0; }
 
-input[rel='hint'].blur { color: @medium-grey; }
+/* CSSTODO I think this is just missions*/
+input[rel='hint'].blur { color: #777; }
 
+/* CSSTODO */
 body#people-map #search_engine_is_down_message { float: left; display: block; margin-top: 1em; margin-bottom: 0; font-size: 1.3em; }
 
 .ajax-loader-circle-txt-medium { display: inline-block; line-height: 32px; padding-left: 32px; background: url('/static/images/throbber.gif') no-repeat left; font-weight: bold; color: #444 }
 
-.enormous {
-    font-size: 3em;
-}
-
-.fairly-big {
-    font-size: 1.7em;
-}
-
-.enormous > div {
-    margin-bottom: 1em;
-}
-
-.normal-size {
-    font-size: 11pt;
-}
-
 /* Stuff for jQuery UI Tabs */
+/* CSSTODO */
 .ui-tabs-hide { display: none !important; }
 .tab_nav .ui-state-active { font-weight: bold; }
 
 /* Stuff initially for the events page */
+/* CSSTODO */
 .module .left-image {
     width: 180px;
     height: 180px;
