@@ -145,13 +145,8 @@ urlpatterns = patterns('',
         (r'^missions/git/rebase$', 'mysite.missions.git.views.rebase'),
         (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
 
-        (r'^missions/windows-setup$', mysite.missions.setup.views.WindowsMainPage.as_view(), None, 'missions-windows-setup-main-page'),
-        (r'^missions/windows-setup/install-git-bash$', mysite.missions.setup.views.WindowsInstallGitBash.as_view(), None, 'missions-windows-setup-install-git-bash'),
-        (r'^missions/windows-setup/open-git-bash-prompt$', mysite.missions.setup.views.WindowsOpenPrompt.as_view(), None, 'missions-windows-setup-open-git-bash-prompt'),
-        (r'^missions/windows-setup/understand-prompt$', mysite.missions.setup.views.WindowsUnderstandPrompt.as_view(), None, 'missions-windows-setup-understand-prompt'),
-        (r'^missions/windows-setup/navigating$', mysite.missions.setup.views.WindowsBrowseFiles.as_view(), None, 'missions-windows-setup-navigating'),
-        (r'^missions/windows-setup/quick-reference$', mysite.missions.setup.views.WindowsQuickReference.as_view(), None, 'missions-windows-setup-quick-reference'),
-        (r'^missions/windows-setup/alternatives$', mysite.missions.setup.views.WindowsAlternatives.as_view(), None, 'missions-windows-setup-alternatives'),
+        (r'^missions/windows-setup',
+         include(mysite.missions.setup.views.WindowsSetup.urls())),
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
