@@ -42,7 +42,7 @@ If you already have an "oh-mainline" directory on your computer, then
 you already have the code. If you're reading this file on the web,
 then you need to run::
 
-  git clone git://github.com/openhatch/oh-mainline.git
+  git clone https://github.com/openhatch/oh-mainline.git
 
 You probably have already done this, though, and can jump to the next
 step.

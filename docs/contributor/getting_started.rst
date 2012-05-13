@@ -20,7 +20,7 @@ To make contributions, you will need to clone our git repository. This requires
 having the git version control system installed. Once you do, type this into a
 terminal::
 
-    $ git clone git://github.com/openhatch/oh-mainline.git
+    $ git clone https://github.com/openhatch/oh-mainline.git
 
 It will take up to five minutes, depending on your Internet connection. it's
 kind of a big repository. (Sixty megabytes, or so.)
