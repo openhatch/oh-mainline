@@ -1,0 +1,419 @@
+/* fonts */
+
+@font-face { font-family: Tuffy; src: url('/static/fonts/tuffy_regular.ttf');}
+@font-face { font-family: Tuffy; font-weight: bold; src: url('/static/fonts/tuffy_bold.ttf');}
+@font-face { font-family: Tuffy; font-style: italic; src: url('/static/fonts/tuffy_italic.ttf');}
+@font-face { font-family: Tuffy; font-weight: bold; font-style: italic; src: url('/static/fonts/tuffy_bold_italic.ttf');}
+
+/* coloration */
+
+@lightest-grey: #f8f8f8;
+@medium-grey: #666;
+@dark-grey: #333;
+@darkest-grey: #222;
+@black: #000;
+@orange: #FF6D3D;
+@white: #FFF;
+@trans-blue: rgba(100, 200, 255,.3);
+
+@page-bg: @lightest-grey url('/static/images/light-hatch.png') repeat;
+
+.nav-bg {
+    background: @dark-grey url('/static/images/dark-hatch.png') repeat;
+    .box-shadow(0, 0, 7px, @dark-grey);
+}
+
+@default-text-color: @darkest-grey;
+@emphasized-text-color: @black;
+@module-border-color: @trans-blue;
+@module-border: 3px solid @module-border-color;
+@submodule-border: 2px dashed #e4e4e4;
+@module-interior: rgba(255,255,255,.6);
+@emphasized-module-interior: @white;
+
+/* size, width and padding stuff */
+
+@total-width: 1000px;
+@standard-padding: 20px;
+
+@padding-between-columns: @standard-padding;
+@column-width: ((@total-width - @padding-between-columns * 2) / 3) - @padding-between-columns;
+
+@normal-size: 11pt;
+
+.width-and-padding(@parent-width: @total-width, @padding: @standard-padding) {
+    padding-left: @padding;
+    padding-right: @padding;
+    width: @parent-width - @padding * 2;
+}
+    
+/* CSSTODO -- do we use these actually?*/
+.enormous {
+    font-size: 3em;
+}
+
+.fairly-big {
+    font-size: 1.7em;
+}
+
+.enormous > div {
+    margin-bottom: 1em;
+}
+
+.normal-size {
+    font-size: @normal-size;
+}
+
+/* other useful mixins */
+
+.border-radius (@radius: 8px) {
+  border-radius: @radius;
+  -moz-border-radius: @radius;
+  -webkit-border-radius: @radius;
+}
+
+.box-shadow (@x: 0, @y: 0, @blur: 5px, @color: #000) {
+  box-shadow: @arguments;
+  -moz-box-shadow: @arguments;
+  -webkit-box-shadow: @arguments;
+}
+
+.screw-you-webkit { -webkit-margin-before: 0; -webkit-margin-after: 0;}
+
+.centered { margin: 0 auto; }
+
+/* styles */
+
+body { font: @normal-size Tuffy, Helvetica, sans-serif; background: @lightest-grey url('/static/images/light-hatch.png') repeat; color: @default-text-color; width: 100%; .centered; padding: 0; }
+
+.link_like, a, body .ui-widget-content a { color: @orange; text-decoration: none; cursor:pointer; cursor:hand; }
+
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+    }
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+/* deprecated; to remove in favor of .clearfix */
+.clearer { width: 100%; clear: both; float: none;}
+
+/* for Firefox */
+input[type="submit"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, button::-moz-focus-inner { border : 0px; }
+/* for IE8 */
+input[type="submit"]:focus, input[type="button"]:focus { outline : none; }
+
+.alt-text { left: -9999px; position: absolute; }
+/* ^^^ display: none would hide this from screenreaders. Let's hide this off stage left instead. */
+
+.hidden { display: none }
+
+a:hover, .ui-widget-content a:hover { text-decoration: underline; }
+a img { border-style: none; }
+
+abbr { border-bottom: 1px dotted #999; }
+abbr.foss { border: 0; font-variant: small-caps;}
+
+h1 a, h1 a:hover { text-decoration: none; }
+
+#container { width: @total-width; padding-bottom: 30px; .centered;}
+
+.module { 
+    width: 100%; 
+    margin-bottom: 15px; 
+    .border-radius(4px); 
+    border: @module-border; 
+    background: @module-interior; 
+    float: left;
+
+    .module-head { 
+        background: @module-border-color; 
+        padding: 2px 20px; 
+        ul li a { float: right; padding-top: 5px; }
+        h3 { text-shadow: 0 1px 0 #fff; float: none; padding: 4px 10px 7px 0; font-size: 1.2em;}
+    }
+    .module-body { clear: both; padding: 10px @standard-padding @standard-padding @standard-padding;} 
+    .module-foot { 
+        padding: 2px @standard-padding 5px @standard-padding; 
+        text-align: right; 
+        .module-foot-left { 
+            float: left;
+        }
+    }
+}
+
+.submodule-container {
+    float: none;
+    clear: both;
+    width: 100%;
+    .centered;
+}
+
+.submodule {
+    background-color: @emphasized-module-interior; 
+    margin: 0 10px @standard-padding 0; 
+    padding: 8px 10px; 
+    border: @submodule-border; 
+    float: left;
+
+    .submodule-head {
+        margin-bottom: 5px;
+    }
+
+    .submodule-body {
+        clear: both;
+    }
+}
+ul { padding: 0; margin: 0; list-style: none; }
+
+h1, h2, h3, h4, h5 { margin: 0; clear: both;}
+
+h1 {
+    font-weight: normal;
+    font-size: 23pt;
+}
+
+#nav-container {
+    width: 100%;
+    height: 67px;
+    .nav-bg;
+    }
+
+#nav {
+    .centered;
+    padding-top: 3px;
+    border-top: 0;
+    .width-and-padding(@total-width, @standard-padding);
+
+    h1 { float: left; }
+    ul { list-style: none; margin: 0; float: right; }
+    li { float: right; margin-left: 20px; margin-top: 10px; }
+}
+
+#pagetop { padding: 0; clear: both; .width-and-padding(@total-width, @standard-padding);}
+
+.up-top { padding: 0; margin-bottom: -15px;}
+
+ul#links { margin-left: 20px; }
+
+#links li { display: inline; font-size: 12pt; margin-top: 20px; }
+
+#account-links, #topnavlinks { 
+    float: right; 
+    #username { font-weight: bold; }
+    li { margin: 15px 0; }
+    a { float: left; padding: 5px 10px; color: white; }
+}
+
+#topnavlinks { 
+    float: left; 
+    li { font-size: 1.1em; }
+}
+
+#content { padding: 10px 0 30px 0; clear: both; .width-and-padding(@total-width, @standard-padding); }
+
+#footer-wrapper { width: 100%; clear: both; padding-top: 40px;}
+
+#footer { 
+    width: 100%;  
+    bottom: 0; 
+    padding: 10px 0px; 
+    text-align: right; 
+    .centered; 
+    .nav-bg;
+
+    ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
+    li { display: block; text-align: left; padding-left: 0; margin-bottom: 0.3em; }
+    a { color: @white; } 
+    h3 { color: #ddd; font-size: 1em; margin-bottom: 0.8em; }
+    
+    .threecol { 
+        width: 960px; padding: 0 20px; margin: 0 auto; text-align: left;
+    }
+    .column { width: 210px; display: inline-block; margin: 0px 5px; vertical-align: top; text-align: left; float: none; }
+
+}
+
+h3 { margin-bottom: 0px; text-align: left; clear: left; font-weight: normal; font-size: 1.1em; color: @default-text-color; letter-spacing: 0; margin: 0; }
+
+h3.nofloat { float: none; }
+
+img.show-more-link {
+    float: right;
+    position: relative;
+    top: 1px;
+}
+.widget {
+    float: left;
+    width: 400px;
+    margin-bottom: 20px;
+}
+input[type='text'], input[type='password'], input[type='file'], textarea {
+    padding: 5px;
+    font-size: 11pt;
+    float: left;
+}
+input[type='submit'] {
+    padding: 1px 8px;
+    color: @default-text-color;
+    font-weight: bold;
+    float: left;
+}
+.alert {
+    padding: 15px 0;
+    div {
+        background-color: #ffa;
+        color: #444;
+        padding: 8px 15px;
+        width: 700px;
+        font-size: 11pt;
+        .border-radius(5px);
+    }
+}
+
+img {
+    border: 0;
+}
+
+img.left { float: left; padding: 0 10px @standard-padding 0;}
+img.right { float: right; padding: 0 0 @standard-padding 10px;}
+
+.usernames {
+    font-size: 10pt;
+}
+#info .tag-type {
+    font-weight: normal;
+    display: block;
+    font-size: 8pt;
+}
+.aka {
+}
+.column {
+    float: left;
+    margin-right: 10px;
+}
+h4, .cute-header {
+    font-size: 9pt;
+    color: @medium-grey;
+    float: left;
+    margin: 0;
+    padding: 1px;
+}
+input[type='submit'] {
+    color: @dark-grey;
+    float: right;
+}
+
+#notifications {
+    text-align: center;
+    float: left;
+}
+
+.notification {
+    float: left;
+    width: 95%;
+    .border-radius;
+    padding: 10px;
+    color: @emphasized-text-color;
+    margin-bottom: 10px;
+}
+
+.errorlist {
+    ul {
+    float: left;
+    margin: 0;
+    padding: 0;
+    }
+    li {
+    float: left;
+    padding: 5px 10px;
+    width: 410px;
+    color: #522;
+    background-color: #ffe4e4;
+    margin: 10px 0;
+    .border-radius(5px);
+    }
+}
+
+#normal_login_form li {
+    list-style: none;
+}
+
+dt { font-size: 120%; }
+dd { margin-top: .5em; margin-left: 1.2em; }
+
+#greeting { background-color: rgb(255, 255, 200); background-color: rgba(255, 255, 200, 0.5); -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 2%; width: 96%; margin-top: 10px; border: 4px solid #fff; float: left; }
+    #greeting #about-openhatch { font-size: 140%; float: left; width: 100%; margin-right: 20px; }
+    #greeting #invitation { font-size: 120%; margin-top: 10px; text-align: center; float: left; width: 100%; }
+    #greeting #next-steps { float: left; width: 100%; }
+    #greeting #next-steps li { font-size: 120%; float: left; width: 210px; margin: 10px 20px 0 0; }
+
+#error #content { padding: 0 300px; 
+    .module { width: 400px; 
+        .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
+        .body { width: 90%; }
+    }
+}
+
+.head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
+.head .more { float: right; padding: 3px; }
+
+body ul.raquo_bullets { 
+    margin-left: 0; 
+    padding-left: .6em; 
+    text-indent: -1em; 
+    list-style: none; 
+    li { margin-bottom: .4em; 
+        &:last-child { margin-bottom: 0; }
+        &:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
+    }
+}
+
+/* CSSTODO */
+body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #faffaa; }
+
+ol > li { margin: 15px 0; }
+
+/* CSSTODO I think this is just missions*/
+input[rel='hint'].blur { color: #777; }
+
+/* CSSTODO */
+body#people-map #search_engine_is_down_message { float: left; display: block; margin-top: 1em; margin-bottom: 0; font-size: 1.3em; }
+
+.ajax-loader-circle-txt-medium { display: inline-block; line-height: 32px; padding-left: 32px; background: url('/static/images/throbber.gif') no-repeat left; font-weight: bold; color: #444 }
+
+/* Stuff for jQuery UI Tabs */
+/* CSSTODO */
+.ui-tabs-hide { display: none !important; }
+.tab_nav .ui-state-active { font-weight: bold; }
+
+/* Stuff initially for the events page */
+/* CSSTODO */
+.module .left-image {
+    width: 180px;
+    height: 180px;
+    float: left;
+    margin-right: 10px;
+}
+
+.module .name-of-event {
+    font-size: 180%;
+    margin-bottom: 1em;
+}
+
+.module .rest-of-box {
+    margin: 15px;
+}
+
+.module .little-read-more {
+    width: 100px;
+    float: right;
+}
+
+.module .link-without-style {
+    color: inherit;
+}
