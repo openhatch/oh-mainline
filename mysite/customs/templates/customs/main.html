@@ -44,7 +44,7 @@ Customs
         </div>
         {% endif %}
         {% block customs_content %}
-        <form name={% block form_name %}{% endblock %} method='POST'
+        <form class="clearfix" name={% block form_name %}{% endblock %} method='POST'
             action={% block form_action %}{% endblock %}>{% csrf_token %}
             {% block form_body %}{% endblock %}
             <p> <input type='submit'
