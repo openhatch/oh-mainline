@@ -14,7 +14,7 @@ up once an hour, checks the git repository for new commits, and runs the test
 suite.
 
 
-.. _more on Wikipedia: https://secure.wikimedia.org/wikipedia/en/wiki/Continuous_integration
+.. _more on Wikipedia: https://en.wikipedia.org/wiki/Continuous_integration
 
 
 Specifics of the OpenHatch setup
