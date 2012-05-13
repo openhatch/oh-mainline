@@ -36,6 +36,7 @@
         <meta http-equiv='Content-Language' content='en-us' />
         <meta name='Description' content='OpenHatch, the open source involvement engine.'>
 
+        <link rel="stylesheet/less" type="text/css" href="{% version '/static/less/base/base.less' %}">
         <style type='text/css'> /*<![CDATA[*/
             {% block css %}
 
@@ -50,9 +51,6 @@
             {% endcomment %}
 
             body { 
-                background: #f8f8f8 url('/static/images/light-hatch.png') repeat; }
-            #nav-container {
-                background: #333 url('/static/images/dark-hatch.png') repeat; }
             #landing a.blog-feed { 
                 background-image:
                 url({% version '/static/images/base/landing/feed-icon-16x16-sprited.png' %}) }
@@ -106,7 +104,7 @@
         type="text/javascript"></script>
         <![endif]-->
         <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
-        <script src="less.js" type="text/javascript"></script>
+        <script src="{% version '/static/js/less.js' %}" type="text/javascript"></script>
         {% block js_in_head %}
         {% endblock js_in_head %}
 
