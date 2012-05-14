@@ -1,5 +1,3 @@
-.. _oh-getting-started:
-
 =======================================
 Getting started with the OpenHatch code
 =======================================
