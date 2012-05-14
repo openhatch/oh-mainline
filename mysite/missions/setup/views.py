@@ -3,7 +3,6 @@
 # Copyright (C) 2010 John Stumpo
 # Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
-# Copyright (C) 2012 Nathan R. Yergler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -18,63 +17,40 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base import Mission, MissionBaseView
+import django.views.generic
 
+class WindowsMissionPage(django.views.generic.TemplateView):
+    def get_context_data(self):
+        data = super(WindowsMissionPage, self).get_context_data()
+        data.update({
+                'this_mission_page_short_name': self.this_mission_page_short_name,
+                'mission_name': 'Finding the command line on Windows'})
+        return data
 
-class SetupIndex(MissionBaseView):
-    url = '/'
+class WindowsMainPage(WindowsMissionPage):
+    this_mission_page_short_name = 'What we recommend and why'
     template_name = 'missions/windows-setup/about.html'
-    view_name = 'main-page'
-    title = 'What we recommend and why'
 
+class WindowsInstallGitBash(WindowsMissionPage):
+    this_mission_page_short_name = 'Install Git Bash'
+    template_name = 'missions/windows-setup/install-git-bash.html'
 
-class SetupGitBash(MissionBaseView):
-    url = '/install-git-bash'
-    template_name='missions/windows-setup/install-git-bash.html'
-    title = 'Install Git Bash'
-
-
-class OpenGitBash(MissionBaseView):
-    url = '/open-git-bash-prompt'
+class WindowsOpenPrompt(WindowsMissionPage):
+    this_mission_page_short_name = 'Open the Git Bash prompt'
     template_name = 'missions/windows-setup/open-prompt.html'
-    title = 'Open the Git Bash prompt'
 
-
-class UnderstandingThePrompt(MissionBaseView):
-    url = '/understand-prompt'
+class WindowsUnderstandPrompt(WindowsMissionPage):
+    this_mission_page_short_name = 'Understanding the prompt and running programs'
     template_name = 'missions/windows-setup/understand-prompt.html'
-    title = 'Understanding the prompt and running programs'
 
-
-class Navigating(MissionBaseView):
-    url = '/navigating'
+class WindowsBrowseFiles(WindowsMissionPage):
+    this_mission_page_short_name = 'Navigating through folders'
     template_name = 'missions/windows-setup/navigating.html'
-    title = 'Navigating through folders'
 
-
-class QuickReference(MissionBaseView):
-    url = '/quick-reference'
+class WindowsQuickReference(WindowsMissionPage):
+    this_mission_page_short_name = 'Quick reference'
     template_name = 'missions/windows-setup/quick-reference.html'
-    title = 'Quick reference'
 
-
-class Alternatives(MissionBaseView):
-    url = '/alternatives'
+class WindowsAlternatives(WindowsMissionPage):
+    this_mission_page_short_name = 'Alternatives'
     template_name = 'missions/windows-setup/alternatives.html'
-    title = 'Alternatives'
-
-
-class WindowsSetup(Mission):
-
-    mission_id = 'windows-setup'
-    name = 'Finding the command line on Windows'
-
-    view_classes = (
-        SetupIndex,
-        SetupGitBash,
-        OpenGitBash,
-        UnderstandingThePrompt,
-        Navigating,
-        QuickReference,
-        Alternatives,
-    )
