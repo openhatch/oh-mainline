@@ -26,10 +26,6 @@ from mysite.missions.models import Step, StepCompletion
 from mysite.missions.base import controllers
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
-from django.conf.urls.defaults import (
-    url,
-    patterns,
-)
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -102,34 +98,10 @@ class MissionViewMixin(object):
     login_required = False
 
     mission = None
-    mission_step = None
-    view_name = None
-    title = None
-
-    # DEPRECATED
     mission_name = None
     this_mission_page_short_name = None
 
-    @classmethod
-    def name(cls):
-        """Return the name for this View."""
-
-        if cls.view_name:
-            return cls.view_name
-
-        # no explicit view_name defined,
-        # strip the leading / from the URL and use that
-        return cls.url[1:]
-
-    @property
-    def page_title(self):
-        """Return the text title of this mission page."""
-
-        return self.title or self.this_mission_page_short_name
-
     def get_context_data(self, *args, **kwargs):
-        """Return the dict of context data for rendering this view."""
-
         data = super(MissionViewMixin, self).get_context_data()
 
         # Add some OpenHatch-specific stuff through side-effects
@@ -140,14 +112,8 @@ class MissionViewMixin(object):
                                        slug=None,
                                        just_modify_data=True)
         data.update({
-            'mission': self.mission,
-            'this_mission_page_short_name': self.page_title,
-            'mission_name': self.mission_name or self.mission.name,
-            'mission_page_name': self.page_title,
-            'title': self.page_title,
-            'prev_step_url':self.mission.prev_step_url(self),
-            'next_step_url':self.mission.next_step_url(self),
-        })
+                'this_mission_page_short_name': self.this_mission_page_short_name,
+                'mission_name': self.mission_name})
 
         # If a dictionary was passed in to us, either via __init__() or
         # as_view(), then incorporate that into the template data as well.
@@ -169,103 +135,8 @@ class MissionBaseView(MissionViewMixin, django.views.generic.base.TemplateView):
     """A Template-based Page in a Mission."""
 
 
-class MissionBaseFormView(MissionViewMixin, django.views.generic.edit.BaseFormView):
+class MissionBaseForm(MissionViewMixin, django.views.generic.edit.BaseFormView):
     """A Form-based Page in a Mission."""
-
-    def form_valid(self, form):
-
-        controllers.set_mission_completed(request.user.get_profile(),
-                                          self.mission_step)
-
-
-class IncompleteConfiguration(ValueError):
-    """Exception raised when a Mission[View] is not fully configured."""
-
-
-class Mission(object):
-
-    mission_id = None
-    name = None
-    VIEW_PREFIX = ''
-    view_classes = None
-
-    def __init__(self):
-
-        if not all((
-            self.mission_id,
-            self.name,
-            self.view_classes,
-        )):
-            raise IncompleteConfiguration(
-                "%s is not fully configured." % (self, )
-            )
-
-    @classmethod
-    def get(cls):
-        """Return the single instance of this Mission class."""
-
-        instance = getattr(cls, '__instance', None)
-        if instance is None:
-            cls.__instance = instance = cls()
-
-        return instance
-
-    @classmethod
-    def as_views(cls):
-        """Return a sequence of instantiated Views for Mission."""
-
-        mission = cls.get()
-
-        return tuple(
-            view.as_view(mission=mission)
-            for view in cls.view_classes
-        )
-
-    @classmethod
-    def urls(cls):
-        """Return the URL Configuration for this Mission."""
-
-        mission = cls.get()
-
-        urls = tuple(
-            url('%s$' % v.url, v.as_view(mission=mission),
-                name='missions-%s-%s' % (mission.mission_id, v.name(),),
-            )
-
-            for v in cls.view_classes
-        )
-
-        return patterns(cls.VIEW_PREFIX, *urls)
-
-    def step_urls(self):
-
-        return (
-            (self.step_url(index), step.title)
-            for index, step in enumerate(self.view_classes)
-        )
-
-    def step_url(self, index):
-        """Return the URL of the step at index.
-
-        If index is out of bounds, returns None.
-        """
-
-        if index < 0 or index >= len(self.view_classes):
-            return None
-
-        return reverse('missions-%s-%s' % (
-            self.mission_id,
-            self.view_classes[index].name(),
-        ))
-
-    def next_step_url(self, step):
-
-        return self.step_url(self.view_classes.index(step.__class__) + 1)
-
-    def prev_step_url(self, step):
-
-        return self.step_url(self.view_classes.index(step.__class__) - 1)
-
 
 
 # This is the /missions/ page.

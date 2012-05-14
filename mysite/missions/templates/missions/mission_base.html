@@ -56,16 +56,6 @@
                         }
                     </style>
 		    {% block side_nav_links %}
-{% if mission %}
-{% for url, step_name in mission.step_urls %}
-<li>
-  <a href='{{ url }}'>
-    {{ step_name }}
-  </a>
-</li>
-{% endfor %}
-{% endif %}
-
 		    {% endblock side_nav_links %}
                 </ul>
 		<div class="mission-help">
