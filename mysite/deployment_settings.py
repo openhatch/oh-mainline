@@ -45,6 +45,7 @@ CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
 GOOGLE_ANALYTICS_CODE='UA-15096810-1'
 
+SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
 GIT_REPO_URL_PREFIX = 'https://openhatch.org/git-mission-data/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
 
