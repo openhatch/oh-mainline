@@ -34,9 +34,14 @@
 /* size, width and padding stuff */
 
 @total-width: 1000px;
+@standard-padding: 20px;
+
+@padding-between-columns: @standard-padding;
+@column-width: ((@totalwidth - @padding-between-columns * 2) / 3) - @padding-between-columns;
+
 @normal-size: 11pt;
 
-.width-and-padding(@parent-width, @padding) {
+.width-and-padding(@parent-width: @total-width, @padding: @standard-padding) {
     padding-left: @padding;
     padding-right: @padding;
     width: @parent-width - @padding * 2;
@@ -129,9 +134,9 @@ h1 a, h1 a:hover { text-decoration: none; }
         ul li a { float: right; padding-top: 5px; }
         h3 { text-shadow: 0 1px 0 #fff; float: none; padding: 4px 10px 7px 0; font-size: 1.2em;}
     }
-    .module-body { clear: both; padding: 10px 20px 20px 20px;} 
+    .module-body { clear: both; padding: 10px @standard-padding @standard-padding @standard-padding;} 
     .module-foot { 
-        padding: 2px 20px 5px 20px; 
+        padding: 2px @standard-padding 5px @standard-padding; 
         text-align: right; 
         .module-foot-left { 
             float: left;
@@ -148,7 +153,7 @@ h1 a, h1 a:hover { text-decoration: none; }
 
 .submodule {
     background-color: @emphasized-module-interior; 
-    margin: 0 10px 20px 0; 
+    margin: 0 10px @standard-padding 0; 
     padding: 8px 10px; 
     border: @submodule-border; 
     float: left;
@@ -180,14 +185,14 @@ h1 {
     .centered;
     padding-top: 3px;
     border-top: 0;
-    .width-and-padding(@total-width, 20px);
+    .width-and-padding(@total-width, @standard-padding);
 
     h1 { float: left; }
     ul { list-style: none; margin: 0; float: right; }
     li { float: right; margin-left: 20px; margin-top: 10px; }
 }
 
-#pagetop { padding: 0; clear: both; .width-and-padding(@total-width, 20px);}
+#pagetop { padding: 0; clear: both; .width-and-padding(@total-width, @standard-padding);}
 
 .up-top { padding: 0; margin-bottom: -15px;}
 
@@ -207,7 +212,7 @@ ul#links { margin-left: 20px; }
     li { font-size: 1.1em; }
 }
 
-#content { padding: 10px 0 30px 0; clear: both; .width-and-padding(@total-width, 20px); }
+#content { padding: 10px 0 30px 0; clear: both; .width-and-padding(@total-width, @standard-padding); }
 
 #footer-wrapper { width: 100%; clear: both; padding-top: 40px;}
 
@@ -267,8 +272,8 @@ img {
     border: 0;
 }
 
-img.left { float: left; padding: 0 10px 20px 0;}
-img.right { float: right; padding: 0 0 20px 10px;}
+img.left { float: left; padding: 0 10px @standard-padding 0;}
+img.right { float: right; padding: 0 0 @standard-padding 10px;}
 
 .usernames {
     font-size: 10pt;
