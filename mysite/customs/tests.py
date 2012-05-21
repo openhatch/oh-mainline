@@ -1504,6 +1504,7 @@ I don't see for example the solvers module""",
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
@@ -1551,6 +1552,7 @@ I don't see for example the solvers module""",
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
@@ -1598,6 +1600,7 @@ I don't see for example the solvers module""",
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
@@ -1645,6 +1648,7 @@ I don't see for example the solvers module""",
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
