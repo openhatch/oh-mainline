@@ -99,17 +99,19 @@ def bug_update(bug_data):
 
     # Fill the Bug.
     for key in bug_data:
+        # Filter out any keys starting with _
+        if key.startswith('_'):
+            continue
+        # Okay, good, it looks like a normal key. Apply it to
+        # the Bug object.
         value = bug_data[key]
         setattr(bug, key, value)
 
     # Save the project onto it.
-    # Project name is just the TrackerModel's tracker_name, as due to the
-    # way Roundup is set up, there is almost always one project per tracker.
-    # This could in theory not be the case, but until we find a Roundup
-    # tracker handling bugs for multiple projects, we will just support one
-    # project per tracker.
+    # Every bug data dictionary comes back with a _project_name key, which
+    # is a way the parsed bug data indicates the project name to use.
     project_from_name, _ = Project.objects.get_or_create(
-            name=bug_data['tracker'].tracker_name)
+        name=bug_data['_project_name'])
     # Manually save() the Project to ensure that if it was created then it has
     # a display_name.
     if not project_from_name.display_name:
