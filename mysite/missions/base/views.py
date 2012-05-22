@@ -139,14 +139,22 @@ class MissionViewMixin(object):
                                        data=data,
                                        slug=None,
                                        just_modify_data=True)
+        ### Transitional:
+        ### While some missions do not have a prev_step_url,
+        ### we make that optional here.
+        if getattr(self.mission, 'prev_step_url', None):
+            data.update({
+                'prev_step_url': self.mission.prev_step_url(self),
+                'next_step_url': self.mission.next_step_url(self),
+                })
+
+        ### Always set these template data values
         data.update({
             'mission': self.mission,
             'this_mission_page_short_name': self.page_title,
             'mission_name': self.mission_name or self.mission.name,
             'mission_page_name': self.page_title,
             'title': self.page_title,
-            'prev_step_url':self.mission.prev_step_url(self),
-            'next_step_url':self.mission.next_step_url(self),
         })
 
         # If a dictionary was passed in to us, either via __init__() or
