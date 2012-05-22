@@ -1105,8 +1105,8 @@ class TracBugParserTests(django.test.TestCase):
                   'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
                   'good_for_newcomers': True,
                   'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
                   'concerns_just_documentation': False,
+                  '_project_name': 'Twisted',
                   'as_appears_in_distribution': '',
                   }
         self.assertEqual(wanted, got)
@@ -1150,7 +1150,7 @@ class TracBugParserTests(django.test.TestCase):
                   'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
                   'good_for_newcomers': True,
                   'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
+                  '_project_name': 'Twisted',
                   'concerns_just_documentation': False,
                   'as_appears_in_distribution': '',
                   }
@@ -1196,7 +1196,7 @@ class TracBugParserTests(django.test.TestCase):
                   'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
                   'good_for_newcomers': True,
                   'looks_closed': False,
-                  'bite_size_tag_name': 'trivial',
+                  '_project_name': 'Tracpriority',
                   'concerns_just_documentation': False,
                   'as_appears_in_distribution': '',
                   }
@@ -1241,9 +1241,9 @@ class TracBugParserTests(django.test.TestCase):
                   'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
                   'good_for_newcomers': True,
                   'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
                   'concerns_just_documentation': False,
                   'as_appears_in_distribution': '',
+                  '_project_name': 'Twisted',
                   }
         self.assertEqual(wanted, got)
 
@@ -1286,8 +1286,8 @@ class TracBugParserTests(django.test.TestCase):
                   'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
                   'good_for_newcomers': True,
                   'looks_closed': False,
-                  'bite_size_tag_name': 'easy',
                   'concerns_just_documentation': False,
+                  '_project_name': 'Twisted',
                   'as_appears_in_distribution': '',
                   }
         self.assertEqual(wanted, got)
@@ -1308,11 +1308,22 @@ class TracBugParserTests(django.test.TestCase):
 
         got = tbp.get_parsed_data_dict(self.tm2)
         del got['last_polled']
-        wanted = {'status': 'new', 'as_appears_in_distribution': u'',
+        wanted = {'status': 'new',
+                  'as_appears_in_distribution': u'',
                   'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
-                  'importance': '', 'bite_size_tag_name': 'bitesized', 'canonical_bug_link': 'http://trac.edgewall.org/ticket/3275', 'date_reported': datetime.datetime(2006, 6, 16, 15, 1, 52),
-                  'submitter_realname': '', 'title': 'Show line numbers when embedding source code in wiki pages', 'people_involved': 3, 'last_touched': datetime.datetime(2010, 11, 26, 13, 45, 45),
-                  'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
+                  'importance': '',
+                  'canonical_bug_link': 'http://trac.edgewall.org/ticket/3275',
+                  'date_reported': datetime.datetime(2006, 6, 16, 15, 1, 52),
+                  'submitter_realname': '',
+                  'title': 'Show line numbers when embedding source code in wiki pages',
+                  'people_involved': 3,
+                  'last_touched': datetime.datetime(2010, 11, 26, 13, 45, 45),
+                  'submitter_username': 'erik@\xe2\x80\xa6',
+                  'looks_closed': False,
+                  'good_for_newcomers': False,
+                  'concerns_just_documentation': False,
+                  '_project_name': 'Trac',
+                  }
         self.assertEqual(wanted, got)
 
 @skipIf(TracBugImporter is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
@@ -1508,8 +1519,8 @@ I don't see for example the solvers module""",
                   'submitter_realname': '',
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
-                  'bite_size_tag_name': 'EasyToFix',
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
@@ -1556,8 +1567,8 @@ I don't see for example the solvers module""",
                   'submitter_realname': '',
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
-                  'bite_size_tag_name': 'EasyToFix',
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
@@ -1604,8 +1615,8 @@ I don't see for example the solvers module""",
                   'submitter_realname': '',
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
-                  'bite_size_tag_name': 'EasyToFix',
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
@@ -1652,8 +1663,8 @@ I don't see for example the solvers module""",
                   'submitter_realname': '',
                   'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
                   'good_for_newcomers': False,
-                  'bite_size_tag_name': 'EasyToFix',
                   'concerns_just_documentation': True,
+                  '_project_name': 'SymPy',
                   }
         self.assertEqual(wanted, got)
 
