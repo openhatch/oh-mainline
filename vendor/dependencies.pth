@@ -35,6 +35,7 @@ packages/python-openid
 packages/python-otp
 packages/python-patch
 packages/pytz
+packages/scrapy
 packages/sessionprofile
 packages/six
 packages/south

@@ -1,0 +1,22 @@
+Metadata-Version: 1.0
+Name: Scrapy
+Version: 0.14.4
+Summary: A high-level Python Screen Scraping framework
+Home-page: http://scrapy.org
+Author: Pablo Hoffman
+Author-email: pablo@pablohoffman.com
+License: BSD
+Description: Scrapy is a high level scraping and web crawling framework for writing spiders to crawl and parse web pages for all kinds of purposes, from information retrieval to monitoring or testing web sites.
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.5
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Environment :: Console
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Internet :: WWW/HTTP
