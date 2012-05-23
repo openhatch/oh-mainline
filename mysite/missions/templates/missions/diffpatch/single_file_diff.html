@@ -24,13 +24,36 @@
     <h3>Diffing individual files</h3>
   </div>
   <div class="body">
-    <p>When you are submitting changes to a project, you will need to run <code>diff</code> to create a patch that you can submit.  Large patches can be stored in files and attached to whatever medium you use to submit the patch, but since this patch will be short, it can be included inline in the message.  So instead of uploading the patch in a file, your mission will be to make your patch and copy and paste it into the box below.</p>
-    <p>Here's the mission:</p>
+    <p>As a popular cookbook author, you often receive requests for modified recipes.
+      You're a generous person, so you're happy to help by providing
+      patches with the changes they asked for.</p>
+
+    <p>One enthusiastic reader wrote in with this question:</p>
+
+    <blockquote style="width: 95%">
+      <p>Dear Cook,</p>
+
+      <p>Thanks to your cookbook, I've been delighting everyone with tasty pancakes. People go bananas
+	when I make the nutty pancake recipe!</p>
+
+      <p>The one problem is that I'm allergic to almonds, so I can't eat the
+	tasty things. Is there some other way to get the
+	nuttiness that everyone loves?</p>
+
+    </blockquote>
+
+    <p>Nutty as it sounds, the answer is <em>walnuts</em>. Your mission is to:</p>
+
     <ul class="raquo_bullets">
-      <li><a href="{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}">Download this file.</a></li>
-      <li>Open the file in a text editor and follow the instructions inside the file.  (These instructions will involve modifying the file.)</li>
-      <li>Make a unified diff (the universally preferred flavor of diff output) of your changes.  (Try <code>diff -u originalfile.txt modifiedfile.txt</code>.)</li>
+      <li><a href="{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}">Download the original recipe</a> to your computer.</li>
+      <li>On your own computer, make a copy of the recipe, and open that copy in a text editor.</li>
+      <li>Replace "almond" with "walnut". You should expect to find "almond" twice in the original recipe.</li>
+      <li>Invoke the <tt>diff</tt> program to summarize the changes you made, creating a "unified diff" (the universally preferred flavor of diff output). Paste that diff into the box below! (See Hints for help.)</li>
     </ul>
+
+    <h3>Context in open source</h3>
+
+    <p>When you are submitting changes to a project, you will often need to run <code>diff</code> to create a patch that you can submit.  Large patches can be stored in files and attached to whatever medium you use to submit the patch; for short patches, contributors often paste them into email messages or bug reports.  So instead of uploading the patch in a file, your mission will be to make your patch and copy and paste it into the box below.</p>
 
     <form method="post" action="{% url mysite.missions.diffpatch.views.diffsingle_submit %}#diffsingle-form">{% csrf_token %}
       <div class="form-row">
@@ -59,6 +82,51 @@
     <p class="next_mission_link">
       <a href="{% url mysite.missions.diffpatch.views.recursive_diff %}">On to diffing entire directories &raquo;</a></p>
     {% endif %}
+
+    <div id="hint_tabs">
+      <ul>
+        <li><a href="#hints">Hints</a></li>
+        <li><a href="#low">Low</a></li>
+        <li><a href="#medium">Medium</a></li>
+        <li><a href="#high">High</a></li>
+    </ul>
+    <div id="hints">
+        <p>If you need help with this step, try clicking through these hints.</p>
+	<p>The "low" hint level is perfect if you're just confused as to what to do.</p>
+	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
+    </div>
+    <div id="low">
+      <pre>man diff</pre>
+      <p>or
+	<a href="http://linux.die.net/man/1/diff">read the man page online</a>.</p>
+    </div>
+    <div id="medium">
+      <p>In this mission, you have to do a few things. Tips:</p>
+      <ul class="raquo_bullets">
+	<li>Make sure to keep a copy of the original around while modifying a copy!</li>
+	<li>Use <tt>diff -u</tt> to create the diff</li>
+	<li>Copy and paste can be tricky in terminal programs. Click around in the menus of your terminal app until you find the right options. If you have trouble, redirect the output to a file and then open it in your favorite text editor.</li>
+      </ul>
+    </div>
+    <div id="high">
+      <p>Open a command propmt, and type these commands in, one at a time. You need to copy them exactly. Make sure to press enter between each one.</p>
+      <p>First, create a directory you'll work in and change into it.</p>
+      <pre>
+	mkdir singlediff
+	cd singlediff
+      </pre>
+      <p>Then, download the original file twice. (You'll only modify one.)</p>
+      <pre>
+	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}
+	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %} -O original
+      </pre>
+      <p>Open <tt>nutty-pancake.txt</tt> in your favorite text editor, and look for the two occurrences of "almond". Replace them both with "walnut".</p>
+      <p>Go back to the terminal and run this command.</p>
+      <pre>
+	diff -u original nutty-pancake.txt
+      </pre>
+      <p>Then select that text with your mouse and use your terminal program's copy-paste functionality to copy it to the clipboard. Paste it into the form above.  Then, submit!</p>
+    </div>
   </div>
 </div>
 {% endblock mission_main %}

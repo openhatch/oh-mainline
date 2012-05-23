@@ -82,8 +82,8 @@ class PatchSingleFileMission(SingleFilePatch):
     PATCH_FILENAME = 'add-oven-temp.patch'
 
 class DiffSingleFileMission(SingleFilePatch):
-    OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'diffsingle.txt')
-    NEW_FILE = os.path.join(get_mission_data_path('diffpatch'), 'diffsingle_result.txt')
+    OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'nutty-pancake.txt')
+    NEW_FILE = os.path.join(get_mission_data_path('diffpatch'), 'nutty-pancake_result.txt')
 
 class DiffRecursiveMission(object):
     ORIG_DIR = 'recipes'
