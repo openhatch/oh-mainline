@@ -76,10 +76,10 @@ class SingleFilePatch(object):
         raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
 
 class PatchSingleFileMission(SingleFilePatch):
-    OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'fib1.c')
-    NEW_FILE = os.path.join(get_mission_data_path('diffpatch'), 'fib2.c')
+    OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'oven-pancake.txt')
+    NEW_FILE = os.path.join(get_mission_data_path('diffpatch'), 'oven-pancake_result.txt')
     # This does not correspond to a real file but is merely the filename the download is presented as.
-    PATCH_FILENAME = 'fib-linear-time.patch'
+    PATCH_FILENAME = 'add-oven-temp.patch'
 
 class DiffSingleFileMission(SingleFilePatch):
     OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'diffsingle.txt')
