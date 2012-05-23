@@ -30,6 +30,7 @@ from mysite.missions.base.controllers import (
     mission_completed,
     set_mission_completed,
     )
+from mysite.base.unicode_sanity import utf8
 from mysite.missions.diffpatch import forms, controllers
 
 ### POST handlers
@@ -82,7 +83,7 @@ def diffsingle_submit(request):
                 set_mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
                 data['diffsingle_success'] = True
             except controllers.IncorrectPatch, e:
-                data['diffsingle_error_message'] = str(e)
+                data['diffsingle_error_message'] = utf8(e)
         data['diffsingle_form'] = form
     return single_file_diff(request, data)
 
@@ -104,7 +105,7 @@ def diffrecursive_submit(request):
                 set_mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive')
                 data['diffrecursive_success'] = True
             except controllers.IncorrectPatch, e:
-                data['diffrecursive_error_message'] = str(e)
+                data['diffrecursive_error_message'] = utf8(e)
         data['diffrecursive_form'] = form
     return recursive_diff(request, data)
 
