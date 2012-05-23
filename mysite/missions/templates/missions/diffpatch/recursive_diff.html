@@ -84,6 +84,57 @@
 	Try the final step, patching entire directories &raquo;
     </a></p>
     {% endif %}
+    <div id="hint_tabs">
+      <ul>
+        <li><a href="#hints">Hints</a></li>
+        <li><a href="#low">Low</a></li>
+        <li><a href="#medium">Medium</a></li>
+        <li><a href="#high">High</a></li>
+    </ul>
+    <div id="hints">
+        <p>If you need help with this step, try clicking through these hints.</p>
+	<p>The "low" hint level is perfect if you're just confused as to what to do.</p>
+	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
+    </div>
+    <div id="low">
+      <pre>man patch</pre>
+      <p>or
+	<a href="http://linux.die.net/man/1/patch">read the patch page online</a>.</p>
+    </div>
+    <div id="medium">
+      <p>In this mission, you have to do a few things. Tips:</p>
+      <ul class="raquo_bullets">
+	<li>Make sure to keep a copy of the original around while modifying a copy!</li>
+	<li>Use <tt>diff -ur</tt> to create the diff. You need <tt>-u</tt> for a "unified" diff, and <tt>-r</tt> to "recursively" generate a diff across a whole directory of files. (You can combine these parameters into just <tt>-ur</tt>.)</li>
+      </ul>
+    </div>
+    <div id="high">
+<p>Open a command propmt, and type these commands in, one at a time. You need to copy them exactly. Make sure to press enter between each one.</p>
+      <p>First, create a directory you'll work in and change into it.</p>
+      <pre>
+	mkdir recursivediff
+	cd recursivediff
+      </pre>
+      <p>Then, download the original collection of recipes.</p>
+      <pre>
+	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
+      </pre>
+      <p>Unpack it a once, and rename that to recipes-us indicating that this is the version you'll adjust for American tastes. (This is the copy we'll edit.)</p>
+      <pre>
+	tar zxvf recipes.tar.gz
+	mv recipes recipes-us
+      </pre>
+      <p>Unpack it again, keeping this one with the original name. (We'll need this original so that <tt>diff</tt> can detect the differences.)</p>
+      <pre>
+	tar zxvf recipes.tar.gz
+      </pre>
+<p>Look for the new <tt>recipes-us</tt> directory on your computer, and open up each of the files inside ending in <tt>.txt</tt>. Change "aubergine" to "eggplant", and change "Aubergine" to "Eggplant" (capitalization matters!).</p>
+      <p>Go back to the terminal and run this command.</p>
+      <pre>
+	diff -ur recipes recipes-us > adjust-for-americans.patch
+      </pre>
+      <p>In the form above, upload the new <tt>adjust-for-americans.patch</tt> file. Then, submit!</p>
+    </div>
   </div>
 </div>
 {% endblock mission_main %}
