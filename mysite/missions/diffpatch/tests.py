@@ -31,6 +31,7 @@ from mysite.missions.base.tests import (
     reverse,
     StepCompletion,
     )
+from mysite.base.unicode_sanity import utf8
 from mysite.missions.diffpatch import views, controllers
 
 class PatchSingleFileTests(TwillTests):
@@ -145,7 +146,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             controllers.DiffSingleFileMission.validate_patch(self.make_good_patch() * 2)
         except controllers.IncorrectPatch, e:
-            self.assert_('affects more than one file' in str(e))
+            self.assert_('affects more than one file' in utf8(e))
         else:
             self.fail('no exception raised')
 
@@ -153,7 +154,7 @@ class DiffSingleFileTests(TwillTests):
     #    try:
     #        controllers.DiffSingleFileMission.validate_patch(self.make_wrong_src_patch())
     #    except controllers.IncorrectPatch, e:
-    #        self.assert_('will not apply' in str(e))
+    #        self.assert_('will not apply' in utf8(e))
     #    else:
     #        self.fail('no exception raised')
 
@@ -161,7 +162,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             controllers.DiffSingleFileMission.validate_patch(self.make_wrong_dest_patch())
         except controllers.IncorrectPatch, e:
-            self.assert_('does not have the correct contents' in str(e))
+            self.assert_('does not have the correct contents' in utf8(e))
         else:
             self.fail('no exception raised')
 
@@ -172,7 +173,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             controllers.DiffSingleFileMission.validate_patch(self.make_swapped_patch())
         except controllers.IncorrectPatch, e:
-            self.assert_('order of files passed to diff was flipped' in str(e))
+            self.assert_('order of files passed to diff was flipped' in utf8(e))
         else:
             self.fail('no exception raised')
 
@@ -184,7 +185,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             controllers.DiffSingleFileMission.validate_patch(self.make_patch_without_trailing_whitespace())
         except controllers.IncorrectPatch, e:
-            self.assert_('removed the space' in str(e))
+            self.assert_('removed the space' in utf8(e))
         else:
             self.fail('no exception raised')
 
@@ -196,7 +197,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             controllers.DiffSingleFileMission.validate_patch("I lack headers.")
         except controllers.IncorrectPatch, e:
-            self.assert_('Make sure you are including the diff headers' in str(e))
+            self.assert_('Make sure you are including the diff headers' in utf8(e))
         else:
             self.fail('no exception raised')
 
@@ -362,7 +363,7 @@ class DiffRecursiveTests(TwillTests):
 
         # Submit, and see if we get the same error message we expect.
         error = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
-        self.assert_('You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.' in str(error))
+        self.assert_('You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.' in utf8(error))
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
 
