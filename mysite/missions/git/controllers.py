@@ -49,8 +49,6 @@ class GitDiffMission(object):
 
     @classmethod
     def commit_if_ok(cls, username, diff):
-        if type(diff) == unicode:
-            diff = diff.encode('utf-8')
         repo = GitRepository(username)
         commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
         commit_diff.communicate(mysite.base.unicode_sanity.utf8(diff))
