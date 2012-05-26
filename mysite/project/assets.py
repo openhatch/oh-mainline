@@ -5,7 +5,6 @@ from django_assets import Bundle, register
 register('openhatch_css',
          Bundle("css/base/base.css",
                 "css/jquery.autocomplete.css",
-                "css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css",
                 "openid/css/openid.css",
                 "css/base/jquery.jgrowl.css",
                 "css/senseknocker/thing.css",
@@ -27,7 +26,16 @@ register('openhatch_css',
                 "css/tipsy.css",
                 "css/facebox.css",
                 "css/missions/base.css",
-                "css/jquery-ui-lightness/jquery-ui-1.7.2.complete.css",
+                ),
+         Bundle(#TODO: does assetizer fallow includes inside css files?
+                #"jquery-ui/themes/ui-lightness/ui.all.css", 
+                "jquery-ui/themes/base/ui.base.css",
+                "jquery-ui/themes/ui-lightness/ui.theme.css",
+                "jquery-ui/themes/base/ui.base.css",
+                "jquery-ui/themes/base/ui.progressbar.css",
+                "jquery-ui/themes/base/ui.tabs.css",
+                #1.8.20:
+                #"jquery-ui/themes/ui-lightness/jquery-ui.all.css",
                 ),
          output="packed/openhatch.css")
 register('header_js',
@@ -48,11 +56,13 @@ register('openhatch_js',
                 'js/jquery.cookie.js',
                 'js/facebox.js',
                 ),
-         # jQuery UI - TODO: import source, and each part individually
-         # 1.7.2: core, sortable, progressbar, tabs
-         Bundle('js/jquery-ui-1.7.2.custom.min.js',
-                'js/jquery.tabs.js',
-         	),
+         # 1.7.3:
+         Bundle('jquery-ui/ui/ui.core.js',
+                'jquery-ui/ui/ui.sortable.js',
+                'jquery-ui/ui/ui.progressbar.js',
+                'jquery-ui/ui/ui.tabs.js',
+                ),
+         # 1.8.20:
          #Bundle('jquery-ui/ui/jquery.ui.core.js',
          #       'jquery-ui/ui/jquery.ui.sortable.js',
          #       'jquery-ui/ui/jquery.ui.progressbar.js',
@@ -64,9 +74,9 @@ register('openhatch_js',
                 'js/facebox.js',
                 ),
          # Other 3rd party
-         Bundle('js/filedrop.js',
-                'js/filedrop-onload.js', # OpenHatch specific
-                ),
+         #Bundle('js/filedrop.js',
+         #       'js/filedrop-onload.js', # OpenHatch specific
+         #       ),
          # OpenHatch
          Bundle('js/base.js',
                 'js/base/locationDialog.js',
