@@ -22,8 +22,7 @@
 {% block body_class %}{{ block.super }} missions{% endblock %}
 
 {% block js_in_head %}
-<link href="/static/css/jquery-ui-lightness/jquery-ui-1.7.2.complete.css" rel="stylesheet" />
-<script type="text/javascript">
+<script type="text/javascript"><!-- TODO: make work with jQuery in footer, not header -->
   $(document).ready(function() {
       $("#hint_tabs").tabs();
   });
