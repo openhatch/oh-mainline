@@ -27,7 +27,7 @@ register('openhatch_css',
                 "css/facebox.css",
                 "css/missions/base.css",
                 ),
-         Bundle(#TODO: does assetizer fallow includes inside css files?
+         Bundle(#TODO: does assetizer follow includes inside css files?
                 #"jquery-ui-1.7.3/themes/ui-lightness/ui.all.css",
                 "jquery-ui-1.7.3/themes/base/ui.base.css",
                 "jquery-ui-1.7.3/themes/ui-lightness/ui.theme.css",
