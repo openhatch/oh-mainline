@@ -22,6 +22,8 @@ from mysite.missions.base.views import (
     make_download,
     login_required,
     MissionPageState,
+    HttpResponseRedirect,
+    reverse,
     view,
     )
 from mysite.missions.base.controllers import (
@@ -118,19 +120,11 @@ def patchrecursive_submit(request):
     data = {}
     data['patchrecursive_form'] = forms.PatchRecursiveUploadForm()
     data['patchrecursive_success'] = False
-    wrong_answers_present = False
     if request.method == 'POST':
         form = forms.PatchRecursiveUploadForm(request.POST)
         if form.is_valid():
-            for key, value in controllers.PatchRecursiveMission.ANSWERS.iteritems():
-                if form.cleaned_data[key] != value:
-                    data['patchrecursive_%s_error_message' % key] = 'This answer is incorrect.'
-                    wrong_answers_present = True
-                else:
-                    data['patchrecursive_%s_error_message' % key] = ''
-            if not wrong_answers_present:
-                set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
-                data['patchrecursive_success'] = True
+            set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
+            return HttpResponseRedirect(reverse(recursive_diff))
         data['patchrecursive_form'] = form
     return recursive_patch(request, data)
 
@@ -181,6 +175,7 @@ def recursive_patch(request, passed_data={}):
     state.this_mission_page_short_name = 'Recursive patch'
     data = state.as_dict_for_template_context()
     data['patchrecursive_form'] = forms.PatchRecursiveUploadForm()
+    data.update(passed_data)
     return (request, 'missions/diffpatch/recursive_patch.html', data)
 
 @view

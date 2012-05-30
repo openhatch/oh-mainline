@@ -201,18 +201,12 @@ class DiffRecursiveMission(object):
             raise IncorrectPatch, 'The patch modifies files that it should not modify: %s' % ', '.join(the_patch.source)
 
 class PatchRecursiveMission(object):
-    OLD_DIR = os.path.join(get_mission_data_path('diffpatch'), 'hats', 'before')
-    NEW_DIR = os.path.join(get_mission_data_path('diffpatch'), 'hats', 'after')
-    BASE_NAME = 'hats'
-    ANSWERS = {'children_hats': 4, 'lizards_hats': 5}
+    OLD_DIR = os.path.join(get_mission_data_path('diffpatch'), 'recipes')
+    NEW_DIR = os.path.join(get_mission_data_path('diffpatch'), 'recipes.more-garlic')
+    BASE_NAME = 'recipes'
+    ANSWERS = {'amount_of_garlic': 3}
 
-    @classmethod
-    def synthesize_tarball(cls):
-        tdata = StringIO()
-        tfile = tarfile.open(fileobj=tdata, mode='w:gz')
-        tfile.add(cls.OLD_DIR, cls.BASE_NAME)
-        tfile.close()
-        return tdata.getvalue()
+    # NOTE: You should rely on the DiffRecursiveMission for the tarball.
 
     @classmethod
     def get_patch(cls):

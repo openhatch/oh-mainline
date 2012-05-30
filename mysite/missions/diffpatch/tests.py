@@ -388,7 +388,7 @@ class PatchRecursiveTests(TwillTests):
 
         try:
             tar_process = subprocess.Popen(['tar', '-C', tempdir, '-zxv'], stdin=subprocess.PIPE)
-            tar_process.communicate(controllers.PatchRecursiveMission.synthesize_tarball())
+            tar_process.communicate(controllers.DiffRecursiveMission.synthesize_tarball())
             self.assertEqual(tar_process.returncode, 0)
 
             patch_process = subprocess.Popen(['patch', '-d', tempdir, '-p1'], stdin=subprocess.PIPE)
@@ -400,7 +400,7 @@ class PatchRecursiveTests(TwillTests):
 
     def test_do_mission_correctly(self):
         response = self.client.post(reverse(views.patchrecursive_submit), controllers.PatchRecursiveMission.ANSWERS)
-        self.assert_(response.context['patchrecursive_success'])
+        self.assert_(response.status_code, 302)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchrecursive', person=paulproteus)), 1)
