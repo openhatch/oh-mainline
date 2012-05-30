@@ -108,9 +108,6 @@ def diffrecursive_submit(request):
         data['diffrecursive_form'] = form
     return recursive_diff(request, data)
 
-def patchrecursive_get_original_tarball(request):
-    return make_download(controllers.PatchRecursiveMission.synthesize_tarball(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.tar.gz')
-
 def patchrecursive_get_patch(request):
     return make_download(controllers.PatchRecursiveMission.get_patch(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.patch')
 
