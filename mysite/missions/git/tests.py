@@ -102,6 +102,18 @@ class GitViewTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'git_diff'))
 
+    def test_do_diff_mission_correctly_in_swedish(self):
+        self.client.post(reverse(views.resetrepo))
+        cwd=self.repo_path
+        with open(
+            os.path.join(cwd, '../../../missions/git/data/swedish-patch'),
+            'r') as expected_diff_file:
+            expected_diff = expected_diff_file.read()
+        self.client.post(reverse(views.resetrepo))
+        self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assert_(controllers.mission_completed(paulproteus, 'git_diff'))
+
     def test_do_diff_mission_incorrectly(self):
         self.client.post(reverse(views.resetrepo))
         cwd=self.repo_path

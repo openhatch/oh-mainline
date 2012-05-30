@@ -58,3 +58,33 @@ def wrap_file_object_in_utf8_check(f):
         as_unicode = unicode(bytes, 'utf-8-sig')
     as_utf8 = as_unicode.encode('utf-8')
     return StringIO.StringIO(as_utf8)
+
+def utf8(s):
+    '''This function takes a bytestring or a Unicode object
+    as its input, and it outputs a bytestring that is UTF-8
+    encoded.
+
+    If you pass an object with a __unicode__ method, like an
+    integer, it will also convert that to a Unicode object.
+
+    This is very similar to the smart_str method provided by
+    Django with one particular difference: this function will
+    raise a UnicodeDecodeError if you pass in a bytestring that
+    cannot be decoded into UTF-8. This is a feature; in the case
+    of invalid data, we refuse the temptation to guess.'''
+    # If the input is a bytestring, then we use the unicode
+    # constructor to up-convert it:
+    try:
+        pure = unicode(s, 'utf-8')
+    except TypeError:
+        # the Unicode constructor will raise a TypeError
+        # if it received something other than a bytestring.
+        #
+        # In that case, just call unicode() directly on it.
+        # For pure Unicode objects, this just gives us the
+        # pure Unicode object back.
+        pure = unicode(s)
+
+    # Now, take that pure object and return a UTF-8-encoded
+    # bytestring.
+    return pure.encode('utf-8')
