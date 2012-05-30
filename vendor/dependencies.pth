@@ -22,6 +22,7 @@ packages/gdata/src
 packages/ghettoq
 packages/html2text
 packages/importlib
+packages/jsmin
 packages/kombu
 packages/mechanize
 packages/mock
