@@ -70,7 +70,7 @@ Bug Importers
 If you want to use the customs bug importers, they will need to be installed.
 You can do this in one of the following ways:
 
-* pip install git://github.com/openhatch/oh-bugimporters.git  # (readonly)
+* pip install https://github.com/openhatch/oh-bugimporters.git  # (readonly)
 * Clone the repo into a folder at the same level as oh-mainline.
 
 
