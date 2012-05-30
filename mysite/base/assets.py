@@ -28,7 +28,7 @@ register('openhatch_css',
                 "css/missions/base.css",
                 ),
          Bundle(#TODO: does assetizer fallow includes inside css files?
-                #"jquery-ui/themes/ui-lightness/ui.all.css", 
+                #"jquery-ui/themes/ui-lightness/ui.all.css",
                 "jquery-ui/themes/base/ui.base.css",
                 "jquery-ui/themes/ui-lightness/ui.theme.css",
                 "jquery-ui/themes/base/ui.base.css",
@@ -41,7 +41,7 @@ register('openhatch_css',
 register('header_js',
          # jQuery
          Bundle('js/jquery-1.3.2.js',
-         	),
+                ),
          filter='jsmin',
          output='packed/header.js')
 
@@ -68,7 +68,7 @@ register('openhatch_js',
          #       'jquery-ui/ui/jquery.ui.progressbar.js',
          #       'jquery-ui/ui/jquery.ui.tabs.js',
          #       ),
-         
+
          # jQuery Tools
          Bundle('openid/js/openid-jquery.js',
                 'js/facebox.js',
