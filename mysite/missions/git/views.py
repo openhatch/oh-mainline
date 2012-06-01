@@ -99,7 +99,8 @@ def rebase_submit(request):
     if request.method == 'POST':
         form = forms.RebaseForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data['secret_word'].lower() == 'pinky':
+            lower_secret = form.cleaned_data['secret_word'].lower()
+            if lower_secret == 'pinky' or lower_secret == 'pinky.':
                 controllers.set_mission_completed(request.user.get_profile(), 'git_rebase')
                 return HttpResponseRedirect(reverse(rebase))
             else:
