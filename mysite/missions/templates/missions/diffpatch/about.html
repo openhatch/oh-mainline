@@ -24,7 +24,29 @@
     <h3>Using diff and patch</h3>
   </div>
   <div class="body">
-    <p>When you make changes to open source software, you need an efficient way to show other people your changes so your changes can be reviewed or applied.  The <code>diff</code> and <code>patch</code> programs are often used for this purpose.  The <code>diff</code> program analyzes the files you give it and outputs the differences between them in a compact, human-and-machine-readable format, and the <code>patch</code> program reads <code>diff</code> output and uses it to transform a copy of the original files into the modified files.  So to show other people the changes, you can send them <code>diff</code> output, and they can use the <code>patch</code> program to apply your changes to their copy of the files.  When <code>diff</code> output is used in this way, the output itself is often called a patch or a diff.</p>
+    <h2>The set-up</h2>
+    <p>Through this training mission, imagine you are a big fan of
+      pancakes. Recently, you published a book with all your best
+      recipes.</p>
+
+      <p>The book has taken the global pancake community
+      by storm, and many of your adoring fans are creating and
+      sharing modifications to your recipes through "patch" files.</p>
+
+    <p>In this training mission, by playing different roles, you will
+      learn how to create and apply patches via the <tt>diff</tt>
+      and <tt>patch</tt> command-line tools.</p>
+
+    <h2>Context in open source</h2>
+    <p>For many open source development communities, patches are the
+      basis of how contributors describe and share changes.  Projects
+      small and large often ask users to "submit a patch" with new
+      features or bugfixes. For example, for decades, the Linux kernel
+      project has asked contributors to send patch files to the main
+      project mailing list for discussion and integration into the
+      main project.
+    </p>
+
     <p>This mission consists of four parts: diffing individual files, patching individual files, diffing entire directory hierarchies, and patching entire directory hierarchies.</p>
 
       <p class="next_mission_link">
