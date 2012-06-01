@@ -48,6 +48,7 @@ GOOGLE_ANALYTICS_CODE='UA-15096810-1'
 SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
 GIT_REPO_URL_PREFIX = 'https://openhatch.org/git-mission-data/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
+URL_PREFIX='https://openhatch.org'
 
 RECOMMEND_BUGS=False
 

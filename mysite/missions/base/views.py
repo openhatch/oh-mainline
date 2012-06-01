@@ -35,6 +35,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 import django.views.generic.base
 import django.views.generic.edit
+import django.conf
 
 import os
 from django.utils import simplejson
@@ -67,6 +68,7 @@ class MissionPageState(object):
         data = {
             'this_mission_page_short_name': self.this_mission_page_short_name,
             'mission_name': self.mission_name,
+            'url_prefix': getattr(django.conf.settings, 'URL_PREFIX', 'http://127.0.0.1:8000'),
             'mission_step_prerequisites_passed': not self.mission_step_prerequisite}
         if (self.passed_data):
             data.update(self.passed_data)
