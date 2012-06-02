@@ -121,7 +121,7 @@ def patchrecursive_submit(request):
         form = forms.PatchRecursiveUploadForm(request.POST)
         if form.is_valid():
             set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
-            return HttpResponseRedirect(reverse(recursive_diff))
+            return HttpResponseRedirect(reverse(recursive_patch))
         data['patchrecursive_form'] = form
     return recursive_patch(request, data)
 
