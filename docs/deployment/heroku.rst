@@ -47,7 +47,11 @@ This app name appears in public as part of the domain name, so choose
 something you don't mind other people reading! (If you leave out the app
 name, Heroku will pick a random cute name for your app.)
 
-Change directory into your clone of oh-mainline, and run (for example)::
+On your computer, within a terminal, change directory into your clone
+of oh-mainline. You'll use the "heroku" command to create your
+app. (In the example here, I've named my app
+"better-frobulator". Substitute your own app name!) So, type something
+like this::
 
   heroku apps:create better-frobulator --stack=cedar
 
