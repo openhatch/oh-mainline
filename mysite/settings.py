@@ -5,6 +5,7 @@ import os
 import logging
 import datetime
 import sys
+import dj_database_url
 
 ## Figure out where in the filesystem we are.
 DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
@@ -39,6 +40,10 @@ DATABASES = {
         'CHARSET': 'utf8',
     },
 }
+
+# Permit it to be overriden
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {'default': dj_database_url.config()}
 
 OTHER_DATABASES = {
     'mysql': {
