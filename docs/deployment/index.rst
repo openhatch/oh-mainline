@@ -8,6 +8,7 @@ Deployment
     installation
     advanced_installation
     maintenance
+    heroku
 
 * Login team
 * Backups of the live site
