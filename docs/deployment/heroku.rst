@@ -133,3 +133,7 @@ with your app's name)::
 
 Look for the "Web URL" at the bottom of the output, and visit that in
 your web browser.
+
+Now, celebrate! Your OpenHatch instance is on the web. Go get yourself
+a strawberry smoothie (making substitutions as necessary for your
+dietary restrictions).
