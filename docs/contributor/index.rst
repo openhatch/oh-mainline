@@ -10,6 +10,8 @@ Contributor process
     about_our_community
     getting_started
     handling_patches
+    login_team
+    login_team_agreement
 
 * Chat with us on IRC
 * Merging patches
