@@ -22,7 +22,7 @@ OpenHatch Servers Access & Usage Policies
 Version 1
 
 This version of the OpenHatch Servers Access & Usage Policies becomes effective
-on April 30, 2011. 
+on April 30, 2011.
 
 
 Introduction
@@ -57,14 +57,14 @@ assure that everything functions perfectly, they can't give any guarantees.
 If someone violates the rules set out in Policies section of this document, as
 Asheesh's sole discretion, then Asheesh will revoke that person's access. See
 also the "Privilege" section.
- 
+
 
 Rules and Guidelines
 ~~~~~~~~~~~~~~~~~~~~
 
-The following section defines OpenHatch's Rules and Guidelines. 
+The following section defines OpenHatch's Rules and Guidelines.
 
-* The rules are binding and may not be violated. 
+* The rules are binding and may not be violated.
 * The guidelines specify rules that may be violated if necessary but we would
   rather one did not.
 
@@ -74,12 +74,12 @@ The Rules
 
 You will not carry out any willful, deliberate, reckless or unlawful act,
 interfere with the work of another developer or jeopardize the integrity of
-data, equipment, systems programs, or other stored information. 
+data, equipment, systems programs, or other stored information.
 
 You will not use the OpenHatch servers for financial gain or for commercial
 purposes, including consultancy or any other work outside the scope of official
 duties or functions for the time being, without specific authorization from
-Asheesh to do so. 
+Asheesh to do so.
 
 You will not use OpenHatch servers for any unlawful activities whatsoever.
 
@@ -122,7 +122,7 @@ Login Team. If you come up with cool ideas of for processes to run, you should
 have a conversation with the rest of the Login Team first. Running servers of
 any sort (this includes IRC bots) without prior permission from Login Team is
 also forbidden. Avoid running processes that are abusive in CPU or memory. If
-necessary Login Team will clean up such processes without warning. 
+necessary Login Team will clean up such processes without warning.
 
 **WWW pages**: In general, web space on the OpenHatch Servers is provided
 specifically for the purpose of serving the webapps of OpenHatch itself, whose
@@ -141,7 +141,7 @@ like an SSH tunnel, try to talk to Asheesh first to make sure your use is okay.
 **Mail/News**: Don't use the OpenHatch servers for reading email. If you want to
 forward your email address somewhere else, that's fine; create a .forward file.
 If a developer becomes unreachable for a prolonged time, his/her accounts, data
-and mail forwarding/filtering/etc may be disabled until the person reappears. 
+and mail forwarding/filtering/etc may be disabled until the person reappears.
 
 I HAVE READ AND AGREED TO THE FOLLOWING TERMS AND CONDITIONS
 

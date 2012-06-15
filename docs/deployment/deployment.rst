@@ -44,7 +44,7 @@ Recommended way to use the deploy script
 
     # Then get the patch file with e.g. wget, and do:
     # Import the patch into current branch, probably called deploy_me
-    git am /path/to/the/patch.file 
+    git am /path/to/the/patch.file
 
     git log  # and sanity-check it
 
