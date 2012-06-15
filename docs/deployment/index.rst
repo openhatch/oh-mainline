@@ -7,8 +7,9 @@ Deployment
 
     installation
     advanced_installation
-    maintenance
+    deployment
     heroku
+    maintenance
+    /contributor/login_team
 
-* Login team
 * Backups of the live site
