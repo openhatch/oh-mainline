@@ -19,10 +19,10 @@ read it to find out what have people agree to in order to get shell access.
 OpenHatch Servers Access & Usage Policies
 =========================================
 
-Version 1
+Version 1.1
 
-This version of the OpenHatch Servers Access & Usage Policies becomes effective
-on April 30, 2011.
+Version 1.0 of the OpenHatch Servers Access & Usage Policies becomes effective
+on April 30, 2011. Version 1.1 fixes some trivial typographic errors.
 
 
 Introduction
@@ -83,7 +83,7 @@ Asheesh to do so.
 
 You will not use OpenHatch servers for any unlawful activities whatsoever.
 
-You will not deliberately interfere with or alter the integrity of the Openhatch
+You will not deliberately interfere with or alter the integrity of the OpenHatch
 servers, by doing any of the following:
 
 * permitting another individual to use your shell login account;
@@ -106,10 +106,10 @@ You do not have to delete session IDs that come to you via the
 monitoring-private list, but you should not share them (because sharing session
 IDs can permit people to impersonate users).
 
-You will not use OpenHatch Servers in a manner which constitutes net abuse.
+You will not use OpenHatch servers in a manner which constitutes net abuse.
 
 You will not allow any bot net or other criminal infiltration of the OpenHatch
-Servers through carelessness or abuse, to the best of your ability. If you think
+servers through carelessness or abuse, to the best of your ability. If you think
 you found or created a security hole, you will tell Asheesh. He promises to be
 nice to you in his acknowledgment of the issue.
 
@@ -128,7 +128,8 @@ necessary Login Team will clean up such processes without warning.
 specifically for the purpose of serving the webapps of OpenHatch itself, whose
 goal is to help OSS projects get new contributors. Using your login account to
 create private 'vanity' pages on Openhatch Servers is discouraged. (Obviously,
-the OpenHatch web app itself promotes some web app.)
+the OpenHatch web app itself provides a way to create vanity pages; you may
+use that.)
 
 **Homedir**: If you receive an email notification that your homedir is large and
 that more free space is needed then please promptly take action. The Login Team
@@ -136,7 +137,7 @@ may find it necessary to clean up without warning.
 
 **Tunneling**: If you need to use the OpenHatch servers as the end of a tunnel,
 like an SSH tunnel, try to talk to Asheesh first to make sure your use is okay.
-(If you had to do in a hurry, try to tell him afterward.)
+(If you had to do it in a hurry, try to tell him afterward.)
 
 **Mail/News**: Don't use the OpenHatch servers for reading email. If you want to
 forward your email address somewhere else, that's fine; create a .forward file.
