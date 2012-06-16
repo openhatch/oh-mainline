@@ -121,11 +121,17 @@ ul#links { margin-left: 20px; }
 
 #footer-wrapper { width: 100%; clear: both; padding-top: 40px;}
 
-#footer { width: 100%; position: fixed; bottom: 0; background: #333; box-shadow: 0 0 7px #333; padding: 10px 0px; margin: 0 auto; text-align: right; z-index: 1005;}
+#footer { width: 100%; bottom: 0; background: #333; box-shadow: 0 0 7px #333; padding: 10px 0px; margin: 0 auto; z-index: 1005;}
+
+#footer .threecol { margin-left: 40px; }
+
+#footer .column { width: 210px; display: inline-block; margin: 0px 5px; vertical-align: top; float: none; }
 
 #footer ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
 
-#footer li { padding: 0 0 0 20px; display: inline; }
+#footer li { display: block; text-align: left; padding-left: 0; margin-bottom: 0.3em;}
+
+#footer h3 { color: #ddd; font-size: 1em; margin-bottom: 0.8em; }
 
 #footer a { color: white; } 
 
