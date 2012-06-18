@@ -9,4 +9,6 @@ Internals
 .. toctree::
     :maxdepth: 2
 
+    monitoring
     continuous_integration
+    emergency_operations
