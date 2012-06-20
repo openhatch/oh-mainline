@@ -31,6 +31,9 @@ key with the service. (If you need help with that, read their docs or
 find OpenHatch people on IRC.) Finally, make sure you have run the
 "heroku login" command.
 
+If you don't see instructions for your operating system, look in this page's
+`Troubleshooting`_ section.
+
 .. _their instructions: https://devcenter.heroku.com/articles/quickstart
 
 
@@ -64,9 +67,13 @@ You'll see output like this::
 Make sure your OpenHatch git repository is configured to use that Heroku app
 ============================================================================
 
-In order to use "git push" to deploy your app to Heroku, you must configure
-Heroku as a "git remote". Notice the git path provided by Heroku in the
-above output. Use git remote to add it, for example as follows::
+In order to use "git push" to deploy your app to Heroku, git must be configured.
+Use the following command to verify git is properly setup::
+
+  git config remote.heroku.url
+
+Notice the git path provided by Heroku in the above output. If there is no
+output, use git remote to add Heroku's repository, for example as follows::
 
   git remote add heroku git@heroku.com:better-frobulator.git
 
@@ -121,9 +128,21 @@ Now, populate the database with data::
 
   heroku run --app better-frobulator python manage.py syncdb --noinput
 
+More information from Heroku will scroll by. You may notice ::
+
+  ( INFO     Some parts of the OpenHatch site may fail because the lxml
+    library is not installed. Look in ADVANCED_INSTALLATION.mkd for
+    information about lxml )
+
+At this point this is not an issue.
+
 
 Visit your app on the web
 =========================
+
+The last Heroku's setup step is to launch a django web process with::
+
+  heroku scale web=1
 
 Now you can go to the Heroku URL for your app. If you're not sure what
 that URL is, you can type (remembering to replace "better-frobulator"
@@ -137,3 +156,38 @@ your web browser.
 Now, celebrate! Your OpenHatch instance is on the web. Go get yourself
 a strawberry smoothie (making substitutions as necessary for your
 dietary restrictions).
+
+
+Troubleshooting
+===============
+
+* If Heroku doesn't have instructions for your operating system, and you
+  have a package manager, try installing *git* and *rubygems* from your
+  package manager. For example, on Fedora and other systems that use yum,
+  you could type::
+
+    sudo yum install git rubytems
+
+  Then run::
+
+    sudo gem install heroku
+
+* After executing all Heroku's setup steps you should see an output similar to::
+
+    # Display active processes
+    heroku ps
+
+    === web: `./mysite/manage.py runserver 0.0.0.0:$PORT`
+    web.1: up for 1m
+
+* From time to time things might not work as expected. In those times, Heroku
+  provides with a nice log facility::
+
+    heroku logs
+
+  More documentation on how to use Heroku's `log facility`_ and `processes`_ is
+  available to you.
+
+.. _log facility: https://devcenter.heroku.com/articles/logging
+.. _processes: https://devcenter.heroku.com/articles/procfile
+
