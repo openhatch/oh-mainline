@@ -3,7 +3,8 @@
 import sys, os
 
 # Import OpenHatch version
-sys.path.insert(0,'..')
+project_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
+sys.path.insert(0,project_path)
 from setup import __version__
 
 # The suffix of source filenames.
