@@ -145,21 +145,42 @@
                 
         </div><!-- /#container -->
         </div>
-        
+
         <div id='footer-wrapper'>
-            <div id='footer'>
-                {% block footer %}
+          <div id='footer'>
+            {% block footer %}
+	    <div class="threecol">
+              <div class="column">
+                <h3>OpenHatch organization</h3>
+
                 <ul>
-                    <li><a href='/about/'>about openhatch</a></li>
-                    <li><a href="/bugs/">report a bug</a></li>
-                    <li><a href="/blog/">blog</a></li>
-                    <li><a href="/wiki/">wiki</a></li>
-                    <li><a href="http://forum.openhatch.org/">forum</a></li>
-                    <li><a href="/contact/">contact</a></li>
-                    <li><a href="/source-code-etc/">source code, etc.</a></li>
+                  <li><a href="/about/">about openhatch</a></li>
+                  <li><a href="/blog/">blog</a></li>
+                  <li><a href="/contact/">contact</a></li>
+                  <li><a href="https://openhatch.org/wiki/Privacy_policy">privacy policy</a></li>
                 </ul>
-                {% endblock footer %}
-            </div>
+              </div>
+
+	      <div class="column">
+		<h3>OpenHatch web app code</h3>
+		<ul>
+		  <li><a href="http://openhatch.readthedocs.org/en/latest/README.html">Intro for developers</a></li>
+		  <li><a href="https://github.com/openhatch/oh-mainline">Github (source code)</a></li>
+		  <li><a href="http://lists.openhatch.org/mailman/listinfo/devel">Devel mailing list</a></li>
+		  <li><a href="http://openhatch.readthedocs.org/">Code docs</a></li>
+		</ul>
+	      </div>
+
+	      <div class="column">
+		<h3>Other web tools</h3>
+		<ul>
+                  <li><a href="/wiki/">wiki</a></li>
+                  <li><a href="http://forum.openhatch.org/">forum</a></li>
+		</ul>
+	      </div>
+	    </div>
+            {% endblock footer %}
+          </div>
         </div>
 
         {% block js_before_bundle %}
