@@ -23,7 +23,7 @@ def get_user_ip(request):
     if request.META['REMOTE_ADDR'] == '127.0.0.1':
         return "98.140.110.121"
     else:
-        return request.META['REMOTE_ADDR'] 
+        return request.META['REMOTE_ADDR']
 
 class HandleWannaHelpQueue(object):
     def process_request(self, request):
@@ -35,7 +35,7 @@ class HandleWannaHelpQueue(object):
                 request.user, request.session)
             request.session['wanna_help_queue_handled'] = True
         return None
-        
+
 
 class DetectLogin(object):
     # called every time a page is gotten
