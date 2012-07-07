@@ -113,7 +113,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = [
     'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
-    'staticgenerator.middleware.StaticGeneratorMiddleware',
+    'mysite.base.middleware.StaticGeneratorMiddlewareOnlyWhenAnonymous',
     'sessionprofile.middleware.SessionProfileMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -321,7 +321,7 @@ if _overridden_db.startswith('postgres://'):
 if sys.platform.startswith('win'):
     # staticgenerator seems to act weirdly on Windows, so we disable it.
     MIDDLEWARE_CLASSES.remove(
-        'staticgenerator.middleware.StaticGeneratorMiddleware')
+        'mysite.base.middleware.StaticGeneratorMiddlewareOnlyWhenAnonymous')
 
 ### Enable the low-quality, high-load bug recommendation system
 RECOMMEND_BUGS=True
