@@ -17,6 +17,7 @@
 
 import mysite.profile.controllers
 import mysite.project.controllers
+import staticgenerator.middleware
 
 def get_user_ip(request):
 #    return request.META['REMOTE_ADDR']
@@ -30,7 +31,9 @@ class HandleWannaHelpQueue(object):
         if not hasattr(request, 'user') or not hasattr(request, 'session'):
             return None
 
-        if request.user.is_authenticated() and 'wanna_help_queue_handled' not in request.session:
+        if (hasattr(request, 'user') and
+            request.user.is_authenticated() and
+            'wanna_help_queue_handled' not in request.session):
             mysite.project.controllers.flush_session_wanna_help_queue_into_database(
                 request.user, request.session)
             request.session['wanna_help_queue_handled'] = True
@@ -48,3 +51,19 @@ class DetectLogin(object):
             mysite.project.controllers.take_control_of_our_answers(request.user, request.session)
             request.session['post_login_stuff_run'] = True
         return response
+
+class StaticGeneratorMiddlewareOnlyWhenAnonymous(object):
+    '''This is a wrapper around
+    staticgenerator.middleware.StaticGeneratorMiddleware that only saves to the
+    cache when request.user.is_authenticated() is False.
+
+    We never want to do static generation for when people are logged in.'''
+    def process_response(self, request, response):
+        # If the request comes from a user that is authenticated, bail.
+        if request.user.is_authenticated():
+            return response
+        # Finally, pass the reponse to StaticGeneratorMiddleware. The middleware
+        # there is responsible for checking the settings.STATIC_GENERATOR_URLS
+        # to make sure the URL is permitted to be cached.
+        m = staticgenerator.middleware.StaticGeneratorMiddleware()
+        return m.process_response(request, response)
