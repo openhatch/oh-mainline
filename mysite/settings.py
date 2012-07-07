@@ -282,25 +282,42 @@ import djcelery
 djcelery.setup_loader()
 
 # By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
-# that off.
+# that off.  If you want to see all SQL queries (e.g., when running a
+# management command locally), remove the stanza related to django.db.backends.
 #
-# If you want to see all SQL queries (e.g., when running a management command
-# locally), remove the stanza related to django.db.backends.
+# Also, this setup sends an email to the site admins on every HTTP 500 error
+# when DEBUG=False.
 LOGGING = {
     'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+    },
     'handlers': {
         'null': {
             'level': 'DEBUG',
             'class':'django.utils.log.NullHandler',
-            },
         },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+    },
     'loggers': {
         'django.db.backends': {
             'handlers': ['null'],  # Quiet by default!
             'propagate': False,
             'level':'DEBUG',
-            },
-        }
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
 }
 
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
