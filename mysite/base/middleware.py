@@ -59,6 +59,9 @@ class StaticGeneratorMiddlewareOnlyWhenAnonymous(object):
 
     We never want to do static generation for when people are logged in.'''
     def process_response(self, request, response):
+        # If somehow the request has no 'user' attribute, bail.
+        if not hasattr(request, 'user'):
+            return response
         # If the request comes from a user that is authenticated, bail.
         if request.user.is_authenticated():
             return response
