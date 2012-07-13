@@ -18,6 +18,7 @@
 
 from django.core.management import BaseCommand, CommandError
 from mysite.missions.svn import controllers
+from mysite.base.unicode_sanity import utf8
 import sys
 
 class Command(BaseCommand):
@@ -36,5 +37,5 @@ class Command(BaseCommand):
         try:
             controllers.SvnCommitMission.pre_commit_hook(repo_path, txn_id)
         except controllers.IncorrectPatch, e:
-            sys.stderr.write('\n    ' + str(e) + '\n\n')
+            sys.stderr.write('\n    ' + utf8(e) + '\n\n')
             raise CommandError, 'The commit failed to validate.'
