@@ -14,9 +14,6 @@ body { background-image: url(/static/images/light-hatch.png); }
 
 .module { }
 
-.module > .body.contains-submodules { /*background-image:
-    url(/static/images/motif.png)*/ }
-
 .two-column-right .module { width: 100%;}
 
 #footer {
@@ -31,30 +28,7 @@ p {
 #main li {
 line-height: 140%;
 }
-/*
-.module > .module-head h3 {
-    padding: 10px 20px;
-    padding-bottom: 5px;
-    width: 500px;
-font-size: 18pt;
-font-weight: normal;
-}
 
-.module > .module-body h3 {
-    float: none;
-    padding: 0;
-    margin: 1em 0 0;
-}
-
-.module > .module-body {
-    font-size: 9.5pt;
-}
-
-#sidebar > .module-body {
-    background: transparent url('images/white-sidebar.png');
-    border-left: none;
-    border-right: none;
-}*/
 .submodule {
     background-color: #f4f4f4;
 }
@@ -62,10 +36,6 @@ font-weight: normal;
 #left .module > .module-body {
  /* Overrides two_columns.css. */
      padding: 10px;
-}
-
-.submodule > .module-head {
-    /* background: #f4f4f4 url('/static/images/module-head-bg.png') bottom repeat-x; */
 }
 
 .module > .module-body ul {
