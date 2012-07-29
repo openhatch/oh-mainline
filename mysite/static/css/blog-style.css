@@ -10,7 +10,9 @@
 
 */
 
-body { background-image: url(/static/images/light-hatch.png); }
+body {
+    background-image: url(/static/images/light-hatch.png);
+}
 
 .module { }
 
@@ -26,7 +28,7 @@ p {
 }
 
 #main li {
-line-height: 140%;
+    line-height: 140%;
 }
 
 .submodule {
@@ -60,7 +62,7 @@ line-height: 140%;
 }
 
 .widget_tag_cloud {
-width: 260px;
+    width: 260px;
 }
 
 #outermost {
@@ -88,7 +90,7 @@ ul#account-links {
 
 .navigation {
     margin-bottom: 0;
-width: 714px;
+    width: 714px;
 }
 
 .alignleft {
@@ -106,21 +108,21 @@ width: 714px;
 /* unique */
 
 #comments {
-border-top: 1px solid #ddd;
-float: left;
-width: 663px;
-background: #f0f0f0; 
-margin-top: -10px;
+    border-top: 1px solid #ddd;
+    float: left;
+    width: 663px;
+    background: #f0f0f0;
+    margin-top: -10px;
     padding: 10px 20px;
 }
 #respond h3, #comments h3 {
     margin-top: 10px;
     float: left;
-width: 683px;
+    width: 683px;
 }
 #commentform {
-float: left;
-width: 673px;
+    float: left;
+    width: 673px;
 }
 
 #respond {
@@ -145,12 +147,12 @@ input[type='submit'] {
     clear: both;
     float: right;
     margin: 10px 10px 20px 0;
-border: 0;
--moz-border-radius: 8px;
-border-radius: 8px;
-padding: 4px 8px;
-cursor: hand;
-cursor: pointer;
+    border: 0;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: hand;
+    cursor: pointer;
 }
 
 label {
@@ -168,13 +170,13 @@ label {
     height: 60px;
     padding: 5px;
     margin: 0;
-clear: both;
+    clear: both;
 }
 
 #more-content p {
     padding: 20px 28px 10px 0;
-    }
-    
+}
+
 /* unique */
 
 #sidebar .body > ul {
@@ -204,7 +206,9 @@ clear: both;
     visibility: hidden;
 }
 
-#searchform label { width: 20px; }
+#searchform label {
+    width: 20px;
+}
 
 #searchform #s, #searchform #searchsubmit {
     text-align: left;
@@ -250,9 +254,9 @@ h3 {
     width: 500px;
 }
 .commentlist li {
-margin-top: 10px;
-float: left;
-width: 90%;
+    margin-top: 10px;
+    float: left;
+    width: 90%;
 }
 
 blockquote {
@@ -264,7 +268,9 @@ blockquote {
 /* end unique */
 
 /* How can I use OpenHatch to help me contribute to free software? page */
-#post-409 h2 { cursor: pointer; }
+#post-409 h2 {
+    cursor: pointer;
+}
 
 /* add to any */
 input.a2a_menu_find {
@@ -272,4 +278,6 @@ input.a2a_menu_find {
     margin: auto;
 }
 
-#footer {background-image: url(/static/images/dark-hatch.png);}
+#footer {
+    background-image: url(/static/images/dark-hatch.png);
+}
