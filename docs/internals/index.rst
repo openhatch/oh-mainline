@@ -13,6 +13,7 @@ Internals
   continuous_integration
   backup
   emergency_operations
+  wordpress
 
 
 Bug tracker import code
