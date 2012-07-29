@@ -26,6 +26,14 @@ maybe a Roundup theme? Who knows.)
 
 It is controlled by the template in mysite/base/templates/base/wordpress_index.html.
 
+One thing to note: When exporting the page for use with WordPress,
+make sure your settings are configured to set DEBUG to False, or else
+every WordPress user will get a copy of the Django Debug Toolbar. This
+is not actually a problem, just an amusing fact. (TODO: When
+django-debug-toolbar gets this pull request landed
+<https://github.com/django-debug-toolbar/django-debug-toolbar/pull/303>,
+we can use that in the instructions.)
+
 Related
 =======
 
