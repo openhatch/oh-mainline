@@ -263,3 +263,15 @@ def test_weekly_email_re_projects(request):
         return mysite.base.decorators.as_view(request, 'weekly_email_re_projects.html', context, "test_weekly_email_re_projects")
     else:
         return HttpResponse("(We couldn't find any recent project activity for you, so you wouldn't get an email updating you about it.)")
+
+### The following view(s) generate stub pages that get converted
+### into themes for other system(s).
+###
+### Right now, there's only one for a single page in a single
+### other theming system. Enjoy!
+
+@view
+def wordpress_index(request):
+    template_path = 'base/wordpress_index.html'
+    data = {}
+    return (request, template_path, data)
