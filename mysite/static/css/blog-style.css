@@ -10,95 +10,95 @@
 
 */
 
-body {
+body.wordpress {
     background-image: url(/static/images/light-hatch.png);
 }
 
-.module { }
+body.wordpress .module { }
 
-.two-column-right .module { width: 100%;}
+body.wordpress .two-column-right .module { width: 100%;}
 
-#footer {
+body.wordpress #footer {
     clear: both;
 }
 
-p {
+body.wordpress p {
     margin: 0.8em 0;
     line-height: 150%;
 }
 
-#main li {
+body.wordpress #main li {
     line-height: 140%;
 }
 
-.submodule {
+body.wordpress .submodule {
     background-color: #f4f4f4;
 }
 
-#left .module > .module-body {
+body.wordpress #left .module > .module-body {
  /* Overrides two_columns.css. */
      padding: 10px;
 }
 
-.module > .module-body ul {
+body.wordpress .module > .module-body ul {
     padding-left: 15px;
 }
 
-.module > .module-body li {
+body.wordpress .module > .module-body li {
     list-style-type: circle;
     margin: 0.8em 0;
 }
 
-#sidebar-list {
+body.wordpress #sidebar-list {
     padding-left: 0px;
 }
 
-#sidebar > .module-body li {
+body.wordpress #sidebar > .module-body li {
     list-style-type: none;
 }
-#sidebar > .module-body li li {
+body.wordpress #sidebar > .module-body li li {
     list-style-type: circle;
     width: 260px;
 }
 
-.widget_tag_cloud {
+body.wordpress .widget_tag_cloud {
     width: 260px;
 }
 
-#outermost {
+body.wordpress #outermost {
     background: url('images/background.png') top left no-repeat;
 }
 
-h1, h2, h3, h4 {
+body.wordpress h1, body.wordpress h2, body.wordpress h3, body.wordpress h4 {
     margin: 0;
 }
-h1 { font-size: 21pt; }
+body.wordpress h1 { font-size: 21pt; }
 
-#nav h2 {
+body.wordpress #nav h2 {
     width: 200px;
 }
 
-#page-top {
+body.wordpress #page-top {
     width: 1000px;
 }
 
-ul#account-links {
+body.wordpress ul#account-links {
     margin-left: 20px;
 }
 
 /*need equiv*/
 
-.navigation {
+body.wordpress .navigation {
     margin-bottom: 0;
     width: 714px;
 }
 
-.alignleft {
+body.wordpress .alignleft {
     padding: 10px 20px;
     float: left;
 }
 
-.alignright {
+body.wordpress .alignright {
     padding: 10px 20px;
     float: right;
 }
@@ -107,7 +107,7 @@ ul#account-links {
 
 /* unique */
 
-#comments {
+body.wordpress #comments {
     border-top: 1px solid #ddd;
     float: left;
     width: 663px;
@@ -115,20 +115,20 @@ ul#account-links {
     margin-top: -10px;
     padding: 10px 20px;
 }
-#respond h3, #comments h3 {
+body.wordpress #respond h3, body.wordpress #comments h3 {
     margin-top: 10px;
     float: left;
     width: 683px;
 }
-#commentform {
+body.wordpress #commentform {
     float: left;
     width: 673px;
 }
 
-#respond {
+body.wordpress #respond {
 }
 
-input[type='text'], textarea {
+body.wordpress input[type='text'], body.wordpress textarea {
     margin: 5px 10px 5px 0;
     width: 653px;
     font-family: sans-serif;
@@ -138,12 +138,12 @@ input[type='text'], textarea {
     border-radius: 8px;
 }
 
-input[type='text'] {
+body.wordpress input[type='text'] {
     height: 20px;
     width: 400px;
 }
 
-input[type='submit'] {
+body.wordpress input[type='submit'] {
     clear: both;
     float: right;
     margin: 10px 10px 20px 0;
@@ -155,7 +155,7 @@ input[type='submit'] {
     cursor: pointer;
 }
 
-label {
+body.wordpress label {
    float: left;
    padding: 13px 0;
    font-size: 16px;
@@ -165,7 +165,7 @@ label {
 
 /* end unique */
 
-#more-content {
+body.wordpress #more-content {
     width: 1000px;
     height: 60px;
     padding: 5px;
@@ -173,23 +173,23 @@ label {
     clear: both;
 }
 
-#more-content p {
+body.wordpress #more-content p {
     padding: 20px 28px 10px 0;
 }
 
 /* unique */
 
-#sidebar .body > ul {
+body.wordpress #sidebar .body > ul {
 }
-#sidebar ul li ul {
+body.wordpress #sidebar ul li ul {
     padding: 5px 0 0 15px;
 }
 
-#sidebar ul li ul li {
+body.wordpress #sidebar ul li ul li {
     list-style: circle;
 }
 
-#sidebar h2 {
+body.wordpress #sidebar h2 {
     margin-bottom: 0px;
     font-size: 12pt;
     font-weight: normal;
@@ -197,39 +197,39 @@ label {
     letter-spacing: 0;
 }
 
-#searchform {
+body.wordpress #searchform {
 }
 
-#searchform label {
+body.wordpress #searchform label {
     font-size: 10px;
     text-align: left;
     visibility: hidden;
 }
 
-#searchform label {
+body.wordpress #searchform label {
     width: 20px;
 }
 
-#searchform #s, #searchform #searchsubmit {
+body.wordpress #searchform #s, #searchform #searchsubmit {
     text-align: left;
     float: left;
     padding-bottom: 0;
 }
 
-#searchform #searchsubmit { padding: 4px 6px; margin: 0;}
+body.wordpress #searchform #searchsubmit { padding: 4px 6px; margin: 0;}
 
-#searchform #s {
+body.wordpress #searchform #s {
     width: 260px;
     margin-left: -20px;
 }
 
 /* end unique */
 
-h3 {
+body.wordpress h3 {
     margin: 0;
 }
 
-.module > .head ul li {
+body.wordpress .module > .head ul li {
     float: right;
     padding: 17px 20px;
     line-height: 13pt;
@@ -237,29 +237,29 @@ h3 {
     margin-right: 0 3px 0 0;
 }
 
-.module > .head ul li a:hover {
+body.wordpress .module > .head ul li a:hover {
     color: orange;
     text-decoration: underline;
 }
-.tags {
+body.wordpress .tags {
     width: 200px;
 }
 
 /* unique */
 
-.comment {
+body.wordpress .comment {
     padding: 5px 0;
 }
-.commentlist {
+body.wordpress .commentlist {
     width: 500px;
 }
-.commentlist li {
+body.wordpress .commentlist li {
     margin-top: 10px;
     float: left;
     width: 90%;
 }
 
-blockquote {
+body.wordpress blockquote {
     background-color: #eee;
     padding: 10px 20px;
     -moz-border-radius: 8px;
@@ -268,16 +268,16 @@ blockquote {
 /* end unique */
 
 /* How can I use OpenHatch to help me contribute to free software? page */
-#post-409 h2 {
+body.wordpress #post-409 h2 {
     cursor: pointer;
 }
 
 /* add to any */
-input.a2a_menu_find {
+body.wordpress input.a2a_menu_find {
     float: none;
     margin: auto;
 }
 
-#footer {
+body.wordpress #footer {
     background-image: url(/static/images/dark-hatch.png);
 }
