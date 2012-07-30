@@ -166,6 +166,7 @@ urlpatterns = patterns('',
         (r'^invitation/', include('invitation.urls')),
 
         (r'^$', 'mysite.base.views.home'),
+        (r'^\+theme-stubs/wordpress/index$', 'mysite.base.views.wordpress_index'),
 
         (r'^\+landing/import$', 'mysite.base.views.landing_for_documenters'),
         (r'^\+landing/opps$', 'mysite.base.views.landing_for_opp_hunters'),
