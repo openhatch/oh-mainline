@@ -10,8 +10,6 @@
 
 */
 
-body.wordpress .module { }
-
 body.wordpress .two-column-right .module { width: 100%;}
 
 body.wordpress #footer {
@@ -174,8 +172,6 @@ body.wordpress #more-content p {
 
 /* unique */
 
-body.wordpress #sidebar .body > ul {
-}
 body.wordpress #sidebar ul li ul {
     padding: 5px 0 0 15px;
 }
