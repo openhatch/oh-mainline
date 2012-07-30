@@ -122,7 +122,6 @@ body.wordpress #respond h3, body.wordpress #comments h3 {
 }
 body.wordpress #commentform {
     float: left;
-    width: 673px;
 }
 
 body.wordpress #respond {
