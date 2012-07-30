@@ -10,10 +10,6 @@
 
 */
 
-body.wordpress {
-    background-image: url(/static/images/light-hatch.png);
-}
-
 body.wordpress .module { }
 
 body.wordpress .two-column-right .module { width: 100%;}
