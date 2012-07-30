@@ -24,6 +24,8 @@
 <!doctype html>
 <html lang="en" dir="ltr">
     <head>
+      {% block extra_head %}
+      {% endblock %}
         <title>
             {% block whole_title %}
             OpenHatch - {% block title %}{% endblock %}
