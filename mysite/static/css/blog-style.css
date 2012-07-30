@@ -130,7 +130,7 @@ body.wordpress #respond {
 
 body.wordpress input[type='text'], body.wordpress textarea {
     margin: 5px 10px 5px 0;
-    width: 653px;
+    width: 560px;
     font-family: sans-serif;
     font-size: 14px;
     border: 1px solid #ddd;
