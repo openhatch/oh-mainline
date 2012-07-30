@@ -10,12 +10,11 @@
                         width='87' height='60' alt='openhatch' />
             </a>
         </h1>
-        <ul id='topnavlinks'>
-	  WORDPRESS_NAV_LINKS
-	</ul>
+        <!-- no nav links for WordPress -->
 </div>
 {% endblock %}
-{% block title %}WORDPRESS_TITLE{% endblock %}
+{% block whole_title %}WORDPRESS_TITLE{% endblock %}
+{% block extra_head %} WORDPRESS_HEAD {% endblock %}
 {% block left %} WORDPRESS_LEFT_STUFF_HERE {% endblock %}
 {% block main %} WORDPRESS_MAIN_STUFF_HERE {% endblock %}
 
