@@ -722,7 +722,7 @@ def delete_portfolio_entry_do(request):
 
 @login_required
 def save_portfolio_entry_do(request):
-    pk = request.POST['portfolio_entry__pk']
+    pk = request.POST.get('portfolio_entry__pk', 'undefined')
 
     if pk == 'undefined':
         project, _ = Project.objects.get_or_create(name=request.POST['project_name'])
