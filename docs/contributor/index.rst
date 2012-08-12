@@ -11,6 +11,7 @@ Contributor process
   chat_on_irc
   getting_started
   handling_patches
+  documentation
   login_team
   login_team_agreement
 
