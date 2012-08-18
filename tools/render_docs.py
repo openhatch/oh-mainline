@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Generate html documentation"""
 
 __requires__ = 'Sphinx>=1.1.2'
@@ -22,5 +23,5 @@ if __name__ == "__main__":
 
     # generate rendered html on the docs/html directory.
     os.chdir(docs_path)
-    sys.exit(main(['generate_docs.py','-b','html','-d','_temp','.','html']))
+    sys.exit(main(['render_docs.py','-b','html','-d','_temp','.','html']))
 

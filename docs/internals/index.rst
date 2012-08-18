@@ -16,6 +16,8 @@ Internals
   wordpress
 
 
+.. _bug_tracker_index:
+
 Bug tracker import code
 =======================
 
@@ -23,5 +25,5 @@ Bug tracker import code
   :maxdepth: 2
 
   bug_tracker_architecture
+  adding_bug_tracker
 
-* a step-by-step guide on adding a bug tracker
