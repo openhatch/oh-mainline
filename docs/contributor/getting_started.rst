@@ -34,14 +34,13 @@ How to run a local site
 Read installation.rst inside
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have the repository, open up the `installation.rst`_ file in any text
-viewer (like gedit, or your favorite web browser).
+Once you have the repository, open up the
+:doc:`docs/deployment/installation.rst </deployment/installation>` file in any
+text viewer (like gedit, or your favorite web browser).
+
 
 Read it, and follow the few short steps to getting your local site going. It
 should take about 5 minutes.
-
-
-.. _installation.rst: installation.html
 
 
 Next steps
@@ -54,13 +53,12 @@ We really recommend that you get in touch with us. (It's not quite mandatory,
 but we'll all be happier if you do)
 
   1. Join the `Devel mailing list`_ and say hello.
-  2. `the #openhatch IRC channel in freenode`_.
+  2. :doc:`the #openhatch IRC channel in freenode </contributor/chat_on_irc>`.
 
   We have weekly meetings, typically on Saturdays at 4pm EST (-5 UTC).
 
 
 .. _Devel mailing list: http://lists.openhatch.org/mailman/listinfo/devel
-.. _the #openhatch IRC channel in freenode: https://openhatch.org/wiki/Chat_with_us_on_IRC
 
 
 Read more documentation
@@ -92,7 +90,7 @@ haven't gotten around to working on it, leave a note on the ticket saying that
 you are interested in taking it (you can also try asking on IRC).
 
 When you are ready to submit a patch for an issue, follow the guidelines at
-`How we handle patches`_.
+:doc:`/contributor/handling_patches`.
 
 If you ever feel like you are getting stuck or could use some design feedback,
 don't hesitate to ask for help on the IRC channel, on the devel mailing list,
@@ -101,4 +99,3 @@ great time to ask for help or recommendations on issues to work on.
 
 
 .. _here: https://openhatch.org/bugs/issue?@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@filter=status,keyword&@pagesize=50&@startwith=0&status=-1,1,2,3,4,5,6,7,9,10&keyword=1&@dispname=bitesized
-.. _How we handle patches: handling_patches.html
