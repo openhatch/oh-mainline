@@ -6,9 +6,8 @@ Bug tracker import code/architecture
 About this page
 ===============
 
-This page covers the **architecture** of our bug tracker import code. There are
-other wiki pages covering the :doc:`/internals/index` and our bug tracker
-import code.
+This document covers the **architecture** of our bug tracker import code. There
+are other documents covering the :ref:`bug_tracker_index`.
 
 
 One file per style of bug tracker
