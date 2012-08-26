@@ -76,6 +76,7 @@ def main(argv=None):
                             'python-openid==2.2.5-openhatch1', # as of this writing, upstream has an HTML file where a tar.gz should be
                             'sessionprofile==1.0',
                             'django-model-utils',
+                            'tastypie',
                            ],
 
         # dependency_links is a list of URLs. If you need to override the URL
