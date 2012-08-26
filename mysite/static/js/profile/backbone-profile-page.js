@@ -6,39 +6,29 @@ Profile.addRegions({
     
 PortfolioEntry = Backbone.Model.extend({
     defaults: {
-        project__name: 'Twisted',
-        project__icon: '/404.png',
-        project_id: 1,
-        project_url: '/+projects/twisted/',
-        project_description: 'The engine of your internets',
-        experience_description: 'I hacked the RSS feed reader.',
-        is_published: true,
-        is_deleted: false,
-        is_archived: false,
-        sort_order: 0,
-        receive_maintainer_updates: true,
-        citation_list: [{   url: 'http://sample.com', 
-                            description: 'Link to the bug I fixed'
-                       }]
-        }
+        project_id: 1
+        },
+    urlRoot: '/+api/v1/profile/portfolio_entry/'
 });
     
 Portfolio = Backbone.Collection.extend({
     model: PortfolioEntry,
     comparator: function(entry){
         return entry.get('sort_order');
-        }
+        },
+    urlRoot: '/+api/v1/profile/portfolio_entry/'
 });
 
 PortfolioEntryView = Backbone.Marionette.ItemView.extend({
     template: '#portfolio-entry-template',
-    className: 'portfolio_entry',
+    className: 'portfolio_entry edit',
     tagName: 'li'
 });
 
 PortfolioView = Backbone.Marionette.CompositeView.extend({
     tagName: "div",
     id: 'portfolio-entries-all',
+    className: 'edit',
     template: '#portfolio-entries-list-template',
     itemView: PortfolioEntryView,
     
@@ -53,35 +43,18 @@ Profile.addInitializer(function(options){
     });
     
 $(document).ready(function(){
-    var portfolio = new Portfolio([
-        new PortfolioEntry ({ 
-            project__name: 'Wet Cat', 
-            project_description: 'A cat that is wet.', 
-            project_id: 2,
-            receive_maintainer_updates: false,
-            citation_list: [
-               {   url: 'http://whee.com', 
-                    description: 'Bugs I have fixed'
-               },
-               {   url: 'http://things.com', 
-                    description: 'Blog post about my feature'
-               },
-               {   url: 'http://pyvideo.org', 
-                    description: 'Video of my 2012 PyCon talk about Wet Cat'
-               },
-            ]
-            }),
-        new PortfolioEntry ({ 
-            project__name: 'Bitey', 
-            project_id: 3,
-            project_description: 'A rather angry cat emulator.', 
-            experience_description: 'I hacked your face.'
-            }),
-        new PortfolioEntry ({ 
-            project__name: 'Ceiling Cat', 
-            receive_maintainer_updates: false
-            })
-        ]);
+    var portfolio = new Portfolio([]);
+    
+    $.ajax({
+        type: "GET", 
+        url: '/+api/v1/profile/portfolio_entry/'
+        })
+        .done(function(data) {
+            _.each(data.objects, function(entry){
+                portfolio.add(new PortfolioEntry(entry));
+            });
+        });
+    
     Profile.start({ portfolio: portfolio });
     
     });
