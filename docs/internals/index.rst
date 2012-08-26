@@ -14,6 +14,7 @@ Internals
   backup
   emergency_operations
   wordpress
+  api
 
 
 .. _bug_tracker_index:
