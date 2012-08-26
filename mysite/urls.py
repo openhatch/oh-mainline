@@ -39,6 +39,7 @@ from voting.views import vote_on_object
 
 import mysite.account.views
 import mysite.profile.views
+import mysite.profile.api
 import mysite.missions.svn.views
 import mysite.missions.setup.views
 
@@ -56,6 +57,9 @@ urlpatterns = patterns('',
         (r'^\)$', lambda x: HttpResponsePermanentRedirect('/')),
 
         (r'^\+meta/', 'mysite.base.views.meta'),
+
+        (r'^\+api/v1/profile/',
+         include(mysite.profile.api.PortfolioEntryResource().urls)),
 
         (r'^\+test_weekly_email_re_projects/', 'mysite.base.views.test_weekly_email_re_projects'),
 
