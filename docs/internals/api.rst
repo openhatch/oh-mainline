@@ -19,8 +19,17 @@ API v1 Profile data
 The URL /+api/v1/profile/ is a RESTful API base URL. It has one endpoint,
 portfolio_entry.
 
-You can find out more about it interactively, by visiting a URL like
+You can find out more about it interactively in your web browser, by
+visiting a URL like
 http://127.0.0.1:8000/+api/v1/profile/portfolio_entry/?format=json .
+
+Additionally, if you have "cURL" (a common web page downloading tool),
+you can run this command from your computer's command prompt::
+
+ curl http://127.0.0.1:8000/+api/v1/profile/portfolio_entry/
+
+Note that with curl (and with AJAX clients), you can (and should) omit
+?format=json.
 
 This exports data from the *PortfolioEntry* model in
 mysite/profile/models.py. You can read the detailed code and
@@ -42,3 +51,10 @@ and values of a dictionary of data about the user.
 use any sort of API system like Tastypie. We should probably convert
 it to use Tastypie.)
 
+If you want to try this URL with cURL, try running this command from
+your computer's command prompt::
+
+ curl http://127.0.0.1:8000/+profile_api/location_data/?person_ids=1,2,3,4
+
+You should see JSON data with location and other information for those
+person IDs.
