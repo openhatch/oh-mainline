@@ -27,6 +27,7 @@ packages/importlib
 packages/jsmin
 packages/kombu
 packages/mechanize
+packages/mimeparse
 packages/mock
 packages/odict/src
 packages/openid
