@@ -35,7 +35,7 @@ Profile API (for location data)
 ===============================
 
 The URL /+profile_api/location_data/ accepts IDs as input through the
-*person_ids* paramter, and it returns a JSON dictionary with user IDs
+*person_ids* parameter, and it returns a JSON dictionary with user IDs
 and values of a dictionary of data about the user.
 
 (This "API" is implemented in mysite/profile/views.py, and it doesn't
