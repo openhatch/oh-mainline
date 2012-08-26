@@ -21,6 +21,11 @@
 
 {% load base_extras %}
 
+{% block less %}
+    {{ block.super }}
+    <link rel="stylesheet/less" type="text/css" href="{% version '/static/less/profile/portfolio.less' %}">
+{% endblock less %}
+
 
 {% block title %}
 {{ person.get_full_name_or_username }}
@@ -102,6 +107,8 @@
             </a>
             </li>
         </ul>
+        {% else %}
+        &nbsp;
         {% endif %}
     </div>
 </div> <!-- /#portfolio -->
@@ -123,10 +130,19 @@
 
 <script type="text/template" id="portfolio-entries-list-template">
 <ul id="portfolio-entries-list" class="edit"></ul>
+<button class='nudgebutton save_all_portfolio_entries'>Save all</button>
 </script>
 
 <script type="text/template" id="portfolio-entry-template">
-<div class='submodule clearfix'>
+<div class='submodule clearfix <% if (!save_status) { %>unsaved<% } %>'>
+    <div class='portfolio-entry-status-bar 
+            <% if (save_status) { %>
+                saved'><span class='portfolio_entry_save_status'>Saved</span>
+            <% } else { %>
+                unsaved'><span class='portfolio_entry_save_status'>Unsaved</span>
+            <% } %>
+    <a class='delete-portfolio-entry link_like' title="Delete">Χ</a>
+    </div>
     <div class='project-stuff'>
         <div class='name_and_icon_flagger'>
                 <div class='project_icon' style="background-image: url(<%= project__icon %>)">
@@ -173,15 +189,13 @@
         <div class="clearer"></div>
     </div>
 
-    <ul class='actions'>
-        <li class='portfolio_entry_is_unpublished'><span>Unpublished</span></li>
-        <li class='portfolio_entry_is_published'><span>Published</span></li>
-        <li class='publish_portfolio_entry save_and_publish_button'><a href='#'>Save and publish</a></li>
-        <li id="update_icon" style='display:none;padding-left:35px;'><img src='/static/images/update.gif' alt='loading...' />
-        <li class='publish_portfolio_entry save_button'><a href='#'>Save</a></li>
-        <li class='portfolio_entry_is_saved'><span>Saved</span></li>
-        <li class='delete_portfolio_entry'><a href='#'>Delete</a></li>
-    </ul>
+        <button class='button save_portfolio_entry'
+            <% if (!save_status) { %>
+                >Save
+            <% } else { %>
+            disabled=disabled>Saved
+            <% } %>
+            </button>
 </div>
     
 </script>

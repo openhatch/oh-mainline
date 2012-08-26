@@ -6,7 +6,8 @@ Profile.addRegions({
     
 PortfolioEntry = Backbone.Model.extend({
     defaults: {
-        project_id: 1
+        project_id: 1,
+        save_status: true
         },
     urlRoot: '/+api/v1/profile/portfolio_entry/'
 });
