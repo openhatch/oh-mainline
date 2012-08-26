@@ -31,14 +31,9 @@
     <div class='module-head'>
         <h3>Projects</h3>
     </div>
-    <div class='module-body'>
+    <div id="portfolio-entries" class='module-body'>
         {% with person.get_published_portfolio_entries as portfolio_entries %} 
             {% if portfolio_entries %}
-                <ul>
-                    {% for pf_entry in portfolio_entries %}
-                    {% include 'profile/portfolio/portfolio_entry_element.html' %}
-                    {% endfor %}
-                </ul>
                 {% if how_many_archived_pf_entries %}
                     <a id='show_more_projects' href='#'>
                         And {{ how_many_archived_pf_entries }} more&hellip;</a>
@@ -107,4 +102,88 @@
     <script type='text/javascript'>
         $(ShowMoreProjects.init);
     </script>
+    
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script src="{% version '/static/js/vendor/underscore.js' %}"></script>
+    <script src="{% version '/static/js/vendor/backbone.js' %}"></script>
+    <script src="{% version '/static/js/vendor/backbone.marionette.js' %}"></script>
+    <script src="{% version '/static/js/profile/backbone-profile-page.js' %}"></script>
 {% endblock js %}
+
+{% block backbone_templates %}
+
+<script type="text/template" id="portfolio-entry-list-template">
+<ul></ul>
+</script>
+
+<script type="text/template" id="portfolio-entry-template">
+<div class='submodule clearfix'>
+    <div class='project-stuff'>
+        <div class='name_and_icon_flagger'>
+                <div class='project__icon' style="background-image: url(<%= path_to_project_icon %>)">
+                    <span class='alt-text'><%= project__name %></span>
+                </div>
+            <span class='project_name'>
+                <a href='<%= project_url %>'>
+                    <%= project__name %>
+                </a>
+            </span>
+        </div>
+        <div class='project_description-wrapper'>
+            <label for='project_description_<%= project_id %>'>Describe this project:</label>
+            <textarea id='project_description_<%= project_id %>' class='project_description'><%= project_description %></textarea>    
+        </div>
+    <div class='receive_maintainer_updates'>
+            <input type='checkbox' class='receive_maintainer_updates'
+                   value='<%= receive_maintainer_updates %>'>
+	        Receive maintainer updates
+	        <a class='explain_maintainer_updates' href='#'>(explain this)</a>
+    </div>        
+</div>
+
+<div class='personal-stuff'>
+    <div class='citations-wrapper'>
+        <label>
+            Web pages that talk about your involvement: <a class='explain_citations' href='#'>(explain this)</a>
+        </label>
+            <ul class='citations'>
+                <% citations.each(function(citation){ %>
+                    <li>
+                        <div class='actions'>
+                            <a href="#" class='delete_citation'></a>
+                        </div>
+                        <div class='summary'>
+                            <a href="<%= citation.url %>"><%= citation.summary %></a>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+            <ul class='citation-forms'>
+            </ul>
+            <span class='add link_like'>Add a page</span>
+    </div>
+    <div class='experience_description-wrapper'>
+        <label for='experience_description'>
+            Describe your involvement:
+        </label>
+        <textarea id='experience_description' class='experience_description'>
+            <%= experience_description %>
+        </textarea>           
+    </div>
+    <div class="clearer"></div>
+</div>
+
+<ul class='actions'>
+    <li class='portfolio_entry_is_unpublished'><span>Unpublished</span></li>
+    <li class='portfolio_entry_is_published'><span>Published</span></li>
+    <li class='publish_portfolio_entry save_and_publish_button'><a href='#'>Save and publish</a></li>
+    <li id="update_icon" style='display:none;padding-left:35px;'><img src='/static/images/update.gif' alt='loading...' />
+    <li class='publish_portfolio_entry save_button'><a href='#'>Save</a></li>
+    <li class='portfolio_entry_is_saved'><span>Saved</span></li>
+    <li class='delete_portfolio_entry'><a href='#'>Delete</a></li>
+</ul>
+    
+</script>
+
+{% endblock backbone_templates %}
