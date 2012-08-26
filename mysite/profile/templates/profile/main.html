@@ -19,6 +19,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% load base_extras %}
+
 
 {% block title %}
 {{ person.get_full_name_or_username }}
@@ -103,7 +105,6 @@
         $(ShowMoreProjects.init);
     </script>
     
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js"></script>
     <script src="{% version '/static/js/vendor/underscore.js' %}"></script>
     <script src="{% version '/static/js/vendor/backbone.js' %}"></script>
@@ -113,15 +114,15 @@
 
 {% block backbone_templates %}
 
-<script type="text/template" id="portfolio-entry-list-template">
-<ul></ul>
+<script type="text/template" id="portfolio-entries-list-template">
+<ul id="portfolio-entries-list"></ul>
 </script>
 
 <script type="text/template" id="portfolio-entry-template">
 <div class='submodule clearfix'>
     <div class='project-stuff'>
         <div class='name_and_icon_flagger'>
-                <div class='project__icon' style="background-image: url(<%= path_to_project_icon %>)">
+                <div class='project_icon' style="background-image: url(<%= project__icon %>)">
                     <span class='alt-text'><%= project__name %></span>
                 </div>
             <span class='project_name'>
@@ -134,55 +135,47 @@
             <label for='project_description_<%= project_id %>'>Describe this project:</label>
             <textarea id='project_description_<%= project_id %>' class='project_description'><%= project_description %></textarea>    
         </div>
-    <div class='receive_maintainer_updates'>
-            <input type='checkbox' class='receive_maintainer_updates'
-                   value='<%= receive_maintainer_updates %>'>
-	        Receive maintainer updates
-	        <a class='explain_maintainer_updates' href='#'>(explain this)</a>
-    </div>        
-</div>
+        <div class='receive_maintainer_updates'>
+                <input type='checkbox' class='receive_maintainer_updates'
+                       value='<%= receive_maintainer_updates %>'>
+	            Receive maintainer updates
+	            <a class='explain_maintainer_updates' href='#'>(explain this)</a>
+        </div>        
+    </div>
 
-<div class='personal-stuff'>
-    <div class='citations-wrapper'>
-        <label>
-            Web pages that talk about your involvement: <a class='explain_citations' href='#'>(explain this)</a>
-        </label>
-            <ul class='citations'>
-                <% citations.each(function(citation){ %>
-                    <li>
-                        <div class='actions'>
-                            <a href="#" class='delete_citation'></a>
-                        </div>
-                        <div class='summary'>
-                            <a href="<%= citation.url %>"><%= citation.summary %></a>
-                        </div>
-                    </li>
+    <div class='personal-stuff'>
+        <div class='citations-wrapper'>
+            <label>
+                Web pages that talk about your involvement: <a class='explain_citations' href='#'>(explain this)</a>
+            </label>
+                <ul class='citations'>
+                <% _.each(citation_list, function(citation){ %>
+                    <li><a href="<%= citation.url %>"><%= citation.description %></a></li>
                 <% }); %>
-            </ul>
-            <ul class='citation-forms'>
-            </ul>
-            <span class='add link_like'>Add a page</span>
+                </ul>
+                <ul class='citation-forms'>
+                </ul>
+                <span class='add link_like'>Add a page</span>
+        </div>
+        <div class='experience_description-wrapper'>
+            <label for='experience_description'>
+                Describe your involvement:
+            </label>
+            <textarea id='experience_description' class='experience_description'><%= experience_description %></textarea>           
+        </div>
+        <div class="clearer"></div>
     </div>
-    <div class='experience_description-wrapper'>
-        <label for='experience_description'>
-            Describe your involvement:
-        </label>
-        <textarea id='experience_description' class='experience_description'>
-            <%= experience_description %>
-        </textarea>           
-    </div>
-    <div class="clearer"></div>
-</div>
 
-<ul class='actions'>
-    <li class='portfolio_entry_is_unpublished'><span>Unpublished</span></li>
-    <li class='portfolio_entry_is_published'><span>Published</span></li>
-    <li class='publish_portfolio_entry save_and_publish_button'><a href='#'>Save and publish</a></li>
-    <li id="update_icon" style='display:none;padding-left:35px;'><img src='/static/images/update.gif' alt='loading...' />
-    <li class='publish_portfolio_entry save_button'><a href='#'>Save</a></li>
-    <li class='portfolio_entry_is_saved'><span>Saved</span></li>
-    <li class='delete_portfolio_entry'><a href='#'>Delete</a></li>
-</ul>
+    <ul class='actions'>
+        <li class='portfolio_entry_is_unpublished'><span>Unpublished</span></li>
+        <li class='portfolio_entry_is_published'><span>Published</span></li>
+        <li class='publish_portfolio_entry save_and_publish_button'><a href='#'>Save and publish</a></li>
+        <li id="update_icon" style='display:none;padding-left:35px;'><img src='/static/images/update.gif' alt='loading...' />
+        <li class='publish_portfolio_entry save_button'><a href='#'>Save</a></li>
+        <li class='portfolio_entry_is_saved'><span>Saved</span></li>
+        <li class='delete_portfolio_entry'><a href='#'>Delete</a></li>
+    </ul>
+</div>
     
 </script>
 
