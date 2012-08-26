@@ -124,7 +124,7 @@ def display_person_web(request, user_to_display__username=None):
     person, was_created = Person.objects.get_or_create(user=user)
 
     data = get_personal_data(person)
-    data['edit_mode'] = False
+    data['edit_mode'] = request.GET.get('edit_mode', False)
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True

@@ -33,11 +33,13 @@
     <div class='module-head'>
         <h3>Projects</h3>
     </div>
-    <div id="portfolio-entries" class='module-body'>
+    <div id="portfolio-entries" class='module-body {% if editable and edit_mode %}edit{% endif %}'>
         {% with person.get_published_portfolio_entries as portfolio_entries %} 
+            {% if not edit_mode %}
             {% if portfolio_entries %}
                 <ul id="portfolio-entries-list">
-                    {% for entry in portfolio_entries %}
+                    {% for pf_entry in portfolio_entries %}
+                        {% include 'profile/portfolio/portfolio_entry_element.html' %}
                     {% endfor %}
                 </ul>
                 {% if how_many_archived_pf_entries %}
@@ -87,14 +89,15 @@
                 {% endif %}
                 <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
             {% endif %}
+            {% endif %}
         {% endwith %}
 
     </div>
     <div class="module-foot">
-        {% if editable %}
+        {% if editable and not edit_mode %}
         <ul>
             <li>
-            <a href='{% url mysite.profile.views.portfolio_editor %}'>
+            <a href='?edit_mode=true'>
                 Add/edit projects &raquo;
             </a>
             </li>

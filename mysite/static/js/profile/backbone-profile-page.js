@@ -1,7 +1,7 @@
 Profile = new Backbone.Marionette.Application();
 
 Profile.addRegions({
-    portfolio: "#portfolio-entries"
+    portfolio: "#portfolio-entries.edit"
 });
     
 PortfolioEntry = Backbone.Model.extend({
