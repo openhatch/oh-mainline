@@ -52,6 +52,9 @@ URL_PREFIX='https://openhatch.org'
 
 RECOMMEND_BUGS=False
 
+### Sessions in database, but cached in memcached if available
+SESSION_ENGINE="django.contrib.sessions.backends.cached_db"
+
 ### Set the logging level to just WARNING or above
 import logging
 logger = logging.getLogger('')
