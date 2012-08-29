@@ -9,6 +9,8 @@ mysite/static/images/icons/projects/**
 .installed.cfg
 develop-eggs
 dist
+docs/_temp/
+docs/html/
 downloads
 eggs
 parts
