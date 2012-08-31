@@ -1,0 +1,56 @@
+==========
+ html5lib
+==========
+
+html5lib is a pure-python library for parsing HTML. It is designed to
+conform to the HTML 5 specification, which has formalized the error handling
+algorithms of popular web browsers.
+
+Installation
+============
+
+The best way to install html5lib is using pip e.g.
+
+::
+
+pip install html5lib
+
+You can also use the traditional 
+
+::
+
+python setup.py install
+
+Tests
+=====
+
+You may wish to check that your installation has been a success by
+running the testsuite. The tests are run using the nosetests tool::
+
+python setup.py nosetests
+
+Usage
+=====
+
+Simple usage follows this pattern::
+
+import html5lib
+f = open("mydocument.html")
+document = html5lib.parse(f)
+
+More documentation is avaliable in the docstrings or from
+http://code.google.com/p/html5lib/wiki/UserDocumentation
+
+Bugs
+====
+
+Please report any bugs on the issue tracker:
+http://code.google.com/p/html5lib/issues/list
+
+Get Involved
+============
+
+Contributions to code or documenation are actively encouraged. Submit
+patches to the issue tracker or discuss changes on irc in the #whatwg
+channel on freenode.net
+

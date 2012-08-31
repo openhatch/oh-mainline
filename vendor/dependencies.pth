@@ -23,6 +23,7 @@ packages/feedparser/feedparser
 packages/gdata/src
 packages/ghettoq
 packages/html2text
+packages/html5lib
 packages/importlib
 packages/jsmin
 packages/kombu
