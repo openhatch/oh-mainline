@@ -138,7 +138,7 @@ about how you can help {{ project.display_name }}
                                         {% endifequal %}
 
                                         <span class="answer" id="answer_{{answer.pk}}">
-                                            {{ answer.text|urlize_without_escaping_percent_signs|safe|linebreaks }}
+                                            {{ answer.text|bleach_urlize|linebreaks }}
                                             <br/>
                                             {% include 'project/byline.html' %}
                                         </span>
