@@ -55,3 +55,11 @@ Recommended way to use the deploy script
 It's really important to make the separate branch so that you don't accidentally
 push random local work into the live site.
 
+Other sites we host
+===================
+
+The OpenHatch infrastructure hosts some other websites, including
+bostonpythonworkshop.com and corp.openhatch.org. For information about that, read
+the `documentation on the wiki about static site hosting`_.
+
+.. _documentation on the wiki about static site hosting: https://openhatch.org/wiki/Static_site_hosting
