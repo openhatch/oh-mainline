@@ -1,6 +1,7 @@
 packages/amqplib
 packages/anyjson
 packages/BeautifulSoup
+packages/bleach
 packages/celery
 packages/decorator/src
 packages/Django
