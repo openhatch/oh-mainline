@@ -1437,6 +1437,33 @@ accuracy.""",
         # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaks
         self.assertContains(project_page, "<br />".join(text))
 
+    def test_answer_with_background_color(self):
+        """
+        If a user submits HTML with embedded styles, they should be dropped.
+        """
+        # go to the project page
+        p = Project.create_dummy(name='Ubuntu')
+        q = ProjectInvolvementQuestion.create_dummy(
+            key_string='where_to_start', is_bug_style=False)
+        q.save()
+        text = u'<p style="background-color: red;">red</p>'
+        POST_data = {
+                'project__pk': p.pk,
+                'question__pk': q.pk,
+                'answer__text': text
+                }
+
+        # Submit the data while logged in
+        POST_handler = reverse(mysite.project.views.create_answer_do)
+        self.login_with_client().post(POST_handler, POST_data)
+
+        # Look at the page while logged out (so we see the anonymous rendering)
+        project_page = self.client.get(p.get_url())
+
+        # The urlize filter in the template should make sure we get a link
+        self.assertNotContains(project_page,
+                            '''background-color: red''')
+
 class BugKnowsItsFreshness(TestCase):
     def test(self):
         b = mysite.search.models.Bug.create_dummy_with_project()

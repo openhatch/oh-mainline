@@ -24,6 +24,7 @@ import datetime
 import re
 import os
 import urlparse
+import bleach
 import mysite.project.controllers
 
 from django.utils.html import * 
@@ -94,6 +95,19 @@ def get_answers_from_session(request):
 def get_project_display_names_to_help_from_session(request):
     return [p.display_name for p in
             mysite.project.controllers.get_wanna_help_queue_from_session(request.session)]
+
+@register.filter
+def bleach_urlize(text):
+    '''Converts any URLs in text into clickable links.
+
+    This adds rel=nofollow, and also sanitizes the input through bleach.'''
+    linkified = bleach.linkify(unicode(text))
+    cleaned = bleach.clean(linkified,
+                           tags=['a',
+                                 'p', 'div', 'br', 'span'
+                                 'b', 'strong',
+                                 'em', 'i'])
+    return mark_safe(cleaned)
 
 @register.filter
 def urlize_without_escaping_percent_signs(text, trim_url_limit=None, nofollow=False, autoescape=False):
