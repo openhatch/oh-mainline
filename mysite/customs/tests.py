@@ -2156,6 +2156,14 @@ class BugTrackerEditingViews(TwillTests):
         super(BugTrackerEditingViews, self).setUp()
         self.twisted = mysite.search.models.Project.create_dummy(name='Twisted System')
 
+    def test_slash_does_not_crash_tracker_editor(self):
+        mysite.customs.models.TracTrackerModel.all_trackers.create(
+            tracker_name="something/or other")
+        client = self.login_with_client()
+        url = reverse(mysite.customs.views.list_trackers)
+        response = client.post(url, {'list_trackers-tracker_type': 'trac'})
+        self.assertEqual(200, response.status_code)
+
     def test_bug_tracker_edit_form_fills_in_hidden_field(self):
         client = self.login_with_client()
         url = reverse(mysite.customs.views.add_tracker,
