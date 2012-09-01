@@ -2173,7 +2173,7 @@ class BugTrackerEditingViews(TwillTests):
         self.assertEqual(self.twisted,
                          response.context['tracker_form'].initial['created_for_project'])
 
-    def test_bug_tracker_edit_url_missing_url_id_404s(self):
+    def test_bug_tracker_edit_url_missing_url_id_302s(self):
         client = self.login_with_client()
         url = reverse(mysite.customs.views.edit_tracker_url, kwargs={
                 'tracker_type': 'trac', 'tracker_name': 'whatever',
@@ -2184,9 +2184,9 @@ class BugTrackerEditingViews(TwillTests):
         url = url.replace('000', '')
 
         response = client.get(url)
-        print response.status_code
+        # This should redirect to what amounts to a not-found page
 
-        assert response.status_code == 404
+        assert response.status_code == 302
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
