@@ -67,6 +67,35 @@ all_trackers = {
             },
         }
 
+def import_one_bug_item(d):
+    '''Accepts one ParsedBug object, as a Python dict.
+
+    Usually causes the side effect of creating a Bug project.'''
+    project = mysite.search.models.Project.objects.get(name=d['_project_name'])
+    tracker = mysite.customs.models.TrackerModel.get_by_name(
+        tracker_name=d['_tracker_name'])
+    del d['_project_name']
+    del d['_tracker_name']
+    # Look for a matching Bug
+    matches = mysite.search.models.Bug.all_bugs.filter(
+        canonical_bug_link=d['canonical_bug_link'])
+    if matches:
+        bug = matches[0]
+    else:
+        bug = mysite.search.models.Bug()
+
+    for key in d:
+        value = d[key]
+        if getattr(bug, key) != value:
+            setattr(bug, key, value)
+
+    if (bug.project_id is None) or (bug.project != project):
+        bug.project = project
+    if (bug.tracker_id is None) or (bug.tracker != tracker):
+        bug.tracker = tracker
+
+    bug.save()
+    return bug
 
 class AddTrackerForeignKeysToBugs(object):
 

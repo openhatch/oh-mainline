@@ -2386,3 +2386,41 @@ class LaunchpadTrackerEditingViews(TwillTests):
         self.assertEqual(1,
                          mysite.customs.models.LaunchpadQueryModel.objects.all().count())
 
+
+### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
+class ImportBugsFromFiles(django.test.TestCase):
+    def setUp(self, *args, **kwargs):
+        # Create the Twisted project object
+        mysite.search.models.Project.objects.create(name='Twisted')
+
+        # Set up the Twisted TrackerModel that will be used here.
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+
+    def test_import_from_data_dict(self):
+        sample_data = [
+            {'status': 'new', 'as_appears_in_distribution': '',
+             'description': "This test method sets the mode of sub1 such that it cannot be deleted in the usual way:\r\r    [Error 5] Access is denied: '_trial_temp\\\\twisted.test.test_paths\\\\FilePathTestCase\\\\test_getPermissions_Windows\\\\bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that regardless of the test outcome, this file ends up deletable, or it should delete it itself.\r",
+             'importance': 'high',
+             'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
+             'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34),
+             '_tracker_name': 'Twisted',
+             'submitter_realname': '',
+             'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14),
+             'people_involved': 3,
+             'title': 'twisted.test.test_paths.FilePathTestCase.test_getPermissions_Windows creates undeleteable file',
+             '_project_name': 'Twisted',
+             'submitter_username': 'exarkun',
+             'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068),
+             'looks_closed': False,
+             'good_for_newcomers': True,
+             'concerns_just_documentation': False}]
+        self.assertFalse(Bug.all_bugs.all())
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
+        self.assertTrue(Bug.all_bugs.all())

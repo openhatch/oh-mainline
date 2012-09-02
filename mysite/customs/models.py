@@ -22,6 +22,7 @@ import urllib
 import reversion
 
 from django.db import models
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
@@ -120,6 +121,25 @@ class TrackerModel(models.Model):
     def get_base_url(self):
         # Implement this in a subclass
         raise NotImplementedError
+
+    @classmethod
+    def get_by_name(cls, tracker_name):
+        '''This returns the instance of a subclass of TrackerModel,
+        if any, that has its tracker_name field set to the provided
+        value.
+
+        This is necessary because tracker_name is defined by each of
+        the subclasses, rather than by this class in particular.'''
+        query_parts = []
+        for subclass in cls.__subclasses__():
+            name = subclass.__name__.lower()
+            query_as_dict = {name + '__tracker_name': tracker_name}
+            query_parts.append(Q(**query_as_dict))
+
+        def _pipe_things(a, b):
+            return a | b
+        joined = reduce(_pipe_things, query_parts)
+        return cls.objects.get(joined)
 
 class TrackerQueryModel(models.Model):
     '''This model just exists to provide a way to grab a QuerySet
