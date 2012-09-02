@@ -3,25 +3,27 @@ function drawAllPeopleDivsAtOnce(list_of_people_data) {
     var $text = $("<div>Drawing people...</div>");
     var i;
     var f;
-    var div;
-    var a;
-    var span;
+    var $div;
+    var $a;
+    var $span;
+    var text;
     var $results = $('<div id="results"></div>');
 
     $("#results").replaceWith($text);
 
 
     for (i = 0; i < list_of_people_data.length && i < MAX_TO_DISPLAY; i++) {
-	f = list_of_people_data[i];
-        div = $("<div />");
-        a = $("<a class='person' href='http://openhatch.org/people/"+f.attributes.all_data.extra_person_info.username+"/'>" + f.attributes.name + "</a>");
-        div.append(a);
-        span = $("<span class='geocode'>, " + f.attributes.location + "</span>");
-        div.append(span);
-        $results.append(div);
+        f = list_of_people_data[i];
+        href = "/people/" + f.attributes.all_data.extra_person_info.username;
+        $a = $("<a></a>", {class: 'person', href: href}).text(f.attributes.name);
+        $span = $("<span></span>", {class: 'geocode'}).text(f.attributes.location);
+        $div = $("<div></div>").append($a).append($span);
+        $results.append($div);
     }
     if (list_of_people_data.length >= MAX_TO_DISPLAY) {
-	$results.append($("<div>and " + (list_of_people_data.length - MAX_TO_DISPLAY) + " more; zoom the map to see them, or search for them specifically.</div>"));
+        text = "and " + (list_of_people_data.length - MAX_TO_DISPLAY) + " more; zoom the map to see them, or search for them specifically.";
+        $div = $("<div></div>").text(text);
+        $results.append($div);
     }
 
     $text.replaceWith($results);
