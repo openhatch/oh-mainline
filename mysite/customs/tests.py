@@ -2388,6 +2388,36 @@ class LaunchpadTrackerEditingViews(TwillTests):
 
 
 ### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
+class ExportTrackerAsDict(django.test.TestCase):
+    def setUp(self, *args, **kwargs):
+        # Set up the Twisted TrackerModel that will be used here.
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+        for url in ['http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                     'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
+            mysite.customs.models.TracQueryModel.objects.create(url=url,
+                                                                tracker=self.tm)
+    def test_export(self):
+        exported = self.tm.as_dict()
+        golden = {'documentation_text': 'documentation',
+                  'documentation_type': 'keywords',
+                  'queries': [u'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                              u'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'],
+                  'base_url': 'http://twistedmatrix.com/trac/',
+                  'bitesized_text': 'easy',
+                  'bitesized_type': 'keywords',
+                  'bug_project_name_format': '{tracker_name}',
+                  'tracker_name': 'Twisted',
+                  'bugimporter': 'trac.SynchronousTracBugImporter',
+                  }
+        self.assertEqual(golden, exported)
+
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):
         # Create the Twisted project object
