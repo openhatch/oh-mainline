@@ -17,7 +17,7 @@ function drawAllPeopleDivsAtOnce(list_of_people_data) {
         href = "/people/" + f.attributes.all_data.extra_person_info.username;
         $a = $("<a></a>", {class: 'person', href: href}).text(f.attributes.name);
         $span = $("<span></span>", {class: 'geocode'}).text(f.attributes.location);
-        $div = $("<div></div>").append($a).append($span);
+        $div = $("<div></div>").append($a).append(" ").append($span);
         $results.append($div);
     }
     if (list_of_people_data.length >= MAX_TO_DISPLAY) {
