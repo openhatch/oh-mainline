@@ -313,6 +313,35 @@ class TracTrackerModel(TrackerModel):
     def get_base_url(self):
         return self.base_url
 
+    def as_dict(self):
+        out_dict = {}
+
+        # First, add simple data fields
+        WHITELISTED_FIELDS = set([
+                'as_appears_in_distribution',
+                'base_url',
+                'bitesized_text',
+                'bitesized_type',
+                'bug_project_name_format',
+                'documentation_text',
+                'documentation_type',
+                'tracker_name',
+                ])
+
+        for key in WHITELISTED_FIELDS:
+            value = getattr(self, key, None)
+            if value:
+                out_dict[key] = value
+
+        # Add a list of our queries
+        out_dict['queries'] = [query.url
+                               for query in self.tracquerymodel_set.all()]
+
+        # Add a hard-coded bugimporter field
+        out_dict['bugimporter'] = 'trac.SynchronousTracBugImporter'
+
+        return out_dict
+
 class TracQueryModel(TrackerQueryModel):
     '''This model stores query URLs for TracTracker objects.'''
     url = models.URLField(max_length=400,

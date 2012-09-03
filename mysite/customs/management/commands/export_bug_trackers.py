@@ -35,10 +35,6 @@ class Command(BaseCommand):
             # Just Trac for now
             if tracker.__class__ != mysite.customs.models.TracTrackerModel:
                 continue
-            this_tracker_as_dict = {}
-            for key in USEFUL_KEYS:
-                value = getattr(tracker, key, None)
-                if value:
-                    this_tracker_as_dict[key] = value
-            as_dicts.append(this_tracker_as_dict)
+            as_dicts.append(tracker.as_dict())
+
         print yaml.safe_dump(as_dicts)
