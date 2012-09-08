@@ -845,6 +845,11 @@ class ImportBugsFromFiles(django.test.TestCase):
         mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
         self.assertFalse(Bug.all_bugs.all())
 
+        # Import the same thing, with _deleted=True, and make sure we don't
+        # accidentally create it somehow, nor crash.
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
+        self.assertFalse(Bug.all_bugs.all())
+
     def test_import_from_data_dict_with_isoformat_date(self):
         sample_data = [
             {'status': 'new', 'as_appears_in_distribution': '',
