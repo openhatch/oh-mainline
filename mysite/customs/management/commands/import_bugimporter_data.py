@@ -17,15 +17,20 @@
 from django.core.management.base import BaseCommand
 import mysite.customs.core_bugimporters
 import yaml
+from django.utils import simplejson
 
 class Command(BaseCommand):
-    args = '<yaml_file yaml_file ...>'
-    help = "Call this command and pass it YAML files to load into the Bug table"
+    args = '<yaml/json_file yaml/json_file ...>'
+    help = "Call this command with YAML/JSON files to load into the Bug table"
 
     def handle(self, *args, **options):
-        for yaml_file in args:
-            with open(yaml_file) as f:
-                s = f.read()
-                bug_dicts = yaml.load(s)
+        for filename in args:
+            with open(filename) as f:
+                if filename.endswith('.json'):
+                    bug_dicts = simplejson.load(f)
+                else:
+                    # assume YAML
+                    s = f.read()
+                    bug_dicts = yaml.loads(s)
             for bug_dict in bug_dicts:
                 mysite.customs.core_bugimporters.import_one_bug_item(bug_dict)

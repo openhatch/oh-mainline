@@ -15,12 +15,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import datetime
+import dateutil
 import mysite.customs.models
 import mysite.customs.forms
 
 from mysite.customs.models import TrackerModel
 from mysite.search.models import Bug
 
+import django.db.models
 
 all_trackers = {
         'bugzilla': {
@@ -84,8 +87,17 @@ def import_one_bug_item(d):
     else:
         bug = mysite.search.models.Bug()
 
+    datetime_field_names = set([
+            field.name
+            for field in bug._meta.fields
+            if isinstance(field,
+                          django.db.models.fields.DateTimeField)])
+
     for key in d:
         value = d[key]
+        if key in datetime_field_names and (
+            not isinstance(value, datetime.datetime)):
+            value = dateutil.parser.parse(value)
         if getattr(bug, key) != value:
             setattr(bug, key, value)
 
