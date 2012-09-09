@@ -1,0 +1,25 @@
+@eek_yellow: #ffa;
+
+.submodule.unsaved {
+    border-color: @eek_yellow;
+}
+
+.portfolio-entry-status-bar {
+    width: 100%;
+    background: #e4e4e4;
+    margin: -8px -10px 3px -10px;
+    padding: 5px 10px;
+    &.unsaved, &.saved {
+        background: @eek_yellow;
+    }
+    
+    .delete-portfolio-entry {
+        float: right;
+        color: #555;
+        font-weight: bold;
+    }
+}
+
+.save_portfolio_entry, .save_all_portfolio_entries {
+    float: right;
+    }
