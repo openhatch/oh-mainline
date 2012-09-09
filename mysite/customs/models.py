@@ -291,6 +291,7 @@ class TracTrackerModel(TrackerModel):
     BITESIZED_TYPES = (
             ('keywords', 'Keyword'),
             ('priority', 'Priority'),
+            ('difficulty', 'Difficulty'),
             )
     bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
