@@ -2,17 +2,21 @@
  Adding a new bug tracker
 ===========================
 
-One of the pillars of Openhatch is helping project owners get in touch with
+One of the pillars of OpenHatch is helping project owners get in touch with
 developers willing to help, by offering them easy to fix bugs where they can get
-started. In order to do this, Openhatch crawls bugtrackers of many projects and
+started. In order to do this, OpenHatch crawls bugtrackers of many projects and
 features them in the site.
 
-If you have a project that you want to add to Openhatch you can do it very
-easily following these steps:
+If you have a project that you want to add to OpenHatch you can do it very
+easily following these steps.
 
 - Go to http://openhatch.org/customs/
 - In the "Tracker Type" select box select the bug tracker that your project uses. If your bug tracker is not in that list, it may be a good a idea to contact us and let us know.
 - Click on "Add a tracker" to add a new tracker
+- You will be directed to a form where you need to fill specific information about your tracker. This form changes depending on the tracker type.
+
+For Trac and Roundup:
+
 - Fill the new tracker form like this:
     - Tracker name: Name of your project
     - Base url: This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.
