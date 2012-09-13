@@ -1,0 +1,20 @@
+{% extends 'base/two_columns.html' %}
+{% load base_extras %}
+
+{% block body_class %}{{block.super}} wordpress{% endblock body_class %}
+{% block nav %}
+<div id='nav'>
+        <h1>
+            <a href='/'>
+                <img src='{% version '/static/images/the-logo-bluegreen-87px.png' %}'
+                        width='87' height='60' alt='openhatch' />
+            </a>
+        </h1>
+        <!-- no nav links for WordPress -->
+</div>
+{% endblock %}
+{% block whole_title %}WORDPRESS_TITLE{% endblock %}
+{% block extra_head %} WORDPRESS_HEAD {% endblock %}
+{% block left %} WORDPRESS_LEFT_STUFF_HERE {% endblock %}
+{% block main %} WORDPRESS_MAIN_STUFF_HERE {% endblock %}
+

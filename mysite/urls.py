@@ -39,6 +39,7 @@ from voting.views import vote_on_object
 
 import mysite.account.views
 import mysite.profile.views
+import mysite.profile.api
 import mysite.missions.svn.views
 import mysite.missions.setup.views
 
@@ -56,6 +57,9 @@ urlpatterns = patterns('',
         (r'^\)$', lambda x: HttpResponsePermanentRedirect('/')),
 
         (r'^\+meta/', 'mysite.base.views.meta'),
+
+        (r'^\+api/v1/profile/',
+         include(mysite.profile.api.PortfolioEntryResource().urls)),
 
         (r'^\+test_weekly_email_re_projects/', 'mysite.base.views.test_weekly_email_re_projects'),
 
@@ -113,15 +117,14 @@ urlpatterns = patterns('',
         (r'^missions/diffpatch/single_patch$', 'mysite.missions.diffpatch.views.single_file_patch'),
         (r'^missions/diffpatch/recursive_diff$', 'mysite.missions.diffpatch.views.recursive_diff'),
         (r'^missions/diffpatch/recursive_patch$', 'mysite.missions.diffpatch.views.recursive_patch'),
-        (r'^missions/diffpatch/patchsingle/fib1.c$', 'mysite.missions.diffpatch.views.patchsingle_get_original_file'),
-        (r'^missions/diffpatch/patchsingle/fib-linear-time.patch$', 'mysite.missions.diffpatch.views.patchsingle_get_patch'),
+        (r'^missions/diffpatch/patchsingle/oven-pancake.txt', 'mysite.missions.diffpatch.views.patchsingle_get_original_file'),
+        (r'^missions/diffpatch/patchsingle/add-oven-temp.patch$', 'mysite.missions.diffpatch.views.patchsingle_get_patch'),
         (r'^missions/diffpatch/patchsingle/submit$', 'mysite.missions.diffpatch.views.patchsingle_submit'),
-        (r'^missions/diffpatch/diffsingle/diffsingle.txt$', 'mysite.missions.diffpatch.views.diffsingle_get_original_file'),
+        (r'^missions/diffpatch/diffsingle/nutty-pancake.txt$', 'mysite.missions.diffpatch.views.diffsingle_get_original_file'),
         (r'^missions/diffpatch/diffsingle/submit$', 'mysite.missions.diffpatch.views.diffsingle_submit'),
         (r'^missions/diffpatch/diffrecursive/recipes.tar.gz$', 'mysite.missions.diffpatch.views.diffrecursive_get_original_tarball'),
         (r'^missions/diffpatch/diffrecursive/submit$', 'mysite.missions.diffpatch.views.diffrecursive_submit'),
-        (r'^missions/diffpatch/patchrecursive/hats.tar.gz$', 'mysite.missions.diffpatch.views.patchrecursive_get_original_tarball'),
-        (r'^missions/diffpatch/patchrecursive/hats.patch$', 'mysite.missions.diffpatch.views.patchrecursive_get_patch'),
+        (r'^missions/diffpatch/patchrecursive/more-garlic.patch$', 'mysite.missions.diffpatch.views.patchrecursive_get_patch'),
         (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.diffpatch.views.patchrecursive_submit'),
 
         (r'^missions/svn$', mysite.missions.svn.views.MainPage.as_view(), None, 'svn_main_page'),
@@ -145,33 +148,29 @@ urlpatterns = patterns('',
         (r'^missions/git/rebase$', 'mysite.missions.git.views.rebase'),
         (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
 
-        (r'^missions/windows-setup$', mysite.missions.setup.views.WindowsMainPage.as_view(), None, 'missions-windows-setup-main-page'),
-        (r'^missions/windows-setup/install-git-bash$', mysite.missions.setup.views.WindowsInstallGitBash.as_view(), None, 'missions-windows-setup-install-git-bash'),
-        (r'^missions/windows-setup/open-git-bash-prompt$', mysite.missions.setup.views.WindowsOpenPrompt.as_view(), None, 'missions-windows-setup-open-git-bash-prompt'),
-        (r'^missions/windows-setup/understand-prompt$', mysite.missions.setup.views.WindowsUnderstandPrompt.as_view(), None, 'missions-windows-setup-understand-prompt'),
-        (r'^missions/windows-setup/navigating$', mysite.missions.setup.views.WindowsBrowseFiles.as_view(), None, 'missions-windows-setup-navigating'),
-        (r'^missions/windows-setup/quick-reference$', mysite.missions.setup.views.WindowsQuickReference.as_view(), None, 'missions-windows-setup-quick-reference'),
-        (r'^missions/windows-setup/alternatives$', mysite.missions.setup.views.WindowsAlternatives.as_view(), None, 'missions-windows-setup-alternatives'),
+        (r'^missions/windows-setup',
+         include(mysite.missions.setup.views.WindowsSetup.urls())),
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
         (r'^customs/add/(?P<tracker_type>\w*)$', 'mysite.customs.views.add_tracker'),
         (r'^customs/add/(?P<tracker_type>\w*)/do$', 'mysite.customs.views.add_tracker_do'),
         (r'^customs/add/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/url$', 'mysite.customs.views.add_tracker_url'),
-        (r'^customs/add/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/url/do$', 'mysite.customs.views.add_tracker_url_do'),
-        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)$', 'mysite.customs.views.edit_tracker'),
-        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/do$', 'mysite.customs.views.edit_tracker_do'),
-        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/url/(?P<url_id>\d*)$', 'mysite.customs.views.edit_tracker_url'),
-        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/url/(?P<url_id>\d*)/do$', 'mysite.customs.views.edit_tracker_url_do'),
-        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)$', 'mysite.customs.views.delete_tracker'),
-        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/do$', 'mysite.customs.views.delete_tracker_do'),
-        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/url/(?P<url_id>\d*)$', 'mysite.customs.views.delete_tracker_url'),
-        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>[^/]+)/url/(?P<url_id>\d*)/do$', 'mysite.customs.views.delete_tracker_url_do'),
+        (r'^customs/add/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/url/do$', 'mysite.customs.views.add_tracker_url_do'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>.+)$', 'mysite.customs.views.edit_tracker'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/do$', 'mysite.customs.views.edit_tracker_do'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/url/(?P<url_id>\d+)$', 'mysite.customs.views.edit_tracker_url'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/url/(?P<url_id>\d*)/do$', 'mysite.customs.views.edit_tracker_url_do'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>.+)$', 'mysite.customs.views.delete_tracker'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/do$', 'mysite.customs.views.delete_tracker_do'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/url/(?P<url_id>\d*)$', 'mysite.customs.views.delete_tracker_url'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/(?P<tracker_name>.+)/url/(?P<url_id>\d*)/do$', 'mysite.customs.views.delete_tracker_url_do'),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 
         (r'^$', 'mysite.base.views.home'),
+        (r'^\+theme-stubs/wordpress/index$', 'mysite.base.views.wordpress_index'),
 
         (r'^\+landing/import$', 'mysite.base.views.landing_for_documenters'),
         (r'^\+landing/opps$', 'mysite.base.views.landing_for_opp_hunters'),
@@ -204,9 +203,9 @@ urlpatterns = patterns('',
         (r'^account/login/$', 'mysite.account.views.login',
             {'template_name': 'account/login.html'},
             'oh_login'),
-        (r'^account/login/do$', 'django.contrib.auth.views.login', 
+        (r'^account/login/do$', 'django.contrib.auth.views.login',
             {'template_name': 'account/login.html'}),
-        (r'^account/login/old$', 'django.contrib.auth.views.login', 
+        (r'^account/login/old$', 'django.contrib.auth.views.login',
             {'template_name': 'account/login_old.html'},
             'oh_login_pwd'),
 
@@ -361,7 +360,7 @@ urlpatterns = patterns('',
             {'document_root': settings.MEDIA_ROOT + '/images'}),
 
         (r'^people/[$]username[/]*$', 'mysite.profile.views.dollar_username'),
-        (r'^\+me$', 'mysite.profile.views.dollar_username', {}, 
+        (r'^\+me$', 'mysite.profile.views.dollar_username', {},
                 'oh_my_profile_redirect'),
 
         (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),

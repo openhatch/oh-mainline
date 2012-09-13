@@ -45,10 +45,15 @@ CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
 GOOGLE_ANALYTICS_CODE='UA-15096810-1'
 
-GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
+SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
+GIT_REPO_URL_PREFIX = 'https://openhatch.org/git-mission-data/git/'
 SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
+URL_PREFIX='https://openhatch.org'
 
 RECOMMEND_BUGS=False
+
+### Sessions in database, but cached in memcached if available
+SESSION_ENGINE="django.contrib.sessions.backends.cached_db"
 
 ### Set the logging level to just WARNING or above
 import logging

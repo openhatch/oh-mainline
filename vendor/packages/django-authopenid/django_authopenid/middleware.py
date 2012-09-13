@@ -39,8 +39,11 @@ class OpenIDMiddleware(object):
         if response.status_code != 200 or len(response.content) < 200:
             return response
         path = request.get_full_path()
-        if path == "/" and request.META.has_key('HTTP_ACCEPT') and \
-                best_match(['text/html', 'application/xrds+xml'], 
-                    request.META['HTTP_ACCEPT']) == 'application/xrds+xml':
-            response = xrdf(request)
+        try: # NOTE: mimeparse sometimes raises ValueError
+            if path == "/" and request.META.has_key('HTTP_ACCEPT') and \
+                    best_match(['text/html', 'application/xrds+xml'], 
+                        request.META['HTTP_ACCEPT']) == 'application/xrds+xml':
+                response = xrdf(request)
+        except ValueError, e:
+            pass # just skip it.
         return response

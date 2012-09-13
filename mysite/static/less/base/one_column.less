@@ -1,0 +1,35 @@
+@import "base";
+
+/* CSSTODO
+   One day, we'll probably want to review this and clean it up. */
+
+body.one_column #main { float: none; 
+    .submodule .head h3 { font-weight: normal; font-size: 11pt; }
+    .submodule .body, #main .submodule .foot { padding: 3% 5%; float: left; }
+
+    /* SKINNY SUBMODULE */
+    .submodule.skinny { width: 25%; margin-right: 20px; 
+        .submodule-head { width: 82.5%; 
+            h3 { width: 95%; }
+        }
+        .submodule-body { width: 90%; }
+    }
+
+    /* FAT SUBMODULE */
+    .submodule.fat { width: 67%; 
+        .submodule-head { width: 93.8%; 
+            h3 { width: 100%; }
+        }
+        .submodule-body { width: 90%; }
+        .submodule-foot { width: 90%; }
+    }
+
+    .equal-width { 
+        width: 45%; 
+        .submodule { 
+        width: 45%; 
+            submodule-head, .submodule-body, .submodule-foot { width: 90.5%; }
+        }
+    }
+    .submodule.left { margin-right: 20px; }
+}

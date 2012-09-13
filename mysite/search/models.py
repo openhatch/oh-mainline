@@ -544,10 +544,12 @@ class Answer(OpenHatchModel):
         ret.save()
         return ret
 
+
 class OpenBugsManager(models.Manager):
     def get_query_set(self):
         return super(OpenBugsManager, self).get_query_set().filter(
                 looks_closed=False)
+
 
 class Bug(OpenHatchModel):
     project = models.ForeignKey(Project)
@@ -565,7 +567,6 @@ class Bug(OpenHatchModel):
                                          blank=False, null=False)
     good_for_newcomers = models.BooleanField(default=False)
     looks_closed = models.BooleanField(default=False)
-    bize_size_tag_name = models.CharField(max_length=50)
     concerns_just_documentation = models.BooleanField(default=False)
     as_appears_in_distribution = models.CharField(max_length=200, default='')
 

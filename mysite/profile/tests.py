@@ -2801,4 +2801,35 @@ class PeopleLocationDict(TwillTests):
                 mysite.profile.models.Person.objects.get().id,))
         self.assertTrue(json)
 
+class ProfileApiTest(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(ProfileApiTest, self).setUp()
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'),
+                    is_published=True)[0]
+
+        citation = Citation(
+            contributor_role='Did stuff',
+            url='http://example.com/',
+                portfolio_entry=portfolio_entry,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+    def test_api_view_when_logged_in(self):
+        self.client = self.login_with_client()
+        response = self.client.get('/+api/v1/profile/portfolio_entry/?format=json')
+        parsed = simplejson.loads(response.content)
+        self.assertEqual(1, parsed['meta']['total_count'])
+
+    def test_api_view_when_logged_out(self):
+        response = self.client.get('/+api/v1/profile/portfolio_entry/?format=json')
+        parsed = simplejson.loads(response.content)
+        self.assertEqual(0, parsed['meta']['total_count'])
+
 # vim: set ai et ts=4 sw=4 nu:

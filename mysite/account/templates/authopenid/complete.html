@@ -25,7 +25,7 @@
 
 {% block body_id %}associate-openid{% endblock %}
 
-{% block body_class %}{{ block.super }} {% endblock %}
+{% block body_class %}{{ block.super }} auth{% endblock %}
 
 {% block css %}
 {{ block.super }}
@@ -83,7 +83,7 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
                 Or associate this OpenID with an existing account.
             </a>
 
-            <form id='associate-with-existing-account' name="fverify" action="{% url user_register %}" method="POST" class='login '>{% csrf_token %}
+            <form id='associate-with-existing-account' name="fverify" action="{% url user_register %}" method="POST" class='login hidden'>{% csrf_token %}
                 <input type="hidden" name="next" value="{{ next }}" />
                 {{ form2.as_p }}
                 <p><input type="submit" name="bverify" value="Associate"></p>

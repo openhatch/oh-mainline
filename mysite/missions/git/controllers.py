@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import mysite.base.unicode_sanity
 from mysite.missions.base.controllers import *
 
 class GitRepository(object):
@@ -50,9 +51,10 @@ class GitDiffMission(object):
     def commit_if_ok(cls, username, diff):
         repo = GitRepository(username)
         commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
-        commit_diff.communicate(str(diff))
+        commit_diff.communicate(mysite.base.unicode_sanity.utf8(diff))
         if commit_diff.returncode == 0: # for shell commands, success is 0
             commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
+
                 Come to my house for a dinner party.
                 Knock 3 times and give the secret password: Pinky.""" % username
             subprocess.Popen(['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)

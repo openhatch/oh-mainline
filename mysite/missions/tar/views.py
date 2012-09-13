@@ -19,6 +19,7 @@
 
 from django.http import HttpResponse
 
+from mysite.base.unicode_sanity import utf8
 from mysite.missions.base.views import *
 from mysite.missions.tar import forms, controllers
 
@@ -54,7 +55,7 @@ def upload(request):
                 data['create_success'] = True
                 controllers.set_mission_completed(request.user.get_profile(), 'tar')
             except controllers.IncorrectTarFile, e:
-                data['what_was_wrong_with_the_tarball'] = str(e)
+                data['what_was_wrong_with_the_tarball'] = utf8(e)
         data['create_form'] = form
     return creating(request, data)
 
@@ -143,6 +144,6 @@ def creating(request, passed_data={}):
 @view
 def hints(request, passed_data={}):
     state = TarMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'Hints'
+    state.this_mission_page_short_name = 'Quick reference'
     return (request, 'missions/tar/hints.html',
             state.as_dict_for_template_context())

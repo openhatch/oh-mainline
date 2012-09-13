@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2011 Jack Grigg
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2012 Berry Phillips
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -16,60 +17,71 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-import importlib
 from django.core.management.base import BaseCommand
 import twisted.web.client
 import twisted.internet
 import mysite.customs.profile_importers
 import datetime
 import logging
+import importlib
 from types import NoneType
 import django.db.models
+from django.conf import settings
 
 import mysite.customs.models
-import mysite.customs.bugimporters.base
-import mysite.customs.bugimporters.bugzilla
-import mysite.customs.bugimporters.google
-import mysite.customs.bugimporters.roundup
-import mysite.customs.bugimporters.trac
-import mysite.customs.bugimporters.launchpad
-
 import mysite.profile.models
+
 from mysite.search.models import Bug
+from mysite.customs.core_bugimporters import AddTrackerForeignKeysToBugs
+from mysite.customs.data_transits import trac_data_transit, bug_data_transit
 
 tracker2importer = {
-        # This first one catches any Bugs with bug.tracker = None and updates
-        # that field. Then it passes the bugs back here for updating.
-        NoneType:
-            mysite.customs.bugimporters.base.AddTrackerForeignKeysToBugs,
+    # This first one catches any Bugs with bug.tracker = None and updates
+    # that field. Then it passes the bugs back here for updating.
+    NoneType:
+        AddTrackerForeignKeysToBugs,
+}
 
-        # This second one is specifically for Bugs belonging to trackers
-        # that are hard-coded in for one reason or another.
-        #mysite.customs.models.HardCodedTrackerModel:
-        #    mysite.customs.bugimporters.base.HandleHardCodedBugTracker,
+try:
+    # These link specific subclasses of TrackerModel to the
+    # relevant BugImporter class. This includes the hard-coded special
+    # cases, where the TrackerModel is just a shell linking to the location
+    # of the hard-coded class and the BugImporter is a special one that
+    # handles them specifically.
 
-        # The rest of these link specific subclasses of TrackerModel to the
-        # relevant BugImporter class. This includes the hard-coded special
-        # cases, where the TrackerModel is just a shell linking to the location
-        # of the hard-coded class and the BugImporter is a special one that
-        # handles them specifically.
+    from bugimporters.google import GoogleBugImporter
+    from bugimporters.trac import TracBugImporter
+    from bugimporters.roundup import RoundupBugImporter
+    from bugimporters.bugzilla import BugzillaBugImporter
+    from bugimporters.launchpad import LaunchpadBugImporter
+    from bugimporters.github import GitHubBugImporter
 
-        # Bugzilla
+    tracker2importer.update({
         mysite.customs.models.BugzillaTrackerModel:
-            mysite.customs.bugimporters.bugzilla.BugzillaBugImporter,
+            BugzillaBugImporter,
         # Google Code Issue Tracker
         mysite.customs.models.GoogleTrackerModel:
-            mysite.customs.bugimporters.google.GoogleBugImporter,
+            GoogleBugImporter,
         # Roundup
         mysite.customs.models.RoundupTrackerModel:
-            mysite.customs.bugimporters.roundup.RoundupBugImporter,
+            RoundupBugImporter,
         # Trac
         mysite.customs.models.TracTrackerModel:
-            mysite.customs.bugimporters.trac.TracBugImporter,
+            TracBugImporter,
         # Launchpad
         mysite.customs.models.LaunchpadTrackerModel:
-            mysite.customs.bugimporters.launchpad.LaunchpadBugImporter,
-        }
+            LaunchpadBugImporter,
+        # GitHub
+        mysite.customs.models.GitHubTrackerModel:
+            GitHubBugImporter,
+    })
+
+except ImportError:
+    # The bugimporters library isn't installed.
+    logging.info(("The bugimporters library could not be loaded. "
+            "It might not be installed. See 'Advanced installation' in the documentation."))
+    pass
+
 
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
@@ -80,7 +92,7 @@ class Command(BaseCommand):
         # Some TrackerModel values have no corresponding BugImporter. Test
         # for that first so that we can bail early if needed.
         if tracker_model.__class__ not in tracker2importer:
-            raise ValueError, "That tracker_model has no corresponding importer"
+            raise ValueError("That tracker_model has no corresponding importer")
 
         # Okay, so success is possible.
         # We keep the collection of running importers indexed by the type of
@@ -91,23 +103,28 @@ class Command(BaseCommand):
         if key not in self.running_importers:
             # Find the custom parser class, if specified.
             custom_parser_class = None
+
             if custom_parser:
                 try:
                     module_part, custom_parser_class_name = (
                         tracker_model.custom_parser.rsplit('.', 1))
                     module = importlib.import_module(
-                        'mysite.customs.bugimporters.' + module_part)
+                        'bugimporters.' + module_part)
                     custom_parser_class = getattr(module, custom_parser_class_name)
                 except Exception:
                     logging.error("Uh oh, failed trying to grab %s", custom_parser)
                     logging.exception("We failed to import the requested custom importer.")
+
+            data_transits = {'bug': bug_data_transit, 'trac': trac_data_transit}
 
             # Okay, at this point we're going to have to create it. Note that
             # when we create it, we store it in the self.running_importers dict
             # so that later calls to this will find it.
             bug_importer_subclass = tracker2importer[tracker_model.__class__]
             bug_importer_instance = bug_importer_subclass(
-                tracker_model, self, bug_parser=custom_parser_class)
+                    tracker_model, self, bug_parser=custom_parser_class,
+                    data_transits=data_transits)
+
             self.running_importers[key] = bug_importer_instance
 
         return self.running_importers[key]
@@ -116,7 +133,8 @@ class Command(BaseCommand):
         print "For all tracker queries we know about, enqueue the stale ones."
         # Fetch a list of Queries that are stale.
         queries = mysite.customs.models.TrackerQueryModel.objects.filter(
-                last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)
+                last_polled__lt=datetime.datetime.utcnow() - datetime.timedelta(
+                days=settings.TRACKER_POLL_INTERVAL)
                 ).select_subclasses()
         # Convert this list to a dictionary of TrackerModels.
         tm_list = [(query, query.tracker) for query in queries if hasattr(query, 'tracker')]
@@ -135,7 +153,7 @@ class Command(BaseCommand):
         object attached.'''
         if bug_list is None:
             bug_list = Bug.all_bugs.filter(
-                last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)).filter(
+                last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=settings.TRACKER_POLL_INTERVAL)).filter(
                 django.db.models.Q(tracker_id=None))
         return self.update_bugs(bug_list=bug_list)
 
@@ -158,10 +176,10 @@ class Command(BaseCommand):
             for tracker_model in tracker_models:
                 # Fetch a list of all Bugs that are stale.
                 bugs = Bug.all_bugs.filter(last_polled__lt=
-                                           datetime.datetime.utcnow()-datetime.timedelta(days=-1)
+                                           datetime.datetime.utcnow()-datetime.timedelta(days=-settings.TRACKER_POLL_INTERVAL)
                                            ).filter(tracker_id=tracker_model.id)
                 tm_dict[tracker_model] = bugs
-                logging.info("Enqueued %d bugs for tracker", len(bugs))
+                logging.info("Enqueued %d bugs for tracker '%s'", len(bugs), tracker_model)
 
         # For each TrackerModel, process its stale Bugs.
         for tm, bugs in tm_dict.items():

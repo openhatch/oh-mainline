@@ -28,5 +28,8 @@ class DiffRecursiveUploadForm(django.forms.Form):
     diff = django.forms.FileField(error_messages={'required': 'No file was uploaded.'})
 
 class PatchRecursiveUploadForm(django.forms.Form):
-    children_hats = django.forms.IntegerField()
-    lizards_hats = django.forms.IntegerField()
+    amount_of_garlic = django.forms.IntegerField()
+
+    def clean_amount_of_garlic(self):
+        if self.cleaned_data['amount_of_garlic'] != 3:
+            raise django.forms.ValidationError, "That is not the right number of garlic cloves."

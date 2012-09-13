@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
+# Copyright (C) 2012 John Morrissey
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +22,7 @@ import urllib
 import reversion
 
 from django.db import models
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
@@ -79,7 +81,7 @@ class TrackerModel(models.Model):
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
 
     ### This optional attribute specifies a class name, which is intepreted as
-    ### part of the mysite.customs.bugimporters module.
+    ### part of the mysite.customs.core_bugimporters module.
     ###
     ### If the class is specified, we will use custom code from that class
     ### when doing bug parsing.
@@ -95,12 +97,12 @@ class TrackerModel(models.Model):
         It is part of this superclass so that derived classes can use the
         functionality without implementing it themselves. It relies on
         the classes being manually added to
-        mysite.customs.bugimporters.all_trackers.'''
-        import mysite.customs.bugimporters
+        mysite.customs.core_bugimporters.all_trackers.'''
+        import mysite.customs.core_bugimporters
         my_short_name = None
 
-        for short_name in mysite.customs.bugimporters.all_trackers:
-            klass = mysite.customs.bugimporters.all_trackers[short_name]['model']
+        for short_name in mysite.customs.core_bugimporters.all_trackers:
+            klass = mysite.customs.core_bugimporters.all_trackers[short_name]['model']
             if self.__class__ == klass:
                 my_short_name = short_name
                 break
@@ -119,6 +121,25 @@ class TrackerModel(models.Model):
     def get_base_url(self):
         # Implement this in a subclass
         raise NotImplementedError
+
+    @classmethod
+    def get_by_name(cls, tracker_name):
+        '''This returns the instance of a subclass of TrackerModel,
+        if any, that has its tracker_name field set to the provided
+        value.
+
+        This is necessary because tracker_name is defined by each of
+        the subclasses, rather than by this class in particular.'''
+        query_parts = []
+        for subclass in cls.__subclasses__():
+            name = subclass.__name__.lower()
+            query_as_dict = {name + '__tracker_name': tracker_name}
+            query_parts.append(Q(**query_as_dict))
+
+        def _pipe_things(a, b):
+            return a | b
+        joined = reduce(_pipe_things, query_parts)
+        return cls.objects.get(joined)
 
 class TrackerQueryModel(models.Model):
     '''This model just exists to provide a way to grab a QuerySet
@@ -270,6 +291,7 @@ class TracTrackerModel(TrackerModel):
     BITESIZED_TYPES = (
             ('keywords', 'Keyword'),
             ('priority', 'Priority'),
+            ('difficulty', 'Difficulty'),
             )
     bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
@@ -291,6 +313,35 @@ class TracTrackerModel(TrackerModel):
 
     def get_base_url(self):
         return self.base_url
+
+    def as_dict(self):
+        out_dict = {}
+
+        # First, add simple data fields
+        WHITELISTED_FIELDS = set([
+                'as_appears_in_distribution',
+                'base_url',
+                'bitesized_text',
+                'bitesized_type',
+                'bug_project_name_format',
+                'documentation_text',
+                'documentation_type',
+                'tracker_name',
+                ])
+
+        for key in WHITELISTED_FIELDS:
+            value = getattr(self, key, None)
+            if value:
+                out_dict[key] = value
+
+        # Add a list of our queries
+        out_dict['queries'] = [query.url
+                               for query in self.tracquerymodel_set.all()]
+
+        # Add a hard-coded bugimporter field
+        out_dict['bugimporter'] = 'trac.SynchronousTracBugImporter'
+
+        return out_dict
 
 class TracQueryModel(TrackerQueryModel):
     '''This model stores query URLs for TracTracker objects.'''
@@ -314,7 +365,7 @@ class RoundupTrackerModel(TrackerModel):
                                blank=False, null=False, verify_exists=False,
             help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
     closed_status = models.CharField(max_length=200, blank=False,
-            help_text="This is the text that the 'Status' field will contain that indicates a bug is closed.")
+            help_text="This is the text that the 'Status' field will contain that indicates a bug is closed. For multiple values to mean 'closed', separate with commas.")
     bitesized_field = models.CharField(max_length=50, blank=True, default='',
             help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a bite-sized bug. Leave blank if none.")
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
@@ -395,3 +446,41 @@ class LaunchpadQueryModel(TrackerQueryModel):
 
 reversion.register(LaunchpadTrackerModel, follow=["launchpadquerymodel_set"])
 reversion.register(LaunchpadQueryModel)
+
+class GitHubTrackerModel(TrackerModel):
+    '''This model stores the data for individual GitHub repositories'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+        blank=False, null=False,
+        help_text="This is the name that OpenHatch will use to identify the project.")
+    github_name = models.CharField(max_length=200, unique=True,
+        blank=False, null=False,
+        help_text="This is the user or project name on GitHub that owns the project.")
+    github_repo = models.CharField(max_length=200, unique=True,
+        blank=False, null=False,
+        help_text="This is the repository name that GitHub uses to identify the project.")
+    bitesized_tag = models.CharField(max_length=50, blank=True,
+        help_text="This is the value of the GitHub label that indicates a bite-sized bug.")
+    documentation_tag = models.CharField(max_length=50, blank=True,
+        help_text="This is the value of the GitHub label that indicates a documentation bug.")
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+    def get_base_url(self):
+        return '__impossible_to_use_with_github'
+
+class GitHubQueryModel(TrackerQueryModel):
+    '''This model stores query URLs for GitHubTracker objects.'''
+    tracker = models.ForeignKey(GitHubTrackerModel)
+    state = models.CharField(max_length=20, default='open')
+
+    def get_query_url(self):
+        return 'http://github.com/api/v2/json/issues/list/%s/%s/%s' % (
+            self.tracker.github_name, self.tracker.github_repo,
+            self.state,
+        )
+
+reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
+reversion.register(GitHubQueryModel)

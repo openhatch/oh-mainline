@@ -5,6 +5,7 @@ import os
 import logging
 import datetime
 import sys
+import dj_database_url
 
 ## Figure out where in the filesystem we are.
 DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
@@ -39,6 +40,10 @@ DATABASES = {
         'CHARSET': 'utf8',
     },
 }
+
+# Permit it to be overriden
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {'default': dj_database_url.config()}
 
 OTHER_DATABASES = {
     'mysql': {
@@ -108,7 +113,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = [
     'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
-    'staticgenerator.middleware.StaticGeneratorMiddleware',
+    'mysite.base.middleware.StaticGeneratorMiddlewareOnlyWhenAnonymous',
     'sessionprofile.middleware.SessionProfileMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -125,7 +130,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    
+
 )
 
 STATIC_GENERATOR_URLS = (
@@ -178,7 +183,7 @@ TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
 if os.environ.get('USE_XML_TEST_REPORTING', None):
     TEST_RUNNER = 'mysite.testrunner.OpenHatchXMLTestRunner'
 
-# Make test names prettier 
+# Make test names prettier
 TEST_OUTPUT_DESCRIPTIONS = True
 
 TEST_OUTPUT_DIR = "test_output"
@@ -256,10 +261,10 @@ WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
 
 SERVER_NAME='openhatch.org'
 
-SVN_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn')
+SVN_REPO_PATH = os.path.abspath(os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn'))
 
 # This should include a trailing slash.
-SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
+SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/' # For local sites, this is what you checkout
 
 # The script to invoke for management commands in this environment.
 PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
@@ -269,30 +274,53 @@ SOUTH_TESTS_MIGRATE = False
 GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
 GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you clone
 
+# This setting is used by the customs bug importers.
+TRACKER_POLL_INTERVAL = 1  # Days
+
 ### Initialize celery
 import djcelery
 djcelery.setup_loader()
 
 # By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
-# that off.
+# that off.  If you want to see all SQL queries (e.g., when running a
+# management command locally), remove the stanza related to django.db.backends.
 #
-# If you want to see all SQL queries (e.g., when running a management command
-# locally), remove the stanza related to django.db.backends.
+# Also, this setup sends an email to the site admins on every HTTP 500 error
+# when DEBUG=False.
+#
+# The lines relating to 'require_debug_false' should be enabled when the
+# project is upgraded to use Django 1.4.
 LOGGING = {
     'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+#        'require_debug_false': {
+#            '()': 'django.utils.log.RequireDebugFalse'
+#        },
+    },
     'handlers': {
         'null': {
             'level': 'DEBUG',
             'class':'django.utils.log.NullHandler',
-            },
         },
+        'mail_admins': {
+            'level': 'ERROR',
+#            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+    },
     'loggers': {
         'django.db.backends': {
             'handlers': ['null'],  # Quiet by default!
             'propagate': False,
             'level':'DEBUG',
-            },
-        }
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
 }
 
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
@@ -313,7 +341,7 @@ if _overridden_db.startswith('postgres://'):
 if sys.platform.startswith('win'):
     # staticgenerator seems to act weirdly on Windows, so we disable it.
     MIDDLEWARE_CLASSES.remove(
-        'staticgenerator.middleware.StaticGeneratorMiddleware')
+        'mysite.base.middleware.StaticGeneratorMiddlewareOnlyWhenAnonymous')
 
 ### Enable the low-quality, high-load bug recommendation system
 RECOMMEND_BUGS=True
@@ -324,3 +352,13 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+try:
+    import bugimporters
+except ImportError:
+    try:
+        sys.path.append(os.path.join('..', 'oh-bugimporters'))
+        import bugimporters
+    except ImportError:
+        # meh.
+        pass

@@ -25,7 +25,7 @@ import mysite.base.decorators
 import mysite.customs.forms
 import mysite.customs.models
 
-from mysite.customs.bugimporters import all_trackers
+from mysite.customs.core_bugimporters import all_trackers
 
 # Lists all the stored trackers of a selected type (Bugzilla, Trac etc.)
 @mysite.base.decorators.view
@@ -240,7 +240,7 @@ def edit_tracker_url(request, tracker_type, tracker_name, url_id, url_form=None)
         data['tracker_type'] = tracker_type
         data['url_id'] = url_id
         data['url_form'] = url_form
-    
+
     data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, tracker_name])
     return mysite.base.decorators.as_view(request, 'customs/edit_tracker_url.html', data, None)
 
