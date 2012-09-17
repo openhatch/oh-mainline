@@ -336,9 +336,8 @@ class TracTrackerModel(TrackerModel):
                 ])
 
         for key in WHITELISTED_FIELDS:
-            value = getattr(self, key, None)
-            if value:
-                out_dict[key] = value
+            value = getattr(self, key, '')
+            out_dict[key] = value
 
         # Add a list of our queries
         out_dict['queries'] = [query.url

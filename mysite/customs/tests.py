@@ -1694,6 +1694,7 @@ class ExportTrackerAsDict(django.test.TestCase):
                   'bug_project_name_format': '{tracker_name}',
                   'tracker_name': 'Twisted',
                   'bugimporter': 'trac.SynchronousTracBugImporter',
+                  'as_appears_in_distribution': '',
                   }
         self.assertEqual(golden, exported)
 
