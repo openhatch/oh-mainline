@@ -132,8 +132,6 @@ class FakeGetPage(object):
         self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr?ws.op=searchTasks&created_since=1970-01-01T00%3A00%3A00'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bzr?ws.op=searchTasks')).read()
         self.url2data['https://api.launchpad.net/1.0/bugs/839461'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
         self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
         self.url2data['https://api.launchpad.net/1.0/~vila'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
