@@ -850,46 +850,6 @@ class RoundupBugImporterTests(django.test.TestCase):
     def test_get_url_does_not_crash(self):
         self.assertTrue(self.tm.get_edit_url())
 
-@skipIf(RoundupBugImporter is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class RoundupBugsFromPythonProjectTests(django.test.TestCase):
-    def setUp(self):
-        # Set up the RoundupTrackerModel that will be used here.
-        self.tm = mysite.customs.models.RoundupTrackerModel.all_trackers.create(
-                tracker_name='Python',
-                base_url='http://bugs.python.org/',
-                closed_status='resolved',
-                bitesized_field='Keywords',
-                bitesized_text='easy',
-                documentation_field='Components',
-                documentation_text='Documentation',
-                )
-        self.im = RoundupBugImporter(self.tm, None, data_transits=importer_data_transits)
-
-    def test_get_url_does_not_crash(self):
-        self.assertTrue(self.tm.get_edit_url())
-
-    def test_bug_import(self, second_run=False):
-        # Check the number of Bugs present.
-        all_bugs = Bug.all_bugs.all()
-        if second_run:
-            self.assertEqual(len(all_bugs), 1)
-            old_last_polled = all_bugs[0].last_polled
-        else:
-            self.assertEqual(len(all_bugs), 0)
-
-        rbp = RoundupBugParser(
-                bug_url='http://bugs.python.org/issue8264')
-        # Parse HTML document as if we got it from the web
-        self.im.handle_bug_html(open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'python-roundup-8264.html')).read(), rbp)
-
-        all_bugs = Bug.all_bugs.all()
-        self.assertEqual(len(all_bugs), 1)
-        bug = all_bugs[0]
-        if second_run:
-            self.assert_(bug.last_polled > old_last_polled)
-        self.assertEqual(bug.project.name, 'Python')
-        self.assertEqual(bug.title, "hasattr doensn't show private (double underscore) attributes exist")
 
 sample_launchpad_data_snapshot = mock.Mock()
 sample_launchpad_data_snapshot.return_value = [dict(
