@@ -19,6 +19,9 @@ from django.core.management.base import BaseCommand
 import mysite.customs.models
 
 CLASS_NAME2SIMPLE_NAME = {
+    mysite.customs.models.GitHubTrackerModel: 'github',
+    mysite.customs.models.GoogleTrackerModel: 'google',
+    mysite.customs.models.RoundupTrackerModel: 'roundup',
     mysite.customs.models.TracTrackerModel: 'trac',
     }
 class Command(BaseCommand):
