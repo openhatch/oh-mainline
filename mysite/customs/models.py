@@ -92,6 +92,34 @@ class TrackerModel(models.Model):
 
     objects = InheritanceManager()
 
+    def as_dict(self):
+        out_dict = {}
+
+        # First, add simple data fields
+        WHITELISTED_FIELDS = set([
+                'as_appears_in_distribution',
+                'base_url',
+                'bitesized_text',
+                'bitesized_type',
+                'bug_project_name_format',
+                'documentation_text',
+                'documentation_type',
+                'tracker_name',
+                ])
+
+        for key in WHITELISTED_FIELDS:
+            value = getattr(self, key, '')
+            out_dict[key] = value
+
+        # Add a list of our queries
+        out_dict['queries'] = [query.url
+                               for query in self.tracquerymodel_set.all()]
+
+        # Add a hard-coded bugimporter field
+        out_dict['bugimporter'] = 'trac.SynchronousTracBugImporter'
+
+        return out_dict
+
     def get_edit_url(self):
         '''This method returns the URL you can use to access this tracker's edit
         link.
@@ -315,38 +343,6 @@ class TracTrackerModel(TrackerModel):
 
     def get_base_url(self):
         return self.base_url
-
-    def as_dict(self):
-        out_dict = {}
-
-        # First, add simple data fields
-        WHITELISTED_FIELDS = set([
-                'as_appears_in_distribution',
-                'base_url',
-                'bitesized_text',
-                'bitesized_type',
-                'bug_project_name_format',
-                'documentation_text',
-                'documentation_type',
-                'tracker_name',
-                'github_name',
-                'github_repo',
-                'bitesized_tag',
-                'documentation_tag',
-                ])
-
-        for key in WHITELISTED_FIELDS:
-            value = getattr(self, key, '')
-            out_dict[key] = value
-
-        # Add a list of our queries
-        out_dict['queries'] = [query.url
-                               for query in self.tracquerymodel_set.all()]
-
-        # Add a hard-coded bugimporter field
-        out_dict['bugimporter'] = 'trac.SynchronousTracBugImporter'
-
-        return out_dict
 
 class TracQueryModel(TrackerQueryModel):
     '''This model stores query URLs for TracTracker objects.'''
