@@ -112,8 +112,12 @@ class TrackerModel(models.Model):
             out_dict[key] = value
 
         # Add a list of our queries
-        out_dict['queries'] = [query.url
-                               for query in self.tracquerymodel_set.all()]
+        query_urls = []
+        for querymodel in TrackerQueryModel.__subclasses__():
+            queries = querymodel.objects.filter(tracker=self)
+            query_urls.extend([
+                    q.get_query_url() for q in queries])
+        out_dict['queries'] = query_urls
 
         return out_dict
 
