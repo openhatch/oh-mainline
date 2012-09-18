@@ -329,6 +329,10 @@ class TracTrackerModel(TrackerModel):
                 'documentation_text',
                 'documentation_type',
                 'tracker_name',
+                'github_name',
+                'github_repo',
+                'bitesized_tag',
+                'documentation_tag',
                 ])
 
         for key in WHITELISTED_FIELDS:
