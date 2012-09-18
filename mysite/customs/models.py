@@ -27,6 +27,7 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
 
+import django.forms.models
 import mysite.base.unicode_sanity
 
 class RecentMessageFromCIA(models.Model):
@@ -91,6 +92,33 @@ class TrackerModel(models.Model):
                                      help_text='(For use by OpenHatch admins) Choose a custom bug parser class for the tracker')
 
     objects = InheritanceManager()
+
+    def as_dict(self):
+        # First, add our data
+        out_dict = django.forms.models.model_to_dict(self)
+
+        # Then, remove fields that we don't care about
+        BLACKLISTED_FIELDS = set([
+                'id', # This is not needed by the importer
+                'trackermodel_ptr', # This is not needed by the importer
+                'created_for_project', # Not needed by importer either
+                'old_trac', # This is useless
+                'max_connections', # This is useless
+                ])
+
+        for field in BLACKLISTED_FIELDS:
+            if field in out_dict:
+                del out_dict[field]
+
+        # Add a list of our queries
+        query_urls = []
+        for querymodel in TrackerQueryModel.__subclasses__():
+            queries = querymodel.objects.filter(tracker=self)
+            query_urls.extend([
+                    q.get_query_url() for q in queries])
+        out_dict['queries'] = query_urls
+
+        return out_dict
 
     def get_edit_url(self):
         '''This method returns the URL you can use to access this tracker's edit
@@ -315,39 +343,6 @@ class TracTrackerModel(TrackerModel):
 
     def get_base_url(self):
         return self.base_url
-
-    def as_dict(self):
-        out_dict = {}
-
-        # First, add simple data fields
-        WHITELISTED_FIELDS = set([
-                'as_appears_in_distribution',
-                'base_url',
-                'bitesized_text',
-                'bitesized_type',
-                'bug_project_name_format',
-                'documentation_text',
-                'documentation_type',
-                'tracker_name',
-                'github_name',
-                'github_repo',
-                'bitesized_tag',
-                'documentation_tag',
-                ])
-
-        for key in WHITELISTED_FIELDS:
-            value = getattr(self, key, None)
-            if value:
-                out_dict[key] = value
-
-        # Add a list of our queries
-        out_dict['queries'] = [query.url
-                               for query in self.tracquerymodel_set.all()]
-
-        # Add a hard-coded bugimporter field
-        out_dict['bugimporter'] = 'trac.SynchronousTracBugImporter'
-
-        return out_dict
 
 class TracQueryModel(TrackerQueryModel):
     '''This model stores query URLs for TracTracker objects.'''
