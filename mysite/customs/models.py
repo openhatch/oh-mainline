@@ -483,7 +483,7 @@ class GitHubQueryModel(TrackerQueryModel):
                 mysite.base.unicode_sanity.quote(self.tracker.github_name),
                 mysite.base.unicode_sanity.quote(self.tracker.github_repo)))
         return base_url + '?' + mysite.base.unicode_sanity.urlencode({
-                'state': 'open'})
+                u'state': u'open'})
 
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
 reversion.register(GitHubQueryModel)
