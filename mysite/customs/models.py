@@ -27,6 +27,8 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
 
+import mysite.base.unicode_sanity
+
 class RecentMessageFromCIA(models.Model):
     '''This model logs all messages from CIA.vc.
     At some point, we should examine how and when we want to flush this.'''
