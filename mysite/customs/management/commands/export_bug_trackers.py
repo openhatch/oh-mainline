@@ -18,15 +18,21 @@ import yaml
 from django.core.management.base import BaseCommand
 import mysite.customs.models
 
+CLASS_NAME2SIMPLE_NAME = {
+    mysite.customs.models.TracTrackerModel: 'trac',
+    }
 class Command(BaseCommand):
     help = "Print a YAML file with configuration all Trac-based trackers"
 
     def handle(self, *args, **options):
         as_dicts = []
         for tracker in mysite.customs.models.TracTrackerModel.objects.select_subclasses():
-            # Just Trac for now
-            if tracker.__class__ != mysite.customs.models.TracTrackerModel:
+            # Annotate it with a oh-bugimporter-compatible name
+            # If no such annotation is possible, then skip the export.
+            if tracker.__class__ not in CLASS_NAME2SIMPLE_NAME:
                 continue
-            as_dicts.append(tracker.as_dict())
+            as_dict = tracker.as_dict()
+            as_dict['bugimporter'] = CLASS_NAME2SIMPLE_NAME[tracker.__class__]
+            as_dicts.append(as_dict)
 
         print yaml.safe_dump(as_dicts)

@@ -115,9 +115,6 @@ class TrackerModel(models.Model):
         out_dict['queries'] = [query.url
                                for query in self.tracquerymodel_set.all()]
 
-        # Add a hard-coded bugimporter field
-        out_dict['bugimporter'] = 'trac.SynchronousTracBugImporter'
-
         return out_dict
 
     def get_edit_url(self):
