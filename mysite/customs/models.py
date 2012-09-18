@@ -477,10 +477,11 @@ class GitHubQueryModel(TrackerQueryModel):
     state = models.CharField(max_length=20, default='open')
 
     def get_query_url(self):
-        return 'http://github.com/api/v2/json/issues/list/%s/%s/%s' % (
-            self.tracker.github_name, self.tracker.github_repo,
-            self.state,
-        )
+        base_url = ('https://api.github.com/repos/%s/%s/issues' % (
+                mysite.base.unicode_sanity.quote(self.tracker.github_name),
+                mysite.base.unicode_sanity.quote(self.tracker.github_repo)))
+        return base_url + '?' + mysite.base.unicode_sanity.urlencode({
+                'state': 'open'})
 
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
 reversion.register(GitHubQueryModel)
