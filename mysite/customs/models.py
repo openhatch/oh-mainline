@@ -27,6 +27,7 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
 
+import django.forms.models
 import mysite.base.unicode_sanity
 
 class RecentMessageFromCIA(models.Model):
@@ -93,23 +94,21 @@ class TrackerModel(models.Model):
     objects = InheritanceManager()
 
     def as_dict(self):
-        out_dict = {}
+        # First, add our data
+        out_dict = django.forms.models.model_to_dict(self)
 
-        # First, add simple data fields
-        WHITELISTED_FIELDS = set([
-                'as_appears_in_distribution',
-                'base_url',
-                'bitesized_text',
-                'bitesized_type',
-                'bug_project_name_format',
-                'documentation_text',
-                'documentation_type',
-                'tracker_name',
+        # Then, remove fields that we don't care about
+        BLACKLISTED_FIELDS = set([
+                'id', # This is not needed by the importer
+                'trackermodel_ptr', # This is not needed by the importer
+                'created_for_project', # Not needed by importer either
+                'old_trac', # This is useless
+                'max_connections', # This is useless
                 ])
 
-        for key in WHITELISTED_FIELDS:
-            value = getattr(self, key, '')
-            out_dict[key] = value
+        for field in BLACKLISTED_FIELDS:
+            if field in out_dict:
+                del out_dict[field]
 
         # Add a list of our queries
         query_urls = []

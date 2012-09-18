@@ -1694,6 +1694,7 @@ class ExportTrackerAsDict(django.test.TestCase):
                   'bug_project_name_format': '{tracker_name}',
                   'tracker_name': 'Twisted',
                   'as_appears_in_distribution': '',
+                  'custom_parser': '',
                   }
         self.assertEqual(golden, exported)
 
