@@ -1,2 +1,3 @@
 setuptools
 psycopg2
+PIL
