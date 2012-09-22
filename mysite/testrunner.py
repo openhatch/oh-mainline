@@ -20,6 +20,7 @@ import xmlrunner.extra.djangotestrunner
 import django.test.simple
 import tempfile
 import os
+import sys
 import datetime
 import random
 import subprocess
@@ -70,10 +71,12 @@ class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
             args = (['base', 'profile', 'account', 'project', 'missions', 'search', 'customs'],)
 
         override_settings_for_testing()
+        n = 1
         try:
-            super(OpenHatchTestRunner, self).run_tests(*args, **kwargs)
+            n = super(OpenHatchTestRunner, self).run_tests(*args, **kwargs)
         finally:
             cleanup_after_tests()
+            sys.exit(n)
 
 class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
     def run_tests(self, *args, **kwargs):
@@ -82,7 +85,9 @@ class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
             args = (['base', 'profile', 'account', 'project', 'missions', 'search', 'customs'],)
 
         override_settings_for_testing()
+        n = 1
         try:
-            super(OpenHatchXMLTestRunner, self).run_tests(*args, **kwargs)
+            n = super(OpenHatchXMLTestRunner, self).run_tests(*args, **kwargs)
         finally:
             cleanup_after_tests()
+            sys.exit(n)

@@ -1178,6 +1178,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
     # run the above test for our two use cases: logged in and not
     def test_alert_anon(self):
         self.exercise_alert(anonymous=True)
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_alert_logged_in(self):
         self.exercise_alert(anonymous=False)
 
@@ -1185,6 +1186,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_delete_paragraph_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
@@ -1208,6 +1210,7 @@ class DeleteAnswer(TwillTests):
         # and make sure our answer isn't in the db anymore
         self.assertEqual(Answer.objects.filter(pk=a.pk).count(), 0)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_delete_bug_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
@@ -1239,6 +1242,7 @@ class DeleteAnswer(TwillTests):
 
 class CreateBugAnswer(TwillTests):
     fixtures = ['user-paulproteus']
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_create_bug_answer(self):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
@@ -1310,6 +1314,7 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_create_answer_anonymously(self):
         # Steps for this test
         # 1. User fills in the form anonymously
@@ -1410,6 +1415,7 @@ accuracy.""",
         self.assertContains(project_page, POST_data['answer__text'])
         self.assertContains(project_page, record.author.username)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_multiparagraph_answer(self):
         """
         If a multi-paragraph answer is submitted, display it as a
