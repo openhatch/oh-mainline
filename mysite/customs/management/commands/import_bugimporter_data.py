@@ -18,6 +18,19 @@ from django.core.management.base import BaseCommand
 import mysite.customs.core_bugimporters
 import yaml
 from django.utils import simplejson
+import logging
+
+
+def jsonlines_decoder(f):
+    for line in f:
+        if line.endswith('\n'):
+            line = line [:-1]
+        try:
+            yield simplejson.loads(line)
+        except:
+            logging.exception("simplejson decode failed")
+            logging.info("repr(line) was: %s", repr(line))
+            continue
 
 class Command(BaseCommand):
     args = '<yaml/json_file yaml/json_file ...>'
@@ -28,9 +41,11 @@ class Command(BaseCommand):
             with open(filename) as f:
                 if filename.endswith('.json'):
                     bug_dicts = simplejson.load(f)
+                elif filename.endswith('.jsonlines'):
+                    bug_dicts = jsonlines_decoder(f)
                 else:
                     # assume YAML
                     s = f.read()
                     bug_dicts = yaml.loads(s)
-            for bug_dict in bug_dicts:
-                mysite.customs.core_bugimporters.import_one_bug_item(bug_dict)
+                for bug_dict in bug_dicts:
+                    mysite.customs.core_bugimporters.import_one_bug_item(bug_dict)
