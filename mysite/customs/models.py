@@ -104,6 +104,7 @@ class TrackerModel(models.Model):
             mysite.customs.models.GoogleTrackerModel: 'google',
             mysite.customs.models.RoundupTrackerModel: 'roundup',
             mysite.customs.models.TracTrackerModel: 'trac',
+            mysite.customs.models.LaunchpadTrackerModel: 'launchpad',
             }
         out_dict['bugimporter'] = CLASS_NAME2SIMPLE_NAME[self.__class__]
 
