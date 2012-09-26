@@ -39,6 +39,7 @@ from voting.views import vote_on_object
 
 import mysite.account.views
 import mysite.profile.views
+import mysite.customs.api
 import mysite.profile.api
 import mysite.missions.svn.views
 import mysite.missions.setup.views
@@ -60,6 +61,9 @@ urlpatterns = patterns('',
 
         (r'^\+api/v1/profile/',
          include(mysite.profile.api.PortfolioEntryResource().urls)),
+
+        (r'^\+api/v1/customs/',
+         include(mysite.customs.api.TrackerModelResource().urls)),
 
         (r'^\+test_weekly_email_re_projects/', 'mysite.base.views.test_weekly_email_re_projects'),
 
