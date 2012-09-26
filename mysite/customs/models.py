@@ -97,6 +97,16 @@ class TrackerModel(models.Model):
         # First, add our data
         out_dict = django.forms.models.model_to_dict(self)
 
+        # Then, indicate to downstream what kind of bug importer we are
+        CLASS_NAME2SIMPLE_NAME = {
+            mysite.customs.models.BugzillaTrackerModel: 'bugzilla',
+            mysite.customs.models.GitHubTrackerModel: 'github',
+            mysite.customs.models.GoogleTrackerModel: 'google',
+            mysite.customs.models.RoundupTrackerModel: 'roundup',
+            mysite.customs.models.TracTrackerModel: 'trac',
+            }
+        out_dict['bugimporter'] = CLASS_NAME2SIMPLE_NAME[self.__class__]
+
         # Then, remove fields that we don't care about
         BLACKLISTED_FIELDS = set([
                 'id', # This is not needed by the importer
