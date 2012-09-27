@@ -203,7 +203,7 @@ class DiffRecursiveMission(object):
 class PatchRecursiveMission(object):
     OLD_DIR = os.path.join(get_mission_data_path('diffpatch'), 'recipes')
     NEW_DIR = os.path.join(get_mission_data_path('diffpatch'), 'recipes.more-garlic')
-    BASE_NAME = 'recipes'
+    BASE_NAME = 'more-garlic'
     ANSWERS = {'amount_of_garlic': 3}
 
     # NOTE: You should rely on the DiffRecursiveMission for the tarball.
