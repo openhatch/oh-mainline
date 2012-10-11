@@ -1,5 +1,6 @@
 import platform
 import re
+import urllib
 import urllib2
 import urlparse
 
@@ -84,6 +85,8 @@ class URLValidator(RegexValidator):
                 "User-Agent": self.user_agent,
             }
             url = url.encode('utf-8')
+            # Quote characters from the unreserved set, refs #16812
+            url = urllib.quote(url, "!*'();:@&=+$,/?#[]")
             broken_error = ValidationError(
                 _(u'This URL appears to be a broken link.'), code='invalid_link')
             try:
@@ -147,7 +150,8 @@ class EmailValidator(RegexValidator):
 
 email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
+    # quoted-string, see also http://tools.ietf.org/html/rfc2822#section-3.2.5
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"'
     r')@(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?$', re.IGNORECASE)  # domain
 validate_email = EmailValidator(email_re, _(u'Enter a valid e-mail address.'), 'invalid')
 

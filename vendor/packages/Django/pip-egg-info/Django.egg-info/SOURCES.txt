@@ -1659,7 +1659,6 @@ django/contrib/gis/db/backends/spatialite/__init__.py
 django/contrib/gis/db/backends/spatialite/adapter.py
 django/contrib/gis/db/backends/spatialite/base.py
 django/contrib/gis/db/backends/spatialite/client.py
-django/contrib/gis/db/backends/spatialite/compiler.py
 django/contrib/gis/db/backends/spatialite/creation.py
 django/contrib/gis/db/backends/spatialite/introspection.py
 django/contrib/gis/db/backends/spatialite/models.py
@@ -3455,9 +3454,12 @@ docs/releases/1.2-rc-1.txt
 docs/releases/1.2.2.txt
 docs/releases/1.2.4.txt
 docs/releases/1.2.5.txt
+docs/releases/1.2.6.txt
+docs/releases/1.2.7.txt
 docs/releases/1.2.txt
 docs/releases/1.3-alpha-1.txt
 docs/releases/1.3-beta-1.txt
+docs/releases/1.3.1.txt
 docs/releases/1.3.txt
 docs/releases/index.txt
 docs/topics/auth.txt
@@ -4295,6 +4297,7 @@ tests/regressiontests/templates/eggs/tagsegg.egg
 tests/regressiontests/templates/templates/broken_base.html
 tests/regressiontests/templates/templates/inclusion.html
 tests/regressiontests/templates/templates/response.html
+tests/regressiontests/templates/templates/ssi include with spaces.html
 tests/regressiontests/templates/templates/ssi_include.html
 tests/regressiontests/templates/templates/test_context.html
 tests/regressiontests/templates/templates/test_extends_error.html

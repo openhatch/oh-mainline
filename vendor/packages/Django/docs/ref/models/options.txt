@@ -166,6 +166,13 @@ Django quotes column and table names behind the scenes.
         >>> answer.get_previous_in_order()
         <Answer: 1>
 
+.. admonition:: Changing order_with_respect_to
+
+        ``order_with_respect_to`` adds an additional field/database column
+        named ``_order``, so be sure to handle that as you would any other
+        change to your models if you add or change ``order_with_respect_to``
+        after your initial :djadmin:`syncdb`.
+
 ``ordering``
 ------------
 
@@ -237,6 +244,12 @@ Django quotes column and table names behind the scenes.
     set of fields::
 
         unique_together = ("driver", "restaurant")
+
+    A :class:`~django.db.models.ManyToManyField` cannot be included in
+    unique_together (it's not even clear what that would mean). If you
+    need to validate uniqueness related to a
+    :class:`~django.db.models.ManyToManyField`, look at signals or
+    using an explicit :attr:`through <ManyToManyField.through>` model.
 
 ``verbose_name``
 ----------------

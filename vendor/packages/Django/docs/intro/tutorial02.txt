@@ -40,22 +40,22 @@ activate the admin site for your installation, do these three things:
 
       .. parsed-literal::
 
-          from django.conf.urls.defaults import *
+          from django.conf.urls.defaults import patterns, include, url
 
           # Uncomment the next two lines to enable the admin:
           **from django.contrib import admin**
           **admin.autodiscover()**
 
           urlpatterns = patterns('',
-              # Example:
-              # (r'^mysite/', include('mysite.foo.urls')),
+              # Examples:
+              # url(r'^$', 'mysite.views.home', name='home'),
+              # url(r'^mysite/', include('mysite.foo.urls')),
 
-              # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
-              # to INSTALLED_APPS to enable admin documentation:
-              # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+              # Uncomment the admin/doc line below to enable admin documentation:
+              # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
               # Uncomment the next line to enable the admin:
-              **(r'^admin/', include(admin.site.urls)),**
+              **url(r'^admin/', include(admin.site.urls)),**
           )
 
       (The bold lines are the ones that needed to be uncommented.)
@@ -343,9 +343,11 @@ an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces). But you can change that by giving that
 method (in ``models.py``) a ``short_description`` attribute::
 
-    def was_published_today(self):
-        return self.pub_date.date() == datetime.date.today()
-    was_published_today.short_description = 'Published today?'
+    class Poll(models.Model):
+        # ...
+        def was_published_today(self):
+            return self.pub_date.date() == datetime.date.today()
+        was_published_today.short_description = 'Published today?'
 
 Edit your admin.py file again and add an improvement to the Poll change list page: Filters. Add the
 following line to ``PollAdmin``::
