@@ -6,6 +6,13 @@ Settings
     :local:
     :depth: 1
 
+.. warning::
+
+    Be careful when you override settings, especially when the default value
+    is a non-empty tuple or dict, like :setting:`MIDDLEWARE_CLASSES` and
+    :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the components
+    required by the features of Django you wish to use.
+
 Available settings
 ==================
 
@@ -619,11 +626,13 @@ Default::
     '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
     '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
 
-A tuple of formats that will be accepted when inputting data on a date
-field. Formats will be tried in order, using the first valid.
-Note that these format strings are specified in Python's datetime_ module
-syntax, that is different from the one used by Django for formatting dates
-to be displayed.
+A tuple of formats that will be accepted when inputting data on a date field.
+Formats will be tried in order, using the first valid. Note that these format
+strings are specified in Python's datetime_ module syntax, that is different
+from the one used by Django for formatting dates to be displayed.
+
+When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
+precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -660,10 +669,12 @@ Default::
     '%m/%d/%y %H:%M:%S', '%m/%d/%y %H:%M', '%m/%d/%y')
 
 A tuple of formats that will be accepted when inputting data on a datetime
-field. Formats will be tried in order, using the first valid.
-Note that these format strings are specified in Python's datetime_ module
-syntax, that is different from the one used by Django for formatting dates
-to be displayed.
+field. Formats will be tried in order, using the first valid. Note that these
+format strings are specified in Python's datetime_ module syntax, that is
+different from the one used by Django for formatting dates to be displayed.
+
+When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
+precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -978,9 +989,12 @@ FIXTURE_DIRS
 
 Default: ``()`` (Empty tuple)
 
-List of locations of the fixture data files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows. See
-:doc:`/topics/testing`.
+List of directories searched for fixture files, in addition to the
+``fixtures`` directory of each application, in search order.
+
+Note that these paths should use Unix-style forward slashes, even on Windows.
+
+See :ref:`initial-data-via-fixtures` and :ref:`topics-testing-fixtures`.
 
 FORCE_SCRIPT_NAME
 ------------------
@@ -1742,8 +1756,10 @@ TEMPLATE_DIRS
 
 Default: ``()`` (Empty tuple)
 
-List of locations of the template source files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows.
+List of locations of the template source files searched by
+:class:`django.template.loaders.filesystem.Loader`, in search order.
+
+Note that these paths should use Unix-style forward slashes, even on Windows.
 
 See :doc:`/topics/templates`.
 
@@ -1836,11 +1852,13 @@ TIME_INPUT_FORMATS
 
 Default: ``('%H:%M:%S', '%H:%M')``
 
-A tuple of formats that will be accepted when inputting data on a time
-field. Formats will be tried in order, using the first valid.
-Note that these format strings are specified in Python's datetime_ module
-syntax, that is different from the one used by Django for formatting dates
-to be displayed.
+A tuple of formats that will be accepted when inputting data on a time field.
+Formats will be tried in order, using the first valid. Note that these format
+strings are specified in Python's datetime_ module syntax, that is different
+from the one used by Django for formatting dates to be displayed.
+
+When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
+precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
