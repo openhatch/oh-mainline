@@ -1,8 +1,11 @@
 import copy
 import pickle
 
-from django.http import (QueryDict, HttpResponse, SimpleCookie, BadHeaderError,
-        parse_cookie)
+from django.core.exceptions import SuspiciousOperation
+from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
+                         HttpResponsePermanentRedirect,
+                         SimpleCookie, BadHeaderError,
+                         parse_cookie)
 from django.utils import unittest
 
 class QueryDictTests(unittest.TestCase):
@@ -243,6 +246,18 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(BadHeaderError, r.__setitem__, 'test\rstr', 'test')
         self.assertRaises(BadHeaderError, r.__setitem__, 'test\nstr', 'test')
 
+    def test_unsafe_redirects(self):
+        bad_urls = [
+            'data:text/html,<script>window.alert("xss")</script>',
+            'mailto:test@example.com',
+            'file:///etc/passwd',
+        ]
+        for url in bad_urls:
+            self.assertRaises(SuspiciousOperation,
+                              HttpResponseRedirect, url)
+            self.assertRaises(SuspiciousOperation,
+                              HttpResponsePermanentRedirect, url)
+
 class CookieTests(unittest.TestCase):
     def test_encode(self):
         """
@@ -281,3 +296,9 @@ class CookieTests(unittest.TestCase):
         Test that a single non-standard cookie name doesn't affect all cookies. Ticket #13007.
         """
         self.assertTrue('good_cookie' in parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
+
+    def test_repeated_nonstandard_keys(self):
+        """
+        Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
+        """
+        self.assertTrue('good_cookie' in parse_cookie('a,=b; a,=c; good_cookie=yes').keys())

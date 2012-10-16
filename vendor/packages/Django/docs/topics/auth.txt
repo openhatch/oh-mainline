@@ -1174,9 +1174,16 @@ The permission_required decorator
 Limiting access to generic views
 --------------------------------
 
-To limit access to a :doc:`generic view </ref/generic-views>`, write a thin
-wrapper around the view, and point your URLconf to your wrapper instead of the
-generic view itself. For example::
+Controlling access to a :doc:`class-based generic view </ref/class-based-views>`
+is done by decorating the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
+method on the class. See :ref:`decorating-class-based-views` for the details.
+
+Function-based generic views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To limit access to a :doc:`function-based generic view </ref/generic-views>`,
+write a thin wrapper around the view, and point your URLconf to your wrapper
+instead of the generic view itself. For example::
 
     from django.views.generic.date_based import object_detail
 
@@ -1251,16 +1258,19 @@ can or cannot do with Task instances, specific to your application::
         ...
         class Meta:
             permissions = (
-                ("can_view", "Can see available tasks"),
-                ("can_change_status", "Can change the status of tasks"),
-                ("can_close", "Can remove a task by setting its status as closed"),
+                ("view_task", "Can see available tasks"),
+                ("change_task_status", "Can change the status of tasks"),
+                ("close_task", "Can remove a task by setting its status as closed"),
             )
 
 The only thing this does is create those extra permissions when you run
 :djadmin:`manage.py syncdb <syncdb>`. Your code is in charge of checking the
 value of these permissions when an user is trying to access the functionality
 provided by the application (viewing tasks, changing the status of tasks,
-closing tasks.)
+closing tasks.) Continuing the above example, the following checks if a user may
+view tasks::
+
+    user.has_perm('app.view_task')
 
 API reference
 -------------
@@ -1508,8 +1518,9 @@ processing at the first positive match.
 
     Once a user has authenticated, Django stores which backend was used to
     authenticate the user in the user's session, and re-uses the same backend
-    for subsequent authentication attempts for that user. This effectively means
-    that authentication sources are cached, so if you change
+    for the duration of that session whenever access to the currently
+    authenticated user is needed. This effectively means that authentication
+    sources are cached on a per-session basis, so if you change
     :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
     you need to force users to re-authenticate using different methods. A simple
     way to do that is simply to execute ``Session.objects.all().delete()``.
