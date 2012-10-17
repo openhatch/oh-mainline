@@ -55,8 +55,8 @@ class GitDiffMission(object):
         if commit_diff.returncode == 0: # for shell commands, success is 0
             commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
 
-                Come to my house for a dinner party.
-                Knock 3 times and give the secret password: Pinky.""" % username
+         Come to my house for a dinner party.
+         Knock 3 times and give the secret password: Pinky.""" % username
             subprocess.Popen(['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)
             return True
         else:
