@@ -121,7 +121,7 @@ class Ohloh(object):
         # Do a real search to find the project
         try:
             data = self.project_name2projectdata(project)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             raise ValueError
         try:
             med_logo = process_logo_filename(data['medium_logo_url'])
@@ -135,7 +135,7 @@ class Ohloh(object):
     def get_icon_for_project_by_id(self, project):
         try:
             data = self.project_id2projectdata(project_name=project)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             raise ValueError
         try:
             med_logo = process_logo_filename(data['medium_logo_url'])
