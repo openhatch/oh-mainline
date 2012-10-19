@@ -97,6 +97,16 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         return ret[0], web_response
     return None, web_response
 
+def process_logo_filename(logo_filename):
+    if logo_filename == 'no_logo.png':
+        # The Ohloh API used to not provide any data
+        # if the logo was missing. Now, it provides this flag value
+        # (as perceived by others at e.g. https://github.com/eventh/syte/commit/12f02c3aff6761278d09893e5ff071af55de238f )
+        # so we raise KeyError, just like in the good old days,
+        # when we see this value.
+        raise KeyError, ("Simulating KeyError "
+                         "to convince caller the logo is not there.")
+    return logo_filename
 
 class Ohloh(object):
 
@@ -111,10 +121,10 @@ class Ohloh(object):
         # Do a real search to find the project
         try:
             data = self.project_name2projectdata(project)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             raise ValueError
         try:
-            med_logo = data['medium_logo_url']
+            med_logo = process_logo_filename(data['medium_logo_url'])
         except TypeError:
             raise ValueError, "Ohloh gave us back nothing."
         except KeyError:
@@ -125,10 +135,10 @@ class Ohloh(object):
     def get_icon_for_project_by_id(self, project):
         try:
             data = self.project_id2projectdata(project_name=project)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             raise ValueError
         try:
-            med_logo = data['medium_logo_url']
+            med_logo = process_logo_filename(data['medium_logo_url'])
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
         b = mysite.customs.mechanize_helpers.mechanize_get(med_logo)
