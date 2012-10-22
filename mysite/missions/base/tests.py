@@ -37,6 +37,12 @@ import difflib
 import shutil
 import random
 
+def get_mission_test_data_path(mission_type):
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    new_path = os.path.join(base_path, '..', mission_type, 'test_data')
+    absolute_ified = os.path.abspath(new_path)
+    return absolute_ified
+
 def make_testdata_filename(mission_type, filename):
     return os.path.join(os.path.dirname(__file__), '..', mission_type, 'testdata', filename)
 
