@@ -30,6 +30,7 @@ from mysite.missions.base.tests import (
     Person,
     reverse,
     StepCompletion,
+    get_mission_test_data_path,
     )
 from mysite.base.unicode_sanity import utf8
 from mysite.missions.diffpatch import views, controllers
@@ -139,6 +140,10 @@ class DiffSingleFileTests(TwillTests):
         newlines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
         return ''.join(difflib.unified_diff(newlines, oldlines, 'new.txt', 'old.txt'))
 
+    def make_copy_paste_error_patch(self):
+        file_path = get_mission_test_data_path('diffpatch');
+        return ''.join(open(os.path.join(file_path, "copy_paste_error_pancake_diff.txt")).readlines());
+
     def test_good_patch(self):
         controllers.DiffSingleFileMission.validate_patch(self.make_good_patch())
 
@@ -174,6 +179,17 @@ class DiffSingleFileTests(TwillTests):
             controllers.DiffSingleFileMission.validate_patch(self.make_swapped_patch())
         except controllers.IncorrectPatch, e:
             self.assert_('order of files passed to diff was flipped' in utf8(e))
+        else:
+            self.fail('no exception raised')
+
+    def test_copy_paste_white_space_error(self):
+        """
+        A diff that is corrupted by the removal of white space while copying from terminal (mostly in the case of windows)
+        """
+        try:
+            controllers.DiffSingleFileMission.validate_patch(self.make_copy_paste_error_patch())
+        except controllers.IncorrectPatch, e:
+            self.assert_('copy and paste from the terminal' in utf8(e))
         else:
             self.fail('no exception raised')
 

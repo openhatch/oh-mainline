@@ -1,0 +1,20 @@
+--- almond-pancake.txt  Sat Jul 28 21:56:00 2012
++++ walnut-pancake.txt  Sat Jul 28 23:53:07 2012
+@@ -11,7 +11,7 @@
+ * 1/4 cup milk
+ * 1 large egg
+ * 2 tablespoon unsalted butter, melted
+-* 1 teaspoon almond extract
++* 1 teaspoon walnut extract
+ * Vegetable oil for brushing griddle
+
+ == Procedure ==
+@@ -25,7 +25,7 @@
+ 3. Microwave buttermilk and milk in a 2-cup Pyrex
+    measuring cup to room temperature, 20 to 30 seconds.
+
+-4. Whisk in egg, butter, and almond extract.
++4. Whisk in egg, butter, and walnut extract.
+
+ 5. Add wet ingredients to dry ingredients and whisk until
+    just mixed.
