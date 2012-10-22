@@ -69,8 +69,8 @@ class SingleFilePatch(object):
         # Maybe the problem is that the user accidentally removed
         # line-ending whitespace from the patch file. We detect that
         # by seeing if \n\n appears in the patch file.
-        if '\n\n' in patchdata:
-            raise IncorrectPatch, 'You seem to have removed the space (" ") characters at the end of some lines. Those are essential to the patch format'
+        if '\n\n' in patchdata or '\r\n\r\n' in patchdata:
+            raise IncorrectPatch, 'You seem to have removed the space (" ") characters at the end of some lines. Those are essential to the patch format. If you are a Windows user, check the hints on how to copy and paste from the terminal.'
 
         # Otherwise, we give a generic error message.
         raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
