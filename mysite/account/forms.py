@@ -183,4 +183,4 @@ class SignUpIfYouWantToHelpForm(django.forms.Form):
 class EmailMeForm(django.forms.ModelForm):
     class Meta:
         model = Person
-        fields = ('email_me_weekly_re_projects',)
+        fields = ('email_me_re_projects',)

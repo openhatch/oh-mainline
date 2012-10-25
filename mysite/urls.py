@@ -65,7 +65,7 @@ urlpatterns = patterns('',
         (r'^\+api/v1/customs/',
          include(mysite.customs.api.TrackerModelResource().urls)),
 
-        (r'^\+test_weekly_email_re_projects/', 'mysite.base.views.test_weekly_email_re_projects'),
+        (r'^\+test_email_re_projects/', 'mysite.base.views.test_email_re_projects'),
 
         (r'^\+project_icon_poll/(?P<project_name>.+)', 'mysite.search.views.project_has_icon'),
 

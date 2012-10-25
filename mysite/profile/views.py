@@ -823,7 +823,7 @@ def unsubscribe(request, token_string):
 def unsubscribe_do(request):
     token_string = request.POST.get('token_string', None)
     person = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string)
-    person.email_me_weekly_re_projects = False
+    person.email_me_re_projects = False
     person.save()
     return HttpResponseRedirect(reverse(unsubscribe, kwargs={'token_string': token_string}))
 

@@ -42,7 +42,7 @@ def push_to_end_of_list(an_object, a_list):
         pass
 
 class Command(BaseCommand):
-    help = "Send out emails, at most once per week, to users who've requested a running summary of OpenHatch activity in their projects."
+    help = "Send out periodic emails to users who've requested a running summary of OpenHatch activity in their projects."
 
     TIMESTAMP_KEY = "What's the endpoint of the time range of the last email we sent out?"
 
@@ -61,16 +61,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        SEVEN_DAYS = datetime.timedelta(days=7)
+        YESTERDAY = datetime.timedelta(hours=24)
 
-        # If it's been less than seven days since our last big email,
+        # If it's been less than 24 hours since our last big email,
         # stop here and don't send any emails.
         if ((self.this_run_covers_things_up_until - self.this_run_covers_things_since) < 
-                SEVEN_DAYS):
-            logging.warn("Not sending emails; emails were last sent later than seven days ago.")
+                YESTERDAY):
+            logging.warn("Not sending emails; emails were last sent within the last 24 hours.")
             return
 
-        # If we made it this far in the function, it's been seven days or more
+        # If we made it this far in the function, it's been 24 hours or more
         # since our last email. Let's make a note that the time range of this
         # email extends until the timestamp stored in self.this_run_covers_things_up_until
         Timestamp.update_timestamp_for_string(Command.TIMESTAMP_KEY,
@@ -79,7 +79,7 @@ class Command(BaseCommand):
         # range starting point of the next email
 
         # Now let's send some emails! :-)
-        people_who_want_email = Person.objects.filter(email_me_weekly_re_projects=True)
+        people_who_want_email = Person.objects.filter(email_me_re_projects=True)
 
         count = 0
         for person in people_who_want_email:
@@ -88,10 +88,10 @@ class Command(BaseCommand):
                 logging.warn("Uh, the person has no email address: %s" % person.user.username)
                 continue # if the user has no email address, we skip the user.
 
-            message_in_plain_text, message_in_html = self.get_weekly_projects_email_for(person)
+            message_in_plain_text, message_in_html = self.get_projects_email_for(person)
             if message_in_html: 
                 count += 1
-                print "Emailing %s their weekly project activity." % person.user.email
+                print "Emailing %s their project activity." % person.user.email
                 email = EmailMultiAlternatives(
                         subject="News about your OpenHatch projects",
                         body=message_in_plain_text,
@@ -104,8 +104,8 @@ class Command(BaseCommand):
                 email.send()
         print "Emailed", count 
 
-    def get_weekly_projects_email_for(self, recipient):
-        context = self.get_context_for_weekly_email_to(recipient)
+    def get_projects_email_for(self, recipient):
+        context = self.get_context_for_email_to(recipient)
         if context is None:
             return None, None
 
@@ -117,8 +117,8 @@ class Command(BaseCommand):
         plain_context['rich_text'] = False
         rich_context['rich_text'] = True
 
-        message_in_simpler_html = render_to_string('weekly_email_re_projects.html', plain_context)
-        message_in_html = render_to_string('weekly_email_re_projects.html', rich_context)
+        message_in_simpler_html = render_to_string('email_re_projects.html', plain_context)
+        message_in_html = render_to_string('email_re_projects.html', rich_context)
 
         # when it is converted into Markdown it looks good in an email
         html2text.BODY_WIDTH = 0 # good for emails
@@ -138,7 +138,7 @@ class Command(BaseCommand):
     def get_maintainer_projects(person):
         return [pfe.project for pfe in person.get_maintainer_portfolio_entries()]
 
-    def get_context_for_weekly_email_to(self, recipient):
+    def get_context_for_email_to(self, recipient):
         context = {}
         project2people = []
 
