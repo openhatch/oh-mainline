@@ -30,7 +30,7 @@ import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
 import mysite.profile.controllers
-from mysite.profile.management.commands import send_weekly_emails
+from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
 from django.utils.unittest import skipIf
@@ -2162,15 +2162,15 @@ class Notifications(TwillTests):
 
         # First move the timestamp back
         Timestamp.update_timestamp_for_string(
-                send_weekly_emails.Command.TIMESTAMP_KEY,
+                send_emails.Command.TIMESTAMP_KEY,
                 override_time=Timestamp.ZERO_O_CLOCK)
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        context = command.get_context_for_weekly_email_to(recipient)
+        command = mysite.profile.management.commands.send_emails.Command()
+        context = command.get_context_for_email_to(recipient)
         return context
 
     @staticmethod
     def send_email_and_get_outbox():
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        command = mysite.profile.management.commands.send_emails.Command()
         command.handle()
         return mail.outbox
 
@@ -2191,9 +2191,9 @@ class Notifications(TwillTests):
     def test_checkbox_manipulates_db(self):
         self.login_with_twill()
 
-        # By default, paulproteus has the column email_me_weekly_re_projects set to True
+        # By default, paulproteus has the column email_me_re_projects set to True
         paul = Person.get_by_username('paulproteus')
-        self.assert_(paul.email_me_weekly_re_projects)
+        self.assert_(paul.email_me_re_projects)
 
         # Now let's set it to false
 
@@ -2207,12 +2207,12 @@ class Notifications(TwillTests):
         tc.follow('Email')
 
         # Click it and you find a form for changing your notification settings
-        # In the form, there's a checkbox labeled "Email me weekly about
+        # In the form, there's a checkbox labeled "Email me periodically about
         # activity on my projects" (or something like that)
 
         # Uncheck the checkbox, and submit the form
 
-        tc.fv(1, 'email_me_weekly_re_projects', '0')
+        tc.fv(1, 'email_me_re_projects', '0')
         tc.submit()
 
         # Now you no longer receive emails. For the purposes of this test,
@@ -2222,15 +2222,15 @@ class Notifications(TwillTests):
 
         paul = Person.get_by_username('paulproteus')
 
-        self.assertFalse(paul.email_me_weekly_re_projects)
+        self.assertFalse(paul.email_me_re_projects)
 
-    def add_two_people_to_a_project_and_send_weekly_emails(self,
+    def add_two_people_to_a_project_and_send_emails(self,
             people_want_emails=True, how_to_add_people=None, outbox_or_context=None,
             emails_should_actually_be_sent=True):
 
         self.assert_(outbox_or_context in ['outbox', 'context'])
 
-        time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
+        time_range_endpoint_at_func_top = send_emails.Command.get_time_range_endpoint_of_last_email()
 
         project_with_two_participants = Project.create_dummy()
 
@@ -2243,7 +2243,7 @@ class Notifications(TwillTests):
         for index, add_person_function in enumerate(how_to_add_people):
             participant = Person.create_dummy(
                     first_name=str(index),
-                    email_me_weekly_re_projects=people_want_emails)
+                    email_me_re_projects=people_want_emails)
             add_person_function(participant, project_with_two_participants)
             participants_who_are_news_to_each_other.append(participant)
 
@@ -2257,14 +2257,14 @@ class Notifications(TwillTests):
             if emails_should_actually_be_sent:
                 # The timestamp log should have been modified since the top of the function.
                 self.assert_(
-                        send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
+                        send_emails.Command.get_time_range_endpoint_of_last_email()
                         > time_range_endpoint_at_func_top)
 
         if outbox_or_context == 'context':
-            command = mysite.profile.management.commands.send_weekly_emails.Command()
+            command = mysite.profile.management.commands.send_emails.Command()
             email_contexts = {} # initial value
             for participant in participants_who_are_news_to_each_other:
-                email_context = command.get_context_for_weekly_email_to(participant)
+                email_context = command.get_context_for_email_to(participant)
                 email_contexts[participant.pk] = email_context
             output = email_contexts
 
@@ -2290,7 +2290,7 @@ class Notifications(TwillTests):
 
     def test_email_the_people_with_checkboxes_checked(self):
         contributors, outbox = (
-                self.add_two_people_to_a_project_and_send_weekly_emails(
+                self.add_two_people_to_a_project_and_send_emails(
                     people_want_emails=True, outbox_or_context='outbox') )
 
         self.assertEqual(len(outbox), 2)
@@ -2300,7 +2300,7 @@ class Notifications(TwillTests):
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
         contributors, outbox = (
-                self.add_two_people_to_a_project_and_send_weekly_emails(
+                self.add_two_people_to_a_project_and_send_emails(
                     people_want_emails=False, outbox_or_context='outbox') )
 
         self.assertEqual(len(outbox), 0)
@@ -2316,12 +2316,12 @@ class Notifications(TwillTests):
 
         # Paul will be the recipient of the email, and he's a contributor to
         # the project created above, so he'll be getting information about that
-        # project's recent activity in his weekly email
+        # project's recent activity in his periodic email
         PortfolioEntry.create_dummy(person=paul, project=project, is_published=True)
 
         NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL = 5
 
-        # 5 people have joined this project in the last week
+        # 5 people have joined this project today
         for i in range(NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL):
             p = Person.create_dummy()
             PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
@@ -2329,12 +2329,12 @@ class Notifications(TwillTests):
         # 1 person joined this project two weeks ago (too long ago to mention
         # in this email)
         now = datetime.datetime.utcnow()
-        seven_days_ago = now - datetime.timedelta(days=7)
+        yesterday = now - datetime.timedelta(hours=24)
         eight_days_ago = now - datetime.timedelta(days=8)
 
         Timestamp.update_timestamp_for_string(
-                send_weekly_emails.Command.TIMESTAMP_KEY,
-                override_time=seven_days_ago)
+                send_emails.Command.TIMESTAMP_KEY,
+                override_time=yesterday)
 
         veteran = Person.create_dummy()
         veteran.user.first_name = 'VETERAN'
@@ -2342,20 +2342,20 @@ class Notifications(TwillTests):
         PortfolioEntry.create_dummy(person=veteran, project=project,
                 is_published=True, date_created=eight_days_ago)
 
-        # Psst, notice that we have sent out a round of weekly emails since the
+        # Psst, notice that we have sent out a round of emails since the
         # veteran added the project to her profile. So the veteran should not
-        # appear in the next round of weekly emails.
+        # appear in the next round of periodic emails.
 
         # Let's assert that the email context contains enough information to
-        # say that such and such a project received 6 contributors in the
-        # last week, here are the person objects for 3 of them
+        # say that such and such a project received 6 contributors recently
+        # and that here are the person objects for 3 of them
 
         new_contributors = list(project.get_contributors())
         new_contributors.remove(paul)
         new_contributors.remove(veteran)
 
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        context = command.get_context_for_weekly_email_to(paul)
+        command = mysite.profile.management.commands.send_emails.Command()
+        context = command.get_context_for_email_to(paul)
 
         project, actual_people = context['project2people'][0]
 
@@ -2412,7 +2412,7 @@ class Notifications(TwillTests):
 
         # Paul will be the recipient of the email, and he's a contributor to
         # the project created above, so he'll be getting information about that
-        # project's recent activity in his weekly email
+        # project's recent activity in his periodic email
         PortfolioEntry.create_dummy(person=paul, project=project, is_published=True)
 
         # Since paul is the only newly marked contributor to this project,
@@ -2422,7 +2422,7 @@ class Notifications(TwillTests):
 
         number_of_new_contributors_other_than_paul = 2
 
-        # 2 people have joined this project in the last week
+        # 2 people have joined this project recently
         for i in range(number_of_new_contributors_other_than_paul):
             p = Person.create_dummy()
             PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
@@ -2502,11 +2502,11 @@ class Notifications(TwillTests):
     @staticmethod
     def set_when_emails_were_last_sent(when):
         Timestamp.update_timestamp_for_string(
-                send_weekly_emails.Command.TIMESTAMP_KEY,
+                send_emails.Command.TIMESTAMP_KEY,
                 override_time=when)
 
     def try_to_send_some_emails(self, expect_success):
-        add_and_send = self.add_two_people_to_a_project_and_send_weekly_emails
+        add_and_send = self.add_two_people_to_a_project_and_send_emails
         people, outbox = add_and_send(
                 how_to_add_people=[
                     Notifications.add_contributor,
@@ -2516,45 +2516,45 @@ class Notifications(TwillTests):
         were_emails_sent = bool(outbox)
         self.assertEqual(expect_success, were_emails_sent)
 
-    def test_we_dont_send_emails_more_than_once_a_week(self):
-        # Test that, no matter what, we never send out emails more than once a
-        # week.
+    def test_we_dont_send_emails_more_than_we_should(self):
+        # Test that, no matter what, we never send out emails more than once
+        # every 24 hours.
 
         # Here we test two scenarios.
 
         # First, what if we (accidentally) run the
-        # send_weekly_emails command today, when we sent the emails yesterday?
+        # send_emails command this afternoon, when we sent the emails this morning?
         # We want to make sure that we can't accidentally send people two
-        # emails in a single week...
+        # emails in a single day...
 
         # Calculate some datetime objects we'll need during this test
         now = datetime.datetime.utcnow()
 
-        just_under_seven_days = datetime.timedelta(days=6, hours=23)
-        just_under_seven_days_ago = now - just_under_seven_days
+        just_under_24_hours = datetime.timedelta(hours=23, minutes=55)
+        just_under_24_hours_ago = now - just_under_24_hours
 
-        # Let's record that emails were sent under 7 days ago
-        Notifications.set_when_emails_were_last_sent(just_under_seven_days_ago)
+        # Let's record that emails were sent within 24 hours
+        Notifications.set_when_emails_were_last_sent(just_under_24_hours_ago)
 
         # Try to send emails, but expect no emails to be sent, because we've
-        # recorded that we sent emails within the last 7 days.
+        # recorded that we sent emails within 24 hours.
         self.try_to_send_some_emails(expect_success=False)
 
     def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(self):
 
         # Now let's make sure that the converse scenario works as expected. We
-        # sent the emails over seven days ago, and somebody runs the
-        # send_weekly_emails command. In this scenario, emails SHOULD be sent.
+        # sent the emails over 24 hours ago, and somebody runs the
+        # send_emails command. In this scenario, emails SHOULD be sent.
 
         now = datetime.datetime.utcnow()
-        just_over_seven_days = datetime.timedelta(days=7, hours=1)
-        just_over_seven_days_ago = now - just_over_seven_days
+        just_over_24_hours = datetime.timedelta(hours=25)
+        just_over_24_hours_ago = now - just_over_24_hours
 
-        # Let's record that emails were sent just OVER 7 days ago
-        Notifications.set_when_emails_were_last_sent(just_over_seven_days_ago)
+        # Let's record that emails were sent just OVER 24 hours ago
+        Notifications.set_when_emails_were_last_sent(just_over_24_hours_ago)
 
         # Try to send emails, but expect some emails to YES be sent, because we've
-        # recorded that we sent emails over 7 days ago.
+        # recorded that we sent emails over 24 hours ago.
         self.try_to_send_some_emails(expect_success=True)
 
     def test_get_maintainer_projects(self):
@@ -2580,7 +2580,7 @@ class Notifications(TwillTests):
         Notifications.add_contributor_with_maintainer_status(
             person, project_i_maintain, True)
 
-        maintainer_projects = mysite.profile.management.commands.send_weekly_emails.Command.get_maintainer_projects(person)
+        maintainer_projects = mysite.profile.management.commands.send_emails.Command.get_maintainer_projects(person)
         self.assertEqual(maintainer_projects, [project_i_maintain])
 
     def test_dont_tell_me_about_projects_where_i_am_the_only_participant(self):
@@ -2590,8 +2590,8 @@ class Notifications(TwillTests):
         project_i_wanna_help_and_contributed_to = Project.create_dummy()
         Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
         Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        email_context = command.get_context_for_weekly_email_to(person)
+        command = mysite.profile.management.commands.send_emails.Command()
+        email_context = command.get_context_for_email_to(person)
         self.assertEqual(None, email_context)
 
     def test_dont_show_previously_mentioned_wannahelpers(self):
@@ -2610,23 +2610,23 @@ class Notifications(TwillTests):
         old_wh = Person.create_dummy('old_wh@example.com')
 
         now = datetime.datetime.utcnow()
-        seven_days_ago = now - datetime.timedelta(days=7)
-        nine_days_ago = now - datetime.timedelta(days=9)
+        yesterday = now - datetime.timedelta(hours=24)
+        a_few_days_ago = now - datetime.timedelta(days=3)
 
-        # The timespan for this email is The Last Seven Days
+        # The timespan for this email is the last 24 hours
         Timestamp.update_timestamp_for_string(
-                send_weekly_emails.Command.TIMESTAMP_KEY,
-                override_time=seven_days_ago)
+                send_emails.Command.TIMESTAMP_KEY,
+                override_time=yesterday)
 
         # This dude signs up to be a helper
         Notifications.add_wannahelper(new_wh, a_project)
 
         # This dude signed up too long ago to appear in this email
-        Notifications.add_wannahelper(old_wh, a_project, nine_days_ago)
+        Notifications.add_wannahelper(old_wh, a_project, a_few_days_ago)
 
         # Assert that the new w.h. was included in the email and the old was not.
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        email_context = command.get_context_for_weekly_email_to(email_recipient)
+        command = mysite.profile.management.commands.send_emails.Command()
+        email_context = command.get_context_for_email_to(email_recipient)
         self.assert_(email_context)
         project2people = email_context['project2people']
         self.assertEqual(len(project2people), 1)
