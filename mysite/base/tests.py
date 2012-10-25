@@ -478,11 +478,11 @@ class NagiosTests(django.test.TestCase):
 
         self.assertEqual(0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
 
-    # Test for OK Nagios weekly mail return (0) after send_weekly_emails is
+    # Test for OK Nagios weekly mail return (0) after send_emails is
     # run as a management command
     def test_nagios_weeklymail_return_ok_after_send(self):
-        # Run the send_weekly_mail
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        # Run the send_mail
+        command = mysite.profile.management.commands.send_emails.Command()
         command.handle()
 
         # Now run to see if the function sees things are ok in the
