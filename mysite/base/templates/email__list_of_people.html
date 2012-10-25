@@ -1,0 +1,82 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load profile_extras %}
+
+                {% if not rich_text %}
+                <ul>
+                {% endif %}
+
+                {% spaceless %}
+                    {% for person in truncated_list_of_people %}
+
+                        {% if rich_text and not forloop.first %}
+                        <span> &middot; </span>
+                        {% endif %}
+
+                        {% ifequal person.user.username recipient.user.username %}
+
+                            {% if not rich_text %} <li> {% endif %}
+                            <span>You</span>
+                            {% if not rich_text %} </li> {% endif %}
+
+                        {% else %}
+
+                            {% if not rich_text %}
+                            <li>
+                            {% endif %}
+
+                            {% with person.user as user %}
+                            {% if rich_text %}
+                            <strong>
+                                <a href='http://openhatch.org{{ person.profile_url }}'>
+                                    {% endif %}
+                                        <span>{% include 'name.html' %}</span>
+                                    {% if rich_text %}
+                                </a>
+                            </strong>
+                            {% endif %}
+
+                            {% if not rich_text %}
+                            &lt;http://openhatch.org{{ person.profile_url }}&gt;
+                            {% endif %}
+
+                            {% endwith %}
+
+                            {% if not rich_text %}
+                            </li>
+                            {% endif %}
+
+                        {% endifequal %}
+                    {% endfor %}
+                {% endspaceless %}
+
+                {% if rich_text %}
+                &middot;
+                {# if you change this url, change the one below #}
+                <a href='http://openhatch.org/people/?q={{ people_search_prefix }}:"{{ project.name|urlencode }}"'>{{ people_count }}&nbsp;total</a>
+                {% else %}
+                <li>
+                {{ people_count }} total
+                &lt;http://openhatch.org/people/?q={{ people_search_prefix }}:{{ project.name|urlencode }}&gt;
+                </li>
+                {% endif %}
+
+                {% if not rich_text %}
+                </ul>
+                {% endif %}
+
