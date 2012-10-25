@@ -450,7 +450,7 @@ class Person(models.Model):
         return not self.location_confirmed and not self.dont_guess_my_location
 
     def get_coolness_factor(self, unhashed_tiebreaker):
-        '''This function's output is used as the sort order in (at least) the weekly emails.
+        '''This function's output is used as the sort order in (at least) the periodic emails.
         You can be more cool if you:
            * Have projects
            * Have a picture
