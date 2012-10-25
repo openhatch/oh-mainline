@@ -46,7 +46,7 @@ import mysite.profile.views
 import mysite.base.views
 
 import mysite.base.management.commands.nagios
-import mysite.profile.management.commands.send_weekly_emails
+import mysite.profile.management.commands.send_emails
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -358,26 +358,26 @@ class Unsubscribe(TwillTests):
         def get_dude():
             return mysite.profile.models.Person.objects.get(user__username='paulproteus')
         dude = get_dude()
-        self.assert_(get_dude().email_me_weekly_re_projects)
+        self.assert_(get_dude().email_me_re_projects)
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         self.client.post(reverse(mysite.profile.views.unsubscribe_do),
                 {'token_string': valid_token_string})
-        self.assertFalse(get_dude().email_me_weekly_re_projects)
+        self.assertFalse(get_dude().email_me_re_projects)
 
     def test_submit_form(self):
         def get_dude():
             return mysite.profile.models.Person.objects.get(user__username='paulproteus')
         dude = get_dude()
-        self.assert_(get_dude().email_me_weekly_re_projects)
+        self.assert_(get_dude().email_me_re_projects)
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         twill_goto_view(mysite.profile.views.unsubscribe,
                 kwargs={'token_string': valid_token_string})
         tc.submit()
-        self.assertFalse(get_dude().email_me_weekly_re_projects)
+        self.assertFalse(get_dude().email_me_re_projects)
 
 class TimestampTests(django.test.TestCase):
     def test_bugzilla_urls_get_and_update_timestamp_without_errors(self):
