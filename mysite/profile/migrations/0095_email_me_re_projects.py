@@ -9,8 +9,11 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Write your forwards methods here."
         for person in orm['profile.person'].objects.all():
-            person.email_me_re_projects = person.email_me_weekly_re_projects
-            person.save()
+            old_value = bool(person.email_me_weekly_re_projects)
+            new_value = bool(person.email_me_re_projects)
+            if new_value != old_value:
+                person.email_me_re_projects = old_value
+                person.save()
 
 
     def backwards(self, orm):
