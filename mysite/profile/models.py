@@ -129,8 +129,8 @@ class Person(models.Model):
                                              verbose_name='Location')
     latitude = models.FloatField(null=False, default=-37.3049962)
     longitude = models.FloatField(null=False, default=-12.6790445)
-    email_me_weekly_re_projects = models.BooleanField( default=True,
-            verbose_name='Email me weekly about activity in my projects')
+    email_me_re_projects = models.BooleanField(default=True,
+            verbose_name='Email me periodically about activity in my projects')
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
 
@@ -450,7 +450,7 @@ class Person(models.Model):
         return not self.location_confirmed and not self.dont_guess_my_location
 
     def get_coolness_factor(self, unhashed_tiebreaker):
-        '''This function's output is used as the sort order in (at least) the weekly emails.
+        '''This function's output is used as the sort order in (at least) the periodic emails.
         You can be more cool if you:
            * Have projects
            * Have a picture

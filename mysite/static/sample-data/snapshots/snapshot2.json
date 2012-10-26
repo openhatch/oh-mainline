@@ -62,7 +62,7 @@
                 "irc_nick": "paulproteus",
                 "user": 1,
                 "blacklisted_repository_committers": [],
-                "email_me_weekly_re_projects": true,
+                "email_me_re_projects": true,
                 "photo_thumbnail_20px_wide": "static/photos/profile-photos/9ba5fd4d78a54414b6b20a3377f05a77-thumbnail-20px-wide",
                 "expand_next_steps": true
             }
@@ -87,7 +87,7 @@
                 "irc_nick": null,
                 "user": 4,
                 "blacklisted_repository_committers": [],
-                "email_me_weekly_re_projects": true,
+                "email_me_re_projects": true,
                 "photo_thumbnail_20px_wide": "",
                 "expand_next_steps": true
         }
@@ -112,7 +112,7 @@
                 "irc_nick": null,
                 "user": 6,
                 "blacklisted_repository_committers": [],
-                "email_me_weekly_re_projects": true,
+                "email_me_re_projects": true,
                 "photo_thumbnail_20px_wide": "",
                 "expand_next_steps": true
         }
@@ -137,7 +137,7 @@
                 "irc_nick": null,
                 "user": 2,
                 "blacklisted_repository_committers": [],
-                "email_me_weekly_re_projects": true,
+                "email_me_re_projects": true,
                 "photo_thumbnail_20px_wide": "",
                 "expand_next_steps": true
         }

@@ -19,7 +19,7 @@ import django.db.models
 
 import logging
 import mysite.profile.tasks
-import mysite.profile.management.commands.send_weekly_emails
+import mysite.profile.management.commands.send_emails
 
 class Command(BaseCommand):
     help = "Run this once daily for the OpenHatch profile app."
@@ -47,7 +47,6 @@ class Command(BaseCommand):
         if made_any_changes:
             mysite.profile.tasks.RegeneratePostfixAliasesForForwarder().run()
 
-        # Try to send the emails. The command will only actually send emails at
-        # most once per week.
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        # Try to send the emails. The command will only send emails periodically.
+        command = mysite.profile.management.commands.send_emails.Command()
         command.handle()

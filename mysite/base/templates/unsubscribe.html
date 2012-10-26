@@ -32,13 +32,13 @@
         {% if unsubscribe_this_user %}
 
         <p>
-{% if unsubscribe_this_user.email_me_weekly_re_projects %}
+{% if unsubscribe_this_user.email_me_re_projects %}
 Hi
 {% endif %}
 {% firstof unsubscribe_this_user.user.first_name unsubscribe_this_user.user.username %},
 </p>
 
-{% if unsubscribe_this_user.email_me_weekly_re_projects %}
+{% if unsubscribe_this_user.email_me_re_projects %}
 <p> This page allows you to unsubscribe from periodic emails from OpenHatch about activity in your projects. </p>
 
 <form method='POST' action='{% url mysite.profile.views.unsubscribe_do %}'>{% csrf_token %}
