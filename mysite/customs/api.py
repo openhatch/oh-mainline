@@ -30,8 +30,10 @@ class TrackerModelResource(tastypie.resources.ModelResource):
                 oldest_last_polled_data = relevant_bugs.aggregate(
                     django.db.models.Min('last_polled'))
                 oldest_last_polled = oldest_last_polled_data['last_polled__min']
-                if oldest_last_polled >= (datetime.datetime.utcnow() -
-                                          datetime.timedelta(days=1)):
+                if (oldest_last_polled and (
+                        oldest_last_polled >= (
+                            datetime.datetime.utcnow() -
+                            datetime.timedelta(days=1)))):
                     skip_these_ids.append(obj.id)
         filtered = all_objects.exclude(id__in=skip_these_ids)
         return filtered
