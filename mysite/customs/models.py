@@ -129,6 +129,10 @@ class TrackerModel(models.Model):
                     q.get_query_url() for q in queries])
         out_dict['queries'] = query_urls
 
+        # Add a list of bug URLs we're responsible for
+        out_dict['existing_bug_urls'] = list(mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).values_list('canonical_bug_link', flat=True))
+
         return out_dict
 
     def get_edit_url(self):
