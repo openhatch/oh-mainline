@@ -121,13 +121,24 @@ class TrackerModel(models.Model):
             if field in out_dict:
                 del out_dict[field]
 
-        # Add a list of our queries
+        # Add a list of our queries.
+        # This permits oh-bugimporters to go to the 'net and query the tracker
+        # for new bugs that correspond to this bug tracker.
         query_urls = []
         for querymodel in TrackerQueryModel.__subclasses__():
             queries = querymodel.objects.filter(tracker=self)
             query_urls.extend([
                     q.get_query_url() for q in queries])
         out_dict['queries'] = query_urls
+
+        # Add a list of bug URLs we're responsible for.
+        # This permits oh-bugimporters to go to the 'net and refresh each bug.
+        # It is essential because otherwise, when a bug falls out of a query
+        # (if, for example, it becomes 'resolved' and the query only looks for
+        # bugs that need fixing), we would not get up-to-date information about
+        # the bug.
+        out_dict['existing_bug_urls'] = list(mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).values_list('canonical_bug_link', flat=True))
 
         return out_dict
 

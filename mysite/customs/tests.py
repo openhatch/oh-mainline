@@ -1704,8 +1704,27 @@ class ExportTrackerAsDict(django.test.TestCase):
                   'as_appears_in_distribution': '',
                   'custom_parser': '',
                   'bugimporter': 'trac',
+                  'existing_bug_urls': [],
                   }
         self.assertEqual(golden, exported)
+
+    def test_export_includes_existing_bugs(self):
+        # Create the list of Bug objects we'll create
+        expected_bug_urls = sorted([
+                'http://twistedmatrix.com/trac/ticket/5858',
+                'http://twistedmatrix.com/trac/ticket/4298',
+                ])
+        # Make sure there is a corresponding Twisted project
+        mysite.search.models.Project.create_dummy(name='Twisted')
+        for expected_bug_url in expected_bug_urls:
+            b = mysite.search.models.Bug.create_dummy(
+                canonical_bug_link=expected_bug_url)
+            b.tracker_id = self.tm.id
+            b.save()
+        exported = self.tm.as_dict()
+        sorted_bug_urls = sorted(exported.get('existing_bug_urls', []))
+        self.assertEqual(expected_bug_urls,
+                         sorted_bug_urls)
 
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):
