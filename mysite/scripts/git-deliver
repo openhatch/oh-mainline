@@ -1,6 +1,0 @@
-#!/bin/bash
-set -x
-git push origin HEAD:master
-expect expect-deploy
-git home
-git pull origin master 
