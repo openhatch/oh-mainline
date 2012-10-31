@@ -34,9 +34,6 @@ mysite/
     missions/
         This is the Django app where the training missions live.
 
-    senseknocker/
-        This was a Django app we were going to write that took feedback from users.
-
     search/
         This Django app contains the views and models necessary to display the volunteer
         opportunity finder, also known as bug search.
