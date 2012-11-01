@@ -72,8 +72,8 @@ You can find more tips about hacking OpenHatch in the Category:Hacking_OpenHatch
 You can find things to work on by browsing our `bug tracker`_ or asking us!
 
 
-.. _Learning new codebase: http://python.mirocommunity.org/video/1882/djangocon-2010-learning-a-new-
-.. _DjangoCon 2010: http://python.mirocommunity.org/category/djangocon-2010
+.. _Learning new codebase: http://pyvideo.org/video/40/djangocon-2010--learning-a-new-codebase
+.. _DjangoCon 2010: http://pyvideo.org/category/23/djangocon-2012
 .. _bug tracker: http://openhatch.org/bugs/
 
 
