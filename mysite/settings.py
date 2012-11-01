@@ -166,7 +166,6 @@ INSTALLED_APPS = (
     'mysite.account',
     'mysite.base',
     'mysite.project',
-    'mysite.senseknocker',
     'mysite.missions',
     'voting',
     'reversion',
