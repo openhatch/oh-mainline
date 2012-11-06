@@ -504,16 +504,22 @@ class GitHubTrackerModel(TrackerModel):
     def get_base_url(self):
         return '__impossible_to_use_with_github'
 
+def github_query_url(github_user_name, github_repo_name, **kwargs):
+    base_url = ('https://api.github.com/repos/%s/%s/issues' % (
+            mysite.base.unicode_sanity.quote(github_user_name),
+            mysite.base.unicode_sanity.quote(github_repo_name)))
+    return base_url + '?' + mysite.base.unicode_sanity.urlencode(
+        kwargs)
+
 class GitHubQueryModel(TrackerQueryModel):
     '''This model stores query URLs for GitHubTracker objects.'''
     tracker = models.ForeignKey(GitHubTrackerModel)
     state = models.CharField(max_length=20, default='open')
 
     def get_query_url(self):
-        base_url = ('https://api.github.com/repos/%s/%s/issues' % (
-                mysite.base.unicode_sanity.quote(self.tracker.github_name),
-                mysite.base.unicode_sanity.quote(self.tracker.github_repo)))
-        return base_url + '?' + mysite.base.unicode_sanity.urlencode({
+        return github_query_url(self.tracker.github_name,
+                                self.tracker.github_repo,
+                                **{
                 u'state': u'open'})
 
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
