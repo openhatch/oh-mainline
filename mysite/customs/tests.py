@@ -1758,6 +1758,39 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # above URL with e.g. 'sympy' or some other valid Google Code project.
         self.assertEqual(expected_url, url)
 
+    def test_github_tracker(self):
+        # Set up the Twisted TrackerModel that will be used here.
+        # Note that we use Twisted here as an example, even though they're
+        # not on Github. It just makes the test look more similar to
+        # the other tests.
+        tm = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                github_name='twisted',
+                github_repo='mainline',
+                )
+
+        # Create the list of Bug objects we'll create
+        expected_bug_urls = sorted([
+                'http://twistedmatrix.com/trac/ticket/5858',
+                'http://twistedmatrix.com/trac/ticket/4298',
+                ])
+        # Make sure there is a corresponding Twisted project
+        mysite.search.models.Project.create_dummy(name='Twisted')
+        for expected_bug_url in expected_bug_urls:
+            b = mysite.search.models.Bug.create_dummy(
+                canonical_bug_link=expected_bug_url)
+            b.tracker_id = tm.id
+            b.last_polled = datetime.datetime(2012, 9, 15, 0, 0, 0)
+            b.save()
+        exported = tm.as_dict()
+        url = exported['get_older_bug_data']
+        expected_url = 'https://api.github.com/repos/twisted/mainline/issues?since=2012-09-15T00%3A00%3A00'
+        # If you want to sanity-check this, just replace 'twisted' in the
+        # above URL with e.g. 'acm-uiuc' or some other valid Github user,
+        # and 'mainline' with 'mango-django' or some other valid repo owned by
+        # that user with issues enabled.
+        self.assertEqual(expected_url, url)
+
 
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):

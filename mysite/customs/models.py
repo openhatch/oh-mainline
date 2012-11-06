@@ -517,6 +517,19 @@ class GitHubTrackerModel(TrackerModel):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def as_dict(self):
+        out = super(GitHubTrackerModel, self).as_dict()
+        lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
+            'last_polled__min']
+        query_data = {u'since':
+                          unicode(lowest_last_polled.isoformat())}
+        query_url = github_query_url(self.github_name,
+                                     self.github_repo,
+                                     **query_data)
+        out['get_older_bug_data'] = query_url
+        return out
+
     def get_base_url(self):
         return '__impossible_to_use_with_github'
 
