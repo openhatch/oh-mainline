@@ -292,6 +292,18 @@ class GoogleTrackerModel(TrackerModel):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def as_dict(self):
+        out = super(GoogleTrackerModel, self).as_dict()
+        lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
+            'last_polled__min']
+        query_data = {u'can': u'all',
+                      u'updated-min': unicode(lowest_last_polled.isoformat())}
+        query_url = google_query_url(self.google_name,
+                                     **query_data)
+        out['get_older_bug_data'] = query_url
+        return out
+
     def get_base_url(self):
         return 'http://code.google.com/p/%s/' % self.google_name
 

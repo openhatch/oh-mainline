@@ -1753,7 +1753,11 @@ class ExportOldBugDataLinks(django.test.TestCase):
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        self.assertTrue(url)
+        expected_url = 'https://code.google.com/feeds/issues/p/twisted/issues/full?max-results=10000&can=all&updated-min=2012-09-15T00%3A00%3A00'
+        # If you want to sanity-check this, just replace 'twisted' in the
+        # above URL with e.g. 'sympy' or some other valid Google Code project.
+        self.assertEqual(expected_url, url)
+
 
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):
