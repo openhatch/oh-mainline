@@ -291,6 +291,15 @@ class GoogleTrackerModel(TrackerModel):
     def get_base_url(self):
         return 'http://code.google.com/p/%s/' % self.google_name
 
+def google_query_url(project_name, **kwargs):
+    extra_data = {u'max-results': u'10000',
+                  u'can': u'open',
+                  }
+    extra_data.update(kwargs)
+    base = 'https://code.google.com/feeds/issues/p/%s/issues/full' % (project_name,)
+    url = base + '?' + mysite.base.unicode_sanity.urlencode(extra_data)
+    return url
+
 class GoogleQueryModel(TrackerQueryModel):
     '''This model stores queries for GoogleTracker objects.
     At present we only allow labels to be queried.'''
@@ -299,10 +308,11 @@ class GoogleQueryModel(TrackerQueryModel):
     tracker = models.ForeignKey(GoogleTrackerModel)
 
     def get_query_url(self):
-        query_url = 'https://code.google.com/feeds/issues/p/%s/issues/full?can=open&max-results=10000' % self.tracker.google_name
         if self.label:
-            query_url = '%s&label=%s' % (query_url, self.label)
-        return query_url
+            extra_data = {u'label': unicode(self.label)}
+        else:
+            extra_data = {}
+        return google_query_url(self.tracker.google_name, **extra_data)
 
 reversion.register(GoogleTrackerModel, follow=["googlequerymodel_set"])
 reversion.register(GoogleQueryModel)
