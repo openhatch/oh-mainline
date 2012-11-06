@@ -53,7 +53,6 @@ from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 from urllib2 import HTTPError
 import datetime
-from dateutil.tz import tzutc
 
 import twisted.internet.defer
 
