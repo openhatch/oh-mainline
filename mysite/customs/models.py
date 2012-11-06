@@ -140,6 +140,10 @@ class TrackerModel(models.Model):
         out_dict['existing_bug_urls'] = list(mysite.search.models.Bug.all_bugs.filter(
             tracker_id=self.id).values_list('canonical_bug_link', flat=True))
 
+        # Some subclasses will add a get_older_bug_data value. This generic
+        # method supports that by adding that key, and setting it to None.
+        out_dict['get_older_bug_data'] = None
+
         return out_dict
 
     def get_edit_url(self):

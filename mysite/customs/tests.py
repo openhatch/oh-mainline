@@ -1704,6 +1704,7 @@ class ExportTrackerAsDict(django.test.TestCase):
                   'custom_parser': '',
                   'bugimporter': 'trac',
                   'existing_bug_urls': [],
+                  'get_older_bug_data': None,
                   }
         self.assertEqual(golden, exported)
 
