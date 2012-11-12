@@ -35,21 +35,40 @@ class SingleFilePatch(object):
         newlines = open(cls.NEW_FILE).readlines()
         return ''.join(difflib.unified_diff(oldlines, newlines, os.path.basename(cls.OLD_FILE), os.path.basename(cls.NEW_FILE)))
 
+    @staticmethod
+    def apply_patch(patch_obj, hunks, base_filename):
+        with open(base_filename, 'rb') as f:
+            lines = patch_obj.patch_stream(f, hunks)
+            return ''.join(lines)
+
     @classmethod
     def validate_patch(cls, patchdata):
+        CORRECT_CONTENTS = open(cls.NEW_FILE).read()
         the_patch = patch.fromstring(patchdata)
 
-        # If we couldn't create even 1 hunk, the patch headers are missing.
+        # the_patch.hunks now contains a list of lists.
+
+        # For each file that appears in the patch file, there is a
+        # list of hunks (patch changesets) that apply to that file.
+
+        # If patch.fromstring() indicates that the patch affects zero files,
+        # then the_patch.hunks will be a zero-length list.
         if not the_patch.hunks:
             raise IncorrectPatch, 'The file resulting from patching does not have the correct contents. \
         Make sure you are including the diff headers (those --- and +++ and @@ lines).'
 
-        # Check that it only patches one file.
-        if len(the_patch.hunks) != 1:
+        # If it affects more than one file, then that would be a
+        # mistake as well.
+        if len(the_patch.hunks) > 1:
             raise IncorrectPatch, 'The patch affects more than one file.'
 
-        # Check if the diff is in the wrong order.
-        if ''.join(the_patch.patch_stream(open(cls.NEW_FILE), the_patch.hunks[0])) == open(cls.OLD_FILE).read():
+        # So now we can grab just the relevant hunks.
+        hunks = the_patch.hunks[0]
+
+        # Is the diff reversed?
+        text_when_patch_applied_in_reverse = SingleFilePatch.apply_patch(
+            the_patch, hunks, cls.NEW_FILE)
+        if text_when_patch_applied_in_reverse == open(cls.OLD_FILE).read():
             raise IncorrectPatch, 'It looks like the order of files passed to diff was flipped. \
         To generate a diff representing the changes you made to originalfile.txt \
         to get to modifiedfile.txt, do "diff -u originalfile.txt modifiedfile.txt".'
@@ -58,9 +77,10 @@ class SingleFilePatch(object):
         #if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
         #   raise IncorrectPatch, 'The patch will not apply correctly to the original file.'
 
-
-        # Check that the resulting file matches what is expected.
-        if ''.join(the_patch.patch_stream(open(cls.OLD_FILE), the_patch.hunks[0])) == open(cls.NEW_FILE).read():
+        resulting_contents = SingleFilePatch.apply_patch(
+            the_patch, hunks, cls.OLD_FILE)
+        # Are the results just totally perfect?
+        if resulting_contents == CORRECT_CONTENTS:
             # Sweet! Success.
             return True
 
