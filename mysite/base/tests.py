@@ -28,6 +28,9 @@ from django.core.servers.basehttp import AdminMediaHandler
 from StringIO import StringIO
 from django.test.client import Client
 import urllib
+import os
+import os.path
+import subprocess
 
 from django.core.cache import cache
 
@@ -503,5 +506,40 @@ class NagiosTests(django.test.TestCase):
 class MetaDataTests(django.test.TestCase):
     def test_meta_data_zero_div(self):
         mysite.base.views.meta_data()
+
+def find_git_path():
+    maybe_git_dir = os.path.abspath(os.getcwd())
+    while not os.path.exists(os.path.join(maybe_git_dir, '.git')):
+        maybe_git_dir = os.path.abspath(os.path.join(maybe_git_dir, '..'))
+
+    if os.path.exists(os.path.join(maybe_git_dir, '.git')):
+        return maybe_git_dir
+    raise ValueError, "Could not find git directory path."
+
+# Test that the git repository has no files that conflict with Windows
+class WindowsFilesystemCompatibilityTests(unittest.TestCase):
+    def test(self):
+        # Find the base directory
+        dir_with_git = find_git_path()
+        # Get a list of files from git
+        files = subprocess.Popen(
+            ['git', 'ls-files'],
+            shell=False,
+            stdout=subprocess.PIPE,
+            cwd=dir_with_git)
+        stdout, stderr = files.communicate()
+        file_set = set(stdout.rstrip().split('\n'))
+
+        # Filter that file set down by constraints that would
+        # apply on Windows. To that end:
+        # Unify files based on case-insensitivity
+        files_filtered = set(
+            [x.lower() for x in file_set])
+        # Filter out any files with '?' in their names, because that is an
+        # invalid character for filenames on Windows.
+        files_filtered = set(
+            [x for x in file_set
+             if ('?' not in x)])
+        self.assertEqual(file_set, files_filtered)
 
 # vim: set ai et ts=4 sw=4 nu:
