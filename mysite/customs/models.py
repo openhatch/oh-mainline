@@ -140,6 +140,10 @@ class TrackerModel(models.Model):
         out_dict['existing_bug_urls'] = list(mysite.search.models.Bug.all_bugs.filter(
             tracker_id=self.id).values_list('canonical_bug_link', flat=True))
 
+        # Some subclasses will add a get_older_bug_data value. This generic
+        # method supports that by adding that key, and setting it to None.
+        out_dict['get_older_bug_data'] = None
+
         return out_dict
 
     def get_edit_url(self):
@@ -288,8 +292,29 @@ class GoogleTrackerModel(TrackerModel):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def as_dict(self):
+        out = super(GoogleTrackerModel, self).as_dict()
+        lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
+            'last_polled__min']
+        query_data = {u'can': u'all',
+                      u'updated-min': unicode(lowest_last_polled.isoformat())}
+        query_url = google_query_url(self.google_name,
+                                     **query_data)
+        out['get_older_bug_data'] = query_url
+        return out
+
     def get_base_url(self):
         return 'http://code.google.com/p/%s/' % self.google_name
+
+def google_query_url(project_name, **kwargs):
+    extra_data = {u'max-results': u'10000',
+                  u'can': u'open',
+                  }
+    extra_data.update(kwargs)
+    base = 'https://code.google.com/feeds/issues/p/%s/issues/full' % (project_name,)
+    url = base + '?' + mysite.base.unicode_sanity.urlencode(extra_data)
+    return url
 
 class GoogleQueryModel(TrackerQueryModel):
     '''This model stores queries for GoogleTracker objects.
@@ -299,10 +324,11 @@ class GoogleQueryModel(TrackerQueryModel):
     tracker = models.ForeignKey(GoogleTrackerModel)
 
     def get_query_url(self):
-        query_url = 'https://code.google.com/feeds/issues/p/%s/issues/full?can=open&max-results=10000' % self.tracker.google_name
         if self.label:
-            query_url = '%s&label=%s' % (query_url, self.label)
-        return query_url
+            extra_data = {u'label': unicode(self.label)}
+        else:
+            extra_data = {}
+        return google_query_url(self.tracker.google_name, **extra_data)
 
 reversion.register(GoogleTrackerModel, follow=["googlequerymodel_set"])
 reversion.register(GoogleQueryModel)
@@ -491,8 +517,28 @@ class GitHubTrackerModel(TrackerModel):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def as_dict(self):
+        out = super(GitHubTrackerModel, self).as_dict()
+        lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
+            'last_polled__min']
+        query_data = {u'since':
+                          unicode(lowest_last_polled.isoformat())}
+        query_url = github_query_url(self.github_name,
+                                     self.github_repo,
+                                     **query_data)
+        out['get_older_bug_data'] = query_url
+        return out
+
     def get_base_url(self):
         return '__impossible_to_use_with_github'
+
+def github_query_url(github_user_name, github_repo_name, **kwargs):
+    base_url = ('https://api.github.com/repos/%s/%s/issues' % (
+            mysite.base.unicode_sanity.quote(github_user_name),
+            mysite.base.unicode_sanity.quote(github_repo_name)))
+    return base_url + '?' + mysite.base.unicode_sanity.urlencode(
+        kwargs)
 
 class GitHubQueryModel(TrackerQueryModel):
     '''This model stores query URLs for GitHubTracker objects.'''
@@ -500,10 +546,9 @@ class GitHubQueryModel(TrackerQueryModel):
     state = models.CharField(max_length=20, default='open')
 
     def get_query_url(self):
-        base_url = ('https://api.github.com/repos/%s/%s/issues' % (
-                mysite.base.unicode_sanity.quote(self.tracker.github_name),
-                mysite.base.unicode_sanity.quote(self.tracker.github_repo)))
-        return base_url + '?' + mysite.base.unicode_sanity.urlencode({
+        return github_query_url(self.tracker.github_name,
+                                self.tracker.github_repo,
+                                **{
                 u'state': u'open'})
 
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
