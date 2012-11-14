@@ -297,6 +297,8 @@ class GoogleTrackerModel(TrackerModel):
         lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
             tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
             'last_polled__min']
+        if lowest_last_polled is None:
+            datetime.datetime(1970, 1, 1)
         query_data = {u'can': u'all',
                       u'updated-min': unicode(lowest_last_polled.isoformat())}
         query_url = google_query_url(self.google_name,
