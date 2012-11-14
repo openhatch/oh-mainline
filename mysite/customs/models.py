@@ -521,9 +521,17 @@ class GitHubTrackerModel(TrackerModel):
 
     def as_dict(self):
         out = super(GitHubTrackerModel, self).as_dict()
+        # By default, set this to the empty string.
+        out['get_older_bug_data'] = ''
+
+        # If we have bugs, then instead set it to a reasonable query
+        # for data that will include information about those bugs.
         lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
             tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
             'last_polled__min']
+        if lowest_last_polled is None:
+            return out
+
         query_data = {u'since':
                           unicode(lowest_last_polled.isoformat())}
         query_url = github_query_url(self.github_name,
