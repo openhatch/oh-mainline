@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# In case anything returns non-zero, just fail immediately.
+set -e
+
 BUG_TRACKER_LIST="$(mktemp --suffix=.yaml /tmp/bug-trackers.$(date -I).XXXX)"
 SCRAPY_RESULT_FILE="$(mktemp --suffix=.jsonlines /tmp/scrapy-results.XXXX)"
 SCRAPY_LOG="$(mktemp --suffix=.log /tmp/scrapy.XXXX)"
