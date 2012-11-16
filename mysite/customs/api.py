@@ -3,7 +3,9 @@ import tastypie.resources
 import tastypie.authorization
 import mysite.search.models
 import django.db.models
+import django.core.exceptions
 import datetime
+import re
 
 
 class TrackerModelResource(tastypie.resources.ModelResource):
@@ -21,6 +23,22 @@ class TrackerModelResource(tastypie.resources.ModelResource):
     def get_object_list(self, request):
         all_objects = super(TrackerModelResource, self).get_object_list(request)
         skip_these_ids = []
+        tracker_type = request.GET.get('tracker_type', '')
+        # Sanitize tracker_type.
+        tracker_type = re.sub('[^a-z]', '', tracker_type)
+        if tracker_type:
+            # Note. This is an ugly hack.
+            query_for_corresponding_foreign_key = ~django.db.models.Q(**{
+                    tracker_type + 'trackermodel' + '__id': None,
+                    })
+            try:
+                all_objects = all_objects.filter(
+                    query_for_corresponding_foreign_key)
+            except django.core.exceptions.FieldError:
+                # In the case the user gave us some nonsense, just declare
+                # the query will get no results.
+                all_objects = all_objects.none()
+
         if request.GET.get('just_stale', '').lower() == 'yes':
             # Note: This code is of low quality.
             for obj in all_objects:
