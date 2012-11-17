@@ -2860,6 +2860,6 @@ class TestUserDeletion(TwillTests):
         self.assertEqual(302, response.status_code)
         self.assertFalse(django.contrib.auth.models.User.objects.filter(
                 username='barry'))
-        self.assertEqual(1, len(django.core.mail.outbox))
+        self.assertEqual(2, len(django.core.mail.outbox))
 
 # vim: set ai et ts=4 sw=4 nu:

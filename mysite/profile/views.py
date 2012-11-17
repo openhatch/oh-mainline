@@ -69,6 +69,8 @@ def delete_user_for_being_spammy(request):
             request.POST)
         if form.is_valid():
             u = User.objects.get(username=form.cleaned_data['username'])
+            # Dump data about the user to the site admins
+            mysite.profile.controllers.send_user_export_to_admins(u)
             # Send out an email to the poor sap.
             mysite.profile.controllers.email_spammy_user(u)
             # Okay... delete the user.
