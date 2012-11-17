@@ -56,10 +56,12 @@ from mysite.base.decorators import view, as_view
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.helpers import render_response
+from django.views.decorators.csrf import csrf_protect
 
 # }}}
 
 @login_required
+@csrf_protect
 def delete_user_for_being_spammy(request):
     form = mysite.profile.forms.DeleteUser()
     if request.method == 'POST':
