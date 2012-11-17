@@ -62,6 +62,9 @@ urlpatterns = patterns('',
         (r'^\+api/v1/profile/',
          include(mysite.profile.api.PortfolioEntryResource().urls)),
 
+        (r'^\+api/v1/delete_user_for_being_spammy/$',
+            mysite.profile.views.delete_user_for_being_spammy),
+
         (r'^\+api/v1/customs/',
          include(mysite.customs.api.TrackerModelResource().urls)),
 

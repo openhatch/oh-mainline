@@ -25,6 +25,9 @@ import pygeoip
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
+import django.core.mail
+import django.core.serializers
+from django.utils import simplejson
 
 import logging
 import mysite.search.controllers
@@ -191,6 +194,75 @@ def parse_string_query(s):
         return _query2results(query_type, search_string)
     parsed['callable_searcher'] = callable_searcher
     return parsed
+
+def email_spammy_user(u):
+    message = '''Dear user of OpenHatch,
+
+We took a look at your account activity and it looked like
+your account is spamming the site with links. For now, we've
+deleted your data from the site.
+
+If this is an error, let us know your username (which was
+%s ) and we can try to restore your data from a backup. If
+it was a mistake, our apologies; we're just trying to make
+the site more useful to everyone.
+
+Sincerely,
+
+-- OpenHatch.org staff''' % (u.username, )
+    subject = "Removing your OpenHatch.org account due to possible abuse"
+    msg = django.core.mail.EmailMessage(subject=subject,
+                                        body=message,
+                                        to=[u.email],
+                                        bcc=[email
+                                             for (name, email)
+                                             in django.conf.settings.ADMINS],
+                                        )
+    msg.send()
+
+def send_user_export_to_admins(u):
+    '''You might want to call this function before deleting a user.
+
+    It sends a semi-reasonable JSON representation of the user to the
+    email addressed defined in ADMINS.
+
+    That could be useful for:
+
+    * training an antispam tool
+
+    * recovering data on a user'''
+    body = simplejson.dumps(generate_user_export(u),
+                            cls=django.core.serializers.json.DjangoJSONEncoder)
+    msg = django.core.mail.EmailMessage(subject="User export for %d" % u.id,
+                                        body=body,
+                                        to=[email
+                                            for (name, email)
+                                            in django.conf.settings.ADMINS],
+                                        )
+    msg.send()
+
+
+def generate_user_export(u):
+    out = {}
+    out['answer_data'] = [django.forms.models.model_to_dict(a)
+                          for a in u.answer_set.all()]
+    out['tags'] = [django.forms.models.model_to_dict(t)
+                   for t in mysite.profile.models.Tag.objects.filter(
+            link_person_tag__person__user=u)]
+    out['user'] = django.forms.models.model_to_dict(u)
+    del out['user']['password']
+    person = u.get_profile()
+    ### Skip columns that can't be easily JSON serialized
+    person.photo = None
+    person.photo_thumbnail = None
+    person.photo_thumbnail_30px_wide = None
+    person.photo_thumbnail_20px_wide = None
+    out['person'] = django.forms.models.model_to_dict(
+        u.get_profile(), exclude=[
+            'photo', 'photo_thumbnail', 'photo_thumbnail_20px_wide',
+            'photo_thumbnail_30px_wide',
+            ])
+    return out
 
 def _query2results(query_type, search_string):
     if query_type == 'project':

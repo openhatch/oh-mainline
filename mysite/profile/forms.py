@@ -69,4 +69,8 @@ class UseDescriptionFromThisPortfolioEntryForm(django.forms.ModelForm):
         model = mysite.profile.models.PortfolioEntry
         fields = ('use_my_description', )
 
+class DeleteUser(django.forms.Form):
+    username = django.forms.CharField(required=True,
+                                      widget=django.forms.Textarea())
+
 # vim: set nu:

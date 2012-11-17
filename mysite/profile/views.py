@@ -52,12 +52,37 @@ from mysite.profile.models import \
         Link_Project_Tag, Link_Person_Tag, \
         DataImportAttempt, PortfolioEntry, Citation
 from mysite.search.models import Project
-from mysite.base.decorators import view
+from mysite.base.decorators import view, as_view
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.helpers import render_response
 
 # }}}
+
+@login_required
+def delete_user_for_being_spammy(request):
+    form = mysite.profile.forms.DeleteUser()
+    if request.method == 'POST':
+        if request.user.username != 'paulproteus':
+            return HttpResponseBadRequest("Sorry, you may not do that.")
+        form = mysite.profile.forms.DeleteUser(
+            request.POST)
+        if form.is_valid():
+            u = User.objects.get(username=form.cleaned_data['username'])
+            # Dump data about the user to the site admins
+            mysite.profile.controllers.send_user_export_to_admins(u)
+            # Send out an email to the poor sap.
+            mysite.profile.controllers.email_spammy_user(u)
+            # Okay... delete the user.
+            u.delete() # hoo boy!
+            return HttpResponseRedirect(reverse(
+                    delete_user_for_being_spammy))
+
+    return as_view(
+        request,
+        'profile/delete_user.html',
+        {'form': form},
+        None)
 
 @login_required
 def add_citation_manually_do(request):
