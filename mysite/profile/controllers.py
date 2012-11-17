@@ -25,6 +25,7 @@ import pygeoip
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
+import django.core.mail
 
 import logging
 import mysite.search.controllers
@@ -191,6 +192,31 @@ def parse_string_query(s):
         return _query2results(query_type, search_string)
     parsed['callable_searcher'] = callable_searcher
     return parsed
+
+def email_spammy_user(u):
+    message = '''Dear user of OpenHatch,
+
+We took a look at your account activity and it looked like
+your account is spamming the site with links. For now, we've
+deleted your data from the site.
+
+If this is an error, let us know your username (which was
+%s ) and we can try to restore your data from a backup. If
+it was a mistake, our apologies; we're just trying to make
+the site more useful to everyone.
+
+Sincerely,
+
+-- OpenHatch.org staff''' % (u.username, )
+    subject = "Removing your OpenHatch.org account due to possible abuse"
+    msg = django.core.mail.EmailMessage(subject=subject,
+                                        body=message,
+                                        to=[u.email],
+                                        bcc=[email
+                                             for (name, email)
+                                             in django.conf.settings.ADMINS],
+                                        )
+    msg.send()
 
 def _query2results(query_type, search_string):
     if query_type == 'project':
