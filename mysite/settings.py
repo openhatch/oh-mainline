@@ -17,7 +17,6 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Asheesh Laroia', 'asheesh@openhatch.org'),
-    ('Raphael Krut-Landau', 'raphael@openhatch.org')
 )
 
 MANAGERS = ADMINS
