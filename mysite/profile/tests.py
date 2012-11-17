@@ -2832,4 +2832,34 @@ class ProfileApiTest(TwillTests):
         parsed = simplejson.loads(response.content)
         self.assertEqual(0, parsed['meta']['total_count'])
 
+class TestUserDeletion(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus']
+
+    def test_view_unauthenticated(self):
+        response = self.client.get('/+api/v1/delete_user_for_being_spammy/')
+        self.assertEqual(302, response.status_code)
+
+    def test_view_as_barry(self):
+        self.client = self.login_with_client_as_barry()
+        response = self.client.get('/+api/v1/delete_user_for_being_spammy/')
+        self.assertEqual(200, response.status_code)
+
+    def test_actual_deletion_as_barry(self):
+        self.client = self.login_with_client_as_barry()
+        response = self.client.post('/+api/v1/delete_user_for_being_spammy/',
+                                    {'username': 'paulproteus'})
+        self.assertEqual(400, response.status_code)
+        self.assert_(django.contrib.auth.models.User.objects.filter(
+                username='paulproteus'))
+
+    def test_actual_deletion_as_paulproteus(self):
+        self.client = self.login_with_client()
+        response = self.client.post('/+api/v1/delete_user_for_being_spammy/',
+                                    {'username': 'barry'})
+        self.assertEqual(302, response.status_code)
+        self.assertFalse(django.contrib.auth.models.User.objects.filter(
+                username='barry'))
+        self.assertEqual(1, len(django.core.mail.outbox))
+
 # vim: set ai et ts=4 sw=4 nu:
