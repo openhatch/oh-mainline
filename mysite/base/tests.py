@@ -47,6 +47,7 @@ import mysite.base.templatetags.base_extras
 import mysite.base.unicode_sanity
 import mysite.profile.views
 import mysite.base.views
+import mysite.project.views
 
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
