@@ -77,6 +77,18 @@ def import_one_bug_item(d):
     Usually causes the side effect of creating a Bug project.'''
     project = mysite.search.models.Project.objects.get(name=d['_project_name'])
 
+    # Look for a matching Bug
+    matches = mysite.search.models.Bug.all_bugs.filter(
+        canonical_bug_link=d['canonical_bug_link'])
+
+    # Provide a quick escape if the bug importer told us it has
+    # no updates for us.
+    if matches and d.get('_no_update'):
+        b = matches[0]
+        b.last_polled = datetime.datetime.utcnow()
+        b.save()
+        return
+
     if not (('_tracker_name' in d) and
             ('_project_name' in d)):
         logging.error("Your data needs a _tracker_name and _project_name.")
@@ -86,9 +98,8 @@ def import_one_bug_item(d):
         tracker_name=d['_tracker_name'])
     del d['_project_name']
     del d['_tracker_name']
-    # Look for a matching Bug
-    matches = mysite.search.models.Bug.all_bugs.filter(
-        canonical_bug_link=d['canonical_bug_link'])
+
+    # Get or create the corresponding bug.
     if matches:
         bug = matches[0]
     else:
