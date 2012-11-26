@@ -27,9 +27,9 @@ def jsonlines_decoder(f):
             line = line [:-1]
         try:
             yield simplejson.loads(line)
-        except:
+        except Exception:
             logging.exception("simplejson decode failed")
-            logging.info("repr(line) was: %s", repr(line))
+            logging.error("repr(line) was: %s", repr(line))
             continue
 
 class Command(BaseCommand):
