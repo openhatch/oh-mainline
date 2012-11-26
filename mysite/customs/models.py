@@ -170,6 +170,7 @@ class TrackerModel(models.Model):
                                "Read the comments around this message.")
 
         return reverse('mysite.customs.views.edit_tracker', kwargs={
+                'tracker_id': self.id,
                 'tracker_type': my_short_name,
                 'tracker_name': self.tracker_name})
 
