@@ -190,6 +190,7 @@ def edit_tracker(request, tracker_type, tracker_id, tracker_name, tracker_form=N
                 tracker_form = all_trackers[tracker_type]['form'](
                         instance=tracker_obj, prefix='edit_tracker')
             tracker_urlmodel = all_trackers[tracker_type]['urlmodel']
+            tracker_urlform = all_trackers[tracker_type]['urlform']
             if tracker_urlmodel:
                 tracker_urls = tracker_urlmodel.objects.filter(
                     tracker=tracker_obj)
@@ -204,6 +205,7 @@ def edit_tracker(request, tracker_type, tracker_id, tracker_name, tracker_form=N
         data['tracker_form'] = tracker_form
         data['tracker_urls'] = tracker_urls
         data['tracker_urlmodel'] = tracker_urlmodel
+        data['tracker_urlform'] = tracker_urlform
         return mysite.base.decorators.as_view(request, 'customs/edit_tracker.html', data, None)
     else:
         return HttpResponseRedirect(reverse(list_trackers))
