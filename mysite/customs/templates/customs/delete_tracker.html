@@ -27,7 +27,7 @@
 {% endblock form_name %}
 
 {% block form_action %}
-'{% url mysite.customs.views.delete_tracker_do tracker_type tracker_name %}'
+'{% url mysite.customs.views.delete_tracker tracker_type tracker_id tracker_name %}'
 {% endblock form_action %}
 
 {% block form_body %}

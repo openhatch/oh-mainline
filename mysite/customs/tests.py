@@ -1579,6 +1579,7 @@ class BugTrackerEditingViews(TwillTests):
     def test_bug_tracker_edit_url_missing_url_id_302s(self):
         client = self.login_with_client()
         url = reverse(mysite.customs.views.edit_tracker_url, kwargs={
+                'tracker_id': '101',
                 'tracker_type': 'trac', 'tracker_name': 'whatever',
                 'url_id': '000'})
 
@@ -1588,7 +1589,6 @@ class BugTrackerEditingViews(TwillTests):
 
         response = client.get(url)
         # This should redirect to what amounts to a not-found page
-
         assert response.status_code == 302
 
 
