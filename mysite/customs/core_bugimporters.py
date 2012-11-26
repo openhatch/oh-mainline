@@ -75,8 +75,6 @@ def import_one_bug_item(d):
     '''Accepts one ParsedBug object, as a Python dict.
 
     Usually causes the side effect of creating a Bug project.'''
-    project = mysite.search.models.Project.objects.get(name=d['_project_name'])
-
     # Look for a matching Bug
     matches = mysite.search.models.Bug.all_bugs.filter(
         canonical_bug_link=d['canonical_bug_link'])
@@ -93,6 +91,10 @@ def import_one_bug_item(d):
             ('_project_name' in d)):
         logging.error("Your data needs a _tracker_name and _project_name.")
         logging.error(repr(d))
+
+    project, created = mysite.search.models.Project.objects.get_or_create(name=d['_project_name'])
+    if created:
+        logging.error("FYI we created: %s", d['_project_name'])
 
     tracker = mysite.customs.models.TrackerModel.get_by_name(
         tracker_name=d['_tracker_name'])
