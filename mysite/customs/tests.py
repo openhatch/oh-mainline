@@ -1791,6 +1791,28 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # that user with issues enabled.
         self.assertEqual(expected_url, url)
 
+class DuplicateNames(django.test.TestCase):
+    def test_two_trackers_of_same_name(self):
+        # Set up two trackers with the same name.
+        gh = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                github_name='twisted',
+                github_repo='mainline',
+                )
+
+        trac = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+
+        # Make sure this doesn't crash
+        gh.get_edit_url()
+        trac.get_edit_url()
+
 
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):
