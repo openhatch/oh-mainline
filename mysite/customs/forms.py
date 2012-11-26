@@ -106,7 +106,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
         # bugs), since GitHub's v2 API doesn't let us list all bugs
         # regardless of status.
         open_qm, _ = mysite.customs.models.GitHubQueryModel.objects.get_or_create(
-            tracker=obj)
+            tracker=obj, state='')
         closed_qm, _ = mysite.customs.models.GitHubQueryModel.objects.get_or_create(
             tracker=obj, state='closed')
 

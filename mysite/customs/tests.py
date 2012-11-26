@@ -1579,6 +1579,7 @@ class BugTrackerEditingViews(TwillTests):
     def test_bug_tracker_edit_url_missing_url_id_302s(self):
         client = self.login_with_client()
         url = reverse(mysite.customs.views.edit_tracker_url, kwargs={
+                'tracker_id': '101',
                 'tracker_type': 'trac', 'tracker_name': 'whatever',
                 'url_id': '000'})
 
@@ -1588,7 +1589,6 @@ class BugTrackerEditingViews(TwillTests):
 
         response = client.get(url)
         # This should redirect to what amounts to a not-found page
-
         assert response.status_code == 302
 
 
@@ -1790,6 +1790,28 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # and 'mainline' with 'mango-django' or some other valid repo owned by
         # that user with issues enabled.
         self.assertEqual(expected_url, url)
+
+class DuplicateNames(django.test.TestCase):
+    def test_two_trackers_of_same_name(self):
+        # Set up two trackers with the same name.
+        gh = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                github_name='twisted',
+                github_repo='mainline',
+                )
+
+        trac = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+
+        # Make sure this doesn't crash
+        gh.get_edit_url()
+        trac.get_edit_url()
 
 
 class ImportBugsFromFiles(django.test.TestCase):
