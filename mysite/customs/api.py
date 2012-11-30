@@ -54,8 +54,8 @@ class TrackerModelResource(tastypie.resources.ModelResource):
                 # This should be changed back to Min() when https://openhatch.org/bugs/issue772
                 # is resolved.
                 oldest_last_polled_data = relevant_bugs.aggregate(
-                    django.db.models.Max('last_polled'))
-                oldest_last_polled = oldest_last_polled_data['last_polled__max']
+                    django.db.models.Min('last_polled'))
+                oldest_last_polled = oldest_last_polled_data['last_polled__min']
                 if (oldest_last_polled and (
                         oldest_last_polled >= (
                             datetime.datetime.utcnow() -
