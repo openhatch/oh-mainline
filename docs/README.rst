@@ -51,6 +51,6 @@ Stay in touch
 IRC (#openhatch on irc.freenode.net).
 
 .. _the project blog: http://openhatch.org/blog
-.. _Identi.ca: http://identi.ca/openhatchery
-.. _Twitter: http://twitter.com/openhatchery
+.. _Identi.ca: http://identi.ca/openhatch
+.. _Twitter: http://twitter.com/openhatch
 .. _Facebook: http://facebook.com/pages/OpenHatch/108578243652
