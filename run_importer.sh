@@ -18,7 +18,7 @@ fi
 wget https://openhatch.org/+api/v1/customs/tracker_model/\?just_stale\=yes\&format\=yaml\&limit\="$MAX_TRACKERS"\&tracker_id="$TRACKER_ID" -O "$BUG_TRACKER_LIST"
 
 pushd ../oh-bugimporters
-env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FILE"
+env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FILE" -l "$SCRAPY_LOG"
 popd
 
 python manage.py import_bugimporter_data "$SCRAPY_RESULT_FILE"
