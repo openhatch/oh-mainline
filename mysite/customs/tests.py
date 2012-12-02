@@ -33,6 +33,7 @@ import mysite.profile.views
 from mysite.customs import ohloh
 import mysite.customs.views
 import mysite.base.depends
+import mysite.customs.api
 
 from django.core.urlresolvers import reverse
 
@@ -1813,6 +1814,26 @@ class DuplicateNames(django.test.TestCase):
         gh.get_edit_url()
         trac.get_edit_url()
 
+class TrackerAPI(TwillTests):
+    def test_trac_instance_shows_up(self):
+        # Create the Twisted project object
+        mysite.search.models.Project.objects.create(name='Twisted')
+
+        # Set up the Twisted TrackerModel that will be used here.
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+
+        api = mysite.customs.api.TrackerModelResource()
+        request = django.test.client.RequestFactory().get('/+api/v1/customs/tracker_model/')
+        objs = api.get_object_list(request)
+        obj = objs[0]
+        self.assertEqual(self.tm, obj)
 
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):
