@@ -1835,6 +1835,39 @@ class TrackerAPI(TwillTests):
         obj = objs[0]
         self.assertEqual(self.tm, obj)
 
+    def test_get_trac_instance_by_id(self):
+        # Create the Twisted project object
+        mysite.search.models.Project.objects.create(name='Twisted')
+
+        # Set up the Twisted TrackerModel that will be used here.
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+
+        # Query for ourselves with the tracker_id parameter that is not == us
+        api = mysite.customs.api.TrackerModelResource()
+        request = django.test.client.RequestFactory().get(
+            '/+api/v1/customs/tracker_model/?tracker_id=%d' % (
+                self.tm.pk - 1,))
+        objs = api.get_object_list(request)
+        self.assertFalse(objs)
+
+        # Query for ourselves properly
+        api = mysite.customs.api.TrackerModelResource()
+        request = django.test.client.RequestFactory().get(
+            '/+api/v1/customs/tracker_model/?tracker_id=%d' % (
+                self.tm.pk,))
+        objs = api.get_object_list(request)
+        self.assertEqual(1, len(objs))
+        obj = objs[0]
+        self.assertEqual(self.tm, obj)
+
+
 class ImportBugsFromFiles(django.test.TestCase):
     def setUp(self, *args, **kwargs):
         # Create the Twisted project object
