@@ -39,6 +39,18 @@ class TrackerModelResource(tastypie.resources.ModelResource):
                 # the query will get no results.
                 all_objects = all_objects.none()
 
+        if request.GET.get('tracker_id', '').lower():
+            try:
+                as_int = int(request.GET['tracker_id'])
+            except ValueError:
+                # Well, if you really want to know what ints are equal to
+                # your string that not an int all, it's no ints. So you get
+                # no results.
+                all_objects = all_objects.none()
+            else:
+                all_objects = all_objects.filter(id=as_int)
+
+
         if request.GET.get('just_stale', '').lower() == 'yes':
             # Note: This code is of low quality.
             for obj in all_objects:
