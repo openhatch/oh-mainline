@@ -331,7 +331,7 @@ about how you can help {{ project.display_name }}
         </style>
         {% if project.get_open_bugs %}
             <p style='font-size: 1.1em;'>
-                    <a href='/search/?project={{ project.name_with_quotes_if_necessary|urlencode }}'>
+                    <a href='/search/?project={{ project.name|urlencode }}'>
                         <strong>
                             Volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
                         </strong>
