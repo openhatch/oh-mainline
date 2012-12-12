@@ -20,6 +20,7 @@ from mysite.missions.tar.tests import *
 from mysite.missions.diffpatch.tests import *
 from mysite.missions.svn.tests import *
 from mysite.missions.git.tests import *
+import datetime
 
 
 import django.test
@@ -60,3 +61,27 @@ class MissionCompletionTestCase(django.test.TestCase):
         
         self.assertTrue(mission_completed(profile, step.name))
         self.assertTrue(obj_after.is_currently_completed)
+
+    def test_set_mission_completed_records_first_completed_time(self):
+        now = datetime.datetime.now()
+        profile = Person.objects.all()[0]
+        step = Step.objects.all()[0]
+
+        set_mission_completed(profile, step.name)
+        # sets StepCompletion.is_currently_completed to True
+
+        # Simulate the user resetting the mission
+        obj_after = StepCompletion.objects.get(person = profile, step = step)
+
+        self.assertGreater(obj_after.created_date, now)
+        self.assertGreater(obj_after.modified_date, now)
+
+        modified_date = obj_after.modified_date
+        created_date = obj_after.created_date
+
+        # And if we set it again... modified_date should increase,
+        # but not created_date.
+        unset_mission_completed(profile, step.name)
+        obj_after = StepCompletion.objects.get(person = profile, step = step)
+        self.assertGreater(obj_after.modified_date, modified_date)
+        self.assertEqual(obj_after.created_date, created_date)
