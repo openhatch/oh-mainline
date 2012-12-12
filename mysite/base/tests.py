@@ -213,7 +213,7 @@ class TestUnicodifyDecorator(TwillTests):
 class Feed(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test_feed_shows_no_answers(self):
+    def test_feed_shows_answers(self):
 
         # Visit the homepage, notice that there are no answers in the context.
 
@@ -232,12 +232,7 @@ class Feed(TwillTests):
         # Visit the homepage, assert that the feed item data is on the page,
         # ordered by date descending.
         actual_answer_pks = [answer.pk for answer in get_answers_from_homepage()]
-
-
-        # NOTE: Expecting no answers for the moment.
-        expected_answer_pks = []
-
-
+        expected_answer_pks = [answer.pk for answer in recent_feed_items]
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
     def test_feed_shows_wanna_help(self):

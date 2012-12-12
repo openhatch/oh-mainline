@@ -41,9 +41,7 @@ from django.contrib.auth.decorators import login_required
 def front_page_data():
     data = {}
     data['entries'] = mysite.customs.feed.cached_blog_entries()[:1]
-    # Grabbing Answer objects is disabled for the moment, due to epic spamming.
-    feed_items = []
-    # feed_items = list(mysite.search.models.Answer.objects.order_by('-modified_date')[:5])
+    feed_items = list(mysite.search.models.Answer.objects.order_by('-modified_date')[:5])
     feed_items.extend(mysite.search.models.WannaHelperNote.objects.order_by('-modified_date')[:5])
     feed_items.sort(key=lambda x: x.modified_date, reverse=True)
     data['recent_feed_items'] = feed_items[:5]
