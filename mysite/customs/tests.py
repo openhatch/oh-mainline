@@ -90,24 +90,6 @@ except ImportError:
     GitHubBugParser = None
 # }}}
 
-# Functions you'll need: {{{
-def twill_setup():
-    app = AdminMediaHandler(WSGIHandler())
-    twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-
-def twill_teardown():
-    twill.remove_wsgi_intercept('127.0.0.1', 8080)
-
-def make_twill_url(url):
-    # modify this
-    return url.replace("http://openhatch.org/", "http://127.0.0.1:8080/")
-
-def twill_quiet():
-    # suppress normal output of twill.. You don't want to
-    # call this if you want an interactive session
-    twill.set_output(StringIO())
-# }}}
-
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
