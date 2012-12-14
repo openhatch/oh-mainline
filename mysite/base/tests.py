@@ -27,7 +27,6 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler
 from StringIO import StringIO
 from django.test.client import Client
-import urllib
 import os
 import os.path
 import subprocess
@@ -52,14 +51,6 @@ import mysite.project.views
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
 
-def twill_setup():
-    app = AdminMediaHandler(WSGIHandler())
-    twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-
-def twill_teardown():
-    twill.remove_wsgi_intercept('127.0.0.1', 8080)
-    tc.reset_browser()
-
 def make_twill_url(url):
     # modify this
     return url.replace("http://openhatch.org/",
@@ -72,15 +63,21 @@ def twill_goto_view(view_name, kwargs):
     url = "http://openhatch.org" + reverse(view_name, kwargs=kwargs)
     tc.go(better_make_twill_url(url))
 
-def twill_quiet():
-    # suppress normal output of twill.. You don't want to
-    # call this if you want an interactive session
-    twill.set_output(StringIO())
-
 mock_get = mock.Mock()
 mock_get.return_value = None
 
 class TwillTests(django.test.TestCase):
+    @staticmethod
+    def _twill_setup():
+        app = AdminMediaHandler(WSGIHandler())
+        twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
+
+    @staticmethod
+    def _twill_quiet():
+        # suppress normal output of twill.. You don't want to
+        # call this if you want an interactive session
+        twill.set_output(StringIO())
+
     '''Some basic methods needed by other testing classes.'''
     def setUp(self):
         self.real_get = django.core.cache.cache.get
@@ -88,15 +85,16 @@ class TwillTests(django.test.TestCase):
         from django.conf import settings
         self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
         settings.DEBUG_PROPAGATE_EXCEPTIONS = True
-        twill_setup()
-        twill_quiet()
+        TwillTests._twill_setup()
+        TwillTests._twill_quiet()
 
     def tearDown(self):
         # If you get an error on one of these lines,
         # maybe you didn't run base.TwillTests.setUp?
         from django.conf import settings
         settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
-        twill_teardown()
+        twill.remove_wsgi_intercept('127.0.0.1', 8080)
+        tc.reset_browser()
         django.core.cache.cache.get = self.real_get
 
     def login_with_twill(self):
