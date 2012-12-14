@@ -40,22 +40,14 @@ from django.core.urlresolvers import reverse
 import logging
 import mock
 import os
-import time
-import twill
-import urlparse
 
 import django.test
 import django.contrib.auth.models
 import django.core.serializers
 from django.conf import settings
-from django.core.servers.basehttp import AdminMediaHandler
-from django.core.handlers.wsgi import WSGIHandler
 
 from StringIO import StringIO
-from urllib2 import HTTPError
 import datetime
-
-import twisted.internet.defer
 
 import mysite.customs.feed
 
@@ -64,30 +56,6 @@ from django.utils.unittest import skipIf
 import mysite.customs.models
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.snapshot_public_data
-
-# We don't want the tests to depend on the optional bugimporters libarary.
-try:
-    from bugimporters.bugzilla import (BugzillaBugImporter, BugzillaBugParser,
-            KDEBugzilla)
-    from bugimporters.roundup import RoundupBugImporter, RoundupBugParser
-    from bugimporters.google import GoogleBugImporter, GoogleBugParser
-    from bugimporters.trac import TracBugImporter, TracBugParser
-    from bugimporters.launchpad import LaunchpadBugImporter
-    from bugimporters.github import GitHubBugImporter, GitHubBugParser
-    import bugimporters.bugzilla # to make mock.patch() happy
-except ImportError:
-    BugzillaBugImporter = None
-    BugzillaBugParser = None
-    RoundupBugImporter = None
-    RoundupBugParser = None
-    TracBugImporter = None
-    TracBugParser = None
-    LaunchpadBugImporter = None
-    GoogleBugImporter = None
-    GoogleBugParser = None
-    GitHubBugImporter = None
-    GitHubBugParser = None
-# }}}
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class OhlohIconTests(django.test.TestCase):
