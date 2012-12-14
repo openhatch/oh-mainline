@@ -141,7 +141,6 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
-
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
@@ -161,25 +160,6 @@ class BlogCrawl(django.test.TestCase):
                          u'Yo \xe9')
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
-
-def raise_504(*args, **kwargs):
-    raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null"))
-mock_browser_open = mock.Mock()
-mock_browser_open.side_effect = raise_504
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class UserGetsMessagesDuringImport(django.test.TestCase):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch("mechanize.Browser.open", mock_browser_open)
-    def test_user_get_messages_during_import(self):
-        paulproteus = Person.objects.get(user__username='paulproteus')
-
-        self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 0)
-
-        self.assertRaises(HTTPError, mysite.customs.mechanize_helpers.mechanize_get, 'http://ohloh.net/somewebsiteonohloh', attempts_remaining=1, person=paulproteus)
-
-        self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
-
 
 sample_launchpad_data_snapshot = mock.Mock()
 sample_launchpad_data_snapshot.return_value = [dict(
