@@ -161,15 +161,6 @@ class BlogCrawl(django.test.TestCase):
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
 
-sample_launchpad_data_snapshot = mock.Mock()
-sample_launchpad_data_snapshot.return_value = [dict(
-        url=u'', project=u'rose.makesad.us', text=u'', status=u'',
-        importance=u'low', reporter={u'lplogin': 'a',
-                                    'realname': 'b'},
-        tags=[], comments=[], date_updated=time.localtime(),
-        date_reported=time.localtime(),
-        title="Joi's Lab AFS",)]
-
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
