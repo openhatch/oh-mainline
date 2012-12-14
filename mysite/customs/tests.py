@@ -64,10 +64,7 @@ from django.utils.unittest import skipIf
 
 import mysite.customs.models
 import mysite.customs.management.commands.customs_daily_tasks
-import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
-from mysite.customs.data_transits import bug_data_transit, trac_data_transit
-
 
 # We don't want the tests to depend on the optional bugimporters libarary.
 try:
@@ -92,103 +89,6 @@ except ImportError:
     GitHubBugImporter = None
     GitHubBugParser = None
 # }}}
-
-importer_data_transits = {'bug': bug_data_transit, 'trac': trac_data_transit}
-
-
-class FakeGetPage(object):
-    '''In this function, we define the fake URLs we know about, and where
-    the saved data is.'''
-    def __init__(self):
-        self.url2data = {}
-        self.url2data['http://github.com/api/v2/json/repos/show/paulproteus'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'github', 'json-repos-show-paulproteus.json')).read()
-        self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-personal-feed.json')).read()
-        self.url2data['https://api.launchpad.net/1.0/people?ws.op=find&text=asheesh%40asheesh.org'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'people__ws.op=find&text=asheesh@asheesh.org')).read()
-        self.url2data['https://launchpad.net/~paulproteus'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~paulproteus')).read()
-        self.url2data['https://launchpad.net/~Mozilla'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~Mozilla')).read()
-        self.url2data['http://api.bitbucket.org/1.0/users/paulproteus/'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'bitbucket', 'paulproteus.json')).read()
-        self.url2data['http://www.ohloh.net/contributors.xml?query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'contributors.xml__query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw')).read()
-        self.url2data['https://www.ohloh.net/accounts/paulproteus'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'paulproteus')).read()
-        self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
-        self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '65837553699824.xml')).read()
-        self.url2data['https://www.ohloh.net/accounts/44c4e8d8ef5137fd8bcd78f9cee164ef'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '44c4e8d8ef5137fd8bcd78f9cee164ef')).read()
-        self.url2data['http://www.ohloh.net/analyses/1454281.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '1454281.xml')).read()
-        self.url2data['http://www.ohloh.net/analyses/1143684.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '1143684.xml')).read()
-        self.url2data['http://www.ohloh.net/projects/15329.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '15329.xml')).read()
-        self.url2data['http://www.ohloh.net/projects/479665.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '479665.xml')).read()
-        self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824'] = ''
-        self.url2data['https://www.ohloh.net/p/ccsearch-/contributors/2060147635589231'] = ''
-        self.url2data['https://www.ohloh.net/p/debian'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'debian')).read()
-        self.url2data['https://www.ohloh.net/p/cchost'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'cchost')).read()
-        self.url2data['https://www.ohloh.net/p/15329/contributors/65837553699824.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '65837553699824.xml')).read()
-        self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
-        self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
-        self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461/subscriptions'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461_subscriptions')).read()
-        self.url2data['https://api.launchpad.net/1.0/~vila'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~vila')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461closed'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461closed')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461doc'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461doc')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461doc'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461doc')).read()
-        self.url2data['https://api.launchpad.net/1.0/bzr/+bug/839461bite'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_task_839461bite')).read()
-        self.url2data['https://api.launchpad.net/1.0/bugs/839461bite'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'bugs_839461bite')).read()
-        self.url2data['http://github.com/api/v2/json/issues/list/openhatch/misc/open']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'github', 'issue-list')).read()
-        self.url2data['http://github.com/api/v2/json/issues/list/openhatch/misc/closed']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'github', 'issue-list-closed')).read()
-        self.url2data['http://github.com/api/v2/json/issues/show/openhatch/misc/42']= open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'github', 'issue-show')).read()
-
-    """This is a fake version of Twisted.web's getPage() function.
-    It returns a Deferred that is already 'fired', and has the page content
-    passed into it already.
-
-    It never adds the Deferred to the 'reactor', so calling reactor.start()
-    should be a no-op."""
-    def getPage(self, url):
-        assert type(url) == str
-        d = twisted.internet.defer.Deferred()
-        d.callback(self.url2data[url])
-        return d
-
-    """This is a fake version of Twisted.web's getPage() function.
-    It returns a Deferred that is already 'fired', and has been passed a
-    Failure containing an HTTP 404 Error.
-
-    It never adds the Deferred to the 'reactor', so calling reactor.start()
-    should be a no-op."""
-    def get404(self, url):
-        d = twisted.internet.defer.Deferred()
-        d.errback(
-                twisted.python.failure.Failure(
-                    twisted.web.error.Error(
-                        404, 'File Not Found', None)))
-        return d
-
-# Create a module-level global that is the fake getPage
-fakeGetPage = FakeGetPage()
-
-# Mocked out browser.open
-open_causes_404 = mock.Mock()
-def generate_404(self):
-    import urllib2
-    raise urllib2.HTTPError('', 404, {}, {}, None)
-open_causes_404.side_effect = generate_404
-
-def generate_403(self):
-    import urllib2
-    raise urllib2.HTTPError('', 403, {}, {}, None)
-
-def generate_408(self):
-    import urllib2
-    raise urllib2.HTTPError('', 408, {}, {}, None)
-
-def generate_504(self):
-    import urllib2
-    raise urllib2.HTTPError('', 504, {}, {}, None)
 
 # Functions you'll need: {{{
 def twill_setup():
