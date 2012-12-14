@@ -897,9 +897,6 @@ def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache
     update_someones_pf_cache.delay(instance.person.pk)
 
-def ping_twisted(sender, instance, **kwargs):
-    mysite.customs.ping_twisted.ping_it()
-
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
     RegeneratePostfixAliasesForForwarder().run()
@@ -911,8 +908,6 @@ models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Per
 
 models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
 models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
-
-models.signals.post_save.connect(ping_twisted, sender=DataImportAttempt)
 
 ### The following signals are here so that we clear the cached list
 ### of people for the map whenever Person, PortfolioEntry, or LinkPersonTag
