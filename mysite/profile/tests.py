@@ -2636,18 +2636,6 @@ class Notifications(TwillTests):
                 people['display_these_wannahelpers'],
                 )
 
-class AfterCreatingADiaPingTwisted(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('mysite.customs.ping_twisted.ping_it')
-    def test(self, mock_ping_it):
-        ### This is a simple test. We just:
-        # * Create a DIA
-        # * Ensure the pingTwisted() function was called.
-        asheesh = Person.objects.get(user__username='paulproteus')
-        mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='paulproteus')
-        self.assertTrue(mock_ping_it.called)
-
 class PeopleMapSummariesAreCheap(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def setUp(self, *args, **kwargs):
