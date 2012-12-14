@@ -307,8 +307,6 @@ class DataExport(django.test.TestCase):
         proj.populate_icon_from_ohloh()
         proj.save()
 
-        icon_raw_path = proj.icon_raw.path
-
         command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
