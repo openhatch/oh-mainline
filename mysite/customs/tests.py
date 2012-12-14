@@ -261,61 +261,6 @@ class OhlohIconTests(django.test.TestCase):
     # }}}
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class ImportFromBitbucket(django.test.TestCase):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def setUp(self, do_nothing, do_nothing_1):
-        # Create a DataImportAttempt for Asheesh
-        asheesh = Person.objects.get(user__username='paulproteus')
-        mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='bb', query='paulproteus')
-
-        # With the DIA in place, we run the command and simulate
-        # going out to Twisted.
-        mysite.customs.management.commands.customs_twist.Command(
-            ).handle(use_reactor=False)
-
-        # Extract the citation objects so tests can easily refer to them.
-        self.bayberry_data = mysite.profile.models.Citation.objects.get(
-            portfolio_entry__project__name='bayberry-data')
-        self.long_kwallet_thing = mysite.profile.models.Citation.objects.get(
-            portfolio_entry__project__name='fix-crash-in-kwallet-handling-code')
-        self.python_keyring_lib = mysite.profile.models.Citation.objects.get(
-            portfolio_entry__project__name='python-keyring-lib')
-
-    def test_create_three(self):
-        self.assertEqual(
-            3,
-            mysite.profile.models.PortfolioEntry.objects.all().count())
-
-    def test_contributor_role(self):
-        # Check that the proper Citation objects were created.
-        self.assertEqual(
-            'Contributed to a repository on Bitbucket.',
-            self.bayberry_data.contributor_role)
-
-    def test_project_urls(self):
-        # Verify that we generate URLs correctly, using the slug.
-        self.assertEqual(
-            'http://bitbucket.org/paulproteus/bayberry-data/',
-            self.bayberry_data.url)
-        self.assertEqual(
-            'http://bitbucket.org/paulproteus/fix-crash-in-kwallet-handling-code/',
-            self.long_kwallet_thing.url)
-
-    def test_citation_descriptions(self):
-        # This comes from the 'description'
-        self.assertEqual(
-            "Training data for an anti wiki spam corpus.",
-            self.bayberry_data.portfolio_entry.project_description)
-        # This comes from the 'slug' because there is no description
-        self.assertEqual(
-            "Fix crash in kwallet handling code",
-            self.long_kwallet_thing.portfolio_entry.project_description)
-
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class TestAbstractOhlohAccountImporter(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

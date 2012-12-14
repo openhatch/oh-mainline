@@ -293,75 +293,6 @@ class GithubImporter(ProfileImporter):
             else:
                 logging.info("When looking in the Github user feed, I found a Github event of unknown type.")
 
-class BitbucketImporter(ProfileImporter):
-    ROOT_URL = 'http://api.bitbucket.org/1.0/'
-    SQUASH_THESE_HTTP_CODES = ['404',]
-
-    def getUrlsAndCallbacks(self):
-        return [{
-            'errback': self.squashIrrelevantErrors,
-            'url': self.url_for_query(self.query),
-            'callback': self.processUserJson,
-            }]
-
-    def url_for_query(self, query):
-        url = self.ROOT_URL
-        url += 'users/%s/' % (mysite.base.unicode_sanity.quote(self.query))
-        return url
-
-    def url_for_project(self, user_name, project_name):
-        return 'http://bitbucket.org/%s/%s/' % (
-            mysite.base.unicode_sanity.quote(user_name),
-            mysite.base.unicode_sanity.quote(project_name))
-
-    def processUserJson(self, json_string):
-        person = self.get_dia().person
-
-        json_data = simplejson.loads(json_string)
-
-        bitbucket_username = json_data['user']['username']
-        repositories = json_data['repositories']
-        ### The repositories list contains a sequence of dictionaries.
-        ### The keys are:
-        # slug: The url slug for the project
-        # name: The name of the project
-        # website: The website associated wit the project, defined by the user
-        # followers_count: Number of followers
-        # description: The project description
-        
-        for repo in repositories:
-            # The project name and description we pull out of the data
-            # provided by Bitbucket.
-            project_name = repo['name']
-            slug = repo['slug']
-            description = repo['description']
-
-            # Get the corresponding project object, if it exists.
-            (project, _) = mysite.search.models.Project.objects.get_or_create(
-                name=repo['slug'])
-
-            # Get the most recent PortfolioEntry for this person and that
-            # project.
-            #
-            # If there is no such PortfolioEntry, then set its project
-            # description to the one provided by Bitbucket.
-            portfolio_entry, _ = mysite.profile.models.PortfolioEntry.objects.get_or_create(
-                person=person,
-                project=project,
-                defaults={'project_description':
-                          description.rstrip() or project_name})
-            # Create a Citation that links to the Bitbucket page
-            citation, _ = mysite.profile.models.Citation.objects.get_or_create(
-                url = self.url_for_project(bitbucket_username,
-                                           slug),
-                portfolio_entry = portfolio_entry,
-                defaults = dict(
-                    contributor_role='Contributed to a repository on Bitbucket.',
-                    data_import_attempt = self.get_dia(),
-                    languages=''))
-            citation.languages = ''
-            citation.save_and_check_for_duplicates()
-
 class AbstractOhlohAccountImporter(ProfileImporter):
     SQUASH_THESE_HTTP_CODES = ['404',]
 
@@ -682,7 +613,6 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
 ###
 
 SOURCE_TO_CLASS = {
-    'bb': BitbucketImporter,
     'gh': GithubImporter,
     'rs': RepositorySearchOhlohImporter,
     'oh': OhlohUsernameImporter,
