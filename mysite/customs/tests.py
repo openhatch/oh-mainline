@@ -57,7 +57,6 @@ import datetime
 
 import twisted.internet.defer
 
-import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
 
