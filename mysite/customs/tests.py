@@ -102,8 +102,6 @@ class FakeGetPage(object):
     the saved data is.'''
     def __init__(self):
         self.url2data = {}
-        self.url2data['http://qa.debian.org/developer.php?login=asheesh%40asheesh.org'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'debianqa-asheesh.html')).read()
         self.url2data['http://github.com/api/v2/json/repos/show/paulproteus'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'github', 'json-repos-show-paulproteus.json')).read()
         self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
@@ -261,57 +259,6 @@ class OhlohIconTests(django.test.TestCase):
         self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
     # }}}
-
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class ImportFromDebianQA(django.test.TestCase):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    def test_asheesh_unit(self, do_nothing, do_nothing_also):
-        # Create a DataImportAttempt for Asheesh
-        asheesh = Person.objects.get(user__username='paulproteus')
-        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
-
-        # Create the DebianQA to track the state.
-        dqa = mysite.customs.profile_importers.DebianQA(query=dia.query, dia_id=dia.id, command=None)
-
-        # Check that we generate the right URL
-        urlsAndCallbacks = dqa.getUrlsAndCallbacks()
-        just_one, = urlsAndCallbacks
-        url = just_one['url']
-        callback = just_one['callback']
-        self.assertEqual('http://qa.debian.org/developer.php?login=asheesh%40asheesh.org', url)
-        self.assertEqual(callback, dqa.handlePageContents)
-
-        # Check that we make Citations as expected
-        page_contents = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'debianqa-asheesh.html')).read()
-        dqa.handlePageContents(page_contents)
-
-        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
-        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def test_asheesh_integration(self, do_nothing, do_nothing_also):
-        # Create a DataImportAttempt for Asheesh
-        asheesh = Person.objects.get(user__username='paulproteus')
-        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
-        cmd = mysite.customs.management.commands.customs_twist.Command()
-        cmd.handle(use_reactor=False)
-
-        # And now, the dia should be completed.
-        dia = mysite.profile.models.DataImportAttempt.objects.get(person=asheesh, source='db', query='asheesh@asheesh.org')
-        self.assertTrue(dia.completed)
-
-        # And Asheesh should have some new projects available.
-        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
-        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
-
-    def test_404(self):
-        pass # uhhh
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
 class LaunchpadProfileImport(django.test.TestCase):
