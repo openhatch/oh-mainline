@@ -273,13 +273,6 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []
 
-def do_list_of_work(l):
-    '''Some helper methods in mysite.customs.management.commands.customs_daily_tasks
-       return a list of worker functions to call. This wrapper simply executes all
-       the elements of l, assuming they are callables.'''
-    for thing in l:
-        thing()
-
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class DataExport(django.test.TestCase):
     def test_snapshot_user_table_without_passwords(self):
