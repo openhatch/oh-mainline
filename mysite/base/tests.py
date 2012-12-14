@@ -27,7 +27,6 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler
 from StringIO import StringIO
 from django.test.client import Client
-import urllib
 import os
 import os.path
 import subprocess
