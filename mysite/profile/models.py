@@ -26,7 +26,6 @@ import mysite.customs.models
 import mysite.profile.controllers
 import mysite.base.models
 import mysite.base.unicode_sanity
-import mysite.customs.ping_twisted
 
 from django.db import models
 from django.contrib.auth.models import User
