@@ -232,48 +232,6 @@ class ParseCiaMessage(django.test.TestCase):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class LineAcceptorTest(django.test.TestCase):
-    def test(self):
-
-        got_response = []
-        def callback(obj, got_response=got_response):
-            got_response.append(obj)
-
-        lines = [
-            '\x02FreeBSD:\x0f \x0303trasz\x0f * r\x02201794\x0f \x0310\x0f/head/sys/ (4 files in 4 dirs)\x02:\x0f ',
-            "\x02FreeBSD:\x0f Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order",
-            '\x02FreeBSD:\x0f to silence newer GCC versions.',
-            '\x02KDE:\x0f \x0303lueck\x0f * r\x021071711\x0f \x0310\x0f/branches/work/doc/kget/\x02:\x0f kget doc was moved back to trunk',
-            '\x02SHR:\x0f \x0303mok\x0f \x0307libphone-ui-shr\x0f * r\x027cad6cdc76f9\x0f \x0310\x0f/po/ru.po\x02:\x0f po: updated russian translation from Vladimir Berezenko']
-        agent = mysite.customs.cia.LineAcceptingAgent(callback)
-
-        expecting_response = None
-        # expecting no full message for the first THREE lines
-        agent.handle_message(lines[0])
-        self.assertFalse(got_response)
-
-        agent.handle_message(lines[1])
-        self.assertFalse(got_response)
-
-        agent.handle_message(lines[2])
-        self.assertFalse(got_response)
-
-        # but now we expect something!
-        agent.handle_message(lines[3])
-        wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'version': 'r201794'}
-        got = got_response[0]
-        self.assertEqual(got, wanted)
-        got_response[:] = []
-
-        # FIXME use (project_name, version) pair instead I guess
-
-        # and again, but differently
-        agent.handle_message(lines[4])
-        wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'version': 'r1071711'}
-        self.assertEqual(got_response[0], wanted)
-        got_response[:] = []
-
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class DataExport(django.test.TestCase):
     def test_snapshot_user_table_without_passwords(self):
         # We'll pretend we're running the snapshot_public_data management command. But
