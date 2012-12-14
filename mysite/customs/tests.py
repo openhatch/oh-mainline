@@ -57,7 +57,6 @@ import datetime
 
 import twisted.internet.defer
 
-import mysite.customs.cia
 import mysite.customs.feed
 
 from django.utils.unittest import skipIf
@@ -160,76 +159,6 @@ class BlogCrawl(django.test.TestCase):
                          u'Yo \xe9')
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
-
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class ParseCiaMessage(django.test.TestCase):
-    def test_with_ansi_codes(self):
-        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
-        parsed = {'project_name': 'XBMC',
-                  'committer_identifier': 'jmarshallnz',
-                  'version': 'r26531',
-                  'path': '/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)',
-                  'message': 'cleanup: eliminate some duplicate code.'}
-        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
-                         parsed)
-
-    def test_parse_a_middle_line(self):
-        message = "\x02FreeBSD:\x0f Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
-        parsed = {'project_name': 'FreeBSD',
-                  'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
-        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
-                         parsed)
-
-    def test_parse_a_middle_line_with_asterisk(self):
-        message = "\x02FreeBSD:\x0f * Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
-        parsed = {'project_name': 'FreeBSD',
-                  'message': "* Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
-        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
-                         parsed)
-
-    def test_find_module(self):
-        tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
-        expected = {'project_name': 'KDE',
-                    'committer_identifier': 'crissi',
-                    'version': 'r1071733',
-                    'path': '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)',
-                    'module': 'kvpnc',
-                    'message': ''}
-        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
-                         expected)
-
-    def test_complicated_mercurial_version(self):
-        tokens = ['Sphinx:', ' birkenfeld', ' ', '*', ' ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
-        expected = {'project_name': 'Sphinx',
-                    'committer_identifier': 'birkenfeld',
-                    'version': '88e880fe9101 r1756',
-                    'path': '/EXAMPLES',
-                    'message': 'Regroup examples list by theme used.'}
-        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
-                         expected)
-
-    def test_find_module_with_no_version(self):
-        tokens = ['FreeBSD:', ' glarkin', ' ', '*', ' ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
-        expected = {'project_name': 'FreeBSD',
-                    'committer_identifier': 'glarkin',
-                    'path': '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)',
-                    'module': 'ports',
-                    'message':  '(log message trimmed)'}
-        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
-                         expected)
-
-    def test_find_module_in_moin(self):
-        tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' ', '*', ' ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
-        expected = {'project_name': 'moin',
-                    'committer_identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
-                    'branch': 'default',
-                    'version': '5405:a1a1ce8894cb',
-                    'module': '1.9',
-                    'path': '/MoinMoin/util/SubProcess.py',
-                    'message':  'merged moin/1.8'}
-        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
-                         expected)
-
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class DataExport(django.test.TestCase):
