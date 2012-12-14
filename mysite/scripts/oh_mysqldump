@@ -1,1 +1,8 @@
-mysqldump -uoh_milestone_a -pahmaC0Th oh_milestone_a "$@"
+#!/bin/bash
+set -e
+DIR="$(mktemp -d /tmp/$(date -I).mysqldump.XXXXX)"
+FILE="$DIR/mysql-dump.gz"
+mysqldump -uoh_milestone_a -pahmaC0Th oh_milestone_a "$@" | gzip > "$FILE"
+zcat "$FILE"
+rm "$FILE"
+rmdir "$DIR"
