@@ -293,130 +293,6 @@ class GithubImporter(ProfileImporter):
             else:
                 logging.info("When looking in the Github user feed, I found a Github event of unknown type.")
 
-class LaunchpadProfilePageScraper(ProfileImporter):
-    SQUASH_THESE_HTTP_CODES = ['404',]
-
-    def getUrlsAndCallbacks(self):
-        # If the query has an '@' in it, enqueue a task to
-        # find the username.
-        if '@' in self.query:
-            return [self.getUrlAndCallbackForEmailLookup()]
-        else:
-            return [self.getUrlAndCallbackForProfilePage()]
-
-    def getUrlAndCallbackForEmailLookup(self, query=None):
-        if query is None:
-            query = self.query
-
-        this_one = {}
-        this_one['url'] = ('https://api.launchpad.net/1.0/people?' +
-                           'ws.op=find&text=' +
-                           mysite.base.unicode_sanity.quote(
-                               query))
-        this_one['callback'] = self.parseAndProcessUserSearch
-        this_one['errback'] = self.squashIrrelevantErrors
-        return this_one
-
-    def getUrlAndCallbackForProfilePage(self, query=None):
-        if query is None:
-            query = self.query
-        # Enqueue a task to actually get the user page
-        this_one = {}
-        this_one['url'] = ('https://launchpad.net/~' +
-                           mysite.base.unicode_sanity.quote(query))
-        this_one['callback'] = self.parseAndProcessProfilePage
-        this_one['errback'] = self.squashIrrelevantErrors
-        return this_one
-    
-    def parseAndProcessProfilePage(self, profile_html):
-        PROJECT_NAME_FIXUPS = {
-            'Launchpad itself': 'Launchpad',
-            'Debian': 'Debian GNU/Linux'}
-
-        doc_u = unicode(profile_html, 'utf-8')
-        tree = lxml.html.document_fromstring(doc_u)
-        
-        contributions = {}
-        # Expecting html like this:
-        # <table class='contributions'>
-        #   <tr>
-        #       ...
-        #       <img title='Bug Management' />
-        #
-        # It generates a list of dictionaries like this:
-## {
-##         'F-Spot': {
-##             'url': 'http://launchpad.net/f-spot',
-##             'involvement_types': ['Bug Management', 'Bazaar Branches'],
-##             'languages' : ['python', 'shell script']
-##         }
-##        }
-        # Extract Launchpad username from page
-        if not tree.cssselect('#launchpad-id dd'):
-            return # Well, there's no launchpad ID here, so that's that.
-        username = tree.cssselect('#launchpad-id dd')[0].text_content().strip()
-        for row in tree.cssselect('.contributions tr'):
-            project_link = row.cssselect('a')[0]
-            project_name = project_link.text_content().strip()
-            # FIXUPs: Launchpad uses some weird project names:
-            project_name = PROJECT_NAME_FIXUPS.get(project_name,
-                                                   project_name)
-
-            project_url_relative = project_link.attrib['href']
-            project_url = urlparse.urljoin('https://launchpad.net/',
-                                           project_url_relative)
-        
-            involvement_types = [
-                i.attrib.get('title', '').strip()
-                for i in row.cssselect('img')]
-            contributions[project_name] = {
-                'involvement_types': set([k for k in involvement_types if k]),
-                'url': project_url,
-                'citation_url': "https://launchpad.net/~" + username,
-                }
-
-        # Now create Citations for those facts
-        for project_name in contributions:
-            self._save_parsed_launchpad_data_in_database(
-                project_name, contributions[project_name])
-
-    def _save_parsed_launchpad_data_in_database(self, project_name, result):
-        dia = self.get_dia()
-        person = dia.person
-        
-        for involvement_type in result['involvement_types']:
-
-            (project, _) = mysite.search.models.Project.objects.get_or_create(name=project_name)
-
-            # This works like a 'get_first_or_create'.
-            # Sometimes there are more than one existing PortfolioEntry
-            # with the details in question.
-            # FIXME: This is untested.
-            if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-                portfolio_entry = mysite.profile.models.PortfolioEntry(person=person, project=project)
-                portfolio_entry.save()
-            portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-
-            citation = mysite.profile.models.Citation()
-            citation.contributor_role = involvement_type
-            citation.portfolio_entry = portfolio_entry
-            citation.data_import_attempt = dia
-            citation.url = result['citation_url']
-            citation.save_and_check_for_duplicates()
-
-    def parseAndProcessUserSearch(self, user_search_json):
-        data = simplejson.loads(user_search_json)
-        if data['total_size']:
-            entry = data['entries'][0]
-        else:
-            # No matches. How sad.
-            return
-
-        username = entry['name']
-        # Now enqueue a task to do the real work.
-        self.command.call_getPage_on_data_dict(self,
-            self.getUrlAndCallbackForProfilePage(query=username))
-
 class BitbucketImporter(ProfileImporter):
     ROOT_URL = 'http://api.bitbucket.org/1.0/'
     SQUASH_THESE_HTTP_CODES = ['404',]
@@ -808,7 +684,6 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
 SOURCE_TO_CLASS = {
     'bb': BitbucketImporter,
     'gh': GithubImporter,
-    'lp': LaunchpadProfilePageScraper,
     'rs': RepositorySearchOhlohImporter,
     'oh': OhlohUsernameImporter,
 }
