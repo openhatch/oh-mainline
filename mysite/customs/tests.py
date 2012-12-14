@@ -141,35 +141,6 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
-@skipIf(BugzillaBugImporter is None, "To run these tests, you must install oh-bugimporters. See ADVANCED_INSTALLATION.mkd for more.")
-class TestCustomBugParser(django.test.TestCase):
-    ### First, test that if we create the bug importer correctly, the
-    ### right thing would happen.
-    def test_bugzilla_bug_importer_uses_bugzilla_parser_by_default(self):
-        bbi = BugzillaBugImporter(
-            tracker_model=None, reactor_manager=None,
-            bug_parser=None)
-        self.assertEqual(bbi.bug_parser, BugzillaBugParser)
-
-    def test_bugzilla_bug_importer_accepts_bug_parser(self):
-        bbi = BugzillaBugImporter(
-            tracker_model=None, reactor_manager=None,
-            bug_parser=KDEBugzilla)
-        self.assertEqual(bbi.bug_parser, KDEBugzilla)
-
-    def test_kdebugparser_uses_tracker_specific_method(self):
-        with mock.patch('bugimporters.bugzilla.KDEBugzilla.extract_tracker_specific_data') as mock_specific:
-            bugzilla_data = mysite.base.depends.lxml.etree.XML(open(os.path.join(
-                        settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
-            bug_data = bugzilla_data.xpath('bug')[0]
-
-            kdebugzilla = bugimporters.bugzilla.KDEBugzilla(bug_data)
-            kdebugzilla.get_parsed_data_dict(base_url='http://bugs.kde.org/',
-                                             bitesized_type=None,
-                                             bitesized_text='',
-                                             documentation_type=None,
-                                             documentation_text='')
-            self.assertTrue(mock_specific.called)
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BlogCrawl(django.test.TestCase):
