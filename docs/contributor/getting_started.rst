@@ -55,9 +55,10 @@ but we'll all be happier if you do)
   1. Join the `Devel mailing list`_ and say hello.
   2. :doc:`the #openhatch IRC channel in freenode </contributor/chat_on_irc>`.
 
-We used to have weekly development meetings on IRC, but they are on hiatus for now. If you find the idea interesting and would show up, do email devel@ and say so!
+We used to have weekly development meetings on IRC, but they are on hiatus for now. If you find the idea interesting and would show up, do `email devel@`_ and say so!
 
 .. _Devel mailing list: http://lists.openhatch.org/mailman/listinfo/devel
+.. _email devel@: devel@lists.openhatch.org
 
 
 Read more documentation
