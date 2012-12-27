@@ -75,6 +75,8 @@ def import_one_bug_item(d):
     '''Accepts one ParsedBug object, as a Python dict.
 
     Usually causes the side effect of creating a Bug project.'''
+    # Store d as a copy of the input dict, to avoid making a mess.
+    d = dict(d)
     # Look for a matching Bug
     matches = mysite.search.models.Bug.all_bugs.filter(
         canonical_bug_link=d['canonical_bug_link'])
@@ -100,12 +102,20 @@ def import_one_bug_item(d):
         tracker_name=d['_tracker_name'])
     del d['_project_name']
     del d['_tracker_name']
-
-    # Get or create the corresponding bug.
+    deleted = d.get('_deleted', False)
+    if '_deleted' in d:
+        del d['_deleted']
     if matches:
         bug = matches[0]
     else:
         bug = mysite.search.models.Bug()
+
+    if deleted:
+        if bug.pk: # meaning, is the bug already in the DB?
+            # If so, delete it.
+            bug.delete()
+        # Either way, stop further processing.
+        return
 
     datetime_field_names = set([
             field.name
