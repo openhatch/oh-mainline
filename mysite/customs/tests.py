@@ -808,6 +808,48 @@ class ImportBugsFromFiles(django.test.TestCase):
         mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
         self.assertTrue(Bug.all_bugs.all())
 
+    def test_bug_can_delete_itself(self):
+        # The purpose of this test is to make sure that if the ParsedBug
+        # has ._deleted set to True, then we delete the corresponding bug
+        # from the database.
+        #
+        # So, we need a bug like that in the DB first. To get that, we first do
+        # an import
+
+        # Show that, before that, we have an empty database of bugs
+        self.assertFalse(Bug.all_bugs.all())
+
+        # Import one...
+        sample_data = [
+            {'status': 'new', 'as_appears_in_distribution': '',
+             'description': "This test method sets the mode of sub1 such that it cannot be deleted in the usual way:\r\r    [Error 5] Access is denied: '_trial_temp\\\\twisted.test.test_paths\\\\FilePathTestCase\\\\test_getPermissions_Windows\\\\bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that regardless of the test outcome, this file ends up deletable, or it should delete it itself.\r",
+             'importance': 'high',
+             'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
+             'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34),
+             '_tracker_name': 'Twisted',
+             'submitter_realname': '',
+             'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14),
+             'people_involved': 3,
+             'title': 'twisted.test.test_paths.FilePathTestCase.test_getPermissions_Windows creates undeleteable file',
+             '_project_name': 'Twisted',
+             'submitter_username': 'exarkun',
+             'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068),
+             'looks_closed': False,
+             'good_for_newcomers': True,
+             'concerns_just_documentation': False}]
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
+        self.assertTrue(Bug.all_bugs.all())
+
+        # Now that we have one, modify the input data to have _deleted to be True
+        sample_data[0]['_deleted'] = True
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
+        self.assertFalse(Bug.all_bugs.all())
+
+        # Import the same thing, with _deleted=True, and make sure we don't
+        # accidentally create it somehow, nor crash.
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
+        self.assertFalse(Bug.all_bugs.all())
+
     def test_import_from_data_dict_with_isoformat_date(self):
         sample_data = [
             {'status': 'new', 'as_appears_in_distribution': '',
