@@ -102,23 +102,19 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
         max_length=200,
         required=True,
         help_text='This is the url of the GitHub project.',
-        error_messages = {'invalid' : 'Not a valid github url.'}
+        error_messages = {'invalid' : 'Not a valid github url.'},
     )
 
     class Meta:
         model = mysite.customs.models.GitHubTrackerModel
         fields = ('tracker_name', 'github_url', 'bitesized_tag', 'documentation_tag')
 
-    def clean(self):
-        cleaned_data = super(GitHubTrackerForm, self).clean()
-
-        # If github_url is not correct, it can't have correct github_name and github repo.
-        if 'github_url' not in cleaned_data:
-            return cleaned_data
+    def clean_github_url(self):
+        github_url = self.cleaned_data['github_url']
 
         github_name_repo = re.match(
             r'^https?:\/\/github.com\/([\_\-\w]+)\/([\_\-\w]+)$',
-            cleaned_data['github_url']
+            github_url
         )
 
         # github name shouldn't need to be unique because a github user can
@@ -140,7 +136,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
             msg = 'The github name or repo is already taken.'
             self._errors['github_url'] = self.error_class([msg])
 
-        return cleaned_data
+        return github_url 
 
     def save(self, *args, **kwargs):
         # Call out to superclass
