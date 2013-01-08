@@ -25,6 +25,5 @@ Bug tracker import code
 .. toctree::
   :maxdepth: 2
 
-  bug_tracker_architecture
   adding_bug_tracker
 
