@@ -106,6 +106,12 @@ def diffrecursive_submit(request):
                 data['diffrecursive_success'] = True
             except controllers.IncorrectPatch, e:
                 data['diffrecursive_error_message'] = utf8(e)
+        else:
+            errors = list(form['diff'].errors)
+            if errors:
+                data['diffrecursive_error_message'] = (
+                    data.get('diffrecursive_error_message', '') +
+                    utf8(' '.join(errors)))
         data['diffrecursive_form'] = form
     return recursive_diff(request, data)
 

@@ -358,6 +358,12 @@ class DiffRecursiveTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
 
+    def test_submit_nothing_causes_an_error(self):
+        submit_response = self.client.post(reverse(views.diffrecursive_submit))
+        self.assertEqual(submit_response.status_code, 200)
+        self.assert_('No file was uploaded' in
+                     utf8(submit_response))
+
     def test_do_mission_incorrectly_revdiff(self):
         orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
         tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
