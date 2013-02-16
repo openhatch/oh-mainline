@@ -42,7 +42,7 @@
     <ul class="raquo_bullets">
       <li>Download <a href="{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}">this patch</a> to the same directory.</li>
       <li>Unpack the tarball. This will create a familiar <code>recipes</code> directory.</li>
-      <li>Look at the <code>more-garlic.diff</code> file. Note the file paths in the headers.</li>
+      <li>Look at the <code>recipes.patch</code> file. Note the file paths in the headers.</li>
       <li>Apply the patch to your <code>recipes</code> directory.</li>
       <li>Answer the question below about the contents of the files inside.</li>
     </ul>
@@ -98,9 +98,9 @@
 
       <p>You can invoke <code>patch</code> on the downloaded file as follows:</p>
 
-      <p><code>patch -p1 &lt; more-garlic.diff</code></p>
+      <p><code>patch -p1 &lt; recipes.patch</code></p>
 
-      <p>That should apply the patch file. Open up <code>more-garlic.diff</code> in a text editor and read the patch file "headers". Pay special attention to the directory paths. The <code>-p1</code> says to ignore up through the first "/" in the paths in the patch headers when trying to find files to patch.</p>
+      <p>That should apply the patch file. Open up <code>recipes.patch</code> in a text editor and read the patch file "headers". Pay special attention to the directory paths. The <code>-p1</code> says to ignore up through the first "/" in the paths in the patch headers when trying to find files to patch.</p>
     </div>
     <div id="high">
       <p>Open a command prompt, and type these commands in, one at a time. You need to copy them exactly. Make sure to press enter between each one.</p>
