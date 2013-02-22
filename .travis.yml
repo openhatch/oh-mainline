@@ -5,8 +5,8 @@ python:
 install:
 # Copy libz.so into the virtualenv so that PIL can build PNG support
  - cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
-# Now, regular pip install
- - pip install -r requirements.txt --use-mirrors
+# Now, regular pip install for PIL
+ - pip install Pillow
 # command to run tests
 script: python manage.py test
 # Get development headers for PIL
