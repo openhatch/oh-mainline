@@ -31,7 +31,7 @@ import logging
 
 # Wrap lxml and the modules that are part of it
 class nothing(object):
-        pass
+    pass
 
 try:
     import lxml
