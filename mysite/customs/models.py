@@ -504,16 +504,17 @@ class GitHubTrackerModel(TrackerModel):
     tracker_name = models.CharField(max_length=200, unique=True,
         blank=False, null=False,
         help_text="This is the name that OpenHatch will use to identify the project.")
-    github_name = models.CharField(max_length=200, unique=True,
-        blank=False, null=False,
+    github_name = models.CharField(max_length=200, blank=False, null=False,
         help_text="This is the user or project name on GitHub that owns the project.")
-    github_repo = models.CharField(max_length=200, unique=True,
-        blank=False, null=False,
+    github_repo = models.CharField(max_length=200, blank=False, null=False,
         help_text="This is the repository name that GitHub uses to identify the project.")
     bitesized_tag = models.CharField(max_length=50, blank=True,
         help_text="This is the value of the GitHub label that indicates a bite-sized bug.")
     documentation_tag = models.CharField(max_length=50, blank=True,
         help_text="This is the value of the GitHub label that indicates a documentation bug.")
+
+    class Meta:
+        unique_together = (('github_name', 'github_repo'),);
 
     all_trackers = models.Manager()
 
