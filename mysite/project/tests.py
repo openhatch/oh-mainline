@@ -92,6 +92,15 @@ class ProjectList(TwillTests):
     def test_it_generally_works(self):
         self.client.get('/+projects/')
 
+    def test_plus_projects_redirects_to_projects(self):
+        response = self.client.get("/+projects/")  
+        self.assertEqual(response.status_code, 301)    
+
+    def test_projects_returns_projects(self):
+        response = self.client.get("/projects/")
+        self.assertEqual(response.status_code, 200)
+
+
 class ProjectPageCreation(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
