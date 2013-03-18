@@ -96,6 +96,10 @@ class ProjectList(TwillTests):
         response = self.client.get("/+projects/")  
         self.assertEqual(response.status_code, 301)    
 
+    def test_space_projects_redirects_to_projects(self):
+        response = self.client.get("/ projects/")  
+        self.assertEqual(response.status_code, 301)    
+
     def test_projects_returns_projects(self):
         response = self.client.get("/projects/")
         self.assertEqual(response.status_code, 200)
