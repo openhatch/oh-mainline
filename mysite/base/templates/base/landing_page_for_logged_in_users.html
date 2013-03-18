@@ -24,16 +24,16 @@
 {% load profile_extras %}
 
 {% block title %}
-Home
+    Home
 {% endblock title %}
 
 {% block body_id %}landing{% endblock body_id %}
 
 {% block js_in_head %}
-{{ block.super }}
-<script type="text/javascript">
-document.documentElement.className = 'javascript_is_enabled';
-</script>
+    {{ block.super }}
+    <script type="text/javascript">
+        document.documentElement.className = 'javascript_is_enabled';
+    </script>
 {% endblock %}
 
 {% block left %}
@@ -67,36 +67,36 @@ document.documentElement.className = 'javascript_is_enabled';
           {% if completed_missions %}
           <ul class="missions">
             {% if completed_missions.tar or completed_missions.tar_extract %}
-            {% if completed_missions.tar and completed_missions.tar_extract %}
-            <li class="tick-progress">You have completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
-            {% else %}
-            <li class="cross-progress">You have partially completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
-            {% endif %}
+              {% if completed_missions.tar and completed_missions.tar_extract %}
+                <li class="tick-progress">You have completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
+              {% else %}
+                <li class="cross-progress">You have partially completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
+              {% endif %}
             {% endif %}
             {% if completed_missions.diffpatch_diffsingle or completed_missions.diffpatch_patchsingle or completed_missions.diffpatch_diffrecursive or completed_missions.diffpatch_patchrecursive %}
-            {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
-            <li class="tick-progress">You have completed the <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
-            {% else %}
-            <li class="cross-progress">You have partially completed this <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
-            {% endif %}
+              {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
+              <li class="tick-progress">You have completed the <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
+              {% else %}
+                <li class="cross-progress">You have partially completed this <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
+              {% endif %}
             {% endif %}
             {% if completed_missions.svn_checkout or completed_missions.svn_diff or completed_missions.svn_commit %}
-            {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
-            <li class="tick-progress">You have completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
-            {% else %}
-            <li class="cross-progress">You have partially completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
-            {% endif %}
+              {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
+                <li class="tick-progress">You have completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
+              {% else %}
+                <li class="cross-progress">You have partially completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
+              {% endif %}
             {% endif %}
             {% if completed_missions.git_checkout or completed_missions.git_diff or completed_missions.git_rebase%}
-            {% if completed_missions.git_checkout and completed_missions.git_diff and completed_missions.git_rebase%}
-            <li class="tick-progress">You have completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
-            {% else %}
-            <li class="cross-progress">You have partially completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
-            {% endif %}
+              {% if completed_missions.git_checkout and completed_missions.git_diff and completed_missions.git_rebase%}
+                <li class="tick-progress">You have completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
+              {% else %}
+                <li class="cross-progress">You have partially completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
+              {% endif %}
             {% endif %}
           </ul>
           {% else %}
-          <p>You haven't completed any missions yet.</p>
+            <p>You haven't completed any missions yet.</p>
           {% endif %}
           {% endif %}
           </div>
@@ -114,28 +114,28 @@ document.documentElement.className = 'javascript_is_enabled';
         
         <h5>I want to help with:</h5>
         {% if projects_i_wanna_help %}
-        <ul class="raquo_bullets">
-          {% for project in projects_i_wanna_help %}
-          <li><a href='{{ project.get_url }}'>{{ project.display_name }}</a></li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <p>No projects listed yet.</p>
+          <ul class="raquo_bullets">
+            {% for project in projects_i_wanna_help %}
+              <li><a href='{{ project.get_url }}'>{{ project.display_name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+            <p>No projects listed yet.</p>
         {% endif %}
 
         <h5>I have helped:</h5>
-        {% if projects_i_helped %}
-        <ul class="raquo_bullets">
-          {% for entry in projects_i_helped %}
-          <li><a href="{{ entry.project.get_url }}">{{ entry.project.display_name }}</a></li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <p>No projects listed yet.</p>
-        {% endif %}
+          {% if projects_i_helped %}
+          <ul class="raquo_bullets">
+            {% for entry in projects_i_helped %}
+              <li><a href="{{ entry.project.get_url }}">{{ entry.project.display_name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+            <p>No projects listed yet.</p>
+          {% endif %}
         </div>
         <div class="module-foot"><a href='{% url mysite.search.views.fetch_bugs %}'>Find more projects to help with &raquo;</a></div>
-        {% if settings.RECOMMEND_BUGS %}
+          {% if settings.RECOMMEND_BUGS %}
         <div class="module-body">
       <h3>Recommended bugs based on your profile
         <a class="feed" href="/+feeds/recbugs/{{ user.username }}/"><img alt="Subscribe" src="{% version '/static/images/icons/feed-icon-14x14.png' %}" ></a>
@@ -150,20 +150,20 @@ document.documentElement.className = 'javascript_is_enabled';
         <div id='volunteer-opportunities' class='hidden'>
           <p>There are currently no bug recommendations available.</p>
           {% if recommended_bug_string2Query_objects.items %}
-          <p>You can always search for bugs manually. For example:</p>
-          <ul>
-            {% for string, query in recommended_bug_string2Query_objects.items %}
-            {% with query.get_or_create_cached_hit_count as count %}
-            {% if count %}
-            {# Don't show an example if no volunteer opportunities match it. #}
-            <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
-            {% endif %}
-            {% endwith %}
+            <p>You can always search for bugs manually. For example:</p>
+            <ul>
+              {% for string, query in recommended_bug_string2Query_objects.items %}
+                {% with query.get_or_create_cached_hit_count as count %}
+                  {% if count %}
+                    {# Don't show an example if no volunteer opportunities match it. #}
+                    <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+                  {% endif %}
+              {% endwith %}
             {% endfor %}
             {% comment %}
-            {% for category in popular_bug_categories %}
-            <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
-            {% endfor %}
+              {% for category in popular_bug_categories %}
+                 <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
+              {% endfor %}
             {% endcomment %}
           </ul>
           {% endif %}
