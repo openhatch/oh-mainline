@@ -179,24 +179,24 @@
 <div class="clearer">&nbsp;</div>
     
     <div class='column three-column'>
-    {% include 'feed_widget.html' %}
+      {% include 'feed_widget.html' %}
     </div>
 
     <div class='column three-column'>
-    {% include 'blog_widget.html' %}
+      {% include 'blog_widget.html' %}
     </div>
     
     <div class='column three-column three-column-last'>
-    {% include 'contribute_widget.html' %}
+      {% include 'contribute_widget.html' %}
     </div>
 
     
 {% endblock more_content %}
 
 {% block js %}
-{{ block.super }}
-<script type='text/javascript'>
-$(function(){
+  {{ block.super }}
+    <script type='text/javascript'>
+      $(function(){
         $('.people-list li').hoverClass('hover');
         $('#tabbed_container_of_big_links').tabs({
             cookie: {
@@ -205,7 +205,7 @@ $(function(){
             }
         });
         $('.invisible_if_js').removeClass('invisible_if_js');
-});
-</script>
-<script src='static/js/base/landing_loggedin.js' type='text/javascript'></script>
+        });
+    </script>
+  <script src='static/js/base/landing_loggedin.js' type='text/javascript'></script>
 {% endblock js %}
