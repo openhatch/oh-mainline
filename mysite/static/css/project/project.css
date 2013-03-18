@@ -68,6 +68,8 @@ body#project #other-questions { display: block; margin-bottom: 10px; }
 body#project li:target { background-color: #ffd; }
 body#project .quotemark { color: #555; }
 
+body#project .actionlink {float: right; font-weight: normal; margin-right: 10px}
+
 body#project #wannahelp { width: 101% ! important; padding: 0; background: transparent; }
 body#project #wanna_help_thanks_tipsy_closer {float: right;}
 body#project #wannahelp-button { -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 10px 20px; color: #444; float: right; border: 3px solid #fff; white-space: normal; font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background-color: #c8e29d; background-repeat: repeat-x; background-position: top; font-size: 13pt; }
