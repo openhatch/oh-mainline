@@ -379,6 +379,8 @@ urlpatterns = patterns('',
 
         (r'^\+projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
 
+        (r'^\ projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
+
         (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),
 
         (r'^\+do/project.views.create_project_page_do$',
