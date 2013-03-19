@@ -117,16 +117,20 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
+      curl {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %} > recipies.tar.gz
       </pre>
-      <p>Unpack it a once, and rename that to recipes-us indicating that this is the version you'll adjust for American tastes. (This is the copy we'll edit.)</p>
+      <p>Unzip the archive file, but do not extract it.</p>
       <pre>
-	tar zxvf recipes.tar.gz
+      	gzip -d recipies.tar.gz
+      </pre>
+      <p>Unpack it once, and rename that to recipes-us indicating that this is the version you'll adjust for American tastes. (This is the copy we'll edit.)</p>
+      <pre>
+	tar -xvf recipes.tar
 	mv recipes recipes-us
       </pre>
       <p>Unpack it again, keeping this one with the original name. (We'll need this original so that <tt>diff</tt> can detect the differences.)</p>
       <pre>
-	tar zxvf recipes.tar.gz
+	tar -xvf recipes.tar
       </pre>
 <p>Look for the new <tt>recipes-us</tt> directory on your computer, and open up each of the files inside ending in <tt>.txt</tt>. Change "aubergine" to "eggplant", and change "Aubergine" to "Eggplant" (capitalization matters!).</p>
       <p>Go back to the terminal and run this command.</p>
