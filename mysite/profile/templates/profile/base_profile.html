@@ -57,11 +57,7 @@
 
 
             {% if editable %}
-            <a class='name-edit-link' href='{% url account.views.edit_name %}'>
-                <img src={% version '/static/images/icons/pencil.png' %}
-                alt='Edit name' />
-            </a>
-            <a href='{% url account.views.edit_name %}'>
+            <a href='{% url account.views.edit_name %}' class="edit-name-link">
             <div id='edit_your_name_notification' 
                 class='notification'>&laquo; Tell us your name!</div>
             </a>
