@@ -55,7 +55,7 @@ class SingleFilePatch(object):
         # then the_patch.hunks will be a zero-length list.
         if not the_patch.hunks:
             raise IncorrectPatch, 'The file resulting from patching does not have the correct contents. \
-        Make sure you are including the diff headers (those --- and +++ and @@ lines).'
+        Make sure you are including the diff headers (those --- and +++ and @@ lines; You might want to look at the "Medium" hint.)'
 
         # If it affects more than one file, then that would be a
         # mistake as well.
