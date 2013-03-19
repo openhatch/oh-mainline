@@ -42,11 +42,11 @@ body.missions .file-upload input[type="file"] {
   padding: 0;
   font-size: 100%
 }
-body.missions .tick-progress {
+.tick-progress {
   list-style-image: url("/static/images/tick.png");
   margin-left: 30px;
 }
-body.missions .cross-progress {
+.cross-progress {
   list-style-image: url("/static/images/no-tick.png");
   margin-left: 30px;
 }
