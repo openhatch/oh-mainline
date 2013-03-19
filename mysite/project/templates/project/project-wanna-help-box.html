@@ -69,11 +69,17 @@
         <input type='hidden' id='id_mark_contact-project' name='mark_contact-project' value='{{ project.pk }}'>
 	</div>
 	<div>
-	  <input type='submit' id='mark_contact-button' value='Save'>
+	  <input type='submit' id='mark_contact-button' style='float: right; margin-right: 10px;' value='Save'>
 	</div>
       </div>
 
     {% endif %}
     </form>
 {% endwith %}
+{% if user_wants_to_help %}
+            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
+                <input type='hidden' name='project' value='{{project.id}}'>
+                <input type='submit' style='float: left; margin-left: 10px;' id='delist_helper_button' value='De-list me!'>
+            </form>
+{% endif %}
 {# vim: set filetype=htmldjango: #}
