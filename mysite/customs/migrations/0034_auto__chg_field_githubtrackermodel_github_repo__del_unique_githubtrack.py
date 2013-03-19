@@ -8,20 +8,38 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Removing unique constraint on 'GitHubTrackerModel', fields ['github_name']
+        db.delete_unique('customs_githubtrackermodel', ['github_name'])
+
+        # Removing unique constraint on 'GitHubTrackerModel', fields ['github_repo']
+        db.delete_unique('customs_githubtrackermodel', ['github_repo'])
+
         # Changing field 'GitHubTrackerModel.github_repo'
         db.alter_column('customs_githubtrackermodel', 'github_repo', self.gf('django.db.models.fields.CharField')(max_length=100))
 
         # Changing field 'GitHubTrackerModel.github_name'
         db.alter_column('customs_githubtrackermodel', 'github_name', self.gf('django.db.models.fields.CharField')(max_length=100))
 
+        # Adding unique constraint on 'GitHubTrackerModel', fields ['github_name', 'github_repo']
+        db.create_unique('customs_githubtrackermodel', ['github_name', 'github_repo'])
+
 
     def backwards(self, orm):
         
+        # Removing unique constraint on 'GitHubTrackerModel', fields ['github_name', 'github_repo']
+        db.delete_unique('customs_githubtrackermodel', ['github_name', 'github_repo'])
+
         # Changing field 'GitHubTrackerModel.github_repo'
-        db.alter_column('customs_githubtrackermodel', 'github_repo', self.gf('django.db.models.fields.CharField')(max_length=200))
+        db.alter_column('customs_githubtrackermodel', 'github_repo', self.gf('django.db.models.fields.CharField')(max_length=200, unique=True))
+
+        # Adding unique constraint on 'GitHubTrackerModel', fields ['github_repo']
+        db.create_unique('customs_githubtrackermodel', ['github_repo'])
 
         # Changing field 'GitHubTrackerModel.github_name'
-        db.alter_column('customs_githubtrackermodel', 'github_name', self.gf('django.db.models.fields.CharField')(max_length=200))
+        db.alter_column('customs_githubtrackermodel', 'github_name', self.gf('django.db.models.fields.CharField')(max_length=200, unique=True))
+
+        # Adding unique constraint on 'GitHubTrackerModel', fields ['github_name']
+        db.create_unique('customs_githubtrackermodel', ['github_name'])
 
 
     models = {
