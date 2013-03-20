@@ -570,9 +570,6 @@ function yay_we_want_to_help() {
    /* Create a tipsy-style message that reports success */
    var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
 
-   /* highlight new guy */
-   $tipsyMe.css('background-color', '#ffc');
-
    /* Trigger tipsy destruction. */
    $('#wannahelp-button').getTipsy().remove();
 
@@ -605,7 +602,8 @@ $('#show_copypastebox').click(function() { $('#copypastebox').toggleDisplay(); r
                     // otherwise, proceed as normal.
 
                     /* Replace the list of person summaries. */
-                    $('#wanna_help').html(response);
+                   // $('#wanna_help').html(response);
+				   $('#wanna_help').load(window.location + " #wanna_help")
 
                     // Call the "Yay, we want to help" function
                     yay_we_want_to_help();
