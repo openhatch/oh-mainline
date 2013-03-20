@@ -304,20 +304,8 @@ def wanna_help_do(request):
         mysite.search.models.WannaHelperNote.add_person_project(person, project)
         project.save()
 
-        if request.is_ajax():
-            people_to_show = list(project.people_who_wanna_help.exclude(user=request.user))
-            people_to_show.insert(0, person)
-            
-            t = django.template.loader.get_template('project/project-wanna-help-box.html')
-            c = django.template.Context({
-                'project': project,
-                'person': request.user.get_profile(),
-                'people_to_show': people_to_show,
-                'just_added_myself': True})
-            rendered = t.render(c)
-            return HttpResponse(rendered)
-        else:
-            return HttpResponseRedirect(project.get_url() + "?success=1")
+     
+        return HttpResponseRedirect(project.get_url() + "?success=1")
     else:
         # Then store a note in the session...
         wanna_help_queue = request.session.get('projects_we_want_to_help_out', [])
