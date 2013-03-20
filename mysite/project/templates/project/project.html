@@ -582,48 +582,48 @@ $('#show').click(function () { $('#show_form').ajaxSubmit()});
 $('#hide').click(function () { $('#hide_form').ajaxSubmit()});
 $('#show_copypastebox').click(function() { $('#copypastebox').toggleDisplay(); return false; });
 
-    Want2HelpJacker = function () { }
-    Want2HelpJacker.prototype = {
-        'initialize': function () {
-            /* Hijack the 'I want to help' form so that it POST's asynchronously. */
-            var options = {
-                'url': "{% url mysite.project.views.wanna_help_do %}",
-                'type': 'POST',
-                'success': function (response) {
-                    /* HACK! In the case that we need to log in, accept a message from the server
-                     * indicating as much.
-                     */
-                    if (response.substring(0, 10) === "redirect: ") {
-                        var destination = response.substring(10);
-                        document.location = destination;
-                        return;
-                    }
-
-                    // otherwise, proceed as normal.
-
-                    /* Replace the list of person summaries. */
-                   // $('#wanna_help').html(response);
-				   $('#wanna_help').load(window.location + " #wanna_help")
-
-                    // Call the "Yay, we want to help" function
-                    yay_we_want_to_help();
-                },
-                'error': function () {
-                    $.jGrowl("Oops! Something went wrong. Please try again.");
+Want2HelpJacker = function () { }
+Want2HelpJacker.prototype = {
+    'initialize': function () {
+        /* Hijack the 'I want to help' form so that it POST's asynchronously. */
+        var options = {
+            'url': "{% url mysite.project.views.wanna_help_do %}",
+            'type': 'POST',
+            'success': function (response) {
+                /* HACK! In the case that we need to log in, accept a message from the server
+                 * indicating as much.
+                 */
+                if (response.substring(0, 10) === "redirect: ") {
+                    var destination = response.substring(10);
+                    document.location = destination;
+                    return;
                 }
-            };
-            $('#want2help_form').ajaxForm(options);
-            $('#want2help_form').find('input:submit').click(function () {
-                $button = $(this);
-                $button.val('Working...')
-            });
 
-        }
-    };
-    {% if user_just_signed_up_as_wants_to_help %}
-    $(yay_we_want_to_help);
-    {% endif %}
-    </script>
+                // otherwise, proceed as normal.
+
+                /* Replace the list of person summaries. */
+                // $('#wanna_help').html(response);
+				$('#wanna_help').load(window.location + " #wanna_help")
+
+                // Call the "Yay, we want to help" function
+                yay_we_want_to_help();
+            },
+            'error': function () {
+                $.jGrowl("Oops! Something went wrong. Please try again.");
+            }
+        };
+        $('#want2help_form').ajaxForm(options);
+        $('#want2help_form').find('input:submit').click(function () {
+            $button = $(this);
+            $button.val('Working...')
+        });
+
+    }
+};
+{% if user_just_signed_up_as_wants_to_help %}
+$(yay_we_want_to_help);
+{% endif %}
+</script>
 
 {% endblock js %}
 
