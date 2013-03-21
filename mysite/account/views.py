@@ -24,6 +24,8 @@ import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
 import django_authopenid.views
 
+from django.contrib.sessions.models import Session
+
 from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
 
@@ -35,6 +37,7 @@ import mysite.base.views
 import mysite.base.view_helpers
 import mysite.account.forms
 from mysite.base.view_helpers import render_response
+from mysite.account.view_helpers import clear_user_sessions
 import mysite.profile.views
 
 # FIXME: We did this because this decorator used to live here
@@ -335,7 +338,8 @@ def change_password_do(request):
     form = django.contrib.auth.forms.PasswordChangeForm(
             request.user, request.POST)
     if form.is_valid():
-        form.save() 
+        form.save()
+        clear_user_sessions(request.user, session_to_omit=request.session)
         return HttpResponseRedirect(
             reverse(change_password) + '?notification_id=success')
     else:
