@@ -29,7 +29,7 @@ from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImp
 import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
-import mysite.profile.controllers
+import mysite.profile.helpers
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
@@ -648,7 +648,7 @@ class BugsAreRecommended(TwillTests):
         # So if we create two Python bugs and one C# bug, and we set N to 2,
         # and paulproteus ought to get hits from Python and C#, we should see
         # only one Python bug.
-        recommender = mysite.profile.controllers.RecommendBugs(['Python', 'C#'], n=2)
+        recommender = mysite.profile.helpers.RecommendBugs(['Python', 'C#'], n=2)
         recommended = list(recommender.recommend())
         python_bugs = [ bug for bug in recommended if bug.project.language == 'Python']
         self.assertEqual(len(python_bugs), 1)
@@ -657,7 +657,7 @@ class BugsAreRecommended(TwillTests):
 
     def test_recommendations_not_duplicated(self):
         """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
-        recommender = mysite.profile.controllers.RecommendBugs(['Python', 'Python'], n=2)
+        recommender = mysite.profile.helpers.RecommendBugs(['Python', 'Python'], n=2)
         recommended = list(recommender.recommend())
         self.assertNotEqual(recommended[0], recommended[1])
 
@@ -1298,20 +1298,20 @@ class ProjectGetMentors(TwillTests):
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(not mysite.profile.helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test(self):
         data = {}
-        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.helpers.get_geoip_guess_for_ip("128.151.2.1")
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
-    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(not mysite.profile.helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
         """We wrote this test because MaxMind gives us back a city in Iceland. That city
         has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
         so we verify here that we properly decode that to pure beautiful Python Unicode."""
         data = {}
-        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("89.160.147.41")
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.helpers.get_geoip_guess_for_ip("89.160.147.41")
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(type(data['geoip_guess']), unicode)
 
@@ -1575,7 +1575,7 @@ class PeopleFinderClasses(TwillTests):
         self.project = Project.create_dummy(name='Banshee')
 
     def test_wannahelp_query_with_zero_hits(self):
-        whq = mysite.profile.controllers.WannaHelpQuery('banshee')
+        whq = mysite.profile.helpers.WannaHelpQuery('banshee')
         self.assertEqual([], list(whq.people))
 
     def test_wannahelp_query_with_one_hit(self):
@@ -1585,19 +1585,19 @@ class PeopleFinderClasses(TwillTests):
         note.save()
         self.project.save()
 
-        whq = mysite.profile.controllers.WannaHelpQuery('banshee')
+        whq = mysite.profile.helpers.WannaHelpQuery('banshee')
         self.assertEqual(1, len(whq.people))
         self.assertEqual(self.person, whq.people[0])
 
     def test_project_query_with_zero_hits(self):
-        pq = mysite.profile.controllers.ProjectQuery('banshee')
+        pq = mysite.profile.helpers.ProjectQuery('banshee')
         self.assertEqual([], list(pq.people))
 
     def test_project_query_with_one_hit(self):
         # This time, set Asheesh up as a Banshee contributor.
         PortfolioEntry(project=self.project, person=self.person, is_published=True).save()
 
-        pq = mysite.profile.controllers.ProjectQuery('banshee')
+        pq = mysite.profile.helpers.ProjectQuery('banshee')
         self.assertEqual(1, len(pq.people))
         self.assertEqual(self.person, pq.people[0])
 
@@ -1609,11 +1609,11 @@ class PeopleFinderTagQueryTests(TwillTests):
         self.person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
 
     def test_tag_type_query_with_zero_hits(self):
-        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        tq = mysite.profile.helpers.TagQuery('can_mentor', 'python')
         self.assertEqual([], list(tq.people))
 
     def test_tag_type_query_with_zero_hits_and_busted_tag(self):
-        tq = mysite.profile.controllers.TagQuery('lol_no_such_tag', 'python')
+        tq = mysite.profile.helpers.TagQuery('lol_no_such_tag', 'python')
         self.assertEqual([], list(tq.people))
 
     def test_tag_type_query_with_one_hit_case_insensitive(self):
@@ -1626,7 +1626,7 @@ class PeopleFinderTagQueryTests(TwillTests):
                                tag=willing_to_mentor_python)
         link.save()
 
-        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        tq = mysite.profile.helpers.TagQuery('can_mentor', 'python')
         self.assertEqual([self.person], list(tq.people))
 
     def test_tag_type_query_with_one_hit_with_distraction_tags(self):
@@ -1652,11 +1652,11 @@ class PeopleFinderTagQueryTests(TwillTests):
                                tag=understands_unit_testing)
         link.save()
 
-        tq = mysite.profile.controllers.TagQuery('can_mentor', 'python')
+        tq = mysite.profile.helpers.TagQuery('can_mentor', 'python')
         self.assertEqual([self.person], list(tq.people))
 
     def test_all_tags_query_with_zero_hits(self):
-        atq = mysite.profile.controllers.AllTagsQuery('python')
+        atq = mysite.profile.helpers.AllTagsQuery('python')
         self.assertEqual([], list(atq.people))
 
     def test_all_tags_query_with_one_hit(self):
@@ -1669,15 +1669,15 @@ class PeopleFinderTagQueryTests(TwillTests):
                                tag=willing_to_mentor_python)
         link.save()
 
-        atq = mysite.profile.controllers.AllTagsQuery('python')
+        atq = mysite.profile.helpers.AllTagsQuery('python')
         self.assertEqual([self.person], list(atq.people))
 
     def test_all_tags_insenstive_case_search_a_name(self):
         # query with person named 'Asheesh', case insenstive, will
         # return the same person (also AllTagsQuery will find a person named
         # Asheesh, even if a tag wasn't used)
-        atq1 = mysite.profile.controllers.AllTagsQuery('ASHEESH')
-        atq2 = mysite.profile.controllers.AllTagsQuery('asheesh')
+        atq1 = mysite.profile.helpers.AllTagsQuery('ASHEESH')
+        atq2 = mysite.profile.helpers.AllTagsQuery('asheesh')
         self.assertEqual(list(atq1.people), list(atq2.people))
 
     def test_all_tags_insensitive_case_search_multiple_names(self):
@@ -1688,7 +1688,7 @@ class PeopleFinderTagQueryTests(TwillTests):
             user__first_name__iexact='asheesh')
 
         #send query to AllTagsQuery
-        atq = mysite.profile.controllers.AllTagsQuery('asheesh spinoza')
+        atq = mysite.profile.helpers.AllTagsQuery('asheesh spinoza')
         atq_filter_spinoza = atq.people.filter(user__last_name__iexact="spinoza")[0]
         atq_filter_asheesh = atq.people.filter(user__first_name__iexact="asheesh")[0]
 
@@ -1703,33 +1703,33 @@ class PeopleSearch(TwillTests):
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
         # {'q': 'Exaile', 'query_type': 'project'}
-        data = mysite.profile.controllers.parse_string_query("project:a_project_name")
+        data = mysite.profile.helpers.parse_string_query("project:a_project_name")
         self.assertEqual(data['q'], 'a_project_name')
         self.assertEqual(data['query_type'], 'project')
 
-        data = mysite.profile.controllers.parse_string_query("a_tag_name_or_whatever")
+        data = mysite.profile.helpers.parse_string_query("a_tag_name_or_whatever")
         self.assertEqual(data['q'], 'a_tag_name_or_whatever')
         self.assertEqual(data['query_type'], 'all_tags')
 
     def test_tokenizer_parses_quotation_marks_correctly_but_if_they_are_missing_greedily_assumes_they_were_there(self):
-        data = mysite.profile.controllers.parse_string_query('project:"Debian GNU/Linux"')
+        data = mysite.profile.helpers.parse_string_query('project:"Debian GNU/Linux"')
         self.assertEqual(data['q'], 'Debian GNU/Linux')
         self.assertEqual(data['query_type'], 'project')
 
-        data = mysite.profile.controllers.parse_string_query('project:Debian GNU/Linux')
+        data = mysite.profile.helpers.parse_string_query('project:Debian GNU/Linux')
         self.assertEqual(data['q'], 'Debian GNU/Linux')
         self.assertEqual(data['query_type'], 'project')
 
     def test_tokenizer_picks_up_on_tag_type_queries(self):
         for tag_type_short_name in mysite.profile.models.TagType.short_name2long_name:
             query = "%s:yourmom" % tag_type_short_name
-            data = mysite.profile.controllers.parse_string_query(query)
+            data = mysite.profile.helpers.parse_string_query(query)
             self.assertEqual(data['q'], 'yourmom')
             self.assertEqual(data['query_type'], tag_type_short_name)
 
     def test_tokenizer_ignores_most_colon_things(self):
         query = "barbie://queue"
-        data = mysite.profile.controllers.parse_string_query(query)
+        data = mysite.profile.helpers.parse_string_query(query)
         self.assertEqual(data['q'], query)
         self.assertEqual(data['query_type'], 'all_tags')
 

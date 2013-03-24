@@ -112,9 +112,9 @@ class Project(OpenHatchModel):
         number of people who can mentor in the project by name unioned
         with those who can mentor in the project's language.'''
         all_mentor_person_ids = set()
-        import mysite.profile.controllers
+        import mysite.profile.helpers
         for way_a_mentor_can_help in (self.name, self.language):
-            tq = mysite.profile.controllers.TagQuery('can_mentor',
+            tq = mysite.profile.helpers.TagQuery('can_mentor',
                                                      way_a_mentor_can_help)
             all_mentor_person_ids.update(tq.people.values_list('id', flat=True))
         return len(all_mentor_person_ids)
@@ -317,8 +317,8 @@ class Project(OpenHatchModel):
 
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
-        import mysite.profile.controllers
-        mentors_available = bool(mysite.profile.controllers.TagQuery(
+        import mysite.profile.helpers
+        mentors_available = bool(mysite.profile.helpers.TagQuery(
                 'can_mentor', self.name).people)
         if mentors_available or self.language:
             query_var = self.name

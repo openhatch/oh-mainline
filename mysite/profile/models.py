@@ -23,7 +23,7 @@ import shutil
 
 from mysite.search.models import Project, get_image_data_scaled
 import mysite.customs.models
-import mysite.profile.controllers
+import mysite.profile.helpers
 import mysite.base.models
 import mysite.base.unicode_sanity
 
@@ -425,7 +425,7 @@ class Person(models.Model):
             people = project.get_n_other_contributors_than(n=infinity, person=self)
             people = random.sample(people, min(n, len(people)))
             collaborator_lists.append(people)
-        round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
+        round_robin = mysite.profile.helpers.roundrobin(*collaborator_lists)
         collaborators = set()
         while len(collaborators) < n:
             try:

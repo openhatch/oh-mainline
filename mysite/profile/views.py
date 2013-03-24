@@ -45,7 +45,7 @@ import django.views.generic
 # OpenHatch apps
 import mysite.base.controllers
 import mysite.base.unicode_sanity
-import mysite.profile.controllers
+import mysite.profile.helpers
 import mysite.base.helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
@@ -72,9 +72,9 @@ def delete_user_for_being_spammy(request):
         if form.is_valid():
             u = User.objects.get(username=form.cleaned_data['username'])
             # Dump data about the user to the site admins
-            mysite.profile.controllers.send_user_export_to_admins(u)
+            mysite.profile.helpers.send_user_export_to_admins(u)
             # Send out an email to the poor sap.
-            mysite.profile.controllers.email_spammy_user(u)
+            mysite.profile.helpers.email_spammy_user(u)
             # Okay... delete the user.
             u.delete() # hoo boy!
             return HttpResponseRedirect(reverse(
@@ -416,7 +416,7 @@ def people(request):
     data['raw_query'] = query
 
     # Parse the query, and store that in the template.
-    parsed_query = mysite.profile.controllers.parse_string_query(query)
+    parsed_query = mysite.profile.helpers.parse_string_query(query)
     data.update(parsed_query)
 
     # Get the list of people to display.
@@ -857,7 +857,7 @@ def unsubscribe_do(request):
 @login_required
 def bug_recommendation_list_as_template_fragment(request):
     suggested_searches = request.user.get_profile().get_recommended_search_terms()
-    recommender = mysite.profile.controllers.RecommendBugs(
+    recommender = mysite.profile.helpers.RecommendBugs(
         suggested_searches, n=5)
     recommended_bugs = list(recommender.recommend())
 

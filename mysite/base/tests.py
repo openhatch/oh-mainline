@@ -277,7 +277,7 @@ class CacheMethod(TwillTests):
         mock_cache.set.assert_called_with('doodles', '{"value": "1"}', 86400 * 10)
 
 class RecommendBugs(TwillTests):
-    @mock.patch('mysite.profile.controllers.RecommendBugs')
+    @mock.patch('mysite.profile.helpers.RecommendBugs')
     def test_no_synchronous_processing_on_empty(self, RecommendBugsMock):
         RecommendBugsMock.is_cache_empty.return_value = True
 

@@ -271,7 +271,7 @@ def set_location(request, edit_location_form = None):
     if (not request.user.get_profile().location_display_name) or (
         request.user.get_profile().location_display_name ==
         mysite.profile.models.DEFAULT_LOCATION):
-        geoip_guess = mysite.profile.controllers.get_geoip_guess_for_ip(
+        geoip_guess = mysite.profile.helpers.get_geoip_guess_for_ip(
             mysite.base.middleware.get_user_ip(request))[1]
         initial['location_display_name'] = geoip_guess
     else:

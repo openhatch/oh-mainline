@@ -351,7 +351,7 @@ class GuessLocationOnLogin(TwillTests):
 
     mock_ip = mock.Mock()
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
-    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(not mysite.profile.helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_accessing_edit_location_form(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -367,7 +367,7 @@ class GuessLocationOnLogin(TwillTests):
 
     mock_ip = mock.Mock()
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
-    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(not mysite.profile.helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_do_not_guess_if_have_location_set(self):
         person = Person.objects.get(user__username="paulproteus")

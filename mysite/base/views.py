@@ -25,7 +25,6 @@ from django.utils import simplejson
 from django.template import loader, Context
 
 import mysite.account
-import mysite.profile.controllers
 import mysite.account.forms
 from mysite.base.decorators import view
 import mysite.customs.feed

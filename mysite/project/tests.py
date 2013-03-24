@@ -25,7 +25,6 @@ import mysite.project.views
 
 import mysite.profile.views
 import mysite.profile.models
-import mysite.profile.controllers
 
 from mysite.base.tests import better_make_twill_url
 
