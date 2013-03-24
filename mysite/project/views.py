@@ -19,7 +19,7 @@ import datetime
 from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
-import mysite.project.controllers
+import mysite.project.helpers
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
@@ -155,7 +155,7 @@ def projects(request):
     project_matches_query_exactly = False
     if query:
         query = query.strip()
-        matching_projects = mysite.project.controllers.similar_project_names(
+        matching_projects = mysite.project.helpers.similar_project_names(
             query)
         project_matches_query_exactly = query.lower() in [p.name.lower() for p in matching_projects]
         if len(matching_projects) == 1 and project_matches_query_exactly:
@@ -227,7 +227,7 @@ def create_answer_do(request):
 
     answer.save()
     if answer.author is None:
-        mysite.project.controllers.note_in_session_we_control_answer_id(request.session,
+        mysite.project.helpers.note_in_session_we_control_answer_id(request.session,
                                                                         answer.pk)
     if not request.user.is_authenticated():
         # If user isn't logged in, send them to the login page with next
