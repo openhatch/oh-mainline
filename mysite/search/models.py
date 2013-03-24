@@ -658,7 +658,7 @@ def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, *
 # Clear the hit count cache whenever Bugs are added or removed. This is
 # simply done by bumping the Timestamp used to generate the cache keys.
 # The hit count cache is used in get_or_create_cached_hit_count() in
-# mysite.search.controllers.Query.
+# mysite.search.helpers.Query.
 # Clear all people's recommended bug cache when a bug is deleted
 # (or when it has been modified to say it looks_closed)
 models.signals.post_save.connect(

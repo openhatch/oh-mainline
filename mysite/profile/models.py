@@ -297,7 +297,7 @@ class Person(models.Model):
         # Remove terms whose hit counts are zero.
         terms_with_results = []
         for term in terms:
-            query = mysite.search.controllers.Query(terms=[term])
+            query = mysite.search.helpers.Query(terms=[term])
             hit_count = query.get_or_create_cached_hit_count()
             if hit_count != 0:
                 terms_with_results.append(term)

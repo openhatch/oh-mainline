@@ -29,7 +29,7 @@ import mysite.profile.controllers
 import mysite.account.forms
 from mysite.base.decorators import view
 import mysite.customs.feed
-import mysite.search.controllers
+import mysite.search.helpers
 import mysite.search.models
 import mysite.missions.models 
 

@@ -162,8 +162,8 @@ def projects(request):
             return HttpResponseRedirect(matching_projects[0].get_url())
         
     if not query:
-        data['projects_with_bugs'] = mysite.search.controllers.get_projects_with_bugs()
-        data['cited_projects_lacking_bugs'] = (mysite.search.controllers.
+        data['projects_with_bugs'] = mysite.search.helpers.get_projects_with_bugs()
+        data['cited_projects_lacking_bugs'] = (mysite.search.helpers.
                 get_cited_projects_lacking_bugs())
 
     data.update({

@@ -30,7 +30,7 @@ import django.core.serializers
 from django.utils import simplejson
 
 import logging
-import mysite.search.controllers
+import mysite.search.helpers
 import mysite.base.models
 import mysite.search.models
 import mysite.profile.models
@@ -94,8 +94,8 @@ class RecommendBugs(object):
         distinct_ids = set()
 
         lists_of_bugs = [
-            mysite.search.controllers.order_bugs(
-                mysite.search.controllers.Query(terms=[t]).get_bugs_unordered())
+            mysite.search.helpers.order_bugs(
+                mysite.search.helpers.Query(terms=[t]).get_bugs_unordered())
             for t in self.terms]
         number_emitted = 0
 
