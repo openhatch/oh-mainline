@@ -1327,7 +1327,7 @@ class SuggestLocation(TwillTests):
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    @mock.patch('mysite.base.controllers._geocode')
+    @mock.patch('mysite.base.helpers._geocode')
     def test(self, mock_geocode):
         '''
         * Goes to paulproteus's profile
@@ -1468,12 +1468,12 @@ class EditContactBlurbForwarderification(TwillTests):
         # grab asheesh by the horns
         sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
         # make them a forwarder
-        mysite.base.controllers.generate_forwarder(sheesh.user)
+        mysite.base.helpers.generate_forwarder(sheesh.user)
         # we have a string that contains the substr $fwd
         mystr = "email me here: $fwd.  it'll be great"
         user_to_forward_to = User.objects.get(username='paulproteus')
         # we run this string through a controller called forwarderify
-        mystr_forwarderified = (mysite.base.controllers.
+        mystr_forwarderified = (mysite.base.helpers.
                 put_forwarder_in_contact_blurb_if_they_want(mystr, user_to_forward_to))
         our_forwarder = mysite.profile.models.Forwarder.objects.get(user=user_to_forward_to)
         output = "email me here: %s@%s .  it'll be great" % (
@@ -1761,8 +1761,8 @@ class PostFixGeneratorList(TwillTests):
         barry.email = ''
         barry.save()
         # make a row in the forwarder table for each of these people
-        mysite.base.controllers.generate_forwarder(barry)
-        mysite.base.controllers.generate_forwarder(asheesh)
+        mysite.base.helpers.generate_forwarder(barry)
+        mysite.base.helpers.generate_forwarder(asheesh)
         # run the function in Forwarder which creates/updates the list of user/forwarder pairs for postfix to generate forwarders for
         what_we_get = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
 

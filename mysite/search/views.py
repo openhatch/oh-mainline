@@ -27,7 +27,7 @@ except ImportError:
 
 from mysite.search.models import Project
 import mysite.search.helpers 
-import mysite.base.controllers
+import mysite.base.helpers
 import mysite.base.unicode_sanity
 from mysite.base.helpers import render_response
 

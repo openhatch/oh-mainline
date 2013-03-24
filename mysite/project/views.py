@@ -109,7 +109,7 @@ def project(request, project__name = None):
                 })
     contact_form_list.sort(key=lambda x: (x['started_checked']))
 
-    button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+    button_widget_data = mysite.base.helpers.get_uri_metadata_for_generating_absolute_links(
             request)
     button_widget_data['project'] = p
     button_as_widget_source = render_to_string(

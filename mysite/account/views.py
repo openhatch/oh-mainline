@@ -32,7 +32,7 @@ import logging
 import json
 
 import mysite.base.views
-import mysite.base.controllers
+import mysite.base.helpers
 import mysite.account.forms
 from mysite.base.helpers import render_response
 import mysite.profile.views
@@ -300,7 +300,7 @@ def set_location_do(request):
         instance=user_profile, prefix='edit_location')
     if edit_location_form.is_valid():
         address = edit_location_form.cleaned_data['location_display_name']
-        as_string = mysite.base.controllers.cached_geocoding_in_json(address)
+        as_string = mysite.base.helpers.cached_geocoding_in_json(address)
         as_dict = json.loads(as_string)
         user_profile.latitude = as_dict['latitude']
         user_profile.longitude = as_dict['longitude']
@@ -346,7 +346,7 @@ def change_password_do(request):
 @view
 def widget(request):
     data = {}
-    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+    data.update(mysite.base.helpers.get_uri_metadata_for_generating_absolute_links(
         request))
     return (request, 'account/widget.html', data)
 

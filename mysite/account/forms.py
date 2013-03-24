@@ -111,7 +111,7 @@ class EditLocationForm(django.forms.ModelForm):
         # make sure the geocoding would succeed, so this method does not
         # have to be the one to store it.
         try:
-            mysite.base.controllers.cached_geocoding_in_json(address)
+            mysite.base.helpers.cached_geocoding_in_json(address)
         except Exception:
             logging.exception("When geocoding, caught an exception")
             raise django.forms.ValidationError(

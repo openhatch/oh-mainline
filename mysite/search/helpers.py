@@ -146,7 +146,7 @@ class Query:
         for word in self.terms:
             if use_regexes:
                 whole_word = "[[:<:]]%s($|[[:>:]])" % (
-                    mysite.base.controllers.mysql_regex_escape(word))
+                    mysite.base.helpers.mysql_regex_escape(word))
                 terms_disjunction = (
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |

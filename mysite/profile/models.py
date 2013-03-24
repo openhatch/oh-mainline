@@ -859,7 +859,7 @@ class Forwarder(models.Model):
         users_needing_regeneration = [User.objects.get(pk=pk)
                                       for pk in user_ids_needing_regeneration]
         for user in users_needing_regeneration:
-            mysite.base.controllers.generate_forwarder(user)
+            mysite.base.helpers.generate_forwarder(user)
             made_any_changes = True
 
         return made_any_changes
