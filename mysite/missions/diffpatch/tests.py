@@ -33,7 +33,7 @@ from mysite.missions.base.tests import (
     get_mission_test_data_path,
     )
 from mysite.base.unicode_sanity import utf8
-from mysite.missions.diffpatch import views, controllers
+from mysite.missions.diffpatch import views, helpers
 
 class PatchSingleFileTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -47,14 +47,14 @@ class PatchSingleFileTests(TwillTests):
         file_to_patch = oldfile.name
 
         try:
-            oldfile.write(open(controllers.PatchSingleFileMission.OLD_FILE).read())
+            oldfile.write(open(helpers.PatchSingleFileMission.OLD_FILE).read())
             oldfile.close()
 
             patch_process = subprocess.Popen(['patch', file_to_patch], stdin=subprocess.PIPE)
-            patch_process.communicate(controllers.PatchSingleFileMission.get_patch())
+            patch_process.communicate(helpers.PatchSingleFileMission.get_patch())
             self.assertEqual(patch_process.returncode, 0)
 
-            self.assertEqual(open(file_to_patch).read(), open(controllers.PatchSingleFileMission.NEW_FILE).read())
+            self.assertEqual(open(file_to_patch).read(), open(helpers.PatchSingleFileMission.NEW_FILE).read())
 
         finally:
             os.unlink(file_to_patch)
@@ -107,14 +107,14 @@ class DiffSingleFileTests(TwillTests):
         self.client = self.login_with_client()
 
     def make_good_patch(self):
-        oldlines = open(controllers.DiffSingleFileMission.OLD_FILE).readlines()
-        newlines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
+        oldlines = open(helpers.DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(helpers.DiffSingleFileMission.NEW_FILE).readlines()
         return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
 
     def make_wrong_src_patch(self):
         # Make a patch that will not apply correctly.
-        oldlines = open(controllers.DiffSingleFileMission.OLD_FILE).readlines()
-        newlines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
+        oldlines = open(helpers.DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(helpers.DiffSingleFileMission.NEW_FILE).readlines()
         del oldlines[0]
         return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
 
@@ -129,15 +129,15 @@ class DiffSingleFileTests(TwillTests):
 
     def make_wrong_dest_patch(self):
         # Make a patch that will apply correctly but does not result in the right file.
-        oldlines = open(controllers.DiffSingleFileMission.OLD_FILE).readlines()
-        newlines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
+        oldlines = open(helpers.DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(helpers.DiffSingleFileMission.NEW_FILE).readlines()
         del newlines[0]
         return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
 
     def make_swapped_patch(self):
         # make a backwards diff.
-        oldlines = open(controllers.DiffSingleFileMission.OLD_FILE).readlines()
-        newlines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
+        oldlines = open(helpers.DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(helpers.DiffSingleFileMission.NEW_FILE).readlines()
         return ''.join(difflib.unified_diff(newlines, oldlines, 'new.txt', 'old.txt'))
 
     def make_copy_paste_error_patch(self):
@@ -145,28 +145,28 @@ class DiffSingleFileTests(TwillTests):
         return ''.join(open(os.path.join(file_path, "copy_paste_error_pancake_diff.txt")).readlines());
 
     def test_good_patch(self):
-        controllers.DiffSingleFileMission.validate_patch(self.make_good_patch())
+        helpers.DiffSingleFileMission.validate_patch(self.make_good_patch())
 
     def test_not_single_file(self):
         try:
-            controllers.DiffSingleFileMission.validate_patch(self.make_good_patch() * 2)
-        except controllers.IncorrectPatch, e:
+            helpers.DiffSingleFileMission.validate_patch(self.make_good_patch() * 2)
+        except helpers.IncorrectPatch, e:
             self.assert_('affects more than one file' in utf8(e))
         else:
             self.fail('no exception raised')
 
     #def test_does_not_apply_correctly(self):
     #    try:
-    #        controllers.DiffSingleFileMission.validate_patch(self.make_wrong_src_patch())
-    #    except controllers.IncorrectPatch, e:
+    #        helpers.DiffSingleFileMission.validate_patch(self.make_wrong_src_patch())
+    #    except helpers.IncorrectPatch, e:
     #        self.assert_('will not apply' in utf8(e))
     #    else:
     #        self.fail('no exception raised')
 
     def test_produces_wrong_file(self):
         try:
-            controllers.DiffSingleFileMission.validate_patch(self.make_wrong_dest_patch())
-        except controllers.IncorrectPatch, e:
+            helpers.DiffSingleFileMission.validate_patch(self.make_wrong_dest_patch())
+        except helpers.IncorrectPatch, e:
             self.assert_('does not have the correct contents' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -176,8 +176,8 @@ class DiffSingleFileTests(TwillTests):
         A backwards diff generates a special IncorrectPatch exception.
         """
         try:
-            controllers.DiffSingleFileMission.validate_patch(self.make_swapped_patch())
-        except controllers.IncorrectPatch, e:
+            helpers.DiffSingleFileMission.validate_patch(self.make_swapped_patch())
+        except helpers.IncorrectPatch, e:
             self.assert_('order of files passed to diff was flipped' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -187,8 +187,8 @@ class DiffSingleFileTests(TwillTests):
         A diff that is corrupted by the removal of white space while copying from terminal (mostly in the case of windows)
         """
         try:
-            controllers.DiffSingleFileMission.validate_patch(self.make_copy_paste_error_patch())
-        except controllers.IncorrectPatch, e:
+            helpers.DiffSingleFileMission.validate_patch(self.make_copy_paste_error_patch())
+        except helpers.IncorrectPatch, e:
             self.assert_('copy and paste from the terminal' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -199,8 +199,8 @@ class DiffSingleFileTests(TwillTests):
         generates a special IncorrectPatch exception.
         """
         try:
-            controllers.DiffSingleFileMission.validate_patch(self.make_patch_without_trailing_whitespace())
-        except controllers.IncorrectPatch, e:
+            helpers.DiffSingleFileMission.validate_patch(self.make_patch_without_trailing_whitespace())
+        except helpers.IncorrectPatch, e:
             self.assert_('removed the space' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -211,8 +211,8 @@ class DiffSingleFileTests(TwillTests):
         exception with a hint that the headers should be included.
         """
         try:
-            controllers.DiffSingleFileMission.validate_patch("I lack headers.")
-        except controllers.IncorrectPatch, e:
+            helpers.DiffSingleFileMission.validate_patch("I lack headers.")
+        except helpers.IncorrectPatch, e:
             self.assert_('Make sure you are including the diff headers' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -220,7 +220,7 @@ class DiffSingleFileTests(TwillTests):
     def test_do_mission_correctly(self):
         orig_response = self.client.get(reverse(views.diffsingle_get_original_file))
         orig_lines = StringIO(orig_response.content).readlines()
-        result_lines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
+        result_lines = open(helpers.DiffSingleFileMission.NEW_FILE).readlines()
 
         diff = ''.join(difflib.unified_diff(orig_lines, result_lines))
 
@@ -265,7 +265,7 @@ class DiffRecursiveTests(TwillTests):
             oldlines = tfile.extractfile(fileinfo).readlines()
             newlines = []
             for line in oldlines:
-                for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
+                for old, new in helpers.DiffRecursiveMission.SUBSTITUTIONS:
                     line = line.replace(old, new)
                 newlines.append(line)
             lines_for_output = list(difflib.unified_diff(oldlines, newlines, 'orig-'+fileinfo.name, fileinfo.name))
@@ -327,13 +327,13 @@ class DiffRecursiveTests(TwillTests):
                 continue
 
             # calcualate the old name
-            transformed_name = controllers.DiffRecursiveMission.name_new2old(
+            transformed_name = helpers.DiffRecursiveMission.name_new2old(
                 fileinfo.name)
 
             oldlines = tfile.extractfile(fileinfo).readlines()
             newlines = []
             for line in oldlines:
-                for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
+                for old, new in helpers.DiffRecursiveMission.SUBSTITUTIONS:
                     line = line.replace(old, new)
                 newlines.append(line)
 
@@ -374,7 +374,7 @@ class DiffRecursiveTests(TwillTests):
             oldlines = tfile.extractfile(fileinfo).readlines()
             newlines = []
             for line in oldlines:
-                for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
+                for old, new in helpers.DiffRecursiveMission.SUBSTITUTIONS:
                     line = line.replace(old, new)
                 newlines.append(line)
 
@@ -411,18 +411,18 @@ class PatchRecursiveTests(TwillTests):
 
         try:
             tar_process = subprocess.Popen(['tar', '-C', tempdir, '-zxv'], stdin=subprocess.PIPE)
-            tar_process.communicate(controllers.DiffRecursiveMission.synthesize_tarball())
+            tar_process.communicate(helpers.DiffRecursiveMission.synthesize_tarball())
             self.assertEqual(tar_process.returncode, 0)
 
             patch_process = subprocess.Popen(['patch', '-d', tempdir, '-p1'], stdin=subprocess.PIPE)
-            patch_process.communicate(controllers.PatchRecursiveMission.get_patch())
+            patch_process.communicate(helpers.PatchRecursiveMission.get_patch())
             self.assertEqual(patch_process.returncode, 0)
 
         finally:
             shutil.rmtree(tempdir)
 
     def test_do_mission_correctly(self):
-        response = self.client.post(reverse(views.patchrecursive_submit), controllers.PatchRecursiveMission.ANSWERS)
+        response = self.client.post(reverse(views.patchrecursive_submit), helpers.PatchRecursiveMission.ANSWERS)
         self.assert_(response.status_code, 302)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -430,7 +430,7 @@ class PatchRecursiveTests(TwillTests):
 
     def test_do_mission_incorrectly(self):
         answers = {}
-        for key, value in controllers.PatchRecursiveMission.ANSWERS.iteritems():
+        for key, value in helpers.PatchRecursiveMission.ANSWERS.iteritems():
             answers[key] = value + 1
         response = self.client.post(reverse(views.patchrecursive_submit), answers)
         self.assertFalse(response.context['patchrecursive_success'])

@@ -18,17 +18,17 @@
 
 from mysite.base.tests import TwillTests
 from mysite.missions.base.tests import *
-from mysite.missions.tar import views, controllers
+from mysite.missions.tar import views, helpers
 
 class TarMissionTests(TestCase):
     def test_good_tarball(self):
-        controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'good.tar.gz')).read())
+        helpers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'good.tar.gz')).read())
 
     def test_bad_tarball_1(self):
         # should fail due to the tarball not containing a wrapper dir
         try:
-            controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-1.tar.gz')).read())
-        except controllers.IncorrectTarFile, e:
+            helpers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-1.tar.gz')).read())
+        except helpers.IncorrectTarFile, e:
             self.assert_('No wrapper directory is present' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -36,8 +36,8 @@ class TarMissionTests(TestCase):
     def test_bad_tarball_2(self):
         # should fail due to the tarball not being gzipped
         try:
-            controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-2.tar')).read())
-        except controllers.IncorrectTarFile, e:
+            helpers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-2.tar')).read())
+        except helpers.IncorrectTarFile, e:
             self.assert_('not a valid gzipped tarball' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -45,8 +45,8 @@ class TarMissionTests(TestCase):
     def test_bad_tarball_3(self):
         # should fail due to one of the files not having the correct contents
         try:
-            controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-3.tar.gz')).read())
-        except controllers.IncorrectTarFile, e:
+            helpers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-3.tar.gz')).read())
+        except helpers.IncorrectTarFile, e:
             self.assert_('has incorrect contents' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -54,8 +54,8 @@ class TarMissionTests(TestCase):
     def test_bad_tarball_4(self):
         # should fail due to the wrapper dir not having the right name
         try:
-            controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-4.tar.gz')).read())
-        except controllers.IncorrectTarFile, e:
+            helpers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-4.tar.gz')).read())
+        except helpers.IncorrectTarFile, e:
             self.assert_('Wrapper directory name is incorrect' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -63,8 +63,8 @@ class TarMissionTests(TestCase):
     def test_bad_tarball_5(self):
         # should fail due to silly ._ files from a Mac
         try:
-            controllers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-5.tar.gz')).read())
-        except controllers.IncorrectTarFile, e:
+            helpers.TarMission.check_tarfile(open(make_testdata_filename('tar', 'bad-5.tar.gz')).read())
+        except helpers.IncorrectTarFile, e:
             self.assert_('Mac_OS_X' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -78,7 +78,7 @@ class TarUploadTests(TwillTests):
         self.client = self.login_with_client()
 
     def test_tar_file_downloads(self):
-        for filename, content in controllers.TarMission.FILES.iteritems():
+        for filename, content in helpers.TarMission.FILES.iteritems():
             response = self.client.get(reverse(views.file_download, kwargs={'name': filename}))
             self.assertEqual(response['Content-Disposition'], 'attachment; filename=%s' % filename)
             self.assertEqual(response.content, content)
@@ -110,12 +110,12 @@ class TarUploadTests(TwillTests):
 class UntarMissionTests(TestCase):
 
     def test_tarball_contains_file_we_want(self):
-        tfile = tarfile.open(fileobj=StringIO(controllers.UntarMission.synthesize_tarball()), mode='r:gz')
+        tfile = tarfile.open(fileobj=StringIO(helpers.UntarMission.synthesize_tarball()), mode='r:gz')
 
         # Check the file we want contains the right thing.
-        file_we_want = tfile.getmember(controllers.UntarMission.FILE_WE_WANT)
+        file_we_want = tfile.getmember(helpers.UntarMission.FILE_WE_WANT)
         self.assert_(file_we_want.isfile())
-        self.assertEqual(tfile.extractfile(file_we_want).read(), controllers.UntarMission.get_contents_we_want())
+        self.assertEqual(tfile.extractfile(file_we_want).read(), helpers.UntarMission.get_contents_we_want())
 
 
 class UntarViewTests(TwillTests):
@@ -127,12 +127,12 @@ class UntarViewTests(TwillTests):
 
     def test_download_headers(self):
         response = self.client.get(reverse(views.download_tarball_for_extract_mission))
-        self.assertEqual(response['Content-Disposition'], 'attachment; filename=%s' % controllers.UntarMission.TARBALL_NAME)
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename=%s' % helpers.UntarMission.TARBALL_NAME)
 
     def test_do_mission_correctly(self):
         download_response = self.client.get(reverse(views.download_tarball_for_extract_mission))
         tfile = tarfile.open(fileobj=StringIO(download_response.content), mode='r:gz')
-        contents_it_wants = tfile.extractfile(tfile.getmember(controllers.UntarMission.FILE_WE_WANT))
+        contents_it_wants = tfile.extractfile(tfile.getmember(helpers.UntarMission.FILE_WE_WANT))
         upload_response = self.client.post(reverse(views.extract_mission_upload), {'extracted_file': contents_it_wants})
         self.assert_('unpack status: success' in upload_response.content)
 
@@ -141,7 +141,7 @@ class UntarViewTests(TwillTests):
 
     def test_do_mission_incorrectly(self):
         bad_file = StringIO('This is certainly not what it wants!')
-        bad_file.name = os.path.basename(controllers.UntarMission.FILE_WE_WANT)
+        bad_file.name = os.path.basename(helpers.UntarMission.FILE_WE_WANT)
         upload_response = self.client.post(reverse(views.extract_mission_upload),
                                            {'extracted_file': bad_file})
         self.assert_('unpack status: failure' in upload_response.content)
@@ -181,7 +181,7 @@ class MissionPageStateTests(TwillTests):
         """
         download_response = self.client.get(reverse(views.download_tarball_for_extract_mission))
         tfile = tarfile.open(fileobj=StringIO(download_response.content), mode='r:gz')
-        return tfile.extractfile(tfile.getmember(controllers.UntarMission.FILE_WE_WANT))
+        return tfile.extractfile(tfile.getmember(helpers.UntarMission.FILE_WE_WANT))
 
     def test_extract_mission_reset_redo(self):
         """

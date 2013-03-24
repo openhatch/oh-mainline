@@ -1839,7 +1839,7 @@ class EmailForwarderResolver(TwillTests):
 
 
     def test(self):
-        # this function was only being used by this test--so i moved it here. it was in base/controllers --parker
+        # this function was only being used by this test--so i moved it here. it was in base/helpers --parker
         def get_email_address_from_forwarder_address(forwarder_address):
             Forwarder = mysite.profile.models.Forwarder
             # look in Forwarder model

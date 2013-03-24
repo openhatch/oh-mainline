@@ -24,7 +24,7 @@ import datetime
 
 
 import django.test
-from mysite.missions.base.controllers import *
+from mysite.missions.base.helpers import *
 from mysite.missions.models import Step, StepCompletion
 from mysite.profile.models import Person
 
