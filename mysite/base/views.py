@@ -25,11 +25,10 @@ from django.utils import simplejson
 from django.template import loader, Context
 
 import mysite.account
-import mysite.profile.controllers
 import mysite.account.forms
 from mysite.base.decorators import view
 import mysite.customs.feed
-import mysite.search.controllers
+import mysite.search.helpers
 import mysite.search.models
 import mysite.missions.models 
 
@@ -137,7 +136,7 @@ def geocode(request):
     if not address:
         return HttpResponseBadRequest() # no address :-(
     # try to geocode
-    coordinates_as_json = mysite.base.controllers.cached_geocoding_in_json(address)
+    coordinates_as_json = mysite.base.helpers.cached_geocoding_in_json(address)
     if coordinates_as_json == 'null':
         # We couldn't geocode that.
         return HttpResponseBadRequest() # no address :-(

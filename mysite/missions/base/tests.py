@@ -18,7 +18,7 @@
 
 from unittest import TestCase
 from mysite.base.tests import TwillTests
-from mysite.missions.base import views, controllers
+from mysite.missions.base import views, helpers
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
 from mysite.base.helpers import subproc_check_output

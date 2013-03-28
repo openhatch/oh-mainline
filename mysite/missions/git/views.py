@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mysite.missions.base.views import *
-from mysite.missions.git import controllers, forms
+from mysite.missions.git import helpers, forms
 
 
 ### POST handlers
@@ -28,11 +28,11 @@ from mysite.missions.git import controllers, forms
 def resetrepo(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-    controllers.GitRepository(request.user.username).reset()
-    controllers.unset_mission_completed(request.user.get_profile(), 'git_config')
-    controllers.unset_mission_completed(request.user.get_profile(), 'git_checkout')
-    controllers.unset_mission_completed(request.user.get_profile(), 'git_diff')
-    controllers.unset_mission_completed(request.user.get_profile(), 'git_rebase')
+    helpers.GitRepository(request.user.username).reset()
+    helpers.unset_mission_completed(request.user.get_profile(), 'git_config')
+    helpers.unset_mission_completed(request.user.get_profile(), 'git_checkout')
+    helpers.unset_mission_completed(request.user.get_profile(), 'git_diff')
+    helpers.unset_mission_completed(request.user.get_profile(), 'git_rebase')
     if 'stay_on_this_page' in request.GET:
         return HttpResponseRedirect(reverse(main_page))
     else:
@@ -48,7 +48,7 @@ def checkout_submit(request):
         form = forms.CheckoutForm(request.POST)
         if form.is_valid():
             if form.cleaned_data['secret_word'].lower() == 'the brain':
-                controllers.set_mission_completed(request.user.get_profile(), 'git_checkout')
+                helpers.set_mission_completed(request.user.get_profile(), 'git_checkout')
                 return HttpResponseRedirect(reverse(checkout))
             else:
                 data['git_checkout_error_message'] = "The author's name is incorrect."
@@ -64,7 +64,7 @@ def long_description_submit(request):
     if request.method == 'POST':
         form = forms.ConfigForm(request.POST)
         if form.is_valid():
-            controllers.set_mission_completed(request.user.get_profile(), 'git_config')
+            helpers.set_mission_completed(request.user.get_profile(), 'git_config')
             return HttpResponseRedirect(reverse(long_description))
 
     data['git_config_form'] = form
@@ -79,8 +79,8 @@ def diff_submit(request):
     if request.method == 'POST':
         form = forms.DiffForm(request.POST)
         if form.is_valid():
-                if controllers.GitDiffMission.commit_if_ok(request.user.username, form.cleaned_data['diff']):
-                    controllers.set_mission_completed(request.user.get_profile(), 'git_diff')
+                if helpers.GitDiffMission.commit_if_ok(request.user.username, form.cleaned_data['diff']):
+                    helpers.set_mission_completed(request.user.get_profile(), 'git_diff')
                     return HttpResponseRedirect(reverse(diff))
                 else:
                     data['git_diff_error_message'] = "Unable to commit the patch. Please check your patch and try again "
@@ -101,7 +101,7 @@ def rebase_submit(request):
         if form.is_valid():
             lower_secret = form.cleaned_data['secret_word'].lower()
             if lower_secret == 'pinky' or lower_secret == 'pinky.':
-                controllers.set_mission_completed(request.user.get_profile(), 'git_rebase')
+                helpers.set_mission_completed(request.user.get_profile(), 'git_rebase')
                 return HttpResponseRedirect(reverse(rebase))
             else:
                 data['git_rebase_error_message'] = "The password is incorrect."
@@ -116,13 +116,13 @@ class GitMissionPageState(MissionPageState):
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
         if person:
-            repo = controllers.GitRepository(self.request.user.username)
+            repo = helpers.GitRepository(self.request.user.username)
             data.update({
                 'repository_exists': repo.exists(),
-                'git_config_done': controllers.mission_completed(person, 'git_config'),
-                'git_checkout_done': controllers.mission_completed(person, 'git_checkout'),
-                'git_diff_done': controllers.mission_completed(person, 'git_diff'),
-                'git_rebase_done': controllers.mission_completed(person, 'git_rebase'),
+                'git_config_done': helpers.mission_completed(person, 'git_config'),
+                'git_checkout_done': helpers.mission_completed(person, 'git_checkout'),
+                'git_diff_done': helpers.mission_completed(person, 'git_diff'),
+                'git_rebase_done': helpers.mission_completed(person, 'git_rebase'),
             })
             if data['repository_exists']:
               data.update({

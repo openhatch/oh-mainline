@@ -112,9 +112,9 @@ class Project(OpenHatchModel):
         number of people who can mentor in the project by name unioned
         with those who can mentor in the project's language.'''
         all_mentor_person_ids = set()
-        import mysite.profile.controllers
+        import mysite.profile.helpers
         for way_a_mentor_can_help in (self.name, self.language):
-            tq = mysite.profile.controllers.TagQuery('can_mentor',
+            tq = mysite.profile.helpers.TagQuery('can_mentor',
                                                      way_a_mentor_can_help)
             all_mentor_person_ids.update(tq.people.values_list('id', flat=True))
         return len(all_mentor_person_ids)
@@ -317,8 +317,8 @@ class Project(OpenHatchModel):
 
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
-        import mysite.profile.controllers
-        mentors_available = bool(mysite.profile.controllers.TagQuery(
+        import mysite.profile.helpers
+        mentors_available = bool(mysite.profile.helpers.TagQuery(
                 'can_mentor', self.name).people)
         if mentors_available or self.language:
             query_var = self.name
@@ -658,7 +658,7 @@ def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, *
 # Clear the hit count cache whenever Bugs are added or removed. This is
 # simply done by bumping the Timestamp used to generate the cache keys.
 # The hit count cache is used in get_or_create_cached_hit_count() in
-# mysite.search.controllers.Query.
+# mysite.search.helpers.Query.
 # Clear all people's recommended bug cache when a bug is deleted
 # (or when it has been modified to say it looks_closed)
 models.signals.post_save.connect(

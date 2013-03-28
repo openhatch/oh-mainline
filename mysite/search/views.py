@@ -26,8 +26,8 @@ except ImportError:
 
 
 from mysite.search.models import Project
-import mysite.search.controllers 
-import mysite.base.controllers
+import mysite.search.helpers 
+import mysite.base.helpers
 import mysite.base.unicode_sanity
 from mysite.base.helpers import render_response
 
@@ -69,13 +69,13 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
 
     total_bug_count = 0
 
-    query = mysite.search.controllers.Query.create_from_GET_data(request.GET)
+    query = mysite.search.helpers.Query.create_from_GET_data(request.GET)
 
     if query:
         bugs = query.get_bugs_unordered()
 
         # Sort
-        bugs = mysite.search.controllers.order_bugs(bugs)
+        bugs = mysite.search.helpers.order_bugs(bugs)
 
         total_bug_count = bugs.count()
 
@@ -167,7 +167,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
         data['url'] = 'http://launchpad.net/'
         data['total_bug_count'] = total_bug_count
         data['facet2any_query_string'] = facet2any_query_string
-        data['project_count'] = mysite.search.controllers.get_project_count()
+        data['project_count'] = mysite.search.helpers.get_project_count()
 
         return mysite.base.decorators.as_view(request, 'search/search.html', data, slug=None)
 

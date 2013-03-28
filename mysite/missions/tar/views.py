@@ -21,7 +21,7 @@ from django.http import HttpResponse
 
 from mysite.base.unicode_sanity import utf8
 from mysite.missions.base.views import *
-from mysite.missions.tar import forms, controllers
+from mysite.missions.tar import forms, helpers
 
 ### POST handlers
 ###
@@ -51,17 +51,17 @@ def upload(request):
         form = forms.UploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                controllers.TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
+                helpers.TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
                 data['create_success'] = True
-                controllers.set_mission_completed(request.user.get_profile(), 'tar')
-            except controllers.IncorrectTarFile, e:
+                helpers.set_mission_completed(request.user.get_profile(), 'tar')
+            except helpers.IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = utf8(e)
         data['create_form'] = form
     return creating(request, data)
 
 def file_download(request, name):
-    if name in controllers.TarMission.FILES:
-        response = HttpResponse(controllers.TarMission.FILES[name])
+    if name in helpers.TarMission.FILES:
+        response = HttpResponse(helpers.TarMission.FILES[name])
         # force it to be presented as a download
         response['Content-Disposition'] = 'attachment; filename=%s' % name
         response['Content-Type'] = 'application/octet-stream'
@@ -71,9 +71,9 @@ def file_download(request, name):
 
 
 def download_tarball_for_extract_mission(request):
-    response = HttpResponse(controllers.UntarMission.synthesize_tarball())
+    response = HttpResponse(helpers.UntarMission.synthesize_tarball())
     # force presentation as download
-    response['Content-Disposition'] = 'attachment; filename=%s' % controllers.UntarMission.TARBALL_NAME
+    response['Content-Disposition'] = 'attachment; filename=%s' % helpers.UntarMission.TARBALL_NAME
     response['Content-Type'] = 'application/octet-stream'
     return response
 
@@ -87,9 +87,9 @@ def extract_mission_upload(request):
     if request.method == 'POST':
         form = forms.ExtractUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            if form.cleaned_data['extracted_file'].read() == controllers.UntarMission.get_contents_we_want():
+            if form.cleaned_data['extracted_file'].read() == helpers.UntarMission.get_contents_we_want():
                 data['unpack_success'] = True
-                controllers.set_mission_completed(request.user.get_profile(), 'tar_extract')
+                helpers.set_mission_completed(request.user.get_profile(), 'tar_extract')
             else:
                 data['what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
         data['unpack_form'] = form
@@ -104,13 +104,13 @@ class TarMissionPageState(MissionPageState):
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
         data.update({
-            'filenames_for_tarball': controllers.TarMission.FILES.keys(),
-            'tarball_for_unpacking_mission': controllers.UntarMission.TARBALL_NAME,
-            'file_we_want': controllers.UntarMission.FILE_WE_WANT})
+            'filenames_for_tarball': helpers.TarMission.FILES.keys(),
+            'tarball_for_unpacking_mission': helpers.UntarMission.TARBALL_NAME,
+            'file_we_want': helpers.UntarMission.FILE_WE_WANT})
         if person:
             data.update( {
-                'create_done': controllers.mission_completed(person, 'tar'),
-                'unpack_done': controllers.mission_completed(person, 'tar_extract')
+                'create_done': helpers.mission_completed(person, 'tar'),
+                'unpack_done': helpers.mission_completed(person, 'tar_extract')
             })
         return data
 

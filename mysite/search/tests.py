@@ -24,7 +24,7 @@ import mysite.base.unicode_sanity
 import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.profile.models
-import mysite.search.controllers
+import mysite.search.helpers
 from mysite.search.models import Project, Bug, \
         ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
@@ -152,7 +152,7 @@ class AutoCompleteTests(SearchTest):
 class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
     def test(self):
         difficult = "With spaces (and parens)"
-        query = mysite.search.controllers.Query.create_from_GET_data({u'q': u'"%s"' % difficult})
+        query = mysite.search.helpers.Query.create_from_GET_data({u'q': u'"%s"' % difficult})
         self.assertEqual(query.terms, [difficult])
         # Make there be a bug to find
         project = Project.create_dummy(name=difficult)
@@ -165,7 +165,7 @@ class SearchResults(TwillTests):
     fixtures = [u'bugs-for-two-projects.json']
 
     def test_query_object_is_false_when_no_terms_or_facets(self):
-        query = mysite.search.controllers.Query.create_from_GET_data({})
+        query = mysite.search.helpers.Query.create_from_GET_data({})
         self.assertFalse(query)
 
     def test_show_no_bugs_if_no_query(self):
@@ -283,7 +283,7 @@ class Recommend(SearchTest):
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
     # Use that to exclude 'will never understand' tags from recommended search terms.
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
-    @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
+    @mock.patch('mysite.search.helpers.Query.get_or_create_cached_hit_count')
     def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
 
         # Make all the search terms appear to return results, so
@@ -313,7 +313,7 @@ class Recommend(SearchTest):
     # FIXME: Include recommendations from tags.
 
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
-    @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
+    @mock.patch('mysite.search.helpers.Query.get_or_create_cached_hit_count')
     def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
 
         # Make all the search terms appear to return results, so
@@ -382,17 +382,17 @@ class SplitIntoTerms(TestCase):
     def test_split_into_terms(self):
         easy = '1 2 3'
         self.assertEqual(
-                mysite.search.controllers.Query.split_into_terms(easy),
+                mysite.search.helpers.Query.split_into_terms(easy),
                 ['1', '2', '3'])
 
         easy = '"1"'
         self.assertEqual(
-                mysite.search.controllers.Query.split_into_terms(easy),
+                mysite.search.helpers.Query.split_into_terms(easy),
                 ['1'])
 
         easy = 'c#'
         self.assertEqual(
-                mysite.search.controllers.Query.split_into_terms(easy),
+                mysite.search.helpers.Query.split_into_terms(easy),
                 ['c#'])
 
 class IconGetsScaled(SearchTest):
@@ -462,7 +462,7 @@ class SearchOnFullWords(SearchTest):
         Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
-        results = mysite.search.controllers.Query(
+        results = mysite.search.helpers.Query(
                 terms=['perl']).get_bugs_unordered()
         self.assertEqual(list(results), [perl_bug])
 
@@ -485,7 +485,7 @@ class FacetsFilterResults(SearchTest):
         not_python_project = Project.create_dummy(language='Nohtyp')
         Bug.create_dummy(project=not_python_project)
 
-        results = mysite.search.controllers.Query(
+        results = mysite.search.helpers.Query(
                 terms=[], active_facet_options=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
 
@@ -505,7 +505,7 @@ class QueryGetPossibleFacets(SearchTest):
         Bug.create_dummy(project=project3, description=u'bAg')
 
         # Search for bugs matching "bug", while constraining to the language C
-        query = mysite.search.controllers.Query(
+        query = mysite.search.helpers.Query(
                 terms=[u'bug'],
                 terms_string=u'bug',
                 active_facet_options={u'language': u'c'})
@@ -550,7 +550,7 @@ class QueryGetPossibleFacets(SearchTest):
         Project.create_dummy(language=u'd')
         Project.create_dummy(language=u'e')
         Bug.create_dummy(project=c, description=u'bug')
-        query = mysite.search.controllers.Query.create_from_GET_data(
+        query = mysite.search.helpers.Query.create_from_GET_data(
                 {u'q': u'nothing matches this', u'language': u'c'})
 
         language_options = dict(query.get_possible_facets())['language']['options']
@@ -583,7 +583,7 @@ class SingleTerm(SearchTest):
                          description='toast')
 
         GET_data = { 'q': 'screensaver' }
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         self.assertEqual(query.terms, ['screensaver'])
         self.assertFalse(query.active_facet_options) # No facets
 
@@ -659,7 +659,7 @@ class SingleFacetOption(SearchTest):
                          description='toast')
 
         GET_data = { u'language': u'Python' }
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         self.assertFalse(query.terms) # No terms
         self.assertEqual(query.active_facet_options, {u'language': u'Python'})
 
@@ -729,7 +729,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
         Bug.create_dummy(project=python_project, good_for_newcomers=False)
         Bug.create_dummy(project=perl_project, good_for_newcomers=True)
 
-        query = mysite.search.controllers.Query(
+        query = mysite.search.helpers.Query(
                 active_facet_options={u'language': u'Python'},
                 terms_string=u'')
         output = query.get_facet_options(u'toughness', [u'bitesize', u''])
@@ -754,7 +754,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
                          description=u'b')
 
         GET_data = {u'q': u'a'}
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         output = query.get_facet_options(u'toughness', [u'bitesize', u''])
         bitesize_dict = [d for d in output if d[u'name'] == u'bitesize'][0]
         all_dict = [d for d in output if d[u'name'] == u'any'][0]
@@ -783,7 +783,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         # sure that we show only those two languages.
         GET_data = {u'q': u'a'}
 
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
@@ -797,7 +797,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
         GET_data = {u'language': u'Python'}
 
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
@@ -811,7 +811,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
         GET_data = {u'language': u'Unknown'}
 
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
@@ -825,7 +825,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
         GET_data = {u'language': u'Unknown', u'q': u'unknowable'}
 
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         match_count = query.get_bugs_unordered().count()
 
         self.assertEqual(match_count, 1)
@@ -845,7 +845,7 @@ class QueryGetPossibleProjectFacetOptions(SearchTest):
 
     def test_select_a_project_and_see_other_project_options(self):
         GET_data = {u'project': u'Miro'}
-        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        query = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
         self.assertEqual(
                 sorted(possible_project_names),
@@ -866,13 +866,13 @@ class QueryContributionType(SearchTest):
 
     def test_contribution_type_is_an_available_facet(self):
         GET_data = {}
-        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+        starting_query = mysite.search.helpers.Query.create_from_GET_data(
             GET_data)
         self.assert_(u'contribution type' in dict(starting_query.get_possible_facets()))
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}
-        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+        starting_query = mysite.search.helpers.Query.create_from_GET_data(
             GET_data)
         cto = starting_query.get_facet_options(u'contribution_type',
                                                [u'documentation'])
@@ -897,13 +897,13 @@ class QueryProject(SearchTest):
 
     def test_project_is_an_available_facet(self):
         GET_data = {}
-        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+        starting_query = mysite.search.helpers.Query.create_from_GET_data(
             GET_data)
         self.assert_(u'project' in dict(starting_query.get_possible_facets()))
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}
-        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+        starting_query = mysite.search.helpers.Query.create_from_GET_data(
             GET_data)
         cto = starting_query.get_facet_options(u'project',
                                                [u'thingamajig',
@@ -926,22 +926,22 @@ class HashQueryData(SearchTest):
 
     def test_queries_with_identical_data_hash_alike(self):
         GET_data = {u'q': u'socialguides', u'language': u'looxii'}
-        one = mysite.search.controllers.Query.create_from_GET_data(GET_data)
-        two = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        one = mysite.search.helpers.Query.create_from_GET_data(GET_data)
+        two = mysite.search.helpers.Query.create_from_GET_data(GET_data)
         self.assertEqual(one.get_sha1(), two.get_sha1())
 
     def test_queries_with_equiv_data_expressed_differently_hash_alike(self):
         GET_data_1 = {u'q': u'socialguides zetapage', u'language': u'looxii'}
         GET_data_2 = {u'q': u'zetapage socialguides', u'language': u'looxii'}
-        one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
-        two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
+        one = mysite.search.helpers.Query.create_from_GET_data(GET_data_1)
+        two = mysite.search.helpers.Query.create_from_GET_data(GET_data_2)
         self.assertEqual(one.get_sha1(), two.get_sha1())
 
     def test_queries_with_different_data_hash_differently(self):
         GET_data_1 = {u'q': u'socialguides zetapage', u'language': u'looxii'}
         GET_data_2 = {u'q': u'socialguides ninjapost', u'language': u'looxii'}
-        one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
-        two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
+        one = mysite.search.helpers.Query.create_from_GET_data(GET_data_1)
+        two = mysite.search.helpers.Query.create_from_GET_data(GET_data_2)
         self.assertNotEqual(one.get_sha1(), two.get_sha1())
 
     # How on earth do we test for collisions?
@@ -960,7 +960,7 @@ class QueryGrabHitCount(SearchTest):
     def test_eventhive_grab_hitcount_once_stored(self, fake_cache):
         fake_cache.cache = FakeCache()
         data = {u'q': u'eventhive', u'language': u'shoutNOW'}
-        query = mysite.search.controllers.Query.create_from_GET_data(data)
+        query = mysite.search.helpers.Query.create_from_GET_data(data)
         stored_hit_count = 10
         # Get the cache key used to store the hit count.
         hit_count_cache_key = query.get_hit_count_cache_key()
@@ -979,7 +979,7 @@ class QueryGrabHitCount(SearchTest):
 
         Bug.create_dummy(project=project)
         data = {u'language': u'shoutNOW'}
-        query = mysite.search.controllers.Query.create_from_GET_data(data)
+        query = mysite.search.helpers.Query.create_from_GET_data(data)
 
         expected_hit_count = 1
         self.assertEqual(query.get_or_create_cached_hit_count(), expected_hit_count)
@@ -996,7 +996,7 @@ class ClearCacheWhenBugsChange(SearchTest):
 
     def test_cached_cleared_after_bug_save_or_delete(self):
         data = {u'language': u'shoutNOW'}
-        query = mysite.search.controllers.Query.create_from_GET_data(data)
+        query = mysite.search.helpers.Query.create_from_GET_data(data)
 
         old_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
         'hit_count_cache_timestamp')
@@ -1037,7 +1037,7 @@ class PublicizeBugTrackerIndex(SearchTest):
     def setUp(self):
         SearchTest.setUp(self)
         self.search_page_response = self.client.get(reverse(mysite.search.views.fetch_bugs))
-        self.bug_tracker_count = mysite.search.controllers.get_project_count()
+        self.bug_tracker_count = mysite.search.helpers.get_project_count()
 
     def test_search_template_contains_bug_tracker_count(self):
         self.assertEqual(
@@ -1294,18 +1294,18 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
         self.assertFalse(Answer.objects.all())
 
         # Store the Answer IDs in the session
-        mysite.project.controllers.note_in_session_we_control_answer_id(session, answer.id)
+        mysite.project.helpers.note_in_session_we_control_answer_id(session, answer.id)
         self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
 
         # If you want to look at those answers, you can this way:
-        stored_answers = mysite.project.controllers.get_unsaved_answers_from_session(session)
+        stored_answers = mysite.project.helpers.get_unsaved_answers_from_session(session)
         self.assertEqual([answer.id for answer in stored_answers], [answer.id])
 
         # Verify that the Answer object is still not available by .objects()
         self.assertFalse(Answer.objects.all())
 
         # At login time, take ownership of those Answer IDs
-        mysite.project.controllers.take_control_of_our_answers(
+        mysite.project.helpers.take_control_of_our_answers(
             User.objects.get(username='paulproteus'), session)
 
         # And now we own it!

@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.profile.controllers
-import mysite.project.controllers
+import mysite.project.helpers
 import staticgenerator.middleware
 
 def get_user_ip(request):
@@ -34,7 +33,7 @@ class HandleWannaHelpQueue(object):
         if (hasattr(request, 'user') and
             request.user.is_authenticated() and
             'wanna_help_queue_handled' not in request.session):
-            mysite.project.controllers.flush_session_wanna_help_queue_into_database(
+            mysite.project.helpers.flush_session_wanna_help_queue_into_database(
                 request.user, request.session)
             request.session['wanna_help_queue_handled'] = True
         return None
@@ -48,7 +47,7 @@ class DetectLogin(object):
             return response
 
         if request.user.is_authenticated() and 'post_login_stuff_run' not in request.session:
-            mysite.project.controllers.take_control_of_our_answers(request.user, request.session)
+            mysite.project.helpers.take_control_of_our_answers(request.user, request.session)
             request.session['post_login_stuff_run'] = True
         return response
 

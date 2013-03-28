@@ -43,9 +43,9 @@ from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 
 # OpenHatch apps
-import mysite.base.controllers
+import mysite.base.helpers
 import mysite.base.unicode_sanity
-import mysite.profile.controllers
+import mysite.profile.helpers
 import mysite.base.helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
@@ -72,9 +72,9 @@ def delete_user_for_being_spammy(request):
         if form.is_valid():
             u = User.objects.get(username=form.cleaned_data['username'])
             # Dump data about the user to the site admins
-            mysite.profile.controllers.send_user_export_to_admins(u)
+            mysite.profile.helpers.send_user_export_to_admins(u)
             # Send out an email to the poor sap.
-            mysite.profile.controllers.email_spammy_user(u)
+            mysite.profile.helpers.email_spammy_user(u)
             # Okay... delete the user.
             u.delete() # hoo boy!
             return HttpResponseRedirect(reverse(
@@ -126,7 +126,7 @@ def display_person_web(request, user_to_display__username=None):
     data = get_personal_data(person)
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
+    data['notifications'] = mysite.base.helpers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
     data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
 
@@ -151,7 +151,7 @@ def get_personal_data(person):
 
     data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
-    data_dict['contact_blurb'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
+    data_dict['contact_blurb'] = mysite.base.helpers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
 
     data_dict['projects_i_wanna_help'] = person.projects_i_wanna_help.all()
 
@@ -178,7 +178,7 @@ def widget_display_undecorated(request, user_to_display__username):
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
-    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+    data.update(mysite.base.helpers.get_uri_metadata_for_generating_absolute_links(
         request))
     return (request, 'profile/widget.html', data)
     # }}}
@@ -357,7 +357,7 @@ def edit_person_info_do(request):
         # if their new contact blurb contains $fwd and their old one didn't,
         # then make them a new forwarder
         if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
-            mysite.base.controllers.generate_forwarder(person.user)
+            mysite.base.helpers.generate_forwarder(person.user)
         person.contact_blurb = posted_contact_blurb
 
     person.save()
@@ -416,7 +416,7 @@ def people(request):
     data['raw_query'] = query
 
     # Parse the query, and store that in the template.
-    parsed_query = mysite.profile.controllers.parse_string_query(query)
+    parsed_query = mysite.profile.helpers.parse_string_query(query)
     data.update(parsed_query)
 
     # Get the list of people to display.
@@ -820,7 +820,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['form'] = edit_info_form
     data['contact_blurb_form'] = contact_blurb_form
     data['contact_blurb_error'] = contact_blurb_error
-    data['forwarder_sample'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
+    data['forwarder_sample'] = mysite.base.helpers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
     data['has_errors'] = has_errors
     return request, 'profile/info_wrapper.html', data
 
@@ -857,7 +857,7 @@ def unsubscribe_do(request):
 @login_required
 def bug_recommendation_list_as_template_fragment(request):
     suggested_searches = request.user.get_profile().get_recommended_search_terms()
-    recommender = mysite.profile.controllers.RecommendBugs(
+    recommender = mysite.profile.helpers.RecommendBugs(
         suggested_searches, n=5)
     recommended_bugs = list(recommender.recommend())
 
