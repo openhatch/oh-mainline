@@ -36,6 +36,7 @@ from django.core.urlresolvers import reverse
 import voting
 import mysite.customs.ohloh
 import mysite.base.depends
+import mysite.base.decorators
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
