@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mysite.base.tests import TwillTests
-import mysite.project.controllers
+import mysite.project.view_helpers
 import mysite.account.tests
 
 from mysite.search.models import Project
@@ -25,7 +25,7 @@ import mysite.project.views
 
 import mysite.profile.views
 import mysite.profile.models
-import mysite.profile.controllers
+import mysite.profile.view_helpers
 
 from mysite.base.tests import better_make_twill_url
 
@@ -44,12 +44,12 @@ class ProjectNameSearch(TwillTests):
         mysite.search.models.Project.create_dummy(name='Irrelevant')
 
         # Call out function, hoping to find Twisted System
-        starts_with_twisted = mysite.project.controllers.similar_project_names(
+        starts_with_twisted = mysite.project.view_helpers.similar_project_names(
             'Twisted')
         self.assertEqual(['Twisted System'], [p.name for p in starts_with_twisted])
 
         # Same with lowercase name
-        starts_with_twisted = mysite.project.controllers.similar_project_names(
+        starts_with_twisted = mysite.project.view_helpers.similar_project_names(
             'twistEd')
         self.assertEqual(['Twisted System'], [p.name for p in starts_with_twisted])
 
@@ -312,7 +312,7 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
         self.assertEqual(response.redirect_chain,
             [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
 
-        lucky_projects = mysite.project.controllers.get_wanna_help_queue_from_session(self.client.session)
+        lucky_projects = mysite.project.view_helpers.get_wanna_help_queue_from_session(self.client.session)
         self.assertEqual([k.name for k in lucky_projects], ['Myproject'])
 
 class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):

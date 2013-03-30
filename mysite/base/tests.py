@@ -38,8 +38,7 @@ import datetime
 import logging
 import unittest
 
-import mysite.base.helpers
-import mysite.base.controllers
+import mysite.base.view_helpers
 import mysite.base.decorators
 import mysite.search.models
 import mysite.base.templatetags.base_extras
@@ -133,16 +132,16 @@ class MySQLRegex(TwillTests):
                 }
         for before, after in before2after.items():
             self.assertEqual(
-                    mysite.base.controllers.mysql_regex_escape(before),
+                    mysite.base.view_helpers.mysql_regex_escape(before),
                     after)
 
 class TestUriDataHelper(TwillTests):
     def test(self):
-        request = mysite.base.helpers.ObjectFromDict({
+        request = mysite.base.view_helpers.ObjectFromDict({
             'is_secure': lambda : True,
             'META': {'SERVER_PORT': '443',
                      'SERVER_NAME': 'name'}})
-        data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(request)
+        data = mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(request)
         self.assertEqual(data, {'uri_scheme': 'https',
                                 'url_prefix': 'name'})
 
@@ -152,7 +151,7 @@ class GeocoderCanGeocode(TwillTests):
         unicode_str = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
 
         # Just exercise the geocoder and ensure it doesn't blow up.
-        return mysite.base.controllers.cached_geocoding_in_json(unicode_str)
+        return mysite.base.view_helpers.cached_geocoding_in_json(unicode_str)
 
     def test_unicode_string(self):
         self.get_geocoding_in_json_for_unicode_string()
@@ -174,15 +173,15 @@ class GeocoderCanCache(django.test.TestCase):
 
     def get_geocoding_in_json_for_unicode_string(self):
         # Just exercise the geocoder and ensure it doesn't blow up.
-        return mysite.base.controllers.cached_geocoding_in_json(self.unicode_address)
+        return mysite.base.view_helpers.cached_geocoding_in_json(self.unicode_address)
 
     mock_geocoder = mock.Mock()
-    @mock.patch("mysite.base.controllers._geocode", mock_geocoder)
+    @mock.patch("mysite.base.view_helpers._geocode", mock_geocoder)
     def test_unicode_strings_get_cached(self):
 
         # Let's make sure that the first time we run this (with original_json),
         # that the cache is empty, and we populate it with original_json.
-        cache.delete(mysite.base.controllers.address2cache_key_name(self.unicode_address))
+        cache.delete(mysite.base.view_helpers.address2cache_key_name(self.unicode_address))
 
         ### NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
         # When the geocoder's results are being cached properly,
@@ -277,7 +276,7 @@ class CacheMethod(TwillTests):
         mock_cache.set.assert_called_with('doodles', '{"value": "1"}', 86400 * 10)
 
 class RecommendBugs(TwillTests):
-    @mock.patch('mysite.profile.controllers.RecommendBugs')
+    @mock.patch('mysite.profile.view_helpers.RecommendBugs')
     def test_no_synchronous_processing_on_empty(self, RecommendBugsMock):
         RecommendBugsMock.is_cache_empty.return_value = True
 

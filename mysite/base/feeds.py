@@ -19,7 +19,7 @@ from django.contrib.syndication.feeds import Feed, FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.feedgenerator import Atom1Feed
 from mysite.profile.models import Person
-from mysite.profile.controllers import RecommendBugs
+from mysite.profile.view_helpers import RecommendBugs
 from mysite.search.models import Answer, WannaHelperNote
 
 class RecommendedBugsFeed(Feed):
