@@ -18,10 +18,11 @@
 
 from unittest import TestCase
 from mysite.base.tests import TwillTests
-from mysite.missions.base import views, controllers
+from mysite.missions.base import views
+import mysite.missions.base.view_helpers
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
-from mysite.base.helpers import subproc_check_output
+from mysite.base.view_helpers import subproc_check_output
 from django.conf import settings
 from django.test.client import Client
 from django.core.urlresolvers import reverse

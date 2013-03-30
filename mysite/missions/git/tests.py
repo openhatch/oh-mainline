@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mysite.missions.base.tests import *
-from mysite.missions.git import views, controllers
+from mysite.missions.git import views, view_helpers
 
 class GitViewTestsWhileLoggedOut(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -58,7 +58,7 @@ class GitViewTests(TwillTests):
         word = 'the brain'
         response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assert_(controllers.mission_completed(paulproteus, 'git_checkout'))
+        self.assert_(view_helpers.mission_completed(paulproteus, 'git_checkout'))
 
     def test_do_checkout_mission_incorrectly(self):
         word = 'the wrong word'
@@ -72,25 +72,25 @@ class GitViewTests(TwillTests):
         self.assertFalse(self.email_address_is_rejected('paulproteus@pathi.local'))
         self.assertFalse(self.email_address_is_rejected('filipovskii_off@Puppo.(none)'))
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(controllers.mission_completed(paulproteus, 'git_config'))
+        self.assertFalse(view_helpers.mission_completed(paulproteus, 'git_config'))
 
     def test_do_git_description_mission_correctly(self):
         correct_email = 'paulproteus@openhatch.org'
         response = self.client.post(reverse(views.long_description_submit), {'user_email': correct_email})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertTrue(controllers.mission_completed(paulproteus, 'git_config'))
+        self.assertTrue(view_helpers.mission_completed(paulproteus, 'git_config'))
 
     def test_do_git_description_mission_correctly_with_weird_email_address(self):
         correct_email = 'paulproteus@localhost.com'
         response = self.client.post(reverse(views.long_description_submit), {'user_email': correct_email})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertTrue(controllers.mission_completed(paulproteus, 'git_config'))
+        self.assertTrue(view_helpers.mission_completed(paulproteus, 'git_config'))
 
     def test_do_rebase_mission_incorrectly(self):
         word = 'the wrong word'
         response = self.client.post(reverse(views.rebase_submit), {'secret_word': word})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(controllers.mission_completed(paulproteus, 'git_rebase'))
+        self.assertFalse(view_helpers.mission_completed(paulproteus, 'git_rebase'))
 
     def test_do_diff_mission_correctly(self):
         self.client.post(reverse(views.resetrepo))
@@ -100,7 +100,7 @@ class GitViewTests(TwillTests):
         response = self.client.post(reverse(views.resetrepo))
         response = self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assert_(controllers.mission_completed(paulproteus, 'git_diff'))
+        self.assert_(view_helpers.mission_completed(paulproteus, 'git_diff'))
 
     def test_do_diff_mission_correctly_in_swedish(self):
         self.client.post(reverse(views.resetrepo))
@@ -112,7 +112,7 @@ class GitViewTests(TwillTests):
         self.client.post(reverse(views.resetrepo))
         self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assert_(controllers.mission_completed(paulproteus, 'git_diff'))
+        self.assert_(view_helpers.mission_completed(paulproteus, 'git_diff'))
 
     def test_do_diff_mission_incorrectly(self):
         self.client.post(reverse(views.resetrepo))
@@ -123,5 +123,5 @@ class GitViewTests(TwillTests):
         response = self.client.post(reverse(views.resetrepo))
         response = self.client.post(reverse(views.diff_submit), {'diff': unexpected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(controllers.mission_completed(paulproteus, 'git_diff'))
+        self.assertFalse(view_helpers.mission_completed(paulproteus, 'git_diff'))
 

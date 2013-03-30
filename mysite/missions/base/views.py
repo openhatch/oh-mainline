@@ -23,7 +23,7 @@
 from mysite.base.decorators import view
 import mysite.base.decorators
 from mysite.missions.models import Step, StepCompletion
-from mysite.missions.base import controllers
+from mysite.missions.base import view_helpers
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.conf.urls.defaults import (
@@ -76,7 +76,7 @@ class MissionPageState(object):
             person = self.request.user.get_profile()
             if self.mission_step_prerequisite:
                 data['mission_step_prerequisites_passed'
-                     ] = controllers.mission_completed(person,
+                     ] = view_helpers.mission_completed(person,
                                                        self.mission_step_prerequisite)
             else:
                 data['mission_step_prerequisites_passed'] = True
@@ -95,7 +95,7 @@ class MissionPageState(object):
 
             for part_name in mission_parts:
                 if part_name in self.mission_parts:
-                    controllers.unset_mission_completed(profile, part_name)
+                    view_helpers.unset_mission_completed(profile, part_name)
 
 
 class MissionViewMixin(object):
@@ -184,7 +184,7 @@ class MissionBaseFormView(MissionViewMixin, django.views.generic.edit.BaseFormVi
 
     def form_valid(self, form):
 
-        controllers.set_mission_completed(request.user.get_profile(),
+        view_helpers.set_mission_completed(request.user.get_profile(),
                                           self.mission_step)
 
 

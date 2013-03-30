@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.management import BaseCommand, CommandError
-from mysite.missions.svn import controllers
+from mysite.missions.svn import view_helpers
 from mysite.base.unicode_sanity import utf8
 import sys
 
@@ -35,7 +35,7 @@ class Command(BaseCommand):
         repo_path, txn_id = args
 
         try:
-            controllers.SvnCommitMission.pre_commit_hook(repo_path, txn_id)
-        except controllers.IncorrectPatch, e:
+            view_helpers.SvnCommitMission.pre_commit_hook(repo_path, txn_id)
+        except view_helpers.IncorrectPatch, e:
             sys.stderr.write('\n    ' + utf8(e) + '\n\n')
             raise CommandError, 'The commit failed to validate.'
