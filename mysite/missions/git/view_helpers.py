@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import mysite.base.unicode_sanity
-from mysite.missions.base.controllers import *
+from mysite.missions.base.view_helpers import *
 
 class GitRepository(object):
     
