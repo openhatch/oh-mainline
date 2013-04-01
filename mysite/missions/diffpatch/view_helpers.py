@@ -23,7 +23,7 @@ from cStringIO import StringIO
 import re
 import tarfile
 
-from mysite.missions.base.controllers import (
+from mysite.missions.base.view_helpers import (
     IncorrectPatch,
     patch,
     get_mission_data_path)

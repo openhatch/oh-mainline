@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base.controllers import *
+from mysite.missions.base.view_helpers import *
 
 class SvnRepository(object):
     INITIAL_CONTENT = os.path.join(get_mission_data_path('svn'), 'svn-initial.svndump')

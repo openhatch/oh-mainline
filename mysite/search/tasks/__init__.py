@@ -21,7 +21,7 @@ import mysite.search.models
 import mysite.customs.models
 from celery.task import Task, task
 
-import mysite.base.helpers
+import mysite.base.view_helpers
 
 class PopulateProjectIconFromOhloh(Task):
     def run(self, project_id):
@@ -68,4 +68,4 @@ class PopulateProjectLanguageFromOhloh(Task):
 @task
 def clear_search_cache():
     logging.info("Clearing the search cache.")
-    mysite.base.helpers.clear_static_cache('search')
+    mysite.base.view_helpers.clear_static_cache('search')

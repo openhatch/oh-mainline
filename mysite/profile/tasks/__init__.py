@@ -23,7 +23,7 @@ import mysite.profile.models
 from celery.task import Task, task
 import celery.registry
 import traceback
-import mysite.profile.controllers
+import mysite.profile.view_helpers
 import shutil
 import staticgenerator
 
@@ -156,7 +156,7 @@ def fill_one_person_recommend_bugs_cache(person_id):
     p = mysite.profile.models.Person.objects.get(id=person_id)
     logging.info("Recommending bugs for %s" % p)
     suggested_searches = p.get_recommended_search_terms() # expensive?
-    recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
+    recommender = mysite.profile.view_helpers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
     recommender.recommend() # cache fill do it.
 
 def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():

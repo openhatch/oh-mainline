@@ -19,7 +19,7 @@
 from mysite.missions.models import Step, StepCompletion
 from mysite.profile.models import Person
 from django.conf import settings
-from mysite.base.helpers import subproc_check_output
+from mysite.base.view_helpers import subproc_check_output
 
 import tarfile
 from StringIO import StringIO

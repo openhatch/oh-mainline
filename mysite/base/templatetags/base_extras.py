@@ -25,7 +25,7 @@ import re
 import os
 import urlparse
 import bleach
-import mysite.project.controllers
+import mysite.project.view_helpers
 
 from django.utils.html import * 
 
@@ -89,12 +89,12 @@ def googleanalyticsjs(parser, token):
 
 @register.filter
 def get_answers_from_session(request):
-    return mysite.project.controllers.get_unsaved_answers_from_session(request.session)
+    return mysite.project.view_helpers.get_unsaved_answers_from_session(request.session)
 
 @register.filter
 def get_project_display_names_to_help_from_session(request):
     return [p.display_name for p in
-            mysite.project.controllers.get_wanna_help_queue_from_session(request.session)]
+            mysite.project.view_helpers.get_wanna_help_queue_from_session(request.session)]
 
 @register.filter
 def bleach_urlize(text):
