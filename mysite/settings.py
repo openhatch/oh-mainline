@@ -141,6 +141,8 @@ STATIC_GENERATOR_URLS = (
 STATIC_DOC_ROOT = 'static/'
 
 # Sessions in /tmp
+# mysite.account.view_helpers.clear_user_sessions assumes the DB backend, it
+# will not work otherwise
 SESSION_ENGINE="django.contrib.sessions.backends.db"
 
 INSTALLED_APPS = (
