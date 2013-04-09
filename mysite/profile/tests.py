@@ -41,6 +41,7 @@ import BeautifulSoup
 import datetime
 import tasks
 import mock
+import os
 from twill import commands as tc
 import quopri
 
@@ -1747,6 +1748,29 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
 
     def tearDown(self):
         django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = self.original_value
+
+
+class PostmapBinaryCalledIfExists(TwillTests):
+
+    @mock.patch('os.system')
+    def test(self, mock_update_table):
+        with mock.patch('mysite.base.depends.postmap_available') as a:
+            task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
+            a.return_value = True
+            task.run()
+            self.assertTrue(os.system.called)
+
+
+class PostmapBinaryNotCalledIfDoesNotExist(TwillTests):
+
+    @mock.patch('os.system')
+    def test(self, mock_update_table):
+        with mock.patch('mysite.base.depends.postmap_available') as a:
+            task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
+            a.return_value = False
+            task.run()
+            self.assertFalse(os.system.called)
+
 
 class PostFixGeneratorList(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',

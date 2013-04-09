@@ -78,7 +78,8 @@ class RegeneratePostfixAliasesForForwarder(Task):
         # Update the Postfix forwarder database. Note that we do not need
         # to ask Postfix to reload. Yay!
         # FIXME stop using os.system()
-        os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps')
+        if mysite.base.depends.postmap_available():
+            os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps')
 
 class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
