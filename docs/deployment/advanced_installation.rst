@@ -10,7 +10,7 @@ reading the OpenHatch documentation, keep reading.
 Automated testing
 =================
 
-The OpenHatch code comes with automated tests that you cah run to make
+The OpenHatch code comes with automated tests that you can run to make
 sure that it is set up To execute all tests, run this command::
 
   python manage.py test
@@ -37,7 +37,7 @@ these using a GUI installer, the program "pip", or a package manager
 like apt-get.
 
 For each dependency, we specify how to get it with pip *or*
-apt-get. If you have a Debian or Ubuntu sustem, use the apt-get
+apt-get. If you have a Debian or Ubuntu system, use the apt-get
 instructions. Otherwise, try pip. (And if it doesn't work, ask for
 help quickly.)
 
