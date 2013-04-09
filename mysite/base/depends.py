@@ -70,3 +70,17 @@ except:
         ### possibly work.
         import sys
         sys.modules['Image'] = sys.modules['sys']
+
+
+def postmap_available(already_emitted_warning=[]):
+    # Module-level state is used to track if we already emitted the warning.
+    # It is not thread-safe, but it sure is convenient.
+    POSTMAP_PATH = '/usr/sbin/postmap'
+    if not os.path.exists(POSTMAP_PATH):
+        if already_emitted_warning:
+            pass
+        else:
+            already_emitted_warning.append(True)
+            logging.warning('postmap binary not found at {0}. Look in ADVANCED_INSTALLATION for the section about postfix for more information.'.format(POSTMAP_PATH))
+        return False
+    return True

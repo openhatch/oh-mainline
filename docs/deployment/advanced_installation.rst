@@ -17,6 +17,13 @@ sure that it is set up To execute all tests, run this command::
 
 For more about tests visit: http://openhatch.org/wiki/Automated_testing
 
+Postmap and Testing
+~~~~~~~~~~~~~~~~~~~
+
+If the postmap binary (/usr/sbin/postmap) is not available on the system,
+it is better not to try running that binary during testing. So before
+tests we check for presence of the postmap binary and log a warning if
+it is not present on the system.
 
 Optional dependencies
 =====================
