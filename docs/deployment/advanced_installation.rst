@@ -17,8 +17,14 @@ sure that it is set up To execute all tests, run this command::
 
 For more about tests visit: http://openhatch.org/wiki/Automated_testing
 
-Postmap and Testing
-~~~~~~~~~~~~~~~~~~~
+Postfix, postmap and testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The code for site creates a configuration file for an email service,
+Craigslist-style, that lets all users have an anonymous inbound email
+address that goes to them. In particular, the code configures a
+Postfix-based alias map for this. When that alias map changes, we notify
+Postfix by calling postmap.
 
 If the postmap binary (/usr/sbin/postmap) is not available on the system,
 it is better not to try running that binary during testing. So before
