@@ -1,0 +1,105 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+{% block title %}
+Donate to OpenHatch and support community engagement
+{% endblock title %}
+
+{% block body_class %}{{ block.super }} missions{% endblock %}
+
+{% block js_in_head %}
+{{ block.super }}
+<script type="text/javascript">
+document.documentElement.className = 'javascript_is_enabled';
+</script>
+{% endblock %}
+
+{% block main %}
+<div class="module">
+  <div class='module-head'>
+    <ul>
+      <li>
+	<a href="/">&laquo; Back to front page</a>
+      </li>
+    </ul>
+    <h3>Thanking our sponsors</h3>
+  </div>
+  <div class='module-body contains-submodules one-column'>
+    <p>We are grateful to the generous gifts of our sponsors. By
+    believing in OpenHatch, they enable us to change the world of open
+    source and programming communities for the better.</p>
+
+    <p>This list reflects sponsors who have supported the organization
+      over the last twelve months. Many have given to support the Open
+      Source Comes to Campus program specifically; a handful support
+      the organization as a whole. We wish to thank all of them.</p>
+
+    <h4 style="float: none;">Organizational sponsors, 2013</h4>
+
+    <ul class="raquo_bullets" style="margin-top: 0.5em;">
+      <li>Google</li>
+      <li>Anonymous individual donor</li>
+    </ul>
+
+    <h4 style="float: none; margin-top: 1em;">Open Source Comes to Campus for Women in Computing, 2013: Patron</h4>
+
+    <ul class="raquo_bullets" style="margin-top: 0.5em;">
+      <li>Stripe</li>
+      <li>10gen</li>
+    </ul>
+
+    <h4 style="float: none; margin-top: 1em;">Open Source Comes to Campus sponsors, 2012</h4>
+
+    <ul class="raquo_bullets" style="margin-top: 0.5em;">
+      <li>OmniTI</li>
+      <li>Dreamwidth Studios</li>
+      <li>Kitware</li>
+      <li>Nokia</li>
+    </ul>
+
+    <h4 style="float: none; margin-top: 1em;">In-kind donations</h4>
+
+    <ul class="raquo_bullets" style="margin-top: 0.5em;">
+      <li><a href="https://linode.com/"><img src="https://www.linode.com/images/linode_logo_gray.png" height="65" width="288" alt="Linode"></a></li>
+    </ul>
+
+    <h3 style="float: none; margin-top: 1em;">You or your company here</h3>
+
+    <h4 style="float: none; margin-top: 1em;">Sponsoring Open Source Comes to Campus, for Women in Computing</h4>
+    <p>We're still looking for companies and individuals that are excited about
+    our efforts to <a href="http://campus.openhatch.org/">teach students how to get
+    involved in open source</a>. This year, in 2013, we are focusing on bringing those
+    workshops to women in computer science groups, aiming to narrow the gender gap in
+    open source.</p>
+    <p>Please read our <a href="http://linode.openhatch.org/~paulproteus/oss-campus-diversity.pdf">sponsor prospectus (PDF)</a> and get in touch
+     by emailing <a href="mailto:hello@openhatch.org">hello@openhatch.org</a>!</p>
+    <h4 style="float: none; margin-top: 1em;">Sponsoring OpenHatch as a whole</h4>
+    <p>If you believe in our mission generally, and are enthusiastic about sponsoring
+    the organization, please send an email to
+    <a href="mailto:hello@openhatch.org">hello@openhatch.org</a>!</p>
+  </div>
+</div>
+{% endblock main %}

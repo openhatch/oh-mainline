@@ -403,6 +403,9 @@ urlpatterns = patterns('',
         # the OpenHatch events page
         (r'^events/$', direct_to_template, {'template': 'base/events.html'}),
 
+        # the OpenHatch sponsors page
+        (r'^sponsors/$', direct_to_template, {'template': 'base/sponsors.html'}),
+
         # the OpenHatch donate page
         (r'^donate/$', direct_to_template, {'template': 'base/donate.html'}),
         # the OpenHatch donate page
