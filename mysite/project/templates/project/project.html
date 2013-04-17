@@ -299,7 +299,6 @@ about how you can help {{ project.display_name }}
                 <li>
                     {% if project.cached_contributor_count %}
                         <a class='actionlink' href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}">See all</a>
-                        <a class='actionlink' href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}>Add yourself</a>
                     {% endif %}
                     <a class='actionlink' href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>Add yourself</a>
                 </li>
