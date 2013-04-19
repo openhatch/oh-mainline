@@ -344,10 +344,7 @@ def change_password_do(request):
             request.user, request.POST)
     if form.is_valid():
         form.save()
-<<<<<<< HEAD
         clear_user_sessions(request.user, session_to_omit=request.session)
-=======
->>>>>>> google deprecated their v2 api https://developers.google.com/maps/documentation/geocoding/v2/index http://drupal.org/node/1940474
         return HttpResponseRedirect(
             reverse(change_password) + '?notification_id=success')
     else:
