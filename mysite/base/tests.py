@@ -37,6 +37,8 @@ import mock
 import datetime
 import logging
 import unittest
+import json
+import urllib
 
 import mysite.base.view_helpers
 import mysite.base.decorators
@@ -540,4 +542,18 @@ class WindowsFilesystemCompatibilityTests(unittest.TestCase):
              if ('?' not in x)])
         self.assertEqual(file_set, files_filtered)
 
+class GoogleApiTests(unittest.TestCase):
+    def test_google_api(self):
+        """ Test to see if the google api is returning what we expect """
+        mapsUrl = 'https://maps.googleapis.com/maps/api/geocode/json?'
+        query_string = "address=Mountain+View,+CA&sensor=false"
+
+        coordinates = json.loads(urllib.urlopen(mapsUrl + query_string).read())
+
+        # Check that latitude and longitude are returned
+        latitude = float(coordinates['results'][0]['geometry']['location']['lat'])
+        longitude = float(coordinates['results'][0]['geometry']['location']['lng'])
+
+        # Check that status is 'OK'
+        self.assertEqual(coordinates['status'], 'OK')
 # vim: set ai et ts=4 sw=4 nu:
