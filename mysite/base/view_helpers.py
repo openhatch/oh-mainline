@@ -239,7 +239,7 @@ def mysql_regex_escape(s):
 ## source: http://code.google.com/apis/kml/articles/geocodingforkml.html
 import urllib
 
-def _geocode(address):
+def _geocode(address=None, response_data=None):
     # This function queries the Google Maps API geocoder with an
     # address. It gets back json, which it then parses and
     # returns a string with the longitude and latitude of the address.
@@ -254,7 +254,10 @@ def _geocode(address):
     # This retrieves the URL from Google, parses out the longitude and latitude,
     # and then returns them as a string.
     try:
-        coordinates = json.loads(urllib.urlopen(mapsUrl + query_string).read())
+        if response_data:
+            coordinates = json.loads(response_data)
+        else:
+            coordinates = json.loads(urllib.urlopen(mapsUrl + query_string).read())
         status = coordinates['status']
 
         # For more info on status,
