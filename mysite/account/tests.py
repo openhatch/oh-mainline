@@ -445,4 +445,32 @@ class LoginPageContainsUnsavedAnswer(TwillTests):
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
 
+class ClearSessionsOnPasswordChange(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def user_logged_in(self, session):
+        return '_auth_user_id' in session
+
+    def test(self):
+        client1 = Client()
+        client2 = Client()
+
+        username = "paulproteus"
+        password = "paulproteus's unbreakable password"
+        new_password = "new password"
+
+        client1.login(username=username, password=password)
+        client2.login(username=username, password=password)
+
+        self.assertTrue(self.user_logged_in(client1.session))
+        self.assertTrue(self.user_logged_in(client2.session))
+
+        client1.post(reverse(mysite.account.views.change_password_do),
+                data={'old_password': password, 'new_password1': new_password,
+                    'new_password2': new_password})
+
+        self.assertTrue(self.user_logged_in(client1.session))
+        self.assertFalse(self.user_logged_in(client2.session))
+
+
 # vim: set nu:
