@@ -551,5 +551,5 @@ class GoogleApiTests(unittest.TestCase):
 
         # Check that latitude and longitude are returned and status is 'OK'
         geocode = mysite.base.view_helpers._geocode(response_data=response)
-        self.assertIsNotNone(geocode)
+        self.assertNotEqual(geocode, None)
 # vim: set ai et ts=4 sw=4 nu:
