@@ -1,0 +1,58 @@
+{
+   "results" : [
+      {
+         "address_components" : [
+            {
+               "long_name" : "Mountain View",
+               "short_name" : "Mountain View",
+               "types" : [ "locality", "political" ]
+            },
+            {
+               "long_name" : "Santa Clara",
+               "short_name" : "Santa Clara",
+               "types" : [ "administrative_area_level_2", "political" ]
+            },
+            {
+               "long_name" : "California",
+               "short_name" : "CA",
+               "types" : [ "administrative_area_level_1", "political" ]
+            },
+            {
+               "long_name" : "United States",
+               "short_name" : "US",
+               "types" : [ "country", "political" ]
+            }
+         ],
+         "formatted_address" : "Mountain View, CA, USA",
+         "geometry" : {
+            "bounds" : {
+               "northeast" : {
+                  "lat" : 37.45087890,
+                  "lng" : -122.04467210
+               },
+               "southwest" : {
+                  "lat" : 37.35654110,
+                  "lng" : -122.11786190
+               }
+            },
+            "location" : {
+               "lat" : 37.38605170,
+               "lng" : -122.08385110
+            },
+            "location_type" : "APPROXIMATE",
+            "viewport" : {
+               "northeast" : {
+                  "lat" : 37.45087890,
+                  "lng" : -122.04467210
+               },
+               "southwest" : {
+                  "lat" : 37.35654110,
+                  "lng" : -122.11786190
+               }
+            }
+         },
+         "types" : [ "locality", "political" ]
+      }
+   ],
+   "status" : "OK"
+}
