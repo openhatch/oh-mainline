@@ -25,6 +25,7 @@ import tempfile
 import datetime
 import dateutil.parser
 import subprocess
+import json
 
 from django.http import HttpResponse
 import django.shortcuts
@@ -217,7 +218,7 @@ def get_notification_from_request(request):
         try:
             notification_text = notifications_dictionary[notification_id]
         except KeyError:
-            notification_text = ("Couldn't find notification text " 
+            notification_text = ("Couldn't find notification text "
                     + "for id = `%s`" % notification_id)
         return [ {
             'id': notification_id,
@@ -238,30 +239,35 @@ def mysql_regex_escape(s):
 ## source: http://code.google.com/apis/kml/articles/geocodingforkml.html
 import urllib
 
-def _geocode(address):
+def _geocode(address=None, response_data=None):
     # This function queries the Google Maps API geocoder with an
-    # address. It gets back a csv file, which it then parses and
+    # address. It gets back json, which it then parses and
     # returns a string with the longitude and latitude of the address.
 
     logging.info('Geocoding address: %s' % address)
 
-    # This isn't an actual maps key, you'll have to get one yourself.
-    # Sign up for one here: http://code.google.com/apis/maps/signup.html
-    mapsUrl = 'http://maps.google.com/maps/geo?q='
-     
+    mapsUrl = 'https://maps.googleapis.com/maps/api/geocode/json?'
+
     # This joins the parts of the URL together into one string.
-    query_string = mysite.base.unicode_sanity.urlencode({u'q': address, u'output': u'csv'})
-    
+    query_string = mysite.base.unicode_sanity.urlencode(
+                                    {u'address': address, u'sensor': u'false'})
     # This retrieves the URL from Google, parses out the longitude and latitude,
     # and then returns them as a string.
     try:
-        coordinates = urllib.urlopen(mapsUrl + query_string).read().split(',')
-        status, accuracy, latitude, longitude = map(float, coordinates)
+        if response_data:
+            coordinates = json.loads(response_data)
+        else:
+            coordinates = json.loads(urllib.urlopen(mapsUrl + query_string).read())
+        status = coordinates['status']
+
         # For more info on status,
-        # http://code.google.com/apis/maps/documentation/geocoding/#GeocodingAccuracy
-        if status == 200:
-            return {'suggested_zoom_level': max(6, int(accuracy)),
-                    'latitude': latitude,
+        # https://developers.google.com/maps/documentation/geocoding/#StatusCodes
+        if status == 'OK':
+            latitude = float(
+                coordinates['results'][0]['geometry']['location']['lat'])
+            longitude = float(
+                coordinates['results'][0]['geometry']['location']['lng'])
+            return {'latitude': latitude,
                     'longitude': longitude}
         return None
     except IOError:
@@ -298,7 +304,6 @@ def cached_geocoding_in_json(address):
         geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
         geocoded_and_inaccessible.update(geocoded)
         geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
-
         if geocoded:
             cache_duration = A_LONG_TIME_IN_SECONDS + random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS) # cache for a week, which should be plenty
         else:

@@ -32,6 +32,7 @@ import os.path
 import subprocess
 
 from django.core.cache import cache
+from django.conf import settings
 
 import mock
 import datetime
@@ -540,4 +541,15 @@ class WindowsFilesystemCompatibilityTests(unittest.TestCase):
              if ('?' not in x)])
         self.assertEqual(file_set, files_filtered)
 
+class GoogleApiTests(unittest.TestCase):
+    def test_google_api(self):
+        """ Test to see if the google api is returning what we expect """
+        response_file_path = os.path.join(settings.MEDIA_ROOT, 'sample-data',
+                                          'google_api', 'sample_response')
+        with open(response_file_path, 'r') as f:
+            response = f.read()
+
+        # Check that latitude and longitude are returned and status is 'OK'
+        geocode = mysite.base.view_helpers._geocode(response_data=response)
+        self.assertNotEqual(geocode, None)
 # vim: set ai et ts=4 sw=4 nu:
