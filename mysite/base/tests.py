@@ -37,7 +37,7 @@ from django.conf import settings
 import mock
 import datetime
 import logging
-import unittest
+from django.utils import unittest
 
 import mysite.base.view_helpers
 import mysite.base.decorators
