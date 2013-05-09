@@ -28,8 +28,6 @@ register('openhatch_css',
                 "jquery-ui-1.7.3/themes/base/ui.base.css",
                 "jquery-ui-1.7.3/themes/base/ui.progressbar.css",
                 "jquery-ui-1.7.3/themes/base/ui.tabs.css",
-                #1.8.20:
-                #"jquery-ui-1.7.3/themes/ui-lightness/jquery-ui.all.css",
                 ),
          output="packed/openhatch.css")
 register('header_js',
@@ -56,12 +54,6 @@ register('openhatch_js',
                 'jquery-ui-1.7.3/ui/ui.progressbar.js',
                 'jquery-ui-1.7.3/ui/ui.tabs.js',
                 ),
-         # 1.8.20:
-         #Bundle('jquery-ui/ui/jquery.ui.core.js',
-         #       'jquery-ui/ui/jquery.ui.sortable.js',
-         #       'jquery-ui/ui/jquery.ui.progressbar.js',
-         #       'jquery-ui/ui/jquery.ui.tabs.js',
-         #       ),
 
          # jQuery Tools
          Bundle('openid/js/openid-jquery.js',
