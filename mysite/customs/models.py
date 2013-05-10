@@ -398,7 +398,8 @@ class TracTrackerModel(TrackerModel):
 class TracQueryModel(TrackerQueryModel):
     '''This model stores query URLs for TracTracker objects.'''
     url = models.URLField(max_length=400,
-                          blank=False, null=False)
+                          blank=False, null=False,
+                          help_text="This is the URL of the Trac query containing the bugs that you want us to index. Make sure to include &format=csv in the URL.")
     description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(TracTrackerModel)
 
