@@ -93,6 +93,7 @@ def import_one_bug_item(d):
             ('_project_name' in d)):
         logging.error("Your data needs a _tracker_name and _project_name.")
         logging.error(repr(d))
+        return
 
     project, created = mysite.search.models.Project.objects.get_or_create(name=d['_project_name'])
     if created:
