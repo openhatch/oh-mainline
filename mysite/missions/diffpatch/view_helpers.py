@@ -134,6 +134,17 @@ class DiffRecursiveMission(object):
                 return new_name
         return s
 
+    @staticmethod
+    def strip_filename_one_path_level(filename):
+        if not '/' in filename:
+            raise IncorrectPatch, 'Attempting to strip one level of slashes from "%s" left nothing.' % filename
+        return re.sub('^[^/]*/+', '', filename)
+
+    @staticmethod
+    def check_for_leading_dot_slash_in_filename(filename):
+        if filename.startswith("./"):
+            raise IncorrectPatch, 'The diff you submitted will not apply properly because it has filename(s) starting with "./". Make sure that when you run the diff command, you do not add unnecessary "./" path prefixes. This is important because it affects the arguments needed to run the patch command for whoever applies the patch.'
+
     @classmethod
     def synthesize_tarball(cls):
         tdata = StringIO()
@@ -148,14 +159,11 @@ class DiffRecursiveMission(object):
 
         # Strip one level of directories from the left of the filenames.
         for i, filename in enumerate(the_patch.source):
-
-            if not '/' in filename:
-                raise IncorrectPatch, 'Attempting to strip one level of slashes from header line "--- %s" left nothing.' % filename
-            the_patch.source[i] = re.sub('^[^/]*/+', '', filename)
+            cls.check_for_leading_dot_slash_in_filename(filename)
+            the_patch.source[i] = cls.strip_filename_one_path_level(filename)
         for i, filename in enumerate(the_patch.target):
-            if not '/' in filename:
-                raise IncorrectPatch, 'Attempting to strip one level of slashes from header line "+++ %s" left nothing.' % filename
-            the_patch.target[i] = re.sub('^[^/]*/+', '', filename)
+            cls.check_for_leading_dot_slash_in_filename(filename)
+            the_patch.target[i] = cls.strip_filename_one_path_level(filename)
 
         # Go through the files and check that ones that should be mentioned in the patch are so mentioned.
         path_to_mission_files = os.path.join(get_mission_data_path('diffpatch'), cls.ORIG_DIR)
