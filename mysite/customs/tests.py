@@ -462,6 +462,18 @@ class BugTrackerEditingViews(TwillTests):
     def setUp(self):
         super(BugTrackerEditingViews, self).setUp()
         self.twisted = mysite.search.models.Project.create_dummy(name='Twisted System')
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+        for url in ['http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                     'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
+            mysite.customs.models.TracQueryModel.objects.create(url=url,
+                                                                tracker=self.tm)
 
     def test_slash_does_not_crash_tracker_editor(self):
         mysite.customs.models.TracTrackerModel.all_trackers.create(
@@ -494,6 +506,17 @@ class BugTrackerEditingViews(TwillTests):
         response = client.get(url)
         # This should redirect to what amounts to a not-found page
         assert response.status_code == 302
+
+    def test_edit_tracker_url(self):
+        client = self.login_with_client()
+        # get url_id
+        url_id = mysite.customs.models.TracQueryModel.objects.all()[0].id
+        url = reverse(mysite.customs.views.edit_tracker_url_do, kwargs={
+                'tracker_id': self.twisted.id,
+                'tracker_type': 'trac', 'tracker_name': 'twisted',
+                'url_id': url_id})
+        r = client.get(url)
+        self.assertEquals(r.status_code, 200)
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
