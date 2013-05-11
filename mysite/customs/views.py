@@ -253,7 +253,7 @@ def edit_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id, ur
         data['url_id'] = url_id
         data['url_form'] = url_form
 
-    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, tracker_name])
+    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, tracker_id, tracker_name])
     return mysite.base.decorators.as_view(request, 'customs/edit_tracker_url.html', data, None)
 
 @login_required
