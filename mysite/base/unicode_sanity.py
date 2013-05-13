@@ -23,7 +23,7 @@
 import urllib
 import cStringIO as StringIO
 
-import mysite.base.decorators
+import decorator
 
 _urlencode = urllib.urlencode
 
@@ -43,8 +43,27 @@ def urlencode(unicode_dict):
         #import pdb
         #pdb.set_trace()
     return _urlencode(utf8_dict)
-    
-@mysite.base.decorators.unicodify_strings_when_inputted
+
+@decorator.decorator
+def unicodify_strings_when_inputted(func, *args, **kwargs):
+    '''Decorator that makes sure every argument passed in that is
+    a string-esque type is turned into a Unicode object. Does so
+    by decoding UTF-8 byte strings into Unicode objects.'''
+    args_as_list = list(args)
+    # first, *args
+    for i in range(len(args)):
+        arg = args[i]
+        if type(arg) is str:
+            args_as_list[i] = unicode(arg, 'utf-8')
+
+    # then, **kwargs
+    for key in kwargs:
+        arg = kwargs[key]
+        if type(arg) is str:
+            kwargs[key] = unicode(arg, 'utf-8')
+    return func(*args_as_list, **kwargs)
+
+@unicodify_strings_when_inputted
 def quote(str):
     return urllib.quote(str.encode('utf-8'))
 

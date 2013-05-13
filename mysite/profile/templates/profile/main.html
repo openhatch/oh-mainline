@@ -31,7 +31,7 @@
     <div class='module-head'>
         <h3>Projects</h3>
     </div>
-    <div class='module-body'>
+        <div class='module-body'>
         {% with person.get_published_portfolio_entries as portfolio_entries %} 
             {% if portfolio_entries %}
                 <ul>
@@ -50,14 +50,29 @@
                 {% if editable %}
                 {# YOUR profile lacks projects. #}
                 <ul class='nudgebuttons' style="float: left; padding-bottom: 10px;border-bottom: 2px dashed #ccc; margin-bottom: 10px;">
+
+                    <li>
+                    <a href='{% url mysite.search.views.fetch_bugs %}'>
+                        <div class='notification'>
+                            <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
+                            <strong>
+                                Find a project to work on
+                            </strong>
+                            <span>
+                                Looking for something to put here? No problem! Get started by searching our database of bite-sized bugs...
+                            </span>
+                        </div>
+                    </a>
+                    </li>
+
                     <li>
                     <a href='{% url mysite.profile.views.portfolio_editor %}'>
                         <div class='notification'>
                             <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
                             <strong>
-                                Add your projects
+                                Add your contributions
                             </strong>
-                            <span style='font-size: 1.2em;'>
+                            <span>
                                 If you've contributed to open source already, say so on our project editor!
                                 We want you to share your your bug reports, translations, patches, community management, and code commits.
                             </span>
@@ -66,18 +81,19 @@
                     </li>
 
                     <li>
-                    <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                        <div class='notification smaller'>
+                    <a href='{% url mysite.customs.views.list_trackers %}'>
+                        <div class='notification'>
                             <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
-                            <span>
-                                Looking for something to put here? No problem!
-                            </span>
                             <strong>
-                                Find a volunteer opportunity
+                                Add your project's bugs
                             </strong>
+                            <span>
+                                If you are looking to list a project on Open Hatch for other contributors to find and submit patches to, add the project, add a bug tracker, and configure your project settings so others can find it.
+                            </span>
                         </div>
                     </a>
                     </li>
+
                 </ul>
 
                 {# To find things to do in the open source community, use our volunteer opportunity finder.   #}
@@ -90,11 +106,21 @@
 
     </div>
     <div class="module-foot">
-        {% if editable %}
+        {% if editable and person.get_published_portfolio_entries %}
         <ul>
             <li>
+            <a href='{% url mysite.search.views.fetch_bugs %}'>
+                Find a project &raquo;
+            </a>
+            </li>
+            <li>
             <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                Add/edit projects &raquo;
+                Add contributions &raquo;
+            </a>
+            </li>
+            <li>
+            <a href='{% url mysite.customs.views.list_trackers %}'>
+                Add project's bugs &raquo;
             </a>
             </li>
         </ul>

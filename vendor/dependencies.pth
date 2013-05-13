@@ -42,6 +42,7 @@ packages/python-otp
 packages/python-patch
 packages/pytz
 packages/PyYaml/lib
+packages/requests
 packages/scrapy
 packages/sessionprofile
 packages/six

@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mysite.missions.base.views import *
-from mysite.missions.svn import forms, controllers
+from mysite.missions.svn import forms, view_helpers
 import mysite.missions.base.views
 import shutil
 import tempfile
@@ -33,10 +33,10 @@ from django.shortcuts import render
 def resetrepo(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-    controllers.SvnRepository(request.user.username).reset()
-    controllers.unset_mission_completed(request.user.get_profile(), 'svn_checkout')
-    controllers.unset_mission_completed(request.user.get_profile(), 'svn_diff')
-    controllers.unset_mission_completed(request.user.get_profile(), 'svn_commit')
+    view_helpers.SvnRepository(request.user.username).reset()
+    view_helpers.unset_mission_completed(request.user.get_profile(), 'svn_checkout')
+    view_helpers.unset_mission_completed(request.user.get_profile(), 'svn_diff')
+    view_helpers.unset_mission_completed(request.user.get_profile(), 'svn_commit')
     if 'stay_on_this_page' in request.GET:
         return HttpResponseRedirect(reverse('svn_main_page'))
     else:
@@ -54,7 +54,7 @@ def diff_submit(request):
             form = forms.DiffForm(request.user.username, wcdir, request.POST)
             if form.is_valid():
                 form.commit_diff()
-                controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
+                view_helpers.set_mission_completed(request.user.get_profile(), 'svn_diff')
                 return HttpResponseRedirect(reverse('svn_diff'))
         finally:
             shutil.rmtree(wcdir)
@@ -71,7 +71,7 @@ def checkout_submit(request):
     if request.method == 'POST':
         form = forms.CheckoutForm(request.user.username, request.POST)
         if form.is_valid():
-            controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
+            view_helpers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
             return HttpResponseRedirect(reverse('svn_checkout'))
         data['svn_checkout_form'] = form
 
@@ -93,19 +93,19 @@ class SvnBaseView(mysite.missions.base.views.MissionBaseView):
         state = MissionPageState(self.request, passed_data=None, mission_name=self.mission_name)
         new_data, person = state.get_base_data_dict_and_person()
         if person:
-            repo = controllers.SvnRepository(self.request.user.username)
+            repo = view_helpers.SvnRepository(self.request.user.username)
             new_data.update({
                 'repository_exists': repo.exists(),
-                'svn_checkout_done': controllers.mission_completed(person, 'svn_checkout'),
-                'svn_diff_done': controllers.mission_completed(person, 'svn_diff'),
-                'svn_commit_done': controllers.mission_completed(person, 'svn_commit'),
+                'svn_checkout_done': view_helpers.mission_completed(person, 'svn_checkout'),
+                'svn_diff_done': view_helpers.mission_completed(person, 'svn_diff'),
+                'svn_commit_done': view_helpers.mission_completed(person, 'svn_commit'),
             })
             if new_data['repository_exists']:
                 new_data.update({
                         'checkout_url': repo.public_trunk_url(),
                         'secret_word_file': forms.CheckoutForm.SECRET_WORD_FILE,
                         'file_for_svn_diff': forms.DiffForm.FILE_TO_BE_PATCHED,
-                        'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
+                        'new_secret_word': view_helpers.SvnCommitMission.NEW_SECRET_WORD,
                         'commit_username': self.request.user.username,
                         'commit_password': repo.get_password()})
         data.update(new_data)
@@ -157,4 +157,4 @@ class Commit(SvnBaseView):
 
 @login_required
 def commit_poll(request):
-    return HttpResponse(simplejson.dumps(controllers.mission_completed(request.user.get_profile(), 'svn_commit')))
+    return HttpResponse(simplejson.dumps(view_helpers.mission_completed(request.user.get_profile(), 'svn_commit')))

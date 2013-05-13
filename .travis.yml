@@ -14,3 +14,5 @@ before_install:
  - sudo apt-get update -qq
  - sudo apt-get build-dep -qq python-imaging
  - sudo apt-get install libjpeg-dev
+ - git config --global user.name TravisDummy
+ - git config --global user.email dummy@travis-ci.orgo

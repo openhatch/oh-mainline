@@ -84,12 +84,6 @@ about how you can help {{ project.display_name }}
                                 Make sure your contact info is up to date</a></li>
                 </ul>
             </span>
-            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
-                <input type='hidden' name='project' value='{{project.id}}'>
-                <input type='image'
-                        src='{% version '/static/images/icons/undo.png' %}'
-                        id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
-            </form>
         </div>
     </div>
 
@@ -99,7 +93,7 @@ about how you can help {{ project.display_name }}
     <div id='project-tab-container' class='module contains_questions'>
             <ul class='module-head tab_nav'>
                     <li class='ui-state-active'>
-                        <h3><a href='#chatter'>Chatter</a></h3>
+                        <h3><a href='#chatter'>Q&A</a></h3>
                     </li>
                     {% if buildhelper_steps %}
                     <li >
@@ -235,7 +229,7 @@ about how you can help {{ project.display_name }}
             <h3>About {{ project.display_name }}</h3>
             <ul>
                 <li>
-                    <a href='{{ project.get_edit_page_url }}'>Edit</a>
+                    <a href='{{ project.get_edit_page_url }}'>Edit project settings</a>
                 </li>
             </ul>
         </div>
@@ -304,11 +298,9 @@ about how you can help {{ project.display_name }}
             <ul>
                 <li>
                     {% if project.cached_contributor_count %}
-                        <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all</a>
-                    {% else %}
-                        <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'
-                                style='float: right; font-weight: normal;'>Add yourself</a>
+                        <a class='actionlink' href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"'>See all</a>
                     {% endif %}
+                    <a class='actionlink' href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>Add yourself</a>
                 </li>
             </ul>
     </div>
@@ -572,9 +564,6 @@ function yay_we_want_to_help() {
    /* Create a tipsy-style message that reports success */
    var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
 
-   /* highlight new guy */
-   $tipsyMe.css('background-color', '#ffc');
-
    /* Trigger tipsy destruction. */
    $('#wannahelp-button').getTipsy().remove();
 
@@ -587,47 +576,47 @@ $('#show').click(function () { $('#show_form').ajaxSubmit()});
 $('#hide').click(function () { $('#hide_form').ajaxSubmit()});
 $('#show_copypastebox').click(function() { $('#copypastebox').toggleDisplay(); return false; });
 
-    Want2HelpJacker = function () { }
-    Want2HelpJacker.prototype = {
-        'initialize': function () {
-            /* Hijack the 'I want to help' form so that it POST's asynchronously. */
-            var options = {
-                'url': "{% url mysite.project.views.wanna_help_do %}",
-                'type': 'POST',
-                'success': function (response) {
-                    /* HACK! In the case that we need to log in, accept a message from the server
-                     * indicating as much.
-                     */
-                    if (response.substring(0, 10) === "redirect: ") {
-                        var destination = response.substring(10);
-                        document.location = destination;
-                        return;
-                    }
-
-                    // otherwise, proceed as normal.
-
-                    /* Replace the list of person summaries. */
-                    $('#wanna_help').html(response);
-
-                    // Call the "Yay, we want to help" function
-                    yay_we_want_to_help();
-                },
-                'error': function () {
-                    $.jGrowl("Oops! Something went wrong. Please try again.");
+Want2HelpJacker = function () { }
+Want2HelpJacker.prototype = {
+    'initialize': function () {
+        /* Hijack the 'I want to help' form so that it POST's asynchronously. */
+        var options = {
+            'url': "{% url mysite.project.views.wanna_help_do %}",
+            'type': 'POST',
+            'success': function (response) {
+                /* HACK! In the case that we need to log in, accept a message from the server
+                 * indicating as much.
+                 */
+                if (response.substring(0, 10) === "redirect: ") {
+                    var destination = response.substring(10);
+                    document.location = destination;
+                    return;
                 }
-            };
-            $('#want2help_form').ajaxForm(options);
-            $('#want2help_form').find('input:submit').click(function () {
-                $button = $(this);
-                $button.val('Working...')
-            });
 
-        }
-    };
-    {% if user_just_signed_up_as_wants_to_help %}
-    $(yay_we_want_to_help);
-    {% endif %}
-    </script>
+                // otherwise, proceed as normal.
+
+                /* Replace the list of person summaries. */
+                $('#wanna_help').load(window.location + " #wanna_help")
+
+                // Call the "Yay, we want to help" function
+                yay_we_want_to_help();
+            },
+            'error': function () {
+                $.jGrowl("Oops! Something went wrong. Please try again.");
+            }
+        };
+        $('#want2help_form').ajaxForm(options);
+        $('#want2help_form').find('input:submit').click(function () {
+            $button = $(this);
+            $button.val('Working...')
+        });
+
+    }
+};
+{% if user_just_signed_up_as_wants_to_help %}
+$(yay_we_want_to_help);
+{% endif %}
+</script>
 
 {% endblock js %}
 

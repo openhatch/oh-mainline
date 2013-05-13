@@ -21,7 +21,7 @@ import logging
 from django.http import HttpResponse
 import re
 import collections
-import mysite.base.helpers
+import mysite.base.view_helpers
 from django.utils import simplejson
 import django.core.cache
 import hashlib
@@ -29,7 +29,7 @@ from functools import partial
 
 from django.template.loader import render_to_string
 import django.db.models.query
-from mysite.base.helpers import render_response
+from mysite.base.view_helpers import render_response
 from django.core.urlresolvers import reverse, resolve
 import django.contrib.auth.decorators
 
@@ -101,8 +101,8 @@ def no_str_in_the_dict(d):
 
     for key in d:
         value = d[key]
-        mysite.base.helpers.assert_or_pdb(type(key) != str)
-        mysite.base.helpers.assert_or_pdb(type(value) != str)
+        mysite.base.view_helpers.assert_or_pdb(type(key) != str)
+        mysite.base.view_helpers.assert_or_pdb(type(value) != str)
     return d
 
 def no_str_in_the_list(l):
@@ -110,7 +110,7 @@ def no_str_in_the_list(l):
         return l
 
     for elt in l:
-        mysite.base.helpers.assert_or_pdb(type(l) != str)
+        mysite.base.view_helpers.assert_or_pdb(type(l) != str)
     return l
 
 def decorator_factory(decfac): # partial is functools.partial

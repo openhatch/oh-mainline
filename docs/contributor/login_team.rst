@@ -15,6 +15,7 @@ Current members
 * Jack Grigg (pythonian4000)
 * Asheesh Laroia (paulproteus)
 * Jessica McKellar (jesstess)
+* John Morrissey (jwm)
 * Karen Rustad (aldeka)
 
 

@@ -19,9 +19,9 @@
 import django.forms
 from django.forms import ValidationError
 import os
-from mysite.missions.base.controllers import get_mission_data_path
+from mysite.missions.base.view_helpers import get_mission_data_path
 import patch
-from mysite.missions.svn import controllers
+from mysite.missions.svn import view_helpers
 
 class CheckoutForm(django.forms.Form):
     secret_word = django.forms.CharField(error_messages={'required': 'No secret word was given.'})
@@ -32,7 +32,7 @@ class CheckoutForm(django.forms.Form):
         self.username = username 
 
     def clean_secret_word(self):
-        cat_trunk = controllers.SvnRepository(self.username).cat('/trunk/' +
+        cat_trunk = view_helpers.SvnRepository(self.username).cat('/trunk/' +
                                                      self.SECRET_WORD_FILE).strip()
         if self.cleaned_data['secret_word'] != cat_trunk:
             raise ValidationError, 'The secret word is incorrect.'
@@ -67,8 +67,8 @@ class DiffForm(django.forms.Form):
 
         # Now we need to generate a working copy to apply the patch to.
         # We can also use this working copy to commit the patch if it's OK.
-        repo = controllers.SvnRepository(self.username)
-        controllers.subproc_check_output(['svn', 'co', repo.file_trunk_url(), self.wcdir])
+        repo = view_helpers.SvnRepository(self.username)
+        view_helpers.subproc_check_output(['svn', 'co', repo.file_trunk_url(), self.wcdir])
 
         # Check that it will apply correctly to the working copy.
         if not self.the_patch._match_file_hunks(self.file_to_patch, self.the_patch.hunks[0]):
@@ -86,4 +86,4 @@ class DiffForm(django.forms.Form):
         commit_message = '''Fix a typo in %s.
 
 Thanks for reporting this, %s!''' % (self.FILE_TO_BE_PATCHED, self.username)
-        controllers.subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.wcdir])
+        view_helpers.subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.wcdir])

@@ -23,7 +23,7 @@ import shutil
 
 from mysite.search.models import Project, get_image_data_scaled
 import mysite.customs.models
-import mysite.profile.controllers
+import mysite.profile.view_helpers
 import mysite.base.models
 import mysite.base.unicode_sanity
 
@@ -297,7 +297,7 @@ class Person(models.Model):
         # Remove terms whose hit counts are zero.
         terms_with_results = []
         for term in terms:
-            query = mysite.search.controllers.Query(terms=[term])
+            query = mysite.search.view_helpers.Query(terms=[term])
             hit_count = query.get_or_create_cached_hit_count()
             if hit_count != 0:
                 terms_with_results.append(term)
@@ -425,7 +425,7 @@ class Person(models.Model):
             people = project.get_n_other_contributors_than(n=infinity, person=self)
             people = random.sample(people, min(n, len(people)))
             collaborator_lists.append(people)
-        round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
+        round_robin = mysite.profile.view_helpers.roundrobin(*collaborator_lists)
         collaborators = set()
         while len(collaborators) < n:
             try:
@@ -859,7 +859,7 @@ class Forwarder(models.Model):
         users_needing_regeneration = [User.objects.get(pk=pk)
                                       for pk in user_ids_needing_regeneration]
         for user in users_needing_regeneration:
-            mysite.base.controllers.generate_forwarder(user)
+            mysite.base.view_helpers.generate_forwarder(user)
             made_any_changes = True
 
         return made_any_changes

@@ -20,7 +20,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-import mysite.base.controllers
+import mysite.base.view_helpers
 import mysite.profile.models
 
 MAX_ERRORS = 5
@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
             # Okay, this is a person we should process! Try to geocode them...
             try:
-                as_string = mysite.base.controllers.cached_geocoding_in_json(address)
+                as_string = mysite.base.view_helpers.cached_geocoding_in_json(address)
             except Exception:
                 self.errors_so_far += 1
                 continue

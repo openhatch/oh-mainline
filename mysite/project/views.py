@@ -19,7 +19,7 @@ import datetime
 from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
-import mysite.project.controllers
+import mysite.project.view_helpers
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
@@ -109,7 +109,7 @@ def project(request, project__name = None):
                 })
     contact_form_list.sort(key=lambda x: (x['started_checked']))
 
-    button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+    button_widget_data = mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(
             request)
     button_widget_data['project'] = p
     button_as_widget_source = render_to_string(
@@ -119,8 +119,8 @@ def project(request, project__name = None):
         'project': p,
         'buildhelper_steps' : buildhelper_steps,
         'contributors': p.get_contributors()[:3],
-        'mentors': mysite.profile.controllers.TagQuery('can_mentor', project__name).people,
-        'language_mentors': mysite.profile.controllers.TagQuery('can_mentor', p.language).people,
+        'mentors': mysite.profile.view_helpers.TagQuery('can_mentor', project__name).people,
+        'language_mentors': mysite.profile.view_helpers.TagQuery('can_mentor', p.language).people,
         'explain_to_anonymous_users': True,
         'wanna_help_form': mysite.project.forms.WannaHelpForm(),
         'user_wants_to_help': request.user.is_authenticated() and request.user.get_profile() in p.people_who_wanna_help.all(),
@@ -155,15 +155,15 @@ def projects(request):
     project_matches_query_exactly = False
     if query:
         query = query.strip()
-        matching_projects = mysite.project.controllers.similar_project_names(
+        matching_projects = mysite.project.view_helpers.similar_project_names(
             query)
         project_matches_query_exactly = query.lower() in [p.name.lower() for p in matching_projects]
         if len(matching_projects) == 1 and project_matches_query_exactly:
             return HttpResponseRedirect(matching_projects[0].get_url())
         
     if not query:
-        data['projects_with_bugs'] = mysite.search.controllers.get_projects_with_bugs()
-        data['cited_projects_lacking_bugs'] = (mysite.search.controllers.
+        data['projects_with_bugs'] = mysite.search.view_helpers.get_projects_with_bugs()
+        data['cited_projects_lacking_bugs'] = (mysite.search.view_helpers.
                 get_cited_projects_lacking_bugs())
 
     data.update({
@@ -227,7 +227,7 @@ def create_answer_do(request):
 
     answer.save()
     if answer.author is None:
-        mysite.project.controllers.note_in_session_we_control_answer_id(request.session,
+        mysite.project.view_helpers.note_in_session_we_control_answer_id(request.session,
                                                                         answer.pk)
     if not request.user.is_authenticated():
         # If user isn't logged in, send them to the login page with next
@@ -304,20 +304,8 @@ def wanna_help_do(request):
         mysite.search.models.WannaHelperNote.add_person_project(person, project)
         project.save()
 
-        if request.is_ajax():
-            people_to_show = list(project.people_who_wanna_help.exclude(user=request.user))
-            people_to_show.insert(0, person)
-            
-            t = django.template.loader.get_template('project/project-wanna-help-box.html')
-            c = django.template.Context({
-                'project': project,
-                'person': request.user.get_profile(),
-                'people_to_show': people_to_show,
-                'just_added_myself': True})
-            rendered = t.render(c)
-            return HttpResponse(rendered)
-        else:
-            return HttpResponseRedirect(project.get_url() + "?success=1")
+     
+        return HttpResponseRedirect(project.get_url() + "?success=1")
     else:
         # Then store a note in the session...
         wanna_help_queue = request.session.get('projects_we_want_to_help_out', [])

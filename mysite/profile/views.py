@@ -43,10 +43,9 @@ from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 
 # OpenHatch apps
-import mysite.base.controllers
+import mysite.base.view_helpers
 import mysite.base.unicode_sanity
-import mysite.profile.controllers
-import mysite.base.helpers
+import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
@@ -55,7 +54,7 @@ from mysite.search.models import Project
 from mysite.base.decorators import view, as_view
 import mysite.profile.forms
 import mysite.profile.tasks
-from mysite.base.helpers import render_response
+from mysite.base.view_helpers import render_response
 from django.views.decorators.csrf import csrf_protect
 
 # }}}
@@ -72,9 +71,9 @@ def delete_user_for_being_spammy(request):
         if form.is_valid():
             u = User.objects.get(username=form.cleaned_data['username'])
             # Dump data about the user to the site admins
-            mysite.profile.controllers.send_user_export_to_admins(u)
+            mysite.profile.view_helpers.send_user_export_to_admins(u)
             # Send out an email to the poor sap.
-            mysite.profile.controllers.email_spammy_user(u)
+            mysite.profile.view_helpers.email_spammy_user(u)
             # Okay... delete the user.
             u.delete() # hoo boy!
             return HttpResponseRedirect(reverse(
@@ -126,7 +125,7 @@ def display_person_web(request, user_to_display__username=None):
     data = get_personal_data(person)
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
+    data['notifications'] = mysite.base.view_helpers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
     data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
 
@@ -151,7 +150,7 @@ def get_personal_data(person):
 
     data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
-    data_dict['contact_blurb'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
+    data_dict['contact_blurb'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
 
     data_dict['projects_i_wanna_help'] = person.projects_i_wanna_help.all()
 
@@ -178,7 +177,7 @@ def widget_display_undecorated(request, user_to_display__username):
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
-    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+    data.update(mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(
         request))
     return (request, 'profile/widget.html', data)
     # }}}
@@ -357,7 +356,7 @@ def edit_person_info_do(request):
         # if their new contact blurb contains $fwd and their old one didn't,
         # then make them a new forwarder
         if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
-            mysite.base.controllers.generate_forwarder(person.user)
+            mysite.base.view_helpers.generate_forwarder(person.user)
         person.contact_blurb = posted_contact_blurb
 
     person.save()
@@ -416,7 +415,7 @@ def people(request):
     data['raw_query'] = query
 
     # Parse the query, and store that in the template.
-    parsed_query = mysite.profile.controllers.parse_string_query(query)
+    parsed_query = mysite.profile.view_helpers.parse_string_query(query)
     data.update(parsed_query)
 
     # Get the list of people to display.
@@ -430,7 +429,7 @@ def people(request):
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template
-    person_id_ranges = mysite.base.helpers.int_list2ranges([x.id for x in data['people']])
+    person_id_ranges = mysite.base.view_helpers.int_list2ranges([x.id for x in data['people']])
     person_ids = ''
     for stop, start in person_id_ranges:
         if stop == start:
@@ -546,7 +545,7 @@ def replace_icon_with_default(request):
     data = {}
     data['success'] = True
     data['portfolio_entry__pk'] = portfolio_entry.pk
-    return mysite.base.helpers.json_response(data)
+    return mysite.base.view_helpers.json_response(data)
 
 @login_required
 @csrf_exempt
@@ -732,17 +731,17 @@ def delete_portfolio_entry_do(request):
     try:
         pk = int(request.POST['portfolio_entry__pk'])
     except KeyError:
-        return mysite.base.helpers.json_response({'success': False})
+        return mysite.base.view_helpers.json_response({'success': False})
 
     try:
         p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
     except PortfolioEntry.DoesNotExist:
-        return mysite.base.helpers.json_response({'success': False})
+        return mysite.base.view_helpers.json_response({'success': False})
 
     p.is_deleted = True
     p.save()
 
-    return mysite.base.helpers.json_response({
+    return mysite.base.view_helpers.json_response({
             'success': True,
             'portfolio_entry__pk': pk})
 
@@ -769,7 +768,7 @@ def save_portfolio_entry_do(request):
         c.is_published = True
         c.save()
 
-    return mysite.base.helpers.json_response({
+    return mysite.base.view_helpers.json_response({
             'success': True,
             'pf_entry_element_id': request.POST['pf_entry_element_id'],
             'project__pk': p.project_id,
@@ -820,7 +819,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['form'] = edit_info_form
     data['contact_blurb_form'] = contact_blurb_form
     data['contact_blurb_error'] = contact_blurb_error
-    data['forwarder_sample'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
+    data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
     data['has_errors'] = has_errors
     return request, 'profile/info_wrapper.html', data
 
@@ -857,7 +856,7 @@ def unsubscribe_do(request):
 @login_required
 def bug_recommendation_list_as_template_fragment(request):
     suggested_searches = request.user.get_profile().get_recommended_search_terms()
-    recommender = mysite.profile.controllers.RecommendBugs(
+    recommender = mysite.profile.view_helpers.RecommendBugs(
         suggested_searches, n=5)
     recommended_bugs = list(recommender.recommend())
 

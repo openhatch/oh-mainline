@@ -17,20 +17,30 @@
 import BeautifulSoup
 
 import feedparser
+import requests
 from django.core.cache import cache
 
-OPENHATCH_BLOG_FEED_URL='http://openhatch.org/blog/feed/atom/'
+OPENHATCH_BLOG_FEED_URL = 'http://openhatch.org/blog/feed/atom/'
+
 
 def summary2html(html_string):
     soup = BeautifulSoup.BeautifulSoup(html_string, convertEntities=BeautifulSoup.BeautifulSoup.ALL_ENTITIES)
     return u' '.join(soup.findAll(text=True))
 
+
 def _blog_entries():
-    parsed = feedparser.parse(OPENHATCH_BLOG_FEED_URL)
+    try:
+        text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
+        content = text.encode('utf-8', 'ignore')
+    except requests.exceptions.Timeout:
+        content = ''
+
+    parsed = feedparser.parse(content)
     for entry in parsed['entries']:
         entry['unicode_text'] = summary2html(entry['summary'])
         entry['title'] = summary2html(entry['title'])
     return parsed['entries']
+
 
 def cached_blog_entries():
     key_name = 'blog_entries'
@@ -40,4 +50,3 @@ def cached_blog_entries():
         # cache it for 30 minutes
         cache.set(key_name, entries, 30 * 60)
     return entries
-

@@ -351,7 +351,7 @@ class GuessLocationOnLogin(TwillTests):
 
     mock_ip = mock.Mock()
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
-    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_accessing_edit_location_form(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -367,7 +367,7 @@ class GuessLocationOnLogin(TwillTests):
 
     mock_ip = mock.Mock()
     mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
-    @skipIf(not mysite.profile.controllers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_do_not_guess_if_have_location_set(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -444,5 +444,33 @@ class LoginPageContainsUnsavedAnswer(TwillTests):
 
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
+
+class ClearSessionsOnPasswordChange(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def user_logged_in(self, session):
+        return '_auth_user_id' in session
+
+    def test(self):
+        client1 = Client()
+        client2 = Client()
+
+        username = "paulproteus"
+        password = "paulproteus's unbreakable password"
+        new_password = "new password"
+
+        client1.login(username=username, password=password)
+        client2.login(username=username, password=password)
+
+        self.assertTrue(self.user_logged_in(client1.session))
+        self.assertTrue(self.user_logged_in(client2.session))
+
+        client1.post(reverse(mysite.account.views.change_password_do),
+                data={'old_password': password, 'new_password1': new_password,
+                    'new_password2': new_password})
+
+        self.assertTrue(self.user_logged_in(client1.session))
+        self.assertFalse(self.user_logged_in(client2.session))
+
 
 # vim: set nu:

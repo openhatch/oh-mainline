@@ -398,7 +398,8 @@ class TracTrackerModel(TrackerModel):
 class TracQueryModel(TrackerQueryModel):
     '''This model stores query URLs for TracTracker objects.'''
     url = models.URLField(max_length=400,
-                          blank=False, null=False)
+                          blank=False, null=False,
+                          help_text="This is the URL of the Trac query containing the bugs that you want us to index. Make sure to include &format=csv in the URL.")
     description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(TracTrackerModel)
 
@@ -504,16 +505,19 @@ class GitHubTrackerModel(TrackerModel):
     tracker_name = models.CharField(max_length=200, unique=True,
         blank=False, null=False,
         help_text="This is the name that OpenHatch will use to identify the project.")
-    github_name = models.CharField(max_length=200, unique=True,
-        blank=False, null=False,
+    github_name = models.CharField(max_length=100, blank=False, null=False,
         help_text="This is the user or project name on GitHub that owns the project.")
-    github_repo = models.CharField(max_length=200, unique=True,
-        blank=False, null=False,
+    github_repo = models.CharField(max_length=100, blank=False, null=False,
         help_text="This is the repository name that GitHub uses to identify the project.")
     bitesized_tag = models.CharField(max_length=50, blank=True,
         help_text="This is the value of the GitHub label that indicates a bite-sized bug.")
     documentation_tag = models.CharField(max_length=50, blank=True,
         help_text="This is the value of the GitHub label that indicates a documentation bug.")
+
+    class Meta:
+        unique_together = (
+            ('github_name', 'github_repo'),
+        )
 
     all_trackers = models.Manager()
 

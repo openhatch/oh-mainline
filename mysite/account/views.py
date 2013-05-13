@@ -18,11 +18,13 @@
 
 # Imports {{{
 from django.http import HttpResponse, HttpResponseRedirect
-import django.contrib.auth 
+import django.contrib.auth
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
 import django_authopenid.views
+
+from django.contrib.sessions.models import Session
 
 from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
@@ -32,9 +34,10 @@ import logging
 import json
 
 import mysite.base.views
-import mysite.base.controllers
+import mysite.base.view_helpers
 import mysite.account.forms
-from mysite.base.helpers import render_response
+from mysite.base.view_helpers import render_response
+from mysite.account.view_helpers import clear_user_sessions
 import mysite.profile.views
 
 # FIXME: We did this because this decorator used to live here
@@ -153,7 +156,7 @@ def edit_contact_info(request, edit_email_form=None, show_email_form=None, email
         edit_email_form = mysite.account.forms.EditEmailForm(
             instance=request.user, prefix='edit_email')
     data['edit_email_form'] = edit_email_form
-    
+
     if show_email_form is None:
         show_email = request.user.get_profile().show_email
         prefix = "show_email"
@@ -271,7 +274,7 @@ def set_location(request, edit_location_form = None):
     if (not request.user.get_profile().location_display_name) or (
         request.user.get_profile().location_display_name ==
         mysite.profile.models.DEFAULT_LOCATION):
-        geoip_guess = mysite.profile.controllers.get_geoip_guess_for_ip(
+        geoip_guess = mysite.profile.view_helpers.get_geoip_guess_for_ip(
             mysite.base.middleware.get_user_ip(request))[1]
         initial['location_display_name'] = geoip_guess
     else:
@@ -300,10 +303,15 @@ def set_location_do(request):
         instance=user_profile, prefix='edit_location')
     if edit_location_form.is_valid():
         address = edit_location_form.cleaned_data['location_display_name']
-        as_string = mysite.base.controllers.cached_geocoding_in_json(address)
+        as_string = mysite.base.view_helpers.cached_geocoding_in_json(address)
         as_dict = json.loads(as_string)
-        user_profile.latitude = as_dict['latitude']
-        user_profile.longitude = as_dict['longitude']
+        if 'latitude' and 'longitude' in as_dict:
+            user_profile.latitude = as_dict['latitude']
+            user_profile.longitude = as_dict['longitude']
+        else:
+            user_profile.location_display_name = mysite.profile.models.DEFAULT_LOCATION
+            user_profile.latitude = mysite.profile.models.DEFAULT_LATITUDE
+            user_profile.longitude = mysite.profile.models.DEFAULT_LONGITUDE
         user_profile.location_confirmed = True
         user_profile.save()
         edit_location_form.save()
@@ -313,7 +321,7 @@ def set_location_do(request):
     else:
         return set_location(request,
                 edit_location_form=edit_location_form)
-       
+
 @login_required
 def confirm_location_suggestion_do(request):
     person = request.user.get_profile()
@@ -335,7 +343,8 @@ def change_password_do(request):
     form = django.contrib.auth.forms.PasswordChangeForm(
             request.user, request.POST)
     if form.is_valid():
-        form.save() 
+        form.save()
+        clear_user_sessions(request.user, session_to_omit=request.session)
         return HttpResponseRedirect(
             reverse(change_password) + '?notification_id=success')
     else:
@@ -346,7 +355,7 @@ def change_password_do(request):
 @view
 def widget(request):
     data = {}
-    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+    data.update(mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(
         request))
     return (request, 'account/widget.html', data)
 
@@ -402,43 +411,43 @@ def invite_someone_do(request):
 ### The following is copied here from django_authopenid, and then
 ### modified trivially in the POST handler.
 @django_authopenid.views.not_authenticated
-def register(request, template_name='authopenid/complete.html', 
-             redirect_field_name=django.contrib.auth.REDIRECT_FIELD_NAME, 
+def register(request, template_name='authopenid/complete.html',
+             redirect_field_name=django.contrib.auth.REDIRECT_FIELD_NAME,
              register_form=django_authopenid.forms.OpenidRegisterForm,
-             auth_form=django.contrib.auth.forms.AuthenticationForm, 
-             register_account=django_authopenid.views.register_account, send_email=False, 
+             auth_form=django.contrib.auth.forms.AuthenticationForm,
+             register_account=django_authopenid.views.register_account, send_email=False,
              extra_context=None):
     """
     register an openid.
 
-    If user is already a member he can associate its openid with 
+    If user is already a member he can associate its openid with
     its account.
 
     A new account could also be created and automaticaly associated
     to the openid.
 
     :attr request: request object
-    :attr template_name: string, name of template to use, 
+    :attr template_name: string, name of template to use,
     'authopenid/complete.html' by default
-    :attr redirect_field_name: string, field name used for redirect. by default 
+    :attr redirect_field_name: string, field name used for redirect. by default
     'next'
-    :attr register_form: form use to create a new account. By default 
+    :attr register_form: form use to create a new account. By default
     `OpenidRegisterForm`
-    :attr auth_form: form object used for legacy authentification. 
+    :attr auth_form: form object used for legacy authentification.
     by default `OpenidVerifyForm` form auser auth contrib.
-    :attr register_account: callback used to create a new account from openid. 
+    :attr register_account: callback used to create a new account from openid.
     It take the register_form as param.
-    :attr send_email: boolean, by default True. If True, an email will be sent 
+    :attr send_email: boolean, by default True. If True, an email will be sent
     to the user.
-    :attr extra_context: A dictionary of variables to add to the template 
-    context. Any callable object in this dictionary will be called to produce 
+    :attr extra_context: A dictionary of variables to add to the template
+    context. Any callable object in this dictionary will be called to produce
     the end result which appears in the context.
     """
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     openid_ = request.session.get('openid', None)
     if openid_ is None or not openid_:
         return HttpResponseRedirect("%s?%s" % (reverse('user_signin'),
-                                urllib.urlencode({ 
+                                urllib.urlencode({
                                 redirect_field_name: redirect_to })))
 
     nickname = ''
@@ -451,13 +460,13 @@ def register(request, template_name='authopenid/complete.html',
             nickname = openid_.ax.get('http://schema.openid.net/namePerson/friendly')[0]
         if openid_.ax.get('http://schema.openid.net/contact/email', False):
             email = openid_.ax.get('http://schema.openid.net/contact/email')[0]
-        
-    
+
+
     form1 = register_form(initial={
         'username': nickname,
         'email': email,
-    }) 
-    form2 = auth_form(initial={ 
+    })
+    form2 = auth_form(initial={
         'username': nickname,
     })
 
@@ -466,10 +475,10 @@ def register(request, template_name='authopenid/complete.html',
         if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
             redirect_to = settings.LOGIN_REDIRECT_URL
         if 'email' in request.POST.keys():
-            form1 = register_form(data=request.POST)        
+            form1 = register_form(data=request.POST)
             if form1.is_valid():
                 user_ = register_account(form1, openid_)
-                
+
                 extra_profile_form = mysite.account.forms.SignUpIfYouWantToHelpForm(
                     request.POST, prefix='extra_profile_form')
                 if extra_profile_form.is_valid():
@@ -482,7 +491,7 @@ def register(request, template_name='authopenid/complete.html',
                         'how_should_people_contact_you']]
                     person.contact_blurb = info
                     person.save()
-                
+
         else:
             form2 = auth_form(data=request.POST)
             if form2.is_valid():
@@ -495,8 +504,8 @@ def register(request, template_name='authopenid/complete.html',
             )
             uassoc.save(send_email=send_email)
             django.contrib.auth.login(request, user_)
-            return HttpResponseRedirect(redirect_to) 
-    
+            return HttpResponseRedirect(redirect_to)
+
     return render_response(request, template_name, {
         'form1': form1,
         'form2': form2,

@@ -10,13 +10,26 @@ reading the OpenHatch documentation, keep reading.
 Automated testing
 =================
 
-The OpenHatch code comes with automated tests that you cah run to make
+The OpenHatch code comes with automated tests that you can run to make
 sure that it is set up To execute all tests, run this command::
 
   python manage.py test
 
 For more about tests visit: http://openhatch.org/wiki/Automated_testing
 
+Postfix, postmap and testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The code for site creates a configuration file for an email service,
+Craigslist-style, that lets all users have an anonymous inbound email
+address that goes to them. In particular, the code configures a
+Postfix-based alias map for this. When that alias map changes, we notify
+Postfix by calling postmap.
+
+If the postmap binary (/usr/sbin/postmap) is not available on the system,
+it is better not to try running that binary during testing. So before
+tests we check for presence of the postmap binary and log a warning if
+it is not present on the system.
 
 Optional dependencies
 =====================
@@ -30,7 +43,7 @@ these using a GUI installer, the program "pip", or a package manager
 like apt-get.
 
 For each dependency, we specify how to get it with pip *or*
-apt-get. If you have a Debian or Ubuntu sustem, use the apt-get
+apt-get. If you have a Debian or Ubuntu system, use the apt-get
 instructions. Otherwise, try pip. (And if it doesn't work, ask for
 help quickly.)
 
