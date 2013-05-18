@@ -398,6 +398,30 @@ class DiffRecursiveTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
 
+    def test_do_mission_incorrectly_with_leading_dot_slash(self):
+        file_path = get_mission_test_data_path('diffpatch')
+        for i in range(1,4):
+            filename = os.path.join(file_path, "leading_dot_slash_diff_" + str(i) + ".txt")
+            with open(filename) as f:
+                leading_dot_slash_diff = f.read()
+            submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': leading_dot_slash_diff})
+            self.assertFalse(submit_response.context['diffrecursive_success'])
+
+            paulproteus = Person.objects.get(user__username='paulproteus')
+            self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
+
+    def test_do_mission_incorrectly_leading_dot_slash_error_message(self):
+        file_path = get_mission_test_data_path('diffpatch')
+        for i in range(1,4):
+            filename = os.path.join(file_path, "leading_dot_slash_diff_" + str(i) + ".txt")
+            with open(filename) as f:
+                leading_dot_slash_diff = f.read()
+            try:
+                view_helpers.DiffRecursiveMission.validate_patch(leading_dot_slash_diff)
+            except view_helpers.IncorrectPatch, e:
+                self.assertEqual('The diff you submitted will not apply properly because it has filename(s) starting with "./". Make sure that when you run the diff command, you do not add unnecessary "./" path prefixes. This is important because it affects the arguments needed to run the patch command for whoever applies the patch.', utf8(e))
+            else:
+                self.fail('no exception raised')
 
 class PatchRecursiveTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
