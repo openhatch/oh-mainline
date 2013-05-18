@@ -117,11 +117,11 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	curl {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %} > recipies.tar.gz
+	curl {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %} > recipes.tar.gz
       </pre>
       <p>Unzip the archive file, but do not extract it.</p>
       <pre>
-	gzip -d recipies.tar.gz
+	gzip -d recipes.tar.gz
       </pre>
       <p>Unpack it once, and rename that to recipes-us indicating that this is the version you'll adjust for American tastes. (This is the copy we'll edit.)</p>
       <pre>
