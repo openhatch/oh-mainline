@@ -1,0 +1,76 @@
++diff -ur recipes/MelanzaneParmigiana.txt ./us/MelanzaneParmigiana.txt
+--- recipes/MelanzaneParmigiana.txt	2013-04-26 15:49:19.000000000 -0700
++++ ./us/MelanzaneParmigiana.txt	2013-05-06 01:11:36.000000000 -0700
+@@ -1,12 +1,12 @@
+ Melanzane Parmigiana was originally a Sicilian dish called Parmiciana di
+ melenzane, parmiciana being the slats of a wooden shutter which resemble
+-the layering of the slices of aubergine in the dish. In the form in which
++the layering of the slices of eggplant in the dish. In the form in which
+ it is now known worldwide, it is generally an oven baked dish consisting
+-of aubergine, Parmesan cheese, mozzarella and tomato sauce.
++of eggplant, Parmesan cheese, mozzarella and tomato sauce.
+ 
+ Ingredients
+ 
+-    * 3 or 4 big aubergines
++    * 3 or 4 big eggplants
+     * tomato sauce
+     * about 200 or 300 grams of mozzarella cheese, sliced
+     * grated Parmesan cheese
+@@ -21,7 +21,7 @@
+ 
+ Procedure
+ 
+-1.  Wash aubergines and cut them in slices about 1-1.5 cm thick. Aubergine
++1.  Wash eggplants and cut them in slices about 1-1.5 cm thick. Eggplant
+     has a bitter taste and it should be prepared in the following way
+     to remove this:
+         1.  Salt each slice on both sides and put them on a big plate.
+@@ -31,14 +31,14 @@
+             (up to 2 hours).
+         4.  Then wash the slices under running water and let them dry
+             a while.
+-        5.  Alternatively, place salted aubergine slices in a large
++        5.  Alternatively, place salted eggplant slices in a large
+             strainer and place a weight (e.g., a smaller pot of water)
+             on top to help squeeze out the water.
+ 
+ 2.  Dust the slices with flour and/or bread crumbs and fry them. Do not
+     overcook, as they will spend some time in the oven later.
+ 
+-3.  Take a pan for the oven and make a layer with aubergine slices, then
++3.  Take a pan for the oven and make a layer with eggplant slices, then
+     one with the tomato sauce, then one with some slices of mozzarella
+     and Parmesan cheese. Some cooks add fresh basil leaves and cooked
+     egg slices.
+
+diff -ur recipes/Skillet.txt ./us/Skillet.txt
+--- recipes/Skillet.txt	2013-04-26 15:49:19.000000000 -0700
++++ ./us/Skillet.txt	2013-05-06 01:12:12.000000000 -0700
+@@ -1,4 +1,4 @@
+-Aubergine and Chickpea Skillet is a colorful and tasty dish suitable
++Eggplant and Chickpea Skillet is a colorful and tasty dish suitable
+ for vegans. It is important to use fresh basil in this recipe.
+ 
+ Ingredients
+@@ -11,17 +11,17 @@
+     * 1 15-oz (400g) can Chickpeas, drained
+     * 1/2 tsp. Tarragon
+     * 2-3 cups (200-250 g) Broccoli, cut into small florets
+-    * 1 small aubergine or 2 Italian aubergines, quartered and sliced
++    * 1 small eggplant or 2 Italian eggplants, quartered and sliced
+     * 8-12 fresh Basil leaves (preferably Thai basil)
+ 
+ Procedure
+ 
+ 1.  Sauté the green bell pepper and garlic in the oil over medium heat
+-    for several minutes. Add mushrooms and aubergine and continue cooking,
++    for several minutes. Add mushrooms and eggplant and continue cooking,
+     stirring often, for five minutes.
+ 
+ 2.  Add the tomatoes with their juice, chickpeas and tarragon. Stir well,
+-    cover and simmer for 10-12 minutes until aubergine has softened
++    cover and simmer for 10-12 minutes until eggplant has softened
+     somewhat.
+ 
+ 3.  Stir in the basil leaves and broccoli and simmer, partially covered,
