@@ -489,6 +489,25 @@ class FacetsFilterResults(SearchTest):
                 terms=[], active_facet_options=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
 
+    def test_any_facet(self):
+        """In the fetch_bugs() method in the search module, the truthfulness of
+        the Query object is evaluated to determine whether or not any results
+        should be returned. Here, we test that if a facet in the GET data
+        is the empty string, the query is still considered to be True. A facet
+        set to the empty string is used to signify that the user selected the
+        "any" option on the search page. If a facet is not provided at all, the
+        user did not select anything on the search page, meaning no results
+        should be returned.
+        """
+
+        language_query = mysite.search.view_helpers.Query.create_from_GET_data(
+                {'language': ''})
+        project_query = mysite.search.view_helpers.Query.create_from_GET_data(
+                {'project': ''})
+
+        self.assertTrue(language_query)
+        self.assertTrue(project_query)
+
 class QueryGetPossibleFacets(SearchTest):
     """Ask a query, what facets are you going to show on the left?
     E.g., search for gtk, it says C (541)."""
