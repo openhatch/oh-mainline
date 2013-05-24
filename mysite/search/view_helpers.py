@@ -37,11 +37,11 @@ def order_bugs(query):
 
 class Query:
 
-    def __init__(self, terms=None, active_facet_options=None, any_facet=False, terms_string=None):
+    def __init__(self, terms=None, active_facet_options=None, any_facet_options=False, terms_string=None):
         self.terms = terms or []
         self.active_facet_options = (mysite.base.decorators.no_str_in_the_dict(active_facet_options)
                                      or {})
-        self.any_facet = any_facet
+        self.any_facet_options = any_facet_options or []
         if type(terms_string) == str:
             terms_string = unicode(terms_string, 'utf-8')
         self._terms_string = terms_string
@@ -80,22 +80,23 @@ class Query:
                            u'project']
 
         active_facet_options = {}
-        any_facet = False
+        any_facet_options = []
         for facet in possible_facets:
             if GET.get(facet):
                 active_facet_options[facet] = GET.get(facet)
             elif GET.get(facet) == '': # Only select any_facet if a facet is empty string, not None
-                any_facet = True
+                any_facet_options.append(facet)
         terms_string = GET.get('q', u'')
         terms = Query.split_into_terms(terms_string)
 
-        return Query(terms=terms, active_facet_options=active_facet_options, any_facet=any_facet, terms_string=terms_string)
+        return Query(terms=terms, active_facet_options=active_facet_options,
+                any_facet_options=any_facet_options, terms_string=terms_string)
 
     def get_bugs_unordered(self):
         return mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
     def __nonzero__(self):
-        if self.terms or self.active_facet_options or self.any_facet:
+        if self.terms or self.active_facet_options or self.any_facet_options:
             return 1
         return 0
 

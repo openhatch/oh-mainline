@@ -209,6 +209,24 @@ class SearchResults(TwillTests):
         for bug in bugs:
             tc.find(bug.description)
 
+    def testPaginationWithAnyFacet(self):
+
+        url = u'http://openhatch.org/search/?q=&language='
+        tc.go(make_twill_url(url))
+
+        bugs = Bug.all_bugs.order_by(u'-last_touched')
+
+        for bug in bugs[:10]:
+            tc.find(bug.description)
+            print "Found bug ", bug
+
+        tc.follow(u'Next')
+
+        bugs = bugs[10:20]
+
+        for bug in bugs:
+            tc.find(bug.description)
+
     def testPaginationAndChangingSearchQuery(self):
 
         url = u'http://openhatch.org/search/'
