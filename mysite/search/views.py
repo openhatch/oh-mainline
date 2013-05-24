@@ -100,6 +100,9 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     for facet_name, selected_option in query.active_facet_options.items():
         prev_page_query_str[facet_name] = selected_option
         next_page_query_str[facet_name] = selected_option
+    for facet_name in query.any_facet_options:
+        prev_page_query_str[facet_name] = ''
+        next_page_query_str[facet_name] = ''
     diff = end - start
     prev_page_query_str['start'] = start - diff - 1
     prev_page_query_str['end'] = start - 1
