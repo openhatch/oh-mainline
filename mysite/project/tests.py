@@ -57,11 +57,11 @@ class ProjectNameSearch(TwillTests):
         # If there's an exactly-matching project name, we redirect to that project's page
         # (instead of showing search results).
         mysite.search.models.Project.create_dummy(name='Twisted System')
-        response = self.client.get('/+projects/',
+        response = self.client.get('/projects/',
                                    {'q': 'twiSted SysTem'},
                                    follow=True)
         self.assertEqual(response.redirect_chain,
-                         [('http://testserver/+projects/Twisted%20System', 302)])
+                         [('http://testserver/projects/Twisted%20System', 302)])
 
     def test_form_sends_data_to_get(self):
         # This test will fail if a query that selects one project but doesn't
@@ -70,7 +70,7 @@ class ProjectNameSearch(TwillTests):
         # First, create the project that we will refer to below.
         mysite.search.models.Project.create_dummy(name='Twisted System')
 
-        tc.go(better_make_twill_url('http://openhatch.org/+projects'))
+        tc.go(better_make_twill_url('http://openhatch.org/projects'))
         query = 'Twisted'
         tc.fv(1, 'search_q', query)
         tc.submit()
@@ -80,7 +80,7 @@ class ProjectNameSearch(TwillTests):
     def test_template_get_matching_projects(self):
         mysite.search.models.Project.create_dummy(name='Twisted System')
         mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
-        response = self.client.get('/+projects/',
+        response = self.client.get('/projects/',
                                    {'q': 'Twisted'},
                                    follow=True)
         matching_projects = response.context[0]['matching_projects']
@@ -90,7 +90,20 @@ class ProjectNameSearch(TwillTests):
 
 class ProjectList(TwillTests):
     def test_it_generally_works(self):
-        self.client.get('/+projects/')
+        self.client.get('/projects/')
+
+    def test_plus_projects_redirects_to_projects(self):
+        response = self.client.get("/+projects/")  
+        self.assertEqual(response.status_code, 301)    
+
+    def test_space_projects_redirects_to_projects(self):
+        response = self.client.get("/ projects/")  
+        self.assertEqual(response.status_code, 301)    
+
+    def test_projects_returns_projects(self):
+        response = self.client.get("/projects/")
+        self.assertEqual(response.status_code, 200)
+
 
 class ProjectPageCreation(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -136,7 +149,7 @@ class ProjectPageCreation(TwillTests):
 
         #  and redirected.
         self.assertEqual(response.redirect_chain,
-                         [('http://testserver/+projects/something%20novel', 302)])
+                         [('http://testserver/projects/something%20novel', 302)])
 
     def test_form_on_project_search_page_submits_to_project_creation_post_handler(self):
         project_search_page_url = better_make_twill_url(
@@ -240,7 +253,7 @@ class WannaHelpWorksAnonymously(TwillTests):
 
         # Make sure we are redirected to the right place
         self.assertEqual(response.redirect_chain,
-            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
+            [('http://testserver/account/login/?next=%2Fprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
 
         # check that the session can detect that we want to help Ubuntu out
         self.assertEqual(self.client.session['projects_we_want_to_help_out'],
@@ -279,7 +292,7 @@ class ProjectPageTellsNextStepsForHelpersToBeExpanded(TwillTests):
 
     def test_default_to_false(self): # FIXME: Make it default to True soon
         client = self.login_with_client()
-        response = client.get('/+projects/Miro')
+        response = client.get('/projects/Miro')
         self.assertFalse(response.context[0].get(
             'expand_next_steps', None))
 
@@ -310,7 +323,7 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
 
         # Make sure we are redirected to the right place
         self.assertEqual(response.redirect_chain,
-            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
+            [('http://testserver/account/login/?next=%2Fprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
 
         lucky_projects = mysite.project.view_helpers.get_wanna_help_queue_from_session(self.client.session)
         self.assertEqual([k.name for k in lucky_projects], ['Myproject'])
