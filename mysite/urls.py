@@ -375,11 +375,11 @@ urlpatterns = patterns('',
 
         (r'^\+do/search.views.subscribe_to_bug_alert_do$', 'mysite.search.views.subscribe_to_bug_alert_do'),
 
-        (r'^\projects/', include('mysite.project.urls')),
+        (r'^projects/', include('mysite.project.urls')),
 
         (r'^\+projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
 
-        (r'^\ projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
+        (r'^ projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
 
         (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),
 
