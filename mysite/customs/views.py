@@ -189,6 +189,9 @@ def edit_tracker(request, tracker_type, tracker_id, tracker_name, tracker_form=N
             if tracker_form is None:
                 tracker_form = all_trackers[tracker_type]['form'](
                         instance=tracker_obj, prefix='edit_tracker')
+                # Set the initial value for github_url field
+                if tracker_type == 'github':
+                    tracker_form.initial['github_url'] = tracker_form.instance.get_github_url()
             tracker_urlmodel = all_trackers[tracker_type]['urlmodel']
             tracker_urlform = all_trackers[tracker_type]['urlform']
             if tracker_urlmodel:

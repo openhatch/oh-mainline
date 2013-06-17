@@ -599,6 +599,34 @@ class LaunchpadTrackerEditingViews(TwillTests):
         self.assertEqual(1,
                          mysite.customs.models.LaunchpadQueryModel.objects.all().count())
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class GitHubTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(GitHubTrackerEditingViews, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+    def test_form_create_github_tracker(self):
+        # We start with no GitHubTrackerModel objects in the DB
+        self.assertEqual(0,
+                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        form = mysite.customs.forms.GitHubTrackerForm({
+                'tracker_name': 'KDE Github',
+                'github_url': 'https://github.com/kde/project-A',
+                'created_for_project': self.kde.id,
+                'bitsized_tag': 'easy',
+                'max_connections': '8',
+                'documentation_tag': 'doc'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(2,
+                         mysite.customs.models.GitHubQueryModel.objects.all().count())
 
 ### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
 class ExportTrackerAsDict(django.test.TestCase):
