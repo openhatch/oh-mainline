@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 import django.forms
-
+import re
 import mysite.search.models
 import mysite.customs.models
 
@@ -95,8 +97,46 @@ class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
         return obj
 
 class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
+    github_url = django.forms.RegexField(
+        regex=r'^https?:\/\/github.com\/[\_\-\w]+\/[\_\-\w]+$',
+        max_length=200,
+        required=True,
+        help_text='This is the url of the GitHub project.',
+        error_messages = {'invalid' : 'Not a valid github url.'},
+    )
+
     class Meta:
         model = mysite.customs.models.GitHubTrackerModel
+        fields = ('tracker_name', 'github_url', 'bitesized_tag', 'documentation_tag')
+
+    def clean_github_url(self):
+        github_url = self.cleaned_data['github_url']
+
+        github_name_repo = re.match(
+            r'^https?:\/\/github.com\/([\_\-\w]+)\/([\_\-\w]+)$',
+            github_url
+        )
+
+        # github name shouldn't need to be unique because a github user can
+        # have multiple repositories.
+        # Because at GitHubTrackerModel github_name is set to be unique,
+        # we need to check if it's unique or not.
+        # We should talk about changing the model.
+        try:
+            (mysite.customs.core_bugimporters.all_trackers['github']['model'].all_trackers
+                .get(
+                    ~Q(id=self.instance.id) & (
+                        Q(github_name__iexact=github_name_repo.group(1)) |
+                        Q(github_repo__iexact=github_name_repo.group(2)))))
+        except ObjectDoesNotExist:
+            # If github_name or/and github_repo don't exist, it continues to save.
+            self.instance.github_name = github_name_repo.group(1)
+            self.instance.github_repo = github_name_repo.group(2)
+        else:
+            msg = 'The github name or repo is already taken.'
+            self._errors['github_url'] = self.error_class([msg])
+
+        return github_url 
 
     def save(self, *args, **kwargs):
         # Call out to superclass

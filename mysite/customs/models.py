@@ -548,6 +548,9 @@ class GitHubTrackerModel(TrackerModel):
     def get_base_url(self):
         return '__impossible_to_use_with_github'
 
+    def get_github_url(self):
+        return 'https://github.com/%s/%s' % (self.github_name, self.github_repo)
+
 def github_query_url(github_user_name, github_repo_name, **kwargs):
     base_url = ('https://api.github.com/repos/%s/%s/issues' % (
             mysite.base.unicode_sanity.quote(github_user_name),
