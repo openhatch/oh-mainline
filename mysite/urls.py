@@ -377,7 +377,9 @@ urlpatterns = patterns('',
 
         (r'^projects/', include('mysite.project.urls')),
 
-        (r'^\+projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
+        (r'^\+projects/$', lambda x: HttpResponsePermanentRedirect('/projects/')),
+
+        (r'^\+projects/(.+)$', lambda request, path: HttpResponsePermanentRedirect('/projects/' + path)),
 
         (r'^ projects/', lambda x: HttpResponsePermanentRedirect('/projects/')),
 
