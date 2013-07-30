@@ -48,14 +48,15 @@ Editing project - {{ project.display_name }}
                             {% ifequal field.name 'icon_raw' %}
                                 <div style='clear: left; margin-top: 10px; 
                                         margin-right: 15px; text-align: center; width: 100px; float: left;'>
-                                    <div style='text-align: center; float: left; width: 100%; height: 64px;'>
-                                        <img id='icon' src='{% if project.icon_for_profile %}/static/{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber.gif' %}{% endif %}' />
+                                    <div style='text-align: center; float: left; width: 100%; height: 64px;' id="project_icon">
+                                        <img id='icon' src='{% if project.icon_for_profile %}/static/{{ project.icon_for_profile }}{% endif %}' />
                                         {% if not project.icon_for_profile %}
-                                            <div style='width: 100%; height: 30px;' id='icon_loading_message'
-                                                    style='text-align: center;' class='example'>
-                                                Looking up icon</div>
+                                            <div style='width: 100%; height: 38px;border:1px solid' id='icon_loading_message' style='text-align: center;' class='example'>
+                                                Add project icon here!</div>
                                         {% endif %}
+
                                     </div>
+                                    
                                 </div>
                             {% endifequal %}
                             <p style='float: left; width: 70%;'>
