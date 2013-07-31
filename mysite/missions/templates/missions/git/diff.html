@@ -32,6 +32,7 @@
 <p>Your mission is this: The file <code>{{ file_for_git_diff }}</code> contains a terrible error.  Fix it in your working copy to print "Hello world!", rather than "Goodbye world!". Submit your changes as a format-patch file. (You can use your working copy from the previous mission.)</p>
 
 <ul class="raquo_bullets">
+  <li>Edit the file to fix the error. Remember that you need to edit files before running git commands!</li>
   <li>Tell git you want to prepare these changes for committing: <code>git add {{ file_for_git_diff }}</code></li>
   <li>Tell git you want to record those changes as a commit, and provide a short message to summarize your commit. For example: <code>git commit -m "Fixed hello world"</code></li>
   <li>Create a file containing the patch: <code>git format-patch origin/master</code></li>
