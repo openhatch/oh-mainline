@@ -238,7 +238,7 @@ class BugzillaTrackerModel(TrackerModel):
     documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
-    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
+    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
 
     all_trackers = models.Manager()
 
@@ -384,7 +384,7 @@ class TracTrackerModel(TrackerModel):
     documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
-    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
+    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
     old_trac = models.BooleanField(default=False)
 
     all_trackers = models.Manager()
@@ -427,7 +427,7 @@ class RoundupTrackerModel(TrackerModel):
             help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a documentation bug. Leave blank if none.")
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
-    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
+    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
 
     all_trackers = models.Manager()
 
