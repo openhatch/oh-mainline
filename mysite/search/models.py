@@ -572,7 +572,7 @@ class Bug(OpenHatchModel):
     as_appears_in_distribution = models.CharField(max_length=200, default='')
 
     tracker_type = models.ForeignKey(ContentType, null=True)
-    tracker_id = models.PositiveIntegerField(null=True)
+    tracker_id = models.PositiveIntegerField(null=False)
     tracker = generic.GenericForeignKey('tracker_type', 'tracker_id')
 
     all_bugs = models.Manager()
