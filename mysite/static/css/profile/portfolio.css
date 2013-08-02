@@ -33,6 +33,7 @@ body#profile #portfolio.editor h4 { font-size: 1.25em; font-weight: normal; marg
 body#profile #portfolio.editor .apologies { font-size: 17pt; padding: 20px 115px; width: 670px; text-align: center; }
 body#profile #portfolio.editor .apologies p { margin-top: 0; }
 body#profile #portfolio h5 { color: #555; font-size: 13pt; font-weight: normal; margin: 0 0 10px 0; }
+body#profile #portfolio .module-head a.add-edit-projects { float: right; }
 body#profile .portfolio_entry { margin-bottom: 20px; }
 body#profile #portfolio.editor .portfolio_entry { position: relative; width: 100%; }
 body#profile #portfolio.editor .portfolio_entry.unpublished .submodule, 
