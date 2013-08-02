@@ -1,4 +1,6 @@
 [
+{"pk": 1, "model": "customs.trackermodel", "fields": {}},
+{"pk": 1, "model": "customs.tractrackermodel", "fields": {"documentation_text": "", "old_trac": false, "documentation_type": "", "base_url": "http://example.com/", "as_appears_in_distribution": "", "bitesized_text": "", "bitesized_type": "", "bug_project_name_format": "rofl", "tracker_name": "Example Trac Tracker"}},
 {
     "pk": 2,
         "model": "search.project",
@@ -71,7 +73,7 @@
     {
         "status": "New",
         "last_polled": "2009-06-08 23:04:31",
-        "submitter_realname": "Mister 8",
+        "tracker_id": 1, "submitter_realname": "Mister 8",
         "description": "pYthOn",
         "title": "-",
         "importance": "Importance #8",
@@ -94,7 +96,7 @@
     {
         "status": "-",
         "last_polled": "2009-10-08 17:10:16",
-        "submitter_realname": "-",
+        "tracker_id": 1, "submitter_realname": "-",
         "description": "-",
         "title": "pYthOn",
         "importance": "-",
@@ -117,7 +119,7 @@
     {
         "status": "Incomplete",
         "last_polled": "2009-06-08 23:04:31",
-        "submitter_realname": "Miss 7",
+        "tracker_id": 1, "submitter_realname": "Miss 7",
         "description": "-",
         "title": "-",
         "importance": "Importance #7",
@@ -140,7 +142,7 @@
     {
         "status": "Fix Committed",
         "last_polled": "2009-06-08 23:04:31",
-        "submitter_realname": "Mister 2",
+        "tracker_id": 1, "submitter_realname": "Mister 2",
         "description": "-",
         "title": "-",
         "importance": "Importance #2",
@@ -163,7 +165,7 @@
     {
         "status": "New",
         "last_polled": "2009-06-08 23:04:31",
-        "submitter_realname": "Mister 0",
+        "tracker_id": 1, "submitter_realname": "Mister 0",
         "description": "An interesting description",
         "title": "An interesting title",
         "importance": "Importance #0",
@@ -186,7 +188,7 @@
     {
         "status": "New",
         "last_polled": "2009-06-08 23:04:31",
-        "submitter_realname": "Mister 0",
+        "tracker_id": 1, "submitter_realname": "Mister 0",
         "description": "An interesting description",
         "title": "This shouldn't be in the results for [pyt*hon 'An interesting description'].",
         "importance": "Importance #0",

@@ -98,7 +98,7 @@ class AutoCompleteTests(SearchTest):
         SearchTest.setUp(self)
         self.project_chat = Project.create_dummy(name=u'ComicChat', language=u'C++')
         self.project_kazaa = Project.create_dummy(name=u'Kazaa', language=u'Vogon')
-        self.bug_in_chat = Bug.all_bugs.create(project=self.project_chat,
+        self.bug_in_chat = Bug.create_dummy(project=self.project_chat,
                 people_involved=2,
                 date_reported=datetime.date(2009, 4, 1),
                 last_touched=datetime.date(2009, 4, 2),
