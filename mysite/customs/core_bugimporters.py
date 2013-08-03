@@ -90,8 +90,11 @@ def import_one_bug_item(d):
         return
 
     if not (('_tracker_name' in d) and
-            ('_project_name' in d)):
-        logging.error("Your data needs a _tracker_name and _project_name.")
+            ('_project_name' in d) and
+            d.get('last_polled', None)):
+        logging.error(
+            "Your data needs a _tracker_name and _project_name and " +
+            "a last_polled.")
         logging.error(repr(d))
         return
 
