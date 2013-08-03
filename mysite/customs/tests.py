@@ -841,7 +841,9 @@ class ImportBugsFromFiles(django.test.TestCase):
         # If the sample data contains exactly one item,
         # and that item does not contain any data, do we crash?
         sample_data = [
-            {'canonical_bug_link': 'http://example.com/ticket1'},
+            {'canonical_bug_link': 'http://example.com/ticket1',
+             'last_polled': '2013-08-02T07:47:11.307599',
+             '_tracker_name': 'Twisted'},
             ]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
