@@ -841,7 +841,9 @@ class ImportBugsFromFiles(django.test.TestCase):
         # If the sample data contains exactly one item,
         # and that item does not contain any data, do we crash?
         sample_data = [
-            {'canonical_bug_link': 'http://example.com/ticket1'},
+            {'canonical_bug_link': 'http://example.com/ticket1',
+             'last_polled': '2013-08-02T07:47:11.307599',
+             '_tracker_name': 'Twisted'},
             ]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
@@ -850,6 +852,33 @@ class ImportBugsFromFiles(django.test.TestCase):
         # but also import no data.
         self.assertFalse(Bug.all_bugs.all())
 
+    def test_import_bails_if_missing_last_polled(self):
+        # If the sample data contains exactly one item,
+        # and that item does not say when it was downloaded, we
+        # should refuse to import the bug.
+        sample_data = [
+            {'canonical_bug_link': 'http://example.com/ticket1',
+             'last_polled': '2013-08-02T07:47:11.307599',
+             'date_reported': '2013-08-02T07:47:11.307599',
+             'last_touched': '2013-08-02T07:47:11.307599',
+             'status': 'new',
+             '_project_name': 'Twisted',
+             '_tracker_name': 'Twisted'},
+            ]
+        # Make sure we start out empty
+        self.assertFalse(Bug.all_bugs.all())
+        # Try the import, and watch us succeed.
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
+        self.assertTrue(Bug.all_bugs.all())
+
+        # Now, delete all bugs, and re-do the import without
+        # last_polled. This time, we reject the datum.
+        Bug.all_bugs.all().delete()
+        self.assertFalse(Bug.all_bugs.all())
+        sample_datum = sample_data[0]
+        del sample_datum['last_polled']
+        mysite.customs.core_bugimporters.import_one_bug_item(sample_datum)
+        self.assertFalse(Bug.all_bugs.all())
 
     def test_import_from_data_dict(self):
         sample_data = [
