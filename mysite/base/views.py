@@ -56,7 +56,7 @@ def home(request):
     data['random_profiles'] = everybody[0:5]
 
     if request.user.is_authenticated():
-        template_path = 'base/landing_page_for_logged_in_users.html'
+        template_path = 'base/landing.html'
         # figure oout which nudges we want to show them
         person = request.user.get_profile()
 
