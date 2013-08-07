@@ -29,12 +29,16 @@
 {% block main %}
 <div id='portfolio' class='module project-display viewer'>
     <div class='module-head'>
+        <ul>
+            <li>
+                {% if editable %}
+                    <a class='add-edit-projects' href=
+                    '{% url mysite.profile.views.portfolio_editor %}'>Add/edit &raquo;
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
         <h3>Projects</h3>
-            {% if editable %}
-                <a class='add-edit-projects' href=
-                '{% url mysite.profile.views.portfolio_editor %}'>Add/edit &raquo;
-                </a>
-            {% endif %}
     </div>
         <div class='module-body'>
         {% with person.get_published_portfolio_entries as portfolio_entries %} 
