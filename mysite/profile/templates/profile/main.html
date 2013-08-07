@@ -19,6 +19,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% load base_extras %}
+{% load profile_extras %}
 
 {% block title %}
 {{ person.get_full_name_or_username }}
@@ -27,6 +29,85 @@
 {% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
 
 {% block main %}
+<div class="module project-display viewer" id="missions">
+    <div class="module-head">
+        <h3>Missions</h3>
+    </div>
+    <div class="module-body">
+        {% if nudge_missions %}
+        <h5>Start learning:</h5>
+        <p>
+            Try our friendly, interactive training missions that teach you essential open source tools like diff and subversion.
+        </p>
+        {% else %}
+          {% if completed_missions %}
+        <ul class="missions">
+            {% if completed_missions.tar or completed_missions.tar_extract %}
+              {% if completed_missions.tar and completed_missions.tar_extract %}
+            <li class="tick-progress">
+                You have completed the
+                <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a>
+            </li>
+            {% else %}
+            <li class="cross-progress">
+                You have partially completed the
+                <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a>
+            </li>
+            {% endif %}
+            {% endif %}
+            {% if completed_missions.diffpatch_diffsingle or completed_missions.diffpatch_patchsingle or completed_missions.diffpatch_diffrecursive or completed_missions.diffpatch_patchrecursive %}
+              {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
+            <li class="tick-progress">
+                You have completed the
+                <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a>
+            </li>
+            {% else %}
+            <li class="cross-progress">
+                You have partially completed this
+                <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a>
+            </li>
+            {% endif %}
+            {% endif %}
+            {% if completed_missions.svn_checkout or completed_missions.svn_diff or completed_missions.svn_commit %}
+              {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
+            <li class="tick-progress">
+                You have completed the
+                <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a>
+            </li>
+            {% else %}
+            <li class="cross-progress">
+                You have partially completed the
+                <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a>
+            </li>
+            {% endif %}
+            {% endif %}
+            {% if completed_missions.git_checkout or completed_missions.git_diff or completed_missions.git_rebase%}
+              {% if completed_missions.git_checkout and completed_missions.git_diff and completed_missions.git_rebase%}
+            <li class="tick-progress">
+                You have completed the
+                <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a>
+            </li>
+            {% else %}
+            <li class="cross-progress">
+                You have partially completed the
+                <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a>
+            </li>
+            {% endif %}
+            {% endif %}
+        </ul>
+        {% else %}
+        <p>You haven't completed any missions yet.</p>
+        {% endif %}
+          {% endif %}
+    </div>
+    <div class="module-foot">
+        <a href="{% url mysite.missions.base.views.main_page %}" class="module-foot-left">More missions &raquo;</a>
+        &nbsp;
+        <!---<a href="">Write a mission &raquo;</a>
+    -->
+    </div>
+</div>
+
 <div id='portfolio' class='module project-display viewer'>
     <div class='module-head'>
         <ul>
@@ -131,6 +212,75 @@
         {% endif %}
     </div>
 </div> <!-- /#portfolio -->
+
+
+<!-- /# Activity Feed -->
+<div class="module project-display viewer" id="projects">
+      <div class="module-head">
+        <h3>Activity Feed</h3>
+      </div>
+      <div class="module-body">
+        <h5>I want to help with:</h5>
+        {% if projects_i_wanna_help %}
+          <ul class="raquo_bullets">
+            {% for project in projects_i_wanna_help %}
+              <li><a href='{{ project.get_url }}'>{{ project.display_name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+            <p>No projects listed yet.</p>
+        {% endif %}
+
+        <h5>I have helped:</h5>
+          {% if projects_i_helped %}
+          <ul class="raquo_bullets">
+            {% for entry in projects_i_helped %}
+              <li><a href="{{ entry.project.get_url }}">{{ entry.project.display_name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+            <p>No projects listed yet.</p>
+          {% endif %}
+        </div>
+        <div class="module-foot"><a href='{% url mysite.search.views.search_index %}'>Find more projects to help with &raquo;</a></div>
+          {% if settings.RECOMMEND_BUGS %}
+        <div class="module-body">
+      <h3>Recommended bugs based on your profile
+        <a class="feed" href="/+feeds/recbugs/{{ user.username }}/"><img alt="Subscribe" src="{% version '/static/images/icons/feed-icon-14x14.png' %}" ></a>
+      </h3>
+      {% if recommended_bugs %}
+        <div id="bugs">
+          {% include "base/recommended_bugs_content.html" %}
+        </div>
+        {% else %}
+        <div id='bug-recommendations' class='hidden'></div>
+        <div id='volunteer-opportunities'>
+          <p>There are currently no bug recommendations available.</p>
+          {% if recommended_bug_string2Query_objects.items %}
+            <p>You can always search for bugs manually. For example:</p>
+            <ul>
+              {% for string, query in recommended_bug_string2Query_objects.items %}
+                {% with query.get_or_create_cached_hit_count as count %}
+                  {% if count %}
+                    {# Don't show an example if no volunteer opportunities match it. #}
+                    <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+                  {% endif %}
+              {% endwith %}
+            {% endfor %}
+            {% comment %}
+              {% for category in popular_bug_categories %}
+                 <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
+              {% endfor %}
+            {% endcomment %}
+          </ul>
+          {% endif %}
+          {% endif %}
+          </div>
+          </div>
+          <div class="module-foot"><a href='{% url mysite.search.views.search_index %}'>Find more recommendations and other opportunities &raquo;</a></div>
+      {% endif %}
+      </div>
+
 {% endblock main %}
 
 {% block js %}
