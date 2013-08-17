@@ -11,6 +11,7 @@ body#profile #nameplate { float: left; width: 940px; margin-top: 20px; padding: 
 		body#profile #nameplate li a { font-size: 13pt; text-decoration: none; color: #999; }
 			body#profile #nameplate li a:hover { color: #666; text-decoration: underline; }
 	body#profile #nameplate .name { float: left; }
+	body#profile #nameplate h1 a { color: #ff6d3d; }
 	body#profile #nameplate .edit { float: left; width: 20px; margin-left: 5px; }
 	body#profile #nameplate .name-edit-link { float: left; padding: 10px 0; margin-right: 10px; }
 	body#profile #nameplate input[type='text'] { width: 160px; float: left; }

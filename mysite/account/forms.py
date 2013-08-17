@@ -121,7 +121,7 @@ class EditLocationForm(django.forms.ModelForm):
 class EditNameForm(django.forms.ModelForm):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', 'username')
 
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:
