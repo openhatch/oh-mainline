@@ -156,6 +156,7 @@ Editing project - {{ project.display_name }}
 		    <li><a href="{% url mysite.customs.views.add_tracker bugzilla %}bugzilla?project_id={{ project.id }}">Bugzilla</a></li>
 		    <li><a href="{% url mysite.customs.views.add_tracker github %}github?project_id={{ project.id }}">GitHub</li>
 		    <li><a href="{% url mysite.customs.views.add_tracker google %}google?project_id={{ project.id }}">Google Code</li>
+		    <li><a href="{% url mysite.customs.views.add_tracker launchpad %}launchpad?project_id={{ project.id }}">Launchpad</li>
 		    <li><a href="{% url mysite.customs.views.add_tracker roundup %}roundup?project_id={{ project.id }}">Roundup</li>
 		    <li><a href="{% url mysite.customs.views.add_tracker trac %}trac?project_id={{ project.id }}">Trac</li>
 		    </ul>
