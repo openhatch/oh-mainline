@@ -38,13 +38,14 @@
     <div id='nameplate'>
             {% if person.user.first_name or person.user.last_name %}
             <h1 class='name'>
-                <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
                     {{ person.user.last_name }}
                     <span class='username' style="font-size: .7em;">
                         ({{ person.user.username }})
+                        {% if editable %}
+                            (<a href='{% url account.views.edit_name %}'>edit name</a>)
+                        {% endif %}
                     </span>
-                </a>
             </h1>
             {% else %}
             <h1 class='name'>
