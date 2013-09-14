@@ -196,7 +196,7 @@ class TrackerModel(models.Model):
         def _pipe_things(a, b):
             return a | b
         joined = reduce(_pipe_things, query_parts)
-        return cls.objects.get(joined)
+        return cls.objects.select_subclasses().get(joined)
 
 class TrackerQueryModel(models.Model):
     '''This model just exists to provide a way to grab a QuerySet
