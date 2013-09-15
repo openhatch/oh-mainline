@@ -25,51 +25,6 @@ from mysite.search.models import Bug
 
 import django.db.models
 
-all_trackers = {
-        'bugzilla': {
-            'namestr': 'Bugzilla',
-            'model': mysite.customs.models.BugzillaTrackerModel,
-            'form': mysite.customs.forms.BugzillaTrackerForm,
-            'urlmodel': mysite.customs.models.BugzillaQueryModel,
-            'urlform': mysite.customs.forms.BugzillaQueryForm,
-            },
-        'google': {
-            'namestr': 'Google Code',
-            'model': mysite.customs.models.GoogleTrackerModel,
-            'form': mysite.customs.forms.GoogleTrackerForm,
-            'urlmodel': mysite.customs.models.GoogleQueryModel,
-            'urlform': mysite.customs.forms.GoogleQueryForm,
-            },
-        'roundup': {
-            'namestr': 'Roundup',
-            'model': mysite.customs.models.RoundupTrackerModel,
-            'form': mysite.customs.forms.RoundupTrackerForm,
-            'urlmodel': mysite.customs.models.RoundupQueryModel,
-            'urlform': mysite.customs.forms.RoundupQueryForm,
-            },
-        'trac': {
-            'namestr': 'Trac',
-            'model': mysite.customs.models.TracTrackerModel,
-            'form': mysite.customs.forms.TracTrackerForm,
-            'urlmodel': mysite.customs.models.TracQueryModel,
-            'urlform': mysite.customs.forms.TracQueryForm,
-            },
-        'launchpad': {
-            'namestr': 'Launchpad',
-            'model': mysite.customs.models.LaunchpadTrackerModel,
-            'form':  mysite.customs.forms.LaunchpadTrackerForm,
-            'urlmodel': mysite.customs.models.LaunchpadQueryModel,
-            'urlform': None,
-            },
-        'github': {
-            'namestr': 'GitHub',
-            'model': mysite.customs.models.GitHubTrackerModel,
-            'form':  mysite.customs.forms.GitHubTrackerForm,
-            'urlmodel': mysite.customs.models.GitHubQueryModel,
-            'urlform': None,
-            },
-        }
-
 def import_one_bug_item(d):
     '''Accepts one ParsedBug object, as a Python dict.
 
