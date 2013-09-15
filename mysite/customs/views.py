@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import django.shortcuts
@@ -26,7 +26,12 @@ import mysite.base.decorators
 import mysite.customs.forms
 import mysite.customs.models
 
-from mysite.customs.core_bugimporters import all_trackers
+# Trivial helper to avoid repeated exception handling
+def get_tracker_model_or_404(tracker_model_name):
+    try:
+        return mysite.customs.models.TrackerModel.get_by_name(tracker_model_name)
+    except ValueError:
+        raise Http404
 
 # Lists all the stored trackers of a selected type (Bugzilla, Trac etc.)
 @mysite.base.decorators.view
