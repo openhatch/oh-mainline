@@ -34,6 +34,7 @@ from mysite.customs import ohloh
 import mysite.customs.views
 import mysite.base.depends
 import mysite.customs.api
+import mysite.customs.core_bugimporters
 
 from django.core.urlresolvers import reverse
 
