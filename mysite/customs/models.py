@@ -83,6 +83,35 @@ class TrackerModel(models.Model):
         'search.Project', null=True,
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
 
+    ### Every subclass provides the following attributes. We set
+    ### them to None, here in the superclass.
+    ###
+    ### Additionally, we spell _form, _urlmodel, and _urlform with
+    ### underscores, and we put strings inside. Then, we access those
+    ### via get_form(), get_urlmodel(), and get_urlform(). This may
+    ### look weird, but it saves us from an otherwise-painful circular
+    ### import situation.
+    short_name = None
+    namestr = None
+    _form = None
+    _urlmodel = None
+    _urlform = None
+
+    def importable_or_none(name):
+        def actual_function(cls, name=name):
+            value = getattr(cls, name)
+            if value is None:
+                return None
+
+            module_name, member_name = value.rsplit('.', 1)
+            module = importlib.import_module(module_name)
+            return getattr(module, member_name)
+        return actual_function
+
+    get_form = classmethod(importable_or_none('_form'))
+    get_urlmodel = classmethod(importable_or_none('_urlmodel'))
+    get_urlform = classmethod(importable_or_none('_urlform'))
+
     ### This optional attribute specifies a class name, which is intepreted as
     ### part of the mysite.customs.core_bugimporters module.
     ###
@@ -217,6 +246,14 @@ class BugzillaTrackerModel(TrackerModel):
             help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
             help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+
+    ### Metadata about the TrackerModel.
+    short_name = 'bugzilla'
+    namestr = 'Bugzilla'
+    _form = 'mysite.customs.forms.BugzillaTrackerForm'
+    _urlmodel = 'mysite.customs.models.BugzillaQueryModel'
+    _urlform = 'mysite.customs.forms.BugzillaQueryForm'
+
     QUERY_URL_TYPES = (
             ('xml', 'Bug XML query'),
             ('tracker', 'Tracker bug URL'),
@@ -287,6 +324,13 @@ class GoogleTrackerModel(TrackerModel):
     documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the label that marks a documentation bug.")
+
+    ### Metadata about the TrackerModel
+    short_name = 'google'
+    namestr = 'Google Code'
+    _form = 'mysite.customs.forms.GoogleTrackerForm'
+    _urlmodel = 'mysite.customs.models.GoogleQueryModel'
+    _urlform = 'mysite.customs.forms.GoogleQueryForm'
 
     all_trackers = models.Manager()
 
@@ -387,6 +431,13 @@ class TracTrackerModel(TrackerModel):
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
     old_trac = models.BooleanField(default=False)
 
+    ### Metadata about the TrackerModel
+    short_name = 'trac'
+    namestr = 'Trac'
+    _form = 'mysite.customs.forms.TracTrackerForm'
+    _urlmodel = 'mysite.customs.models.TracQueryModel'
+    _urlform = 'mysite.customs.forms.TracQueryForm'
+
     all_trackers = models.Manager()
 
     def __str__(self):
@@ -429,6 +480,13 @@ class RoundupTrackerModel(TrackerModel):
             help_text="This is the text that the field above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
 
+    ### Metadata about the TrackerModel
+    short_name = 'roundup'
+    namestr = 'Roundup'
+    _form = 'mysite.customs.forms.RoundupTrackerForm'
+    _urlmodel = 'mysite.customs.models.RoundupQueryModel'
+    _urlform = 'mysite.customs.forms.RoundupQueryForm'
+
     all_trackers = models.Manager()
 
     def __str__(self):
@@ -463,6 +521,13 @@ class LaunchpadTrackerModel(TrackerModel):
             help_text="This is the value of the tag that indicates a bite-sized bug.")
     documentation_tag = models.CharField(max_length=50, blank=True,
             help_text="This is the value of the tag that indicates documentation bug.")
+
+    ### Metadata about the TrackerModel
+    short_name = 'launchpad'
+    namestr = 'Launchpad'
+    _form = 'mysite.customs.forms.LaunchpadTrackerForm'
+    _urlmodel = 'mysite.customs.models.LaunchpadQueryModel'
+    _urlform = None
 
     all_trackers = models.Manager()
 
@@ -518,6 +583,12 @@ class GitHubTrackerModel(TrackerModel):
         unique_together = (
             ('github_name', 'github_repo'),
         )
+
+    ### Metadata about the TrackerModel
+    namestr = 'GitHub'
+    _form = 'mysite.customs.forms.GitHubTrackerModel'
+    _urlmodel = 'mysite.customs.models.GitHubQueryModel'
+    _urlform = 'mysite.customs.forms.GoogleQueryForm'
 
     all_trackers = models.Manager()
 
