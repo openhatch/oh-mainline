@@ -101,7 +101,7 @@ def import_one_bug_item(d):
     if created:
         logging.error("FYI we created: %s", d['_project_name'])
 
-    tracker = mysite.customs.models.TrackerModel.get_by_name(
+    tracker = mysite.customs.models.TrackerModel.get_instance_by_name(
         tracker_name=d['_tracker_name'])
     del d['_project_name']
     del d['_tracker_name']
