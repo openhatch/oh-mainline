@@ -180,7 +180,7 @@ class TrackerModel(models.Model):
         raise NotImplementedError
 
     @classmethod
-    def get_by_name(cls, tracker_name):
+    def get_instance_by_name(cls, tracker_name):
         '''This returns the instance of a subclass of TrackerModel,
         if any, that has its tracker_name field set to the provided
         value.
