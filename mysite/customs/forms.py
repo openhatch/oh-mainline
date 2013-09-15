@@ -124,7 +124,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
         # We should talk about changing the model.
         try:
             (mysite.customs.models.GitHubTrackerModel.all_trackers
-                .get(
+             .get(
                     ~Q(id=self.instance.id) & (
                         Q(github_name__iexact=github_name_repo.group(1)) |
                         Q(github_repo__iexact=github_name_repo.group(2)))))
