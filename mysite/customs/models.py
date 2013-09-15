@@ -182,26 +182,11 @@ class TrackerModel(models.Model):
 
         It is part of this superclass so that derived classes can use the
         functionality without implementing it themselves. It relies on
-        the classes being manually added to
-        mysite.customs.core_bugimporters.all_trackers.'''
-        import mysite.customs.core_bugimporters
-        my_short_name = None
-
-        for short_name in mysite.customs.core_bugimporters.all_trackers:
-            klass = mysite.customs.core_bugimporters.all_trackers[short_name]['model']
-            if self.__class__ == klass:
-                my_short_name = short_name
-                break
-
-        # Did we find a short name suitable for use in a URL? If not, let's
-        # just crash.
-        if my_short_name is None:
-            raise ValueError, ("The tracker class seems to be misconfigured. "
-                               "Read the comments around this message.")
+        the subclasses having a short_name attribute.'''
 
         return reverse('mysite.customs.views.edit_tracker', kwargs={
                 'tracker_id': self.id,
-                'tracker_type': my_short_name,
+                'tracker_type': self.short_name,
                 'tracker_name': self.tracker_name})
 
 
