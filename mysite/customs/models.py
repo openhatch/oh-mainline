@@ -20,6 +20,7 @@ import datetime
 import urlparse
 import urllib
 import reversion
+import importlib
 
 from django.db import models
 from django.db.models import Q
@@ -207,6 +208,17 @@ class TrackerModel(models.Model):
     def get_base_url(self):
         # Implement this in a subclass
         raise NotImplementedError
+
+    @staticmethod
+    def get_by_name(tracker_model_name):
+        '''This returns the right TrackerModel by looping
+        across all the subclasses and returning the one that
+        has the desired short_name.'''
+        for candidate in TrackerModel.__subclasses__():
+            if candidate.short_name == tracker_model_name:
+                return candidate
+        raise ValueError("No TrackerModel known by name: %s" % (
+                tracker_model_name,))
 
     @classmethod
     def get_instance_by_name(cls, tracker_name):
