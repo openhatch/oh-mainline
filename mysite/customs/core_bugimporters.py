@@ -21,7 +21,6 @@ import mysite.customs.models
 import mysite.customs.forms
 import logging
 
-from mysite.customs.models import TrackerModel
 from mysite.search.models import Bug
 
 import django.db.models
@@ -156,7 +155,7 @@ class AddTrackerForeignKeysToBugs(object):
         bug_urls = [bug_url for (bug_url, bug_data) in list_of_url_data_pairs]
         # Fetch a list of all Bugs that are stale.
         bugs = Bug.all_bugs.filter(canonical_bug_link__in=bug_urls)
-        tms = TrackerModel.objects.all().select_subclasses()
+        tms = mysite.customs.models.TrackerModel.objects.all().select_subclasses()
         # For each TrackerModel, process its stale Bugs.
         bugs_to_retry = []
         for bug in bugs:
