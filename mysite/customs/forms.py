@@ -123,7 +123,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
         # we need to check if it's unique or not.
         # We should talk about changing the model.
         try:
-            (mysite.customs.core_bugimporters.all_trackers['github']['model'].all_trackers
+            (mysite.customs.models.GitHubTrackerModel.all_trackers
                 .get(
                     ~Q(id=self.instance.id) & (
                         Q(github_name__iexact=github_name_repo.group(1)) |
