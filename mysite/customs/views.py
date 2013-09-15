@@ -318,35 +318,28 @@ def delete_tracker(request, tracker_type, tracker_id, tracker_name):
 @revision.create_on_success
 def delete_tracker_do(request, tracker_type, tracker_id, tracker_name):
     tracker_model = get_object_or_404(tracker_type)
-    if True:
-        tracker = tracker_model.all_trackers.get(
-            pk=tracker_id, tracker_name=tracker_name)
-        tracker.delete()
-        # Set the revision meta data.
-        revision.user = request.user
-        revision.comment = 'Deleted the %s tracker' % tracker_name
-        # Tell them it worked.
-        return HttpResponseRedirect(reverse(list_trackers) +
+    tracker = tracker_model.all_trackers.get(
+        pk=tracker_id, tracker_name=tracker_name)
+    tracker.delete()
+    # Set the revision meta data.
+    revision.user = request.user
+    revision.comment = 'Deleted the %s tracker' % tracker_name
+    # Tell them it worked.
+    return HttpResponseRedirect(reverse(list_trackers) +
                         '?notification_id=delete-success')
-    else:
-        # Shouldn't get here. Just go back to base.
-        return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
 def delete_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id):
     data = {}
     tracker_model = get_object_or_404(tracker_type)
-    if True:
-        data['tracker_name'] = tracker_name
-        data['tracker_id'] = tracker_id
-        data['tracker_type'] = tracker_type
-        data['url_id'] = url_id
-        url_obj = get_tracker_model_or_404(tracker_type).get_urlmodel().objects.get(id=url_id)
-        data['url'] = url_obj.url
-        return mysite.base.decorators.as_view(request, 'customs/delete_tracker_url.html', data, None)
-    else:
-        # Shouldn't get here. Just go back to base.
-        return HttpResponseRedirect(reverse(list_trackers))
+    url_obj = tracker_model.get_urlmodel().objects.get(id=url_id)
+    data['tracker_name'] = tracker_name
+    data['tracker_id'] = tracker_id
+    data['tracker_type'] = tracker_type
+    data['url_id'] = url_id
+    data['url'] = url_obj.url
+    return mysite.base.decorators.as_view(request, 'customs/delete_tracker_url.html', data, None)
+
 
 @login_required
 @revision.create_on_success
