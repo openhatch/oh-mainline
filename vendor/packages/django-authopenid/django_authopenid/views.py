@@ -314,8 +314,8 @@ def is_association_exist(openid_url):
     
 def register_account(form, _openid):
     """ create an account """
-    user = User.objects.create_user(form.cleaned_data['username'], 
-                            form.cleaned_data['email'])
+    user, created = User.objects.get_or_create(username=form.cleaned_data['username'], 
+                                               email=form.cleaned_data['email'])
     user.backend = "django.contrib.auth.backends.ModelBackend"
     oid_register.send(sender=user, openid=_openid)
     return user
