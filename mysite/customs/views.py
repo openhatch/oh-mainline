@@ -299,6 +299,7 @@ def edit_tracker_url_do(request, tracker_type, tracker_id, tracker_name, url_id)
 
 @login_required
 def delete_tracker(request, tracker_type, tracker_id, tracker_name):
+    tracker_model = get_tracker_model_or_404(tracker_type)
     tracker = django.shortcuts.get_object_or_404(
         tracker_model.all_trackers,
         pk=tracker_id, tracker_name=tracker_name)
@@ -317,7 +318,7 @@ def delete_tracker(request, tracker_type, tracker_id, tracker_name):
 @login_required
 @revision.create_on_success
 def delete_tracker_do(request, tracker_type, tracker_id, tracker_name):
-    tracker_model = get_object_or_404(tracker_type)
+    tracker_model = get_tracker_model_or_404(tracker_type)
     tracker = tracker_model.all_trackers.get(
         pk=tracker_id, tracker_name=tracker_name)
     tracker.delete()
@@ -331,7 +332,7 @@ def delete_tracker_do(request, tracker_type, tracker_id, tracker_name):
 @login_required
 def delete_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id):
     data = {}
-    tracker_model = get_object_or_404(tracker_type)
+    tracker_model = get_tracker_model_or_404(tracker_type)
     url_obj = tracker_model.get_urlmodel().objects.get(id=url_id)
     data['tracker_name'] = tracker_name
     data['tracker_id'] = tracker_id
