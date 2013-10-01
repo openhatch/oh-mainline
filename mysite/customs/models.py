@@ -585,7 +585,7 @@ class GitHubTrackerModel(TrackerModel):
     namestr = 'GitHub'
     _form = 'mysite.customs.forms.GitHubTrackerModel'
     _urlmodel = 'mysite.customs.models.GitHubQueryModel'
-    _urlform = 'mysite.customs.forms.GoogleQueryForm'
+    _urlform = None
 
     all_trackers = models.Manager()
 
