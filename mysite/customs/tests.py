@@ -685,6 +685,37 @@ class GitHubTrackerListing(TwillTests):
         resp = client.get('/customs/add/github')
         self.assertEqual(resp.status_code, 200)
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class JiraTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(JiraTrackerEditingViews, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='kde')
+
+    def test_form_create_jira_tracker(self):
+        self.assertEqual(0,
+                         mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
+
+        form = mysite.customs.forms.JiraTrackerForm({
+                'tracker_name': 'KDE Jira',
+                'base_url': 'https://jira.kde.org/',
+                'created_for_project': self.kde.id,
+                'bitesized_tag': 'easy',
+                'bitesized_type': 'label',
+                'max_connections': '8',
+                'bug_project_name_format': 'KDE',
+                'documentation_tag': 'doc'})
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        self.assertEqual(1,
+                     mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(2,
+                     mysite.customs.models.JiraQueryModel.objects.all().count())
+
 ### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
 class ExportTrackerAsDict(django.test.TestCase):
     def setUp(self, *args, **kwargs):
@@ -801,6 +832,40 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # above URL with e.g. 'acm-uiuc' or some other valid Github user,
         # and 'mainline' with 'mango-django' or some other valid repo owned by
         # that user with issues enabled.
+        self.assertEqual(expected_url, url)
+
+    def test_jira_tracker(self):
+        # Set up the Twisted TrackerModel that will be used here.
+        # Note that we use Twisted here as an example, even though they're
+        # not on Jira. It just makes the test look more similar to
+        # the other tests.
+        tm = mysite.customs.models.JiraTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://jira.twistedmatrix.com',
+                bitesized_type='label',
+                bitesized_text='bitesize',
+                documentation_text='doc'
+                )
+
+        # Create the list of Bug objects we'll create
+        expected_bug_urls = sorted([
+                'http://twistedmatrix.com/trac/ticket/5858',
+                'http://twistedmatrix.com/trac/ticket/4298',
+                ])
+        # Make sure there is a corresponding Twisted project
+        mysite.search.models.Project.create_dummy(name='Twisted')
+        for expected_bug_url in expected_bug_urls:
+            b = mysite.search.models.Bug.create_dummy(
+                canonical_bug_link=expected_bug_url)
+            b.tracker_id = tm.id
+            b.last_polled = datetime.datetime(2012, 9, 15, 0, 0, 0)
+            b.save()
+        exported = tm.as_dict()
+        url = exported['get_older_bug_data']
+        expected_url = 'http://jira.twistedmatrix.com/rest/api/2/search?jql=updated%3E%3D2012-09-15T00%3A00%3A00'
+
+        # If you want to sanity-check this, just replace 'twisted' in the
+        # above URL with e.g. 'cyanogenmod' or some other valid Jira project.
         self.assertEqual(expected_url, url)
 
 class DuplicateNames(django.test.TestCase):

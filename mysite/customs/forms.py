@@ -27,6 +27,7 @@ class TrackerTypesForm(django.forms.Form):
             ('bugzilla', 'Bugzilla'),
             ('github', 'GitHub'),
             ('google', 'Google Code'),
+            ('jira', 'Jira'),
             ('launchpad', 'Launchpad'),
             ('roundup', 'Roundup'),
             ('trac', 'Trac'),
@@ -59,6 +60,16 @@ class GoogleQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.GoogleQueryModel
         exclude = ('tracker', 'last_polled',)
+
+class JiraTrackerForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.JiraTrackerModel
+
+class JiraQueryForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.JiraQueryModel
+        exlucde = ('tracker', 'last_polled',)
+
 
 class TracTrackerForm(TrackerFormThatHidesCreatedForProject):
     class Meta:
@@ -136,7 +147,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
             msg = 'The github name or repo is already taken.'
             self._errors['github_url'] = self.error_class([msg])
 
-        return github_url 
+        return github_url
 
     def save(self, *args, **kwargs):
         # Call out to superclass
