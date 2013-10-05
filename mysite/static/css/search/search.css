@@ -12,7 +12,7 @@ body#search input[type='text'].default-text-active { color: #999 ! important; }
 /*          Filters
  *---------------------- */
 
-body#search #filters { width: 75%; margin-right: 1%; margin-bottom: 10px; }
+body#search #filters { margin-right: 1%; margin-bottom: 10px; float: left;}
     body#search #filters > .head { float: left; width: 100%; }
     body#search #filters li { margin-left: 0; margin-bottom: .3em; margin-right: 0.3em; float: left;}
     body#search #filters > .body { padding: 1em; float: left; width: 96.5%; font-size: .9em; }
@@ -26,14 +26,14 @@ body#search #filters { width: 75%; margin-right: 1%; margin-bottom: 10px; }
 
     body#search #facets { }
     body#search #facets ul { margin-left: 10px; }
-    body#search #facets .facet-list { width: 20%;}
+/*    body#search #facets .facet-list { width: 20%;} */
     body#search #facets ul li, #suggested_searches li, .facet_more_options li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
     body#search #filters > .body > ul > li > ul { margin-top: .5em; }
     body#search #facets div.more_facet_options { list-style: none; margin-left: 2.5em; }
     body#search #facets div.active, body#search .facet_more_options div.active { font-weight: bold; }
 
 body#search #about_projects, #about_bug_trackers { margin-top: 0; }
-body#search #about_projects { width: 20%; padding: 10px; }
+body#search #about_projects { padding: 10px; width: 220px; }
 body#search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
 body#search #about_projects h3 { margin-bottom: 5px; font-weight: normal; }
 body#search #how_many_projects { font-weight: normal; text-align: center; font-size: 140%; margin-top: .3em; width: 100% ! important; }
@@ -47,7 +47,7 @@ body#search .expanded .separator_betw_tags_and_desc { display: none ! important;
 
 /*          Search field
  *---------------------- */
-body#search #textual_search { width: 22%; }
+body#search #textual_search {  }
 body#search #textual_search .body { width: 87%; padding: 1em; }
 body#search #textual_search input[type='text'] { width: 70%; }
 body#search #textual_search input[type='submit'] { width: 20%; padding: 5px; }
@@ -171,7 +171,7 @@ body#search #create_bug_alert { padding: 10px 15px; -webkit-border-radius: 8px; 
     body#search #create_bug_alert .errorlist li { display: block; float: none; background-color: #f98; color: #000; font-weight: bold; }
 
 body#search .head h3 { font-weight: normal; text-shadow: 0 1px 0 #fff; }
-body#search #results { width: 100%; }
+body#search #results { width: 70%; margin-left: 10px;}
 body#search #results .body { width: 99%; padding: 5px; }
 body#search .contributors { display: none; }
 
@@ -183,5 +183,8 @@ body#search .facet_more_options li { margin-top: 3px; }
 #facebox h2 { font-weight: normal; font-size: 1.5em; }
 
 .active_facet_value a:hover { text-decoration: line-through; }
+
+/* LAYOUT */
+body#search #left_column { float: left; width: 25% }
 
 /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */

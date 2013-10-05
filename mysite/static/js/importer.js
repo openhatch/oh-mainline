@@ -568,25 +568,29 @@ drawAddCitationFormNearThisButton = function () {
     var $citationForms = $(this).closest('.citations-wrapper').find('ul.citation-forms');
     var buildingBlockHTML = $('#citation_form_building_block').html();
     var $form_container = $(buildingBlockHTML);
-
+	
     // Set element ID
     $form_container.attr('id', generateUniqueID());
-
+	if ($citationForms.find('form').length >= 1 ){
+		return false;
+	}
     $citationForm = $form_container.find('form');
-   
+
+	
     $citationForms.append($form_container);
+	
 
-    console.log($citationForm);
+//    console.log($citationForm);
 
-    console.log($citationForm.parents('.portfolio_entry'));
+//    console.log($citationForm.parents('.portfolio_entry'));
 
     // Set field: portfolio entry ID
     var portfolioEntryID = $citationForm.closest('.portfolio_entry')
         .attr('portfolio_entry__pk');
     $citationForm.find('[name="portfolio_entry"]').attr('lang', 'your-mom');
     $citationForm.find('[name="portfolio_entry"]').attr('value', portfolioEntryID);
-    console.log('hi');
-    console.log($citationForm.find('[name="portfolio_entry"]'));
+//    console.log('hi');
+//    console.log($citationForm.find('[name="portfolio_entry"]'));
 
     // Set field: form container element ID
     var formContainerElementID = $citationForm.closest('.citation-forms li').attr('id');
@@ -809,6 +813,8 @@ PortfolioEntry.Save.save = function () {
 }
 PortfolioEntry.Save.bindEventHandlers = function() {
     $('.portfolio_entry li.publish_portfolio_entry a').click(PortfolioEntry.Save.save);
+    $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
+
 };
 
 PortfolioEntry.Delete = {};
