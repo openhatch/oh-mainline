@@ -20,15 +20,7 @@ https://openhatch.org/policies-etc/.
 How to run the bug importer
 ===========================
 
-At present, there is no inbuilt automation of bug importing (celeryd
-was causing too many problems). Run the following command to start a
-bug import::
-
-  ./manage.py customs_twist
-
-Since this can take a while, it is a good idea to run this somewhere
-where it won't prevent you from using your computer - for example,
-inside a GNU screen session.
+This can be done via cron job.
 
 
 Run the hourly tasks related to profiles
