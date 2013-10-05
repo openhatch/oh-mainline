@@ -1542,6 +1542,29 @@ class EditContactBlurb(TwillTests):
         asheesh = Person.get_by_username('paulproteus')
         self.assertEqual(asheesh.homepage_url, homepage_url)
 
+    def test_blurb_with_irc_info(self):
+        '''
+        * Goes to paulproteus' profile
+        * clicks edit in the info area
+        * enters irc url under the "how to contact me" section
+        * submits
+        * checks that his profile now has irc url
+        '''
+        irc_url = 'irc://irc.freenode.net/openhatch'
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        # set the contact info in the form
+        tc.fv("edit-tags", 'edit-tags-contact_blurb', irc_url)
+        tc.submit()
+        # verify that the irc url is there
+        tc.find(irc_url)
+        # verify that contact_blurb is saved
+        asheesh = Person.get_by_username('paulproteus')
+        self.assertEqual(asheesh.contact_blurb, irc_url)
+        # verify that irc url is not a link on view profile page
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.notfind('<a[^>]*>[^<]*irc[^<]*<\/a>')
+
 class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
     def test_one_valid_project(self):
         # make a project called Banana
