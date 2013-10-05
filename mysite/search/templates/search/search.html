@@ -41,7 +41,7 @@ Volunteer opportunities in free and open source software
 {% endblock css %}
 
 {% block pagetop %}
-    <h3><a href='{% url mysite.search.views.fetch_bugs %}'><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></a></h3>
+    <h3><a href='{% url mysite.search.views.search_index %}'><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></a></h3>
 
 {% endblock pagetop %}
 
@@ -195,7 +195,7 @@ Volunteer opportunities in free and open source software
 
     <div id='textual_search' class='module right'>
         <div class='module-body'>
-            <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
+            <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.search_index %}'> 
                 <input type='text' name='q' id='q' rel='hint'
                 title='Textual search'
                 value='{{ query.terms_string }}' />

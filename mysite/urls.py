@@ -183,7 +183,7 @@ urlpatterns = patterns('',
         (r'^\+landing/opps$', 'mysite.base.views.landing_for_opp_hunters'),
         (r'^\+landing/projects$', 'mysite.base.views.landing_for_project_maintainers'),
 
-        (r'^search/$', 'mysite.search.views.fetch_bugs'),
+        (r'^search/$', 'mysite.search.views.search_index'),
         (r'^admin/', include(admin.site.urls)),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT}),

@@ -508,7 +508,7 @@ class FacetsFilterResults(SearchTest):
         self.assertEqual(list(results), [python_bug])
 
     def test_any_facet(self):
-        """In the fetch_bugs() method in the search module, the truthfulness of
+        """In the search_index() method in the search module, the truthfulness of
         the Query object is evaluated to determine whether or not any results
         should be returned. Here, we test that if a facet in the GET data
         is the empty string, the query is still considered to be True. A facet
@@ -1073,7 +1073,7 @@ class PublicizeBugTrackerIndex(SearchTest):
 
     def setUp(self):
         SearchTest.setUp(self)
-        self.search_page_response = self.client.get(reverse(mysite.search.views.fetch_bugs))
+        self.search_page_response = self.client.get(reverse(mysite.search.views.search_index))
         self.bug_tracker_count = mysite.search.view_helpers.get_project_count()
 
     def test_search_template_contains_bug_tracker_count(self):
@@ -1137,7 +1137,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
             b.save()
 
         # Visit the first page of a vol. opp. search results page.
-        opps_view = mysite.search.views.fetch_bugs
+        opps_view = mysite.search.views.search_index
         query = u'ruby'
         opps_query_string = { u'q': query, u'start': 1, u'end': 10}
         opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
