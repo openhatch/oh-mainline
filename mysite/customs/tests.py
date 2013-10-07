@@ -629,6 +629,16 @@ class GitHubTrackerEditingViews(TwillTests):
         self.assertEqual(2,
                          mysite.customs.models.GitHubQueryModel.objects.all().count())
 
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class GitHubTrackerListing(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_view_github_trackers(self):
+        self.assertEqual(0,
+                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        client = self.login_with_client()
+        resp = client.post('/customs/', {'list_trackers-tracker-type': 'github'})
+        self.assertEqual(resp.status_code, 200)
 ### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
 class ExportTrackerAsDict(django.test.TestCase):
     def setUp(self, *args, **kwargs):
