@@ -638,7 +638,7 @@ class GitHubTrackerListing(TwillTests):
                 mysite.customs.models.GitHubTrackerModel.objects.all()
                 .select_subclasses().count())
         client = self.login_with_client()
-        resp = client.post('/customs/', {'list_trackers-tracker-type':
+        resp = client.post('/customs/', {'list_trackers-tracker_type':
             'github'})
         self.assertEqual(resp.status_code, 200)
 
