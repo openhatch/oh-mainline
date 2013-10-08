@@ -582,6 +582,7 @@ class GitHubTrackerModel(TrackerModel):
         )
 
     ### Metadata about the TrackerModel
+    short_name = 'github'
     namestr = 'GitHub'
     _form = 'mysite.customs.forms.GitHubTrackerModel'
     _urlmodel = 'mysite.customs.models.GitHubQueryModel'
