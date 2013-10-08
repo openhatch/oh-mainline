@@ -639,6 +639,7 @@ class GitHubTrackerListing(TwillTests):
         client = self.login_with_client()
         resp = client.post('/customs/', {'list_trackers-tracker-type': 'github'})
         self.assertEqual(resp.status_code, 200)
+
 ### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
 class ExportTrackerAsDict(django.test.TestCase):
     def setUp(self, *args, **kwargs):
