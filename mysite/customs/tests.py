@@ -635,9 +635,11 @@ class GitHubTrackerListing(TwillTests):
 
     def test_view_github_trackers(self):
         self.assertEqual(0,
-                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+                mysite.customs.models.GitHubTrackerModel.objects.all()
+                .select_subclasses().count())
         client = self.login_with_client()
-        resp = client.post('/customs/', {'list_trackers-tracker-type': 'github'})
+        resp = client.post('/customs/', {'list_trackers-tracker-type':
+            'github'})
         self.assertEqual(resp.status_code, 200)
 
 ### Tests for importing bug data from YAML files, as emitted by oh-bugimporters
