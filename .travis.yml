@@ -4,15 +4,14 @@ python:
   - "2.7"
 install:
 # Install coveralls to test code coverage
- - pip install coveralls
+ - sudo pip install coveralls
 # Copy libz.so into the virtualenv so that PIL can build PNG support
- - cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
-# Now, regular pip install for PIL
- - pip install Pillow
+ - sudo cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
 # command to run tests
 script: coverage run --source="mysite" manage.py test
 # Get development headers for PIL
 before_install:
+ - deactivate # We are having problems with using Pillow in a virtualenv
  - sudo apt-get update -qq
  - sudo apt-get build-dep -qq python-imaging
  - sudo apt-get install libjpeg-dev
