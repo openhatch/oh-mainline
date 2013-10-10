@@ -571,6 +571,41 @@ class BugzillaTrackerEditingViews(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+class BugzillaTrackerListing(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(BugzillaTrackerListing, self).setUp()
+        self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+
+    def test_view_url_form(self):
+        self.assertEqual(0,
+                         mysite.customs.models.BugzillaTrackerModel.objects.
+                         all().select_subclasses().count())
+
+        client = self.login_with_client()
+
+        form = mysite.customs.forms.BugzillaTrackerForm({
+                'tracker_name': 'KDE',
+                'base_url': 'https://bugs.kde.org/',
+                'created_for_project': self.kde.id,
+                'query_url_type': 'xml',
+                'max_connections': '8',
+                'custom_parser': 'bugzilla.KDEBugzilla',
+                'bug_project_name_format': 'format'})
+
+        if form.errors:
+            logging.info(form.errors)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
+
+        resp = client.get('/customs/add/bugzilla/' + str(btm.id) + '/KDE/url/do')
+        self.assertEqual(resp.status_code, 200)
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class LaunchpadTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
