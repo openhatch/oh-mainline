@@ -157,6 +157,7 @@ class Person(models.Model):
     time_to_commit = models.ForeignKey(TimeToCommit, default=1)
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
+    linked_in_url = models.URLField(default="", blank=True)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)

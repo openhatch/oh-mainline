@@ -135,7 +135,7 @@
         <small style='color: #777;'>Nothing here yet.</small>
         {% endif %}
 
-        {% if not person.bio and not person.homepage_url and not tags_flat %}
+        {% if not person.bio and not person.linked_in_url and not person.homepage_url and not tags_flat %}
         {% ifequal user.get_profile person %}
         <ul class='nudgebuttons'>
             <li>
@@ -168,6 +168,13 @@
         <h4>irc nick</h4>
         <p id="ircnick" style='clear: both;'>
             {{ person.irc_nick }}
+        </p>
+        {% endif %}
+
+        {% if person.linked_in_url %}
+        <h4>LinkedIn</h4>
+        <p id="linkedinurl" style='clear: both;'>
+            <a href="{{ person.linked_in_url }}">{{ person.linked_in_url }}</a>
         </p>
         {% endif %}
 

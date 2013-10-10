@@ -55,6 +55,7 @@ class EditInfoForm(django.forms.Form):
     bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
     homepage_url = django.forms.URLField(required=False)
     irc_nick = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    linked_in_url = django.forms.URLField(required=False)
     understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
     understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
     studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
