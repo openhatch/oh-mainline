@@ -38,7 +38,7 @@ People Search
     where {{ property }} = {{ value }}
     {% endif %}
 
-<form action="." method="POST">
+<form id="search-form" action="." method="POST">
     <div id='search'>
         <div class='keyword field'>
             <label for='search_profiles'>Search for</label>
@@ -369,6 +369,32 @@ People Search
 
         </div>
     </div><!-- /#search_summary -->
+
+    <p><a id="export-link" href="">Export</a></p>
+    <select style="display: none;" id="export-format">
+        {% for key, value in export_formats.items %}
+        <option value="{{key}}">{{value}}</option>
+        {% endfor %}
+    </select>
+    <p><a id="export-selected" href="" style="display: none;">Export to selected format</a></p>
+    <script>
+        $("#export-link").click(function(e) {
+            e.preventDefault();
+            $(this).css("display", "none");
+            $("#export-format").css("display", "inline");
+            $("#export-selected").css("display", "block");
+        });
+        $("#export-selected").click(function(e) {
+            $("#search-form")
+                .attr("target", "_blank")
+                .attr("action", "/people-export/?format=" + $("#export-format").val())
+                .submit()
+                .removeAttr("target")
+                .attr("action", ".");
+            e.preventDefault();
+        });
+    </script>
+
 
     {% if people %}
 

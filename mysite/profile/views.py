@@ -41,6 +41,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
+import csv
 
 # OpenHatch apps
 import mysite.base.view_helpers
@@ -405,6 +406,47 @@ def permanent_redirect_to_people_search(request, property, value):
                        mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
+
+def manyToString(many):
+    res = ""
+    for obj in many.all():
+        res += obj.name + ";"
+    return res
+
+def export_to_csv(people):
+    response = HttpResponse(content_type = "text/csv")
+    response['Content-Disposition'] = 'attachment; filename="sc4g-people.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Username', 'E-mail', 'Homepage', 'Company name', 'Time to commit', 'Cause', 'Language'])
+    empty = "N/A"
+
+    for person in people:
+        writer.writerow([person.user.username,
+                         person.user.email,
+                         person.homepage_url or empty,
+                         person.company_name or empty,
+                         person.time_to_commit.name or empty,
+                         manyToString(person.cause) or empty,
+                         manyToString(person.language) or empty])
+    return response
+
+def people_export(request):
+    query = request.POST.get('q', '')
+    parsed_query = mysite.profile.view_helpers.parse_string_query(query)
+
+    if parsed_query['q'].strip():
+        people = parsed_query['callable_searcher']().people
+    else:
+        people = Person.objects.all().order_by('user__username')
+
+    people = mysite.profile.view_helpers.filter_people(people, request.POST)
+
+    format = request.GET.get('format', 'csv')
+    return {
+        'csv': export_to_csv(people),
+      # 'excel': export_to_excel(people), etc...
+    }[format]
+
 @view
 def people(request):
     """Display a list of people."""
@@ -441,6 +483,7 @@ def people(request):
         else:
             person_ids += '%d-%d,' % (stop, start)
 
+    data['export_formats'] = {"csv": "CSV"}
     data['skills'] = Skill.objects.all()
     data['organizations'] = Organization.objects.all()
     data['causes'] = Cause.objects.all()

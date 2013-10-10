@@ -191,6 +191,10 @@ urlpatterns = patterns('',
         (r'^people/$',
             'mysite.profile.views.people'),
 
+        (r'^people-export/$',
+            'mysite.profile.views.people_export'),
+
+
         (r'^\+profile_api/location_data/$',
             mysite.profile.views.LocationDataApiView.as_view()),
 
