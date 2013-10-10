@@ -49,7 +49,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation
+        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view
 import mysite.profile.forms
@@ -408,8 +408,9 @@ def people(request):
     """Display a list of people."""
     data = {}
 
-    # pull in q from GET
-    query = request.GET.get('q', '')
+    # pull in q from POST
+    post_data = request.POST
+    query = request.POST.get('q', '')
 
     # Store the raw query in the template data
     data['raw_query'] = query
@@ -426,6 +427,7 @@ def people(request):
     else:
         everybody = Person.objects.all().order_by('user__username')
 
+    everybody = mysite.profile.view_helpers.filter_people(people=everybody, post_data=post_data)
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template
@@ -437,6 +439,11 @@ def people(request):
         else:
             person_ids += '%d-%d,' % (stop, start)
 
+    data['skills'] = Skill.objects.all()
+    data['organizations'] = Organization.objects.all()
+    data['causes'] = Cause.objects.all()
+    data['languages'] = Language.objects.all()
+    data['times_to_commit'] = TimeToCommit.objects.all()
     data['person_ids'] = simplejson.dumps(person_ids)
     return (request, 'profile/search_people.html', data)
 

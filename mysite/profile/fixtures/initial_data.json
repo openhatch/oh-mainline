@@ -1,0 +1,317 @@
+[
+    {
+        "model": "profile.Skill",
+        "pk": 1,
+        "fields": {
+            "name": "Project Management / Scrum Master"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 2,
+        "fields": {
+            "name": "Software Development"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 3,
+        "fields": {
+            "name": "User Interface Design"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 4,
+        "fields": {
+            "name": "Product Management"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 5,
+        "fields": {
+            "name": "Community Management"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 6,
+        "fields": {
+            "name": "Quality Assurance"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 7,
+        "fields": {
+            "name": "Systems Administration"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 8,
+        "fields": {
+            "name": "Technical Documentation"
+        }
+    },
+    {
+        "model": "profile.Skill",
+        "pk": 9,
+        "fields": {
+            "name": "Technical Support"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 1,
+        "fields": {
+            "name": "Benetech"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 2,
+        "fields": {
+            "name": "Code for America"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 3,
+        "fields": {
+            "name": "FrontlineSMS"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 4,
+        "fields": {
+            "name": "The guardian project"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 5,
+        "fields": {
+            "name": "Mozilla Webmaker"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 6,
+        "fields": {
+            "name": "Amara (Universal subtitles)"
+        }
+    },
+    {
+        "model": "profile.Organization",
+        "pk": 7,
+        "fields": {
+            "name": "Wikimedia foundation"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 1,
+        "fields": {
+            "name": "Civic Engagement"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 2,
+        "fields": {
+            "name": "Climate Change Mitigation"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 3,
+        "fields": {
+            "name": "Disaster Relief"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 4,
+        "fields": {
+            "name": "Education and Literacy"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 5,
+        "fields": {
+            "name": "Empowerment of Women"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 6,
+        "fields": {
+            "name": "Environmental and Species Conservation"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 7,
+        "fields": {
+            "name": "Healthcare"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 8,
+        "fields": {
+            "name": "Homelessness"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 9,
+        "fields": {
+            "name": "Human Rights"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 10,
+        "fields": {
+            "name": "Poverty Alleviation"
+        }
+    },
+    {
+        "model": "profile.Cause",
+        "pk": 11,
+        "fields": {
+            "name": "Self Sufficiency for People with Disabilities"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 1,
+        "fields": {
+            "name": "C"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 2,
+        "fields": {
+            "name": "C++"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 3,
+        "fields": {
+            "name": "C#"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 4,
+        "fields": {
+            "name": "HTML/CSS"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 5,
+        "fields": {
+            "name": "Java"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 6,
+        "fields": {
+            "name": "Java on Android"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 7,
+        "fields": {
+            "name": "JavaScript"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 8,
+        "fields": {
+            "name": "Objective C"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 9,
+        "fields": {
+            "name": "Objective C on iPhone"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 10,
+        "fields": {
+            "name": "Perl"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 11,
+        "fields": {
+            "name": "PHP"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 12,
+        "fields": {
+            "name": "Python"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 13,
+        "fields": {
+            "name": "Ruby"
+        }
+    },
+    {
+        "model": "profile.Language",
+        "pk": 14,
+        "fields": {
+            "name": "Scala"
+        }
+    },
+    {
+        "model": "profile.TimeToCommit",
+        "pk": 1,
+        "fields": {
+            "name": "A few hours per week"
+        }
+    },
+    {
+        "model": "profile.TimeToCommit",
+        "pk": 2,
+        "fields": {
+            "name": "A few hours per month"
+        }
+    },
+    {
+        "model": "profile.TimeToCommit",
+        "pk": 3,
+        "fields": {
+            "name": "0 to 8 hours total"
+        }
+    },
+    {
+        "model": "profile.TimeToCommit",
+        "pk": 4,
+        "fields": {
+            "name": "8 to 20 hours total"
+        }
+    }
+]

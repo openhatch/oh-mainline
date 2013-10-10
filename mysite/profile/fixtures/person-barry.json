@@ -1,1 +1,1 @@
-[{ "pk": 2, "model": "profile.person", "fields": {"user": 2, "gotten_name_from_ohloh": 1} }]
+[{ "pk": 2, "model": "profile.person", "fields": {"user": 2, "gotten_name_from_ohloh": 1, "opensource": "True", "company_name": "Test Company"} }]

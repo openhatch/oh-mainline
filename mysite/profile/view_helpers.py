@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from ast import literal_eval
 
 import os.path
 import hashlib
@@ -163,6 +164,36 @@ def get_geoip_guess_for_ip(ip_as_string):
     if as_unicode:
         return True, as_unicode
     return False, u''
+
+def filter_people(people, post_data):
+    filtered_people = people
+
+    if 'filter_name' in post_data and len(post_data.get('filter_name')) > 0:
+        name = post_data.get('filter_name', '')
+        filtered_people = filtered_people.filter(
+            Q(user__username__contains=name)
+            | Q(user__first_name__contains=name)
+            | Q(user__last_name__contains=name))
+    if 'filter_company_name' in post_data and len(post_data.get('filter_company_name')) > 0:
+        company_name = post_data.get('filter_company_name', '')
+        filtered_people = filtered_people.filter(company_name__contains=company_name)
+    if 'filter_email' in post_data and len(post_data.get('filter_email')) > 0:
+        filtered_people = filtered_people.filter(user__email=post_data.get('filter_email'))
+    if 'skills' in post_data:
+        filtered_people = filtered_people.filter(skill__pk__in=post_data.getlist('skills'))
+    if 'organizations' in post_data:
+        filtered_people = filtered_people.filter(organization__pk__in=post_data.getlist('organizations'))
+    if 'causes' in post_data:
+        filtered_people = filtered_people.filter(cause__pk__in=post_data.getlist('causes'))
+    if 'languages' in post_data:
+        filtered_people = filtered_people.filter(language__pk__in=post_data.getlist('languages'))
+    if 'time_to_commit' in post_data:
+        filtered_people = filtered_people.filter(time_to_commit__pk=post_data.get('time_to_commit'))
+    if 'opensource' in post_data:
+        opensource = literal_eval(post_data.get('opensource', None))
+        filtered_people = filtered_people.filter(opensource=opensource)
+
+    return filtered_people
 
 def parse_string_query(s):
     parsed = {}
@@ -444,7 +475,7 @@ class AllTagsQuery(PeopleFinder):
 
         # get search based on username
         user_results = mysite.profile.models.Person.objects.none()
-        if len(search_list) == 1: 
+        if len(search_list) == 1:
           user_results = self.get_persons_by_username(
               search_string)
 
@@ -512,4 +543,3 @@ class ProjectQuery(PeopleFinder):
     def add_query_summary(self):
         self.template_data['this_query_summary'] = 'who have contributed to '
         self.template_data['query_is_a_project_name'] = True
-

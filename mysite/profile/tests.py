@@ -19,7 +19,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.view_helpers import ObjectFromDict
 from mysite.base.models import Timestamp
@@ -1551,7 +1551,7 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
             name='Banana',
             cached_contributor_count=1)
         url = reverse(mysite.profile.views.people)
-        response = self.client.get(url, {'q': 'bANANA'})
+        response = self.client.post(url, {'q': 'bANANA'})
         self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [Project.objects.get(name='Banana')])
 
@@ -1563,7 +1563,7 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
             name='Banana',
             cached_contributor_count=0)
         url = reverse(mysite.profile.views.people)
-        response = self.client.get(url, {'q': 'bANANA'})
+        response = self.client.post(url, {'q': 'bANANA'})
         self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [])
 
@@ -1734,6 +1734,32 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['q'], query)
         self.assertEqual(data['query_type'], 'all_tags')
 
+class PeopleFilter(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
+
+    @staticmethod
+    def get_filtered_people(data):
+        post_data = data
+        query = post_data.get(u'q', u'')
+        parsed_query = mysite.profile.view_helpers.parse_string_query(query)
+
+        if parsed_query['q'].strip():
+            search_results = parsed_query['callable_searcher']()
+            everybody = search_results.people
+        else:
+            everybody = Person.objects.all().order_by('user__username')
+
+        return mysite.profile.view_helpers.filter_people(people=everybody, post_data=post_data)
+
+    def test_search_by_name(self):
+        data = {u'q': u'Asheesh'}
+        everybody = PeopleFilter.get_filtered_people(data)
+        self.assertEqual(len(everybody), 1)
+
+    def test_search_by_opensource(self):
+        data = {u'q': u'', u'opensource': u'True'}
+        everybody = PeopleFilter.get_filtered_people(data)
+        logging.info('Everybody list size: %s' % len(everybody))
 
 class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
     def setUp(self):
@@ -2071,14 +2097,14 @@ class PeopleMapForNonexistentProject(TwillTests):
 
     def test(self):
         mock_request = ObjectFromDict(
-            {u'GET': {u'q': u'project:Phorum'},
+            {u'POST': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
     def test_icanhelp(self):
         mock_request = ObjectFromDict(
-            {u'GET': {u'q': u'icanhelp:Phorum'},
+            {u'POST': {u'q': u'icanhelp:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.

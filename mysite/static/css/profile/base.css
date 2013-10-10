@@ -71,3 +71,22 @@ body#landing ul.nudgebuttons a .notification { margin: 0; }
 ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
 
 body#edit_profile_info_form #contact_blurb:target label { background-color: #faffaa; float: none; }
+
+div.input {
+    display: block;
+    min-height: 60px;
+    height: 60px;
+    max-height: 60px;
+}
+
+div.input input[type=text] {
+    width: 250px;
+}
+
+.list-hidden {
+    display: none;
+}
+
+.clear {
+    clear: both;
+}

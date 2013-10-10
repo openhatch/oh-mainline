@@ -1,3 +1,4 @@
+south
 setuptools
 psycopg2
 PIL

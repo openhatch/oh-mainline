@@ -38,29 +38,198 @@ People Search
     where {{ property }} = {{ value }}
     {% endif %}
 
-    <form action=".">
-        <div id='search'>
-            <div class='keyword field'>
-                <label for='search_profiles'>Search for</label>
-                <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
-            </div>
-            <div class='location field'>
-              <div class="input-and-labels">
-                <label for='location_for_map_centering'>Near</label>
-                <p class="map-error">We couldn't find that location.</p>
-                <input id="location_for_map_centering" name="center"
-                       type="text" value="{{ center_name }}"/>
-          </div>
-            </div>
-            <div class='stubmit field'>
-              <div class="input-and-labels">
+<form action="." method="POST">
+    <div id='search'>
+        <div class='keyword field'>
+            <label for='search_profiles'>Search for</label>
+            <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
+        </div>
+        <div class='stubmit field'>
+            <div class="input-and-labels">
                 <label for='search_locations'>&nbsp;</label>
                 <input id="center_the_map" type="submit" value="Search"/>
-          </div>
             </div>
-            
         </div>
-    </form>
+    </div>
+
+    {% if user and user.is_superuser %}
+
+    <div>
+        <fieldset>
+            <legend>Filter</legend>
+            <div class="input">
+                <div>
+                    <label for="filter_name">Name:</label>
+                </div>
+                <div>
+                    <input id="filter_name" name="filter_name" type="text" />
+                </div>
+            </div>
+            <div class="input">
+                <div>
+                    <label for="filter_company_name">Company Name:</label>
+                </div>
+                <div>
+                    <input id="filter_company_name" name="filter_company_name" type="text" />
+                </div>
+            </div>
+            <div class="input">
+                <div>
+                    <label for="filter_email">Email:</label>
+                </div>
+                <div>
+                    <input id="filter_email" name="filter_email" type="text" pattern="^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+(\.[a-zA-Z]{2,6})+$" />
+                </div>
+            </div>
+            <div class="clear">
+                <div>
+                    <label for="filter_email">Skills:</label>
+                    <a class="collapse-button" href="#">+</a>
+                </div>
+                <ul class="list-hidden">
+                    {% for skill in skills %}
+                    <li>
+                        <input type="checkbox" name="skills" id="skill_{{ skill.id }}" value="{{ skill.id }}" />
+                        <label for="skill_{{ skill.id }}">{{ skill.name }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="clear">
+                <div>
+                    <label for="filter_email">Organizations:</label>
+                    <a class="collapse-button" href="#">+</a>
+                </div>
+                <ul class="list-hidden">
+                    {% for organization in organizations %}
+                    <li>
+                        <input type="checkbox" name="organizations" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
+                        <label for="organization_{{ organization.id }}">{{ organization.name }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="clear">
+                <div>
+                    <label for="filter_email">Causes:</label>
+                    <a class="collapse-button" href="#">+</a>
+                </div>
+                <ul class="list-hidden">
+                    {% for cause in causes %}
+                    <li>
+                        <input type="checkbox" name="causes" id="cause_{{ cause.id }}" value="{{ cause.id }}" />
+                        <label for="cause_{{ cause.id }}">{{ cause.name }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="clear">
+                <div>
+                    <label for="filter_email">Languages:</label>
+                    <a class="collapse-button" href="#">+</a>
+                </div>
+                <ul class="list-hidden">
+                    {% for language in languages %}
+                    <li>
+                        <input type="checkbox" name="languages" id="language_{{ language.id }}" value="{{ language.id }}" />
+                        <label for="language_{{ language.id }}">{{ language.name }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="clear">
+                <div>
+                    <label for="filter_email">Time to Commit:</label>
+                    <a class="collapse-button" href="#">+</a>
+                </div>
+                <ul class="list-hidden">
+                    {% for time_to_commit in times_to_commit %}
+                    <li>
+                        <input type="radio" name="time_to_commit" id="time_to_commit_{{ time_to_commit.id }}" value="{{ time_to_commit.id }}" />
+                        <label for="time_to_commit_{{ time_to_commit.id }}">{{ time_to_commit.name }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="clear">
+                <div>
+                    <label for="filter_email">Open Source Projects:</label>
+                    <a class="collapse-button" href="#">+</a>
+                </div>
+                <ul class="list-hidden">
+                    <li>
+                        <input type="radio" name="opensource" id="opensource_yes" value="True" />
+                        <label for="opensource_yes">Yes</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="opensource" id="opensource_no" value="False" />
+                        <label for="opensource_no">No</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="opensource" id="opensource_either" value="None" />
+                        <label for="opensource_either">Either</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="clear">
+                <button id="resetButton">Reset Filter</button>
+                <button id="collapseAllButton">Collapse All</button>
+                <button id="expandAllButton">Expand All</button>
+            </div>
+        </fieldset>
+    </div>
+
+    {% endif %}
+</form>
+
+<script>
+        $(document).ready(function() {
+            $('a.collapse-button').click(function(e) {
+                e.preventDefault();
+
+                var div = $(this).parent().next();
+                var display = div.css('display');
+                var text = $(this).text();
+                var newDisplay = (display == 'none') ? 'block' : 'none';
+                var newText = (text == '-') ? '+' : '-';
+
+                div.css('display', newDisplay);
+                $(this).text(newText);
+            });
+
+            $('#resetButton').click(function(e) {
+                e.preventDefault();
+
+                $('#filter_name').val('');
+                $('#filter_company_name').val('');
+                $('#filter_email').val('');
+                $('ul.list-hidden input[type="checkbox"][name="skills"]').prop('checked', false);
+                $('ul.list-hidden input[type="checkbox"][name="organizations"]').prop('checked', false);
+                $('ul.list-hidden input[type="checkbox"][name="causes"]').prop('checked', false);
+                $('ul.list-hidden input[type="checkbox"][name="languages"]').prop('checked', false);
+                $('ul.list-hidden input[type="radio"][name="time_to_commit"]').prop('checked', false);
+                $('ul.list-hidden input[type="radio"][name="opensource"]').prop('checked', false);
+            });
+
+            function toggleCollapseAll(collapse) {
+                var display = (collapse === true) ? 'none' : 'block';
+                var text = (collapse === true) ? '+' : '-';
+
+                $('ul.list-hidden').css('display', display);
+                $('a.collapse-button').text(text);
+            }
+
+            $('#collapseAllButton').click(function(e) {
+                e.preventDefault();
+                toggleCollapseAll(true);
+            });
+
+            $('#expandAllButton').click(function(e) {
+                e.preventDefault();
+                toggleCollapseAll(false);
+            });
+        });
+    </script>
 
     {% if not q %}
     <ul class='suggestions'>
@@ -141,7 +310,7 @@ People Search
     {% with projects_that_match_q_exactly.0 as matching_project %}
         {% if matching_project %}
             <div id='project_yeller'>
-                <a href='{{ matching_project.get_url }}'>{{ matching_project.display_name }}</a> is a project with 
+                <a href='{{ matching_project.get_url }}'>{{ matching_project.display_name }}</a> is a project with
                 <a href='?q=project:{{matching_project.name_with_quotes_if_necessary|urlencode}}'>
                     {{ matching_project.get_contributors|length }}
                     contributor{{ matching_project.get_contributors|length|pluralize}}</a>.
@@ -157,7 +326,7 @@ People Search
                 {{ total_query_summary|safe }}
             {% else %}
                 {% if q %}
-                    People 
+                    People
                     {# If there's a query, tell us the people who match it. #}
                     {{ this_query_summary }}
                     {% spaceless %}
@@ -195,7 +364,7 @@ People Search
             <span class='dont_show_until_map_loads'>
             &middot;
                 <span id='how_many_people_are_visible'></span> visible on the map<span style="display: none;" id="people_without_locations">, including those with no location set <a id='about_uninhabited_island' href='#'>(?)</a></span>.
-                <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
+                <a href=''>{# refresh the page #} id='show_everybody'>(Show everybody.)</a>
             </span>
 
         </div>

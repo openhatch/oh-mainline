@@ -42,7 +42,7 @@ body#people-map #search { float: left; width: 100%; }
 
 /* Field */
 body#people-map #search .field { float: left; margin-right: 5px; }
-body#people-map #search .field.keyword { width: 60%; }
+body#people-map #search .field.keyword { width: 840px; }
 body#people-map #search .field.location { width: 27%; }
 body#people-map #search .field.location input { width: 94%; }
 

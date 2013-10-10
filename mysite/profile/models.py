@@ -70,6 +70,24 @@ def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
     return random_uuid.hex + suffix
 
+class Skill(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class Organization(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class Cause(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class Language(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class TimeToCommit(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+    class Meta:
+        db_table = 'profile_time_to_commit'
+
 class RepositoryCommitter(models.Model):
     """Ok, so we need to keep track of repository committers, e.g.
         paulproteus@fspot
@@ -92,6 +110,7 @@ class RepositoryCommitter(models.Model):
 class Person(models.Model):
     """ A human bean. """
     # {{{
+    company_name = models.CharField(default="", blank=True, null=True, max_length=100)
     homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
@@ -130,8 +149,18 @@ class Person(models.Model):
     longitude = models.FloatField(null=False, default=-12.6790445)
     email_me_re_projects = models.BooleanField(default=True,
             verbose_name='Email me periodically about activity in my projects')
+    skill = models.ManyToManyField(Skill)
+    organization = models.ManyToManyField(Organization)
+    cause = models.ManyToManyField(Cause)
+    language = models.ManyToManyField(Language)
+    opensource = models.NullBooleanField(default=None)
+    time_to_commit = models.ForeignKey(TimeToCommit, default=1)
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
+
+    def add_skill(self, skill_id):
+        skill = Skill.objects.get(pk=skill_id)
+        self.skill.add(skill)
 
     @staticmethod
     def create_dummy(first_name="", email=None, **kwargs):
@@ -500,7 +529,7 @@ class DataImportAttempt(models.Model):
     person = models.ForeignKey(Person)
     query = models.CharField(max_length=200)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    web_response = models.ForeignKey(mysite.customs.models.WebResponse, 
+    web_response = models.ForeignKey(mysite.customs.models.WebResponse,
                                      null=True) # null=True for
     # now, so the migration doesn't cause data validation errors
 
