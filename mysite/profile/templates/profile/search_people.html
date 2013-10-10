@@ -54,8 +54,7 @@ People Search
 
     {% if user and user.is_superuser %}
 
-    <div>
-        <fieldset>
+        <fieldset id="search-filters">
             <legend>Filter</legend>
             <div class="input">
                 <div>
@@ -177,7 +176,6 @@ People Search
                 <button id="expandAllButton">Expand All</button>
             </div>
         </fieldset>
-    </div>
 
     {% endif %}
 </form>

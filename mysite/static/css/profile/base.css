@@ -90,3 +90,9 @@ div.input input[type=text] {
 .clear {
     clear: both;
 }
+
+#search-filters {
+    float: left;
+    width: 100%;
+    margin-right: 20px;
+}
