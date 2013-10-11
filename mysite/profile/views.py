@@ -24,6 +24,7 @@
 import StringIO
 import datetime
 import urllib
+from django.db.models import Q
 from django.utils import simplejson
 import re
 import collections
@@ -36,8 +37,8 @@ from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Permission
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
@@ -52,7 +53,7 @@ from mysite.profile.models import \
         Link_Project_Tag, Link_Person_Tag, \
         DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause
 from mysite.search.models import Project
-from mysite.base.decorators import view, as_view
+from mysite.base.decorators import view, as_view, has_permissions
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
@@ -406,7 +407,6 @@ def permanent_redirect_to_people_search(request, property, value):
                        mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
-
 def manyToString(many):
     res = ""
     for obj in many.all():
@@ -447,6 +447,8 @@ def people_export(request):
       # 'excel': export_to_excel(people), etc...
     }[format]
 
+@login_required
+@has_permissions(['can_view_people'])
 @view
 def people(request):
     """Display a list of people."""

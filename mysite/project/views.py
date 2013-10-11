@@ -24,6 +24,7 @@ import django.template
 import mysite.base.decorators
 import mysite.profile.views
 import mysite.project.forms
+from mysite.base.decorators import has_permissions
 
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponsePermanentRedirect, HttpResponseBadRequest
@@ -49,6 +50,9 @@ def create_project_page_do(request):
 
     return HttpResponseBadRequest('Bad request')
 
+
+@login_required
+@has_permissions(['can_view_projects'])
 @mysite.base.decorators.view
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
@@ -147,6 +151,9 @@ def project(request, project__name = None):
             'project/project.html',
             context)
 
+
+@login_required
+@has_permissions(['can_view_projects'])
 @mysite.base.decorators.cache_function_that_takes_request
 def projects(request):
     data = {}

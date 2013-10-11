@@ -14,11 +14,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
 from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
+from mysite.base.decorators import has_permissions
+
 try:
     from urlparse import parse_qsl
 except ImportError:
@@ -29,7 +32,6 @@ from mysite.search.models import Project
 import mysite.search.view_helpers 
 import mysite.base.view_helpers
 import mysite.base.unicode_sanity
-from mysite.base.view_helpers import render_response
 
 import datetime
 from dateutil import tz
@@ -47,6 +49,8 @@ def encode_datetime(obj):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
 
+@login_required
+@has_permissions(['can_view_projects'])
 def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     # Make the query string keys lowercase using a redirect.
     if any([k.lower() != k for k in request.GET.keys()]):

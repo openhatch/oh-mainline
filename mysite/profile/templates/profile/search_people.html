@@ -52,8 +52,8 @@ People Search
         </div>
     </div>
 
-    {% if user and user.is_superuser %}
-
+    {% if user|has_permission:'can_filter_people' %}
+    <div>
         <fieldset id="search-filters">
             <legend>Filter</legend>
             <div class="input">
@@ -176,6 +176,7 @@ People Search
                 <button id="expandAllButton">Expand All</button>
             </div>
         </fieldset>
+    </div>
 
     {% endif %}
 </form>
