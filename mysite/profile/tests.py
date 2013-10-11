@@ -1543,10 +1543,13 @@ class EditContactBlurb(TwillTests):
         self.assertEqual(asheesh.homepage_url, homepage_url)
 
 class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def test_one_valid_project(self):
         # make a project called Banana
         # query for that, but spelled bANANA
         # look in the template and see that projects_that_match_q_exactly == ['Banana']
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         mysite.search.models.Project.create_dummy(
             name='Banana',
             cached_contributor_count=1)
@@ -1559,6 +1562,7 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         # make a project called Banana
         # query for that, but spelled bANANA
         # look in the template and see that projects_that_match_q_exactly == ['Banana']
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         mysite.search.models.Project.create_dummy(
             name='Banana',
             cached_contributor_count=0)

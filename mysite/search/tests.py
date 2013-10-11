@@ -162,7 +162,7 @@ class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
         self.assertEqual(num_bugs, 1)
 
 class SearchResults(TwillTests):
-    fixtures = [u'bugs-for-two-projects.json']
+    fixtures = [u'bugs-for-two-projects.json', 'user-paulproteus', 'person-paulproteus']
 
     def test_query_object_is_false_when_no_terms_or_facets(self):
         query = mysite.search.view_helpers.Query.create_from_GET_data({})
@@ -170,12 +170,14 @@ class SearchResults(TwillTests):
 
     def test_show_no_bugs_if_no_query(self):
         # Call up search page with no query.
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.get(u'/search/')
 
         # The variable u'bunch_of_bugs', passed to the template, is a blank list.
         self.assertEqual(response.context[0][u'bunch_of_bugs'], [])
 
     def test_json_view(self):
+        self.login_with_twill()
         tc.go(make_twill_url(u'http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
         response = tc.show()
         self.assert_(response.startswith(u'callback'))
@@ -187,6 +189,7 @@ class SearchResults(TwillTests):
         self.assert_(u'pk' in objects[0][u'bugs'][0])
 
     def testPagination(self):
+        self.login_with_twill()
         url = u'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
         tc.fv(u'search_opps', u'q', u'python')
@@ -211,6 +214,7 @@ class SearchResults(TwillTests):
 
     def testPaginationWithAnyFacet(self):
 
+        self.login_with_twill()
         url = u'http://openhatch.org/search/?q=&language='
         tc.go(make_twill_url(url))
 
@@ -229,6 +233,7 @@ class SearchResults(TwillTests):
 
     def testPaginationAndChangingSearchQuery(self):
 
+        self.login_with_twill()
         url = u'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
         tc.fv(u'search_opps', u'q', u'python')
@@ -485,7 +490,10 @@ class SearchOnFullWords(SearchTest):
         self.assertEqual(list(results), [perl_bug])
 
 class SearchTemplateDecodesQueryString(SearchTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def test_facets_appear_in_search_template_context(self):
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.get('/search/', {'language': 'Python'})
         expected_facets = { 'language': 'Python' }
         self.assertEqual(response.context['query'].active_facet_options,
@@ -951,8 +959,10 @@ class QueryProject(SearchTest):
         self.assertEqual(any_one[u'count'], 3)
 
 class QueryStringCaseInsensitive(SearchTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_Language(self):
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         """Do we redirect queries that use non-lowercase facet keys to pages
         that use lowercase facet keys?"""
         redirects = self.client.get(u'/search/',
@@ -1070,8 +1080,10 @@ class DontRecommendFutileSearchTerms(TwillTests):
 
 
 class PublicizeBugTrackerIndex(SearchTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         SearchTest.setUp(self)
         self.search_page_response = self.client.get(reverse(mysite.search.views.fetch_bugs))
         self.bug_tracker_count = mysite.search.view_helpers.get_project_count()
@@ -1212,9 +1224,6 @@ class SuggestAlertOnLastResultsPage(TwillTests):
             self.assertEqual(alert_record.__getattribute__(key), expected_value,
                     'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
 
-    # run the above test for our two use cases: logged in and not
-    def test_alert_anon(self):
-        self.exercise_alert(anonymous=True)
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_alert_logged_in(self):
         self.exercise_alert(anonymous=False)
@@ -1416,7 +1425,7 @@ class CreateAnonymousAnswer(TwillTests):
         self.assertContains(response, answer_text)
 
 class CreateAnswer(TwillTests):
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_create_answer(self):
 
@@ -1432,7 +1441,8 @@ class CreateAnswer(TwillTests):
 the solution to a problem, or check, proof and test other documents for \
 accuracy.""",
                     }
-        self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
+        self.client.post(reverse(mysite.project.views.create_answer_do), POST_data)
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like
         #   self.assertEqual(response.content, '1')
@@ -1479,33 +1489,6 @@ accuracy.""",
         # Django documents publicly that linebreaks replaces one "\n" with "<br />".
         # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaks
         self.assertContains(project_page, "<br />".join(text))
-
-    def test_answer_with_background_color(self):
-        """
-        If a user submits HTML with embedded styles, they should be dropped.
-        """
-        # go to the project page
-        p = Project.create_dummy(name='Ubuntu')
-        q = ProjectInvolvementQuestion.create_dummy(
-            key_string='where_to_start', is_bug_style=False)
-        q.save()
-        text = u'<p style="background-color: red;">red</p>'
-        POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
-                'answer__text': text
-                }
-
-        # Submit the data while logged in
-        POST_handler = reverse(mysite.project.views.create_answer_do)
-        self.login_with_client().post(POST_handler, POST_data)
-
-        # Look at the page while logged out (so we see the anonymous rendering)
-        project_page = self.client.get(p.get_url())
-
-        # The urlize filter in the template should make sure we get a link
-        self.assertNotContains(project_page,
-                            '''background-color: red''')
 
 class BugKnowsItsFreshness(TestCase):
     def test(self):

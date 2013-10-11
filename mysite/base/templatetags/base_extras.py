@@ -232,3 +232,28 @@ def version(path_string):
     return path_string 
 
 register.simple_tag(version)
+
+
+@register.filter
+def has_permission(user, codename):
+    if user.is_active and user.is_superuser:
+        return True
+
+    groups = user.groups.all()
+    for group in groups:
+        permissions = group.permissions.all()
+        for permission in permissions:
+            if permission.codename == codename:
+                return True
+    return False
+
+@register.filter
+def has_group(user, group_name):
+    if user.is_active and user.is_superuser:
+        return True
+
+    for group in user.groups.all():
+        if group.name == group_name:
+            return True
+
+    return False

@@ -38,6 +38,8 @@ from django.core.urlresolvers import reverse
 from twill import commands as tc
 
 class ProjectNameSearch(TwillTests):
+    fixtures = ['user-paulproteus','person-paulproteus']
+
     def test_search_for_similar_project_names_backend(self):
         # Create one relevant, one irrelevant project
         mysite.search.models.Project.create_dummy(name='Twisted System')
@@ -57,6 +59,7 @@ class ProjectNameSearch(TwillTests):
         # If there's an exactly-matching project name, we redirect to that project's page
         # (instead of showing search results).
         mysite.search.models.Project.create_dummy(name='Twisted System')
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.get('/projects/',
                                    {'q': 'twiSted SysTem'},
                                    follow=True)
@@ -70,6 +73,7 @@ class ProjectNameSearch(TwillTests):
         # First, create the project that we will refer to below.
         mysite.search.models.Project.create_dummy(name='Twisted System')
 
+        self.login_with_twill()
         tc.go(better_make_twill_url('http://openhatch.org/projects'))
         query = 'Twisted'
         tc.fv(1, 'search_q', query)
@@ -80,6 +84,7 @@ class ProjectNameSearch(TwillTests):
     def test_template_get_matching_projects(self):
         mysite.search.models.Project.create_dummy(name='Twisted System')
         mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.get('/projects/',
                                    {'q': 'Twisted'},
                                    follow=True)
@@ -89,6 +94,8 @@ class ProjectNameSearch(TwillTests):
             sorted(['Twisted Orange Drinks', 'Twisted System']))
 
 class ProjectList(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def test_it_generally_works(self):
         self.client.get('/projects/')
 
@@ -110,6 +117,7 @@ class ProjectList(TwillTests):
         self.assertEqual(response.status_code, 301)
 
     def test_projects_returns_projects(self):
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.get("/projects/")
         self.assertEqual(response.status_code, 200)
 
@@ -150,6 +158,7 @@ class ProjectPageCreation(TwillTests):
         # See? We have our project in the database (with slightly different case, but still)
         self.assertEqual(1, len(mysite.search.models.Project.objects.all()))
 
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.post(reverse(mysite.project.views.create_project_page_do),
                                     {'project_name': project_name}, follow=True)
 
@@ -161,6 +170,7 @@ class ProjectPageCreation(TwillTests):
                          [('http://testserver/projects/something%20novel', 302)])
 
     def test_form_on_project_search_page_submits_to_project_creation_post_handler(self):
+        self.login_with_twill()
         project_search_page_url = better_make_twill_url(
                 "http://openhatch.org%s?q=newproject" % reverse(mysite.project.views.projects))
         tc.go(project_search_page_url)

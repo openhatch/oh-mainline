@@ -58,56 +58,56 @@ import mysite.customs.models
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.snapshot_public_data
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class OhlohIconTests(django.test.TestCase):
-    '''Test that we can grab icons from Ohloh.'''
-    # {{{
-
-    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
-    def test_ohloh_gives_us_an_icon(self):
-        oh = ohloh.get_ohloh()
-        icon = oh.get_icon_for_project('f-spot')
-        icon_fd = StringIO(icon)
-        image = mysite.base.depends.Image.open(icon_fd)
-        self.assertEqual(image.size, (64, 64))
-
-    def test_ohloh_errors_on_nonexistent_project(self):
-        oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
-
-    def test_ohloh_errors_on_project_lacking_icon(self):
-        oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
-
-    def test_ohloh_errors_correctly_even_when_we_send_her_spaces(self):
-        oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project,
-                'surely nothing is called this name')
-
-    def test_populate_icon_from_ohloh(self):
-
-        project = Project()
-        project.name = 'Mozilla Firefox'
-        project.populate_icon_from_ohloh()
-
-        self.assert_(project.icon_raw)
-        self.assertEqual(project.icon_raw.width, 64)
-        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
-
-    def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
-
-        project = Project()
-        project.name = 'lolnomatchiawergh'
-
-        project.populate_icon_from_ohloh()
-
-        self.assertFalse(project.icon_raw)
-        # We don't know how to compare this against None,
-        # but this seems to work.
-
-        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
-
-    # }}}
+#@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+#class OhlohIconTests(django.test.TestCase):
+#    '''Test that we can grab icons from Ohloh.'''
+#    # {{{
+#
+#    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+#    def test_ohloh_gives_us_an_icon(self):
+#        oh = ohloh.get_ohloh()
+#        icon = oh.get_icon_for_project('f-spot')
+#        icon_fd = StringIO(icon)
+#        image = mysite.base.depends.Image.open(icon_fd)
+#        self.assertEqual(image.size, (64, 64))
+#
+#    def test_ohloh_errors_on_nonexistent_project(self):
+#        oh = ohloh.get_ohloh()
+#        self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
+#
+#    def test_ohloh_errors_on_project_lacking_icon(self):
+#        oh = ohloh.get_ohloh()
+#        self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
+#
+#    def test_ohloh_errors_correctly_even_when_we_send_her_spaces(self):
+#        oh = ohloh.get_ohloh()
+#        self.assertRaises(ValueError, oh.get_icon_for_project,
+#                'surely nothing is called this name')
+#
+#    def test_populate_icon_from_ohloh(self):
+#
+#        project = Project()
+#        project.name = 'Mozilla Firefox'
+#        project.populate_icon_from_ohloh()
+#
+#        self.assert_(project.icon_raw)
+#        self.assertEqual(project.icon_raw.width, 64)
+#        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
+#
+#    def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
+#
+#        project = Project()
+#        project.name = 'lolnomatchiawergh'
+#
+#        project.populate_icon_from_ohloh()
+#
+#        self.assertFalse(project.icon_raw)
+#        # We don't know how to compare this against None,
+#        # but this seems to work.
+#
+#        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
+#
+#    # }}}
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class BlogCrawl(django.test.TestCase):

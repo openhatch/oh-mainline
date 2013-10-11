@@ -418,33 +418,6 @@ class SignupWithNoPassword(TwillTests):
         self.assertFalse(form.is_valid())
         self.assertEqual(User.objects.count(), 0)
 
-class LoginPageContainsUnsavedAnswer(TwillTests):
-    
-    def test(self):
-        # Create an answer whose author isn't specified. This replicates the
-        # situation where the user isn't logged in.
-        p = Project.create_dummy(name='Myproject')
-        q = ProjectInvolvementQuestion.create_dummy(
-                key_string='where_to_start', is_bug_style=False)
-
-        # Do a GET on the project page to prove cookies work.
-        self.client.get(p.get_url())
-
-        # POST some text to the answer creation post handler
-        POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
-                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
-                    }
-        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
-                                    follow=True)
-
-        # Now, the session will know about the answer, but the answer will not be published.
-        # Visit the login page, assert that the page contains the text of the answer.
-
-        response = self.client.get(reverse('oh_login'))
-        self.assertContains(response, POST_data['answer__text'])
-
 class ClearSessionsOnPasswordChange(TwillTests):
     fixtures = ['user-paulproteus']
 

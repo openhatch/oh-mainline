@@ -14,8 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import urlparse
 
 from decorator import decorator
+from django.conf import settings
+from django.utils.decorators import available_attrs
 from odict import odict
 import logging
 from django.http import HttpResponse
@@ -25,7 +28,7 @@ import mysite.base.view_helpers
 from django.utils import simplejson
 import django.core.cache
 import hashlib
-from functools import partial
+from functools import partial, wraps
 
 from django.template.loader import render_to_string
 import django.db.models.query
@@ -198,3 +201,88 @@ def cached_property(f):
             return x
 
     return property(get)
+
+
+def has_permissions(permissions):
+    """
+    Decorator for views that checks that the user passes the given test,
+    redirecting to the log-in page if necessary. The test should be a callable
+    that takes the user object and returns True if the user passes.
+    """
+
+    def decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, *args, **kwargs):
+            if __has_permissions(request.user, permissions):
+                return view_func(request, *args, **kwargs)
+            path = request.build_absolute_uri()
+            # If the login url is the same scheme and net location then just
+            # use the path as the "next" url.
+            login_scheme, login_netloc = urlparse.urlparse(settings.LOGIN_URL)[:2]
+            current_scheme, current_netloc = urlparse.urlparse(path)[:2]
+            if ((not login_scheme or login_scheme == current_scheme) and
+                    (not login_netloc or login_netloc == current_netloc)):
+                path = request.get_full_path()
+            from django.contrib.auth.views import redirect_to_login
+
+            return redirect_to_login(path, None, 'next')
+
+        return _wrapped_view
+
+    return decorator
+
+def __has_permissions(user, permissions=None):
+    if not permissions: permissions = []
+    if user.is_active and user.is_superuser:
+        return True
+
+    all_permissions = []
+    for group in user.groups.all():
+        all_permissions += [item for item in group.permissions.all() if item not in all_permissions]
+
+    found_permissions = []
+    for group_permission in all_permissions:
+        for permission in permissions:
+            if permission == group_permission.codename and group_permission not in found_permissions:
+                found_permissions.append(group_permission)
+
+    return len(found_permissions) == len(permissions)
+
+
+def has_group(group_name):
+    """
+    Decorator for views that checks that the user passes the given test,
+    redirecting to the log-in page if necessary. The test should be a callable
+    that takes the user object and returns True if the user passes.
+    """
+
+    def decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, *args, **kwargs):
+            if __has_group(request.user, group_name):
+                return view_func(request, *args, **kwargs)
+            path = request.build_absolute_uri()
+            # If the login url is the same scheme and net location then just
+            # use the path as the "next" url.
+            login_scheme, login_netloc = urlparse.urlparse(settings.LOGIN_URL)[:2]
+            current_scheme, current_netloc = urlparse.urlparse(path)[:2]
+            if ((not login_scheme or login_scheme == current_scheme) and
+                    (not login_netloc or login_netloc == current_netloc)):
+                path = request.get_full_path()
+            from django.contrib.auth.views import redirect_to_login
+
+            return redirect_to_login(path, None, 'next')
+
+        return _wrapped_view
+
+    return decorator
+
+def __has_group(user, group_name):
+    if user.is_active and user.is_superuser:
+        return True
+
+    for group in user.groups.all():
+        if group.name == group_name:
+            return True
+
+    return False
