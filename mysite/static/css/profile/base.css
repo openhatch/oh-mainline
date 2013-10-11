@@ -96,3 +96,48 @@ div.input input[type=text] {
     width: 100%;
     margin-right: 20px;
 }
+
+.user {
+    width: 40%;
+    border: 2px solid #333;
+    float: left;
+    margin: 20px;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    border-radius: 12px;
+    background-image: -ms-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #6ECAFF 300%);
+    background-image: -moz-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #6ECAFF 300%);
+    background-image: -o-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #6ECAFF 300%);
+    background-image: -webkit-gradient(radial, center center, 0, center center, 497, color-stop(0, #FFFFFF), color-stop(3, #6ECAFF));
+    background-image: -webkit-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #6ECAFF 300%);
+    background-image: radial-gradient(circle farthest-corner at center, #FFFFFF 0%, #6ECAFF 300%);
+    padding: 10px;
+    cursor: pointer;
+    height: 250px;
+    box-shadow: 10px 10px 5px #888888;
+}
+
+.user:hover {
+    background-image: -ms-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #0017E3 200%);
+    background-image: -moz-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #0017E3 200%);
+    background-image: -o-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #0017E3 200%);
+    background-image: -webkit-gradient(radial, center center, 0, center center, 497, color-stop(0, #FFFFFF), color-stop(2, #0017E3));
+    background-image: -webkit-radial-gradient(center, circle farthest-corner, #FFFFFF 0%, #0017E3 200%);
+    background-image: radial-gradient(circle farthest-corner at center, #FFFFFF 0%, #0017E3 200%);
+}
+
+.user-name {
+    border-bottom: 2px solid black;
+    text-align: center;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.user img {
+    vertical-align: middle;
+}
+
+.user img:hover {
+    border-right: 2px solid yellow;
+}
