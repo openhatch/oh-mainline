@@ -22,6 +22,7 @@ import os.path
 import shutil
 
 from mysite.search.models import Project, get_image_data_scaled
+from mysite.base.models import Skill, Organization
 import mysite.customs.models
 import mysite.profile.view_helpers
 import mysite.base.models
@@ -69,12 +70,6 @@ def url2printably_short(url, CUTOFF=50):
 def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
     return random_uuid.hex + suffix
-
-class Skill(models.Model):
-    name = models.CharField(default='', unique=True, null=False, max_length=100)
-
-class Organization(models.Model):
-    name = models.CharField(default='', unique=True, null=False, max_length=100)
 
 class Cause(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)

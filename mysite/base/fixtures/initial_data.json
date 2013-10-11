@@ -1,0 +1,114 @@
+[
+    {
+        "model": "base.Skill",
+        "pk": 1,
+        "fields": {
+            "name": "Project Management / Scrum Master"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 2,
+        "fields": {
+            "name": "Software Development"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 3,
+        "fields": {
+            "name": "User Interface Design"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 4,
+        "fields": {
+            "name": "Product Management"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 5,
+        "fields": {
+            "name": "Community Management"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 6,
+        "fields": {
+            "name": "Quality Assurance"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 7,
+        "fields": {
+            "name": "Systems Administration"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 8,
+        "fields": {
+            "name": "Technical Documentation"
+        }
+    },
+    {
+        "model": "base.Skill",
+        "pk": 9,
+        "fields": {
+            "name": "Technical Support"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 1,
+        "fields": {
+            "name": "Benetech"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 2,
+        "fields": {
+            "name": "Code for America"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 3,
+        "fields": {
+            "name": "FrontlineSMS"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 4,
+        "fields": {
+            "name": "The guardian project"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 5,
+        "fields": {
+            "name": "Mozilla Webmaker"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 6,
+        "fields": {
+            "name": "Amara (Universal subtitles)"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 7,
+        "fields": {
+            "name": "Wikimedia foundation"
+        }
+    }
+]

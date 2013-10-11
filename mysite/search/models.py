@@ -38,7 +38,7 @@ import mysite.customs.ohloh
 import mysite.base.depends
 import mysite.base.decorators
 import django.contrib.contenttypes.models
-
+from mysite.base.models import Skill, Organization
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -151,6 +151,8 @@ class Project(OpenHatchModel):
             verbose_name='Project homepage URL')
     language = models.CharField(max_length=200, blank=True, default='',
             verbose_name='Primary programming language')
+    skills = models.ManyToManyField(Skill)
+    organization = models.ForeignKey(Organization, null=True)
 
     def invalidate_all_icons(self):
         self.icon_raw = None

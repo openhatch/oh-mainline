@@ -60,6 +60,12 @@ class Timestamp(models.Model):
         s = 'model last updated ' + cls.__module__ + '.' + cls.__name__
         return s
 
+class Skill(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class Organization(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
 ### Adjustments to default Django sqlite3 behavior
 def activate_foreign_keys(sender, connection, **kwargs):
     """Enable integrity constraint with sqlite."""
