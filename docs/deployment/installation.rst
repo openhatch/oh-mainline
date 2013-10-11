@@ -53,15 +53,15 @@ Open up a command prompt
 
 For the rest of these instructions, you have to open a command prompt:
 
-*On a Linux or similar system, find a program with "terminal" or
-"konsole" in the name. Run it.
+* On a Linux or similar system, find a program with "terminal" or
+  "konsole" in the name. Run it.
 
-*On a Mac, click the search icon in the top-right of the screen and
-search for Terminal. This should find the Terminal program, stored in
-/Applications/Utilities. Run it.
+* On a Mac, click the search icon in the top-right of the screen and
+  search for Terminal. This should find the Terminal program, stored in
+  /Applications/Utilities. Run it.
 
-*On a Windows computer, click the Start icon, and find the Run
-box. Enter "cmd" into it, and press enter.
+* On a Windows computer, click the Start icon, and find the Run
+  box. Enter "cmd" into it, and press enter.
 
 Important note:
 Before your run the commands in the next sections, make sure you have
