@@ -64,8 +64,9 @@ For the rest of these instructions, you have to open a command prompt:
   box. Enter "cmd" into it, and press enter.
 
 Important note:
-Before your run the commands in the next sections, make sure you have
-changed your working directory to the oh-mainline directory.
+Before you run the commands in the next sections, make sure you have
+changed your present working directory to the oh-mainline directory.
+
 
 
 Set up the database
