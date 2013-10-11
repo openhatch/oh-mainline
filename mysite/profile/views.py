@@ -52,7 +52,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause
+        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, Heard_From
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view, has_permissions
 import mysite.profile.forms
@@ -301,10 +301,21 @@ def edit_person_info_do(request):
     # grab their submitted bio
     person.bio = edit_info_form['bio'].data
 
+    # setting SC4G volunteer fields
+    person.company_name = edit_info_form['company_name'].data
+    person.language_spoken = edit_info_form['language_spoken'].data
+    person.comment = edit_info_form['comment'].data
+    person.subscribed = edit_info_form['subscribed'].data
+    person.github_name = edit_info_form['github_name'].data
+    person.google_code_name =edit_info_form['google_code_name'].data
+    person.other_name = edit_info_form['other_name'].data
+
+
     # grab the irc nick
     person.irc_nick = edit_info_form['irc_nick'].data
 
     person.linked_in_url = edit_info_form['linked_in_url'].data
+
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
@@ -881,6 +892,12 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['contact_blurb_error'] = contact_blurb_error
     data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
     data['has_errors'] = has_errors
+    data['organizations'] = Organization.objects.all()
+    data['heard_from'] = Heard_From.objects.all()
+    data['skills'] = Skill.objects.all()
+    data['causes'] = Cause.objects.all()
+    data['languages'] = Language.objects.all()
+    data['times_to_commit'] = TimeToCommit.objects.all()
     return request, 'profile/info_wrapper.html', data
 
 @login_required

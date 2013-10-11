@@ -49,11 +49,11 @@
                         action='/people/info/edit/do'
                         method='POST'>{% csrf_token %}
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                         <h3>You, in a nutshell</h3>
                     </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>Bio:</label>
                             {{ form.bio }}
                             <p class='example'>Example: I like traffic lights.
@@ -61,14 +61,14 @@
                             Twitter, and eat breakfast.</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>Web site:</label>
                             {{ form.homepage_url.errors }}
                             {{ form.homepage_url }}
                             <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>IRC nick:</label>
                             {{ form.irc_nick.errors }}
                             {{ form.irc_nick }}
@@ -76,51 +76,245 @@
                         </div>
 
                         <div class='form-row'>
-                            <label>LinkedIn URL:</label>
+                            <div>
+                                <label>First Name *</label>
+                            </div>
+                            {{ form.first_name.errors }}
+                            {{ form.first_name }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Last Name *</label>
+                            </div>
+                            {{ form.last_name.errors }}
+                            {{ form.last_name }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Email *</label>
+                            </div>
+                            {{ form.email.errors }}
+                            {{ form.email }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Company, Organization, or Event Where You Learned About SocialCoding4Good</label>
+                            </div>
+                            {{ form.company_name.errors }}
+                            {{ form.company_name }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>HFOSS Organizations That Interest You</label>
+                            </div>
+                                <select id='organizations' multiple='multiple'>
+                                    {% for organization in organizations %}
+                                        <option name="organization" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
+                                        {{ organization.name }}
+                                    {% endfor %}
+                                </select>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Causes That Interest You</label>
+                            </div>
+                                <select id='causes' name="edit-tags-causes" multiple='multiple'>
+                                    {% for cause in causes %}
+                                        <option name="cause" id="cause_{{ cause.id }}" value="{{ cause.id }}" />
+                                        {{ cause.name }}
+                                    {% endfor %}
+                                </select>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>How much time would you like to commit to volunteering? *</label>
+                            </div>
+                                <select name='edit-tags-times' multiple='multiple'>
+                                    {% for time_to_commit in times_to_commit %}
+                                        <option name="time" id="time_to_commit_{{ time_to_commit.id }}" value="{{ time_to_commit.id }}" />
+                                        {{ time_to_commit.name }}
+                                    {% endfor %}
+                                </select>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Skills *</label>
+                            </div>
+                                <select id='skills' multiple='multiple'>
+                                    {% for skill in skills %}
+                                        <option name="skill" id="skill_{{ skill.id }}" value="{{ skill.id }}" />
+                                        {{ skill.name }}
+                                    {% endfor %}
+                                </select>
+                        </div>
+
+                        <!--<div class='form-row'>
+                            <div>
+                                <label>Resume</label>
+                            </div>
+                            <input id="resume_file" type="file" name="file">
+                            <div>
+                                <input type="submit" value="Upload">
+                            </div>
+                        </div>-->
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Resume</label>
+                            </div>
+                            {{ form.file.errors }}
+                            {{ form.file }}
+                            <div>
+                                <input type="submit" value="Upload">
+                            </div>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>LinkedIn, OpenHatch or CoderWall Profile URL </label>
+                            </div>
                             {{ form.linked_in_url.errors }}
                             {{ form.linked_in_url }}
                         </div>
 
                         <div class='form-row'>
+                            <div>
+                                <label>Have you previously contributed to open source projects?  </label>
+                            </div>
+                            {{ form.open_source.errors }}
+                            {{ form.open_source }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Github Username</label>
+                            </div>
+                            {{ form.github_name.errors }}
+                            {{ form.github_name }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Google Code Username</label>
+                            </div>
+                            {{ form.google_code_name.errors }}
+                            {{ form.google_code_name }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>SourceForge, Ohloh or Other Username</label>
+                            </div>
+                            {{ form.other_name.errors }}
+                            {{ form.other_name }}
+                        </div>
+
+                        <div class="clear">
+                            <div>
+                                <label>Programming Languages, Frameworks, Environments</label>
+                            </div>
+                            <ul>
+                                {% for language in languages %}
+                                <li>
+                                    <input type="checkbox" name="edit-tags-languages" id="language_{{ language.id }}" value="{{ language.id }}" />
+                                    <label for="language_{{ language.id }}">{{ language.name }}</label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Experience Level </label>
+                            </div>
+
+                            <div><input type="radio" value="Beginner" name="edit-tags-exp_level">Beginner</div>
+                            <div><input type="radio" value="Intermediate" name="edit-tags-exp_level">Intermediate</div>
+                            <div><input type="radio" value="Expert" name="edit-tags-exp_level">Expert</div>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>What languages do you speak, read, and write? </label>
+                            </div>
+                            {{ form.language_spoken.errors }}
+                            {{ form.language_spoken }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>How did you hear about SocialCoding4Good? </label>
+                            </div>
+                                <select name='edit-tags-heard_from' multiple='multiple'>
+                                    {% for heard_f in heard_from %}
+                                        <option name="heardFromOption" id="heard_f_{{ heard_f.id }}" value="{{ heard_f.id }}" />
+                                        {{ heard_f.name }}
+                                    {% endfor %}
+                                </select>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Would you like us to keep you posted on the latest news from SocialCoding4Good?  </label>
+                            </div>
+                            {{ form.subscribed.errors }}
+                            {{ form.subscribed }}
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label>Comment or Questions? </label>
+                            </div>
+                            {{ form.comment }}
+                        </div>
+
+                        <div class='form-row' style='display: none;'>
                             <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
                             <p class='why'>After you save, these tags will appear on your profile. Click them to find similar people. {# In the near future, this information will help people find you in the <a href='/people/'>People Search</a>.#} </p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>I understand:</label>
                             {{ form.understands }}
                             <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>I will never understand:</label>
                             {{ form.understands_not }}
                             <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>I'm currently studying:</label>
                             {{ form.studying }}
                             <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Volunteering</h3>
                             <p class='why'>These tags help us match you with interesting people and projects.</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>When projects need help, I'm willing to pitch in with:</label>
                             {{ form.can_pitch_in }}
                             <p class='example'>Example: documentation, testing, c++, mac compatibility, design</p>
                         </div>
 
-                        <div class='form-row'>
+                        <div class='form-row' style='display: none;'>
                             <label>I can mentor in:</label>
                             {{ form.can_mentor }}
                             <p class='example'>Example: python, unicode, git, GTK+</p>
                         </div>
-                        <div class='form-row' id='contact_blurb'>
+                        <div class='form-row' id='contact_blurb' style='display: none;'>
                             <label>How to contact me:</label>
                             {% if contact_blurb_error %}
                             <!--contact_blurb_error-->

@@ -35,6 +35,8 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from mysite.base.models import Skill, Organization
+from django.forms import ModelForm
 
 import datetime
 import uuid
@@ -80,6 +82,9 @@ class Language(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
     def __str__(self):
         return self.name
+
+class Heard_From(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
 
 class TimeToCommit(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
@@ -159,6 +164,14 @@ class Person(models.Model):
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
     linked_in_url = models.URLField(default="", blank=True)
+
+    heard_from = models.ManyToManyField(Heard_From)
+    comment = models.TextField(default="", blank=True)
+    subscribed = models.NullBooleanField(default=None)
+    github_name = models.TextField(default="", blank=True)
+    other_name = models.TextField(default="", blank=True)
+    google_code_name = models.TextField(default="", blank=True)
+    language_spoken = models.TextField(default="", blank=True)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)

@@ -201,5 +201,48 @@
         "fields": {
             "name": "8 to 20 hours total"
         }
+    },
+
+    {
+        "model": "profile.Heard_From",
+        "pk": 1,
+        "fields": {
+            "name": "Social Media"
+        }
+    },
+    {
+        "model": "profile.Heard_From",
+        "pk": 2,
+        "fields": {
+            "name": "Other"
+        }
+    },
+    {
+        "model": "profile.Heard_From",
+        "pk": 3,
+        "fields": {
+            "name": "Company Where You Work"
+        }
+    },
+    {
+        "model": "profile.Heard_From",
+        "pk": 4,
+        "fields": {
+            "name": "Word of Mouth"
+        }
+    },
+    {
+        "model": "profile.Heard_From",
+        "pk": 5,
+        "fields": {
+            "name": "Conference or Event"
+        }
+    },
+    {
+        "model": "profile.Heard_From",
+        "pk": 6,
+        "fields": {
+            "name": "Media or News Coverage"
+        }
     }
 ]

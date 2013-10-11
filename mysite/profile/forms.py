@@ -17,6 +17,8 @@
 
 import django.forms
 import mysite.profile.models
+from mysite.profile.models import  TimeToCommit, Language
+
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
     portfolio_entry = django.forms.ModelChoiceField(
@@ -53,14 +55,27 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
 
 class EditInfoForm(django.forms.Form):
     bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    comment = django.forms.CharField(required=False, widget=django.forms.Textarea())
     homepage_url = django.forms.URLField(required=False)
     irc_nick = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    first_name = django.forms.CharField(required=True, widget=django.forms.TextInput())
+    last_name = django.forms.CharField(required=True, widget=django.forms.TextInput())
+    email = django.forms.CharField(required=True, widget=django.forms.TextInput())
+    file = django.forms.FileField(required=False)
+    open_source = django.forms.NullBooleanField(required=False)
+    time_to_commit = django.forms.ModelMultipleChoiceField(required=False, queryset=TimeToCommit.objects.all())
+    company_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     linked_in_url = django.forms.URLField(required=False)
+    github_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    google_code_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    language_spoken = django.forms.CharField(required=False, widget=django.forms.TextInput())
     understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
     understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
     studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
     can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
     can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    subscribed = django.forms.BooleanField(required=False)
 
 class ContactBlurbForm(django.forms.Form):
     contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())

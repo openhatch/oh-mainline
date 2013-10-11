@@ -110,5 +110,26 @@
         "fields": {
             "name": "Wikimedia foundation"
         }
+    },
+    {
+        "model": "base.Experience",
+        "pk": 1,
+        "fields": {
+            "name": "Beginner"
+        }
+    },
+    {
+        "model": "base.Experience",
+        "pk": 2,
+        "fields": {
+            "name": "Intermediate"
+        }
+    },
+    {
+        "model": "base.Experience",
+        "pk": 3,
+        "fields": {
+            "name": "Expert"
+        }
     }
 ]
