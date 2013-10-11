@@ -175,6 +175,7 @@ INSTALLED_APPS = (
     'model_utils',
     'djcelery',
     'djkombu',
+    'django_crontab',
 )
 
 # testrunner allows us to control which testrunner to use
@@ -347,6 +348,13 @@ if sys.platform.startswith('win'):
 RECOMMEND_BUGS=True
 
 ENABLE_NEW_IWH_HANDLER = False
+
+CRONTAB_DJANGO_MANAGE_PATH = PATH_TO_MANAGEMENT_SCRIPT
+
+CRONJOBS = [
+    ('@daily', 'mysite.cron.push_volunteers_to_zoho_crm')
+]
+
 ### Include a user's customizations
 try:
     from local_settings import *
