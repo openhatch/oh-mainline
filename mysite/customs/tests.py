@@ -578,7 +578,6 @@ class BugzillaTrackerListing(TwillTests):
         super(BugzillaTrackerListing, self).setUp()
         self.kde = mysite.search.models.Project.create_dummy(name='KDE')
 
-
     def test_view_url_form(self):
         self.assertEqual(0,
                          mysite.customs.models.BugzillaTrackerModel.objects.
@@ -604,6 +603,7 @@ class BugzillaTrackerListing(TwillTests):
 
         resp = client.get('/customs/add/bugzilla/' + str(btm.id) + '/KDE/url/do')
         self.assertEqual(resp.status_code, 200)
+
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class LaunchpadTrackerEditingViews(TwillTests):
