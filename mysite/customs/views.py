@@ -120,8 +120,8 @@ def add_tracker_url(request, tracker_type, tracker_id, tracker_name, url_form=No
     if url_form or tracker_model.get_urlform():
         if url_form is None:
             try:
-                tracker_obj = mysite.customs.models.TrackerModel.get_instance_by_name(
-                    tracker_name)
+                tracker_obj = mysite.customs.models.TrackerModel.get_instance_by_id(
+                    tracker_id)
                 url_obj = tracker_model.get_urlmodel()(
                         tracker=tracker_obj)
                 url_form = tracker_model.get_urlform()(
@@ -147,8 +147,8 @@ def add_tracker_url(request, tracker_type, tracker_id, tracker_name, url_form=No
 def add_tracker_url_do(request, tracker_type, tracker_id, tracker_name):
     url_form = None
     tracker_model = get_tracker_model_or_404(tracker_type)
-    tracker_obj = mysite.customs.models.TrackerModel.get_instance_by_name(
-        tracker_name)
+    tracker_obj = mysite.customs.models.TrackerModel.get_instance_by_id(
+        tracker_id)
     url_obj = tracker_model.get_urlmodel()(
         tracker=tracker_obj)
     url_form = tracker_model.get_urlform()(

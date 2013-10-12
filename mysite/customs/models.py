@@ -224,6 +224,20 @@ class TrackerModel(models.Model):
         joined = reduce(_pipe_things, query_parts)
         return cls.objects.select_subclasses().get(joined)
 
+    @classmethod
+    def get_instance_by_id(cls, tracker_name):
+        query_parts = []
+        for subclass in cls.__subclasses__():
+            name = subclass.__name__.lower()
+            query_as_dict = {name + '__pk': tracker_name}
+            query_parts.append(Q(**query_as_dict))
+
+        def _pipe_things(a, b):
+            return a | b
+        joined = reduce(_pipe_things, query_parts)
+        return cls.objects.select_subclasses().get(joined)
+
+
 class TrackerQueryModel(models.Model):
     '''This model just exists to provide a way to grab a QuerySet
     containing all tracker queries.'''
