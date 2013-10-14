@@ -77,6 +77,7 @@ def main(argv=None):
                             'sessionprofile==1.0',
                             'django-model-utils',
                             'tastypie',
+                            'xmlbuilder'
                            ],
 
         # dependency_links is a list of URLs. If you need to override the URL

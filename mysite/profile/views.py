@@ -43,6 +43,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 import csv
+from django.core.exceptions import ObjectDoesNotExist
 
 # OpenHatch apps
 import mysite.base.view_helpers
@@ -421,11 +422,15 @@ def export_to_csv(people):
     empty = "N/A"
 
     for person in people:
+        try:
+            time_to_commit = person.time_to_commit.name or empty if person.time_to_commit else empty
+        except ObjectDoesNotExist:
+            time_to_commit = empty
         writer.writerow([person.user.username,
                          person.user.email,
                          person.homepage_url or empty,
                          person.company_name or empty,
-                         person.time_to_commit.name or empty,
+                         time_to_commit,
                          manyToString(person.cause) or empty,
                          manyToString(person.language) or empty])
     return response

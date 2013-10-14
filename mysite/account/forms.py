@@ -32,6 +32,27 @@ RESERVED_USERNAMES =  (
         'Spam cleanup script',
         )
 
+class InsertVolunteerForm(django.forms.Form):
+    first_name = django.forms.CharField()
+    last_name = django.forms.CharField()
+    email = django.forms.EmailField()
+    company_event_organization = django.forms.CharField()
+    hfoss_organizations_that_interest_you = django.forms.MultipleChoiceField()
+    causes_you_want_to_contribute_to = django.forms.MultipleChoiceField()
+    how_much_time_would_you_like_to_commit_to_volunteering = django.forms.MultipleChoiceField()
+    skills = django.forms.MultipleChoiceField()
+    linkedin_profile_url = django.forms.CharField()
+    have_you_previously_contributed_to_open_source_projects = django.forms.CharField()
+    github_profile___username = django.forms.CharField()
+    google_code = django.forms.CharField()
+    other = django.forms.CharField()
+    languages = django.forms.MultipleChoiceField()
+    Experience_level = django.forms.CharField()
+    what_languages = django.forms.CharField()
+    how_did_you_hear_about_socialcoding4good = django.forms.MultipleChoiceField()
+    yes = django.forms.CharField()
+    comments = django.forms.CharField()
+
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
         help_text = "<span class='help_text'>Pick a username with length < 31 characters. Stick to letters, digits and underscores.</span>",

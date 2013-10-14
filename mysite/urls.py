@@ -194,6 +194,9 @@ urlpatterns = patterns('',
         (r'^people-export/$',
             'mysite.profile.views.people_export'),
 
+        (r'^insert-volunteer/$',
+            'mysite.account.views.insert_volunteer'),
+
 
         (r'^\+profile_api/location_data/$',
             mysite.profile.views.LocationDataApiView.as_view()),

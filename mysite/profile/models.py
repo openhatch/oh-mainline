@@ -73,12 +73,18 @@ def generate_person_photo_path(instance, filename, suffix=""):
 
 class Cause(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
+    def __str__(self):
+        return self.name
 
 class Language(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
+    def __str__(self):
+        return self.name
 
 class TimeToCommit(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'profile_time_to_commit'

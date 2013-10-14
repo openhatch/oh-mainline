@@ -23,6 +23,9 @@ from django.contrib.auth.decorators import login_required
 import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
 import django_authopenid.views
+from django.contrib.auth.models import User
+from mysite.profile.models import Person, Skill
+import uuid
 
 from django.contrib.sessions.models import Session
 
@@ -78,7 +81,6 @@ def signup_do(request):
 def signup(request, signup_form=None):
     if signup_form is None:
         signup_form = mysite.account.forms.UserCreationFormWithEmail()
-
     return render_response(request, 'account/signup.html', {'form': signup_form})
 
 @login_required
@@ -515,6 +517,22 @@ def register(request, template_name='authopenid/complete.html',
         'nickname': nickname,
         'email': email
     }, context_instance=django_authopenid.views._build_context(request, extra_context=extra_context))
+
+def insert_volunteer(request):
+    form = mysite.account.forms.InsertVolunteerForm(request.POST)
+    username = uuid.uuid4()
+    first_name = form['first_name'].data
+    last_name = form['last_name'].data
+    email = form['email'].data
+    password = "super-secret"
+    skills = form['company_event_organization'].data
+    user = User.objects.create(username = username, first_name = first_name, last_name = last_name, email = email, password = password)
+    user.save()
+    person = Person.objects.get(user=user)
+    for skill in skills:
+        person.add_skill(Skill.objects.get(name=skill))
+    person.company_name = "company-name"
+    person.save()
 
 ### We use this "not_authenticated" wrapper so that if you *are* logged in, you go
 ### straight to the ?next= value.

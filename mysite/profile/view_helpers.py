@@ -36,6 +36,9 @@ import mysite.base.models
 import mysite.search.models
 import mysite.profile.models
 import mysite.base.decorators
+from xmlbuilder import XMLBuilder
+import urllib2
+import urllib
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
 
@@ -250,6 +253,30 @@ Sincerely,
                                              in django.conf.settings.ADMINS],
                                         )
     msg.send()
+
+def add_people_to_zoho_CRM(people, auth_token = "93ec1ab167308f477ce9efa77091dafe"):
+    xml = XMLBuilder('Leads')
+    for counter, person in enumerate(people):
+        with xml.row(no=str(counter+1)):
+            xml.FL("SC4G", val="Lead Source")
+            xml.FL("Volunteer", val="Title")
+            company = person.company_name or "N/A"
+            first_name = person.user.first_name or person.user.username
+            last_name = person.user.last_name or person.user.username
+            xml.FL(first_name, val="First Name")
+            xml.FL(last_name, val="Last Name")
+            xml.FL(company, val="Company")
+            xml.FL(person.user.email, val="Email")
+    data = urllib.urlencode({"authtoken": auth_token, 'scope': 'crmapi', 'xmlData': str(xml)})
+    url = 'https://crm.zoho.com/crm/private/xml/Leads/insertRecords'
+    req = urllib2.Request(url=url, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    response = urllib2.urlopen(req)
+    if (response.code != 200):
+        logging.error("Cannot upload people to Zoho CRM. " + response)
+    else:
+        response_body = response.read()
+        if not "Record(s) added successfully" in response_body:
+            logging.error("Cannot upload people to Zoho CRM. " + response_body)
 
 def send_user_export_to_admins(u):
     '''You might want to call this function before deleting a user.
