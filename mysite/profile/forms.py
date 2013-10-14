@@ -17,7 +17,6 @@
 
 import django.forms
 import mysite.profile.models
-from mysite.profile.models import  TimeToCommit, Language
 
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
@@ -63,7 +62,6 @@ class EditInfoForm(django.forms.Form):
     email = django.forms.CharField(required=True, widget=django.forms.TextInput())
     file = django.forms.FileField(required=False)
     open_source = django.forms.NullBooleanField(required=False)
-    time_to_commit = django.forms.ModelMultipleChoiceField(required=False, queryset=TimeToCommit.objects.all())
     company_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     linked_in_url = django.forms.URLField(required=False)
     github_name = django.forms.CharField(required=False, widget=django.forms.TextInput())

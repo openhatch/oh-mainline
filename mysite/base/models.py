@@ -70,6 +70,11 @@ class Organization(models.Model):
     def __str__(self):
         return self.name
 
+class Experience(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+    def __str__(self):
+        return self.name
+
 ### Adjustments to default Django sqlite3 behavior
 def activate_foreign_keys(sender, connection, **kwargs):
     """Enable integrity constraint with sqlite."""

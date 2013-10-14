@@ -310,7 +310,6 @@ def edit_person_info_do(request):
     person.google_code_name =edit_info_form['google_code_name'].data
     person.other_name = edit_info_form['other_name'].data
 
-
     # grab the irc nick
     person.irc_nick = edit_info_form['irc_nick'].data
 
