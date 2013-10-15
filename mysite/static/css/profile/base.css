@@ -72,6 +72,8 @@ ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
 
 body#edit_profile_info_form #contact_blurb:target label { background-color: #faffaa; float: none; }
 
+body#edit_profile_info_form .header-label { font-weight:bold; float: none; }
+
 div.input {
     display: block;
     min-height: 60px;

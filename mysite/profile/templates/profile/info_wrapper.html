@@ -77,31 +77,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>First Name *</label>
-                            </div>
-                            {{ form.first_name.errors }}
-                            {{ form.first_name }}
-                        </div>
-
-                        <div class='form-row'>
-                            <div>
-                                <label>Last Name *</label>
-                            </div>
-                            {{ form.last_name.errors }}
-                            {{ form.last_name }}
-                        </div>
-
-                        <div class='form-row'>
-                            <div>
-                                <label>Email *</label>
-                            </div>
-                            {{ form.email.errors }}
-                            {{ form.email }}
-                        </div>
-
-                        <div class='form-row'>
-                            <div>
-                                <label>Company, Organization, or Event Where You Learned About SocialCoding4Good</label>
+                                <label class='header-label'>Company, Organization, or Event Where You Learned About SocialCoding4Good</label>
                             </div>
                             {{ form.company_name.errors }}
                             {{ form.company_name }}
@@ -109,55 +85,39 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>HFOSS Organizations That Interest You</label>
+                                <label class='header-label'>HFOSS Organizations That Interest You</label>
                             </div>
-                                <select id='organizations' multiple='multiple'>
-                                    {% for organization in organizations %}
-                                        <option name="organization" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
-                                        {{ organization.name }}
-                                    {% endfor %}
-                                </select>
+                            {{ form.organizations.errors }}
+                            {{ form.organizations }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>Causes That Interest You</label>
+                                <label class='header-label'>Causes That Interest You</label>
                             </div>
-                                <select id='causes' name="edit-tags-causes" multiple='multiple'>
-                                    {% for cause in causes %}
-                                        <option name="cause" id="cause_{{ cause.id }}" value="{{ cause.id }}" />
-                                        {{ cause.name }}
-                                    {% endfor %}
-                                </select>
+                            {{ form.causes.errors }}
+                            {{ form.causes }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>How much time would you like to commit to volunteering? *</label>
+                                <label class='header-label'>How much time would you like to commit to volunteering? </label>
                             </div>
-                                <select name='edit-tags-times' multiple='multiple'>
-                                    {% for time_to_commit in times_to_commit %}
-                                        <option name="time" id="time_to_commit_{{ time_to_commit.id }}" value="{{ time_to_commit.id }}" />
-                                        {{ time_to_commit.name }}
-                                    {% endfor %}
-                                </select>
+                            {{ form.times_to_commit.errors }}
+                            {{ form.times_to_commit }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>Skills *</label>
+                                <label class='header-label'>Skills</label>
                             </div>
-                                <select id='skills' multiple='multiple'>
-                                    {% for skill in skills %}
-                                        <option name="skill" id="skill_{{ skill.id }}" value="{{ skill.id }}" />
-                                        {{ skill.name }}
-                                    {% endfor %}
-                                </select>
+                            {{ form.skills.errors }}
+                            {{ form.skills }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>Resume</label>
+                                <label class='header-label'>Resume</label>
                             </div>
                             {{ form.file.errors }}
                             {{ form.file }}
@@ -168,7 +128,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>LinkedIn, OpenHatch or CoderWall Profile URL </label>
+                                <label class='header-label'>LinkedIn, OpenHatch or CoderWall Profile URL </label>
                             </div>
                             {{ form.linked_in_url.errors }}
                             {{ form.linked_in_url }}
@@ -176,7 +136,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>Have you previously contributed to open source projects?  </label>
+                                <label class='header-label'>Have you previously contributed to open source projects?  </label>
                             </div>
                             {{ form.open_source.errors }}
                             {{ form.open_source }}
@@ -184,7 +144,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>Github Username</label>
+                                <label class='header-label'>Github Username</label>
                             </div>
                             {{ form.github_name.errors }}
                             {{ form.github_name }}
@@ -192,7 +152,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>Google Code Username</label>
+                                <label class='header-label'>Google Code Username</label>
                             </div>
                             {{ form.google_code_name.errors }}
                             {{ form.google_code_name }}
@@ -200,7 +160,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>SourceForge, Ohloh or Other Username</label>
+                                <label class='header-label'>SourceForge, Ohloh or Other Username</label>
                             </div>
                             {{ form.other_name.errors }}
                             {{ form.other_name }}
@@ -208,31 +168,23 @@
 
                         <div class="clear">
                             <div>
-                                <label>Programming Languages, Frameworks, Environments</label>
+                                <label class='header-label'>Programming Languages, Frameworks, Environments</label>
                             </div>
-                            <ul>
-                                {% for language in languages %}
-                                <li>
-                                    <input type="checkbox" name="edit-tags-languages" id="language_{{ language.id }}" value="{{ language.id }}" />
-                                    <label for="language_{{ language.id }}">{{ language.name }}</label>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                                {{ form.languages.errors }}
+                                {{ form.languages }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>Experience Level </label>
+                                <label class='header-label'>Experience Level </label>
                             </div>
-
-                            <div><input type="radio" value="Beginner" name="edit-tags-exp_level">Beginner</div>
-                            <div><input type="radio" value="Intermediate" name="edit-tags-exp_level">Intermediate</div>
-                            <div><input type="radio" value="Expert" name="edit-tags-exp_level">Expert</div>
+                            {{ form.experience.errors }}
+                            {{ form.experience }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>What languages do you speak, read, and write? </label>
+                                <label class='header-label'>What languages do you speak, read, and write? </label>
                             </div>
                             {{ form.language_spoken.errors }}
                             {{ form.language_spoken }}
@@ -240,19 +192,15 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>How did you hear about SocialCoding4Good? </label>
+                                <label class='header-label'>How did you hear about SocialCoding4Good? </label>
                             </div>
-                                <select name='edit-tags-heard_from' multiple='multiple'>
-                                    {% for heard_f in heard_from %}
-                                        <option name="heardFromOption" id="heard_f_{{ heard_f.id }}" value="{{ heard_f.id }}" />
-                                        {{ heard_f.name }}
-                                    {% endfor %}
-                                </select>
+                                    {{ form.heard_from.errors }}
+                                    {{ form.heard_from }}
                         </div>
 
                         <div class='form-row'>
                             <div>
-                                <label>Would you like us to keep you posted on the latest news from SocialCoding4Good?  </label>
+                                <label class='header-label'>Would you like us to keep you posted on the latest news from SocialCoding4Good?  </label>
                             </div>
                             {{ form.subscribed.errors }}
                             {{ form.subscribed }}
@@ -260,7 +208,7 @@
 
                         <div class='form-row'>
                             <div>
-                                <label>Comment or Questions? </label>
+                                <label class='header-label'>Comment or Questions? </label>
                             </div>
                             {{ form.comment }}
                         </div>

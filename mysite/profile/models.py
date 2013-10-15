@@ -22,7 +22,7 @@ import os.path
 import shutil
 
 from mysite.search.models import Project, get_image_data_scaled
-from mysite.base.models import Skill, Organization
+from mysite.base.models import Skill, Organization, Experience
 import mysite.customs.models
 import mysite.profile.view_helpers
 import mysite.base.models
@@ -35,8 +35,6 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from mysite.base.models import Skill, Organization
-from django.forms import ModelForm
 
 import datetime
 import uuid
@@ -85,6 +83,8 @@ class Language(models.Model):
 
 class Heard_From(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
+    def __str__(self):
+        return self.name
 
 class TimeToCommit(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
@@ -157,6 +157,7 @@ class Person(models.Model):
             verbose_name='Email me periodically about activity in my projects')
     skill = models.ManyToManyField(Skill)
     organization = models.ManyToManyField(Organization)
+    experience = models.ForeignKey(Experience, default=1)
     cause = models.ManyToManyField(Cause)
     language = models.ManyToManyField(Language)
     opensource = models.NullBooleanField(default=None)

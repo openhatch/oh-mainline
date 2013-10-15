@@ -17,6 +17,7 @@
 
 import django.forms
 import mysite.profile.models
+from mysite.profile.models import  TimeToCommit, Heard_From, Language, Organization, Cause, Skill, Experience
 
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
@@ -53,27 +54,39 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
                     "regarding a portfolio entry that you do not own.")
 
 class EditInfoForm(django.forms.Form):
+
     bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    causes = django.forms.ModelMultipleChoiceField(
+        required=False, queryset=Cause.objects.all(), widget=django.forms.CheckboxSelectMultiple)
     comment = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    homepage_url = django.forms.URLField(required=False)
-    irc_nick = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    first_name = django.forms.CharField(required=True, widget=django.forms.TextInput())
-    last_name = django.forms.CharField(required=True, widget=django.forms.TextInput())
-    email = django.forms.CharField(required=True, widget=django.forms.TextInput())
-    file = django.forms.FileField(required=False)
-    open_source = django.forms.NullBooleanField(required=False)
     company_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    linked_in_url = django.forms.URLField(required=False)
+    experience = django.forms.ModelChoiceField(
+        required=False, empty_label=None, queryset=Experience.objects.all(),widget=django.forms.RadioSelect())
+    file = django.forms.FileField(required=False)
     github_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     google_code_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    heard_from = django.forms.ModelMultipleChoiceField(
+        required=False, queryset=Heard_From.objects.all(), widget=django.forms.CheckboxSelectMultiple)
+    homepage_url = django.forms.URLField(required=False)
+    irc_nick = django.forms.CharField(required=False, widget=django.forms.TextInput())
     language_spoken = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    languages = django.forms.ModelMultipleChoiceField(
+        required=False, queryset=Language.objects.all(), widget=django.forms.CheckboxSelectMultiple)
+    linked_in_url = django.forms.URLField(required=False)
+    open_source = django.forms.BooleanField(required=False)
+    organizations = django.forms.ModelMultipleChoiceField(
+        required=False, queryset=Organization.objects.all(), widget=django.forms.CheckboxSelectMultiple)
+    other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    subscribed = django.forms.BooleanField(required=False, label='yes')
+    times_to_commit = django.forms.ModelChoiceField(
+        required=False, empty_label=None, queryset=TimeToCommit.objects.all(),widget=django.forms.RadioSelect())
     understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
     understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    subscribed = django.forms.BooleanField(required=False)
+    skills = django.forms.ModelMultipleChoiceField(
+        required=False, queryset=Skill.objects.all(),widget=django.forms.CheckboxSelectMultiple)
 
 class ContactBlurbForm(django.forms.Form):
     contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())

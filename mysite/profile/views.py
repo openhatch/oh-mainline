@@ -52,7 +52,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, Heard_From
+        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, Heard_From, Experience
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view, has_permissions
 import mysite.profile.forms
@@ -302,19 +302,29 @@ def edit_person_info_do(request):
     person.bio = edit_info_form['bio'].data
 
     # setting SC4G volunteer fields
-    person.company_name = edit_info_form['company_name'].data
-    person.language_spoken = edit_info_form['language_spoken'].data
+    person.cause = edit_info_form['causes'].data
     person.comment = edit_info_form['comment'].data
-    person.subscribed = edit_info_form['subscribed'].data
+    person.company_name = edit_info_form['company_name'].data
+    if edit_info_form['experience'].data is not None:
+        experience_id = edit_info_form['experience'].data[0]
+        person.experience = Experience.objects.get(pk=experience_id)
     person.github_name = edit_info_form['github_name'].data
     person.google_code_name =edit_info_form['google_code_name'].data
+    person.heard_from = edit_info_form['heard_from'].data
+    person.language = edit_info_form['languages'].data
+    person.language_spoken = edit_info_form['language_spoken'].data
+    person.linked_in_url = edit_info_form['linked_in_url'].data
+    person.opensource = edit_info_form['open_source'].data
+    person.organization = edit_info_form['organizations'].data
     person.other_name = edit_info_form['other_name'].data
+    person.skill = edit_info_form['skills'].data
+    person.subscribed = edit_info_form['subscribed'].data
+    if edit_info_form['times_to_commit'].data is not None:
+        time_to_commit_id = edit_info_form['times_to_commit'].data[0]
+        person.time_to_commit = TimeToCommit.objects.get(pk=time_to_commit_id)
 
     # grab the irc nick
     person.irc_nick = edit_info_form['irc_nick'].data
-
-    person.linked_in_url = edit_info_form['linked_in_url'].data
-
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
@@ -887,15 +897,33 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['info_edit_mode'] = True
     if edit_info_form is None:
         edit_info_form = mysite.profile.forms.EditInfoForm(initial={
-          'bio': person.bio,
-          'homepage_url': person.homepage_url,
-          'irc_nick': person.irc_nick,
-          'linked_in_url': person.linked_in_url,
-          'understands': data['tags_flat'].get('understands', ''),
-          'understands_not': data['tags_flat'].get('understands_not', ''),
-          'studying': data['tags_flat'].get('studying', ''),
-          'can_pitch_in': data['tags_flat'].get('can_pitch_in', ''),
-          'can_mentor': data['tags_flat'].get('can_mentor', ''),
+            'bio': person.bio,
+            'homepage_url': person.homepage_url,
+            'irc_nick': person.irc_nick,
+            'understands': data['tags_flat'].get('understands', ''),
+            'understands_not': data['tags_flat'].get('understands_not', ''),
+            'studying': data['tags_flat'].get('studying', ''),
+            'can_pitch_in': data['tags_flat'].get('can_pitch_in', ''),
+            'can_mentor': data['tags_flat'].get('can_mentor', ''),
+
+            # Setting initial SC4G volunteer fields
+            'causes': Cause.objects.filter(person=person._get_pk_val),
+            'comment': person.comment,
+            'company_name': person.company_name,
+            'experience': person.experience,
+            'github_name': person.github_name,
+            'google_code_name': person.google_code_name,
+            'heard_from': Heard_From.objects.filter(person=person._get_pk_val),
+            'language_spoken': person.language_spoken,
+            'languages': Language.objects.filter(person=person._get_pk_val),
+            'linked_in_url': person.linked_in_url,
+            'open_source': person.opensource,
+            'organizations': Cause.objects.filter(person=person._get_pk_val),
+            'other_name': person.other_name,
+            'skills': Skill.objects.filter(person=person._get_pk_val),
+            'subscribed': person.subscribed,
+            'times_to_commit': person.time_to_commit,
+
         }, prefix='edit-tags')
     if contact_blurb_form is None:
         contact_blurb_form = mysite.profile.forms.ContactBlurbForm(initial={
@@ -906,12 +934,6 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['contact_blurb_error'] = contact_blurb_error
     data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
     data['has_errors'] = has_errors
-    data['organizations'] = Organization.objects.all()
-    data['heard_from'] = Heard_From.objects.all()
-    data['skills'] = Skill.objects.all()
-    data['causes'] = Cause.objects.all()
-    data['languages'] = Language.objects.all()
-    data['times_to_commit'] = TimeToCommit.objects.all()
     return request, 'profile/info_wrapper.html', data
 
 @login_required
