@@ -1,12 +1,12 @@
 from settings import *
-DEBUG = TEMPLATE_DEBUG = False
+DEBUG = TEMPLATE_DEBUG = True
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'null': {
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'class':'django.utils.log.NullHandler',
         },
         'mail_admins': {
@@ -18,7 +18,7 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['null'],  # Quiet by default!
             'propagate': False,
-            'level':'ERROR',
+            'level':'DEBUG',
         },
         'django.request': {
             'handlers': ['mail_admins'],
@@ -29,8 +29,8 @@ LOGGING = {
 }
 
 logging.basicConfig(
-    level = logging.ERROR,
+    level = logging.DEBUG,
     format = '%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
 )
 
-ASSETS_DEBUG = False
+ASSETS_DEBUG = True
