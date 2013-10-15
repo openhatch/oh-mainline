@@ -17,6 +17,9 @@
 
 from django.conf import settings
 from django import template
+from django.core.serializers import serialize
+from django.db.models.query import QuerySet
+from django.utils import simplejson
 from django.utils.timesince import timesince
 import time
 import calendar
@@ -236,6 +239,9 @@ register.simple_tag(version)
 
 @register.filter
 def has_permission(user, codename):
+    if user is None:
+        return True
+
     if user.is_active and user.is_superuser:
         return True
 
@@ -249,6 +255,9 @@ def has_permission(user, codename):
 
 @register.filter
 def has_group(user, group_name):
+    if user is None:
+        return True
+
     if user.is_active and user.is_superuser:
         return True
 

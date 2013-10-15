@@ -56,6 +56,12 @@ People Search
     <div>
         <fieldset id="search-filters">
             <legend>Filter</legend>
+            <div id="filter_buttons">
+                <button id="filter_submit">Filter Results</button>
+                <button id="expandAllButton">Expand All</button>
+                <button id="collapseAllButton">Collapse All</button>
+                <button id="resetButton">Reset Filter</button>
+            </div>
             <div class="input">
                 <div>
                     <label for="filter_name">Name:</label>
@@ -82,10 +88,10 @@ People Search
             </div>
             <div class="clear">
                 <div>
-                    <label for="filter_email">Skills:</label>
+                    <label for="filter_skills">Skills:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul class="list-hidden">
+                <ul id="filter_skills" class="list-hidden">
                     {% for skill in skills %}
                     <li>
                         <input type="checkbox" name="skills" id="skill_{{ skill.id }}" value="{{ skill.id }}" />
@@ -96,10 +102,10 @@ People Search
             </div>
             <div class="clear">
                 <div>
-                    <label for="filter_email">Organizations:</label>
+                    <label for="filter_organizations">Organizations:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul class="list-hidden">
+                <ul for="filter_organizations" class="list-hidden">
                     {% for organization in organizations %}
                     <li>
                         <input type="checkbox" name="organizations" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
@@ -110,10 +116,10 @@ People Search
             </div>
             <div class="clear">
                 <div>
-                    <label for="filter_email">Causes:</label>
+                    <label for="filter_causes">Causes:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul class="list-hidden">
+                <ul id="filter_causes" class="list-hidden">
                     {% for cause in causes %}
                     <li>
                         <input type="checkbox" name="causes" id="cause_{{ cause.id }}" value="{{ cause.id }}" />
@@ -124,10 +130,10 @@ People Search
             </div>
             <div class="clear">
                 <div>
-                    <label for="filter_email">Languages:</label>
+                    <label for="filter_languages">Languages:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul class="list-hidden">
+                <ul id="filter_languages" class="list-hidden">
                     {% for language in languages %}
                     <li>
                         <input type="checkbox" name="languages" id="language_{{ language.id }}" value="{{ language.id }}" />
@@ -138,10 +144,10 @@ People Search
             </div>
             <div class="clear">
                 <div>
-                    <label for="filter_email">Time to Commit:</label>
+                    <label for="filter_time_to_commit">Time to Commit:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul class="list-hidden">
+                <ul id="filter_time_to_commit" class="list-hidden">
                     {% for time_to_commit in times_to_commit %}
                     <li>
                         <input type="radio" name="time_to_commit" id="time_to_commit_{{ time_to_commit.id }}" value="{{ time_to_commit.id }}" />
@@ -152,10 +158,10 @@ People Search
             </div>
             <div class="clear">
                 <div>
-                    <label for="filter_email">Open Source Projects:</label>
+                    <label for="filter_opensource">Open Source Projects:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul class="list-hidden">
+                <ul id="filter_opensource" class="list-hidden">
                     <li>
                         <input type="radio" name="opensource" id="opensource_yes" value="True" />
                         <label for="opensource_yes">Yes</label>
@@ -170,19 +176,73 @@ People Search
                     </li>
                 </ul>
             </div>
-            <div class="clear">
-                <button id="resetButton">Reset Filter</button>
-                <button id="collapseAllButton">Collapse All</button>
-                <button id="expandAllButton">Expand All</button>
-            </div>
         </fieldset>
     </div>
 
     {% endif %}
 </form>
 
-<script>
+    <script>
         $(document).ready(function() {
+            $('#filter_submit').click(function(e) {
+                e.preventDefault();
+
+                var getPeopleIds = function () {
+                    var ids = [];
+
+                    $('#results .user').each(function(index, item) {
+                        ids.push($(item).attr('id'));
+                    });
+
+                    return ids;
+                };
+
+                var getCheckboxValues = function(name) {
+                    var list = [];
+
+                    $('ul.list-hidden input[type="checkbox"][name="' + name + '"]').each(function(index, item) {
+                        if ($(item).is(':checked')) {
+                            list.push(parseInt($(item).val()));
+                        }
+                    });
+
+                    return list;
+                };
+
+                var getRadioValue = function (name) {
+                    var value = $('ul.list-hidden input[type="radio"][name="' + name + '"]:checked');
+                    if (value.length > 0) {
+                        return $(value).val();
+                    }
+
+                    return null;
+                };
+
+                post_data = {
+                    people_ids: {{ people_ids }},
+                    filter_name: $('#filter_name').val(),
+                    filter_company_name: $('#filter_company_name').val(),
+                    filter_email: $('#filter_email').val(),
+                    skills: getCheckboxValues('skills'),
+                    organizations: getCheckboxValues('organizations'),
+                    causes: getCheckboxValues('causes'),
+                    languages: getCheckboxValues('languages'),
+                    time_to_commit: getRadioValue('time_to_commit'),
+                    opensource: getRadioValue('opensource')
+                };
+
+                var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
+                var loading = $(document.createElement('div')).addClass('loading').append(img);
+                $('#results').html(loading);
+
+                $.post('filter/', post_data,function (response) {
+                    $('#results').replaceWith(response);
+                }).error(function () {
+                    var error_msg = '<p class="error-message">Unexpected error!</p>';
+                    $('#results').html(error_msg);
+                });
+            });
+
             $('a.collapse-button').click(function(e) {
                 e.preventDefault();
 
@@ -395,38 +455,7 @@ People Search
     </script>
 
     {% if people %}
-
-    {# Here's the big list of everybody with an account on the site. #}
-    <div id="results">
-
-    {% for person in people %}
-        <div class="user">
-            <div class="user-name">
-                <span class="user-name-inner">{{person.user}}</span>
-                {% if person.linked_in_url %}
-                    <a href="{{person.linked_in_url}}">
-                        <img width="24" height="24" src="/static/images/linkedin-icon.gif" />
-                    </a>
-                {% endif %}
-            </div>
-            <p><b>Company:</b> {% if person.company %} {{person.company}} {% else %} N/A {% endif %}</p>
-            <p><b>Causes:</b> {% if person.cause and person.cause.all %} {% for cause in person.cause.all %} {{cause.name}} {% endfor %} {% else %} N/A {% endif %}</p>
-            <p><b>Organizations:</b> {% if person.organization and person.organization.all %} {% for organization in person.organization.all %} {{organization.name}} {% endfor %} {% else %} N/A {% endif %}</p>
-            <p><b>Languages:</b> {% if person.language and person.language.all %} {% for language in person.language.all %} {{language.name}} {% endfor %} {% else %} N/A {% endif %}</p>
-            <p><b>Time commit:</b> {% if person.time_to_commit %} {{person.time_to_commit.name}} {% else %}  N/A {% endif %}</p>
-            <p><b>Skills:</b> {% if person.skill and person.skill.all %} {% for skill in person.skill.all %} {{skill.name}} {% endfor %} {% else %} N/A {% endif %}</p>
-        </div>
-    {% endfor %}
-
-    </div>
-
-   <script>
-       $(".user").click(function() {
-            var name = $(this).find(".user-name-inner").html();
-            window.location.href = '/people/' + name;
-       });
-   </script>
-
+    {% include 'profile/people_list.html' %}
     {% endif %}
 
     {% if not user.is_authenticated and people %}

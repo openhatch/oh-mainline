@@ -12,7 +12,7 @@ DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY # This is needed for {% version %}
 
 ## Now, actual settings
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -231,7 +231,7 @@ GITHUB_API_TOKEN='ceb85898146b6a0d4283cdf8788d8b6a'
 # Value     Effect
 #   True        Don't pack assets in DEBUG mode
 #   False       Pack assets in DEBUG mode
-ASSETS_DEBUG = True
+ASSETS_DEBUG = False
 
 ADD_VERSION_STRING_TO_IMAGES = True
 ADD_VERSION_STRING_TO_IMAGES_IN_DEBUG_MODE = True

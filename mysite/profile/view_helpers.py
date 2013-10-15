@@ -182,20 +182,23 @@ def filter_people(people, post_data):
         filtered_people = filtered_people.filter(company_name__contains=company_name)
     if 'filter_email' in post_data and len(post_data.get('filter_email')) > 0:
         filtered_people = filtered_people.filter(user__email=post_data.get('filter_email'))
-    if 'skills' in post_data:
-        filtered_people = filtered_people.filter(skill__pk__in=post_data.getlist('skills'))
-    if 'organizations' in post_data:
-        filtered_people = filtered_people.filter(organization__pk__in=post_data.getlist('organizations'))
-    if 'causes' in post_data:
-        filtered_people = filtered_people.filter(cause__pk__in=post_data.getlist('causes'))
-    if 'languages' in post_data:
-        filtered_people = filtered_people.filter(language__pk__in=post_data.getlist('languages'))
-    if 'time_to_commit' in post_data:
+    if 'skills[]' in post_data:
+        filtered_people = filtered_people.filter(skill__pk__in=post_data.getlist('skills[]'))
+    if 'organizations[]' in post_data:
+        filtered_people = filtered_people.filter(organization__pk__in=post_data.getlist('organizations[]'))
+    if 'causes[]' in post_data:
+        filtered_people = filtered_people.filter(cause__pk__in=post_data.getlist('causes[]'))
+    if 'languages[]' in post_data:
+        filtered_people = filtered_people.filter(language__pk__in=post_data.getlist('languages[]'))
+    if 'time_to_commit' in post_data and post_data.get('time_to_commit') != u'null':
         filtered_people = filtered_people.filter(time_to_commit__pk=post_data.get('time_to_commit'))
     if 'opensource' in post_data:
-        opensource = literal_eval(post_data.get('opensource', None))
-        filtered_people = filtered_people.filter(opensource=opensource)
-
+        if post_data.get('opensource') == u'null' or post_data.get('opensource') is None\
+            or post_data.get('opensource') == u'None':
+            filtered_people = filtered_people.filter(Q(opensource=True) | Q(opensource=False))
+        else:
+            opensource = literal_eval(post_data.get('opensource'))
+            filtered_people = filtered_people.filter(opensource=opensource)
     return filtered_people
 
 def parse_string_query(s):

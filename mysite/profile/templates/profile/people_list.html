@@ -1,0 +1,27 @@
+    <div id="results">
+        {% for person in people %}
+            <div id="{{ person.id }}" class="user">
+                <div class="user-name">
+                    <span class="user-name-inner">{{ person.user }}</span>
+                    {% if person.linked_in_url %}
+                        <a href="{{ person.linked_in_url }}">
+                            <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
+                        </a>
+                    {% endif %}
+                </div>
+                <p><b>Company:</b> {% if person.company %} {{ person.company }} {% else %} N/A {% endif %}</p>
+                <p><b>Causes:</b> {% if person.cause and person.cause.all %} {% for cause in person.cause.all %} {{ cause.name }} {% endfor %} {% else %} N/A {% endif %}</p>
+                <p><b>Organizations:</b> {% if person.organization and person.organization.all %} {% for organization in person.organization.all %} {{ organization.name }} {% endfor %} {% else %} N/A {% endif %}</p>
+                <p><b>Languages:</b> {% if person.language and person.language.all %} {% for language in person.language.all %} {{ language.name }} {% endfor %} {% else %} N/A {% endif %}</p>
+                <p><b>Time commit:</b> {% if person.time_to_commit %} {{ person.time_to_commit.name }} {% else %} N/A {% endif %}</p>
+                <p><b>Skills:</b> {% if person.skill and person.skill.all %} {% for skill in person.skill.all %} {{ skill.name }} {% endfor %} {% else %} N/A {% endif %}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        $(".user").click(function () {
+            var name = $(this).find(".user-name-inner").html();
+            window.location.href = '/people/' + name;
+        });
+    </script>

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if [ -z $1 ]
 then
@@ -8,4 +9,5 @@ else
     SCRIPT_PATH="./mysite/scripts/populate-with-data/$PREFIX$1.py"
     echo -e "$(tput bold)$(tput setaf 3)Executing script $SCRIPT_PATH$(tput sgr0)"
     python $SCRIPT_PATH "db=./mysite/site.db" "$@"
+    echo -e "$(tput bold)$(tput setaf 2)All done.$(tput sgr0)"
 fi

@@ -24,7 +24,6 @@
 import StringIO
 import datetime
 import urllib
-from django.db.models import Q
 from django.utils import simplejson
 import re
 import collections
@@ -32,7 +31,7 @@ import logging
 
 # Django
 from django.template.loader import render_to_string
-from django.template import RequestContext
+from django.template import RequestContext, Context
 from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
@@ -48,6 +47,7 @@ from django.core.exceptions import ObjectDoesNotExist
 # OpenHatch apps
 import mysite.base.view_helpers
 import mysite.base.unicode_sanity
+from mysite.profile import view_helpers
 import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
@@ -462,6 +462,16 @@ def people_export(request):
       # 'excel': export_to_excel(people), etc...
     }[format]
 
+def people_filter(request):
+    post_data = request.POST
+    people_ids = post_data.getlist(u'people_ids[]')
+    people = Person.objects.filter(pk__in=people_ids).order_by('id')
+    filtered_people = view_helpers.filter_people(people, post_data)
+    json = serializers.serialize('json', filtered_people)
+    response = render_to_string(template_name='profile/people_list.html',
+        dictionary={'people': filtered_people}, context_instance=RequestContext(request))
+    return HttpResponse(response)
+
 @login_required
 @has_permissions(['can_view_people'])
 @view
@@ -492,7 +502,7 @@ def people(request):
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template
-    person_id_ranges = mysite.base.view_helpers.int_list2ranges([x.id for x in data['people']])
+    person_id_ranges = mysite.base.view_helpers.int_list2ranges([x.id for x in everybody])
     person_ids = ''
     for stop, start in person_id_ranges:
         if stop == start:
@@ -500,6 +510,11 @@ def people(request):
         else:
             person_ids += '%d-%d,' % (stop, start)
 
+    people_ids = []
+    for person in everybody:
+        people_ids.append(int(person.id))
+
+    data['people_ids'] = simplejson.dumps(people_ids)
     data['export_formats'] = {"csv": "CSV"}
     data['skills'] = Skill.objects.all()
     data['organizations'] = Organization.objects.all()

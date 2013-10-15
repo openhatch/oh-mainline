@@ -194,6 +194,9 @@ urlpatterns = patterns('',
         (r'^people-export/$',
             'mysite.profile.views.people_export'),
 
+        (r'^people/filter/$',
+         'mysite.profile.views.people_filter'),
+
         (r'^insert-volunteer/$',
             'mysite.account.views.insert_volunteer'),
 
