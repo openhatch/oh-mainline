@@ -7,16 +7,13 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        # Deleting model 'Experience'
-        db.delete_table('base_experience')
-
-        # Adding model 'Language'
-        db.create_table('base_language', (
+        
+        # Adding model 'Experience'
+        db.create_table('base_experience', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(default='', unique=True, max_length=100)),
         ))
-        db.send_create_signal('base', ['Language'])
+        db.send_create_signal('base', ['Experience'])
 
         # Adding model 'Duration'
         db.create_table('base_duration', (
@@ -25,26 +22,34 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('base', ['Duration'])
 
+        # Adding model 'Language'
+        db.create_table('base_language', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(default='', unique=True, max_length=100)),
+        ))
+        db.send_create_signal('base', ['Language'])
+
 
     def backwards(self, orm):
-
-        # Adding model 'Experience'
-        db.create_table('base_experience', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(default='', max_length=100, unique=True)),
-        ))
-        db.send_create_signal('base', ['Experience'])
-
-        # Deleting model 'Language'
-        db.delete_table('base_language')
+        
+        # Deleting model 'Experience'
+        db.delete_table('base_experience')
 
         # Deleting model 'Duration'
         db.delete_table('base_duration')
+
+        # Deleting model 'Language'
+        db.delete_table('base_language')
 
 
     models = {
         'base.duration': {
             'Meta': {'object_name': 'Duration'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
+        },
+        'base.experience': {
+            'Meta': {'object_name': 'Experience'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
         },

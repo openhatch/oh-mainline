@@ -77,6 +77,8 @@ class Experience(models.Model):
 
 class Language(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
+    def __str__(self):
+        return self.name
 
 class Duration(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)

@@ -35,8 +35,6 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from mysite.base.models import Skill, Organization
-from django.forms import ModelForm
 
 import datetime
 import uuid
@@ -74,11 +72,6 @@ def generate_person_photo_path(instance, filename, suffix=""):
     return random_uuid.hex + suffix
 
 class Cause(models.Model):
-    name = models.CharField(default='', unique=True, null=False, max_length=100)
-    def __str__(self):
-        return self.name
-
-class Language(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
     def __str__(self):
         return self.name

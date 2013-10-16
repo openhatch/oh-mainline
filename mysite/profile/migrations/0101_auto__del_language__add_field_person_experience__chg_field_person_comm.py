@@ -8,14 +8,54 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Deleting model 'Language'
+        db.delete_table('profile_language')
+
         # Adding field 'Person.experience'
         db.add_column('profile_person', 'experience', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['base.Experience']), keep_default=False)
+
+        # Changing field 'Person.comment'
+        db.alter_column('profile_person', 'comment', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'Person.language_spoken'
+        db.alter_column('profile_person', 'language_spoken', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'Person.other_name'
+        db.alter_column('profile_person', 'other_name', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'Person.github_name'
+        db.alter_column('profile_person', 'github_name', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'Person.google_code_name'
+        db.alter_column('profile_person', 'google_code_name', self.gf('django.db.models.fields.TextField')())
 
 
     def backwards(self, orm):
         
+        # Adding model 'Language'
+        db.create_table('profile_language', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(default='', max_length=100, unique=True)),
+        ))
+        db.send_create_signal('profile', ['Language'])
+
         # Deleting field 'Person.experience'
         db.delete_column('profile_person', 'experience_id')
+
+        # Changing field 'Person.comment'
+        db.alter_column('profile_person', 'comment', self.gf('django.db.models.fields.CharField')(max_length=100))
+
+        # Changing field 'Person.language_spoken'
+        db.alter_column('profile_person', 'language_spoken', self.gf('django.db.models.fields.CharField')(max_length=100))
+
+        # Changing field 'Person.other_name'
+        db.alter_column('profile_person', 'other_name', self.gf('django.db.models.fields.CharField')(max_length=100))
+
+        # Changing field 'Person.github_name'
+        db.alter_column('profile_person', 'github_name', self.gf('django.db.models.fields.CharField')(max_length=100))
+
+        # Changing field 'Person.google_code_name'
+        db.alter_column('profile_person', 'google_code_name', self.gf('django.db.models.fields.CharField')(max_length=100))
 
 
     models = {
@@ -133,11 +173,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
         },
-        'profile.language': {
-            'Meta': {'object_name': 'Language'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
-        },
         'profile.link_person_tag': {
             'Meta': {'object_name': 'Link_Person_Tag'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -180,7 +215,7 @@ class Migration(SchemaMigration):
             'homepage_url': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'irc_nick': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'language': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['profile.Language']", 'symmetrical': 'False'}),
+            'language': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['base.Language']", 'symmetrical': 'False'}),
             'language_spoken': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'last_polled': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(1970, 1, 1, 0, 0)'}),
             'latitude': ('django.db.models.fields.FloatField', [], {'default': '-37.3049962'}),
