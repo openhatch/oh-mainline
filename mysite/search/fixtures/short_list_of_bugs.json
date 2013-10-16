@@ -8,7 +8,9 @@
         {
             "icon_url": "https://launchpadlibrarian.net/9017963/foo.png",
             "name": "x",
-            "language": "pYthOn"
+            "language": "pYthOn",
+            "organization": 1,
+            "duration": 1
         }
 
 }
@@ -21,7 +23,9 @@
     {
         "icon_url": "https://launchpadlibrarian.net/9017963/foo.png",
         "name": "!!!pYThOn!!!",
-        "language": "x"
+        "language": "x",
+        "organization": 1,
+        "duration": 1
     }
 
 }
@@ -34,7 +38,9 @@
     {
         "icon_url": "https://launchpadlibrarian.net/9017963/foo.png",
         "name": "pYThOn",
-        "language": "x"
+        "language": "x",
+        "organization": 1,
+        "duration": 1
     }
 
 }
@@ -47,7 +53,9 @@
     {
         "icon_url": "http://google.com/3",
         "name": "xxxx",
-        "language": "x"
+        "language": "x",
+        "organization": 1,
+        "duration": 1
     }
 
 }
@@ -60,7 +68,8 @@
     {
         "icon_url": "http://google.com/",
         "name": "xx",
-        "language": "Python"
+        "language": "Python",
+        "duration": 1
     }
 
 }

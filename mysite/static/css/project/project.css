@@ -255,3 +255,78 @@ span.frustration {
 .step-button img {
     margin-bottom: -8px;
     }
+
+div.input {
+    display: block;
+    min-height: 60px;
+    height: 60px;
+    max-height: 60px;
+}
+
+div.input input[type=text] {
+    width: 250px;
+}
+
+.list-hidden {
+    display: none;
+}
+
+.clear {
+    clear: both;
+}
+
+#search-filters {
+    float: left;
+    width: 890px;
+    margin-right: 20px;
+    position: relative;
+    min-height: 160px;
+}
+
+#search-filters #filter_buttons {
+    float: right;
+}
+
+#search-filters #filter_buttons button {
+    display: block;
+    margin-left: auto;
+    margin-right: 0px;
+}
+
+#search-filters li {
+    width: 800px !important;
+    float: none !important;
+    margin: 5px 0px 5px 0px !important;
+}
+
+#search-filters #filter_buttons button:not(:first-child) {
+    margin-top: 10px;
+}
+
+.loading {
+    display: block;
+    margin: auto;
+    width: 64px;
+    height: 64px;
+}
+
+ul#results {
+    clear: both !important;
+    margin: 20px !important;
+    padding-top: 20px !important;
+}
+
+input[type=text].search_bar {
+    width: 800px;
+}
+
+input[type=submit].search_bar {
+    float: none !important;
+    padding: 5px;
+    margin: 2px 0px 0px 20px;
+}
+
+#search-filters div.buttons-overlay {
+    position: absolute;
+    right: 12px;
+}

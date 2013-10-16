@@ -149,12 +149,12 @@ div.input input[type=text] {
 }
 
 #search-filters #filter_buttons button {
+    display: block;
     margin-left: auto;
     margin-right: 0px;
 }
 
 #search-filters #filter_buttons button:not(:first-child) {
-    display: block;
     margin-top: 10px;
 }
 
@@ -163,4 +163,12 @@ div.input input[type=text] {
     margin: auto;
     width: 64px;
     height: 64px;
+}
+
+#search_profiles {
+    width: 800px !important;
+}
+
+.stubmit.field {
+    margin-right: 0px !important;
 }

@@ -477,10 +477,9 @@ def people_filter(request):
     people_ids = post_data.getlist(u'people_ids[]')
     people = Person.objects.filter(pk__in=people_ids).order_by('id')
     filtered_people = view_helpers.filter_people(people, post_data)
-    json = serializers.serialize('json', filtered_people)
     response = render_to_string(template_name='profile/people_list.html',
         dictionary={'people': filtered_people}, context_instance=RequestContext(request))
-    return HttpResponse(response)
+    return HttpResponse(response, mimetype='application/html')
 
 @login_required
 @has_permissions(['can_view_people'])
@@ -508,7 +507,6 @@ def people(request):
     else:
         everybody = Person.objects.all().order_by('user__username')
 
-    everybody = mysite.profile.view_helpers.filter_people(people=everybody, post_data=post_data)
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template

@@ -1,3 +1,4 @@
 [
- {"pk": 3, "model": "search.project", "fields": {"icon_raw": "/static/no-project-icon.png", "name": "ccHost", "language": "PHP"}}
+ {"pk": 3, "model": "search.project", "fields": {"icon_raw": "/static/no-project-icon.png", "name": "ccHost", "language": "PHP", "organization": 1,
+ "duration": 1}}
 ]

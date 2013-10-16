@@ -16,8 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+from django.contrib.admindocs.tests import fields
+from django.core import serializers
 from django.core.mail import send_mail
 import socket
+from django.template import RequestContext
+from mysite.base.models import Organization, Skill, Language, Duration
+from mysite.project import view_helpers
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 import mysite.project.view_helpers
 import django.template
@@ -41,12 +46,8 @@ def create_project_page_do(request):
         matches = Project.objects.filter(name__iexact=project_name)
         if matches:
             our_project = matches[0]
-            # If project exists, go to normal project page 
+            # If project exists, go to normal project page
             return HttpResponseRedirect(our_project.get_url())
-        else:
-            # If project doesn't exists, create it, and go to project settings page 
-            our_project, was_created = Project.objects.get_or_create(name=project_name)
-            return HttpResponseRedirect(our_project.get_edit_page_url())
 
     return HttpResponseBadRequest('Bad request')
 
@@ -154,12 +155,12 @@ def project(request, project__name = None):
 
 @login_required
 @has_permissions(['can_view_projects'])
-@mysite.base.decorators.cache_function_that_takes_request
+#@mysite.base.decorators.cache_function_that_takes_request
 def projects(request):
     data = {}
-    query = request.GET.get('q', '')
+    post_data = request.POST
+    query = request.POST.get('q', '')
     matching_projects = []
-    project_matches_query_exactly = False
     if query:
         query = query.strip()
         matching_projects = mysite.project.view_helpers.similar_project_names(
@@ -167,20 +168,36 @@ def projects(request):
         project_matches_query_exactly = query.lower() in [p.name.lower() for p in matching_projects]
         if len(matching_projects) == 1 and project_matches_query_exactly:
             return HttpResponseRedirect(matching_projects[0].get_url())
-        
-    if not query:
-        data['projects_with_bugs'] = mysite.search.view_helpers.get_projects_with_bugs()
-        data['cited_projects_lacking_bugs'] = (mysite.search.view_helpers.
-                get_cited_projects_lacking_bugs())
+        matching_projects = mysite.project.view_helpers.filter_projects(projects=matching_projects, post_data=post_data)
+    else:
+        matching_projects = Project.objects.all()
+
+    project_ids = []
+    for project in matching_projects:
+        project_ids.append(int(project.id))
 
     data.update({
+            'project_ids': project_ids,
             'query': query,
             'matching_projects': matching_projects,
-            'no_project_matches_query_exactly': not project_matches_query_exactly,
-            'explain_to_anonymous_users': True
+            'explain_to_anonymous_users': True,
+            'skills': Skill.objects.all(),
+            'organizations': Organization.objects.all(),
+            'languages': Language.objects.all(),
+            'duration': Duration.objects.all()
             })
     return mysite.base.decorators.as_view(request, "project/projects.html", data,
             slug=projects.__name__)
+
+def project_filter(request):
+    post_data = request.POST
+    project_ids= post_data.getlist(u'project_ids[]')
+    projects = Project.objects.filter(pk__in=project_ids).order_by('id')
+    filtered_projects = view_helpers.filter_projects(projects, post_data)
+    response = render_to_string(template_name='project/project_list.html',
+        dictionary={'matching_projects': filtered_projects},
+        context_instance=RequestContext(request))
+    return HttpResponse(response, mimetype='application/html')
 
 def redirect_project_to_projects(request, project__name):
     new_url = reverse(project, kwargs={'project__name': project__name})

@@ -31,7 +31,7 @@
             <li><a href='{% url mysite.missions.base.views.main_page %}'>training</a></li>
             <li><a href='/events/'>events</a></li>
             {% if user|has_permission:'can_view_projects' %}
-            <li><a href='{% url mysite.search.views.fetch_bugs %}'>projects</a></li>
+            <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
             {% endif%}
             {% if user|has_permission:'can_view_people' %}
             <li><a href='{% url mysite.profile.views.people%}'>people</a></li>

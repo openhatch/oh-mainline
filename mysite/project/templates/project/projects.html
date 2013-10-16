@@ -43,90 +43,178 @@ about the projects we index
 {% endblock %}
 
 {% block pagetop %}
-    <h3>
-        <a href='{% url mysite.project.views.projects %}'>
-            <img alt='Projects on OpenHatch' id='projects' alt='Projects on OpenHatch' src={% version '/static/images/projects.png' %} width='960' height='141'/>
-        </a>
-    </h3>
+<h3>
+    <a href='{% url mysite.project.views.projects %}'>
+        <img alt='Projects on OpenHatch' id='projects' alt='Projects on OpenHatch' src={% version '/static/images/projects.png' %} width='960' height='141'/>
+    </a>
+</h3>
 {% endblock pagetop %}
 
 {% block main %}
 <div id='big-project-list' class='module'>
     <div class='module-content body'>
-        <meta http-equiv="content-Language" content="en_US" />
-	<h4>
-            <label for="search_q">Search for a project</label>
-        </h4>
-        <form method="GET" action="" style='width: 100%; float: left; '>
-                <input type="text" name="q" id="search_q" value="{{ query }}" />
-                <input type="submit" value='Search'>
+
+        <form method="post" action=".">
+            <label for="search_q">Search for a project</label><br />
+            <input class="search_bar" type="text" name="q" id="search_q" value="{{ query }}" />
+            <input class="search_bar" type="submit" value='Search'>
+
+            {% if user|has_permission:'can_filter_projects' %}
+            <div>
+                <fieldset id="search-filters">
+                    <legend>Criteria</legend>
+                    <div id="filter_buttons" class="buttons-overlay">
+                        <button id="filter_submit">Filter Results</button>
+                        <button id="expandAllButton">Expand All</button>
+                        <button id="collapseAllButton">Collapse All</button>
+                        <button id="resetButton">Reset Filters</button>
+                    </div>
+                    <div class="input">
+                        <div>
+                            <label for="filter_language">Speak & write language:</label>
+                        </div>
+                        <div>
+                            <input id="filter_language" name="filter_language" type="text" />
+                        </div>
+                    </div>
+                    <div class="clear">
+                        <div>
+                            <label>Skills:</label>
+                            <a class="collapse-button" href="#">+</a>
+                        </div>
+                        <ul class="list-hidden">
+                            {% for skill in skills %}
+                            <li>
+                                <input type="checkbox" name="skills" id="skill_{{ skill.id }}" value="{{ skill.id }}" />
+                                <label for="skill_{{ skill.id }}">{{ skill.name }}</label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="clear">
+                        <div>
+                            <label>Organizations:</label>
+                            <a class="collapse-button" href="#">+</a>
+                        </div>
+                        <ul class="list-hidden">
+                            {% for organization in organizations %}
+                            <li>
+                                <input type="checkbox" name="organizations" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
+                                <label for="organization_{{ organization.id }}">{{ organization.name }}</label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="clear">
+                        <div>
+                            <label>Languages:</label>
+                            <a class="collapse-button" href="#">+</a>
+                        </div>
+                        <ul class="list-hidden">
+                            {% for language in languages %}
+                            <li>
+                                <input type="checkbox" name="languages" id="language_{{ language.id }}" value="{{ language.id }}" />
+                                <label for="language_{{ language.id }}">{{ language.name }}</label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="clear">
+                        <div>
+                            <label>Duration:</label>
+                            <a class="collapse-button" href="#">+</a>
+                        </div>
+                        <ul class="list-hidden">
+                            {% for dur in duration %}
+                            <li>
+                                <input type="checkbox" name="duration" id="duration_{{ dur.id }}" value="{{ dur.id }}" />
+                                <label for="duration_{{ dur.id }}">{{ dur.name }}</label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+
+            {% endif %}
+
         </form>
-        
-        {% if query %}
+
+    <script>
+        $(document).ready(function() {
+            $('#filter_submit').click(function(e) {
+                e.preventDefault();
+
+                var getCheckboxValues = function (name) {
+                    var list = [];
+
+                    $('ul.list-hidden input[type="checkbox"][name="' + name + '"]').each(function (index, item) {
+                        if ($(item).is(':checked')) {
+                            list.push(parseInt($(item).val()));
+                        }
+                    });
+
+                    return list;
+                };
+
+                var getRadioValue = function (name) {
+                    var value = $('ul.list-hidden input[type="radio"][name="' + name + '"]:checked');
+                    if (value.length > 0) {
+                        return $(value).val();
+                    }
+
+                    return null;
+                };
+
+                post_data = {
+                    project_ids: {{ project_ids }},
+                    filter_language: $('#filter_language').val(),
+                    skills: getCheckboxValues('skills'),
+                    organizations: getCheckboxValues('organizations'),
+                    languages: getCheckboxValues('languages'),
+                    duration: getCheckboxValues('duration')
+                };
+
+                var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
+                var loading = $(document.createElement('div')).addClass('loading').append(img);
+                $('#results').html(loading);
+
+                $.post('filter/', post_data).success(function (response) {
+                    $('#results').replaceWith(response);
+                }).error(function () {
+                    var error_msg = '<p class="error-message">Unexpected error!</p>';
+                    $('#results').html(error_msg);
+                });
+            });
+        });
+    </script>
+
+        {% if query and matching_projects %}
+        <p style='float: left; width: 100%; margin-top: 0; margin-bottom: 20px;'>
+            You searched for &ldquo;{{ query }}&rdquo;.
+            Here {{ matching_projects|pluralize:"is,are" }} your
+            {{ matching_projects|length }} result{{ matching_projects|pluralize}}.
+        </p>
+        {% include 'project/project_list.html' %}
+        {% else %}
             {% if matching_projects %}
-                <p style='float: left; width: 100%; margin-top: 0; margin-bottom: 20px;'>
-                    You searched for &ldquo;{{ query }}&rdquo;.
-                    Here {{ matching_projects|pluralize:"is,are" }} your
-                    {{ matching_projects|length }} result{{ matching_projects|pluralize}}.
-                </p>
-                <ul>
-                    {% for project in matching_projects %}
-                        {% include 'project/project_list_item.html' %}
-                    {% endfor %}
-                </ul>
+                {% include 'project/project_list.html' %}
             {% else %}
                 <p style='font-size: 1.2em; float: left; width: 100%; margin-top: 10px;'>
-                    No matches for {{query}} :(
+                    No matches for {{ query }} :(
                 </p>
             {% endif %}
-
-            {% if no_project_matches_query_exactly %}
-                <form method="POST"
-                        name="create_project"
-                        action="{% url mysite.project.views.create_project_page_do %}"
-                        style='clear: left; float: left; padding: 8px;
-                        -moz-border-radius: 8px; border-radius: 8px;
-                        background-color: #ffc; '>{% csrf_token %}
-                    <input type='hidden' name='project_name' value='{{ query }}'>
-
-                    <input style='float: left; color: #444; padding: 8px; font-size: 1.5em;' type="submit" value='Start a page for {{ query }} &raquo;'>
-                </form>
-            {% endif %}
-        {% endif %}
-            
-
-        {% if projects_with_bugs %}
-        {% cache 86400 projects_with_bugs %}{# cache for one day 86400 #}
-        <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})
-        <span class='note'>These numbers just include bugs and contributors in our network.</span>
-        </h4>
-        <ul>
-            {% for project in projects_with_bugs %}
-                {% include 'project/project_list_item.html' %}
-            {% endfor %}
-        </ul>
-        {% endcache %}
-        {% endif %}
-
-        {% if cited_projects_lacking_bugs %}
-        {% cache 86400 cited_projects_lacking_bugs %}
-        <h4>Projects without bugs</h4>
-        <ul>
-            {% for project in cited_projects_lacking_bugs %}
-                {% include 'project/project_list_item.html' %}
-            {% endfor %}
-        </ul>
-        {% endcache %}
         {% endif %}
 
     </div>
 </div>
 <style>
-    #big-project-list li { width: 160px; float: left; margin: 0 50px 20px 0; }
-    #big-project-list li a { font-size: 120%; }
-    .summary { color: #444; margin-top: 5px; }
-    .first-in-row { clear: left; }
     h4 { width: 100%; margin-top: 20px; margin-bottom: 10px; }
     h4:first-child { margin-top: 0px; }
 </style>
 {% endblock main %}
+
+{% block js_in_head %}
+{{ block.super }}
+<script src="/static/js/collapse.js" type="text/javascript"></script>
+{% endblock %}

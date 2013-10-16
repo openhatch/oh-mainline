@@ -22,7 +22,7 @@ import os.path
 import shutil
 
 from mysite.search.models import Project, get_image_data_scaled
-from mysite.base.models import Skill, Organization, Experience
+from mysite.base.models import Skill, Organization, Experience, Language
 import mysite.customs.models
 import mysite.profile.view_helpers
 import mysite.base.models
@@ -35,6 +35,8 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from mysite.base.models import Skill, Organization
+from django.forms import ModelForm
 
 import datetime
 import uuid

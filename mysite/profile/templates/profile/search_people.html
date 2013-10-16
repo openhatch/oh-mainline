@@ -187,16 +187,6 @@ People Search
             $('#filter_submit').click(function(e) {
                 e.preventDefault();
 
-                var getPeopleIds = function () {
-                    var ids = [];
-
-                    $('#results .user').each(function(index, item) {
-                        ids.push($(item).attr('id'));
-                    });
-
-                    return ids;
-                };
-
                 var getCheckboxValues = function(name) {
                     var list = [];
 
@@ -235,57 +225,12 @@ People Search
                 var loading = $(document.createElement('div')).addClass('loading').append(img);
                 $('#results').html(loading);
 
-                $.post('filter/', post_data,function (response) {
+                $.post('filter/', post_data).success(function(response) {
                     $('#results').replaceWith(response);
                 }).error(function () {
                     var error_msg = '<p class="error-message">Unexpected error!</p>';
                     $('#results').html(error_msg);
                 });
-            });
-
-            $('a.collapse-button').click(function(e) {
-                e.preventDefault();
-
-                var div = $(this).parent().next();
-                var display = div.css('display');
-                var text = $(this).text();
-                var newDisplay = (display == 'none') ? 'block' : 'none';
-                var newText = (text == '-') ? '+' : '-';
-
-                div.css('display', newDisplay);
-                $(this).text(newText);
-            });
-
-            $('#resetButton').click(function(e) {
-                e.preventDefault();
-
-                $('#filter_name').val('');
-                $('#filter_company_name').val('');
-                $('#filter_email').val('');
-                $('ul.list-hidden input[type="checkbox"][name="skills"]').prop('checked', false);
-                $('ul.list-hidden input[type="checkbox"][name="organizations"]').prop('checked', false);
-                $('ul.list-hidden input[type="checkbox"][name="causes"]').prop('checked', false);
-                $('ul.list-hidden input[type="checkbox"][name="languages"]').prop('checked', false);
-                $('ul.list-hidden input[type="radio"][name="time_to_commit"]').prop('checked', false);
-                $('ul.list-hidden input[type="radio"][name="opensource"]').prop('checked', false);
-            });
-
-            function toggleCollapseAll(collapse) {
-                var display = (collapse === true) ? 'none' : 'block';
-                var text = (collapse === true) ? '+' : '-';
-
-                $('ul.list-hidden').css('display', display);
-                $('a.collapse-button').text(text);
-            }
-
-            $('#collapseAllButton').click(function(e) {
-                e.preventDefault();
-                toggleCollapseAll(true);
-            });
-
-            $('#expandAllButton').click(function(e) {
-                e.preventDefault();
-                toggleCollapseAll(false);
             });
         });
     </script>
@@ -499,8 +444,8 @@ People Search
 
 {% block js_in_head %}
 {{ block.super }}
+<script src="/static/js/collapse.js" type="text/javascript"></script>
 {% endblock %}
-
 
 {% block js_before_bundle %}
     <script type="text/javascript">

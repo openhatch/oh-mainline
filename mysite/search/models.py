@@ -38,7 +38,8 @@ import mysite.customs.ohloh
 import mysite.base.depends
 import mysite.base.decorators
 import django.contrib.contenttypes.models
-from mysite.base.models import Skill, Organization
+from mysite.base.models import Skill, Organization, Duration, Language
+
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -126,7 +127,7 @@ class Project(OpenHatchModel):
     def create_dummy(**kwargs):
         data = dict(name=uuid.uuid4().hex,
                 icon_raw='/static/no-project-icon.png',
-                    language='C')
+                    language='English')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()
@@ -136,7 +137,7 @@ class Project(OpenHatchModel):
     def create_dummy_no_icon(**kwargs):
         data = dict(name=uuid.uuid4().hex,
                 icon_raw='',
-                    language='C')
+                    language='English')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()
@@ -146,13 +147,14 @@ class Project(OpenHatchModel):
             help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
     display_name = models.CharField(max_length=200, default='',
             help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
-    display_name = models.CharField(max_length=200, default='')
     homepage = models.URLField(max_length=200, blank=True, default='',
             verbose_name='Project homepage URL')
     language = models.CharField(max_length=200, blank=True, default='',
-            verbose_name='Primary programming language')
+            verbose_name='Speak & write language')
     skills = models.ManyToManyField(Skill)
-    organization = models.ForeignKey(Organization, null=True)
+    organization = models.ForeignKey(Organization, default=1)
+    duration = models.ForeignKey(Duration, default=1)
+    languages = models.ManyToManyField(Language)
 
     def invalidate_all_icons(self):
         self.icon_raw = None

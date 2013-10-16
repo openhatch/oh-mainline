@@ -75,6 +75,15 @@ class Experience(models.Model):
     def __str__(self):
         return self.name
 
+class Language(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class Duration(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
+class Experience(models.Model):
+    name = models.CharField(default='', unique=True, null=False, max_length=100)
+
 ### Adjustments to default Django sqlite3 behavior
 def activate_foreign_keys(sender, connection, **kwargs):
     """Enable integrity constraint with sqlite."""

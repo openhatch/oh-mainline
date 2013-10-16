@@ -17,6 +17,7 @@
 
 import mysite.search.models
 import logging
+
 KEY='answer_ids_that_are_ours'
 PROJECTS_TO_HELP_OUT_KEY='projects_we_want_to_help_out'
 
@@ -78,3 +79,21 @@ def get_wanna_help_queue_from_session(session):
         ret.append(project)
     ret = list(set(ret))
     return ret
+
+
+def filter_projects(projects, post_data):
+    filtered_projects = projects
+
+    if 'filter_language' in post_data and len(post_data.get('filter_language')) > 0:
+        language = post_data.get('filter_language', '')
+        filtered_projects = filtered_projects.filter(language__contains=language)
+    if 'skills[]' in post_data:
+        filtered_projects = filtered_projects.filter(skills__pk__in=post_data.getlist('skills[]'))
+    if 'organizations[]' in post_data:
+        filtered_projects = filtered_projects.filter(organization__pk__in=post_data.getlist('organizations[]'))
+    if 'duration[]' in post_data:
+        filtered_projects = filtered_projects.filter(duration__pk__in=post_data.getlist('duration[]'))
+    if 'languages[]' in post_data:
+        filtered_projects = filtered_projects.filter(languages__pk__in=post_data.getlist('languages[]'))
+
+    return filtered_projects

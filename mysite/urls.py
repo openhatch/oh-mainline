@@ -385,6 +385,8 @@ urlpatterns = patterns('',
 
         (r'^\+do/search.views.subscribe_to_bug_alert_do$', 'mysite.search.views.subscribe_to_bug_alert_do'),
 
+        (r'^projects/filter/$', 'mysite.project.views.project_filter'),
+
         (r'^projects/', include('mysite.project.urls')),
 
         (r'^\+projects/$', lambda x: HttpResponsePermanentRedirect('/projects/')),

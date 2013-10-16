@@ -130,6 +130,139 @@
         "pk": 3,
         "fields": {
             "name": "Expert"
+            }
+    },
+    {
+        "model": "base.Language",
+        "pk": 1,
+        "fields": {
+            "name": "C"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 2,
+        "fields": {
+            "name": "C++"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 3,
+        "fields": {
+            "name": "C#"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 4,
+        "fields": {
+            "name": "HTML/CSS"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 5,
+        "fields": {
+            "name": "Java"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 6,
+        "fields": {
+            "name": "Java on Android"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 7,
+        "fields": {
+            "name": "JavaScript"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 8,
+        "fields": {
+            "name": "Objective C"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 9,
+        "fields": {
+            "name": "Objective C on iPhone"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 10,
+        "fields": {
+            "name": "Perl"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 11,
+        "fields": {
+            "name": "PHP"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 12,
+        "fields": {
+            "name": "Python"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 13,
+        "fields": {
+            "name": "Ruby"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 14,
+        "fields": {
+            "name": "Scala"
+        }
+    },
+    {
+        "model": "base.Duration",
+        "pk": 1,
+        "fields": {
+            "name": "Less than month"
+        }
+    },
+    {
+        "model": "base.Duration",
+        "pk": 2,
+        "fields": {
+            "name": "1 - 3 months"
+        }
+    },
+    {
+        "model": "base.Duration",
+        "pk": 3,
+        "fields": {
+            "name": "3 - 6 months"
+        }
+    },
+    {
+        "model": "base.Duration",
+        "pk": 4,
+        "fields": {
+            "name": "6 - 12 months"
+        }
+    },
+    {
+        "model": "base.Duration",
+        "pk": 5,
+        "fields": {
+            "name": "More than 12 months"
         }
     }
 ]
