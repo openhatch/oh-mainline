@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% load base_extras %}
 
 {% block title %}
 {{ person.get_full_name_or_username }}
@@ -27,6 +28,7 @@
 {% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
 
 {% block main %}
+{% if person.user == user or user|has_group:'ADMIN' %}
 <div id='portfolio' class='module project-display viewer'>
     <div class='module-head'>
         <ul>
@@ -112,7 +114,6 @@
                 <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
             {% endif %}
         {% endwith %}
-
     </div>
     <div class="module-foot">
         {% if editable and person.get_published_portfolio_entries %}
@@ -131,6 +132,7 @@
         {% endif %}
     </div>
 </div> <!-- /#portfolio -->
+{% endif %}
 {% endblock main %}
 
 {% block js %}

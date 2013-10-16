@@ -80,9 +80,11 @@
           {% endif %}
 
           {% if person.show_email and person.user.email %}
-          <div>
-              <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
-          </div>
+              {% if person.user == user or user|has_group:'ADMIN' %}
+                  <div>
+                      <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
+                  </div>
+              {% endif %}
           {% endif %}
 	      
 	    </div>
