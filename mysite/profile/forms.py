@@ -79,8 +79,9 @@ class EditInfoForm(django.forms.Form):
     organizations = django.forms.ModelMultipleChoiceField(
         required=False, queryset=Organization.objects.all(), widget=django.forms.CheckboxSelectMultiple)
     other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
+    private = django.forms.BooleanField(required=False)
     studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    subscribed = django.forms.BooleanField(required=False, label='yes')
+    subscribed = django.forms.BooleanField(required=False)
     times_to_commit = django.forms.ModelChoiceField(
         required=False, empty_label=None, queryset=TimeToCommit.objects.all(),widget=django.forms.RadioSelect())
     understands = django.forms.CharField(required=False, widget=django.forms.Textarea())

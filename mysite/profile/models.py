@@ -160,7 +160,7 @@ class Person(models.Model):
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
     linked_in_url = models.URLField(default="", blank=True)
-
+    private = models.BooleanField(default=True)
     heard_from = models.ManyToManyField(Heard_From)
     comment = models.TextField(default="", blank=True)
     subscribed = models.NullBooleanField(default=None)

@@ -140,6 +140,7 @@
                             </div>
                             {{ form.open_source.errors }}
                             {{ form.open_source }}
+                            <label>Yes, I did.</label>
                         </div>
 
                         <div class='form-row'>
@@ -200,10 +201,20 @@
 
                         <div class='form-row'>
                             <div>
-                                <label class='header-label'>Would you like us to keep you posted on the latest news from SocialCoding4Good?  </label>
+                                <label class='header-label'>Would you like us to keep you posted on the latest news from SocialCoding4Good?</label>
                             </div>
                             {{ form.subscribed.errors }}
                             {{ form.subscribed }}
+                            <label>Yes, please!</label>
+                        </div>
+
+                        <div class='form-row'>
+                            <div>
+                                <label class='header-label'>Do you want to have private profile?</label>
+                            </div>
+                            {{ form.private.errors }}
+                            {{ form.private }}
+                            <label>Yes, keep my profile private.</label>
                         </div>
 
                         <div class='form-row'>

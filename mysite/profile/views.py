@@ -317,6 +317,7 @@ def edit_person_info_do(request):
     person.opensource = edit_info_form['open_source'].data
     person.organization = edit_info_form['organizations'].data
     person.other_name = edit_info_form['other_name'].data
+    person.private = edit_info_form['private'].data
     person.skill = edit_info_form['skills'].data
     person.subscribed = edit_info_form['subscribed'].data
     if edit_info_form['times_to_commit'].data is not None:
@@ -918,6 +919,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
             'open_source': person.opensource,
             'organizations': Cause.objects.filter(person=person._get_pk_val),
             'other_name': person.other_name,
+            'private': person.private,
             'skills': Skill.objects.filter(person=person._get_pk_val),
             'subscribed': person.subscribed,
             'times_to_commit': person.time_to_commit,
