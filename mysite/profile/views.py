@@ -682,6 +682,7 @@ def prepare_data_import_attempts(identifiers, user):
                 dia.save()
                 dia.do_what_it_says_on_the_tin()
 
+@has_permissions(['add_portfolioentry', 'change_portfolioentry'])
 @login_required
 @view
 def importer(request, test_js = False):
@@ -838,7 +839,7 @@ def delete_portfolio_entry_do(request):
             'success': True,
             'portfolio_entry__pk': pk})
 
-
+@has_permissions(['add_portfolioentry', 'change_portfolioentry'])
 @login_required
 def save_portfolio_entry_do(request):
     pk = request.POST.get('portfolio_entry__pk', 'undefined')
