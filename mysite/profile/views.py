@@ -34,10 +34,10 @@ from django.template.loader import render_to_string
 from django.template import RequestContext, Context
 from django.core import serializers
 from django.http import \
-        HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
+        HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User, Permission
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
@@ -56,7 +56,7 @@ from mysite.profile.models import \
         Link_Project_Tag, Link_Person_Tag, \
         DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, Heard_From, Experience
 from mysite.search.models import Project
-from mysite.base.decorators import view, as_view, has_permissions
+from mysite.base.decorators import view, as_view, has_permissions, __has_permissions
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
@@ -126,6 +126,9 @@ def display_person_web(request, user_to_display__username=None):
 
     user = get_object_or_404(User, username=user_to_display__username)
     person, was_created = Person.objects.get_or_create(user=user)
+
+    if person.private and request.user != user and __has_permissions(request.user,['can_view_people']) == False:
+        raise Http404
 
     data = get_personal_data(person)
     data['edit_mode'] = False
