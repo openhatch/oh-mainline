@@ -176,7 +176,7 @@ urlpatterns = patterns('',
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 
-        (r'^$', 'mysite.base.views.home'),
+        (r'^$', 'mysite.profile.views.dollar_username'),
         (r'^\+theme-stubs/wordpress/index$', 'mysite.base.views.wordpress_index'),
 
         (r'^\+landing/import$', 'mysite.base.views.landing_for_documenters'),
@@ -416,16 +416,8 @@ urlpatterns = patterns('',
         # the OpenHatch guide
         (r'^guide/$', direct_to_template, {'template': 'base/guide.html'}),
 
-        # the OpenHatch events page
-        (r'^events/$', direct_to_template, {'template': 'base/events.html'}),
-
         # the OpenHatch sponsors page
         (r'^sponsors/$', direct_to_template, {'template': 'base/sponsors.html'}),
-
-        # the OpenHatch donate page
-        (r'^donate/$', direct_to_template, {'template': 'base/donate.html'}),
-        # the OpenHatch donate page
-        (r'^donate/t-shirts/$', direct_to_template, {'template': 'base/shirts.html'}),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)/$',

@@ -95,7 +95,6 @@
             body#project .next_steps_for_helpers { 
                 background-image:
                 url({% version '/static/images/bg-translucent-green.png' %}); }
-            #footer { background: #333 url('/static/images/dark-hatch.png') repeat; }
 
             {% endblock css %}
             /*]]>*/
@@ -159,36 +158,10 @@
           <div id='footer'>
             {% block footer %}
 	    <div class="threecol">
-              <div class="column">
-                <h3>OpenHatch organization</h3>
-
-                <ul>
-                  <li><a href="/about/">about openhatch</a></li>
-                  <li><a href="/sponsors/">sponsors</a></li>
-                  <li><a href="/blog/">blog</a></li>
-                  <li><a href="/contact/">contact</a></li>
-                  <li><a href="https://openhatch.org/wiki/Privacy_policy">privacy policy</a></li>
-                </ul>
-              </div>
-
-	      <div class="column">
-		<h3>OpenHatch web app code</h3>
-		<ul>
-		  <li><a href="http://openhatch.readthedocs.org/en/latest/README.html">Intro for developers</a></li>
-		  <li><a href="https://github.com/openhatch/oh-mainline">Github (source code)</a></li>
-		  <li><a href="http://lists.openhatch.org/mailman/listinfo/devel">Devel mailing list</a></li>
-		  <li><a href="http://openhatch.readthedocs.org/">Code docs</a></li>
-		  <li><a href="https://openhatch.org/bugs/">Bug tracker</a></li>
-		</ul>
-	      </div>
-
-	      <div class="column">
-		<h3>Other web tools</h3>
-		<ul>
-                  <li><a href="/wiki/">wiki</a></li>
-                  <li><a href="http://forum.openhatch.org/">forum</a></li>
-		</ul>
-	      </div>
+        <a href="http://soldevelo.com/">
+            <img class="footer" src="/static/images/soldevelo_logo.png">
+            <span>OpenHatch fork developed by SolDevelo</span>
+        </a>
 	    </div>
             {% endblock footer %}
           </div>
