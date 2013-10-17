@@ -480,7 +480,7 @@ def export_to_html(people):
 
 def export_to_xml(people):
     response = HttpResponse(content_type = "application/xml")
-    response['Content-Disposition'] = 'attachment; filename="sc4g-people.html"'
+    response['Content-Disposition'] = 'attachment; filename="sc4g-people.xml"'
     xml = XMLBuilder('volunteers')
     for person in people:
         with xml.volunteer:
