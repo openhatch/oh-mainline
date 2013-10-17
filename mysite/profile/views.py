@@ -43,6 +43,8 @@ from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 import csv
 from django.core.exceptions import ObjectDoesNotExist
+from mysite.libs import HTML
+from xmlbuilder import XMLBuilder
 
 # OpenHatch apps
 import mysite.base.view_helpers
@@ -432,28 +434,74 @@ def permanent_redirect_to_people_search(request, property, value):
 def manyToString(many):
     res = ""
     for obj in many.all():
-        res += obj.name + ";"
+        res += obj.name + "; "
     return res
+
+def prepare_person_row(person):
+    empty = "N/A"
+    try:
+        time_to_commit = person.time_to_commit.name or empty if person.time_to_commit else empty
+    except ObjectDoesNotExist:
+        time_to_commit = empty
+    return [person.user.username,
+            person.user.email,
+            person.homepage_url or empty,
+            person.company_name or empty,
+            time_to_commit,
+            manyToString(person.cause) or empty,
+            manyToString(person.language) or empty]
 
 def export_to_csv(people):
     response = HttpResponse(content_type = "text/csv")
     response['Content-Disposition'] = 'attachment; filename="sc4g-people.csv"'
     writer = csv.writer(response)
     writer.writerow(['Username', 'E-mail', 'Homepage', 'Company name', 'Time to commit', 'Cause', 'Language'])
-    empty = "N/A"
-
     for person in people:
-        try:
-            time_to_commit = person.time_to_commit.name or empty if person.time_to_commit else empty
-        except ObjectDoesNotExist:
-            time_to_commit = empty
-        writer.writerow([person.user.username,
-                         person.user.email,
-                         person.homepage_url or empty,
-                         person.company_name or empty,
-                         time_to_commit,
-                         manyToString(person.cause) or empty,
-                         manyToString(person.language) or empty])
+        writer.writerow(prepare_person_row(person))
+    return response
+
+def export_to_json(people):
+    response = HttpResponse(content_type = "application/json")
+    response['Content-Disposition'] = 'attachment; filename="sc4g-people.json"'
+    to_export = []
+    for person in people:
+        to_export.append(prepare_person_row(person))
+    response.content = simplejson.dumps(to_export)
+    return response
+
+def export_to_html(people):
+    response = HttpResponse(content_type = "text/html")
+    response['Content-Disposition'] = 'attachment; filename="sc4g-people.html"'
+    table = HTML.Table(header_row=['Username', 'E-mail', 'Homepage', 'Company name', 'Time to commit', 'Cause', 'Language'])
+    for person in people:
+        table.rows.append(prepare_person_row(person))
+    response.content = str(table)
+    return response
+
+def export_to_xml(people):
+    response = HttpResponse(content_type = "application/xml")
+    response['Content-Disposition'] = 'attachment; filename="sc4g-people.html"'
+    xml = XMLBuilder('volunteers')
+    for person in people:
+        with xml.volunteer:
+            xml.username(person.user.username)
+            xml.email(person.user.email)
+            if person.homepage_url:
+                xml.homepage(person.homepage_url)
+            if person.company_name:
+                xml.companyName(person.company_name)
+            try:
+                if person.time_to_commit:
+                    xml.timeToCommit(person.time_to_commit.name)
+            except ObjectDoesNotExist:
+                pass
+            with xml.causes:
+                for cause in person.cause.all():
+                    xml.cause(cause.name)
+            with xml.languages:
+                for language in person.language.all():
+                    xml.language(language.name)
+    response.content = str(xml)
     return response
 
 def people_export(request):
@@ -468,10 +516,8 @@ def people_export(request):
     people = mysite.profile.view_helpers.filter_people(people, request.POST)
 
     format = request.GET.get('format', 'csv')
-    return {
-        'csv': export_to_csv(people),
-      # 'excel': export_to_excel(people), etc...
-    }[format]
+    if format in ['csv', 'json', 'html', 'xml']:
+        return globals()["export_to_" + format](people)
 
 def people_filter(request):
     post_data = request.POST
@@ -524,7 +570,7 @@ def people(request):
         people_ids.append(int(person.id))
 
     data['people_ids'] = simplejson.dumps(people_ids)
-    data['export_formats'] = {"csv": "CSV"}
+    data['export_formats'] = {"csv": "CSV", "json": "JSON", "html": "HTML Table", 'xml': 'XML'}
     data['skills'] = Skill.objects.all()
     data['organizations'] = Organization.objects.all()
     data['causes'] = Cause.objects.all()

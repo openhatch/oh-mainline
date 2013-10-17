@@ -26,7 +26,6 @@ import django_authopenid.views
 from django.contrib.auth.models import User
 from mysite.base.models import Experience, Organization, Skill, Language
 from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit
-import uuid
 
 from django.contrib.sessions.models import Session
 
@@ -521,10 +520,10 @@ def register(request, template_name='authopenid/complete.html',
 
 def insert_volunteer(request):
     form = mysite.account.forms.InsertVolunteerForm(request.POST)
-    username = uuid.uuid4()
     first_name = form['first_name'].data
     last_name = form['last_name'].data
     email = form['email'].data
+    username = email
     password = "super-secret"
     user = User.objects.create(username = username, first_name = first_name, last_name = last_name, email = email, password = password)
     user.save()
@@ -553,7 +552,9 @@ def insert_volunteer(request):
     person.subscribed = form['yes'].data == "yes"
     person.language_spoken = form['what_languages'].data
     person.comment = form['comments'].data
-    person.experience = Experience.objects.get(name=form['Experience_level'].data)
+    experience_level = form['Experience_level'].data
+    if experience_level:
+        person.experience = Experience.objects.get(name=experience_level)
     person.save()
     return django.shortcuts.redirect("http://www.socialcoding4good.org/volunteering/volunteer")
 
