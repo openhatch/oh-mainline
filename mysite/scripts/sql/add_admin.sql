@@ -26,8 +26,8 @@ INSERT INTO profile_person ('photo', 'photo_thumbnail_30px_wide', 'photo_thumbna
     'location_confirmed', 'linked_in_url', 'expand_next_steps', 'location_display_name',
     'time_to_commit_id', 'homepage_url', 'gotten_name_from_ohloh', 'email_me_re_projects',
     'google_code_name', 'comment', 'language_spoken', 'other_name', 'github_name', 'subscribed',
-    'experience_id')
+    'experience_id', 'uploaded_to_zoho')
     VALUES ('', '', '', 'admin', '1', '', CURRENT_TIMESTAMP, '1', '', '0', '', '',
-        '1', '1', '', '1', '', '1', '', '0', '0', '', '', '', '', '', '1', '1');
+        '1', '1', '', '1', '', '1', '', '0', '0', '', '', '', '', '', '1', '1', '1');
 
 INSERT INTO auth_user_groups ('user_id', 'group_id') VALUES ('1', '1');

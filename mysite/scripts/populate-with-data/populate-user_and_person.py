@@ -71,11 +71,12 @@ for p in xrange(next_id, next_id + MAX_USERS):
     github_name = ''
     subscribed = False
     experience_id = random.randint(1, 3)
+    uploaded_to_zoho = False
     person_data.append((photo, photo_thumbnail_30px_wide, photo_thumbnail, irc_nick, user_id, photo_thumbnail_20px_wide,
                         last_polled, opensource, company_name, dont_guess_my_location, bio, contact_blurb, show_email,
                         location_confirmed, linked_in_url, expand_next_steps, location_display_name, time_to_commit_id,
                         homepage_url, gotten_name_from_ohloh, email_me_re_projects, google_code_name, comment,
-                        language_spoken, other_name, github_name, subscribed, experience_id))
+                        language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho))
 
 print 'Adding user rows...'
 user_sql = u'INSERT INTO auth_user (id, username, first_name, last_name, email, password, is_staff, is_active,' \
@@ -91,8 +92,8 @@ person_sql = u'INSERT INTO profile_person (photo, photo_thumbnail_30px_wide, pho
              u'photo_thumbnail_20px_wide, last_polled, opensource, company_name, dont_guess_my_location, bio,' \
              u'contact_blurb, show_email, location_confirmed, linked_in_url, expand_next_steps, location_display_name,' \
              u'time_to_commit_id, homepage_url, gotten_name_from_ohloh, email_me_re_projects, google_code_name,' \
-             u'comment, language_spoken, other_name, github_name, subscribed, experience_id)' \
-             u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             u'comment, language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho)' \
+             u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 cursor.executemany(person_sql, person_data)
 connection.commit()
 print '%s person rows added.' % MAX_USERS

@@ -169,6 +169,7 @@ class Person(models.Model):
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
     date_added = models.DateField(default=datetime.date.today, auto_now_add=True)
+    uploaded_to_zoho=models.BooleanField(default=False)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)
