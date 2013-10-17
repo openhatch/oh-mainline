@@ -17,7 +17,7 @@ INSERT OR IGNORE INTO auth_group_permissions('group_id', 'permission_id')
 
 INSERT INTO auth_user ('username', 'first_name', 'last_name', 'email', 'password', 'is_staff',
     'is_active', 'is_superuser', 'last_login', 'date_joined')
-    VALUES ('admin', '', '', 'admin@admin.org', 'sha1$2e371$0230d0b7fa33dff4750ea4cdca98523cb75ae43b',
+    VALUES ('admin', 'admin', 'admin', 'admin@admin.org', 'sha1$2e371$0230d0b7fa33dff4750ea4cdca98523cb75ae43b',
         '1', '1', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO profile_person ('photo', 'photo_thumbnail_30px_wide', 'photo_thumbnail',

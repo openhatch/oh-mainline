@@ -18,10 +18,10 @@
 {% endcomment %}
 {% load profile_extras %}
 
-<li class="project_item_container">
+<li class="search_card_project">
     <fieldset>
         <legend>
-            <a href="{{ project.name }}">{{ project.display_name }}</a>
+            <a class="legend" href="{{ project.name }}">{{ project.display_name }}</a>
         </legend>
         <p><strong>Homepage:</strong> <a href="{{ project.homepage }}">{{ project.homepage }}</a></p>
         <p><strong>Written language:</strong> {{ project.language }}</p>
@@ -45,25 +45,3 @@
         </p>
     </fieldset>
 </li>
-
-            {% comment %}<li
-            {% if forloop.counter0|divisibleby:"4" %}
-            class='first-in-row'
-            {% endif %}
-            >
-            <a href='{{ project.get_url }}'>
-                {{ project.display_name|safe }}
-            </a>
-            <div class='summary'>
-                {% if project.get_bug_count %}
-                {{ project.get_bug_count }} bug{{ project.get_bug_count|pluralize }}<!--
-                -->{% endif %}<!--
-                -->{% if project.get_bug_count and project.cached_contributor_count %},{% endif %}
-                {% with project.cached_contributor_count as count %}
-                {% if count %}
-                {{ count }} contributor{{ count|pluralize }}
-                {% endif %}
-                {% endwith %}
-            </div>
-            </li>{% endcomment %}
-

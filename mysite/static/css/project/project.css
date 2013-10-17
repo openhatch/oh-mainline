@@ -331,7 +331,7 @@ input[type=submit].search_bar {
     right: 12px;
 }
 
-li.project_item_container {
+li.search_card_project {
     width: 430px;
     display: inline-table;
     border-radius: 10px;
@@ -349,29 +349,30 @@ li.project_item_container {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f9f9f9', GradientType=0); /* IE6-9 */
 }
 
-li.project_item_container fieldset {
+li.search_card_project fieldset {
     border: none !important;
 }
 
-li.project_item_container fieldset p {
+li.search_card_project fieldset p {
     margin: 15px 0px 15px 0px;
 }
 
-li.project_item_container fieldset legend {
+li.search_card_project fieldset legend {
     font-family: Helvetica;
     font-weight: bold;
     border-bottom: 1px solid #DDDDDD;
-    width: 85%;
+    width: 400px;
     text-align: center;
+    margin: auto;
 }
 
-li.project_item_container fieldset legend a {
+li.search_card_project fieldset legend a.legend {
     width: 100%;
-    padding: 15px;
+    padding: 15px 0px 15px 0px;
     display: inline-block;
 }
 
-li.project_item_container fieldset ul li {
+li.search_card_project fieldset ul li {
     font-size: 10pt;
     display: inline-block;
 }

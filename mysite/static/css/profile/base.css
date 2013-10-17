@@ -172,3 +172,55 @@ div.input input[type=text] {
 .stubmit.field {
     margin-right: 0px !important;
 }
+
+li.search_card_profile {
+    width: 430px;
+    display: inline-table;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    box-shadow: #222222 2px 2px 5px;
+    margin: 0px 10px 20px 10px;
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top, #ffffff 0%, #f9f9f9 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #f9f9f9)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%, #f9f9f9 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ffffff 0%, #f9f9f9 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ffffff 0%, #f9f9f9 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f9f9f9', GradientType=0); /* IE6-9 */
+}
+
+li.search_card_profile fieldset {
+    border: none !important;
+}
+
+li.search_card_profile fieldset p {
+    margin: 15px 0px 15px 0px;
+}
+
+li.search_card_profile fieldset legend {
+    position: relative;
+    font-family: Helvetica;
+    font-weight: bold;
+    border-bottom: 1px solid #DDDDDD;
+    width: 400px;
+    text-align: center;
+}
+
+li.search_card_profile fieldset legend a.legend {
+    width: 100%;
+    padding: 15px 0px 15px 0px;
+    display: inline-block;
+}
+
+li.search_card_profile fieldset ul li {
+    font-size: 10pt;
+    display: inline-block;
+}
+
+li.search_card_profile fieldset legend a.linked_in {
+    position: absolute;
+    top: 12px;
+    right: 0px;
+}

@@ -1,4 +1,55 @@
-    <div id="results">
+<div id="results">
+{% for person in people %}
+    <li class="search_card_profile">
+        <fieldset>
+            <legend>
+                <a class="legend" href="{{ person.user.username }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
+                {% if person.linked_in_url %}
+                    <a class="linked_in" href="{{ person.linked_in_url }}">
+                        <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
+                    </a>
+                {% endif %}
+            </legend>
+            <p><strong>Company:</strong> {{ person.company }}</p>
+            <p><strong>Time to Commit:</strong> {{ person.time_to_commit }}</p>
+            <p>
+                <strong>Skills:</strong>
+            <ul>
+                {% for skill in person.skills.all %}
+                    <li>{{ skill.name }}{% if forloop.counter < person.skills.all|length %}, {% endif %}</li>
+                {% endfor %}
+            </ul>
+            </p>
+            <p>
+                <strong>Causes:</strong>
+                <ul>
+                    {% for cause in person.causes.all %}
+                        <li>{{ cause.name }}{% if forloop.counter < person.causes.all|length %}, {% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </p>
+            <p>
+                <strong>Organizations:</strong>
+                <ul>
+                    {% for organization in person.organizations.all %}
+                        <li>{{ organization.name }}{% if forloop.counter < person.organizations.all|length %}, {% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </p>
+            <p>
+                <strong>Languages:</strong>
+                <ul>
+                    {% for language in person.languages.all %}
+                        <li>{{ language.name }}{% if forloop.counter < person.languages.all|length %}, {% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </p>
+        </fieldset>
+    </li>
+{% endfor %}
+</div>
+
+{% comment %}    <div id="results">
         {% for person in people %}
             <div id="{{ person.id }}" class="user">
                 <div class="user-name">
@@ -24,4 +75,4 @@
             var name = $(this).find(".user-name-inner").html();
             window.location.href = '/people/' + name;
         });
-    </script>
+    </script>{% endcomment %}
