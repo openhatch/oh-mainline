@@ -86,14 +86,14 @@ def filter_projects(projects, post_data):
 
     if 'filter_language' in post_data and len(post_data.get('filter_language')) > 0:
         language = post_data.get('filter_language', '')
-        filtered_projects = filtered_projects.filter(language__contains=language)
+        filtered_projects = filtered_projects.filter(language__contains=language).distinct()
     if 'skills[]' in post_data:
-        filtered_projects = filtered_projects.filter(skills__pk__in=post_data.getlist('skills[]'))
+        filtered_projects = filtered_projects.filter(skills__pk__in=post_data.getlist('skills[]')).distinct()
     if 'organizations[]' in post_data:
-        filtered_projects = filtered_projects.filter(organization__pk__in=post_data.getlist('organizations[]'))
+        filtered_projects = filtered_projects.filter(organization__pk__in=post_data.getlist('organizations[]')).distinct()
     if 'duration[]' in post_data:
-        filtered_projects = filtered_projects.filter(duration__pk__in=post_data.getlist('duration[]'))
+        filtered_projects = filtered_projects.filter(duration__pk__in=post_data.getlist('duration[]')).distinct()
     if 'languages[]' in post_data:
-        filtered_projects = filtered_projects.filter(languages__pk__in=post_data.getlist('languages[]'))
+        filtered_projects = filtered_projects.filter(languages__pk__in=post_data.getlist('languages[]')).distinct()
 
     return filtered_projects

@@ -176,29 +176,29 @@ def filter_people(people, post_data):
         filtered_people = filtered_people.filter(
             Q(user__username__contains=name)
             | Q(user__first_name__contains=name)
-            | Q(user__last_name__contains=name))
+            | Q(user__last_name__contains=name)).distinct()
     if 'filter_company_name' in post_data and len(post_data.get('filter_company_name')) > 0:
         company_name = post_data.get('filter_company_name', '')
-        filtered_people = filtered_people.filter(company_name__contains=company_name)
+        filtered_people = filtered_people.filter(company_name__contains=company_name).distinct()
     if 'filter_email' in post_data and len(post_data.get('filter_email')) > 0:
-        filtered_people = filtered_people.filter(user__email=post_data.get('filter_email'))
+        filtered_people = filtered_people.filter(user__email=post_data.get('filter_email')).distinct()
     if 'skills[]' in post_data:
-        filtered_people = filtered_people.filter(skill__pk__in=post_data.getlist('skills[]'))
+        filtered_people = filtered_people.filter(skill__pk__in=post_data.getlist('skills[]')).distinct()
     if 'organizations[]' in post_data:
-        filtered_people = filtered_people.filter(organization__pk__in=post_data.getlist('organizations[]'))
+        filtered_people = filtered_people.filter(organization__pk__in=post_data.getlist('organizations[]')).distinct()
     if 'causes[]' in post_data:
-        filtered_people = filtered_people.filter(cause__pk__in=post_data.getlist('causes[]'))
+        filtered_people = filtered_people.filter(cause__pk__in=post_data.getlist('causes[]')).distinct()
     if 'languages[]' in post_data:
-        filtered_people = filtered_people.filter(language__pk__in=post_data.getlist('languages[]'))
+        filtered_people = filtered_people.filter(language__pk__in=post_data.getlist('languages[]')).distinct()
     if 'time_to_commit' in post_data and post_data.get('time_to_commit') != u'null':
-        filtered_people = filtered_people.filter(time_to_commit__pk=post_data.get('time_to_commit'))
+        filtered_people = filtered_people.filter(time_to_commit__pk=post_data.get('time_to_commit')).distinct()
     if 'opensource' in post_data:
         if post_data.get('opensource') == u'null' or post_data.get('opensource') is None\
             or post_data.get('opensource') == u'None':
-            filtered_people = filtered_people.filter(Q(opensource=True) | Q(opensource=False))
+            filtered_people = filtered_people.filter(Q(opensource=True) | Q(opensource=False)).distinct()
         else:
             opensource = literal_eval(post_data.get('opensource'))
-            filtered_people = filtered_people.filter(opensource=opensource)
+            filtered_people = filtered_people.filter(opensource=opensource).distinct()
     return filtered_people
 
 def parse_string_query(s):

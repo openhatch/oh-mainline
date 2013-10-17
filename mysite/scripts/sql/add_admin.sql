@@ -11,6 +11,10 @@ INSERT OR IGNORE INTO auth_group ('name') VALUES ('VOLUNTEER');
 INSERT OR IGNORE INTO auth_group_permissions ('group_id', 'permission_id')
     SELECT 1 as 'group_id', id as 'permission_id' from auth_permission;
 
+INSERT OR IGNORE INTO auth_group_permissions('group_id', 'permission_id')
+    SELECT 2 as 'group_id', id as 'permission_id' FROM auth_permission
+    WHERE codename IN ('can_view_people', 'can_filter_people');
+
 INSERT INTO auth_user ('username', 'first_name', 'last_name', 'email', 'password', 'is_staff',
     'is_active', 'is_superuser', 'last_login', 'date_joined')
     VALUES ('admin', '', '', 'admin@admin.org', 'sha1$2e371$0230d0b7fa33dff4750ea4cdca98523cb75ae43b',

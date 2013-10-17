@@ -17,7 +17,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 {% load profile_extras %}
-            <li
+
+<li class="project_item_container">
+    <fieldset>
+        <legend>
+            <a href="{{ project.name }}">{{ project.display_name }}</a>
+        </legend>
+        <p><strong>Homepage:</strong> <a href="{{ project.homepage }}">{{ project.homepage }}</a></p>
+        <p><strong>Written language:</strong> {{ project.language }}</p>
+        <p><strong>Organization:</strong> {{ project.organization.name }}</p>
+        <p><strong>Duration:</strong> {{ project.duration.name }}</p>
+        <p>
+            <strong>Skills:</strong>
+            <ul>
+            {% for skill in project.skills.all %}
+                <li>{{ skill.name }}{% if forloop.counter < project.skills.all|length %}, {% endif %}</li>
+            {% endfor %}
+            </ul>
+        </p>
+        <p>
+            <strong>Languages:</strong>
+            <ul>
+                {% for language in project.languages.all %}
+                    <li>{{ language.name }}{% if forloop.counter < project.languages.all|length %}, {% endif %}</li>
+                {% endfor %}
+            </ul>
+        </p>
+    </fieldset>
+</li>
+
+            {% comment %}<li
             {% if forloop.counter0|divisibleby:"4" %}
             class='first-in-row'
             {% endif %}
@@ -36,5 +65,5 @@
                 {% endif %}
                 {% endwith %}
             </div>
-            </li>
+            </li>{% endcomment %}
 

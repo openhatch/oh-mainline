@@ -45,7 +45,7 @@ for p in xrange(0, MAX_PROJECTS):
     cached_contributor_count = 1
     icon_raw = ''
     logo_contains_name = '0'
-    homepage = ''
+    homepage = 'http://127.0.0.1/'
     display_name = 'project_%s' % id
     organization_id = random.randint(1, 7)
     project_data.append((id, modified_date, date_icon_was_fetched_from_ohloh, duration_id, icon_smaller_for_badge,

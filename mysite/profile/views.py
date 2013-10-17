@@ -493,7 +493,7 @@ def people(request):
     post_data = request.POST
     query = request.POST.get('q', '')
 
-    # Store the raw query in the template data
+    # Store the raw query in the teemplate data
     data['raw_query'] = query
 
     # Parse the query, and store that in the template.
