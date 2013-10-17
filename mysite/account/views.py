@@ -24,7 +24,8 @@ import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
 import django_authopenid.views
 from django.contrib.auth.models import User
-from mysite.profile.models import Person, Skill
+from mysite.base.models import Experience, Organization, Skill, Language
+from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit
 import uuid
 
 from django.contrib.sessions.models import Session
@@ -525,14 +526,36 @@ def insert_volunteer(request):
     last_name = form['last_name'].data
     email = form['email'].data
     password = "super-secret"
-    skills = form['company_event_organization'].data
     user = User.objects.create(username = username, first_name = first_name, last_name = last_name, email = email, password = password)
     user.save()
     person = Person.objects.get(user=user)
-    for skill in skills:
-        person.add_skill(Skill.objects.get(name=skill))
-    person.company_name = "company-name"
+    for skill in form['skills'].data:
+        person.skill.add(Skill.objects.get(name=skill))
+    for language in form['languages'].data:
+        person.language.add(Language.objects.get(name=language))
+    for cause in form['causes_you_want_to_contribute_to'].data:
+        person.cause.add(Cause.objects.get(name=cause))
+    for org in form['hfoss_organizations_that_interest_you'].data:
+        person.organization.add(Organization.objects.get(name=org))
+    person.company_name = form['company_event_organization'].data
+    person.comment = form['comments'].data
+    person.linked_in_url = form['linkedin_profile_url'].data
+    person.language_spoken = form['what_languages'].data
+    person.github_name = form['github_profile___username'].data
+    person.other_name = form['other'].data
+    person.google_code_name = form['google_code'].data
+    time_to_commit = form['how_much_time_would_you_like_to_commit_to_volunteering'].data
+    if time_to_commit:
+        person.time_to_commit = TimeToCommit.objects.get(name=time_to_commit)
+    heard_from = Heard_From.objects.filter(name=form['how_did_you_hear_about_socialcoding4good'].data)
+    if len(heard_from) > 0:
+        person.heard_from = heard_from[0]
+    person.subscribed = form['yes'].data == "yes"
+    person.language_spoken = form['what_languages'].data
+    person.comment = form['comments'].data
+    person.experience = Experience.objects.get(name=form['Experience_level'].data)
     person.save()
+    return django.shortcuts.redirect("http://www.socialcoding4good.org/volunteering/volunteer")
 
 ### We use this "not_authenticated" wrapper so that if you *are* logged in, you go
 ### straight to the ?next= value.

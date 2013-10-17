@@ -39,7 +39,7 @@ class InsertVolunteerForm(django.forms.Form):
     company_event_organization = django.forms.CharField()
     hfoss_organizations_that_interest_you = django.forms.MultipleChoiceField()
     causes_you_want_to_contribute_to = django.forms.MultipleChoiceField()
-    how_much_time_would_you_like_to_commit_to_volunteering = django.forms.MultipleChoiceField()
+    how_much_time_would_you_like_to_commit_to_volunteering = django.forms.CharField()
     skills = django.forms.MultipleChoiceField()
     linkedin_profile_url = django.forms.CharField()
     have_you_previously_contributed_to_open_source_projects = django.forms.CharField()

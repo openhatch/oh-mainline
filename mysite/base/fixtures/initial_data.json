@@ -112,6 +112,13 @@
         }
     },
     {
+        "model": "base.Organization",
+        "pk": 8,
+        "fields": {
+            "name": "Mifos"
+        }
+    },
+    {
         "model": "base.Experience",
         "pk": 1,
         "fields": {
@@ -228,6 +235,20 @@
         "pk": 14,
         "fields": {
             "name": "Scala"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 15,
+        "fields": {
+            "name": "Django"
+        }
+    },
+    {
+        "model": "base.Language",
+        "pk": 16,
+        "fields": {
+            "name": "Other"
         }
     },
     {

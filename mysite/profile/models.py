@@ -157,6 +157,7 @@ class Person(models.Model):
     language = models.ManyToManyField(Language)
     opensource = models.NullBooleanField(default=None)
     time_to_commit = models.ForeignKey(TimeToCommit, default=1)
+    experience = models.ForeignKey(Experience, default=1)
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
     linked_in_url = models.URLField(default="", blank=True)
@@ -168,6 +169,7 @@ class Person(models.Model):
     other_name = models.TextField(default="", blank=True)
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
+    date_added = models.DateField(default=datetime.date.today, auto_now_add=True)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)

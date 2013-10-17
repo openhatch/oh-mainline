@@ -250,7 +250,7 @@ def __has_permissions(user, permissions=None):
 
 
 def has_group(group_name):
-    """
+    """-
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
     that takes the user object and returns True if the user passes.
