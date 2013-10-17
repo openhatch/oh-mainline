@@ -10,37 +10,37 @@
                     </a>
                 {% endif %}
             </legend>
-            <p><strong>Company:</strong> {{ person.company }}</p>
+            <p><strong>Company:</strong> {{ person.company_name }}</p>
             <p><strong>Time to Commit:</strong> {{ person.time_to_commit }}</p>
             <p>
                 <strong>Skills:</strong>
             <ul>
-                {% for skill in person.skills.all %}
-                    <li>{{ skill.name }}{% if forloop.counter < person.skills.all|length %}, {% endif %}</li>
+                {% for skill in person.skill.all %}
+                    <li>{{ skill.name }}{% if forloop.counter < person.skill.all|length %}, {% endif %}</li>
                 {% endfor %}
             </ul>
             </p>
             <p>
                 <strong>Causes:</strong>
                 <ul>
-                    {% for cause in person.causes.all %}
-                        <li>{{ cause.name }}{% if forloop.counter < person.causes.all|length %}, {% endif %}</li>
+                    {% for cause in person.cause.all %}
+                        <li>{{ cause.name }}{% if forloop.counter < person.cause.all|length %}, {% endif %}</li>
                     {% endfor %}
                 </ul>
             </p>
             <p>
                 <strong>Organizations:</strong>
                 <ul>
-                    {% for organization in person.organizations.all %}
-                        <li>{{ organization.name }}{% if forloop.counter < person.organizations.all|length %}, {% endif %}</li>
+                    {% for organization in person.organization.all %}
+                        <li>{{ organization.name }}{% if forloop.counter < person.organization.all|length %}, {% endif %}</li>
                     {% endfor %}
                 </ul>
             </p>
             <p>
                 <strong>Languages:</strong>
                 <ul>
-                    {% for language in person.languages.all %}
-                        <li>{{ language.name }}{% if forloop.counter < person.languages.all|length %}, {% endif %}</li>
+                    {% for language in person.language.all %}
+                        <li>{{ language.name }}{% if forloop.counter < person.language.all|length %}, {% endif %}</li>
                     {% endfor %}
                 </ul>
             </p>

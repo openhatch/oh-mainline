@@ -214,6 +214,10 @@ li.search_card_profile fieldset legend a.legend {
     display: inline-block;
 }
 
+li.search_card_profile fieldset ul {
+    margin-bottom: 15px;
+}
+
 li.search_card_profile fieldset ul li {
     font-size: 10pt;
     display: inline-block;
