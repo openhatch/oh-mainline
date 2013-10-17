@@ -8,50 +8,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding field 'Person.experience'
-        db.add_column('profile_person', 'experience', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['base.Experience']), keep_default=False)
-
         # Adding field 'Person.date_added'
         db.add_column('profile_person', 'date_added', self.gf('django.db.models.fields.DateField')(default=datetime.date.today, auto_now_add=True, blank=True), keep_default=False)
-
-        # Changing field 'Person.comment'
-        db.alter_column('profile_person', 'comment', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Person.other_name'
-        db.alter_column('profile_person', 'other_name', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Person.github_name'
-        db.alter_column('profile_person', 'github_name', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Person.language_spoken'
-        db.alter_column('profile_person', 'language_spoken', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Person.google_code_name'
-        db.alter_column('profile_person', 'google_code_name', self.gf('django.db.models.fields.TextField')())
 
 
     def backwards(self, orm):
         
-        # Deleting field 'Person.experience'
-        db.delete_column('profile_person', 'experience_id')
-
         # Deleting field 'Person.date_added'
         db.delete_column('profile_person', 'date_added')
-
-        # Changing field 'Person.comment'
-        db.alter_column('profile_person', 'comment', self.gf('django.db.models.fields.CharField')(max_length=100))
-
-        # Changing field 'Person.other_name'
-        db.alter_column('profile_person', 'other_name', self.gf('django.db.models.fields.CharField')(max_length=100))
-
-        # Changing field 'Person.github_name'
-        db.alter_column('profile_person', 'github_name', self.gf('django.db.models.fields.CharField')(max_length=100))
-
-        # Changing field 'Person.language_spoken'
-        db.alter_column('profile_person', 'language_spoken', self.gf('django.db.models.fields.CharField')(max_length=100))
-
-        # Changing field 'Person.google_code_name'
-        db.alter_column('profile_person', 'google_code_name', self.gf('django.db.models.fields.CharField')(max_length=100))
 
 
     models = {
@@ -84,8 +48,18 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'base.duration': {
+            'Meta': {'object_name': 'Duration'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
+        },
         'base.experience': {
             'Meta': {'object_name': 'Experience'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
+        },
+        'base.language': {
+            'Meta': {'object_name': 'Language'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
         },
@@ -159,11 +133,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
         },
-        'profile.language': {
-            'Meta': {'object_name': 'Language'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '100'})
-        },
         'profile.link_person_tag': {
             'Meta': {'object_name': 'Link_Person_Tag'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -207,7 +176,7 @@ class Migration(SchemaMigration):
             'homepage_url': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'irc_nick': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'language': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['profile.Language']", 'symmetrical': 'False'}),
+            'language': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['base.Language']", 'symmetrical': 'False'}),
             'language_spoken': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'last_polled': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(1970, 1, 1, 0, 0)'}),
             'latitude': ('django.db.models.fields.FloatField', [], {'default': '-37.3049962'}),
@@ -222,6 +191,7 @@ class Migration(SchemaMigration):
             'photo_thumbnail': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'null': 'True'}),
             'photo_thumbnail_20px_wide': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'null': 'True'}),
             'photo_thumbnail_30px_wide': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'null': 'True'}),
+            'private': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'show_email': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'skill': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['base.Skill']", 'symmetrical': 'False'}),
             'subscribed': ('django.db.models.fields.NullBooleanField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
@@ -289,6 +259,7 @@ class Migration(SchemaMigration):
             'created_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'date_icon_was_fetched_from_ohloh': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True'}),
             'display_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200'}),
+            'duration': ('django.db.models.fields.related.ForeignKey', [], {'default': '1', 'to': "orm['base.Duration']"}),
             'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'icon_for_profile': ('django.db.models.fields.files.ImageField', [], {'default': 'None', 'max_length': '100', 'null': 'True'}),
             'icon_for_search_result': ('django.db.models.fields.files.ImageField', [], {'default': 'None', 'max_length': '100', 'null': 'True'}),
@@ -297,10 +268,11 @@ class Migration(SchemaMigration):
             'icon_url': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
+            'languages': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['base.Language']", 'symmetrical': 'False'}),
             'logo_contains_name': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'}),
-            'organization': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['base.Organization']", 'null': 'True'}),
+            'organization': ('django.db.models.fields.related.ForeignKey', [], {'default': '1', 'to': "orm['base.Organization']"}),
             'people_who_wanna_help': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'projects_i_wanna_help'", 'symmetrical': 'False', 'to': "orm['profile.Person']"}),
             'skills': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['base.Skill']", 'symmetrical': 'False'})
         }

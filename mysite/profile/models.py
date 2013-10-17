@@ -157,7 +157,6 @@ class Person(models.Model):
     language = models.ManyToManyField(Language)
     opensource = models.NullBooleanField(default=None)
     time_to_commit = models.ForeignKey(TimeToCommit, default=1)
-    experience = models.ForeignKey(Experience, default=1)
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
     linked_in_url = models.URLField(default="", blank=True)
