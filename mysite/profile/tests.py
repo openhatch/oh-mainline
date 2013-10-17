@@ -1131,7 +1131,11 @@ class OtherContributors(TwillTests):
 
     def test_list_other_contributors(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
+        paulproteus.private = False
+        paulproteus.save()
         barry = Person.objects.get(user__username='barry')
+        barry.private = False
+        barry.save()
         project = Project(name='project', icon_raw="static/no-project-icon-w=40.png")
         project.save()
         PortfolioEntry(project=project, person=paulproteus, is_published=True).save()

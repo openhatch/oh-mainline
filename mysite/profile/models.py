@@ -318,7 +318,7 @@ class Person(models.Model):
     def get_list_of_all_published_projects(self):
         # This method looks familiar but testing -- jl
 
-        return self.get_published_portfolio_entries()
+        return list(self.get_published_portfolio_entries().values_list('project', flat=True))
 
     def get_list_of_all_project_names(self):
         # if you change this method, be sure to increment the version number in

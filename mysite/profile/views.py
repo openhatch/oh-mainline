@@ -134,9 +134,33 @@ def display_person_web(request, user_to_display__username=None):
     data['explain_to_anonymous_users'] = True
     data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
 
+    if request.method == 'POST':
+        projects_form = mysite.profile.forms.SelectProjectsForm(request.POST)
+        if projects_form.is_valid():
+            projects = projects_form.cleaned_data.get('Projects')
+            delete_unselected_portfolio_entries(projects, person)
+            save_selected_portfolio_entries(projects, person)
+
+    data['projects_form'] = mysite.profile.forms.SelectProjectsForm(initial={
+        'Projects': person.get_list_of_all_published_projects()
+    })
+
     return (request, 'profile/main.html', data)
 
     # }}}
+
+def delete_unselected_portfolio_entries(projects, person):
+    portfolio_entries = person.get_published_portfolio_entries()
+    for p in portfolio_entries:
+        if p.project not in projects:
+            p.delete()
+
+def save_selected_portfolio_entries(projects, person):
+    for project in projects:
+        project_db = Project.objects.get(name=project.name)
+        portfolio_entry, _ = PortfolioEntry.objects.get_or_create(project=project_db, person=person)
+        portfolio_entry.is_published = True
+        portfolio_entry.save()
 
 #FIXME: Create a separate function that just passes the data required for displaying the little user bar on the top right to the template, and leaves out all the data required for displaying the large user bar on the left.
 def get_personal_data(person):

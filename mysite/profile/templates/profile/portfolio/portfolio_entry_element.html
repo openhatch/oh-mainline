@@ -37,35 +37,33 @@
     <div class='submodule clearfix'>
         <div class='project-stuff'>
             <div class='name_and_icon_flagger'>
-                {% if not edit_mode and not adding_mode %}
-                <a href='{{ pf_entry.project.get_url }}'>
-                {% endif %}
-                    <div class='project_icon'
-                        {% if edit_mode %}
-                            style="background-image:
-                            url({% version '/static/no-project-icon.png' %})"
+                <div class='project_icon'
+                    {% if edit_mode %}
+                        style="background-image:
+                        url({% version '/static/no-project-icon.png' %})"
+                    {% else %}
+                    style="background-image: url({% version pf_entry.project.get_url_of_icon_or_generic %})"
+                    {% endif %}
+                    ><span class='alt-text'>
+                        {% if edit_mode or adding_mode %}
+                        (icon)
                         {% else %}
-                        style="background-image: url({% version pf_entry.project.get_url_of_icon_or_generic %})"
+                        {{ pf_entry.project.display_name}}
                         {% endif %}
-                        ><span class='alt-text'>
-                            {% if edit_mode or adding_mode %}
-                            (icon)
-                            {% else %}
-                            {{ pf_entry.project.display_name}}
-                            {% endif %}
-                        </span></div>
-                {% if not edit_mode and not adding_mode %}
-                </a>
-                {% endif %}
+                    </span></div>
                 
                 {% if adding_mode %}
                     <input class='project_name' type='text' title="Type a project name" value='' />
                 {% else %}
 
                 <span class='project_name'>
+                    {% if user|has_group:'ADMIN' %}
                     <a href='{{ pf_entry.project.get_url }}'>
+                    {% endif %}
                         {{ pf_entry.project.display_name|break_long_words|safe }}
+                    {% if user|has_group:'ADMIN' %}
                     </a>
+                    {% endif %}
                 </span>
 
                 {% endif %}

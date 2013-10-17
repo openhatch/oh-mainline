@@ -18,6 +18,7 @@
 import django.forms
 import mysite.profile.models
 from mysite.profile.models import  TimeToCommit, Heard_From, Language, Organization, Cause, Skill, Experience
+from mysite.search.models import Project
 
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
@@ -100,5 +101,13 @@ class UseDescriptionFromThisPortfolioEntryForm(django.forms.ModelForm):
 class DeleteUser(django.forms.Form):
     username = django.forms.CharField(required=True,
                                       widget=django.forms.Textarea())
+
+class SelectProjectsModelMultipleChoiceField(django.forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.name
+
+class SelectProjectsForm(django.forms.Form):
+    Projects = SelectProjectsModelMultipleChoiceField(
+        required=False, queryset=Project.objects.all(),widget=django.forms.CheckboxSelectMultiple)
 
 # vim: set nu:

@@ -297,7 +297,7 @@ class Project(OpenHatchModel):
         # FIXME: Use the method above.
         from mysite.profile.models import PortfolioEntry
         pf_entries = list(PortfolioEntry.published_ones.filter(
-            project=self).exclude(person=person))
+            project=self).exclude(person=person).filter(person__private=False))
         random.shuffle(pf_entries)
         other_contributors = [p.person for p in pf_entries]
 
