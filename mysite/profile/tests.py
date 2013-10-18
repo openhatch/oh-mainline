@@ -2038,6 +2038,7 @@ class ForwarderGetsCreated(TwillTests):
 
     def test(self):
         # paulproteus has $fwd in his contact blurb
+        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         p = Person.get_by_username('paulproteus')
         p.contact_blurb = "hi, $fwd!"
         p.save()
