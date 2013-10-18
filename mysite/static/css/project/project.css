@@ -68,7 +68,29 @@ body#project #other-questions { display: block; margin-bottom: 10px; }
 body#project li:target { background-color: #ffd; }
 body#project .quotemark { color: #555; }
 
-body#project .actionlink {float: right; font-weight: normal; margin-right: 10px}
+body#project .actionlink:not(input) {float: right; font-weight: normal; margin-right: 10px;}
+
+body#project input.actionlink {
+    float: right;
+    margin-top: 5px;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 1em;
+    color: #FF6D3D;
+    padding: 0;
+    display: inline;
+    text-decoration: none;
+}
+
+body#project input.actionlink:hover, input.actionlink:focus, input.actionlink:active {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+div#nav-container div#nav h1 {
+    margin-top: 0px !important;
+}
 
 body#project #wannahelp { width: 101% ! important; padding: 0; background: transparent; }
 body#project #wanna_help_thanks_tipsy_closer {float: right;}

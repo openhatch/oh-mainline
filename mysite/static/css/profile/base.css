@@ -45,6 +45,27 @@ body#profile #info .save-button { margin-top: 10px; }
 
 body#profile.two_columns .module > .body { width: 97%; padding: 10px; }
 
+div#export {
+    display: block;
+    clear: both;
+}
+
+body input.actionlink {
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 1em;
+    color: #FF6D3D;
+    padding: 0;
+    display: inline;
+    text-decoration: none;
+    float: none !important;
+}
+
+body input.actionlink:hover, input.actionlink:focus, input.actionlink:active {
+    cursor: pointer;
+    text-decoration: underline;
+}
 
 /*body#profile #info .tags { float: left; width: 158px; margin-bottom: 15px; } */
 body#profile #info .tags:last-child { margin-bottom: 0; }

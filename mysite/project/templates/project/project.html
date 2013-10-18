@@ -279,26 +279,16 @@ about how you can help {{ project.display_name }}
         </div>
     </div>
 
-    <div class='module' id='wannahelp'>
-        {% if not user_wants_to_help %}
-        <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
-            <input type='hidden' name='project' value='{{project.id}}'>
-            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
-        </form>
-        {% endif %}
-    </div>
-
-<div class='module' id='wanna_help'>
-{% include 'project/project-wanna-help-box.html' %}
-</div>
-
 <div class='module' id='contributors'>
     <div class='module-head'>
         <h3>Registered contributors ({% firstof project.get_contributor_count "none listed yet" %})</h3>
             <ul>
                 <li>
                     {% if project.cached_contributor_count %}
-                        <a class='actionlink' href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"'>See all</a>
+                        <form method="POST" action="{% url mysite.profile.views.people %}">
+                            <input type="hidden" name="q" value="project:{{ project.name|urlencode }}" />
+                            <input type="submit" class='actionlink' value="See all" />
+                        </form>
                     {% endif %}
                     <a class='actionlink' href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>Add yourself</a>
                 </li>
@@ -356,11 +346,6 @@ about how you can help {{ project.display_name }}
   {% endwith %}
   {% endwith %}
   {% endif %}
-
-  You can <a id='show_copypastebox' href='#'>embed the "I want to help" button</a> on your website. (<a href='/blog/2010/let-people-help-your-project-give-them-a-button-to-click/'>More about this</a>.)
-  <div id='copypastebox'>
-      <textarea style='font-size: .8em; font-family: monospace;'>{{ button_as_widget_source }}</textarea>
-  </div>
 
     </div>
 </div><!-- /.module #bugs -->

@@ -313,12 +313,13 @@ People Search
 
     {% with projects_that_match_q_exactly.0 as matching_project %}
         {% if matching_project %}
-            <div id='project_yeller'>
-                <a href='{{ matching_project.get_url }}'>{{ matching_project.display_name }}</a> is a project with
-                <a href='?q=project:{{matching_project.name_with_quotes_if_necessary|urlencode}}'>
-                    {{ matching_project.get_contributors|length }}
-                    contributor{{ matching_project.get_contributors|length|pluralize}}</a>.
-            </div>
+            <form method="POST" action=".">
+                <div id='project_yeller'>
+                    <input type="hidden" name="q" value="{{ matching_project.name_with_quotes_if_necessary|urlencode }}" />
+                    <a href='{{ matching_project.get_url }}'>{{ matching_project.display_name }}</a> is a project with
+                    <input type="submit" class="actionlink" value="{{ matching_project.get_contributors|length }} contributor{{ matching_project.get_contributors|length|pluralize }}" />.
+                </div>
+            </form>
         {% endif %}
     {% endwith %}
 
@@ -374,30 +375,32 @@ People Search
         </div>
     </div><!-- /#search_summary -->
 
-    <p><a id="export-link" href="">Export</a></p>
-    <select style="display: none;" id="export-format">
-        {% for key, value in export_formats.items %}
-        <option value="{{key}}">{{value}}</option>
-        {% endfor %}
-    </select>
-    <p><a id="export-selected" href="" style="display: none;">Export to selected format</a></p>
-    <script>
-        $("#export-link").click(function(e) {
-            e.preventDefault();
-            $(this).css("display", "none");
-            $("#export-format").css("display", "inline");
-            $("#export-selected").css("display", "block");
-        });
-        $("#export-selected").click(function(e) {
-            $("#search-form")
-                .attr("target", "_blank")
-                .attr("action", "/people-export/?format=" + $("#export-format").val())
-                .submit()
-                .removeAttr("target")
-                .attr("action", ".");
-            e.preventDefault();
-        });
-    </script>
+    <div id="export">
+        <p><a id="export-link" href="">Export</a></p>
+        <select style="display: none;" id="export-format">
+            {% for key, value in export_formats.items %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+        </select>
+        <p><a id="export-selected" href="" style="display: none;">Export to selected format</a></p>
+        <script>
+            $("#export-link").click(function(e) {
+                e.preventDefault();
+                $(this).css("display", "none");
+                $("#export-format").css("display", "inline");
+                $("#export-selected").css("display", "block");
+            });
+            $("#export-selected").click(function(e) {
+                $("#search-form")
+                    .attr("target", "_blank")
+                    .attr("action", "/people-export/?format=" + $("#export-format").val())
+                    .submit()
+                    .removeAttr("target")
+                    .attr("action", ".");
+                e.preventDefault();
+            });
+        </script>
+    </div>
 
     {% if people %}
     {% include 'profile/people_list.html' %}
