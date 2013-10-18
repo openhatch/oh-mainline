@@ -52,6 +52,7 @@ for p in xrange(next_id, next_id + MAX_USERS):
     if random.randint(0, 1) == 1:
         opensource = True
     company_name = u'company_%s' % p
+    private = True
     dont_guess_my_location = False
     bio = u'bio_%s' % p
     contact_blurb = ''
@@ -73,7 +74,7 @@ for p in xrange(next_id, next_id + MAX_USERS):
     experience_id = random.randint(1, 3)
     uploaded_to_zoho = False
     person_data.append((photo, photo_thumbnail_30px_wide, photo_thumbnail, irc_nick, user_id, photo_thumbnail_20px_wide,
-                        last_polled, opensource, company_name, dont_guess_my_location, bio, contact_blurb, show_email,
+                        last_polled, opensource, company_name, private, dont_guess_my_location, bio, contact_blurb, show_email,
                         location_confirmed, linked_in_url, expand_next_steps, location_display_name, time_to_commit_id,
                         homepage_url, gotten_name_from_ohloh, email_me_re_projects, google_code_name, comment,
                         language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho))
@@ -89,11 +90,11 @@ print '%s user rows added.' % MAX_USERS
 
 print 'Adding person rows...'
 person_sql = u'INSERT INTO profile_person (photo, photo_thumbnail_30px_wide, photo_thumbnail, irc_nick, user_id,' \
-             u'photo_thumbnail_20px_wide, last_polled, opensource, company_name, dont_guess_my_location, bio,' \
+             u'photo_thumbnail_20px_wide, last_polled, opensource, company_name, private, dont_guess_my_location, bio,' \
              u'contact_blurb, show_email, location_confirmed, linked_in_url, expand_next_steps, location_display_name,' \
              u'time_to_commit_id, homepage_url, gotten_name_from_ohloh, email_me_re_projects, google_code_name,' \
              u'comment, language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho)' \
-             u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 cursor.executemany(person_sql, person_data)
 connection.commit()
 print '%s person rows added.' % MAX_USERS
