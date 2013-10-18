@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import django.forms
+from mysite.base.models import Organization, Duration, Skill, Language
 import mysite.search.models
 import mysite.profile.models
 
@@ -47,25 +48,15 @@ class MarkContactedForm(django.forms.Form):
         raise django.forms.ValidationError, "Invalid person ID."
 
 class ProjectForm(django.forms.ModelForm):
-
-    def clean_name(self):
-
-        proposed_name = self.cleaned_data['name'].strip()
-
-        # Only save if nothing but capitalization was changed
-        if (proposed_name.lower() != self.instance.name.lower()):
-            raise django.forms.ValidationError("You can only make changes to the capitalization of the name.")
-        return proposed_name
-
-    def clean_language(self):
-        lang = self.cleaned_data['language']
-
-        # Try to use the capitalization of a language already assigned to a project
-        matching_projects = mysite.search.models.Project.objects.filter(language__iexact=lang)
-        if matching_projects:
-            return matching_projects[0].language
-        return lang
+    name = django.forms.CharField(required=True, widget=django.forms.TextInput)
+    display_name = django.forms.CharField(required=True, widget=django.forms.TextInput)
+    language = django.forms.CharField(required=False, widget=django.forms.TextInput)
+    homepage = django.forms.URLField(required=False)
+    organization = django.forms.ModelChoiceField(required=True, queryset=Organization.objects.all(), widget=django.forms.Select)
+    duration = django.forms.ModelChoiceField(required=True, queryset=Duration.objects.all(), widget=django.forms.Select)
+    skills = django.forms.ModelMultipleChoiceField(required=True, queryset=Skill.objects.all(), widget=django.forms.CheckboxSelectMultiple)
+    languages = django.forms.ModelMultipleChoiceField(required=True, queryset=Language.objects.all(), widget=django.forms.CheckboxSelectMultiple)
 
     class Meta:
         model = mysite.search.models.Project
-        fields = ('name', 'display_name', 'homepage', 'language', 'icon_raw')
+        fields = ("name", "display_name", "language", "homepage", "skills", "duration", "organization", "languages")

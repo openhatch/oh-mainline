@@ -29,7 +29,7 @@ import django.template
 import mysite.base.decorators
 import mysite.profile.views
 import mysite.project.forms
-from mysite.base.decorators import has_permissions
+from mysite.base.decorators import has_permissions, view
 
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponsePermanentRedirect, HttpResponseBadRequest
@@ -188,6 +188,25 @@ def projects(request):
             })
     return mysite.base.decorators.as_view(request, "project/projects.html", data,
             slug=projects.__name__)
+
+@login_required
+@has_permissions(['add_project'])
+def add_project(request):
+    data = {}
+    project_form = mysite.project.forms.ProjectForm()
+    data['form'] = project_form
+
+    if request.POST:
+        project_data_form = mysite.project.forms.ProjectForm(request.POST)
+
+        if project_data_form.is_valid():
+            project = project_data_form.save()
+            return HttpResponseRedirect("/projects")
+        else:
+            data['form'] = project_data_form
+            data['has_errors'] = True
+
+    return mysite.base.decorators.as_view(request, "project/add_project.html", data, projects.__name__)
 
 def project_filter(request):
     post_data = request.POST
@@ -375,43 +394,4 @@ def nextsteps4helpers(request):
             'the_lucky_project': lucky_project,
             'helpers': lucky_project.people_who_wanna_help.exclude(pk__exact=request.user.get_profile().pk)
             }
-    return (request, "nextsteps4helpers.html", context) 
-
-@login_required
-def edit_project(request, project__name):
-    project = old_project = get_object_or_404(Project, name=project__name)
-
-    if request.POST or request.FILES:
-        form = mysite.project.forms.ProjectForm(request.POST, request.FILES, instance=project)
-        if form.is_valid():
-            project = form.save()
-            project.update_scaled_icons_from_self_icon()
-
-            import logging
-
-            # This is a good time to make a little note pertaining to the fact
-            # that someone has edited the project info.
-            logging.info("Project edit: %s just edited a project.  The project's data originally read as follows: %s.  Its data now read as follows: %s" % (
-                request.user.username, old_project.__dict__, project.__dict__))
-
-            return HttpResponseRedirect(project.get_url())
-    else:
-        form = mysite.project.forms.ProjectForm(instance=project)
-
-    context = {'project': project, 'form': form}
-
-    person = request.user.get_profile() 
-    context['i_am_a_contributor'] = ( person in project.get_contributors() )
-    context['i_described_this_project'] = bool(project.get_pfentries_with_descriptions(
-        person=person))
-
-    pfes = project.get_pfentries_with_descriptions() 
-    context['pfentries_with_descriptions'] = pfes
-
-    Form = mysite.profile.forms.UseDescriptionFromThisPortfolioEntryForm
-    context['pfentry_forms'] = [Form(instance=pfe, prefix=str(pfe.pk)) for pfe in pfes]
-
-    context['trackers'] = project.get_corresponding_bug_trackers()
-
-    return mysite.base.decorators.as_view(
-            request, 'edit_project.html', context, slug=__name__)
+    return (request, "nextsteps4helpers.html", context)

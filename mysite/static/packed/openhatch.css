@@ -770,13 +770,13 @@ ul#results {
 }
 
 input[type=text].search_bar {
-    width: 800px;
+    width: 760px;
 }
 
-input[type=submit].search_bar {
+input[type=submit].search_bar, button.add {
     float: none !important;
     padding: 5px;
-    margin: 2px 0px 0px 20px;
+    margin: 2px 0px 0px 10px;
 }
 
 #search-filters div.buttons-overlay {

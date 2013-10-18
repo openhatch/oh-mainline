@@ -57,7 +57,8 @@ about the projects we index
         <form method="post" action=".">
             <label for="search_q">Search for a project</label><br />
             <input class="search_bar" type="text" name="q" id="search_q" value="{{ query }}" />
-            <input class="search_bar" type="submit" value='Search'>
+            <input class="search_bar" type="submit" value='Search' />
+            <a href="{% url mysite.project.views.add_project %}"><button class="add" type="button">Add</button></a>
 
             {% if user|has_permission:'can_filter_projects' %}
             <div>

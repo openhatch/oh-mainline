@@ -50,7 +50,6 @@ feeds = {
         'recbugs': RecommendedBugsFeed,
         'activity': RecentActivityFeed,
         }
-
 urlpatterns = patterns('',
         ### Okay, sometimes people link /, or /) because of bad linkification
         ### if so, just permit it as a redirect.
@@ -79,9 +78,6 @@ urlpatterns = patterns('',
 
         (r'^\+projects/suggest_question/',
             'mysite.project.views.suggest_question'),
-
-        (r'^\+projedit/(?P<project__name>.+)',
-            'mysite.project.views.edit_project'),
 
         (r'^\+projects/suggest_question_do/',
             'mysite.project.views.suggest_question_do'),
@@ -387,6 +383,8 @@ urlpatterns = patterns('',
 
         (r'^projects/filter/$', 'mysite.project.views.project_filter'),
 
+        (r'^projects/add_project$', 'mysite.project.views.add_project'),
+
         (r'^projects/', include('mysite.project.urls')),
 
         (r'^\+projects/$', lambda x: HttpResponsePermanentRedirect('/projects/')),
@@ -424,6 +422,7 @@ urlpatterns = patterns('',
                 'mysite.profile.views.display_person_web'),
 
         )
+
 
 handler404 = 'mysite.base.views.page_not_found'
 
