@@ -819,7 +819,7 @@ li.search_card_project fieldset legend {
     margin: auto;
 }
 
-li.search_card_project fieldset legend a.legend {
+li.search_card_project fieldset legend a.legend, span.legend {
     width: 100%;
     padding: 15px 0px 15px 0px;
     display: inline-block;
