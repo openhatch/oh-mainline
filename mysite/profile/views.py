@@ -316,7 +316,7 @@ def edit_person_info_do(request):
     # {{{
     person = request.user.get_profile()
 
-    edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, prefix='edit-tags')
+    edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, request.FILES, prefix='edit-tags')
     contact_blurb_form = mysite.profile.forms.ContactBlurbForm(request.POST, prefix='edit-tags')
     contact_blurb_error = False
     errors_occurred = False
@@ -347,6 +347,7 @@ def edit_person_info_do(request):
     person.organization = edit_info_form['organizations'].data
     person.other_name = edit_info_form['other_name'].data
     person.private = edit_info_form['private'].data
+    person.resume = edit_info_form['resume'].data
     person.skill = edit_info_form['skills'].data
     person.subscribed = edit_info_form['subscribed'].data
     if edit_info_form['times_to_commit'].data is not None:

@@ -69,7 +69,7 @@ def url2printably_short(url, CUTOFF=50):
 
 def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
-    return random_uuid.hex + suffix
+    return random_uuid.hex + "_" + filename + suffix
 
 class Cause(models.Model):
     name = models.CharField(default='', unique=True, null=False, max_length=100)
@@ -170,6 +170,10 @@ class Person(models.Model):
     language_spoken = models.TextField(default="", blank=True)
     date_added = models.DateField(default=datetime.date.today, auto_now_add=True)
     uploaded_to_zoho=models.BooleanField(default=False)
+    resume=models.FileField(upload_to=
+                              lambda a, b: 'static/resumes/' +
+                              generate_person_photo_path(a, b, suffix="_resume"),
+                              default='', max_length=100)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)

@@ -47,7 +47,7 @@
 
                 <form name='edit-tags'
                         action='/people/info/edit/do'
-                        method='POST'>{% csrf_token %}
+                        method='POST' enctype="multipart/form-data">>{% csrf_token %}
 
                         <div class='form-row' style='display: none;'>
                         <h3>You, in a nutshell</h3>
@@ -119,11 +119,8 @@
                             <div>
                                 <label class='header-label'>Resume</label>
                             </div>
-                            {{ form.file.errors }}
-                            {{ form.file }}
-                            <div>
-                                <input type="submit" value="Upload">
-                            </div>
+                            {{ form.resume.errors }}
+                            {{ form.resume }}
                         </div>
 
                         <div class='form-row'>

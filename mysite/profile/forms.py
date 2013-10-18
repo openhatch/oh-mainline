@@ -65,7 +65,6 @@ class EditInfoForm(django.forms.Form):
     company_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     experience = django.forms.ModelChoiceField(
         required=False, empty_label=None, queryset=Experience.objects.all(),widget=django.forms.RadioSelect())
-    file = django.forms.FileField(required=False)
     github_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     google_code_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     heard_from = django.forms.ModelMultipleChoiceField(
@@ -81,6 +80,7 @@ class EditInfoForm(django.forms.Form):
         required=False, queryset=Organization.objects.all(), widget=django.forms.CheckboxSelectMultiple)
     other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     private = django.forms.BooleanField(required=False)
+    resume = django.forms.FileField(required=False)
     studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
     subscribed = django.forms.BooleanField(required=False)
     times_to_commit = django.forms.ModelChoiceField(
