@@ -1,0 +1,212 @@
+[
+    {
+        "model": "search.Project",
+        "pk": 1,
+        "fields": {
+            "name": "Mifos X",
+            "display_name": "Mifos X",
+            "homepage": "http://mifos.org/product/mifos-x",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 8,
+            "duration": 4,
+            "languages": [4, 5, 7]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 2,
+        "fields": {
+            "name": "Amara",
+            "display_name": "Amara",
+            "homepage": "http://www.amara.org/en/",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 6,
+            "duration": 2,
+            "languages": [12, 15]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 3,
+        "fields": {
+            "name": "Bookshare",
+            "display_name": "Bookshare",
+            "homepage": "https://www.bookshare.org/",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 1,
+            "duration": 2,
+            "languages": [12, 15]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 4,
+        "fields": {
+            "name": "Poet",
+            "display_name": "Poet",
+            "homepage": "http://www.diagramcenter.org/development/poet.html",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 1,
+            "duration": 2,
+            "languages": [13]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 5,
+        "fields": {
+            "name": "Miradi",
+            "display_name": "Miradi",
+            "homepage": "https://miradi.org/",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 1,
+            "duration": 2,
+            "languages": [5]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 6,
+        "fields": {
+            "name": "Martus",
+            "display_name": "Martus",
+            "homepage": "https://www.martus.org/",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 1,
+            "duration": 2,
+            "languages": [5]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 7,
+        "fields": {
+            "name": "Code for America",
+            "display_name": "Code for America",
+            "homepage": "http://brigade.codeforamerica.org/pages/opensource",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 2,
+            "duration": 2,
+            "languages": [4, 5, 7, 11, 12, 13]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 8,
+        "fields": {
+            "name": "FrontlineSMS",
+            "display_name": "FrontlineSMS",
+            "homepage": "http://www.frontlinesms.com/",
+            "language": "English",
+            "skills": [2, 3, 6],
+            "organization": 3,
+            "duration": 2,
+            "languages": [5]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 9,
+        "fields": {
+            "name": "Orbot",
+            "display_name": "Orbot",
+            "homepage": "https://guardianproject.info/apps/orbot/",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 4,
+            "duration": 2,
+            "languages": [6]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 10,
+        "fields": {
+            "name": "Gibberbot",
+            "display_name": "Gibberbot",
+            "homepage": "https://guardianproject.info/apps/gibber/",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 4,
+            "duration": 2,
+            "languages": [6]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 11,
+        "fields": {
+            "name": "ObscuraCam",
+            "display_name": "ObscuraCam",
+            "homepage": "https://guardianproject.info/apps/obscuracam/",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 4,
+            "duration": 2,
+            "languages": [6]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 12,
+        "fields": {
+            "name": "Kujua Lite",
+            "display_name": "Kujua Lite",
+            "homepage": "http://medicmobile.org/tools/kujua-lite/",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 9,
+            "duration": 2,
+            "languages": [7]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 13,
+        "fields": {
+            "name": "Sahana Eden",
+            "display_name": "Sahana Eden",
+            "homepage": "http://sahanafoundation.org/products/eden/",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 10,
+            "duration": 2,
+            "languages": [12, 15]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 14,
+        "fields": {
+            "name": "Ushahidi",
+            "display_name": "Ushahidi",
+            "homepage": "https://wiki.ushahidi.com/display/WIKI/Our+Products",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 11,
+            "duration": 2,
+            "languages": [7, 11]
+        }
+    },
+    {
+        "model": "search.Project",
+        "pk": 15,
+        "fields": {
+            "name": "MediaWiki",
+            "display_name": "MediaWiki",
+            "homepage": "http://www.mediawiki.org/wiki/Developer_hub",
+            "language": "English",
+            "skills": [2, 3],
+            "organization": 7,
+            "duration": 2,
+            "languages": [7, 11]
+        }
+    }
+]

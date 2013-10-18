@@ -119,6 +119,27 @@
         }
     },
     {
+        "model": "base.Organization",
+        "pk": 9,
+        "fields": {
+            "name": "Medic Mobile"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 10,
+        "fields": {
+            "name": "Sahana Software Foundation"
+        }
+    },
+    {
+        "model": "base.Organization",
+        "pk": 11,
+        "fields": {
+            "name": "Ushahidi"
+        }
+    },
+    {
         "model": "base.Experience",
         "pk": 1,
         "fields": {
