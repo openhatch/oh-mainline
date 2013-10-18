@@ -20,12 +20,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from django.http import QueryDict
+from mysite.base.test_helpers import QueryDictHelper
+from mysite.profile.test_helpers import UserAndPersonHelper
 from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.view_helpers import ObjectFromDict
-from mysite.base.models import Timestamp
+from mysite.base.models import Timestamp, Experience
 import mysite.account.tests
 from mysite.search.models import Project, WannaHelperNote
-from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder, TimeToCommit
 import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
@@ -38,7 +41,7 @@ import pprint
 
 from django.utils import simplejson
 import BeautifulSoup
-import datetime
+from datetime import datetime, timedelta
 import tasks
 import mock
 import os
@@ -1027,7 +1030,7 @@ class GimmeJsonTellsAboutImport(TwillTests):
         return mysite.profile.models.Person.objects.get(user__username='barry')
 
     def get_n_min_ago(self, n):
-        return datetime.datetime.utcnow() - datetime.timedelta(minutes=n)
+        return datetime.utcnow() - timedelta(minutes=n)
 
     def test_import_running_false(self):
         "When there are no dias from the past five minutes, import.running = False"
@@ -1487,7 +1490,7 @@ class EditContactBlurbForwarderification(TwillTests):
         # sure it that the urlizetrunc filter, in the template, linkifies it correctly.
 
         # make sure our forwarder that we just made hasn't expired
-        self.assert_(our_forwarder.expires_on > datetime.datetime.utcnow())
+        self.assert_(our_forwarder.expires_on > datetime.utcnow())
         # we test that the result contains, as a substr, the output of a call to generate_forwarder
         self.assertEqual(mystr_forwarderified, output);
 
@@ -1743,10 +1746,19 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['query_type'], 'all_tags')
 
 class PeopleFilter(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
+    """ Tests people search and filters on the /people page """
+    test_person = None
 
-    @staticmethod
-    def get_filtered_people(data):
+    @classmethod
+    def setUpClass(cls):
+        cls.test_person = UserAndPersonHelper.create_test_user_and_person()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.test_person.user.delete()
+        cls.test_person.delete()
+
+    def get_filtered_people(self, data):
         post_data = data
         query = post_data.get(u'q', u'')
         parsed_query = mysite.profile.view_helpers.parse_string_query(query)
@@ -1759,15 +1771,40 @@ class PeopleFilter(TwillTests):
 
         return mysite.profile.view_helpers.filter_people(people=everybody, post_data=post_data)
 
+    def assert_person_count(self, count, *args):
+        queryDict = QueryDictHelper.create_query_dict(*args)
+        people = self.get_filtered_people(queryDict)
+        self.assertEqual(len(people), count)
+
     def test_search_by_name(self):
-        data = {u'q': u'Asheesh'}
-        everybody = PeopleFilter.get_filtered_people(data)
-        self.assertEqual(len(everybody), 1)
+        self.assert_person_count(1, (u'q', u'test_user'))
+
+    def test_search_by_company_name(self):
+        self.assert_person_count(1, (u'q', u''), (u'filter_company_name', u'test_company'))
+
+    def test_search_by_email(self):
+        self.assert_person_count(1, (u'q', u''), (u'filter_email', u'test@user.com'))
+
+    def test_search_by_skills(self):
+        self.assert_person_count(1, (u'q', u''), (u'skills[]', [u'1', u'2']))
+
+    def test_search_by_organizations(self):
+        self.assert_person_count(1, (u'q', u''), (u'organizations[]', [u'1', u'2']))
+
+    def test_search_by_causes(self):
+        self.assert_person_count(1, (u'q', u''), (u'causes[]', [u'1', u'2']))
+
+    def test_search_by_languages(self):
+        self.assert_person_count(1, (u'q', u''), (u'languages[]', [u'1', u'2']))
+
+    def test_search_by_time_to_commit(self):
+        self.assert_person_count(1, (u'q', u''), (u'time_to_commit', '1'))
 
     def test_search_by_opensource(self):
-        data = {u'q': u'', u'opensource': u'True'}
-        everybody = PeopleFilter.get_filtered_people(data)
-        logging.info('Everybody list size: %s' % len(everybody))
+        self.assert_person_count(1, (u'q', u''), (u'opensource', u'True'))
+
+    def test_should_find_none(self):
+        self.assert_person_count(0, (u'q', u'some_other_test_user'))
 
 class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
     def setUp(self):
@@ -1844,8 +1881,8 @@ class EmailForwarderGarbageCollection(TwillTests):
         def create_forwarder(address, valid, new_enough_for_display):
             expires_on_future_number = valid and 1 or -1
             stops_being_listed_on_future_number = new_enough_for_display and 1 or -1
-            expires_on = datetime.datetime.utcnow() + expires_on_future_number*datetime.timedelta(minutes=10)
-            stops_being_listed_on = datetime.datetime.utcnow() + stops_being_listed_on_future_number*datetime.timedelta(minutes=10)
+            expires_on = datetime.utcnow() + expires_on_future_number*timedelta(minutes=10)
+            stops_being_listed_on = datetime.utcnow() + stops_being_listed_on_future_number*timedelta(minutes=10)
             user = User.objects.get(username="paulproteus")
             new_mapping = mysite.profile.models.Forwarder(address=address,
                     expires_on=expires_on, user=user, stops_being_listed_on=stops_being_listed_on)
@@ -1905,13 +1942,13 @@ class EmailForwarderResolver(TwillTests):
             # if it isn't return the user's real email address
             # if it is expired, or if it's not in the table at all, return None
             try:
-                return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
+                return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.utcnow()).user.email
             except Forwarder.DoesNotExist:
                 return None
         def test_possible_forwarder_address(address, future, actually_create, should_work):
             future_number = future and 1 or -1
             if actually_create:
-                expiry_date = datetime.datetime.utcnow() + future_number*datetime.timedelta(minutes=10)
+                expiry_date = datetime.utcnow() + future_number*timedelta(minutes=10)
                 user = User.objects.get(username="paulproteus")
                 new_mapping = mysite.profile.models.Forwarder(address=address,
                         expires_on=expiry_date, user=user)
@@ -2387,9 +2424,9 @@ class Notifications(TwillTests):
 
         # 1 person joined this project two weeks ago (too long ago to mention
         # in this email)
-        now = datetime.datetime.utcnow()
-        yesterday = now - datetime.timedelta(hours=24)
-        eight_days_ago = now - datetime.timedelta(days=8)
+        now = datetime.utcnow()
+        yesterday = now - timedelta(hours=24)
+        eight_days_ago = now - timedelta(days=8)
 
         Timestamp.update_timestamp_for_string(
                 send_emails.Command.TIMESTAMP_KEY,
@@ -2587,9 +2624,9 @@ class Notifications(TwillTests):
         # emails in a single day...
 
         # Calculate some datetime objects we'll need during this test
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
 
-        just_under_24_hours = datetime.timedelta(hours=23, minutes=55)
+        just_under_24_hours = timedelta(hours=23, minutes=55)
         just_under_24_hours_ago = now - just_under_24_hours
 
         # Let's record that emails were sent within 24 hours
@@ -2605,8 +2642,8 @@ class Notifications(TwillTests):
         # sent the emails over 24 hours ago, and somebody runs the
         # send_emails command. In this scenario, emails SHOULD be sent.
 
-        now = datetime.datetime.utcnow()
-        just_over_24_hours = datetime.timedelta(hours=25)
+        now = datetime.utcnow()
+        just_over_24_hours = timedelta(hours=25)
         just_over_24_hours_ago = now - just_over_24_hours
 
         # Let's record that emails were sent just OVER 24 hours ago
@@ -2668,9 +2705,9 @@ class Notifications(TwillTests):
         new_wh = Person.create_dummy('new_wh@example.com')
         old_wh = Person.create_dummy('old_wh@example.com')
 
-        now = datetime.datetime.utcnow()
-        yesterday = now - datetime.timedelta(hours=24)
-        a_few_days_ago = now - datetime.timedelta(days=3)
+        now = datetime.utcnow()
+        yesterday = now - timedelta(hours=24)
+        a_few_days_ago = now - timedelta(days=3)
 
         # The timespan for this email is the last 24 hours
         Timestamp.update_timestamp_for_string(

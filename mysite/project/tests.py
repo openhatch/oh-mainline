@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.utils.unittest.case import skip
+from mysite.base.test_helpers import QueryDictHelper
+from mysite.project.test_helpers import ProjectHelper
 
 from mysite.base.tests import TwillTests
 import mysite.project.view_helpers
@@ -409,3 +411,50 @@ class BugTrackersOnProjectEditPage(TwillTests):
         # Now, the Twisted project should have one corresponding bug tracker
         trackers_from_project = list(self.twisted.get_corresponding_bug_trackers())
         self.assertEqual([bug_tracker], trackers_from_project)
+
+class ProjectFilter(TwillTests):
+    """ Tests project search and filters on the projects/ page """
+
+    test_project = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.test_project = ProjectHelper.create_test_project()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.test_project.delete()
+
+    def get_filtered_projects(self, post_data):
+        query = post_data.get('q', '')
+        matching_projects = []
+        if query:
+            query = query.strip()
+            matching_projects = mysite.project.view_helpers.similar_project_names(query)
+            matching_projects = mysite.project.view_helpers.filter_projects(projects=matching_projects,
+                                                                            post_data=post_data)
+        else:
+            matching_projects = Project.objects.all()
+
+    def assert_project_count(self, count, *args):
+        queryDict = QueryDictHelper.create_query_dict(*args)
+        projects = self.get_filtered_projects(queryDict)
+        self.assertEqual(len(projects), count)
+
+    def test_search_by_name(self):
+        self.assert_project_count(1, (u'q', u'test_project'))
+
+    def test_search_by_skills(self):
+        self.assert_project_count(1, (u'q', u''), (u'skills[]', [u'1', u'2']))
+
+    def test_search_by_organizations(self):
+        self.assert_project_count(1, (u'q', u''), (u'organizations[]', [u'1', u'2']))
+
+    def test_search_by_languages(self):
+        self.assert_project_count(1, (u'q', u''), (u'languages[]', [u'1', u'2']))
+
+    def test_search_by_duration(self):
+        self.assert_project_count(1, (u'q', u''), (u'duration[]', [u'1', u'2']))
+
+    def test_should_find_none(self):
+        self.assert_project_count(0, (u'q', u'some_other_test_project'))
