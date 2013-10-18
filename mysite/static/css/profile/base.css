@@ -50,7 +50,7 @@ div#export {
     clear: both;
 }
 
-body input.actionlink {
+body#people-map input.actionlink {
     background: none;
     border: none;
     font: inherit;
@@ -62,7 +62,7 @@ body input.actionlink {
     float: none !important;
 }
 
-body input.actionlink:hover, input.actionlink:focus, input.actionlink:active {
+body#people-map input.actionlink:hover, input.actionlink:focus, input.actionlink:active {
     cursor: pointer;
     text-decoration: underline;
 }
