@@ -8,6 +8,10 @@ DATABASE_FILE_PATH='../../site.db'
 MAX_USERS = 100
 user_data = []
 person_data = []
+person_skill_data = []
+person_language_data = []
+person_organization_data = []
+person_cause_data = []
 
 for arg in sys.argv:
     argument = str(arg)
@@ -38,6 +42,17 @@ for u in xrange(0, MAX_USERS):
     last_login = datetime.now()
     date_joined = datetime.now()
     user_data.append((id, username, first_name, last_name, email, password, 0, 1, 0, last_login, date_joined))
+    organization_id = random.randint(1, 7)
+    # Many to Many
+    skill_id = random.randint(1, 9)
+    language_id = random.randint(1, 14)
+    organization_id = random.randint(1, 7)
+    cause_id = random.randint(1, 11)
+
+    person_skill_data.append((id, skill_id))
+    person_language_data.append((id, language_id))
+    person_organization_data.append((id, organization_id))
+    person_cause_data.append((id, cause_id))
 
 next_id -= MAX_USERS
 for p in xrange(next_id, next_id + MAX_USERS):
@@ -96,5 +111,27 @@ person_sql = u'INSERT INTO profile_person (photo, photo_thumbnail_30px_wide, pho
              u'comment, language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho)' \
              u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 cursor.executemany(person_sql, person_data)
+connection.commit()
+
+person_skill_sql = u'INSERT INTO profile_person_skill (person_id, skill_id) VALUES (?, ?)'
+cursor.executemany(
+    person_skill_sql,
+    person_skill_data)
+
+person_language_sql = u'INSERT INTO profile_person_language (person_id, language_id) VALUES(?, ?)';
+cursor.executemany(
+    person_language_sql,
+    person_language_data)
+
+person_organization_sql = u'INSERT INTO profile_person_organization (person_id, organization_id) VALUES (?, ?)'
+cursor.executemany(
+    person_organization_sql,
+    person_organization_data)
+
+person_cause_sql = u'INSERT INTO profile_person_cause (person_id, cause_id) VALUES(?, ?)';
+cursor.executemany(
+    person_cause_sql,
+    person_cause_data)
+
 connection.commit()
 print '%s person rows added.' % MAX_USERS
