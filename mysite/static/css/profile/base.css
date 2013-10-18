@@ -209,7 +209,7 @@ div.input input[type=text] {
     margin-right: 0px !important;
 }
 
-li.search_card_profile {
+.search_card_profile {
     width: 430px;
     display: inline-table;
     border-radius: 10px;
@@ -227,15 +227,15 @@ li.search_card_profile {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f9f9f9', GradientType=0); /* IE6-9 */
 }
 
-li.search_card_profile fieldset {
+.search_card_profile fieldset {
     border: none !important;
 }
 
-li.search_card_profile fieldset p {
+.search_card_profile fieldset p {
     margin: 15px 0px 15px 0px;
 }
 
-li.search_card_profile fieldset legend {
+.search_card_profile fieldset legend {
     position: relative;
     font-family: Helvetica;
     font-weight: bold;
@@ -244,22 +244,22 @@ li.search_card_profile fieldset legend {
     text-align: center;
 }
 
-li.search_card_profile fieldset legend a.legend {
+.search_card_profile fieldset legend a.legend {
     width: 100%;
     padding: 15px 0px 15px 0px;
     display: inline-block;
 }
 
-li.search_card_profile fieldset ul {
+.search_card_profile fieldset ul {
     margin-bottom: 15px;
 }
 
-li.search_card_profile fieldset ul li {
+.search_card_profile fieldset ul li {
     font-size: 10pt;
     display: inline-block;
 }
 
-li.search_card_profile fieldset legend a.linked_in {
+.search_card_profile fieldset legend a.linked_in {
     position: absolute;
     top: 12px;
     right: 0px;

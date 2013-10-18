@@ -14,35 +14,35 @@
             <p><strong>Time to Commit:</strong> {{ person.time_to_commit }}</p>
             <p>
                 <strong>Skills:</strong>
-            <ul>
+            </p>
+            <p>
                 {% for skill in person.skill.all %}
-                    <li>{{ skill.name }}{% if forloop.counter < person.skill.all|length %}, {% endif %}</li>
+                    {{ skill.name }}{% if forloop.counter < person.skill.all|length %}, {% endif %}
                 {% endfor %}
-            </ul>
             </p>
             <p>
                 <strong>Causes:</strong>
-                <ul>
-                    {% for cause in person.cause.all %}
-                        <li>{{ cause.name }}{% if forloop.counter < person.cause.all|length %}, {% endif %}</li>
-                    {% endfor %}
-                </ul>
+            </p>
+            <p>
+                {% for cause in person.cause.all %}
+                    {{ cause.name }}{% if forloop.counter < person.cause.all|length %}, {% endif %}
+                {% endfor %}
             </p>
             <p>
                 <strong>Organizations:</strong>
-                <ul>
-                    {% for organization in person.organization.all %}
-                        <li>{{ organization.name }}{% if forloop.counter < person.organization.all|length %}, {% endif %}</li>
-                    {% endfor %}
-                </ul>
+            </p>
+            <p>
+                {% for organization in person.organization.all %}
+                    {{ organization.name }}{% if forloop.counter < person.organization.all|length %}, {% endif %}
+                {% endfor %}
             </p>
             <p>
                 <strong>Languages:</strong>
-                <ul>
-                    {% for language in person.language.all %}
-                        <li>{{ language.name }}{% if forloop.counter < person.language.all|length %}, {% endif %}</li>
-                    {% endfor %}
-                </ul>
+            </p>
+            <p>
+                {% for language in person.language.all %}
+                    {{ language.name }}{% if forloop.counter < person.language.all|length %}, {% endif %}
+                {% endfor %}
             </p>
         </fieldset>
     </li>
