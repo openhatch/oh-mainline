@@ -991,7 +991,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
             'languages': Language.objects.filter(person=person._get_pk_val),
             'linked_in_url': person.linked_in_url,
             'open_source': person.opensource,
-            'organizations': Cause.objects.filter(person=person._get_pk_val),
+            'organizations': Organization.objects.filter(person=person._get_pk_val),
             'other_name': person.other_name,
             'private': person.private,
             'skills': Skill.objects.filter(person=person._get_pk_val),
