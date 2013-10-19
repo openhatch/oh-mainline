@@ -47,13 +47,13 @@ def encode_datetime(obj):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
 
-def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
+def search_index(request, invalid_subscribe_to_alert_form=None):
     # Make the query string keys lowercase using a redirect.
     if any([k.lower() != k for k in request.GET.keys()]):
         new_GET = {}
         for key in request.GET.keys():
             new_GET[key.lower()] = request.GET[key]
-        return HttpResponseRedirect(reverse(fetch_bugs) + '?' + mysite.base.unicode_sanity.urlencode(new_GET))
+        return HttpResponseRedirect(reverse(search_index) + '?' + mysite.base.unicode_sanity.urlencode(new_GET))
 
     if request.user.is_authenticated():
         person = request.user.get_profile()
@@ -323,7 +323,7 @@ def subscribe_to_bug_alert_do(request):
     alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
     query_string = request.POST.get('query_string', '') # Lacks initial '?'
     query_string = query_string.replace(confirmation_query_string_fragment, '')
-    next = reverse(fetch_bugs) + '?' + query_string
+    next = reverse(search_index) + '?' + query_string
     if alert_form.is_valid():
         alert = alert_form.save()
         if request.user.is_authenticated():
@@ -332,12 +332,12 @@ def subscribe_to_bug_alert_do(request):
         next += confirmation_query_string_fragment
         return HttpResponseRedirect(next)
     elif query_string:
-        # We want fetch_bugs to get the right query string but we can't exactly
+        # We want search_index to get the right query string but we can't exactly
         # do that. What we *can* do is fiddle with the request obj we're about
-        # to pass to fetch_bugs.
+        # to pass to search_index.
         # Commence fiddling.
         request.GET = dict(parse_qsl(query_string))
-        return fetch_bugs(request, alert_form)
+        return search_index(request, alert_form)
     else:
         # If user tries to do a different bug search after invalid form input
         return HttpResponseRedirect(next + request.META['QUERY_STRING'])

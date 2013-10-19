@@ -61,7 +61,7 @@
                 <ul class='nudgebuttons' style="float: left; padding-bottom: 10px;border-bottom: 2px dashed #ccc; margin-bottom: 10px;">
 
                     <li>
-                    <a href='{% url mysite.search.views.fetch_bugs %}'>
+                    <a href='{% url mysite.search.views.search_index %}'>
                         <div class='notification'>
                             <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
                             <strong>
@@ -106,7 +106,7 @@
                 </ul>
 
                 {# To find things to do in the open source community, use our volunteer opportunity finder.   #}
-                {# <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on</a>. <a href='{% url mysite.search.views.fetch_bugs %}'>find someone near you to work with</a>#}
+                {# <a href='{% url mysite.search.views.search_index %}'>find a bug to work on</a>. <a href='{% url mysite.search.views.search_index %}'>find someone near you to work with</a>#}
 
                 {% endif %}
                 <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
@@ -118,7 +118,7 @@
         {% if editable and person.get_published_portfolio_entries %}
         <ul>
             <li>
-            <a href='{% url mysite.search.views.fetch_bugs %}'>
+            <a href='{% url mysite.search.views.search_index %}'>
                 Find a project &raquo;
             </a>
             </li>
