@@ -218,9 +218,6 @@ urlpatterns = patterns('',
             'oh_login'),
         (r'^account/login/do$', 'django.contrib.auth.views.login',
             {'template_name': 'account/login.html'}),
-        (r'^account/login/old$', 'django.contrib.auth.views.login',
-            {'template_name': 'account/login_old.html'},
-            'oh_login_pwd'),
 
         (r'^account/logout/$', 'django.contrib.auth.views.logout',
             {

@@ -18,122 +18,45 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
-{% load base_extras %}
 
 {% block title %}
 Log in 
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-{% comment %}CSSTODO - move this to a style sheet{% endcomment %}
-form { width: 350px; }
-.login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }
-.unsaved-data p{ margin-left: 3; padding-left: 0; list-style: square; float: left; width: 95%; margin-top: 5px; }
-.unsaved-data .the-data { float: left; color: #555;}
-.unsaved-data .the-data .label { font-style: normal;}
-.unsaved-data h4 { margin: 0 0 10px 0; }
-.unsaved-data p { margin: 0 0 10px 0; }
-{% endblock css %}
-
-{% block body_id %}login{% endblock %}
-
 {% block body_class %}{{ block.super }} auth{% endblock %}
 
-{% block main %}
+{% block css %}
+{{ block.super }}
+form {
+    width: 500px;
+}
+{% endblock css %}
 
+{% block main %}
 <div id='login' class='module'>
     <div class='module-head'>
-        <h3>Log in with an account you already own</h3>
+        <h3>Log in with a password</h3>
     </div>
     <div class='module-body'>
-
-        {% with request|get_answers_from_session as answers %}
-        {% with request|get_project_display_names_to_help_from_session as project_names_to_help %}
-
-        {% if answers %}
-        <div class='post_login_action_explanation'>
-            Thanks for your reply! To post it, <strong>link it to an account</strong>.
-        </div>
-        {% endif %}
-
-        {% if project_names_to_help %}
-        <div class='post_login_action_explanation'>
-            Thanks for declaring your interest in helping
-            {% spaceless %}
-                {% for project_name in project_names_to_help %}
-                    {% if not forloop.first and forloop.last %}
-                        and
-                    {% else %}
-                        {% if forloop.counter0 %}
-                        <span>, </span>
-                        {% endif %}
-                    {% endif %}
-                    <span>{{ project_name }}</span>
-                {% endfor %}
-            {% endspaceless %}! <br> Let us know who you are by <strong>picking an account provider</strong>.
-        </div>
-        {% endif %}
-
         <div style='float: left; width: 500px;'>
-
-            {% include 'account/login_openid.html' %}
+            <form method='POST' name='login' action='{% url django.contrib.auth.views.login %}'>{% csrf_token %}
+                {{ form.as_p }}
+                <input type='hidden' name='next' value='{{ next }}' />
+                <p><input type='submit' value='Go' /></p>
+            </form>
         </div>
-        <div style='float: right; width: 100px;'>
-
-            {% if answers %}
-            <ul class='unsaved-data' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; margin-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
-
-                {% for answer in answers %}
-                    <li>
-                        <h4 style='width: 95%;'>
-                            Your reply on the {{ answer.project.display_name }} page:
-                        </h4>
-                        <div class="the-data">
-                            <p> <span style='font-size: 1.1em;'>
-                                    {{ answer.text|linebreaks}}
-                                </span>
-                            </p>
-                            {% with answer.question as question %}
-                            {% spaceless %}
-                                <p> <small style='font-size: .95em;'>(In response to <span>&ldquo;</span>{% include 'question_text.html' %}<span>&rdquo;</span>)</small></p>
-                            {% endspaceless %}
-                            {% endwith %}
-
-                        </div>
-                    </li>
-                {% endfor %}
-
-            </ul>
-            {% endif %}
-
-            <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
-                <h4 style='width: 95%;'>Relatedly</h4>
-
-                <li><a style='font-weight: bold;'
-                    href='/blog/2009/why-we-support-openid'>
-                    What is OpenID?
-                </a></li>
-
-                <li><a href='{% url oh_login_pwd %}?next={{ next|urlencode }}'>
-                    Log in with a password
-                </a></li>
-
-                <li><a href='{% url mysite.account.views.signup %}?next={{ next|urlencode }}'>
-                    Sign up without OpenID
-                </a></li>
-            </ul>
-        </div>
+        <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
+            <h4 style='width: 95%;'>Related</h4>
+            <style>.login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }</style>
+            <li><a style='font-weight: bold;'
+            <li><a href='/account/forgot_pass'>Forgot your password?</a></li>
+        </ul>
     </div>
-    {% endwith %}
-    {% endwith %}
     <div class="module-foot">
     </div>
 </div>
 {% endblock main %}
 
 {% block js %}
-<script type='text/javascript'>
-    $(function() { openid.init('id_openid_url'); });
-</script>
+<script> $(function() { openid.init('id_openid_url'); }); </script>
 {% endblock %}

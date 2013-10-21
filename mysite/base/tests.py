@@ -100,7 +100,7 @@ class TwillTests(django.test.TestCase):
 
     def login_with_twill(self):
         # Visit login page
-        login_url = 'http://openhatch.org/account/login/old'
+        login_url = 'http://openhatch.org/account/login'
         tc.go(make_twill_url(login_url))
 
         # Log in
@@ -113,8 +113,7 @@ class TwillTests(django.test.TestCase):
     def login_with_client(self, username='paulproteus',
             password="paulproteus's unbreakable password"):
         client = Client()
-        success = client.login(username=username,
-                     password=password)
+        success = client.login(username=username, password=password)
         self.assert_(success)
         return client
 
