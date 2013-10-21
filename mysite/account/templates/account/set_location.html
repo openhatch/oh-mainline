@@ -29,18 +29,20 @@ Put yourself on the map -
 {% endblock form_action %}
 
 {% block submodule_head %}
-Put yourself on the map
+Set your Location
 {% endblock submodule_head %}
 
 {% block submodule_body %}
 {% if user.get_profile.location_display_name %}
 <p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.people %}">the global map</a>.
 If you want us to forget your location, empty out the text field and hit save.</p>
+        <p>You can specify the city, along with a country you living in.</p>
 {% else %}
 <p>To appear on <a href="{%url mysite.profile.views.people %}">the global map</a>,
   set a location.</p>
 {% endif %}
 {% if not user.get_profile.location_confirmed and user.get_profile.location_display_name and not user.get_profile.dont_guess_my_location  and not dont_suggest_location %}
+        <p>You can specify the city, along with a country you living in.</p>
 <p>
   <label></label>
   <span class="notification" style="width: 311px; margin-bottom: 0;">We've tried to guess your location.</span>

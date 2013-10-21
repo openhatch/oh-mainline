@@ -1,15 +1,9 @@
-{% load base_extras %}Hi there. I am a robot. A human named {% with invitation_key|invitation_key2user as u %}{% with u.get_full_name as n %}{{ n }}{% if n %} ({% endif %}{{ u.username }}{% if n %}){% endif %}{% endwith %}{% endwith %} asked me to let you know about a website called OpenHatch. OpenHatch makes it easier to find interesting things to do in free/libre/open source software (aka FLOSS).
+{% load base_extras %}Hi there. I am a robot. A human named {% with invitation_key|invitation_key2user as u %}{% with u.get_full_name as n %}{{ n }}{% if n %} ({% endif %}{{ u.username }}{% if n %}){% endif %}{% endwith %}{% endwith %} asked me to let you know about a website called SocialCoding4Good. SocialCoding4Good makes it easier to find interesting things to do in free/libre/open source software.
 
-Here 'tis: https://openhatch.org/
+Here 'tis: http://www.socialcoding4good.org/volunteering
 
-Things you can do once you get there:
-* Find a cool bug (or other sort of volunteering opportunity): https://openhatch.org/search/
-* Learn what other people in FLOSS are working on: https://openhatch.org/people/
-* Chat about how to contribute to libre software: https://openhatch.org/+projects/
+You can contribute to a number of projects!
 
 Kind regards,
 
 A Robot
-
--- 
-The grass is always greener on the other side of your sunglasses.

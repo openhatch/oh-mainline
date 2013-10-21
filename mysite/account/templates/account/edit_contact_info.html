@@ -33,6 +33,8 @@ Email settings
 
 {% block submodule_body %}
 {{ edit_email_form.as_p }}
-{{ show_email_form.as_p }}
-{{ email_me_form.as_p }}
+    {% comment %}
+        {{ show_email_form.as_p }}
+        {{ email_me_form.as_p }}
+    {% endcomment %}
 {% endblock submodule_body %}
