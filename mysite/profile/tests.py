@@ -610,28 +610,6 @@ class ImporterDeleteCitation(TwillTests):
 
         self.assertEqual(response.content, "0")
 
-class UserCanShowEmailAddress(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-    # {{{
-    def test_show_email(self):
-        """This test: (a) verifies my@ema.il does not appear on paulproteus's profile page, then goes to his account settings and opts in to showing it, and then verifies it does appear."""
-        # {{{
-        self.login_with_twill()
-
-        tc.go('/people/paulproteus/')
-        tc.notfind('my@ema.il')
-
-        tc.follow('settings')
-        tc.follow('Email')
-        tc.fv("a_settings_tab_form", 'show_email', '1')
-        tc.submit()
-
-        tc.go('/people/paulproteus/')
-        tc.find('my@ema.il')
-        # }}}
-    # }}}
-
-
 # Create a mock Launchpad get_info_for_launchpad_username
 mock_launchpad_debian_response = mock.Mock()
 mock_launchpad_debian_response.return_value = {
@@ -2291,42 +2269,6 @@ class Notifications(TwillTests):
         contributor_emails = [c.user.email for c in contributors]
 
         self.assertEqual(sorted(recipient_emails), sorted(contributor_emails))
-
-    def test_checkbox_manipulates_db(self):
-        self.login_with_twill()
-
-        # By default, paulproteus has the column email_me_re_projects set to True
-        paul = Person.get_by_username('paulproteus')
-        self.assert_(paul.email_me_re_projects)
-
-        # Now let's set it to false
-
-        # Visit the homepage
-        tc.go(better_make_twill_url('http://openhatch.org/'))
-
-        # Visit the settings page
-        tc.follow('settings')
-
-        # Follow the link that says "Email"
-        tc.follow('Email')
-
-        # Click it and you find a form for changing your notification settings
-        # In the form, there's a checkbox labeled "Email me periodically about
-        # activity on my projects" (or something like that)
-
-        # Uncheck the checkbox, and submit the form
-
-        tc.fv(1, 'email_me_re_projects', '0')
-        tc.submit()
-
-        # Now you no longer receive emails. For the purposes of this test,
-        # let's just inspect the database to see whether we've written down the
-        # fact that you don't want to receive emails about recent activity on
-        # your projects.
-
-        paul = Person.get_by_username('paulproteus')
-
-        self.assertFalse(paul.email_me_re_projects)
 
     def add_two_people_to_a_project_and_send_emails(self,
             people_want_emails=True, how_to_add_people=None, outbox_or_context=None,

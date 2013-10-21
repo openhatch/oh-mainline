@@ -177,8 +177,6 @@ class EditContactInfo(TwillTests):
 
         # Edit email
         tc.fv("a_settings_tab_form", 'edit_email-email', email)
-        # Show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '1') # [1]
         tc.submit()
 
         # Form submission ought to redirect us back to the form.
@@ -187,27 +185,10 @@ class EditContactInfo(TwillTests):
         # Was email successfully edited? 
         tc.find(email)
 
-        # Was email visibility successfully edited? [2]
-        tc.find('checked="checked"')
-
         # And does the email address show up on the profile?
         tc.go(make_twill_url(
                 'http://openhatch.org/people/paulproteus'))
         tc.find(email)
-
-        # 2. And when we uncheck, does it go away?
-        
-        # 2.1. Go to contact info form
-        tc.go(url)
-
-        # 2.2. Don't show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '0') # [1]
-        tc.submit()
-
-        # 2.3. Verify it's not on profile anymore
-        tc.go(make_twill_url(
-                'http://openhatch.org/people/paulproteus'))
-        tc.notfind(email)
 
         # [1]: This email suggests that twill only accepts
         # *single quotes* around the '1'.
