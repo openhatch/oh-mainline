@@ -108,6 +108,6 @@ class SelectProjectsModelMultipleChoiceField(django.forms.ModelMultipleChoiceFie
 
 class SelectProjectsForm(django.forms.Form):
     Projects = SelectProjectsModelMultipleChoiceField(
-        required=False, queryset=Project.objects.all(),widget=django.forms.CheckboxSelectMultiple)
+        required=False, queryset=Project.objects.all().order_by('name'),widget=django.forms.CheckboxSelectMultiple)
 
 # vim: set nu:
