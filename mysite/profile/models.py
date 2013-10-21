@@ -168,7 +168,7 @@ class Person(models.Model):
     other_name = models.TextField(default="", blank=True)
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
-    date_added = models.DateField(default=datetime.date.today, auto_now_add=True)
+    date_added = models.DateTimeField(default=datetime.datetime.now(), auto_now_add=True)
     uploaded_to_zoho=models.BooleanField(default=False)
     resume=models.FileField(upload_to=
                               lambda a, b: 'static/resumes/' +
