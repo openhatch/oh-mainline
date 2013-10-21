@@ -197,10 +197,11 @@ def add_project(request):
     data['form'] = project_form
 
     if request.POST:
-        project_data_form = mysite.project.forms.ProjectForm(request.POST)
+        project_data_form = mysite.project.forms.ProjectForm(request.POST, request.FILES)
 
         if project_data_form.is_valid():
             project = project_data_form.save()
+            project.update_scaled_icons_from_self_icon()
             return HttpResponseRedirect("/projects")
         else:
             data['form'] = project_data_form

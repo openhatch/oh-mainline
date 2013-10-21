@@ -65,7 +65,7 @@ about the projects we index
         </ul>
         {% endif %}
         <form name='edit-tags'
-              action='/projects/add_project'
+              action='/projects/add_project' enctype='multipart/form-data'
               method='POST'>{% csrf_token %}
 
             <div class='form-row'>
@@ -82,6 +82,14 @@ about the projects we index
                 </div>
                 {{ form.display_name }}
                 {{ form.display_name.errors }}
+            </div>
+
+            <div class='form-row'>
+                <div>
+                    <label>Icon:</label>
+                </div>
+                {{ form.icon_raw }}
+                {{ form.icon_raw.errors }}
             </div>
 
             <div class='form-row'>

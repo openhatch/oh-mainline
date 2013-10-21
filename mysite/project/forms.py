@@ -59,4 +59,4 @@ class ProjectForm(django.forms.ModelForm):
 
     class Meta:
         model = mysite.search.models.Project
-        fields = ("name", "display_name", "language", "homepage", "skills", "duration", "organization", "languages")
+        fields = ("name", "display_name", "language", "homepage", "skills", "duration", "organization", "languages", "icon_raw")
