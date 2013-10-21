@@ -408,4 +408,4 @@ class ProjectFilter(TwillTests):
         self.client = self.login_with_client()
         response = HttpResponse(self.client.get(path='/projects', follow=True))
         self.assertTrue('<li class="search_card_project">' in response.content)
-        self.assertTrue('<span class="legend">test_project</span>' in response.content)
+        self.assertTrue('<a class="legend" href="test_project">test_project</a>' in response.content)
