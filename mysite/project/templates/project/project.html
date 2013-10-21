@@ -227,11 +227,6 @@ about how you can help {{ project.display_name }}
     <div class='module' id='about'>
         <div class='module-head'>
             <h3>About {{ project.display_name }}</h3>
-            <ul>
-                <li>
-                    <a href='{{ project.get_edit_page_url }}'>Edit project settings</a>
-                </li>
-            </ul>
         </div>
         <div class='module-body'>
             <div class='project_icon' 
@@ -322,10 +317,7 @@ about how you can help {{ project.display_name }}
             </p>
         {% else %}
             <p>
-                No volunteer opportunities in {{project.display_name}} indexed here yet. 
-                <a href='{% url mysite.project.views.edit_project project.name %}#edit_bug_trackers'>
-                    Add a bug tracker</a>.
-
+                No volunteer opportunities in {{project.display_name}} indexed here yet.
             </p>
     {% endif %}
   

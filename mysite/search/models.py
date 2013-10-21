@@ -317,11 +317,6 @@ class Project(OpenHatchModel):
         return reverse(mysite.project.views.project,
                 kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
 
-    def get_edit_page_url(self):
-        import mysite.project.views
-        return reverse(mysite.project.views.edit_project,
-                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
-
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
         import mysite.profile.view_helpers

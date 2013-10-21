@@ -110,7 +110,7 @@ class AutoCompleteTests(SearchTest):
 
     def testSuggestionsMinimallyWorks(self):
         suggestions = views.get_autocompletion_suggestions(u'')
-        self.assert_("lang:Vogon" in suggestions)
+        self.assert_("lang:English" in suggestions)
 
     def testSuggestForAllFields(self):
         c_suggestions = views.get_autocompletion_suggestions(u'C')
@@ -133,8 +133,7 @@ class AutoCompleteTests(SearchTest):
         suggestions_string = views.list_to_jquery_autocompletion_format(
                 suggestions_list)
         suggestions_list_reconstructed = suggestions_string.split("\n")
-        self.assert_("project:ComicChat" in suggestions_list_reconstructed)
-        self.assert_("lang:Vogon" in suggestions_list_reconstructed)
+        self.assert_("project:Amara" in suggestions_list_reconstructed)
         self.assert_("lang:C++" in suggestions_list_reconstructed)
 
     def testSuggestsSomethingOverHttp(self):
@@ -894,7 +893,7 @@ class QueryGetPossibleProjectFacetOptions(SearchTest):
         possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
         self.assertEqual(
                 sorted(possible_project_names),
-                sorted(list(Project.objects.values_list('name', flat=True))))
+                sorted(['Dali', 'Magritte', 'Miro']))
 
 class QueryContributionType(SearchTest):
 

@@ -321,7 +321,7 @@ def generate_user_export(u):
     out['person'] = django.forms.models.model_to_dict(
         u.get_profile(), exclude=[
             'photo', 'photo_thumbnail', 'photo_thumbnail_20px_wide',
-            'photo_thumbnail_30px_wide',
+            'photo_thumbnail_30px_wide', "resume",
             ])
     return out
 

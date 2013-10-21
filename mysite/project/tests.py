@@ -156,14 +156,14 @@ class ProjectPageCreation(TwillTests):
         Project.create_dummy(name=project_name.lower())
 
         # See? We have our project in the database (with slightly different case, but still)
-        self.assertEqual(1, len(mysite.search.models.Project.objects.all()))
+        self.assertEqual(16, len(mysite.search.models.Project.objects.all()))
 
         self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
         response = self.client.post(reverse(mysite.project.views.create_project_page_do),
                                     {'project_name': project_name}, follow=True)
 
         # And we still have exactly that one project in the database.
-        self.assertEqual(1, len(mysite.search.models.Project.objects.all()))
+        self.assertEqual(16, len(mysite.search.models.Project.objects.all()))
 
         #  and redirected.
         self.assertEqual(response.redirect_chain,
@@ -334,61 +334,6 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
         lucky_projects = mysite.project.view_helpers.get_wanna_help_queue_from_session(self.client.session)
         self.assertEqual([k.name for k in lucky_projects], ['Myproject'])
 
-class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
-
-    def test(self):
-
-        # Create a project.
-        project = Project.create_dummy()
-
-        # Create two profiles, each with a PortfolioEntry linking it to the
-        # project, each with descriptions.
-        def create_pfe_with_description(username):
-            return PortfolioEntry.create_dummy(project=project,
-                    person=Person.get_by_username(username),
-                    is_published=True)
-        pfes = {'uncheck_me': create_pfe_with_description('paulproteus'),
-                'keep_me_checked': create_pfe_with_description('barry')}
-
-        # Get a list of the PortfolioEntries that we use to get a random project
-        # description for the project page.
-        descriptions = project.get_pfentries_with_usable_descriptions()
-
-        # Observe that the list contains both PortfolioEntries.
-        for entry in pfes.values():
-            self.assert_(entry in descriptions)
-
-        self.login_with_twill()
-
-        # Go to the project page.
-        url = urlparse.urljoin("http://openhatch.org", project.get_edit_page_url())
-        tc.go(better_make_twill_url(url))
-
-        # In preparation for the next set of assertions, make sure that the
-        # entries don't have the same description.
-        self.assertNotEqual(
-                pfes['uncheck_me'].project_description,
-                pfes['keep_me_checked'].project_description)
-
-        # See a list of project descriptions on the page, which equals the list of
-        # descriptions in the DB.
-        for entry in pfes.values():
-            tc.find(entry.project_description)
-
-        # Uncheck one of the checkboxes and submit the form
-        name_of_checkbox_to_uncheck = "%s-use_my_description" % pfes['uncheck_me'].pk
-        tc.fv("2", name_of_checkbox_to_uncheck, False)
-        tc.submit()
-
-        # Get a list of the PortfolioEntries that we use to get a random project
-        # description for the project page.
-        good_pfentries = project.get_pfentries_with_usable_descriptions()
-
-        # Observe that the list contains only the checked PortfolioEntry.
-        self.assert_(pfes['uncheck_me'] not in good_pfentries)
-        self.assert_(pfes['keep_me_checked'] in good_pfentries)
-
 class BugTrackersOnProjectEditPage(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
 
@@ -431,10 +376,10 @@ class ProjectFilter(TwillTests):
         if query:
             query = query.strip()
             matching_projects = mysite.project.view_helpers.similar_project_names(query)
-            matching_projects = mysite.project.view_helpers.filter_projects(projects=matching_projects,
+            return mysite.project.view_helpers.filter_projects(projects=matching_projects,
                                                                             post_data=post_data)
         else:
-            matching_projects = Project.objects.all()
+            return Project.objects.all()
 
     def assert_project_count(self, count, *args):
         queryDict = QueryDictHelper.create_query_dict(*args)
@@ -445,16 +390,16 @@ class ProjectFilter(TwillTests):
         self.assert_project_count(1, (u'q', u'test_project'))
 
     def test_search_by_skills(self):
-        self.assert_project_count(1, (u'q', u''), (u'skills[]', [u'1', u'2']))
+        self.assert_project_count(16, (u'q', u''), (u'skills[]', [u'1', u'2']))
 
     def test_search_by_organizations(self):
-        self.assert_project_count(1, (u'q', u''), (u'organizations[]', [u'1', u'2']))
+        self.assert_project_count(16, (u'q', u''), (u'organizations[]', [u'1', u'2']))
 
     def test_search_by_languages(self):
-        self.assert_project_count(1, (u'q', u''), (u'languages[]', [u'1', u'2']))
+        self.assert_project_count(16, (u'q', u''), (u'languages[]', [u'1', u'2']))
 
     def test_search_by_duration(self):
-        self.assert_project_count(1, (u'q', u''), (u'duration[]', [u'1', u'2']))
+        self.assert_project_count(16, (u'q', u''), (u'duration[]', [u'1', u'2']))
 
     def test_should_find_none(self):
         self.assert_project_count(0, (u'q', u'some_other_test_project'))
