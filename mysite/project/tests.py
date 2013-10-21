@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from django.http import HttpResponse
 from django.utils.unittest.case import skip
 from mysite.base.test_helpers import QueryDictHelper
 from mysite.project.test_helpers import ProjectHelper
@@ -359,7 +360,7 @@ class BugTrackersOnProjectEditPage(TwillTests):
 
 class ProjectFilter(TwillTests):
     """ Tests project search and filters on the projects/ page """
-
+    fixtures = ['user-paulproteus', 'person-paulproteus']
     test_project = None
 
     @classmethod
@@ -370,36 +371,41 @@ class ProjectFilter(TwillTests):
     def tearDownClass(cls):
         cls.test_project.delete()
 
-    def get_filtered_projects(self, post_data):
-        query = post_data.get('q', '')
+    def __get_filtered_projects(self, post_data):
+        query = post_data.get(u'q', '')
         matching_projects = []
-        if query:
+        if query is not None:
             query = query.strip()
             matching_projects = mysite.project.view_helpers.similar_project_names(query)
-            return mysite.project.view_helpers.filter_projects(projects=matching_projects,
-                                                                            post_data=post_data)
+            return mysite.project.view_helpers.filter_projects(projects=matching_projects, post_data=post_data)
         else:
             return Project.objects.all()
 
-    def assert_project_count(self, count, *args):
+    def __assert_project_count(self, count, *args):
         queryDict = QueryDictHelper.create_query_dict(*args)
-        projects = self.get_filtered_projects(queryDict)
+        projects = self.__get_filtered_projects(queryDict)
         self.assertEqual(len(projects), count)
 
     def test_search_by_name(self):
-        self.assert_project_count(1, (u'q', u'test_project'))
+        self.__assert_project_count(1, (u'q', u'test_project'))
 
     def test_search_by_skills(self):
-        self.assert_project_count(16, (u'q', u''), (u'skills[]', [u'1', u'2']))
+        self.__assert_project_count(1, (u'q', u''), (u'skills[]', [u'1', u'4']))
 
     def test_search_by_organizations(self):
-        self.assert_project_count(16, (u'q', u''), (u'organizations[]', [u'1', u'2']))
+        self.__assert_project_count(6, (u'q', u''), (u'organizations[]', [u'1', u'2']))
 
     def test_search_by_languages(self):
-        self.assert_project_count(16, (u'q', u''), (u'languages[]', [u'1', u'2']))
+        self.__assert_project_count(1, (u'q', u''), (u'languages[]', [u'1', u'2']))
 
     def test_search_by_duration(self):
-        self.assert_project_count(16, (u'q', u''), (u'duration[]', [u'1', u'2']))
+        self.__assert_project_count(1, (u'q', u''), (u'duration[]', [u'4']))
 
     def test_should_find_none(self):
-        self.assert_project_count(0, (u'q', u'some_other_test_project'))
+        self.__assert_project_count(0, (u'q', u'some_other_test_project'))
+
+    def test_is_project_card_displayed(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/projects', follow=True))
+        self.assertTrue('<li class="search_card_project">' in response.content)
+        self.assertTrue('<span class="legend">test_project</span>' in response.content)

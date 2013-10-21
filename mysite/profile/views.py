@@ -56,7 +56,7 @@ from mysite.profile.models import \
         Link_Project_Tag, Link_Person_Tag, \
         DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, Heard_From, Experience
 from mysite.search.models import Project
-from mysite.base.decorators import view, as_view, has_permissions, __has_permissions
+from mysite.base.decorators import view, as_view, has_permissions, _has_permissions
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
@@ -127,7 +127,7 @@ def display_person_web(request, user_to_display__username=None):
     user = get_object_or_404(User, username=user_to_display__username)
     person, was_created = Person.objects.get_or_create(user=user)
 
-    if person.private and request.user != user and __has_permissions(request.user,['can_view_people']) == False:
+    if person.private and request.user != user and _has_permissions(request.user,['can_view_people']) == False:
         raise Http404
 
     data = get_personal_data(person)

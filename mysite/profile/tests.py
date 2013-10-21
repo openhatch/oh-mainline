@@ -20,8 +20,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
-from django.http import QueryDict
+from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 from mysite.base.test_helpers import QueryDictHelper
+from mysite.base.decorators import _has_permissions, _has_group
 from mysite.profile.test_helpers import UserAndPersonHelper
 from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.view_helpers import ObjectFromDict
@@ -56,7 +58,8 @@ import django.db
 from django.core import serializers
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+
 
 class StarlingTests(TwillTests):
     def test_page(self):
@@ -1747,18 +1750,17 @@ class PeopleSearch(TwillTests):
 
 class PeopleFilter(TwillTests):
     """ Tests people search and filters on the /people page """
+    fixtures = ['user-paulproteus', 'person-paulproteus']
     test_person = None
 
-    @classmethod
-    def setUpClass(cls):
-        cls.test_person = UserAndPersonHelper.create_test_user_and_person()
+    def setUp(self):
+        self.test_person = UserAndPersonHelper.create_test_user_and_person()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.test_person.user.delete()
-        cls.test_person.delete()
+    def tearDown(self):
+        self.test_person.user.delete()
+        self.test_person.delete()
 
-    def get_filtered_people(self, data):
+    def __get_filtered_people(self, data):
         post_data = data
         query = post_data.get(u'q', u'')
         parsed_query = mysite.profile.view_helpers.parse_string_query(query)
@@ -1771,40 +1773,46 @@ class PeopleFilter(TwillTests):
 
         return mysite.profile.view_helpers.filter_people(people=everybody, post_data=post_data)
 
-    def assert_person_count(self, count, *args):
+    def __assert_person_count(self, count, *args):
         queryDict = QueryDictHelper.create_query_dict(*args)
-        people = self.get_filtered_people(queryDict)
+        people = self.__get_filtered_people(queryDict)
         self.assertEqual(len(people), count)
 
     def test_search_by_name(self):
-        self.assert_person_count(1, (u'q', u'test_user'))
+        self.__assert_person_count(1, (u'q', u'test_user'))
 
     def test_search_by_company_name(self):
-        self.assert_person_count(1, (u'q', u''), (u'filter_company_name', u'test_company'))
+        self.__assert_person_count(1, (u'q', u''), (u'filter_company_name', u'test_company'))
 
     def test_search_by_email(self):
-        self.assert_person_count(1, (u'q', u''), (u'filter_email', u'test@user.com'))
+        self.__assert_person_count(1, (u'q', u''), (u'filter_email', u'test@user.com'))
 
     def test_search_by_skills(self):
-        self.assert_person_count(1, (u'q', u''), (u'skills[]', [u'1', u'2']))
+        self.__assert_person_count(1, (u'q', u''), (u'skills[]', [u'1', u'2']))
 
     def test_search_by_organizations(self):
-        self.assert_person_count(1, (u'q', u''), (u'organizations[]', [u'1', u'2']))
+        self.__assert_person_count(1, (u'q', u''), (u'organizations[]', [u'1', u'2']))
 
     def test_search_by_causes(self):
-        self.assert_person_count(1, (u'q', u''), (u'causes[]', [u'1', u'2']))
+        self.__assert_person_count(1, (u'q', u''), (u'causes[]', [u'1', u'2']))
 
     def test_search_by_languages(self):
-        self.assert_person_count(1, (u'q', u''), (u'languages[]', [u'1', u'2']))
+        self.__assert_person_count(1, (u'q', u''), (u'languages[]', [u'1', u'2']))
 
     def test_search_by_time_to_commit(self):
-        self.assert_person_count(1, (u'q', u''), (u'time_to_commit', '1'))
+        self.__assert_person_count(2, (u'q', u''), (u'time_to_commit', '1'))
 
     def test_search_by_opensource(self):
-        self.assert_person_count(1, (u'q', u''), (u'opensource', u'True'))
+        self.__assert_person_count(2, (u'q', u''), (u'opensource', u'True'))
 
     def test_should_find_none(self):
-        self.assert_person_count(0, (u'q', u'some_other_test_user'))
+        self.__assert_person_count(0, (u'q', u'some_other_test_user'))
+
+    def test_is_person_card_displayed(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/people', follow=True))
+        self.assertTrue('<li class="search_card_profile">' in response.content)
+        self.assertTrue('<a class="legend" href="test_user">test user</a>' in response.content)
 
 class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
     def setUp(self):
@@ -2945,5 +2953,144 @@ class TestUserDeletion(TwillTests):
         self.assertFalse(django.contrib.auth.models.User.objects.filter(
                 username='barry'))
         self.assertEqual(2, len(django.core.mail.outbox))
+
+class PermissionsAndGroups(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    test_person = None
+
+    def setUp(self):
+        self.test_person = UserAndPersonHelper.create_test_user_and_person()
+
+    def tearDown(self):
+        self.test_person.delete()
+
+    def __create_test_group(self):
+        permission = Permission.objects.create(name='Test Permission', content_type=ContentType.objects.get(pk=1),
+                                               codename='test_permission')
+        permission.save()
+        group = Group.objects.create(name='TEST_GROUP')
+        group.permissions.add(permission)
+        group.save()
+        self.test_person.user.groups.add(group)
+        self.test_person.user.save()
+
+    def __create_project_partner_group(self):
+        permission = Permission.objects.create(name='Can view people', content_type=ContentType.objects.get(pk=38),
+                                               codename='can_view_people')
+        permission.save()
+        permission = Permission.objects.create(name='Can filter people', content_type=ContentType.objects.get(pk=38),
+                                               codename='can_filter_people')
+        permission.save()
+        group = Group.objects.create(name='PROJECT_PARTNER')
+        group.permissions = Permission.objects.filter(codename__in=['can_view_people', 'can_filter_people'])
+        group.save()
+        self.test_person.user.groups.add(group)
+        self.test_person.user.save()
+
+    def __cleanup_test_group(self):
+        self.test_person.user.groups.clear()
+        Group.objects.get(name='TEST_GROUP').delete()
+        Permission.objects.get(codename='test_permission').delete()
+
+    def __cleanup_project_partner_group(self):
+        self.test_person.user.groups.clear()
+        Group.objects.get(name='PROJECT_PARTNER').delete()
+        Permission.objects.filter(codename__in=['can_view_people', 'can_filter_people']).delete()
+
+    def test_user_has_permission(self):
+        self.__create_test_group()
+        self.assertTrue(_has_permissions(self.test_person.user, ['test_permission']))
+        self.__cleanup_test_group()
+
+    def test_user_has_group(self):
+        self.__create_test_group()
+        self.assertTrue(_has_group(self.test_person.user, 'TEST_GROUP'))
+        self.__cleanup_test_group()
+
+    def test_user_has_access_to_people_page(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/people/', follow=True))
+        self.assertTrue('<body id=\'people-map\'' in response.content)
+
+    def test_project_partner_has_access_to_people_page(self):
+        self.__create_project_partner_group()
+        self.client = self.login_with_client('test_user', 'user')
+        response = HttpResponse(self.client.get(path='/people/', follow=True))
+        self.assertTrue('<body id=\'people-map\'' in response.content)
+        self.__cleanup_project_partner_group()
+
+    def test_user_has_access_to_projects_page(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/projects/', follow=True))
+        self.assertTrue('<body id=\'projects\'' in response.content)
+
+    def test_access_denied_for_people_page(self):
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/people/', follow=True))
+        self.assertTrue('<body id=\'people-map\'' not in response.content)
+
+    def test_access_denied_for_projects_page(self):
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/projects/', follow=True))
+        self.assertTrue('<body id=\'projects\'' not in response.content)
+
+    def test_project_partner_access_denied_for_projects_page(self):
+        self.__create_project_partner_group()
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/projects/', follow=True))
+        self.assertTrue('<body id=\'projects\'' not in response.content)
+        self.__cleanup_project_partner_group()
+
+    def test_login_required_for_people_page(self):
+        response = HttpResponse(self.client.get(path='/people/', follow=True))
+        self.assertTrue('id=\'people-map\'' not in response.content)
+
+    def test_login_required_for_projects_page(self):
+        response = HttpResponse(self.client.get(path='/projects/', follow=True))
+        self.assertTrue('<body id=\'projects\'' not in response.content)
+
+    def test_nav_people_and_projects_displayed(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/', follow=True))
+        self.assertTrue('<a href=\'/people/\'>' in response.content)
+        self.assertTrue('<a href=\'/projects/\'>' in response.content)
+
+    def test_nav_people_and_projects_not_displayed(self):
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/', follow=True))
+        self.assertTrue('<a href=\'/people/\'>' not in response.content)
+        self.assertTrue('<a href=\'/projects/\'>' not in response.content)
+
+    def test_nav_people_and_projects_login_required(self):
+        response = HttpResponse(self.client.get(path='/', follow=True))
+        self.assertTrue('<a href=\'/people/\'>' not in response.content)
+        self.assertTrue('<a href=\'/projects/\'>' not in response.content)
+
+    def test_volunteer_projects_displayed(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        self.assertTrue('<div id=\'portfolio\'' in response.content)
+
+    def test_project_partner_volunteer_projects_not_displayed(self):
+        self.__create_project_partner_group()
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/people/paulproteus', follow=True))
+        self.assertTrue('<div id=\'portfolio\'' not in response.content)
+        self.__cleanup_project_partner_group()
+
+    def test_user_can_see_own_projects(self):
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        self.assertTrue('<div id=\'portfolio\'' in response.content)
+
+    def test_admin_can_see_projects_edit_button(self):
+        self.client = self.login_with_client()
+        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        self.assertTrue('<a id="edit-user-projects"' in response.content)
+
+    def test_user_cannot_see_own_projects_edit_button(self):
+        self.client = self.login_with_client(username='test_user', password='user')
+        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        self.assertTrue('<a id="edit-user-projects"' not in response.content)
 
 # vim: set ai et ts=4 sw=4 nu:

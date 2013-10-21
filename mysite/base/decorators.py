@@ -213,7 +213,7 @@ def has_permissions(permissions):
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-            if __has_permissions(request.user, permissions):
+            if _has_permissions(request.user, permissions):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
             # If the login url is the same scheme and net location then just
@@ -231,7 +231,7 @@ def has_permissions(permissions):
 
     return decorator
 
-def __has_permissions(user, permissions=None):
+def _has_permissions(user, permissions=None):
     if not permissions: permissions = []
     if user.is_active and user.is_superuser:
         return True
@@ -259,7 +259,7 @@ def has_group(group_name):
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-            if __has_group(request.user, group_name):
+            if _has_group(request.user, group_name):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
             # If the login url is the same scheme and net location then just
@@ -277,7 +277,7 @@ def has_group(group_name):
 
     return decorator
 
-def __has_group(user, group_name):
+def _has_group(user, group_name):
     if user.is_active and user.is_superuser:
         return True
 

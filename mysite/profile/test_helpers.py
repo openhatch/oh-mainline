@@ -10,8 +10,8 @@ class UserAndPersonHelper():
         # Password: user
         user = User.objects.create(username='test_user', first_name='test', last_name='user', email='test@user.com',
                                    password='sha1$e6e97$9968be01c90fc1658c9d640902e83f36b511c018',
-                                   is_staff='1', is_active='1', is_superuser='1', last_login=datetime.now(),
-                                   date_joined=datetime.now())
+                                   is_staff='0', is_active='1', last_login=datetime.now(), date_joined=datetime.now())
+        user.is_superuser = False
         user.save()
         person = Person.objects.get(user=user)
         person.bio = 'test_bio'

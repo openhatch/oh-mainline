@@ -42,7 +42,6 @@ for u in xrange(0, MAX_USERS):
     last_login = datetime.now()
     date_joined = datetime.now()
     user_data.append((id, username, first_name, last_name, email, password, 0, 1, 0, last_login, date_joined))
-    organization_id = random.randint(1, 7)
     # Many to Many
     skill_id = random.randint(1, 9)
     language_id = random.randint(1, 14)
@@ -88,11 +87,12 @@ for p in xrange(next_id, next_id + MAX_USERS):
     subscribed = False
     experience_id = random.randint(1, 3)
     uploaded_to_zoho = False
+    date_added = datetime.now()
     person_data.append((photo, photo_thumbnail_30px_wide, photo_thumbnail, irc_nick, user_id, photo_thumbnail_20px_wide,
                         last_polled, opensource, company_name, private, dont_guess_my_location, bio, contact_blurb, show_email,
                         location_confirmed, linked_in_url, expand_next_steps, location_display_name, time_to_commit_id,
                         homepage_url, gotten_name_from_ohloh, email_me_re_projects, google_code_name, comment,
-                        language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho))
+                        language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho, date_added))
 
 print 'Adding user rows...'
 user_sql = u'INSERT INTO auth_user (id, username, first_name, last_name, email, password, is_staff, is_active,' \
@@ -108,8 +108,9 @@ person_sql = u'INSERT INTO profile_person (photo, photo_thumbnail_30px_wide, pho
              u'photo_thumbnail_20px_wide, last_polled, opensource, company_name, private, dont_guess_my_location, bio,' \
              u'contact_blurb, show_email, location_confirmed, linked_in_url, expand_next_steps, location_display_name,' \
              u'time_to_commit_id, homepage_url, gotten_name_from_ohloh, email_me_re_projects, google_code_name,' \
-             u'comment, language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho)' \
-             u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             u'comment, language_spoken, other_name, github_name, subscribed, experience_id, uploaded_to_zoho,' \
+             u'date_added)' \
+             u'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 cursor.executemany(person_sql, person_data)
 connection.commit()
 
@@ -118,7 +119,7 @@ cursor.executemany(
     person_skill_sql,
     person_skill_data)
 
-person_language_sql = u'INSERT INTO profile_person_language (person_id, language_id) VALUES(?, ?)';
+person_language_sql = u'INSERT INTO profile_person_language (person_id, language_id) VALUES(?, ?)'
 cursor.executemany(
     person_language_sql,
     person_language_data)
@@ -128,7 +129,7 @@ cursor.executemany(
     person_organization_sql,
     person_organization_data)
 
-person_cause_sql = u'INSERT INTO profile_person_cause (person_id, cause_id) VALUES(?, ?)';
+person_cause_sql = u'INSERT INTO profile_person_cause (person_id, cause_id) VALUES(?, ?)'
 cursor.executemany(
     person_cause_sql,
     person_cause_data)
