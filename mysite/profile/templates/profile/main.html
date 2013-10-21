@@ -28,6 +28,7 @@
 {% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
 
 {% block main %}
+{% if person.user == user or user|has_group:'ADMIN' %}
 <div id='portfolio' class='module project-display viewer'>
     <div class='module-head'>
         {% if user|has_group:'ADMIN' %}
@@ -66,6 +67,7 @@
         {% endwith %}
     </div>
 </div> <!-- /#portfolio -->
+{% endif %}
 {% endblock main %}
 
 {% block js %}
