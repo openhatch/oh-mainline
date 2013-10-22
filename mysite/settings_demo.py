@@ -1,6 +1,7 @@
 from settings import *
 
-FORCE_SCRIPT_NAME = 'demo'
-MEDIA_URL = '/' + FORCE_SCRIPT_NAME + '/static/'
-STATIC_DOC_ROOT = FORCE_SCRIPT_NAME + '/static/'
-LOGIN_URL = '/' + FORCE_SCRIPT_NAME + '/account/login/'
+DEMO_APP_CONTEXT_NAME = 'demo'
+FORCE_SCRIPT_NAME = '/' + DEMO_APP_CONTEXT_NAME
+MEDIA_URL = FORCE_SCRIPT_NAME + '/static/'
+STATIC_DOC_ROOT = DEMO_APP_CONTEXT_NAME + '/static/'
+LOGIN_URL = FORCE_SCRIPT_NAME + '/account/login/'
