@@ -1176,7 +1176,9 @@ body#profile div#info a.edit {
 body#profile div#portfolio li.project_list_item {
     float: left;
     width: 280px;
-    height: 70px;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
     padding: 15px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -1196,6 +1198,11 @@ body#profile div#portfolio li.project_list_item {
     background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f9f9f9', GradientType=0); /* IE6-9 */
     cursor: pointer;
+}
+
+body#profile div#portfolio li.project_list_item img {
+    width: 64px !important;
+    height: 64px !important;
 }
 
 body#profile div#portfolio li.project_list_item_hover {
