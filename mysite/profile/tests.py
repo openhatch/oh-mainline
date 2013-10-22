@@ -29,6 +29,7 @@ from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.view_helpers import ObjectFromDict
 from mysite.base.models import Timestamp, Experience
 import mysite.account.tests
+from mysite.project.test_helpers import ProjectHelper
 from mysite.search.models import Project, WannaHelperNote
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder, TimeToCommit
 import mysite.project.views
@@ -177,19 +178,6 @@ class Info(TwillTests):
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
         tc.find(tag_dict.values()[0][0])
-        # }}}
-
-    def test_tag_edit_once(self):
-        # {{{
-        self.login_with_twill()
-        self.update_tags(self.tags)
-        # }}}
-
-    def test_tag_edit_twice(self):
-        # {{{
-        self.login_with_twill()
-        self.update_tags(self.tags)
-        self.update_tags(self.tags_2)
         # }}}
 
     # }}}
@@ -646,41 +634,6 @@ class BugsAreRecommended(TwillTests):
         recommended = list(recommender.recommend())
         self.assertNotEqual(recommended[0], recommended[1])
 
-class PersonInfoLinksToSearch(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test_whatever(self):
-        # FIXME: When there is a reasonable way to do search during test runtime,
-        # like us using djapian or whoosh, then let's re-enable the assertion at the end
-        # of this.
-        '''
-        * Have a user, say that he understands+wantstolearn+currentlylearns+canmentor something
-        * Go to his user page, and click those various links
-        * Find yourself on some search page that mentions the user.
-        '''
-        tags = {
-            'understands': ['thing1'],
-            'understands_not': ['thing2'],
-            'can_pitch_in': ['thing3'],
-            'studying': ['thing4'],
-            'can_mentor': ['thing5'],
-            }
-
-        # Log in as paulproteus
-
-        self.login_with_twill()
-
-        # Update paulproteus's tags
-        tc.go(reverse(mysite.profile.views.edit_info))
-        for tag_type_name in tags:
-            tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tags[tag_type_name]))
-        tc.submit()
-
-        # Now, click on "thing1"
-        tc.follow("thing1")
-
-        # XXX see fixme remark in top of method
-
 class Widget(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -695,38 +648,6 @@ class Widget(TwillTests):
                 kwargs={'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
         client.get(widget_js_url)
-
-class PersonalData(TwillTests):
-    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
-            'person-paulproteus', 'cchost-data-imported-from-ohloh']
-
-    def test_all_views_that_call_get_personal_data(self):
-        # Views where you can look at somebody else.
-        stalking_view2args = {
-                mysite.profile.views.display_person_web: {
-                    'user_to_display__username': 'paulproteus'},
-                }
-
-        # Views where you look only at yourself.
-        navelgazing_view2args = {
-                mysite.profile.views.importer: {},
-                }
-
-        for view in stalking_view2args:
-            self.client.login(username='barry', password='parallelism')
-            kwargs = stalking_view2args[view]
-            url = reverse(view, kwargs=kwargs)
-            response = self.client.get(url)
-            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
-            self.client.logout()
-
-        for view in navelgazing_view2args:
-            client = self.login_with_client()
-            kwargs = navelgazing_view2args[view]
-            url = reverse(view, kwargs=kwargs)
-            response = client.get(url)
-            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
-            client.logout()
 
 class DeletePortfolioEntry(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -912,89 +833,6 @@ class ReplaceIconWithDefault(TwillTests):
         self.assertFalse(portfolio_entry.project.icon_raw,
             "Expected postcondition: portfolio entry's icon evaluates to False "
             "because it is generic.")
-
-class SavePortfolioEntry(TwillTests):
-    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
-
-    def setUp(self):
-        TwillTests.setUp(self)
-        self.user = "paulproteus"
-        self.project = Project.objects.get_or_create(name='project name')[0]
-
-        self.portfolio_entry = PortfolioEntry.objects.get_or_create(
-            project=self.project,
-            person=Person.objects.get(user__username=self.user))[0]
-        citation = Citation(
-            portfolio_entry=self.portfolio_entry,
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query=self.user, completed=True,
-                person=Person.objects.get(user__username=self.user))[0]
-            )
-        citation.is_published = False
-        citation.save()
-
-        self.experience_description = [
-            'This is a multiparagraph experience description.',
-            'This is the second paragraph.',
-            'This is the third paragraph.']
-
-        self.project_description = [
-            'This is a multiparagraph project description.',
-            'This is the second paragraph.',
-            'This is the third paragraph.']
-
-        self.POST_data = {
-            'portfolio_entry__pk': self.portfolio_entry.pk,
-            'pf_entry_element_id': 'blargle', # this can be whatever
-            'project_description': "\n".join(self.project_description),
-            'experience_description': "\n".join(self.experience_description),
-            'receive_maintainer_updates': 'false',
-        }
-
-        POST_handler = reverse(mysite.profile.views.save_portfolio_entry_do)
-        self.post_result = self.login_with_client().post(POST_handler, self.POST_data)
-        self.contribution_page = self.login_with_client().get(
-            make_twill_url("http://openhatch.org/people/%s/" % (self.user,)))
-
-    def test_save_portfolio_entry(self):
-        expected_output = {
-            'success': True,
-            'pf_entry_element_id': 'blargle',
-            'portfolio_entry__pk': self.portfolio_entry.pk,
-            'project__pk': self.project.id,
-        }
-
-        # check output
-        self.assertEqual(simplejson.loads(self.post_result.content), expected_output)
-
-        # postcondition
-        portfolio_entry = PortfolioEntry.objects.get(pk=self.portfolio_entry.pk)
-        self.assertEqual(portfolio_entry.project_description,
-                         self.POST_data['project_description'])
-        self.assertEqual(portfolio_entry.experience_description,
-                         self.POST_data['experience_description'])
-        self.assert_(portfolio_entry.is_published, "pf entry is published.")
-        self.assertFalse(portfolio_entry.receive_maintainer_updates)
-
-        citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
-        for c in citations:
-            self.assert_(c.is_published)
-
-    def test_multiparagraph_contribution_description(self):
-        """
-        If a multi-paragraph project contribution description is submitted,
-        display it as a multi-paragraph description.
-        """
-        self.assertContains(
-            self.contribution_page, "<br />".join(self.experience_description))
-
-    def test_multiparagraph_project_description(self):
-        """
-        If a multi-paragraph project description is submitted, display it as a
-        multi-paragraph description.
-        """
-        self.assertContains(
-            self.contribution_page, "<br />".join(self.project_description))
 
 class GimmeJsonTellsAboutImport(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -1378,43 +1216,6 @@ class EditBio(TwillTests):
         #now we should see our bio in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('lookatme!')
-
-class EditHomepage(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        '''
-        * Goes to paulproteus's profile
-        * checks that there is no link to asheesh.org
-        * clicks edit on the Info area
-        * enters a link as Info
-        * checks that his bio now contains "asheesh.org"
-        '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        # not so vain.. yet
-        tc.notfind('asheesh.org')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        # make sure our bio is not already on the form
-        tc.notfind('asheesh.org')
-        # set the bio in ze form
-        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
-        tc.submit()
-        # find the string we just submitted as our bio
-        tc.find('asheesh.org')
-        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
-        "http://www.asheesh.org/")
-        # now we should see our bio in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('asheesh.org')
-        # try an invalid url
-        tc.fv('edit-tags', 'edit-tags-homepage_url', 'htttp://www.asheesh.org/')
-        tc.submit()
-        # check that the form came back with an error
-        tc.find('has_errors')
-        # ensure it didn't get saved
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        tc.notfind('htttp')
 
 class EditIrcNick(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -3034,5 +2835,53 @@ class PermissionsAndGroups(TwillTests):
         self.client = self.login_with_client(username='test_user', password='user')
         response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
         self.assertTrue('<a id="edit-user-projects"' not in response.content)
+
+class UserProfile(TwillTests):
+    test_project = None
+    test_person = None
+    portfolio_entry = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.test_project = ProjectHelper.create_test_project()
+        cls.test_person = UserAndPersonHelper.create_test_user_and_person()
+        cls.portfolio_entry = PortfolioEntry.objects.create(person=cls.test_person, project=cls.test_project)
+        cls.portfolio_entry.is_published = True
+        cls.portfolio_entry.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.portfolio_entry.delete()
+        cls.test_person.delete()
+        cls.test_project.delete()
+
+    def __get_page_content(self):
+        self.client = self.login_with_client('test_user', 'user')
+        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+
+        return response.content
+
+    def test_profile_avatar_div_contains_info(self):
+        content = self.__get_page_content()
+        self.assertTrue('<h4>Username</h4>' in content)
+        self.assertTrue('<h4>Location</h4>' in content)
+        self.assertTrue('<h4>Company</h4>' in content)
+        self.assertTrue('<h4>Email</h4>' in content)
+        self.assertTrue('<h4>LinkedIn</h4>' in content)
+
+    def test_profile_contains_info(self):
+        content = self.__get_page_content()
+        self.assertTrue('<h3>Info</h3>' in content)
+        self.assertTrue('<h4>Irc nick</h4>' in content)
+        self.assertTrue('<h4>Time to commit</h4>' in content)
+        self.assertTrue('<h4>Skills</h4>' in content)
+        self.assertTrue('<h4>Causes</h4>' in content)
+        self.assertTrue('<h4>Organizations</h4>' in content)
+        self.assertTrue('<h4>Languages</h4>' in content)
+
+    def test_profile_containts_project_list(self):
+        content = self.__get_page_content()
+        self.assertTrue('<h3>Projects</h3>' in content)
+        self.assertTrue('<li class="project_list_item" data-project-name="test_project">' in content)
 
 # vim: set ai et ts=4 sw=4 nu:

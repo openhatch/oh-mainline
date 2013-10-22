@@ -27,48 +27,48 @@
 
 {% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
 
-{% block main %}
-{% if person.user == user or user|has_group:'ADMIN' %}
-<div id='portfolio' class='module project-display viewer'>
-    <div class='module-head'>
-        {% if user|has_group:'ADMIN' %}
-        <ul>
-            <li>
-                <a id="edit-user-projects" href="#">Edit</a>
-            </li>
-        </ul>
-        {% endif %}
-        <h3>Projects</h3>
-    </div>
-    <div class='module-body'>
-        <div id="edit-user-projects-form" class='submodule-full split triple' style="display: none">
-            <form method='post'>
-                {{ projects_form }}
-                <input type='submit' value='submit'>
-            </form>
-        </div>
-        {% with person.get_published_portfolio_entries as portfolio_entries %} 
-            {% if portfolio_entries %}
-                <ul>
-                    {% for pf_entry in portfolio_entries %}
-                    {% include 'profile/portfolio/portfolio_entry_element.html' %}
-                    {% endfor %}
-                </ul>
-                {% if how_many_archived_pf_entries %}
-                    <a id='show_more_projects' href='#'>
-                        And {{ how_many_archived_pf_entries }} more&hellip;</a>
-                    <noscript>
-                        Enable JavaScript to see more stuff here.
-                    </noscript>
+{% block more_content %}
+    {% if person.user == user or user|has_group:'ADMIN' %}
+        <div id='portfolio' class='module project-display viewer'>
+            <div class='module-head'>
+                {% if user|has_group:'ADMIN' %}
+                    <ul>
+                        <li>
+                            <a id="edit-user-projects" href="#">Edit</a>
+                        </li>
+                    </ul>
                 {% endif %}
-            {% else %}
-                <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
-            {% endif %}
-        {% endwith %}
-    </div>
-</div> <!-- /#portfolio -->
-{% endif %}
-{% endblock main %}
+                <h3>Projects</h3>
+            </div>
+            <div class='module-body'>
+                <div id="edit-user-projects-form" class='submodule-full split triple' style="display: none">
+                    <form method='post'>
+                        {{ projects_form }}
+                        <input type='submit' value='submit'>
+                    </form>
+                </div>
+                {% with person.get_published_portfolio_entries as portfolio_entries %}
+                    {% if portfolio_entries %}
+                        <ul>
+                            {% for pf_entry in portfolio_entries %}
+                                {% include 'profile/portfolio/portfolio_entry_element.html' %}
+                            {% endfor %}
+                        </ul>
+                        {% if how_many_archived_pf_entries %}
+                            <a id='show_more_projects' href='#'>
+                                And {{ how_many_archived_pf_entries }} more&hellip;</a>
+                            <noscript>
+                                Enable JavaScript to see more stuff here.
+                            </noscript>
+                        {% endif %}
+                    {% else %}
+                        <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div> <!-- /#portfolio -->
+    {% endif %}
+{% endblock %}
 
 {% block js %}
     <script type='text/javascript'>

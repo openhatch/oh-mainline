@@ -6019,8 +6019,21 @@ $(function () {
 }
 // vim: set nu:
 
-$("#edit-user-projects").click(function(){
-  $("#edit-user-projects-form").toggle();
+$("#edit-user-projects").click(function(e){
+    e.preventDefault();
+    $("#edit-user-projects-form").next('ul').toggle();
+    $("#edit-user-projects-form").toggle();
+});
+
+$(function() {
+    $("body#profile li.project_list_item").hover(function () {
+        $(this).toggleClass('project_list_item_hover');
+    });
+
+    $("body#profile li.project_list_item").click(function () {
+        var projectName = $(this).attr('data-project-name');
+        window.location.href = '/projects/' + projectName;
+    });
 });
 
 /* Icon refresher class.

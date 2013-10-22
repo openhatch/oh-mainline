@@ -345,7 +345,6 @@ class DataExport(django.test.TestCase):
                                      longitude=0)
         self.assertEquals(munroe.get_public_location_or_default(), 'Inaccessible Island')
 
-
         # Creating dummy tags, tags_persons and tagtypes
         # Dummy TagTypes
         tagtype_understands = TagType(name="understands")
@@ -391,7 +390,7 @@ class DataExport(django.test.TestCase):
         # did we snapshot/save ANY Persons?
         self.assertTrue(Person.objects.all())
 
-        # did our fake Persons get saved?
+        # did our fake Persons get saved?)
         new_zuckerberg = mysite.profile.models.Person.objects.get(user__first_name="mark")
         new_munroe = mysite.profile.models.Person.objects.get(user__first_name="randall")
 
@@ -420,8 +419,8 @@ class DataExport(django.test.TestCase):
         self.assertEquals(new_munroe.get_public_location_or_default(), 'Inaccessible Island')
 
         # get tags linked to our two dummy users...
-        new_link_zuckerberg = mysite.profile.models.Link_Person_Tag.objects.get(id = new_zuckerberg.user_id)
-        new_link_munroe = mysite.profile.models.Link_Person_Tag.objects.get(id = new_munroe.user_id)
+        new_link_zuckerberg = mysite.profile.models.Link_Person_Tag.objects.get(person__user__pk = new_zuckerberg.user_id)
+        new_link_munroe = mysite.profile.models.Link_Person_Tag.objects.get(person__user__pk = new_munroe.user_id)
 
         new_tag_facebook_development = mysite.profile.models.Tag.objects.get(link_person_tag__person = new_zuckerberg)
         new_tag_something_interesting = mysite.profile.models.Tag.objects.get(link_person_tag__person = new_munroe)
