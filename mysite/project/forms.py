@@ -56,6 +56,7 @@ class ProjectForm(django.forms.ModelForm):
     duration = django.forms.ModelChoiceField(required=True, queryset=Duration.objects.all(), widget=django.forms.Select)
     skills = django.forms.ModelMultipleChoiceField(required=True, queryset=Skill.objects.all(), widget=django.forms.CheckboxSelectMultiple)
     languages = django.forms.ModelMultipleChoiceField(required=True, queryset=Language.objects.all(), widget=django.forms.CheckboxSelectMultiple)
+    pk = django.forms.IntegerField(required=False)
 
     class Meta:
         model = mysite.search.models.Project

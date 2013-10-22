@@ -382,6 +382,10 @@ urlpatterns = patterns('',
 
         (r'^projects/add_project$', 'mysite.project.views.add_project'),
 
+        (r'^projects/edit/(?P<project__name>.+)', 'mysite.project.views.edit_project'),
+
+        (r'^projects/edit_project_do$', 'mysite.project.views.edit_project_do'),
+
         (r'^projects/', include('mysite.project.urls')),
 
         (r'^\+projects/$', lambda x: HttpResponsePermanentRedirect('/projects/')),

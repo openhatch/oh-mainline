@@ -226,6 +226,9 @@ about how you can help {{ project.display_name }}
 {% block main %}
     <div class='module' id='about'>
         <div class='module-head'>
+            <ul>
+                <li><a class='edit' href='edit/{{ project.name|urlencode }}' value='{{ project.name }}'>Edit</a></li>
+            </ul>
             <h3>About {{ project.display_name }}</h3>
         </div>
         <div class='module-body'>
