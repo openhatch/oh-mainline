@@ -140,8 +140,7 @@ class TestUriDataHelper(TwillTests):
     def test(self):
         request = mysite.base.view_helpers.ObjectFromDict({
             'is_secure': lambda : True,
-            'META': {'SERVER_PORT': '443',
-                     'SERVER_NAME': 'name'}})
+            'get_host': lambda : 'name'})
         data = mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(request)
         self.assertEqual(data, {'uri_scheme': 'https',
                                 'url_prefix': 'name'})
