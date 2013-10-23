@@ -18,6 +18,7 @@ import django.forms
 from mysite.base.models import Organization, Duration, Skill, Language
 import mysite.search.models
 import mysite.profile.models
+from file_resubmit.admin import AdminResubmitImageWidget
 
 class WannaHelpForm(django.forms.Form):
     project = django.forms.ModelChoiceField(mysite.search.models.Project.objects.all())
@@ -56,6 +57,7 @@ class ProjectForm(django.forms.ModelForm):
     duration = django.forms.ModelChoiceField(required=True, queryset=Duration.objects.all(), widget=django.forms.Select)
     skills = django.forms.ModelMultipleChoiceField(required=True, queryset=Skill.objects.all(), widget=django.forms.CheckboxSelectMultiple)
     languages = django.forms.ModelMultipleChoiceField(required=True, queryset=Language.objects.all(), widget=django.forms.CheckboxSelectMultiple)
+    icon_raw = django.forms.ImageField(required=False, widget=AdminResubmitImageWidget())
     pk = django.forms.IntegerField(required=False)
 
     class Meta:

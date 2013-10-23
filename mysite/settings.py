@@ -162,6 +162,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'django_assets',
+    'file_resubmit',
     'celery',
     'invitation',
     'mysite.search',
@@ -221,6 +222,10 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'openhatch'
+    },
+    "file_resubmit": {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        "LOCATION": '/tmp/file_resubmit/'
     }
 }
 

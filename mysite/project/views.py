@@ -17,7 +17,6 @@
 
 import datetime
 import django.forms
-from mysite.base.models import Skill, Organization
 from django.core.mail import send_mail
 import socket
 from django.template import RequestContext
@@ -204,6 +203,7 @@ def add_project(request):
             project.update_scaled_icons_from_self_icon()
             return HttpResponseRedirect("/projects")
         else:
+
             data['form'] = project_data_form
             data['has_errors'] = True
 

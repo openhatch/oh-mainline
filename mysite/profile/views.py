@@ -324,6 +324,10 @@ def edit_person_info_do(request):
     # Grab the submitted homepage URL.
     if edit_info_form.is_valid():
         person.homepage_url = edit_info_form.cleaned_data['homepage_url']
+        if (person.resume):
+            person.resume.delete()
+        if edit_info_form['resume'].data is not False:
+            person.resume = edit_info_form['resume'].data
     else:
         errors_occurred = True
 
@@ -347,7 +351,7 @@ def edit_person_info_do(request):
     person.organization = edit_info_form['organizations'].data
     person.other_name = edit_info_form['other_name'].data
     person.private = edit_info_form['private'].data
-    person.resume = edit_info_form['resume'].data
+
     person.skill = edit_info_form['skills'].data
     person.subscribed = edit_info_form['subscribed'].data
     if edit_info_form['times_to_commit'].data is not None:
@@ -995,6 +999,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
             'organizations': Organization.objects.filter(person=person._get_pk_val),
             'other_name': person.other_name,
             'private': person.private,
+            'resume': person.resume,
             'skills': Skill.objects.filter(person=person._get_pk_val),
             'subscribed': person.subscribed,
             'times_to_commit': person.time_to_commit,

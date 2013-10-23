@@ -172,7 +172,7 @@ class Person(models.Model):
     uploaded_to_zoho=models.BooleanField(default=False)
     resume=models.FileField(upload_to=
                               lambda a, b: 'static/resumes/' +
-                              generate_person_photo_path(a, b, suffix="_resume"),
+                              generate_person_photo_path(a, b),
                               default='', max_length=100)
 
     def add_skill(self, skill_id):

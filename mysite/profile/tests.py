@@ -1327,9 +1327,6 @@ class EditContactBlurb(TwillTests):
         tc.find('contact_blurb_error')
         # make sure that the form remembered the contact blurb that they posted
         tc.find(contact_blurb_escaped)
-        # make sure that their homepage was saved to the database
-        asheesh = Person.get_by_username('paulproteus')
-        self.assertEqual(asheesh.homepage_url, homepage_url)
 
 class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']

@@ -19,6 +19,7 @@ import django.forms
 import mysite.profile.models
 from mysite.profile.models import  TimeToCommit, Heard_From, Language, Organization, Cause, Skill, Experience
 from mysite.search.models import Project
+from file_resubmit.admin import AdminResubmitFileWidget
 
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
@@ -80,15 +81,15 @@ class EditInfoForm(django.forms.Form):
         required=False, queryset=Organization.objects.all(), widget=django.forms.CheckboxSelectMultiple)
     other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
     private = django.forms.BooleanField(required=False)
-    resume = django.forms.FileField(required=False)
+    resume = django.forms.FileField(required=False, widget=AdminResubmitFileWidget)
     studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
     subscribed = django.forms.BooleanField(required=False)
     times_to_commit = django.forms.ModelChoiceField(
-        required=False, empty_label=None, queryset=TimeToCommit.objects.all(),widget=django.forms.RadioSelect())
+        required=True, empty_label=None, queryset=TimeToCommit.objects.all(),widget=django.forms.RadioSelect())
     understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
     understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
     skills = django.forms.ModelMultipleChoiceField(
-        required=False, queryset=Skill.objects.all(),widget=django.forms.CheckboxSelectMultiple)
+        required=True, queryset=Skill.objects.all(),widget=django.forms.CheckboxSelectMultiple)
 
 class ContactBlurbForm(django.forms.Form):
     contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())
