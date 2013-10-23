@@ -20,6 +20,8 @@ from ast import literal_eval
 import os.path
 import hashlib
 from itertools import cycle, islice
+import itertools
+from django.contrib.sites.models import Site
 
 import pygeoip
 
@@ -43,6 +45,8 @@ import urllib
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
 
 # Name constants
+from mysite.settings import GITHUB_USERNAME_BASE_PATH, GOOGLE_CODE_USERNAME_BASE_PATH
+
 SUGGESTION_COUNT = 6
 DEFAULT_CACHE_TIMESPAN = 86400 * 7
 
@@ -263,13 +267,36 @@ def add_people_to_zoho_CRM(people, auth_token = "93ec1ab167308f477ce9efa77091daf
         with xml.row(no=str(counter+1)):
             xml.FL("SC4G", val="Lead Source")
             xml.FL("Volunteer", val="Title")
-            company = person.company_name or "N/A"
             first_name = person.user.first_name or person.user.username
             last_name = person.user.last_name or person.user.username
+            company = person.company_name or "N/A"
+            skills = ', '.join(str(item.name) for item in person.skill.all())
+            organizations = ', '.join(str(item.name) for item in person.organization.all())
+            causes = ', '.join(str(item.name) for item in person.cause.all())
+            languages = ', '.join(str(item.name) for item in person.language.all())
+            resume_url = ''
+            if person.resume:
+                resume_url = 'http://' + Site.objects.get_current().domain + person.resume.url
+            github_url = GITHUB_USERNAME_BASE_PATH + '/' + person.github_name
+            google_code_url = GOOGLE_CODE_USERNAME_BASE_PATH + '/' + person.google_code_name
             xml.FL(first_name, val="First Name")
             xml.FL(last_name, val="Last Name")
             xml.FL(company, val="Company")
             xml.FL(person.user.email, val="Email")
+            xml.FL(organizations, val="Project Partner Interest")
+            xml.FL(causes, val="Causes")
+            xml.FL(person.time_to_commit.name, val="Time to Commit")
+            xml.FL(skills, val="Skills - Functional Role")
+            xml.FL(resume_url or '', val="Resume")
+            xml.FL(person.linked_in_url or '', val="LinkedIn, Coderwall, Etc.")
+            xml.FL(str(person.opensource), val="Previous Open Source?")
+            xml.FL(github_url, val="GitHub")
+            xml.FL(google_code_url, val="GoogleCode")
+            xml.FL(person.other_name, val="SourceForge, Ohloh or Other Username")
+            xml.FL(languages, val="Programming Experience in These Languages")
+            xml.FL(person.experience.name, val="Experience Level")
+            xml.FL(person.language_spoken, val="Spoken Languages")
+            xml.FL(person.comment, val="Comments")
     data = urllib.urlencode({"authtoken": auth_token, 'scope': 'crmapi', 'xmlData': str(xml)})
     url = 'https://crm.zoho.com/crm/private/xml/Leads/insertRecords'
     req = urllib2.Request(url=url, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'})

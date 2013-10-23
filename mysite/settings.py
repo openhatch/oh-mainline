@@ -11,6 +11,9 @@ import dj_database_url
 DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY # This is needed for {% version %}
 
+GITHUB_USERNAME_BASE_PATH = 'https://github.com'
+GOOGLE_CODE_USERNAME_BASE_PATH = 'https://code.google.com/u'
+
 ## Now, actual settings
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
