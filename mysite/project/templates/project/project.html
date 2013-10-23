@@ -239,28 +239,6 @@ about how you can help {{ project.display_name }}
                         (logo)
                     </span></div>
             <div style='float: left; width: 70%;'>
-                {% if random_pfentry %}
-                    <h2 style='font-size: 1.3em; font-weight: normal;'>
-                        {% spaceless %}
-                            <span>{{ random_pfentry.project_description|urlize|linebreaks}}</span>
-                        {% endspaceless %}
-                    </h2>
-                    <p style='font-size: .9em; margin: 5px 0 0 40px;'>
-                        from the profile of
-                        <a href='{{ random_pfentry.person.profile_url }}'>
-                            {% with random_pfentry.person.user as user %}
-                            {% include 'name.html' %}
-                            {% endwith %}
-                        </a>
-                    </p>
-                {% else %}
-                    <div style='color: #777; font-size: .85em;'>
-                        No one has described this project yet. To describe the
-                        project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.display_name|urlencode }}'>
-                            add it to your profile</a>.
-                    </div>
-                {% endif %}
-
                 {% if project.homepage %}
                     <div style='margin-top: 10px;'>
                         Homepage: <a href="{{ project.homepage }}">{{ project.homepage }}</a>
@@ -269,7 +247,12 @@ about how you can help {{ project.display_name }}
 
                 {% if project.language %}
                     <div style='margin-top: 10px;'>
-                        The code is mostly written in <strong>{{ project.language }}</strong>.
+                        The code is mostly written in:
+                        <strong>
+                            {% for language in project.languages.all %}
+                                {{ language.name }}{% if forloop.counter < project.languages.all|length %},{% endif %}
+                            {% endfor %}
+                        </strong>
                     </div>
                 {% endif %}
 
@@ -302,48 +285,6 @@ about how you can help {{ project.display_name }}
         </div>
     {% endif %}
 </div>
-
-<div class='module' id='bugs'>
-    <div class='module-head'> <h3>Volunteer opportunities, etc.</h3> </div>
-    <div class='module-body'>
-        <style>
-            #bugs p { margin-top: 0; }
-        </style>
-        {% if project.get_open_bugs %}
-            <p style='font-size: 1.1em;'>
-                    <a href='/search/?project={{ project.name|urlencode }}'>
-                        <strong>
-                            Volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
-                        </strong>
-                        matching {{ project.display_name }} ({{ project.get_open_bugs|length }})
-                    </a>
-            </p>
-        {% else %}
-            <p>
-                No volunteer opportunities in {{project.display_name}} indexed here yet.
-            </p>
-    {% endif %}
-  
-  {% with mentors as mentors %}
-  {% with project.display_name as topic %}
-  {% with 0 as explain_language %}
-  {% include 'project/mentor_summary.html' %}
-  {% endwith %}
-  {% endwith %}
-  {% endwith %}
-
-  {% if project.language %}
-  {% with language_mentors as mentors %}
-  {% with project.language as topic %}
-  {% with 1 as explain_language %}
-  {% include 'project/mentor_summary.html' %}
-  {% endwith %}
-  {% endwith %}
-  {% endwith %}
-  {% endif %}
-
-    </div>
-</div><!-- /.module #bugs -->
 
 {% endblock main %}
 
