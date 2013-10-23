@@ -259,22 +259,31 @@ div.input input[type=text] {
     display: inline-block;
 }
 
-.search_card_profile fieldset legend a.linked_in {
+.search_card_profile fieldset legend div.links {
     position: absolute;
+    top: 49px;
+    right: 0px;
+}
+
+.search_card_profile fieldset legend a.linked_in {
+    /*position: absolute;
     top: 12px;
-    right: 48px;
+    right: 48px;*/
+    float: right;
 }
 
 .search_card_profile fieldset legend a.github {
-    position: absolute;
+    /*position: absolute;
     top: 12px;
-    right: 24px;
+    right: 24px;*/
+    float: right;
 }
 
 .search_card_profile fieldset legend a.google_code {
-    position: absolute;
+    /*position: absolute;
     top: 12px;
-    right: 0px;
+    right: 0px;*/
+    float: right;
 }
 
 div#portfolio {

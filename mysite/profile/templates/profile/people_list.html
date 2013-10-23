@@ -4,21 +4,23 @@
         <fieldset>
             <legend>
                 <a class="legend" href="{{ person.user.username }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
-                {% if person.linked_in_url %}
-                    <a class="linked_in" href="{{ person.linked_in_url }}">
-                        <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
-                    </a>
-                {% endif %}
-                {% if person.github_name %}
-                    <a class="github" href="https://github.com/{{ person.github_name }}">
-                        <img width="24" height="24" src="/static/images/webicon-github.png"/>
-                    </a>
-                {% endif %}
-                {% if person.github_name %}
-                    <a class="google_code" href="https://code.google.com/u/{{ person.google_code_name }}">
-                        <img width="24" height="24" src="/static/images/webicon-googlecode.png"/>
-                    </a>
-                {% endif %}
+                <div class="links">
+                    {% if person.linked_in_url %}
+                        <a class="linked_in" href="{{ person.linked_in_url }}">
+                            <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
+                        </a>
+                    {% endif %}
+                    {% if person.github_name %}
+                        <a class="github" href="https://github.com/{{ person.github_name }}">
+                            <img width="24" height="24" src="/static/images/webicon-github.png"/>
+                        </a>
+                    {% endif %}
+                    {% if person.google_code_name %}
+                        <a class="google_code" href="https://code.google.com/u/{{ person.google_code_name }}">
+                            <img width="24" height="24" src="/static/images/webicon-googlecode.png"/>
+                        </a>
+                    {% endif %}
+                </div>
             </legend>
             <p><strong>Company:</strong> {{ person.company_name }}</p>
             <p><strong>Time to Commit:</strong> {{ person.time_to_commit }}</p>
