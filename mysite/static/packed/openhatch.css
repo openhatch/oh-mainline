@@ -1153,15 +1153,15 @@ div#portfolio {
 }
 
 body#profile div#avatar {
-    max-height: 550px;
-    height: 550px;
-    min-height: 550px;
+    max-height: 600px;
+    height: 600px;
+    min-height: 600px;
 }
 
 body#profile div#info {
-    max-height: 550px;
-    height: 550px;
-    min-height: 550px;
+    max-height: 600px;
+    height: 600px;
+    min-height: 600px;
 }
 
 body#profile div#info h3 {

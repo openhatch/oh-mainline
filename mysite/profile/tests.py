@@ -2865,13 +2865,15 @@ class UserProfile(TwillTests):
         content = self.__get_page_content()
         self.assertTrue('<h4>Username</h4>' in content)
         self.assertTrue('<h4>Location</h4>' in content)
-        self.assertTrue('<h4>Company</h4>' in content)
         self.assertTrue('<h4>Email</h4>' in content)
         self.assertTrue('<h4>LinkedIn</h4>' in content)
+        self.assertTrue('<h4>GitHub</h4>' in content)
+        self.assertTrue('<h4>GoogleCode</h4>' in content)
 
     def test_profile_contains_info(self):
         content = self.__get_page_content()
         self.assertTrue('<h3>Info</h3>' in content)
+        self.assertTrue('<h4>Company</h4>' in content)
         self.assertTrue('<h4>Irc nick</h4>' in content)
         self.assertTrue('<h4>Time to commit</h4>' in content)
         self.assertTrue('<h4>Skills</h4>' in content)

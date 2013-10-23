@@ -97,25 +97,15 @@
                         <a style='color: #555;' href="/people/?center={{ person.location_display_name }}">
                             {{ person.location_display_name }}
                         </a>
-                    </p>
-                {% endif %}
-                {% if editable %}
-                    {% if person.location_display_name and person.location_confirmed %}
-                        <h4>Location</h4>
-                        <p class="clear">
+                        {% if editable %}
                             (<a href="{% url mysite.account.views.set_location %}">edit</a>)
-                        </p>
-                    {% else %}
-                        <h4>Location</h4>
-                        <p class="clear">
-                            <a href="{% url mysite.account.views.set_location %}">Set your location</a>
-                        </p>
-                    {% endif %}
-                {% endif %}
-
-                {% if person.company_name %}
-                    <h4>Company</h4>
-                    <p class="clear">{{ person.company_name }}</p>
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <h4>Location</h4>
+                    <p class="clear">
+                        <a href="{% url mysite.account.views.set_location %}">Set your location</a>
+                    </p>
                 {% endif %}
 
                 {% if person.user.email %}
@@ -125,6 +115,20 @@
                             <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
                         </p>
                     {% endif %}
+                {% endif %}
+
+                {% if person.github_name %}
+                    <h4>GitHub</h4>
+                    <p id="gitHubUrl" style='clear: both;'>
+                        <a href="https://github.com/{{ person.github_name }}">{{ person.github_name }}</a>
+                    </p>
+                {% endif %}
+
+                {% if person.google_code_name %}
+                    <h4>GoogleCode</h4>
+                    <p id="googleCodeUrl" style='clear: both;'>
+                        <a href="https://code.google.com/u/{{ person.google_code_name }}">{{ person.google_code_name }}</a>
+                    </p>
                 {% endif %}
 
                 {% if person.linked_in_url %}
@@ -190,6 +194,11 @@
         <small style='color: #777;'>Nothing here yet.</small>
     {% endif %}
 
+    {% if person.company_name %}
+        <h4>Company</h4>
+        <p>{{ person.company_name }}</p>
+    {% endif %}
+
     {% if person.bio %}
         <h4>Bio</h4>
         <p>{{ person.bio }}</p>
@@ -238,6 +247,13 @@
             {% for language in person.language.all %}
                 {{ language.name }}{% if forloop.counter < person.language.all|length %}, {% endif %}
             {% endfor %}
+        </p>
+    {% endif %}
+
+    {% if person.resume %}
+        <h4>Resume</h4>
+        <p>
+            <a href="{{ person.resume.url|urlencode }}">Download</a>
         </p>
     {% endif %}
     </div>
