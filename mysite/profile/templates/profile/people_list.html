@@ -9,6 +9,16 @@
                         <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
                     </a>
                 {% endif %}
+                {% if person.github_name %}
+                    <a class="github" href="https://github.com/{{ person.github_name }}">
+                        <img width="24" height="24" src="/static/images/webicon-github.png"/>
+                    </a>
+                {% endif %}
+                {% if person.github_name %}
+                    <a class="google_code" href="https://code.google.com/u/{{ person.google_code_name }}">
+                        <img width="24" height="24" src="/static/images/webicon-googlecode.png"/>
+                    </a>
+                {% endif %}
             </legend>
             <p><strong>Company:</strong> {{ person.company_name }}</p>
             <p><strong>Time to Commit:</strong> {{ person.time_to_commit }}</p>

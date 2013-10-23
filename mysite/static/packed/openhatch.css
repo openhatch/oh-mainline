@@ -1142,6 +1142,18 @@ div.input input[type=text] {
 .search_card_profile fieldset legend a.linked_in {
     position: absolute;
     top: 12px;
+    right: 48px;
+}
+
+.search_card_profile fieldset legend a.github {
+    position: absolute;
+    top: 12px;
+    right: 24px;
+}
+
+.search_card_profile fieldset legend a.google_code {
+    position: absolute;
+    top: 12px;
     right: 0px;
 }
 
@@ -1153,15 +1165,15 @@ div#portfolio {
 }
 
 body#profile div#avatar {
-    max-height: 600px;
-    height: 600px;
-    min-height: 600px;
+    max-height: 610px;
+    height: 610px;
+    min-height: 610px;
 }
 
 body#profile div#info {
-    max-height: 600px;
-    height: 600px;
-    min-height: 600px;
+    max-height: 610px;
+    height: 610px;
+    min-height: 610px;
 }
 
 body#profile div#info h3 {
