@@ -265,15 +265,21 @@ def add_people_to_zoho_CRM(people, auth_token = "93ec1ab167308f477ce9efa77091daf
     xml = XMLBuilder('Leads')
     for counter, person in enumerate(people):
         with xml.row(no=str(counter+1)):
-            xml.FL("SC4G", val="Lead Source")
             xml.FL("Volunteer", val="Title")
             first_name = person.user.first_name or person.user.username
             last_name = person.user.last_name or person.user.username
             company = person.company_name or "N/A"
-            skills = ', '.join(str(item.name) for item in person.skill.all())
-            organizations = ', '.join(str(item.name) for item in person.organization.all())
-            causes = ', '.join(str(item.name) for item in person.cause.all())
-            languages = ', '.join(str(item.name) for item in person.language.all())
+            skills = '; '.join(str(item.name) for item in person.skill.all())
+            organizations = '; '.join(str(item.name) for item in person.organization.all())
+            causes = '; '.join(str(item.name) for item in person.cause.all())
+            languages_list = list()
+            # FIXME: The "C Sharp" language doesn't upload correctly to ZOHO crm
+            for item in person.language.all():
+                if item.name == "C#":
+                    item.name = "C Sharp"
+                languages_list.append(str(item.name))
+            languages = '; '.join(languages_list)
+            heard_from = '; '.join(str(item.name) for item in person.heard_from.all())
             resume_url = ''
             if person.resume:
                 resume_url = 'http://' + Site.objects.get_current().domain + person.resume.url
@@ -292,11 +298,13 @@ def add_people_to_zoho_CRM(people, auth_token = "93ec1ab167308f477ce9efa77091daf
             xml.FL(str(person.opensource), val="Previous Open Source?")
             xml.FL(github_url, val="GitHub")
             xml.FL(google_code_url, val="GoogleCode")
+            xml.FL(heard_from, val="Lead Source")
             xml.FL(person.other_name, val="SourceForge, Ohloh or Other Username")
             xml.FL(languages, val="Programming Experience in These Languages")
             xml.FL(person.experience.name, val="Experience Level")
             xml.FL(person.language_spoken, val="Spoken Languages")
             xml.FL(person.comment, val="Comments")
+
     data = urllib.urlencode({"authtoken": auth_token, 'scope': 'crmapi', 'xmlData': str(xml)})
     url = 'https://crm.zoho.com/crm/private/xml/Leads/insertRecords'
     req = urllib2.Request(url=url, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
