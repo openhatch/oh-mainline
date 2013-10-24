@@ -108,6 +108,19 @@ class RepositoryCommitter(models.Model):
     class Meta:
         unique_together = ('project', 'data_import_attempt')
 
+
+class FormQuestion(models.Model):
+    name = models.CharField(blank=False, null=False, max_length=100)
+    type = models.CharField(blank=False, null=False, max_length=50)
+
+class FormResponse(models.Model):
+    question = models.ForeignKey(FormQuestion)
+    value = models.CharField(default='', blank=True, null=True, max_length=150)
+
+class FormAnswer(models.Model):
+    question = models.ForeignKey(FormQuestion)
+    value = models.CharField(default='', blank=True, null=True, max_length=150)
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
@@ -169,11 +182,12 @@ class Person(models.Model):
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
     date_added = models.DateTimeField(default=datetime.datetime.now(), auto_now_add=True)
-    uploaded_to_zoho=models.BooleanField(default=False)
-    resume=models.FileField(upload_to=
+    uploaded_to_zoho = models.BooleanField(default=False)
+    resume = models.FileField(upload_to=
                               lambda a, b: 'static/resumes/' +
                               generate_person_photo_path(a, b),
                               default='', max_length=100)
+    response = models.ManyToManyField(FormResponse)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)
