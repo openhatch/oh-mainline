@@ -565,7 +565,7 @@ def people_filter(request):
 @login_required
 @has_permissions(['can_view_people'])
 @view
-def people(request):
+def people(request, order='username'):
     """Display a list of people."""
     data = {}
 
@@ -586,7 +586,7 @@ def people(request):
         everybody, extra_data = search_results.people, search_results.template_data
         data.update(extra_data)
     else:
-        everybody = Person.objects.all().order_by('user__username')
+        everybody = Person.objects.all().order_by('user__' + order)
 
     data['people'] = everybody
 
@@ -611,6 +611,7 @@ def people(request):
     data['languages'] = Language.objects.all()
     data['times_to_commit'] = TimeToCommit.objects.all()
     data['person_ids'] = simplejson.dumps(person_ids)
+    data['order'] = order
     return (request, 'profile/search_people.html', data)
 
 def gimme_json_for_portfolio(request):

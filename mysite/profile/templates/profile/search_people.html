@@ -351,6 +351,7 @@ People Search
                         If there's *no query*, we list *everybody* in the DB on this page.
                     {% endcomment %}
                     Everybody on OpenHatch
+
                 {% endif %}
 
                 {% if people %}
@@ -359,7 +360,13 @@ People Search
             {% endif %}
 
         </div>
-
+        <div style="float:right">
+            Sort by:
+            <select id="order">
+                <option value="username" {% ifequal order 'last_name' %} selected="selected"{% endifequal %}>Name</option>
+                <option value="date_joined" {% ifequal order 'date_joined' %} selected="selected"{% endifequal %}>Signup date</option>
+            </select>
+        </div>
         <div id='summary_of_mapped_people'>
             <span id='people_count'>
                     <span>{{ people|length|pluralize:"Just," }}</span>
@@ -398,6 +405,9 @@ People Search
                     .removeAttr("target")
                     .attr("action", ".");
                 e.preventDefault();
+            });
+            $('#order').change(function() {
+                window.location.replace('/people/' + this.value);
             });
         </script>
     </div>
