@@ -32,7 +32,7 @@
             <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
             {% endif%}
             {% if user|has_permission:'can_view_people' %}
-            <li><a href='{% url mysite.profile.views.people%}'>people</a></li>
+            <li><a href='{% url mysite.profile.views.people%}'>volunteers</a></li>
             {% endif %}
         </ul>
         <ul id='account-links'>
