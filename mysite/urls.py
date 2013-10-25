@@ -351,6 +351,8 @@ urlpatterns = patterns('',
         (r'^\+portfolio/editor/test$',
                 'mysite.profile.views.portfolio_editor_test'),
 
+        (r'^profile/views/edit_info/(?P<username>[^/]+)$', 'mysite.profile.views.edit_info'),
+
         (r'^profile/views/edit_info$', 'mysite.profile.views.edit_info'),
 
         (r'^profile/views/prepare_data_import_attempts_do$',

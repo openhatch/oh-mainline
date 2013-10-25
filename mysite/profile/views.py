@@ -24,14 +24,16 @@
 import StringIO
 import datetime
 import urllib
-from django.utils import simplejson
 import re
 import collections
 import logging
 
+from django.utils import simplejson
+
+
 # Django
 from django.template.loader import render_to_string
-from django.template import RequestContext, Context
+from django.template import RequestContext
 from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest, Http404
@@ -969,8 +971,12 @@ def set_expand_next_steps_do(request):
 
 @login_required
 @view
-def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_blurb_form=None, has_errors=False):
-    person = request.user.get_profile()
+def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_blurb_form=None, has_errors=False, username=None):
+    if username is not None and request.user.is_superuser:
+        person = Person.objects.get(user__username__exact=username)
+    else:
+        person = request.user.get_profile()
+
     data = get_personal_data(person)
     data['info_edit_mode'] = True
     if edit_info_form is None:

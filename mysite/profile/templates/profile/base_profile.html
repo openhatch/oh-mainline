@@ -173,6 +173,10 @@
         <h3>Info</h3>
         {% if editable and not info_edit_mode %}
             <a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a>
+        {% else %}
+            {% if user|has_permission:'change_user' and not info_edit_mode %}
+                <a class='edit' href='/profile/views/edit_info/{{ person.user.username }}'>Edit</a>
+            {% endif %}
         {% endif %}
     </div>
 
