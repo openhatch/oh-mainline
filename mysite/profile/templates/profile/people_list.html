@@ -3,7 +3,7 @@
     <li class="search_card_profile">
         <fieldset>
             <legend>
-                <a class="legend" href="{{ person.user.username }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
+                <a class="legend" href="/people/{{ person.user.username }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
                 <div class="links">
                     {% if person.linked_in_url %}
                         <a class="linked_in" href="{{ person.linked_in_url }}">

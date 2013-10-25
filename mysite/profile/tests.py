@@ -1588,7 +1588,7 @@ class PeopleFilter(TwillTests):
         self.client = self.login_with_client()
         response = HttpResponse(self.client.get(path='/people', follow=True))
         self.assertTrue('<li class="search_card_profile">' in response.content)
-        self.assertTrue('<a class="legend" href="test_user">test user</a>' in response.content)
+        self.assertTrue('<a class="legend" href="/people/test_user">test user</a>' in response.content)
 
 class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
     def setUp(self):

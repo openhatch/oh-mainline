@@ -363,7 +363,7 @@ People Search
         <div style="float:right">
             Sort by:
             <select id="order">
-                <option value="username" {% ifequal order 'last_name' %} selected="selected"{% endifequal %}>Name</option>
+                <option value="last_name" {% ifequal order 'last_name' %} selected="selected"{% endifequal %}>Name</option>
                 <option value="date_joined" {% ifequal order 'date_joined' %} selected="selected"{% endifequal %}>Signup date</option>
             </select>
         </div>
@@ -407,7 +407,7 @@ People Search
                 e.preventDefault();
             });
             $('#order').change(function() {
-                window.location.replace('/people/' + this.value);
+                window.location.replace('/people/orderby/' + this.value);
             });
         </script>
     </div>
