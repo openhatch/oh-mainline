@@ -132,6 +132,7 @@ class TrackerModel(models.Model):
             mysite.customs.models.BugzillaTrackerModel: 'bugzilla',
             mysite.customs.models.GitHubTrackerModel: 'github',
             mysite.customs.models.GoogleTrackerModel: 'google',
+            mysite.customs.models.JiraTrackerModel: 'jira',
             mysite.customs.models.RoundupTrackerModel: 'roundup',
             mysite.customs.models.TracTrackerModel: 'trac',
             mysite.customs.models.LaunchpadTrackerModel: 'launchpad',
@@ -654,3 +655,80 @@ class GitHubQueryModel(TrackerQueryModel):
 
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
 reversion.register(GitHubQueryModel)
+
+def jira_query_url(base_url, path):
+    return base_url + '/rest/api/2/search?jql=' + mysite.base.unicode_sanity.quote(
+        'updated>=' + path)
+
+class JiraTrackerModel(TrackerModel):
+    '''This model stores the data for individual Jira trackers.'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False)
+    base_url = models.URLField(max_length=200, unique=True,
+                               blank=False, null=False, verify_exists=False,
+            help_text="This is the URL to the homepage of the Jira instance, i.e http://jira.cyanogenmod.org")
+    bug_project_name_format = models.CharField(max_length=200, blank=False,
+            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+
+    BITESIZED_TYPES = (
+            ('label', 'Label'),
+            ('priority', 'Priority')
+    )
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
+    bitesized_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+
+    DOCUMENTATION_TYPES = (
+            ('label', 'Label')
+    )
+    documentation_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+
+    ### Metadata about the TrackerModel
+    short_name = 'jira'
+    namestr = 'Jira'
+    _form = 'mysite.customs.forms.JiraTrackerForm'
+    _urlmodel = None
+    _urlform = None
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+    def as_dict(self):
+        out = super(JiraTrackerModel, self).as_dict()
+        # By default, set this to the empty string.
+        out['get_older_bug_data'] = ''
+
+        # If we have bugs, then instead set it to a reasonable query
+        # for data that will include information about those bugs.
+        lowest_last_polled = mysite.search.models.Bug.all_bugs.filter(
+            tracker_id=self.id).aggregate(django.db.models.Min('last_polled'))[
+            'last_polled__min']
+        if lowest_last_polled is None:
+            return out
+
+        query_url = jira_query_url(self.base_url,
+                                     unicode(lowest_last_polled.isoformat()))
+        out['get_older_bug_data'] = query_url
+        return out
+
+    def get_base_url(self, path):
+        return self.base_url
+
+
+class JiraQueryModel(TrackerQueryModel):
+    '''This model stores query URLs for JiraTracker objects.'''
+
+    tracker = models.ForeignKey(JiraTrackerModel)
+    state = models.CharField(max_length=20, default='open')
+    url = models.URLField(max_length=400,
+                          blank=False, null=False)
+
+    def get_query_url(self):
+        return self.url
+
+
+reversion.register(JiraTrackerModel, follow=["jiraquerymodel_set"])
+reversion.register(JiraQueryModel)
