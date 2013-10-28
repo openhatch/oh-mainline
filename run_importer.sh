@@ -18,7 +18,7 @@ if [ ! -z "$1" ] ; then
     MAX_TRACKERS="$1"
 fi
 
-if [ ! -z "2" ] ; then
+if [ ! -z "$2" ] ; then
     TRACKER_ID="$2"
 fi
 
