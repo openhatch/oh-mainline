@@ -32,3 +32,6 @@ env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FI
 popd
 
 python manage.py import_bugimporter_data "$SCRAPY_RESULT_FILE"
+
+# Remove old log files.
+find "$BASE_DIR" -name 'scrapy.*.log' -mtime +14 -print0 | xargs -0 rm
