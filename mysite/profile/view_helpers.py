@@ -269,17 +269,11 @@ def add_people_to_zoho_CRM(people, auth_token = "93ec1ab167308f477ce9efa77091daf
             first_name = person.user.first_name or person.user.username
             last_name = person.user.last_name or person.user.username
             company = person.company_name or "N/A"
-            skills = '; '.join(str(item.name) for item in person.skill.all())
-            organizations = '; '.join(str(item.name) for item in person.organization.all())
-            causes = '; '.join(str(item.name) for item in person.cause.all())
-            languages_list = list()
-            # FIXME: The "C Sharp" language doesn't upload correctly to ZOHO crm
-            for item in person.language.all():
-                if item.name == "C#":
-                    item.name = "C Sharp"
-                languages_list.append(str(item.name))
-            languages = '; '.join(languages_list)
-            heard_from = '; '.join(str(item.name) for item in person.heard_from.all())
+            skills = ','.join(str(item.name) for item in person.skill.all())
+            organizations = ','.join(str(item.name) for item in person.organization.all())
+            causes = ','.join(str(item.name) for item in person.cause.all())
+            languages = ','.join(str(item.name) for item in person.language.all())
+            heard_from = ','.join(str(item.name) for item in person.heard_from.all())
             resume_url = ''
             if person.resume:
                 resume_url = 'http://' + Site.objects.get_current().domain + person.resume.url
