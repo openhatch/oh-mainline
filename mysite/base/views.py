@@ -31,7 +31,6 @@ from mysite.base.decorators import view
 import mysite.customs.feed
 import mysite.search.view_helpers
 import mysite.search.models
-import mysite.missions.models 
 
 import random
 import datetime
@@ -85,9 +84,6 @@ def home(request):
                                   'nudge_importer_when_user_has_some_projects' in data)
 
         # For performance reasons, we do not send bug recommendations here.
-        
-        completed_missions = dict((c.step.name, True) for c in mysite.missions.models.StepCompletion.objects.filter(person=request.user.get_profile()))
-        data[u'completed_missions'] = completed_missions
         
         data[u'projects_i_wanna_help'] = person.projects_i_wanna_help.all()
         data[u'projects_i_helped'] = person.get_published_portfolio_entries()

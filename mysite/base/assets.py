@@ -18,7 +18,6 @@ register('openhatch_css',
                 "css/profile/search_people.css",
                 "css/tipsy.css",
                 "css/facebox.css",
-                "css/missions/base.css",
                 ),
          Bundle(#TODO: does assetizer follow includes inside css files?
                 #"jquery-ui-1.7.3/themes/ui-lightness/ui.all.css",

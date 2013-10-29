@@ -41,8 +41,6 @@ import mysite.account.views
 import mysite.profile.views
 import mysite.customs.api
 import mysite.profile.api
-import mysite.missions.svn.views
-import mysite.missions.setup.views
 
 from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
 
@@ -102,57 +100,6 @@ urlpatterns = patterns('',
 
         # Feed URL pattern
         url(r'^\+feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}, name='oh_feed_url'),
-
-        # Mission-related URLs
-        (r'^missions/$', 'mysite.missions.base.views.main_page'),
-        (r'^missions/tar$', 'mysite.missions.tar.views.about'),
-        (r'^missions/tar/reset$', 'mysite.missions.tar.views.reset'),
-        (r'^missions/tar/unpacking$', 'mysite.missions.tar.views.unpacking'),
-        (r'^missions/tar/creating$', 'mysite.missions.tar.views.creating'),
-        (r'^missions/tar/hints$', 'mysite.missions.tar.views.hints'),
-        (r'^missions/tar/upload$', 'mysite.missions.tar.views.upload'),
-        (r'^missions/tar/downloadfile/(?P<name>.*)', 'mysite.missions.tar.views.file_download'),
-        (r'^missions/tar/ghello-0.4.tar.gz', 'mysite.missions.tar.views.download_tarball_for_extract_mission'),
-        (r'^missions/tar/extractupload', 'mysite.missions.tar.views.extract_mission_upload'),
-
-        (r'^missions/diffpatch$', 'mysite.missions.diffpatch.views.about'),
-        (r'^missions/diffpatch/single_diff$', 'mysite.missions.diffpatch.views.single_file_diff'),
-        (r'^missions/diffpatch/single_patch$', 'mysite.missions.diffpatch.views.single_file_patch'),
-        (r'^missions/diffpatch/recursive_diff$', 'mysite.missions.diffpatch.views.recursive_diff'),
-        (r'^missions/diffpatch/recursive_patch$', 'mysite.missions.diffpatch.views.recursive_patch'),
-        (r'^missions/diffpatch/patchsingle/oven-pancake.txt', 'mysite.missions.diffpatch.views.patchsingle_get_original_file'),
-        (r'^missions/diffpatch/patchsingle/add-oven-temp.patch$', 'mysite.missions.diffpatch.views.patchsingle_get_patch'),
-        (r'^missions/diffpatch/patchsingle/submit$', 'mysite.missions.diffpatch.views.patchsingle_submit'),
-        (r'^missions/diffpatch/diffsingle/nutty-pancake.txt$', 'mysite.missions.diffpatch.views.diffsingle_get_original_file'),
-        (r'^missions/diffpatch/diffsingle/submit$', 'mysite.missions.diffpatch.views.diffsingle_submit'),
-        (r'^missions/diffpatch/diffrecursive/recipes.tar.gz$', 'mysite.missions.diffpatch.views.diffrecursive_get_original_tarball'),
-        (r'^missions/diffpatch/diffrecursive/submit$', 'mysite.missions.diffpatch.views.diffrecursive_submit'),
-        (r'^missions/diffpatch/patchrecursive/recipes.patch$', 'mysite.missions.diffpatch.views.patchrecursive_get_patch'),
-        (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.diffpatch.views.patchrecursive_submit'),
-
-        (r'^missions/svn$', mysite.missions.svn.views.MainPage.as_view(), None, 'svn_main_page'),
-        (r'^missions/svn/description$', mysite.missions.svn.views.LongDescription.as_view(), None, 'svn_long_description'),
-        (r'^missions/svn/checkout$', mysite.missions.svn.views.Checkout.as_view(), None, 'svn_checkout'),
-        (r'^missions/svn/diff$', mysite.missions.svn.views.Diff.as_view(), None, 'svn_diff'),
-        (r'^missions/svn/commit$', mysite.missions.svn.views.Commit.as_view(), None, 'svn_commit'),
-        (r'^missions/svn/resetrepo$', 'mysite.missions.svn.views.resetrepo'),
-        (r'^missions/svn/checkout/submit$', 'mysite.missions.svn.views.checkout_submit'),
-        (r'^missions/svn/diff/submit$', 'mysite.missions.svn.views.diff_submit'),
-        (r'^missions/svn/commit/poll$', 'mysite.missions.svn.views.commit_poll'),
-
-        (r'^missions/git$', 'mysite.missions.git.views.main_page'),
-        (r'^missions/git/description$', 'mysite.missions.git.views.long_description'),
-        (r'^missions/git/description/submit$', 'mysite.missions.git.views.long_description_submit'),
-        (r'^missions/git/checkout$', 'mysite.missions.git.views.checkout'),
-        (r'^missions/git/resetrepo$', 'mysite.missions.git.views.resetrepo'),
-        (r'^missions/git/checkout/submit$', 'mysite.missions.git.views.checkout_submit'),
-        (r'^missions/git/diff$', 'mysite.missions.git.views.diff'),
-        (r'^missions/git/diff/submit$', 'mysite.missions.git.views.diff_submit'),
-        (r'^missions/git/rebase$', 'mysite.missions.git.views.rebase'),
-        (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
-
-        (r'^missions/windows-setup',
-         include(mysite.missions.setup.views.WindowsSetup.urls())),
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
@@ -416,8 +363,6 @@ urlpatterns = patterns('',
         #regex for the robots.txt file, for search engine exclusion
         (r'^robots\.txt$', direct_to_template, {'template': 'robots.txt', 'mimetype': 'text/plain'}),
 
-        # the OpenHatch guide
-        (r'^guide/$', direct_to_template, {'template': 'base/guide.html'}),
 
         # the OpenHatch sponsors page
         (r'^sponsors/$', direct_to_template, {'template': 'base/sponsors.html'}),

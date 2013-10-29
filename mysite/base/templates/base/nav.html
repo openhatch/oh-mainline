@@ -27,7 +27,6 @@
         </h1>
         
         <ul id='topnavlinks'>
-            <li><a href='{% url mysite.missions.base.views.main_page %}'>training</a></li>
             {% if user|has_permission:'can_view_projects' %}
             <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
             {% endif%}
