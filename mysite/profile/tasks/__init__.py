@@ -20,8 +20,6 @@ import logging
 import os
 import mysite.base.models
 import mysite.profile.models
-from celery.task import Task, task
-import celery.registry
 import traceback
 import mysite.profile.view_helpers
 import shutil
@@ -53,17 +51,14 @@ source2result_handler = {
         'ou': do_nothing_because_this_functionality_moved_to_twisted,
         }
 
-class GarbageCollectForwarders(Task):
+class GarbageCollectForwarders:
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started garbage collecting profile email forwarders")
         deleted_any = mysite.profile.models.Forwarder.garbage_collect()
-        if deleted_any:
-            # Well, in that case, we should purge the staticgenerator-generated cache of the people pages.
-            clear_people_page_cache()
         return deleted_any
 
-class RegeneratePostfixAliasesForForwarder(Task):
+class RegeneratePostfixAliasesForForwarder:
     def run(self, **kwargs):
         if django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH:
             self.update_table()
@@ -81,7 +76,7 @@ class RegeneratePostfixAliasesForForwarder(Task):
         if mysite.base.depends.postmap_available():
             os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps')
 
-class FetchPersonDataFromOhloh(Task):
+class FetchPersonDataFromOhloh:
     name = "profile.FetchPersonDataFromOhloh"
 
     def run(self, dia_id, **kwargs):
@@ -118,14 +113,6 @@ class FetchPersonDataFromOhloh(Task):
             logger.error('Dying: ' + code + ' getting ' + url)
             raise ValueError, {'code': code, 'url': url}
 
-try:
-    celery.registry.tasks.register(RegeneratePostfixAliasesForForwarder)
-    celery.registry.tasks.register(FetchPersonDataFromOhloh)
-    celery.registry.tasks.register(GarbageCollectForwarders)
-except celery.registry.AlreadyRegistered:
-    pass
-
-@task
 def update_person_tag_cache(person__pk):
     try:
         person = mysite.profile.models.Person.objects.get(pk=person__pk)
@@ -137,22 +124,12 @@ def update_person_tag_cache(person__pk):
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 
-@task
-def update_someones_pf_cache(person__pk):
-    person = mysite.profile.models.Person.objects.get(pk=person__pk)
-    cache_key = person.get_cache_key_for_projects()
-    django.core.cache.cache.delete(cache_key)
-
-    # This getter will populate the cache
-    return person.get_display_names_of_nonarchived_projects()
-
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
         fill_one_person_recommend_bugs_cache.apply(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
 
-@task
 def fill_one_person_recommend_bugs_cache(person_id):
     p = mysite.profile.models.Person.objects.get(id=person_id)
     logging.info("Recommending bugs for %s" % p)
@@ -175,25 +152,3 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
         logging.info("Whee! Bumped the timestamp. Guess I'll fill the cache.")
         fill_recommended_bugs_cache()
     logging.info("Done syncing bug timestamp.")
-
-@task
-def clear_people_page_cache():
-    shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
-                               'people'),
-                  ignore_errors=True)
-
-def clear_people_page_cache_task(*args, **kwargs):
-    return clear_people_page_cache.delay()
-
-def fill_people_page_cache():
-    staticgenerator.quick_publish('/people/')
-
-for model in [mysite.profile.models.PortfolioEntry,
-              mysite.profile.models.Person,
-              mysite.profile.models.Link_Person_Tag]:
-    for signal_to_hook in [
-        django.db.models.signals.post_save,
-        django.db.models.signals.post_delete]:
-        signal_to_hook.connect(
-            clear_people_page_cache_task,
-            sender=model)
