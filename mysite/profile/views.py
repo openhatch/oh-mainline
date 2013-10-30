@@ -24,7 +24,6 @@
 import StringIO
 import datetime
 import urllib
-import re
 import collections
 import logging
 
@@ -56,7 +55,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, Heard_From, Experience
+        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, FormResponse
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view, has_permissions, _has_permissions
 import mysite.profile.forms
@@ -318,119 +317,21 @@ def edit_person_info_do(request):
     # {{{
     person = request.user.get_profile()
 
-    edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, request.FILES, prefix='edit-tags')
-    contact_blurb_form = mysite.profile.forms.ContactBlurbForm(request.POST, prefix='edit-tags')
-    contact_blurb_error = False
-    errors_occurred = False
+    edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, request.FILES, prefix='edit-tags', person=person)
 
-    # Grab the submitted homepage URL.
-    if edit_info_form.is_valid():
-        person.homepage_url = edit_info_form.cleaned_data['homepage_url']
-        if (person.resume):
-            person.resume.delete()
-        if edit_info_form['resume'].data is not False:
-            person.resume = edit_info_form['resume'].data
-    else:
-        errors_occurred = True
+    if edit_info_form.is_valid() != True:
+        return edit_info(request,edit_info_form=edit_info_form, has_errors=True)
 
-    # grab their submitted bio
-    person.bio = edit_info_form['bio'].data
+    FormResponse.objects.filter(person=person).delete()
 
-    # setting SC4G volunteer fields
-    person.cause = edit_info_form['causes'].data
-    person.comment = edit_info_form['comment'].data
-    person.company_name = edit_info_form['company_name'].data
-    if edit_info_form['experience'].data is not None:
-        experience_id = edit_info_form['experience'].data[0]
-        person.experience = Experience.objects.get(pk=experience_id)
-    person.github_name = edit_info_form['github_name'].data
-    person.google_code_name =edit_info_form['google_code_name'].data
-    person.heard_from = edit_info_form['heard_from'].data
-    person.language = edit_info_form['languages'].data
-    person.language_spoken = edit_info_form['language_spoken'].data
-    person.linked_in_url = edit_info_form['linked_in_url'].data
-    person.opensource = edit_info_form['open_source'].data
-    person.organization = edit_info_form['organizations'].data
-    person.other_name = edit_info_form['other_name'].data
-    person.private = edit_info_form['private'].data
-
-    person.skill = edit_info_form['skills'].data
-    person.subscribed = edit_info_form['subscribed'].data
-    if edit_info_form['times_to_commit'].data is not None:
-        time_to_commit_id = edit_info_form['times_to_commit'].data[0]
-        person.time_to_commit = TimeToCommit.objects.get(pk=time_to_commit_id)
-
-    # grab the irc nick
-    person.irc_nick = edit_info_form['irc_nick'].data
-
-    # We can map from some strings to some TagTypes
-    for known_tag_type_name in ('understands', 'understands_not',
-                           'studying', 'can_pitch_in', 'can_mentor'):
-        tag_type, _ = TagType.objects.get_or_create(name=known_tag_type_name)
-
-        text = edit_info_form[known_tag_type_name].data or ''
-        # Set the tags to this thing
-        new_tag_texts_for_this_type_raw = text.split(',')
-        new_tag_texts_for_this_type = [tag.strip()
-                for tag in new_tag_texts_for_this_type_raw]
-        # Now figure out what tags are in the DB
-        old_tag_links = Link_Person_Tag.objects.filter(
-                tag__tag_type=tag_type, person=person)
-
-        # FIXME: Churn, baby churn
-        for link in old_tag_links:
-            link.delete()
-
-        for tag_text in new_tag_texts_for_this_type:
-            if not tag_text.strip(): # Don't save blank tags.
-                continue
-
-            # HACK
-            if type(tag_text) == str:
-                tag_text = unicode(tag_text, 'utf-8')
-
-            # The following code gets the first matching tag or creates one. We
-            # previously used a straight-up get_or_create, but the parameters
-            # (name, tagtype) no longer uniquely select a tag. We get errors
-            # like this: "MultipleObjectsReturned: get() returned more than one
-            # Tag -- it returned 25!  Lookup parameters were {'text__regex':
-            # u'^fran\\\xe7ais$', 'tag_type': <TagType: understands>}" Our
-            # data, as you can see, is not very healthy. But I don't think it
-            # will make a difference.
-            matching_tags = Tag.objects.filter(
-                    text__regex=r"^%s$" % re.escape(tag_text),
-                    tag_type=tag_type)
-            if matching_tags:
-                tag = matching_tags[0]
+    for question in edit_info_form.questions:
+        if edit_info_form['question_' + str(question.id)].data:
+            if type(edit_info_form['question_' + str(question.id)].data) == list:
+                for i, answer in enumerate(edit_info_form['question_' + str(question.id)].data):
+                    mysite.profile.models.FormResponse(person=person, question=question, value=edit_info_form['question_' + str(question.id)].data[i]).save()
             else:
-                tag = Tag.objects.create(tag_type=tag_type, text=tag_text)
-
-            new_link, _ = Link_Person_Tag.objects.get_or_create(
-                    tag=tag, person=person)
-
-    posted_contact_blurb = contact_blurb_form['contact_blurb'].data or ''
-    # If their new contact blurb contains $fwd, but they don't have an  email
-    # address in our database, give them an error.
-    if '$fwd' in posted_contact_blurb and not person.user.email:
-        contact_blurb_error = True
-        errors_occurred = True
-    else:
-        # if their new contact blurb contains $fwd and their old one didn't,
-        # then make them a new forwarder
-        if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
-            mysite.base.view_helpers.generate_forwarder(person.user)
-        person.contact_blurb = posted_contact_blurb
-
-    person.save()
-
-    if errors_occurred:
-        return edit_info(request,
-                         edit_info_form=edit_info_form,
-                         contact_blurb_form=contact_blurb_form,
-                         contact_blurb_error=contact_blurb_error,
-                         has_errors=errors_occurred)
-    else:
-        return HttpResponseRedirect(person.profile_url)
+                mysite.profile.models.FormResponse(person=person, question=question, value=edit_info_form['question_' + str(question.id)].data).save()
+    return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
@@ -981,37 +882,8 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data = get_personal_data(person)
     data['info_edit_mode'] = True
     if edit_info_form is None:
-        edit_info_form = mysite.profile.forms.EditInfoForm(initial={
-            'bio': person.bio,
-            'homepage_url': person.homepage_url,
-            'irc_nick': person.irc_nick,
-            'understands': data['tags_flat'].get('understands', ''),
-            'understands_not': data['tags_flat'].get('understands_not', ''),
-            'studying': data['tags_flat'].get('studying', ''),
-            'can_pitch_in': data['tags_flat'].get('can_pitch_in', ''),
-            'can_mentor': data['tags_flat'].get('can_mentor', ''),
+        edit_info_form = mysite.profile.forms.EditInfoForm(prefix='edit-tags', person=person)
 
-            # Setting initial SC4G volunteer fields
-            'causes': Cause.objects.filter(person=person._get_pk_val),
-            'comment': person.comment,
-            'company_name': person.company_name,
-            'experience': person.experience,
-            'github_name': person.github_name,
-            'google_code_name': person.google_code_name,
-            'heard_from': Heard_From.objects.filter(person=person._get_pk_val),
-            'language_spoken': person.language_spoken,
-            'languages': Language.objects.filter(person=person._get_pk_val),
-            'linked_in_url': person.linked_in_url,
-            'open_source': person.opensource,
-            'organizations': Organization.objects.filter(person=person._get_pk_val),
-            'other_name': person.other_name,
-            'private': person.private,
-            'resume': person.resume,
-            'skills': Skill.objects.filter(person=person._get_pk_val),
-            'subscribed': person.subscribed,
-            'times_to_commit': person.time_to_commit,
-
-        }, prefix='edit-tags')
     if contact_blurb_form is None:
         contact_blurb_form = mysite.profile.forms.ContactBlurbForm(initial={
           'contact_blurb': person.contact_blurb,

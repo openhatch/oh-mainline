@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Imports {{{
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 import django.contrib.auth
 from django.contrib.auth.decorators import login_required
@@ -25,9 +26,7 @@ from django.core.urlresolvers import reverse
 import django_authopenid.views
 from django.contrib.auth.models import User
 from mysite.base.models import Experience, Organization, Skill, Language
-from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit
-
-from django.contrib.sessions.models import Session
+from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit, FormQuestion, FormAnswer, FormResponse
 
 from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
@@ -82,6 +81,76 @@ def signup(request, signup_form=None):
     if signup_form is None:
         signup_form = mysite.account.forms.UserCreationFormWithEmail()
     return render_response(request, 'account/signup.html', {'form': signup_form})
+
+def signup_request(request):
+    try:
+        post_data = request.POST
+        questions_json = post_data.get(u'data', [])
+        questions_json = json.loads(questions_json)
+
+        email = __getFieldValue__(questions_json, u'Email')
+        first_name = __getFieldValue__(questions_json, u'First Name')
+        last_name = __getFieldValue__(questions_json, u'Last Name')
+        if email is None:
+            return HttpResponse(status=400)
+        Person.objects.filter(user__email__iexact=email).delete()
+        User.objects.filter(email__iexact=email).delete()
+        user = User.objects.create(username=email, email=email, first_name=first_name, last_name=last_name)
+        person = user.get_profile()
+
+        answers = dict()
+        questions = []
+        for question in questions_json:
+            form_question = FormQuestion(name=question.get(u'label'),
+                                         type=question.get(u'inputType'),
+                                         required=question.get(u'required'))
+            if len(FormQuestion.objects.filter(name__iexact=form_question.name)) > 0:
+                FormQuestion.objects.filter(name__iexact=form_question.name)\
+                    .update(type=question.get(u'inputType'), required=question.get(u'required'))
+            else:
+                form_question.save()
+            questions.append(form_question)
+            answers[form_question.name] = []
+            for answer in question.get(u'values'):
+                answers[form_question.name].append(FormAnswer(question=form_question, value=answer))
+        existing_questions = FormQuestion.objects.all()
+        for existing_question in existing_questions:
+            is_present = False
+            for question in questions:
+                if question.name  == existing_question.name:
+                    is_present = True
+                    continue
+            if not is_present:
+                existing_question.delete()
+        __updateQuestionAnswers__(FormQuestion.objects.all(), answers)
+    except (Exception, RuntimeError) as e:
+        raise e
+
+    return HttpResponse(status=200)
+
+def __updateQuestionAnswers__(questions, answers):
+    for question in questions:
+        existing_answers = FormAnswer.objects.filter(question__pk__iexact=question.id)
+        for answer in answers[question.name]:
+            if len(FormAnswer.objects.filter(Q(question__pk__iexact=question.id) and Q(value__iexact=answer.value))) == 0:
+                answer.save()
+        for existing_answer in existing_answers:
+            is_present = False
+            for answer in answers[question.name]:
+                if answer.value == existing_answer.value:
+                    is_present = True
+                    continue
+            if not is_present:
+                for response in FormResponse.objects.all():
+                    if response.question.id == existing_answer.question.id:
+                        response.delete()
+                existing_answer.delete()
+
+def __getFieldValue__(questions, label):
+    for question in questions:
+        if question.get(u'label') == label:
+            return question.get(u'responses')[0]
+    return None
 
 @login_required
 @view

@@ -14,17 +14,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from speechd_config.config import question
 
 import django.forms
+from mysite.base.fields import QuestionFormField
 import mysite.profile.models
-from mysite.profile.models import  TimeToCommit, Heard_From, Language, Organization, Cause, Skill, Experience
+from mysite.profile.models import FormResponse, FormAnswer, FormQuestion
 from mysite.search.models import Project
-from file_resubmit.admin import AdminResubmitFileWidget
 
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
     portfolio_entry = django.forms.ModelChoiceField(
-            queryset=mysite.profile.models.PortfolioEntry.objects.all(), 
+            queryset=mysite.profile.models.PortfolioEntry.objects.all(),
             widget=django.forms.HiddenInput())
 
     # The ID of the element in the portfolio editor that contains this form.
@@ -57,39 +58,35 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
 
 class EditInfoForm(django.forms.Form):
 
-    bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    causes = django.forms.ModelMultipleChoiceField(
-        required=False, queryset=Cause.objects.all(), widget=django.forms.CheckboxSelectMultiple)
-    comment = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    company_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    experience = django.forms.ModelChoiceField(
-        required=False, empty_label=None, queryset=Experience.objects.all(),widget=django.forms.RadioSelect())
-    github_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    google_code_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    heard_from = django.forms.ModelMultipleChoiceField(
-        required=False, queryset=Heard_From.objects.all(), widget=django.forms.CheckboxSelectMultiple)
-    homepage_url = django.forms.URLField(required=False)
-    irc_nick = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    language_spoken = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    languages = django.forms.ModelMultipleChoiceField(
-        required=False, queryset=Language.objects.all(), widget=django.forms.CheckboxSelectMultiple)
-    linked_in_url = django.forms.URLField(required=False)
-    open_source = django.forms.BooleanField(required=False)
-    organizations = django.forms.ModelMultipleChoiceField(
-        required=False, queryset=Organization.objects.all(), widget=django.forms.CheckboxSelectMultiple)
-    other_name = django.forms.CharField(required=False, widget=django.forms.TextInput())
-    private = django.forms.BooleanField(required=False)
-    resume = django.forms.FileField(required=False, widget=AdminResubmitFileWidget)
-    studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    subscribed = django.forms.BooleanField(required=False)
-    times_to_commit = django.forms.ModelChoiceField(
-        required=True, empty_label=None, queryset=TimeToCommit.objects.all(),widget=django.forms.RadioSelect())
-    understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
-    skills = django.forms.ModelMultipleChoiceField(
-        required=True, queryset=Skill.objects.all(),widget=django.forms.CheckboxSelectMultiple)
+    person = None
+    questions = []
+    responses = []
+
+    def __select_initial_response__(self, field, question):
+        initial = []
+        for a, response in enumerate(self.responses):
+            if response.question.id == question.id:
+                initial.append(response.value)
+                if field.type != 'multi':
+                    break
+        if field.type == 'multi':
+            field.initial = initial
+        else:
+            if len(initial) > 0:
+                field.initial = str(initial[0]).replace('\\r\\n', '\n').replace('\\n', '\n')
+
+    def __init__(self, *args, **kwargs):
+        self.person = kwargs.pop('person')
+        self.questions = FormQuestion.objects.all()
+        self.responses = FormResponse.objects.filter(person__pk=self.person.id)
+        super(EditInfoForm, self).__init__(*args, **kwargs)
+
+        for i, question in enumerate(self.questions):
+            answers = FormAnswer.objects.filter(question__pk=question.id)
+            self.fields['question_%s' % question.id] = QuestionFormField(required=question.required, type=question.type,
+                                                                     label=question.name, answers=answers)
+            self.__select_initial_response__(self.fields['question_%s' % question.id], question)
+
 
 class ContactBlurbForm(django.forms.Form):
     contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())

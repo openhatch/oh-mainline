@@ -108,29 +108,35 @@ class RepositoryCommitter(models.Model):
     class Meta:
         unique_together = ('project', 'data_import_attempt')
 
-
 class FormQuestion(models.Model):
     name = models.CharField(blank=False, null=False, max_length=100)
     type = models.CharField(blank=False, null=False, max_length=50)
-
-class FormResponse(models.Model):
-    question = models.ForeignKey(FormQuestion)
-    value = models.CharField(default='', blank=True, null=True, max_length=150)
+    required = models.BooleanField(default=True, null=False, blank=False)
 
 class FormAnswer(models.Model):
     question = models.ForeignKey(FormQuestion)
     value = models.CharField(default='', blank=True, null=True, max_length=150)
 
+class FormResponse(models.Model):
+    question = models.ForeignKey(FormQuestion)
+    person = models.ForeignKey('Person')
+    value = models.CharField(default='', blank=True, null=True, max_length=150)
+    def __str__(self):
+        return self.value
+
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
     company_name = models.CharField(default="", blank=True, null=True, max_length=100)
+    private = models.BooleanField(default=True)
+    bio = models.TextField(blank=True)
+    email_me_re_projects = models.BooleanField(default=True)
     homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
-    bio = models.TextField(blank=True)
     contact_blurb = models.TextField(blank=True)
     expand_next_steps = models.BooleanField(default=True)
     photo = models.ImageField(upload_to=
@@ -161,6 +167,15 @@ class Person(models.Model):
                                              verbose_name='Location')
     latitude = models.FloatField(null=False, default=-37.3049962)
     longitude = models.FloatField(null=False, default=-12.6790445)
+
+    #responses = models.ManyToManyField(FormQuestion, through=FormResponse)
+    date_added = models.DateTimeField(default=datetime.datetime.now(), auto_now_add=True)
+    uploaded_to_zoho = models.BooleanField(default=False)
+    resume = models.FileField(upload_to=
+                              lambda a, b: 'static/resumes/' +
+                              generate_person_photo_path(a, b),
+                              default='', max_length=100)
+    
     email_me_re_projects = models.BooleanField(default=True,
             verbose_name='Email me periodically about activity in my projects')
     skill = models.ManyToManyField(Skill)
@@ -170,7 +185,6 @@ class Person(models.Model):
     language = models.ManyToManyField(Language)
     opensource = models.NullBooleanField(default=None)
     time_to_commit = models.ForeignKey(TimeToCommit, default=1)
-
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
     linked_in_url = models.URLField(default="", blank=True)
     private = models.BooleanField(default=True)
@@ -181,13 +195,9 @@ class Person(models.Model):
     other_name = models.TextField(default="", blank=True)
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
-    date_added = models.DateTimeField(default=datetime.datetime.now(), auto_now_add=True)
-    uploaded_to_zoho = models.BooleanField(default=False)
-    resume = models.FileField(upload_to=
-                              lambda a, b: 'static/resumes/' +
-                              generate_person_photo_path(a, b),
-                              default='', max_length=100)
-    response = models.ManyToManyField(FormResponse)
+
+    def get_responses(self):
+        return FormResponse.objects.filter(person__pk=self.id)
 
     def add_skill(self, skill_id):
         skill = Skill.objects.get(pk=skill_id)

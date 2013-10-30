@@ -18,6 +18,7 @@
 
 from django import template
 import re
+from django.forms import BooleanField
 from django.utils.html import escape
 from urlparse import urlparse
 import logging
@@ -125,3 +126,13 @@ register.filter('length_gte', length_gte)
 register.filter('length_lte', length_lte)
 register.filter('break_long_words', break_long_words)
 register.filter('person_tag_descriptions_for_tag_text', person_tag_descriptions_for_tag_text)
+
+@register.filter
+def format(value, arg):
+    try:
+        if value:
+            return (unicode(arg)) % value
+        else:
+            return u''
+    except (ValueError, TypeError):
+        return u''
