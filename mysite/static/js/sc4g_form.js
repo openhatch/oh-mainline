@@ -20,12 +20,26 @@ jQuery(document).ready(function($) {
                 return valueArray;
             };
 
-            var getResponses = function(selector) {
-                var responses = [];
+            var getSelectValue = function(selector) {
+                var valueArray = [];
 
+                if ($(selector).find('option').length > 0 && $(selector).val() !== null) {
+                    var values = $(selector).val();
+                    for (var i = 0; i < values.length; i++) {
+                        $(selector).find('option[value=\'' + values[i] + '\']').each(function (index, element) {
+                            valueArray.push($(this).text());
+                        });
+                    }
+                }
 
+                return valueArray;
+            };
 
-                return responses;
+            var getSelectType = function(selector) {
+                if ($(selector).is('[size]') && parseInt($(selector).attr('size')) > 1) {
+                    return 'multi';
+                }
+                return 'single';
             };
 
             String.prototype.trim = function() {
@@ -61,12 +75,16 @@ jQuery(document).ready(function($) {
                 } else if ($(this).find('input[type=radio]').length > 0) {
                     inputType = 'single';
                     values = getValues($(this).find('input[type=radio]'));
-                    responses = getResponses($(this).find('input[type=radio]'));
-                } else if ($(this).find('input[type=checkbox]').length > 0 ||
-                        $(this).find('select').length > 0) {
+                    responses = getValues($(this).find('input[type=radio]:checked'));
+                } else if ($(this).find('select').length > 0) {
+                    var select = $(this).find('select');
+                    inputType = getSelectType(select);
+                    values = getValues($(this).find('option'));
+                    responses = getSelectValue(select);
+                } else if ($(this).find('input[type=checkbox]').length > 0) {
                     inputType = 'multi';
-                    values = getValues($(this).find('input[type=checkbox], option'));
-                    responses = getResponses($(this).find('input[type=checkbox], option'));
+                    values = getValues($(this).find('input[type=checkbox]'));
+                    responses = getValues($(this).find('input[type=checkbox]:checked'));
                 } else if ($(this).find('textarea').length > 0) {
                     inputType = 'textarea';
                     responses = [ $(this).find('textarea').val() ];
@@ -86,19 +104,20 @@ jQuery(document).ready(function($) {
                 questions.push(question);
             });
 
-            console.log(questions);
-
             $.post('http://127.0.0.1:8000/account/signup', { data: JSON.stringify(questions) })
                 .success(function(response) {
-                    //submit form
+                    return true;
                 }).error(function(response) {
-
+                    alert('There was an error while processing the form.');
+                    return false;
                 });
         }
 
         $('form').submit(function(e) {
             e.preventDefault();
-            parseInputFields();
+            if (parseInputFields()) {
+                $(this).submit();
+            }
         });
 
     }(jQuery));
