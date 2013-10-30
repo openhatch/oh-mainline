@@ -108,14 +108,17 @@ class RepositoryCommitter(models.Model):
     class Meta:
         unique_together = ('project', 'data_import_attempt')
 
+
 class FormQuestion(models.Model):
     name = models.CharField(blank=False, null=False, max_length=100)
     type = models.CharField(blank=False, null=False, max_length=50)
-    required = models.BooleanField(default=True, null=False, blank=False)
+    required = models.BooleanField(default=False, null=False, blank=False)
+
 
 class FormAnswer(models.Model):
     question = models.ForeignKey(FormQuestion)
     value = models.CharField(default='', blank=True, null=True, max_length=150)
+
 
 class FormResponse(models.Model):
     question = models.ForeignKey(FormQuestion)
@@ -168,7 +171,6 @@ class Person(models.Model):
     latitude = models.FloatField(null=False, default=-37.3049962)
     longitude = models.FloatField(null=False, default=-12.6790445)
 
-    #responses = models.ManyToManyField(FormQuestion, through=FormResponse)
     date_added = models.DateTimeField(default=datetime.datetime.now(), auto_now_add=True)
     uploaded_to_zoho = models.BooleanField(default=False)
     resume = models.FileField(upload_to=

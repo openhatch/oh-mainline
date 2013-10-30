@@ -28,7 +28,6 @@ class QuestionFormField(Field):
             self.widget = RadioSelect(choices=[(True,'Yes'),(False,'No')])
         if self.type == 'url':
             self.widget = django.forms.TextInput()
-            #self.extra_validators.append(validators.URLValidator())
         if self.type == 'file':
             self.widget = AdminResubmitFileWidget()
 

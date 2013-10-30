@@ -99,58 +99,72 @@ def signup_request(request):
         person = user.get_profile()
 
         answers = dict()
+        responses = dict()
         questions = []
         for question in questions_json:
-            form_question = FormQuestion(name=question.get(u'label'),
-                                         type=question.get(u'inputType'),
-                                         required=question.get(u'required'))
-            if len(FormQuestion.objects.filter(name__iexact=form_question.name)) > 0:
-                FormQuestion.objects.filter(name__iexact=form_question.name)\
+            question_name = question.get(u'label')
+            form_question = None
+            if FormQuestion.objects.filter(name__iexact=question_name).count() > 0:
+                FormQuestion.objects.filter(name__iexact=question_name) \
                     .update(type=question.get(u'inputType'), required=question.get(u'required'))
+                form_question = FormQuestion.objects.get(name__iexact=question_name)
             else:
+                form_question = FormQuestion(name=question_name,
+                                             type=question.get(u'inputType'),
+                                             required=question.get(u'required'))
                 form_question.save()
+                # TODO: adjust possible answers based on input type
             questions.append(form_question)
             answers[form_question.name] = []
+            responses[form_question.name] = []
             for answer in question.get(u'values'):
                 answers[form_question.name].append(FormAnswer(question=form_question, value=answer))
+            for response in question.get(u'responses'):
+                if len(response) == 0:
+                    continue
+                responses[form_question.name].append(FormResponse(question=form_question, person=person, value=response))
         existing_questions = FormQuestion.objects.all()
         for existing_question in existing_questions:
             is_present = False
             for question in questions:
                 if question.name  == existing_question.name:
                     is_present = True
-                    continue
             if not is_present:
                 existing_question.delete()
         __updateQuestionAnswers__(FormQuestion.objects.all(), answers)
+        __updateQuestionResponses__(person, FormQuestion.objects.all(), responses)
     except (Exception, RuntimeError) as e:
         raise e
 
     return HttpResponse(status=200)
-
-def __updateQuestionAnswers__(questions, answers):
-    for question in questions:
-        existing_answers = FormAnswer.objects.filter(question__pk__iexact=question.id)
-        for answer in answers[question.name]:
-            if len(FormAnswer.objects.filter(Q(question__pk__iexact=question.id) and Q(value__iexact=answer.value))) == 0:
-                answer.save()
-        for existing_answer in existing_answers:
-            is_present = False
-            for answer in answers[question.name]:
-                if answer.value == existing_answer.value:
-                    is_present = True
-                    continue
-            if not is_present:
-                for response in FormResponse.objects.all():
-                    if response.question.id == existing_answer.question.id:
-                        response.delete()
-                existing_answer.delete()
 
 def __getFieldValue__(questions, label):
     for question in questions:
         if question.get(u'label') == label:
             return question.get(u'responses')[0]
     return None
+
+def __updateQuestionAnswers__(questions, answers):
+    for question in questions:
+        existing_answers = FormAnswer.objects.filter(question__pk__exact=question.id)
+        for answer in answers[question.name]:
+            if FormAnswer.objects.filter(Q(question__pk__exact=question.id) and Q(value__iexact=answer.value)).count() == 0:
+                answer.save()
+        for existing_answer in existing_answers:
+            is_present = False
+            for answer in answers[question.name]:
+                if answer.value == existing_answer.value:
+                    is_present = True
+            if not is_present:
+                FormResponse.objects.filter(Q(question__pk__exact=existing_answer.question.id)
+                and Q(value__iexact=existing_answer.value)).delete()
+                existing_answer.delete()
+
+def __updateQuestionResponses__(person, questions, responses):
+    for question in questions:
+        question.formresponse_set.get_query_set().delete()
+        for response in responses[question.name]:
+            response.save()
 
 @login_required
 @view
