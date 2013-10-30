@@ -1189,61 +1189,6 @@ class EditLocation(TwillTests):
         self.assertNotEqual(mysite.profile.models.DEFAULT_LATITUDE,
                             person.get_public_latitude_or_default())
 
-class EditBio(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        '''
-        * Goes to paulproteus's profile
-        * checks that they don't already have a bio that says "lookatme!"
-        * clicks edit on the Info area
-        * enters a string as bio
-        * checks that his bio now contains string
-        '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        #not so vain.. yet
-        tc.notfind('lookatme!')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        #make sure our bio is not already on the form
-        tc.notfind('lookatme!')
-        # set the bio in ze form
-        tc.fv("edit-tags", 'edit-tags-bio', 'lookatme!')
-        tc.submit()
-        #find the string we just submitted as our bio
-        tc.find('lookatme!')
-        self.assertEqual(Person.get_by_username('paulproteus').bio, "lookatme!")
-        #now we should see our bio in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('lookatme!')
-
-class EditIrcNick(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        '''
-        * Goes to paulproteus's profile
-        * checks that they don't already have a ircnick that says "paulproteusnick"
-        * clicks edit on the Info area
-        * enters a string as irc nick
-        * checks that his irc nick now contains string
-        '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        tc.notfind('paulproteusnick')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        # make sure our irc nick is not already on the form
-        tc.notfind('paulproteusnick')
-        # set the irc nick in the form
-        tc.fv("edit-tags", 'edit-tags-irc_nick', 'paulproteusnick')
-        tc.submit()
-        # find the string we just submitted as our irc nick
-        tc.find('paulproteusnick')
-        self.assertEqual(Person.get_by_username('paulproteus').irc_nick, "paulproteusnick")
-        # now we should see our irc nick in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('paulproteusnick')
-
 class EditContactBlurbForwarderification(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test(self):
@@ -1275,58 +1220,6 @@ class EditContactBlurbForwarderification(TwillTests):
         self.assert_(our_forwarder.expires_on > datetime.utcnow())
         # we test that the result contains, as a substr, the output of a call to generate_forwarder
         self.assertEqual(mystr_forwarderified, output);
-
-
-class EditContactBlurb(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        '''
-        * Goes to paulproteus' profile
-        * checks that it doesn't say "bananas"
-        * clicks edit in the info area
-        * checks that the input field for "how to contact me" doesn't say bananas
-        * enters bananas under the "how to contact me" section
-        * submits
-        * checks that his profile now says "bananas"
-        * clicks edit in the info area again
-        * checks that the input field for "how to contact me" now says bananas
-        * removes email address from user
-        * enters contact blurb containing $fwd
-        * makes sure that the user gets an error message
-        '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        # make sure our contact info isn't already on the profile page
-        tc.notfind('bananas')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        #make sure our contact info is not already on the form
-        tc.notfind('bananas')
-        # set the contact info in ze form
-        tc.fv("edit-tags", 'edit-tags-contact_blurb', 'bananas')
-        tc.submit()
-        #find the string we just submitted as our contact info
-        tc.find('bananas')
-        asheesh = Person.get_by_username('paulproteus')
-        self.assertEqual(asheesh.contact_blurb, "bananas")
-        #now we should see our contact info in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('bananas')
-        #delete asheesh's email
-        asheesh_user = asheesh.user
-        asheesh_user.email = ''
-        asheesh_user.save()
-        contact_blurb = 'email me here: $fwd'
-        contact_blurb_escaped = 'email me here: \$fwd'
-        homepage_url = 'http://mysite.com/'
-        tc.fv("edit-tags", 'edit-tags-contact_blurb', contact_blurb)
-        # also enter a homepage so that we can make sure that this gets saved despite our error with the forwarder stuff
-        tc.fv("edit-tags", 'edit-tags-homepage_url', homepage_url)
-        tc.submit()
-        # make sure that they got an error message
-        tc.find('contact_blurb_error')
-        # make sure that the form remembered the contact blurb that they posted
-        tc.find(contact_blurb_escaped)
 
 class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
