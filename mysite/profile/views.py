@@ -132,6 +132,11 @@ def display_person_web(request, user_to_display__username=None):
         raise Http404
 
     data = get_personal_data(person)
+    all_responses = person.formresponse_set.all()
+    data['questions'] = [{ 'question': question, 'responses': [response for response in all_responses
+                                                               if response.question.id == question.id] }
+                         for question in FormQuestion.objects.all() if question
+                         in [response.question for response in all_responses]]
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.view_helpers.get_notification_from_request(request)

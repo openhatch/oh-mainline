@@ -880,7 +880,7 @@ p#qunit-testresult { margin-left: 1em; font-size: 10pt; font-family: 'trebuchet 
 
 body#profile #bio { margin: 0; padding: 0 0 10px 0; }
 body#profile #tags-links li { list-style: square outside; margin: 0 0 0 15px; }
-body#profile #nameplate { float: left; width: 940px; margin-top: 20px; padding: 3px; }
+body#profile #nameplate { float: left; width: 600px; margin-top: 20px; padding: 3px; }
 	body#profile #nameplate h1 { font-weight: bold; font-size: 15pt; text-shadow: 0 1px 0 #fff; }
 		body#profile #nameplate h1 a { color: #000; }
 	body#profile #nameplate h1, #nameplate #sep, #nameplate h2 { font-size: 19pt; font-weight: normal; margin-right: 10px; }
@@ -1167,22 +1167,7 @@ div.input input[type=text] {
 }
 
 div#portfolio {
-    width: 955px !important;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-}
-
-body#profile div#avatar {
-    max-height: 610px;
-    height: 610px;
-    min-height: 610px;
-}
-
-body#profile div#info {
-    max-height: 610px;
-    height: 610px;
-    min-height: 610px;
+    width: 100% !important;
 }
 
 body#profile div#info h3 {
@@ -1192,6 +1177,13 @@ body#profile div#info h3 {
 body#profile div#info a.edit {
     float: right !important;
     padding: 6px !important;
+}
+
+body#profile div#info div.module-body div {
+    width: 50% !important;
+    float: left !important;
+    display: inline-table !important;
+    margin: 0px !important;
 }
 
 body#profile div#portfolio li.project_list_item {
@@ -1607,103 +1599,6 @@ body#people-map #thinking { display: none; margin-right: 1em; padding: 0 2px; ba
     margin-top: 5px;
     float: right;
     padding: 2px;
-}
-
-body.missions .successmsg {
-  background-color: #e4ffc0;
-  margin: 10px 0px;
-  padding: 5px 10px;
-  -moz-border-radius: 5px 5px 5px 5px;
-  -webkit-border-radius: 5px 5px 5px 5px;
-  border-radius: 5px 5px 5px 5px;
-}
-
-body.missions div.body > * {
-  float: left;
-  width: 100%;
-}
-
-/* Don't let the above rule force code markup and hyperlinks to be floated left. */
-body.missions div.body code {
-  float: none;
-}
-body.missions div.body a {
-  float: none;
-}
-
-body.missions p.next_mission_link {
-    width: 100%;
-}
-
-body.missions .file-upload-row {
-  width: 100%
-}
-
-body.missions .file-upload {
-  margin-top: 5px;
-  padding: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  width: 100%;
-  background: #F9F9F9
-}
-
-body.missions .file-upload input[type="file"] {
-  padding: 0;
-  font-size: 100%
-}
-.tick-progress {
-  list-style-image: url("/static/images/tick.png");
-  margin-left: 30px;
-}
-.cross-progress {
-  list-style-image: url("/static/images/no-tick.png");
-  margin-left: 30px;
-}
-body.missions .bump-over {
-  margin-left: 30px;
-}
-body.missions .submodule.skinny ul li a{
-  vertical-align: 3px;
-}
-
-body.missions .mission-help {
-    padding: 3px;
-    padding-right: 7px;
-    background-color: yellow;
-}
-
-body#missions_index div.body h2 {
-    margin-bottom: 0.5em;
-    margin-top: 0.5em;
-    clear: both;
-}
-
-body#missions_index .submodule {
-    width: 21%;
-    margin-right: 12px;
-}
-
-body#missions_index .submodule h3 {
-    text-align: center;
-    border-bottom: 1px solid;
-    float: none;
-}
-
-body#missions_index .submodule h3.uncompleted {
-    color: black;
-}
-
-body#missions_index .submodule .go_to_it {
-    text-align: right;
-    float: right;
-}
-
-body#missions_index .submodule .status {
-    float: left;
-    text-align: center;
-    width: 80%;
 }
 
 @import url("ui.core.css");

@@ -1,4 +1,4 @@
-{% extends 'profile/base_profile.html' %}
+{% extends 'base/one_column.html' %}
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
@@ -20,14 +20,133 @@
 {% endcomment %}
 
 {% load base_extras %}
+{% load profile_extras %}
+
+{% block body_id %}profile{% endblock %}
 
 {% block title %}
-{{ person.get_full_name_or_username }}
+    {{ person.get_full_name_or_username }}
 {% endblock title %}
 
-{% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
+{% block description_for_anonymous_users %}
+    <strong>
+        Learn below
+    </strong>
+    how
+    {% firstof person.user.first_name person.user.username %}
+    is involved in <abbr title='that is, Free, Libre Open Source Software'>FLOSS</abbr>
+{% endblock %}
 
-{% block more_content %}
+{% block pagetop %}
+    <div id='nameplate'>
+    {% if person.user.first_name or person.user.last_name %}
+        <h1 class='name'>
+            {{ person.user.first_name }}
+            {{ person.user.last_name }}
+                    <span class='username' style="font-size: .7em;">
+                        {{ person.username }}
+                        {% if editable %}
+                            (<a href='{% url account.views.edit_name %}'>edit name</a>)
+                        {% endif %}
+                    </span>
+        </h1>
+    {% else %}
+        <h1 class='name'>
+            <a href='/people/{{ person.user.username }}'>
+                <div class='name'>
+                    {{ person.user.username }}
+                </div>
+            </a>
+        </h1>
+
+        {% if editable %}
+            <a href='{% url account.views.edit_name %}' class="edit-name-link">
+                <div id='edit_your_name_notification'
+                     class='notification'>Tell us your name!
+                </div>
+            </a>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div id='avatar' class='module'>
+        {% if editable %}
+            {% if person.photo %}
+                <img src={% version photo_url %}>
+                <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
+            {% else %}
+                {# Haven't uploaded a photo yet #}
+                <style>
+
+                    #avatar .default_image {
+                        background: url({% version photo_url %}) no-repeat;
+                    }
+                </style>
+                <a href="/account/edit/photo/" class='default_image'>
+                    <div class='notification'>Upload a photo</div>
+                </a>
+            {% endif %}
+        {% else %}
+            <img src={% version photo_url %}>
+
+        {% endif %}
+
+        <div id='nameplate'>
+                <h4>Username</h4>
+
+                <p class="clear">{{ person.user.username }}</p>
+
+                {% if person.location_display_name and person.location_confirmed %}
+                    <h4>Location</h4>
+                    <p class="clear">
+                        <a style='color: #555;' href="/people/?center={{ person.location_display_name }}">
+                            {{ person.location_display_name }}
+                        </a>
+                        {% if editable %}
+                            (<a href="{% url mysite.account.views.set_location %}">edit</a>)
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <h4>Location</h4>
+                    <p class="clear">
+                        <a href="{% url mysite.account.views.set_location %}">Set your location</a>
+                    </p>
+                {% endif %}
+
+                {% if person.user.email %}
+                    {% if person.user == user or user|has_group:'ADMIN' %}
+                        <h4>Email</h4>
+                        <p class="clear">
+                            <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
+                        </p>
+                    {% endif %}
+                {% endif %}
+
+                {% if person.github_name %}
+                    <h4>GitHub</h4>
+                    <p id="gitHubUrl" style='clear: both;'>
+                        <a href="https://github.com/{{ person.github_name }}">{{ person.github_name }}</a>
+                    </p>
+                {% endif %}
+
+                {% if person.google_code_name %}
+                    <h4>GoogleCode</h4>
+                    <p id="googleCodeUrl" style='clear: both;'>
+                        <a href="https://code.google.com/u/{{ person.google_code_name }}">{{ person.google_code_name }}</a>
+                    </p>
+                {% endif %}
+
+                {% if person.linked_in_url %}
+                    <h4>LinkedIn</h4>
+                    <p id="linkedinurl" style='clear: both;'>
+                        <a href="{{ person.linked_in_url }}">{{ person.linked_in_url }}</a>
+                    </p>
+                {% endif %}
+        </div>
+        <!-- /.nameplate -->
+    </div>
+
     {% if person.user == user or user|has_group:'ADMIN' %}
         <div id='portfolio' class='module project-display viewer'>
             <div class='module-head'>
@@ -68,7 +187,32 @@
             </div>
         </div> <!-- /#portfolio -->
     {% endif %}
-{% endblock %}
+
+    <div id='info' class='module'>
+        <div class='module-head'>
+            <h3>Info</h3>
+            {% if editable and not info_edit_mode %}
+                <a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a>
+            {% else %}
+                {% if user|has_permission:'change_user' and not info_edit_mode %}
+                    <a class='edit' href='/profile/views/edit_info/{{ person.user.username }}'>Edit</a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class='module-body'>
+            {% for item in questions %}
+                <div>
+                    <h4>{{ item.question.name }}</h4>
+                    <p>
+                        {% for response in item.responses %}
+                            {{ response.value|linebreaksbr }}{% if forloop.counter < item.responses|length %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}
 
 {% block js %}
     <script type='text/javascript'>

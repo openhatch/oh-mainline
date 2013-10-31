@@ -1751,28 +1751,6 @@ class PersonProjectCache(TwillTests):
             86400 * 10)
         mock_cache.set.reset_mock()
 
-class ForwarderGetsCreated(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        # paulproteus has $fwd in his contact blurb
-        self.client.login(username="paulproteus", password="paulproteus's unbreakable password")
-        p = Person.get_by_username('paulproteus')
-        p.contact_blurb = "hi, $fwd!"
-        p.save()
-
-        # no forwarder in the db
-        self.assertFalse(Forwarder.objects.all())
-
-        # now we GET the profile...
-        response = self.client.get(p.profile_url)
-
-        new_fwd = Forwarder.objects.all()[0]
-        self.assert_(new_fwd)
-
-        # the page will contain the whole string because it's in the mailto:
-        self.assertContains(response, new_fwd.address)
-
 class EditYourName(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -2764,6 +2742,7 @@ class UserProfile(TwillTests):
         self.assertTrue('<h4>GitHub</h4>' in content)
         self.assertTrue('<h4>GoogleCode</h4>' in content)
 
+    @skip('Dynamically created fields')
     def test_profile_contains_info(self):
         content = self.__get_page_content()
         self.assertTrue('<h3>Info</h3>' in content)
