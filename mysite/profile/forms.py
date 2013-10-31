@@ -14,7 +14,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from speechd_config.config import question
 
 import django.forms
 from mysite.base.fields import QuestionFormField

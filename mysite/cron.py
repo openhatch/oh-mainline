@@ -10,6 +10,8 @@ def push_volunteers_to_zoho_crm(*job_args, **job_kwargs):
     try:
         people = Person.objects.filter(Q(date_added=datetime.date.today) and Q(uploaded_to_zoho=False))
         mysite.profile.view_helpers.add_people_to_zoho_CRM(people)
+        people = Person.objects.filter(Q(is_updated=True))
+        mysite.profile.view_helpers.update_people_in_zoho_CRM(people)
     except Exception as e:
         logging.error(e.message)
         return

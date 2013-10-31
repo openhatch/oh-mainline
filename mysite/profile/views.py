@@ -323,7 +323,7 @@ def edit_person_info_do(request):
         return edit_info(request,edit_info_form=edit_info_form, has_errors=True)
 
     FormResponse.objects.filter(person=person).delete()
-
+    person.is_updated = True
     for question in edit_info_form.questions:
         if edit_info_form['question_' + str(question.id)].data:
             if type(edit_info_form['question_' + str(question.id)].data) == list:
@@ -878,7 +878,6 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
         person = Person.objects.get(user__username__exact=username)
     else:
         person = request.user.get_profile()
-
     data = get_personal_data(person)
     data['info_edit_mode'] = True
     if edit_info_form is None:

@@ -133,6 +133,8 @@ class Person(models.Model):
     # {{{
     company_name = models.CharField(default="", blank=True, null=True, max_length=100)
     private = models.BooleanField(default=True)
+    is_updated = models.BooleanField(default=False)
+    zoho_id = models.CharField(default="", blank=True, null=True, max_length=100)
     bio = models.TextField(blank=True)
     email_me_re_projects = models.BooleanField(default=True)
     homepage_url = models.URLField(default="", blank=True)
