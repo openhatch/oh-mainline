@@ -103,6 +103,8 @@ def signup_request(request):
         questions = []
         for question in questions_json:
             question_name = question.get(u'label')
+            if question_name in ['First Name', 'Last Name', 'Email']:
+                continue
             form_question = None
             if FormQuestion.objects.filter(name__iexact=question_name).count() > 0:
                 FormQuestion.objects.filter(name__iexact=question_name) \
