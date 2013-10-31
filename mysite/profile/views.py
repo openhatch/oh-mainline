@@ -329,6 +329,7 @@ def edit_person_info_do(request):
 
     FormResponse.objects.filter(person=person).delete()
     person.is_updated = True
+    person.save()
     for question in edit_info_form.questions:
         if edit_info_form['question_' + str(question.id)].data:
             if type(edit_info_form['question_' + str(question.id)].data) == list:

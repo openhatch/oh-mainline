@@ -301,57 +301,38 @@ Sincerely,
 def prepare_person_xml_row(xml, index, person):
     with xml.row(no=str(index)):
         xml.FL("Volunteer", val="Title")
-        first_name = person.user.first_name or person.user.username
-        last_name = person.user.last_name or person.user.username
-        company = person.company_name or "N/A"
-        skills = ','.join(str(item.name) for item in person.skill.all())
-        organizations = ','.join(str(item.name) for item in person.organization.all())
-        causes = ','.join(str(item.name) for item in person.cause.all())
-        languages = ','.join(str(item.name) for item in person.language.all())
-        heard_from = ','.join(str(item.name) for item in person.heard_from.all())
-        resume_url = ''
-        if person.resume:
-            resume_url = 'http://' + Site.objects.get_current().domain + person.resume.url
-        github_url = GITHUB_USERNAME_BASE_PATH + '/' + person.github_name
-        google_code_url = GOOGLE_CODE_USERNAME_BASE_PATH + '/' + person.google_code_name
-        xml.FL(first_name, val="First Name")
-        xml.FL(last_name, val="Last Name")
-        xml.FL(company, val="Company")
+        responses = list()
+        for response in mysite.profile.models.FormResponse.objects.filter(person=person):
+            if response.question.type != 'multi':
+                xml.FL(response.value, val=response.question.name)
+                continue
+            if responses and response.question.name != responses[-1].question.name:
+                responses_values = ','.join(str(item.value) for item in responses)
+                xml.FL(responses_values, val=responses[0].question.name)
+                del responses[:]
+            responses.append(response)
+        xml.FL(person.user.first_name, val="First Name")
+        xml.FL(person.user.last_name, val="Last Name")
         xml.FL(person.user.email, val="Email")
-        xml.FL(organizations, val="Project Partner Interest")
-        xml.FL(causes, val="Causes")
-        xml.FL(person.time_to_commit.name, val="Time to Commit")
-        xml.FL(skills, val="Skills - Functional Role")
-        xml.FL(resume_url or '', val="Resume")
-        xml.FL(person.linked_in_url or '', val="LinkedIn, Coderwall, Etc.")
-        xml.FL(str(person.opensource), val="Previous Open Source?")
-        xml.FL(github_url, val="GitHub")
-        xml.FL(google_code_url, val="GoogleCode")
-        xml.FL(heard_from, val="Lead Source")
-        xml.FL(person.other_name, val="SourceForge, Ohloh or Other Username")
-        xml.FL(languages, val="Programming Experience in These Languages")
-        xml.FL(person.experience.name, val="Experience Level")
-        xml.FL(person.language_spoken, val="Spoken Languages")
-        xml.FL(person.comment, val="Comments")
 
 def update_people_in_zoho_CRM(people, auth_token = ZOHO_AUTH_TOKEN):
     for person in people:
-        xml = XMLBuilder('Leads')
+        xml = XMLBuilder('Contacts')
         prepare_person_xml_row(xml, 1, person)
         data = urllib.urlencode({"authtoken": auth_token, 'scope': 'crmapi', 'id': person.zoho_id, 'xmlData': str(xml)})
-        url = 'https://crm.zoho.com/crm/private/xml/Leads/updateRecords'
+        url = 'https://crm.zoho.com/crm/private/xml/Contacts/updateRecords'
         req = urllib2.Request(url=url, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
         response = urllib2.urlopen(req)
         if (response.code != 200):
             logging.error("Cannot update person in Zoho CRM. " + response)
 
 def add_people_to_zoho_CRM(people, auth_token = ZOHO_AUTH_TOKEN):
-    xml = XMLBuilder('Leads')
+    xml = XMLBuilder('Contacts')
     for counter, person in enumerate(people):
         prepare_person_xml_row(xml, counter+1, person)
 
     data = urllib.urlencode({"authtoken": auth_token, 'scope': 'crmapi', 'xmlData': str(xml)})
-    url = 'https://crm.zoho.com/crm/private/xml/Leads/insertRecords'
+    url = 'https://crm.zoho.com/crm/private/xml/Contacts/insertRecords'
     req = urllib2.Request(url=url, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
     response = urllib2.urlopen(req)
     if (response.code != 200):
@@ -361,8 +342,8 @@ def add_people_to_zoho_CRM(people, auth_token = ZOHO_AUTH_TOKEN):
         index = 0
         if "Record(s) added successfully" in response_body:
             xmldoc = minidom.parseString(response_body)
-            for el in xmldoc.getElementsByTagName("FL"):
-                id = el.childNodes[0].nodeValue
+            for el in xmldoc.getElementsByTagName("recorddetail"):
+                id = el.firstChild.firstChild.nodeValue
                 people[index].zoho_id = id
                 people[index].save()
                 index += 1
