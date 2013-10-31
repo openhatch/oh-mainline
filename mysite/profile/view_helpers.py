@@ -175,37 +175,72 @@ def get_geoip_guess_for_ip(ip_as_string):
     return False, u''
 
 def filter_people(people, post_data):
-    filtered_people = people
+    return [person for person in people if __does_person_meet_criteria__(person, post_data)]
+
+def __does_person_meet_criteria__(person, post_data):
+    meets_criteria = True
+    responses = person.formresponse_set.all()
 
     if 'filter_name' in post_data and len(post_data.get('filter_name')) > 0:
         name = post_data.get('filter_name', '')
-        filtered_people = filtered_people.filter(
-            Q(user__username__contains=name)
-            | Q(user__first_name__contains=name)
-            | Q(user__last_name__contains=name)).distinct()
+        if name not in person.user.username and name not in person.user.first_name and name not in person.user.last_name:
+            meets_criteria = False
     if 'filter_company_name' in post_data and len(post_data.get('filter_company_name')) > 0:
         company_name = post_data.get('filter_company_name', '')
-        filtered_people = filtered_people.filter(company_name__contains=company_name).distinct()
+        found_responses = responses.filter(Q(question__name__iexact='Company, Organization, or Event Where You Learned '
+                                                                  'About SocialCoding4Good') and
+                                           Q(value__contains=company_name))
+        if found_responses.count() == 0:
+            meets_criteria = False
     if 'filter_email' in post_data and len(post_data.get('filter_email')) > 0:
-        filtered_people = filtered_people.filter(user__email=post_data.get('filter_email')).distinct()
+        email = post_data.get('email', '')
+        if email not in person.user.email:
+            meets_criteria = False
     if 'skills[]' in post_data:
-        filtered_people = filtered_people.filter(skill__pk__in=post_data.getlist('skills[]')).distinct()
+        skills = post_data.getlist('skills[]')
+        answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=skills)
+        found = __is_any_answer_in_responses__(answers, responses)
+        if not found:
+            meets_criteria = False
     if 'organizations[]' in post_data:
-        filtered_people = filtered_people.filter(organization__pk__in=post_data.getlist('organizations[]')).distinct()
+        organizations = post_data.getlist('organizations[]')
+        answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=organizations)
+        found = __is_any_answer_in_responses__(answers, responses)
+        if not found:
+            meets_criteria = False
     if 'causes[]' in post_data:
-        filtered_people = filtered_people.filter(cause__pk__in=post_data.getlist('causes[]')).distinct()
+        causes = post_data.getlist('causes[]')
+        answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=causes)
+        found = __is_any_answer_in_responses__(answers, responses)
+        if not found:
+            meets_criteria = False
     if 'languages[]' in post_data:
-        filtered_people = filtered_people.filter(language__pk__in=post_data.getlist('languages[]')).distinct()
-    if 'time_to_commit' in post_data and post_data.get('time_to_commit') != u'null':
-        filtered_people = filtered_people.filter(time_to_commit__pk=post_data.get('time_to_commit')).distinct()
-    if 'opensource' in post_data:
-        if post_data.get('opensource') == u'null' or post_data.get('opensource') is None\
-            or post_data.get('opensource') == u'None':
-            filtered_people = filtered_people.filter(Q(opensource=True) | Q(opensource=False)).distinct()
-        else:
-            opensource = literal_eval(post_data.get('opensource'))
-            filtered_people = filtered_people.filter(opensource=opensource).distinct()
-    return filtered_people
+        languages = post_data.getlist('languages[]')
+        answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=languages)
+        found = __is_any_answer_in_responses__(answers, responses)
+        if not found:
+            meets_criteria = False
+    if 'time_to_commit[]' in post_data:
+        time_to_commit = post_data.getlist('time_to_commit[]')
+        answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=time_to_commit)
+        found = __is_any_answer_in_responses__(answers, responses)
+        if not found:
+            meets_criteria = False
+    if 'opensource[]' in post_data:
+        opensource = post_data.get('opensource[]')
+        answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=opensource)
+        found = __is_any_answer_in_responses__(answers, responses)
+        if not found:
+            meets_criteria = False
+
+    return meets_criteria
+
+def __is_any_answer_in_responses__(answers, responses):
+    for answer in answers:
+        for response in responses:
+            if answer.value == response.value and answer.question.id == response.question.id:
+                return True
+    return False
 
 def parse_string_query(s):
     parsed = {}

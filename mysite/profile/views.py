@@ -55,7 +55,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, FormResponse
+        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, FormResponse, FormQuestion, FormAnswer
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view, has_permissions, _has_permissions
 import mysite.profile.forms
@@ -504,13 +504,30 @@ def people(request, order='username'):
     for person in everybody:
         people_ids.append(int(person.id))
 
+    questions = FormQuestion.objects.all()
+    all_answers = FormAnswer.objects.filter(question__pk__in=[item.id for item in questions])
+    answers = dict([
+        ('Skills', []),
+        ('HFOSS Organizations That Interest You', []),
+        ('Causes That Interest You', []),
+        ('Programming Languages, Frameworks, Environments', []),
+        ('How much time would you like to commit to volunteering?', []),
+        ('Have you previously contributed to open source projects?', [])
+    ])
+    for question in questions:
+        answers[question.name] = []
+        for answer in all_answers:
+            if answer.question.id == question.id:
+                answers[question.name].append(answer)
+
     data['people_ids'] = simplejson.dumps(people_ids)
     data['export_formats'] = {"csv": "CSV", "json": "JSON", "html": "HTML Table", 'xml': 'XML'}
-    data['skills'] = Skill.objects.all()
-    data['organizations'] = Organization.objects.all()
-    data['causes'] = Cause.objects.all()
-    data['languages'] = Language.objects.all()
-    data['times_to_commit'] = TimeToCommit.objects.all()
+    data['skills'] = answers['Skills']
+    data['organizations'] = answers['HFOSS Organizations That Interest You']
+    data['causes'] = answers['Causes That Interest You']
+    data['languages'] = answers['Programming Languages, Frameworks, Environments']
+    data['times_to_commit'] = answers['How much time would you like to commit to volunteering?']
+    data['opensource'] = answers['Have you previously contributed to open source projects?']
     data['person_ids'] = simplejson.dumps(person_ids)
     data['order'] = order
     return (request, 'profile/search_people.html', data)

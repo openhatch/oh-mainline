@@ -95,7 +95,7 @@ People Search
                     {% for skill in skills %}
                     <li>
                         <input type="checkbox" name="skills" id="skill_{{ skill.id }}" value="{{ skill.id }}" />
-                        <label for="skill_{{ skill.id }}">{{ skill.name }}</label>
+                        <label for="skill_{{ skill.id }}">{{ skill.value }}</label>
                     </li>
                     {% endfor %}
                 </ul>
@@ -109,7 +109,7 @@ People Search
                     {% for organization in organizations %}
                     <li>
                         <input type="checkbox" name="organizations" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
-                        <label for="organization_{{ organization.id }}">{{ organization.name }}</label>
+                        <label for="organization_{{ organization.id }}">{{ organization.value }}</label>
                     </li>
                     {% endfor %}
                 </ul>
@@ -123,7 +123,7 @@ People Search
                     {% for cause in causes %}
                     <li>
                         <input type="checkbox" name="causes" id="cause_{{ cause.id }}" value="{{ cause.id }}" />
-                        <label for="cause_{{ cause.id }}">{{ cause.name }}</label>
+                        <label for="cause_{{ cause.id }}">{{ cause.value }}</label>
                     </li>
                     {% endfor %}
                 </ul>
@@ -137,7 +137,7 @@ People Search
                     {% for language in languages %}
                     <li>
                         <input type="checkbox" name="languages" id="language_{{ language.id }}" value="{{ language.id }}" />
-                        <label for="language_{{ language.id }}">{{ language.name }}</label>
+                        <label for="language_{{ language.id }}">{{ language.value }}</label>
                     </li>
                     {% endfor %}
                 </ul>
@@ -150,8 +150,8 @@ People Search
                 <ul id="filter_time_to_commit" class="list-hidden">
                     {% for time_to_commit in times_to_commit %}
                     <li>
-                        <input type="radio" name="time_to_commit" id="time_to_commit_{{ time_to_commit.id }}" value="{{ time_to_commit.id }}" />
-                        <label for="time_to_commit_{{ time_to_commit.id }}">{{ time_to_commit.name }}</label>
+                        <input type="checkbox" name="time_to_commit" id="time_to_commit_{{ time_to_commit.id }}" value="{{ time_to_commit.id }}" />
+                        <label for="time_to_commit_{{ time_to_commit.id }}">{{ time_to_commit.value }}</label>
                     </li>
                     {% endfor %}
                 </ul>
@@ -162,18 +162,12 @@ People Search
                     <a class="collapse-button" href="#">+</a>
                 </div>
                 <ul id="filter_opensource" class="list-hidden">
+                    {% for item in opensource %}
                     <li>
-                        <input type="radio" name="opensource" id="opensource_yes" value="True" />
-                        <label for="opensource_yes">Yes</label>
+                        <input type="checkbox" name="opensource" id="opensource_{{ item.id }}" value="{{ item.id }}" />
+                        <label for="opensource_{{ item.id }}">{{ item.value }}</label>
                     </li>
-                    <li>
-                        <input type="radio" name="opensource" id="opensource_no" value="False" />
-                        <label for="opensource_no">No</label>
-                    </li>
-                    <li>
-                        <input type="radio" name="opensource" id="opensource_either" value="None" />
-                        <label for="opensource_either">Either</label>
-                    </li>
+                    {% endfor %}
                 </ul>
             </div>
         </fieldset>
@@ -217,8 +211,8 @@ People Search
                     organizations: getCheckboxValues('organizations'),
                     causes: getCheckboxValues('causes'),
                     languages: getCheckboxValues('languages'),
-                    time_to_commit: getRadioValue('time_to_commit'),
-                    opensource: getRadioValue('opensource')
+                    time_to_commit: getCheckboxValues('time_to_commit'),
+                    opensource: getCheckboxValues('opensource')
                 };
 
                 var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
