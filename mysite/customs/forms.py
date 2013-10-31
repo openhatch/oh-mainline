@@ -65,6 +65,12 @@ class JiraTrackerForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.JiraTrackerModel
 
+    def save(self, *args, **kwargs):
+        obj = super(JiraTrackerForm, self).save(*args, **kwargs)
+        qm, _ = mysite.customs.models.JiraQueryModel.objects.get_or_create(tracker=obj)
+
+        return obj
+
 class JiraQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.JiraQueryModel
