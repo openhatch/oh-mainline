@@ -218,12 +218,6 @@ urlpatterns = patterns('',
         (r'^account/settings/$',
             'mysite.account.views.settings'),
 
-        (r'^account/settings/edit_name$',
-            'mysite.account.views.edit_name'),
-
-        (r'^account/settings/edit_name_do$',
-            'mysite.account.views.edit_name_do'),
-
         (r'^account/settings/password/$',
             'mysite.account.views.change_password'),
 
@@ -247,12 +241,6 @@ urlpatterns = patterns('',
 
         (r'^account/settings/password/change$',
             'mysite.account.views.change_password_do'),
-
-        (r'^account/settings/contact-info/$',
-            'mysite.account.views.edit_contact_info'),
-
-        (r'^account/settings/contact-info/do$',
-            'mysite.account.views.edit_contact_info_do'),
 
         (r'^account/settings/widget/$',
                 'mysite.account.views.widget'),

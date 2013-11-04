@@ -1751,6 +1751,7 @@ class PersonProjectCache(TwillTests):
             86400 * 10)
         mock_cache.set.reset_mock()
 
+@skip("Name can now be changed in edit profile section")
 class EditYourName(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

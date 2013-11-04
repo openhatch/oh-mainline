@@ -60,6 +60,9 @@ class EditInfoForm(django.forms.Form):
     person = None
     questions = []
     responses = []
+    first_name = django.forms.CharField(required=True, widget=django.forms.TextInput(), label="First name *")
+    last_name = django.forms.CharField(required=True, widget=django.forms.TextInput(), label="Last name *")
+    email = django.forms.CharField(required=True, widget=django.forms.TextInput(), label="Email *")
 
     def __select_initial_response__(self, field, question):
         initial = []
@@ -78,6 +81,7 @@ class EditInfoForm(django.forms.Form):
         self.person = kwargs.pop('person')
         self.questions = FormQuestion.objects.all()
         self.responses = FormResponse.objects.filter(person__pk=self.person.id)
+
         super(EditInfoForm, self).__init__(*args, **kwargs)
 
         for i, question in enumerate(self.questions):

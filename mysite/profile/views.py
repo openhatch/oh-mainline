@@ -329,6 +329,10 @@ def edit_person_info_do(request):
 
     FormResponse.objects.filter(person=person).delete()
     person.is_updated = True
+    person.user.first_name=edit_info_form['first_name'].data
+    person.user.last_name=edit_info_form['last_name'].data
+    person.user.email=edit_info_form['email'].data
+    person.user.save()
     person.save()
     for question in edit_info_form.questions:
         if edit_info_form['question_' + str(question.id)].data:
@@ -904,7 +908,11 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data = get_personal_data(person)
     data['info_edit_mode'] = True
     if edit_info_form is None:
-        edit_info_form = mysite.profile.forms.EditInfoForm(prefix='edit-tags', person=person)
+        edit_info_form = mysite.profile.forms.EditInfoForm(prefix='edit-tags', person=person, initial={
+            'first_name': person.user.first_name,
+            'last_name': person.user.last_name,
+            'email': person.user.email
+        })
 
     if contact_blurb_form is None:
         contact_blurb_form = mysite.profile.forms.ContactBlurbForm(initial={

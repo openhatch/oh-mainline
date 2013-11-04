@@ -45,9 +45,6 @@
             {{ person.user.last_name }}
                     <span class='username' style="font-size: .7em;">
                         {{ person.username }}
-                        {% if editable %}
-                            (<a href='{% url account.views.edit_name %}'>edit name</a>)
-                        {% endif %}
                     </span>
         </h1>
     {% else %}
@@ -61,9 +58,6 @@
 
         {% if editable %}
             <a href='{% url account.views.edit_name %}' class="edit-name-link">
-                <div id='edit_your_name_notification'
-                     class='notification'>Tell us your name!
-                </div>
             </a>
         {% endif %}
     {% endif %}

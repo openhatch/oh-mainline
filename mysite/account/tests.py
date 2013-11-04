@@ -22,6 +22,7 @@ import mock
 import tempfile
 import StringIO
 import logging
+from django.utils.unittest.case import skip
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
@@ -114,6 +115,7 @@ class EditPassword(TwillTests):
                 should_succeed = False)
 #}}}
 
+@skip("Email address is edited in different place now")
 class EditContactInfo(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
