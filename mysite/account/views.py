@@ -25,6 +25,7 @@ import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
 import django_authopenid.views
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
 from mysite.base.models import Experience, Organization, Skill, Language
 from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit, FormQuestion, FormAnswer, FormResponse
 
@@ -95,8 +96,14 @@ def signup_request(request):
             return HttpResponse(status=400)
         Person.objects.filter(user__email__iexact=email).delete()
         User.objects.filter(email__iexact=email).delete()
-        user = User.objects.create(username=email, email=email, first_name=first_name, last_name=last_name)
+        random_password = User.objects.make_random_password(length=10)
+        user = User.objects.create(username=email, email=email, first_name=first_name,
+                                   last_name=last_name)
+        user.set_password(random_password)
+        user.save()
+
         person = user.get_profile()
+        send_registration_email(email=email, user=user, hostname=request.get_host(), random_password=random_password)
 
         answers = dict()
         responses = dict()
@@ -140,6 +147,23 @@ def signup_request(request):
         raise e
 
     return HttpResponse(status=200)
+
+def send_registration_email(email, user, hostname, random_password):
+
+        subject = render_to_string('registration/registration_email_subject.txt')
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+
+        message = render_to_string('registration/registration_email.txt',
+                                   {'user': user,
+                                    'hostname': hostname,
+                                    'random_password': random_password})
+
+        msg = django.core.mail.EmailMessage(subject=subject,
+                                            body=message,
+                                            to=[email]
+                                            )
+        msg.send()
 
 def __getFieldValue__(questions, label):
     for question in questions:

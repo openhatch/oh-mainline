@@ -215,7 +215,17 @@ ACCOUNT_INVITATION_DAYS=7
 INVITE_MODE=False # Enable this on production site ...?
 INVITATIONS_PER_USER=100
 
-DEFAULT_FROM_EMAIL = 'all@openhatch.org'
+DEFAULT_FROM_EMAIL = 'sc4g.test@gmail.com'
+
+EMAIL_HOST = 'smtp.gmail.com'    # The host to use for sending email.
+
+EMAIL_USE_TLS = True    # Whether to use a secure connection when talking to the SMTP server. Default: False
+
+EMAIL_PORT = 587    # Port to use for the server. Default: 25
+
+EMAIL_HOST_USER = 'sc4g.test@gmail.com'    # Username to use for the SMTP server defined in EMAIL_HOST.
+
+EMAIL_HOST_PASSWORD = 'sc4g-test'    # Password to use for the SMTP server.
 
 CACHES = {
     'default': {

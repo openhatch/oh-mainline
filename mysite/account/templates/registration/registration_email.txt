@@ -1,0 +1,12 @@
+{% load base_extras %}Hi {% with user.get_full_name as n %}{{ n }}{% if n %}{% endif %}{% endwith %}.
+Your registration to SocialCoding4Good has been successful.
+SocialCoding4Good makes it easier to find interesting
+things to do in free/libre/open source software.
+
+Your username is your email, that is: {{ user.email }}
+Password assigned to you is: {{ random_password }}
+You can sign in on our page http://{{ hostname }}
+
+Kind regards,
+
+SocialCoding4Good
