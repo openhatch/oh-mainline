@@ -102,7 +102,7 @@ def signup_request(request):
         responses = dict()
         questions = []
         for question in questions_json:
-            question_name = question.get(u'label')
+            question_name = question.get(u'label').strip()
             if question_name in ['First Name', 'Last Name', 'Email']:
                 continue
             form_question = None
@@ -120,11 +120,12 @@ def signup_request(request):
             answers[form_question.name] = []
             responses[form_question.name] = []
             for answer in question.get(u'values'):
-                answers[form_question.name].append(FormAnswer(question=form_question, value=answer))
+                answers[form_question.name].append(FormAnswer(question=form_question, value=answer.strip()))
             for response in question.get(u'responses'):
                 if len(response) == 0:
                     continue
-                responses[form_question.name].append(FormResponse(question=form_question, person=person, value=response))
+                responses[form_question.name].append(FormResponse(question=form_question, person=person,
+                                                                  value=response.strip()))
         existing_questions = FormQuestion.objects.all()
         for existing_question in existing_questions:
             is_present = False

@@ -7,5 +7,8 @@ python manage.py migrate
 cat ./mysite/scripts/sql/add_admin.sql | sqlite3 ./mysite/site.db
 sudo pip install xmlbuilder
 sudo pip install django-crontab
-crontab -r
+if [[ `crontab -l` == *openhatch/manage.py* ]]
+then
+    crontab -r
+fi
 python manage.py crontab add
