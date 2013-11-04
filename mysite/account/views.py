@@ -164,7 +164,7 @@ def __updateQuestionAnswers__(questions, answers):
 
 def __updateQuestionResponses__(person, questions, responses):
     for question in questions:
-        question.formresponse_set.get_query_set().delete()
+        question.formresponse_set.get_query_set().filter(person__pk__exact=person.id).delete()
         for response in responses[question.name]:
             response.save()
 
@@ -212,7 +212,7 @@ def edit_photo_do(request, mock=None):
 
         return HttpResponseRedirect(
             reverse(mysite.profile.views.display_person_web, kwargs={
-                    'user_to_display__username': request.user.username
+                    'user_to_display__id': request.user.id
                     }))
     else:
         return edit_photo(request, form)

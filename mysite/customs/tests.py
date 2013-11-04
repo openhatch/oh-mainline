@@ -30,7 +30,6 @@ from mysite.search.models import Bug, Project
 from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
-from mysite.customs import ohloh
 import mysite.customs.views
 import mysite.base.depends
 import mysite.customs.api

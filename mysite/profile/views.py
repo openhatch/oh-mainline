@@ -122,10 +122,10 @@ def add_citation_manually_do(request):
     #}}}
 
 @view
-def display_person_web(request, user_to_display__username=None):
+def display_person_web(request, user_to_display__id=None):
     # {{{
 
-    user = get_object_or_404(User, username=user_to_display__username)
+    user = get_object_or_404(User, pk=user_to_display__id)
     person, was_created = Person.objects.get_or_create(user=user)
 
     if person.private and request.user != user and _has_permissions(request.user,['can_view_people']) == False:
@@ -207,11 +207,11 @@ def tags_dict_for_person(person):
     # }}}
 
 # FIXME: Test this.
-def widget_display_undecorated(request, user_to_display__username):
+def widget_display_undecorated(request, user_to_display__id):
     """We leave this function unwrapped by @view """
     """so it can referenced by widget_display_string."""
     # {{{
-    user = get_object_or_404(User, username=user_to_display__username)
+    user = get_object_or_404(User, id=user_to_display__id)
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
@@ -222,13 +222,13 @@ def widget_display_undecorated(request, user_to_display__username):
 
 widget_display = view(widget_display_undecorated)
 
-def widget_display_string(request, user_to_display__username):
-    request, template, data = widget_display_undecorated(request, user_to_display__username)
+def widget_display_string(request, user_to_display__id):
+    request, template, data = widget_display_undecorated(request, user_to_display__id)
     return render_to_string(template, data)
 
-def widget_display_js(request, user_to_display__username):
+def widget_display_js(request, user_to_display__id):
     # FIXME: In the future, use:
-    html_doc = widget_display_string(request, user_to_display__username)
+    html_doc = widget_display_string(request, user_to_display__id)
     # to generate html_doc
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by
@@ -881,8 +881,8 @@ def save_portfolio_entry_do(request):
 @login_required
 def dollar_username(request):
     return HttpResponseRedirect(reverse(display_person_web,
-		kwargs={'user_to_display__username':
-                request.user.username}))
+		kwargs={'user_to_display__id':
+                request.user.id}))
 
 @login_required
 def set_expand_next_steps_do(request):

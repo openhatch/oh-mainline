@@ -322,7 +322,7 @@ class UserListTests(TwillTests):
         tc.find(r'paulproteus')
 
         tc.follow('paulproteus')
-        tc.url('people/paulproteus')
+        tc.url('people/1')
         tc.find('paulproteus')
         # }}}
 
@@ -640,13 +640,13 @@ class Widget(TwillTests):
 
     def test_widget_display(self):
         widget_url = reverse(mysite.profile.views.widget_display,
-                kwargs={'user_to_display__username': 'paulproteus'})
+                kwargs={'user_to_display__id': '1'})
         client = self.login_with_client()
         client.get(widget_url)
 
     def test_widget_display_js(self):
         widget_js_url = reverse(mysite.profile.views.widget_display_js,
-                kwargs={'user_to_display__username': 'paulproteus'})
+                kwargs={'user_to_display__id': '1'})
         client = self.login_with_client()
         client.get(widget_js_url)
 
@@ -1168,7 +1168,7 @@ class EditLocation(TwillTests):
                                      'latitude': 16.77532,
                                      'longitude': -3.008265}
         self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.go(make_twill_url('http://openhatch.org/people/1/'))
         # not in Timbuktu!
         tc.notfind('Timbuktu')
 
@@ -1178,7 +1178,7 @@ class EditLocation(TwillTests):
         tc.fv("a_settings_tab_form", 'location_display_name', 'Timbuktu')
         tc.submit()
         # Timbuktu!
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.go(make_twill_url('http://openhatch.org/people/1/'))
         tc.find('Timbuktu')
         # Make sure latitude and longitude are sett
         person = Person.objects.get(user__username='paulproteus')
@@ -1484,7 +1484,7 @@ class PeopleFilter(TwillTests):
         self.client = self.login_with_client()
         response = HttpResponse(self.client.get(path='/people', follow=True))
         self.assertTrue('<li class="search_card_profile">' in response.content)
-        self.assertTrue('<a class="legend" href="/people/test_user">test user</a>' in response.content)
+        self.assertTrue('<a class="legend" href="/people/' + self.test_person.user.id + '">test user</a>' in response.content)
 
 
 class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
@@ -2684,29 +2684,29 @@ class PermissionsAndGroups(TwillTests):
 
     def test_volunteer_projects_displayed(self):
         self.client = self.login_with_client()
-        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        response = HttpResponse(self.client.get(path='/people/%s' % self.test_person.user.id, follow=True))
         self.assertTrue('<div id=\'portfolio\'' in response.content)
 
     def test_project_partner_volunteer_projects_not_displayed(self):
         self.__create_project_partner_group()
         self.client = self.login_with_client(username='test_user', password='user')
-        response = HttpResponse(self.client.get(path='/people/paulproteus', follow=True))
+        response = HttpResponse(self.client.get(path='/people/1', follow=True))
         self.assertTrue('<div id=\'portfolio\'' not in response.content)
         self.__cleanup_project_partner_group()
 
     def test_user_can_see_own_projects(self):
         self.client = self.login_with_client(username='test_user', password='user')
-        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        response = HttpResponse(self.client.get(path='/people/%s' % self.test_person.user.id, follow=True))
         self.assertTrue('<div id=\'portfolio\'' in response.content)
 
     def test_admin_can_see_projects_edit_button(self):
         self.client = self.login_with_client()
-        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        response = HttpResponse(self.client.get(path='/people/%s' % self.test_person.user.id, follow=True))
         self.assertTrue('<a id="edit-user-projects"' in response.content)
 
     def test_user_cannot_see_own_projects_edit_button(self):
         self.client = self.login_with_client(username='test_user', password='user')
-        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        response = HttpResponse(self.client.get(path='/people/%s' % self.test_person.user.id, follow=True))
         self.assertTrue('<a id="edit-user-projects"' not in response.content)
 
 class UserProfile(TwillTests):
@@ -2730,7 +2730,7 @@ class UserProfile(TwillTests):
 
     def __get_page_content(self):
         self.client = self.login_with_client('test_user', 'user')
-        response = HttpResponse(self.client.get(path='/people/test_user', follow=True))
+        response = HttpResponse(self.client.get(path='/people/%s' % self.test_person.user.id, follow=True))
 
         return response.content
 

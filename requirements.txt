@@ -1,3 +1,6 @@
+mock
+twill
+django
 south
 setuptools
 psycopg2

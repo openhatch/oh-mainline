@@ -80,7 +80,7 @@ class EditPassword(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
+        tc.go(make_twill_url('http://openhatch.org/people/1'))
         tc.follow('settings')
         tc.follow('Password')
         tc.url('/account/settings/password')
@@ -154,7 +154,7 @@ class EditContactInfo(TwillTests):
 
         # And does the email address show up on the profile?
         tc.go(make_twill_url(
-                'http://openhatch.org/people/paulproteus'))
+                'http://openhatch.org/people/1'))
         tc.find(email)
 
         # [1]: This email suggests that twill only accepts
@@ -183,7 +183,7 @@ class EditPhoto(TwillTests):
         self.login_with_twill()
         for image in [photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')]:
-            url = 'http://openhatch.org/people/paulproteus/'
+            url = 'http://openhatch.org/people/1/'
             tc.go(make_twill_url(url))
             tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
@@ -206,7 +206,7 @@ class EditPhoto(TwillTests):
         self.login_with_twill()
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
-            url = 'http://openhatch.org/people/paulproteus/'
+            url = 'http://openhatch.org/people/1/'
             tc.go(make_twill_url(url))
             tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
@@ -229,7 +229,7 @@ class EditPhoto(TwillTests):
             bad_image.write("garbage")
             bad_image.close()
 
-            tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+            tc.go(make_twill_url('http://openhatch.org/people/1/'))
             tc.follow('photo')
             tc.formfile('edit_photo', 'photo', bad_image.name)
             tc.submit()
@@ -256,7 +256,7 @@ class EditPhoto(TwillTests):
         logger.setLevel(logging.ERROR)
 
         self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.go(make_twill_url('http://openhatch.org/people/1/'))
         tc.follow('photo')
         # This is a special image from issue166 that passes Django's image
         # validation tests but causes an exception during zlib decompression.
@@ -282,7 +282,7 @@ class EditPhotoWithOldPerson(TwillTests):
         self.login_with_twill()
         for image in (photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')):
-            url = 'http://openhatch.org/people/paulproteus/'
+            url = 'http://openhatch.org/people/1/'
             tc.go(make_twill_url(url))
             tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)

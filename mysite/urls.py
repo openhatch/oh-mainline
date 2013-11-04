@@ -177,10 +177,10 @@ urlpatterns = patterns('',
 
         (r'^account/signup$', 'mysite.account.views.signup_request'),
 
-        (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
+        (r'^people/(?P<user_to_display__id>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 
-        (r'^people/(?P<user_to_display__username>[^/]+)/openhatch-widget.js$',
+        (r'^people/(?P<user_to_display__id>[^/]+)/openhatch-widget.js$',
                 'mysite.profile.views.widget_display_js'),
 
         (r'^people/info/edit/do$',
@@ -308,7 +308,7 @@ urlpatterns = patterns('',
          'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT + '/images'}),
 
-        (r'^people/[$]username[/]*$', 'mysite.profile.views.dollar_username'),
+        (r'^people/[$]id[/]*$', 'mysite.profile.views.dollar_username'),
         (r'^\+me$', 'mysite.profile.views.dollar_username', {},
                 'oh_my_profile_redirect'),
 
@@ -356,7 +356,7 @@ urlpatterns = patterns('',
         (r'^sponsors/$', direct_to_template, {'template': 'base/sponsors.html'}),
 
         # This dangerous regex is last
-        (r'^people/(?P<user_to_display__username>[^/]+)/$',
+        (r'^people/(?P<user_to_display__id>[^/]+)/$',
                 'mysite.profile.views.display_person_web'),
 
         )
