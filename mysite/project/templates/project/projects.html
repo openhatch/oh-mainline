@@ -55,15 +55,13 @@ about the projects we index
     <div class='module-content body'>
 
         <form method="post" action=".">
-            <label for="search_q">Search for a project</label><br />
-            <input class="search_bar" type="text" name="q" id="search_q" value="{{ query }}" />
-            <input class="search_bar" type="submit" value='Search' />
-            <a href="{% url mysite.project.views.add_project %}"><button class="add" type="button">Add</button></a>
-
+            <div style="text-align:center; margin-top:3.5px;">
+                <a href="{% url mysite.project.views.add_project %}"><button class="add" type="button" style="font-weight: bold">Add new Project</button></a>
+            </div>
             {% if user|has_permission:'can_filter_projects' %}
             <div>
                 <fieldset id="search-filters">
-                    <legend>Criteria</legend>
+                    <legend>Filter projects criteria</legend>
                     <div id="filter_buttons" class="buttons-overlay">
                         <button id="filter_submit">Filter Results</button>
                         <button id="expandAllButton">Expand All</button>
