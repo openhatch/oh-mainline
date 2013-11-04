@@ -302,6 +302,9 @@ def prepare_person_xml_row(xml, index, person):
     with xml.row(no=str(index)):
         xml.FL("Volunteer", val="Title")
         responses = list()
+        xml.FL(person.user.first_name, val="First Name")
+        xml.FL(person.user.last_name, val="Last Name")
+        xml.FL(person.user.email, val="Email")
         for response in mysite.profile.models.FormResponse.objects.filter(person=person):
             if response.question.type != 'multi':
                 xml.FL(response.value, val=response.question.name)
@@ -311,9 +314,10 @@ def prepare_person_xml_row(xml, index, person):
                 xml.FL(responses_values, val=responses[0].question.name)
                 del responses[:]
             responses.append(response)
-        xml.FL(person.user.first_name, val="First Name")
-        xml.FL(person.user.last_name, val="Last Name")
-        xml.FL(person.user.email, val="Email")
+        if responses:
+            responses_values = ','.join(str(item.value) for item in responses)
+            xml.FL(responses_values, val=responses[0].question.name)
+            del responses[:]
 
 def update_people_in_zoho_CRM(people, auth_token = ZOHO_AUTH_TOKEN):
     for person in people:
