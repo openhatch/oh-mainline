@@ -63,7 +63,7 @@ Submitting your patch series for review
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     1. Attach your patches to the issue ticket at https://openhatch.org/bugs.
-    2. Change the issue status to "in-review".
+    2. Change the issue status to "need-review".
     3. Join IRC and say that you have an issue ready for review.
 
 If the reviewer says it's ready to go, your patch set will get deployed in short
