@@ -23,10 +23,10 @@ or Github.com pull requests. You can `read more about that`_.
 .. _read more about that: handling_patches.html
 
 
-Named sub-groups
+Community structure
 ================
 
-Some groups or individuals have extra power. Here are the important ones:
+Here are some sub-groups of the OpenHatch community:
 
   * Contributor: This refers to anyone who makes a contribution that gets put
     in the main OpenHatch git repository. To become part of this, just show up
@@ -37,8 +37,8 @@ Some groups or individuals have extra power. Here are the important ones:
   * "Login team": These are the people who can SSH into the main OpenHatch server.
     To become part of this, submit a few high-quality code contributions and
     then ask the project lead.
-  * "Project lead": This person, currently Asheesh Laroia, is a figurehead
-    for the project. He also holds a bunch of power, but tries not to exercise it.
+  * "Project lead": Asheesh Laroia is the project lead.  You can contact him with questions
+    about the project.
 
 Anyone can contribute to OpenHatch, through submitting a patch or pull request.
 
