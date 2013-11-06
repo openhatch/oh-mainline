@@ -6,6 +6,9 @@ Important files in git
 README.rst
     Read the README! Read it first.
 
+    It points to our main documentation; this file is just a quick
+    thumbnail view of what different files in here are.
+
     (Aside: it has a ".rst" extension because it is in reStructuredText format.)
 
 COPYING
