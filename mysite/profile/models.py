@@ -209,31 +209,6 @@ class Person(models.Model):
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
 
-    def get_card_fields(self):
-        fields = dict()
-        displayed_fields = [field.question.id for field in CardDisplayedQuestion.objects.filter(person__pk__exact=self.id)]
-        for response in self.formresponse_set.all():
-            if not response.question.id in displayed_fields:
-                continue
-            if fields.has_key(response.question.display_name):
-                fields[response.question.display_name] += ', %s' % response.value
-            else:
-                fields[response.question.display_name] = response.value
-        return fields
-
-    def get_list_fields(self):
-        fields = dict()
-        displayed_fields = [field.question.id for field in
-                            ListDisplayedQuestion.objects.filter(person__pk__exact=self.id)]
-        for response in self.formresponse_set.all():
-            if not response.question.id in displayed_fields:
-                continue
-            if fields.has_key(response.question.display_name):
-                fields[response.question.display_name] += ', %s' % response.value
-            else:
-                fields[response.question.display_name] = response.value
-        return fields
-
     def get_responses(self):
         return FormResponse.objects.filter(person__pk=self.id)
 

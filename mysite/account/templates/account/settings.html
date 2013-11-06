@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% load base_extras %}
 
 {% block title %}
 Settings
@@ -66,11 +67,13 @@ Settings
                             Password
                         </a>
                     </li>
+                    {% if request.user|has_group:'ADMIN' %}
                     <li id='link-edit_fields'>
                         <a href='{% url account.views.edit_fields %}'>
                             Profile fields
                         </a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

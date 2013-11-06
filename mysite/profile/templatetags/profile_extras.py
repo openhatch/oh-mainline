@@ -22,6 +22,7 @@ from django.forms import BooleanField
 from django.utils.html import escape
 from urlparse import urlparse
 import logging
+from mysite.profile.models import ListDisplayedQuestion, CardDisplayedQuestion
 
 register = template.Library()
 
@@ -136,3 +137,30 @@ def format(value, arg):
             return u''
     except (ValueError, TypeError):
         return u''
+
+@register.filter
+def get_card_fields(person, user_id):
+    fields = dict()
+    displayed_fields = [field.question.id for field in CardDisplayedQuestion.objects.filter(person__user__pk=user_id)]
+    for response in person.formresponse_set.all():
+        if not response.question.id in displayed_fields:
+            continue
+        if fields.has_key(response.question.display_name):
+            fields[response.question.display_name] += ', %s' % response.value
+        else:
+            fields[response.question.display_name] = response.value
+    return fields
+
+@register.filter
+def get_list_fields(person, user_id):
+    fields = dict()
+    displayed_fields = [field.question.id for field in
+                        ListDisplayedQuestion.objects.filter(person__user__pk__exact=user_id)]
+    for response in person.formresponse_set.all():
+        if not response.question.id in displayed_fields:
+            continue
+        if fields.has_key(response.question.display_name):
+            fields[response.question.display_name] += ', %s' % response.value
+        else:
+            fields[response.question.display_name] = response.value
+    return fields
