@@ -22,7 +22,7 @@ from django.forms import BooleanField
 from django.utils.html import escape
 from urlparse import urlparse
 import logging
-from mysite.profile.models import ListDisplayedQuestion, CardDisplayedQuestion
+from mysite.profile.models import ListDisplayedQuestion, CardDisplayedQuestion, Icon
 
 register = template.Library()
 
@@ -140,16 +140,22 @@ def format(value, arg):
 
 @register.filter
 def get_card_fields(person, user_id):
+    all_icons = Icon.objects.all()
     fields = dict()
+    icons = list()
     displayed_fields = [field.question.id for field in CardDisplayedQuestion.objects.filter(person__user__pk=user_id)]
     for response in person.formresponse_set.all():
         if not response.question.id in displayed_fields:
+            continue
+        icon = response.question.get_icon(all_icons)
+        if icon is not None:
+            icons.append({'response': response, 'icon': icon})
             continue
         if fields.has_key(response.question.display_name):
             fields[response.question.display_name] += ', %s' % response.value
         else:
             fields[response.question.display_name] = response.value
-    return fields
+    return { 'fields': fields, 'icons': icons }
 
 @register.filter
 def get_list_fields(person, user_id):

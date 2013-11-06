@@ -146,5 +146,45 @@
         "fields": {
             "name": "Media or News Coverage"
         }
+    },
+    {
+        "model": "profile.Icon",
+        "pk": 1,
+        "fields": {
+            "name": "github",
+            "display_name": "GitHub",
+            "base_profile_url": "https://gihub.com",
+            "icon_url": "/static/images/webicon-github.png"
+        }
+    },
+    {
+        "model": "profile.Icon",
+        "pk": 2,
+        "fields": {
+            "name": "linkedin",
+            "display_name": "LinkedIn",
+            "base_profile_url": "https://linkedin.com/in",
+            "icon_url": "/static/images/linkedin-icon.gif"
+        }
+    },
+    {
+        "model": "profile.Icon",
+        "pk": 3,
+        "fields": {
+            "name": "googlecode",
+            "display_name": "Google Code",
+            "base_profile_url": "https://code.google.com/u",
+            "icon_url": "/static/images/webicon-googlecode.png"
+        }
+    },
+    {
+        "model": "profile.Icon",
+        "pk": 4,
+        "fields": {
+            "name": "google code",
+            "display_name": "Google Code",
+            "base_profile_url": "https://code.google.com/u",
+            "icon_url": "/static/images/webicon-googlecode.png"
+        }
     }
 ]

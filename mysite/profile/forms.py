@@ -87,7 +87,7 @@ class EditInfoForm(django.forms.Form):
         for i, question in enumerate(self.questions):
             answers = FormAnswer.objects.filter(question__pk=question.id)
             self.fields['question_%s' % question.id] = QuestionFormField(required=question.required, type=question.type,
-                                                                     label=question.name, answers=answers)
+                                                                         label=question.display_name, answers=answers)
             if question.required:
                 self.fields['question_%s' % question.id].label += " *"
             self.__select_initial_response__(self.fields['question_%s' % question.id], question)

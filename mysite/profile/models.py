@@ -115,6 +115,15 @@ class FormQuestion(models.Model):
     type = models.CharField(blank=False, null=False, max_length=50)
     required = models.BooleanField(default=False, null=False, blank=False)
 
+    def get_icon(self, all_icons):
+        question_name = self.name.lower()
+        if not 'username' in question_name:
+            return None
+        for icon in all_icons:
+            if icon.name.lower() in question_name:
+                return icon
+        return None
+
 
 class FormAnswer(models.Model):
     question = models.ForeignKey(FormQuestion)
@@ -138,6 +147,12 @@ class ListDisplayedQuestion(models.Model):
     person = models.ForeignKey('Person', null=False, blank=False)
     question = models.ForeignKey(FormQuestion, null=False, blank=False)
 
+
+class Icon(models.Model):
+    name = models.CharField(unique=True, blank=False, null=False, max_length=100)
+    display_name = models.CharField(blank=False, null=False, max_length=100)
+    base_profile_url = models.URLField(blank=False, null=False, max_length=255)
+    icon_url = models.URLField(blank=False, null=False, max_length=255)
 
 class Person(models.Model):
     """ A human bean. """

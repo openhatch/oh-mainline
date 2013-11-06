@@ -2,38 +2,43 @@
 {% load profile_extras %}
 
 <div id="results">
-{% for person in people %}
-    <li class="search_card_profile">
-        <fieldset>
-            <legend>
-                <a class="legend" href="/people/{{ person.user.id }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
-                <div class="links">
-                    {% if person.linked_in_url %}
-                        <a class="linked_in" href="{{ person.linked_in_url }}">
-                            <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
-                        </a>
+    {% for person in people %}
+        {% with person|get_card_fields:request.user.id as card %}
+            <li class="search_card_profile">
+                <fieldset>
+                    <legend>
+                        <a class="legend" href="/people/{{ person.user.id }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
+                        <div class="links">
+                        {% for link in card.icons %}
+                            <a class="linked_in" href="{{ link.icon.base_profile_url }}/{{ link.response.value }}" title="{{ link.icon.display_name }} - {{ link.response.value }}">
+                                <img width="24" height="24" src="{{ link.icon.icon_url }}"/>
+                            </a>
+                            {% comment %}{% if person.linked_in_url %}
+                                <a class="linked_in" href="{{ person.linked_in_url }}">
+                                    <img width="24" height="24" src="/static/images/linkedin-icon.gif"/>
+                                </a>
+                            {% endif %}
+                            {% if person.github_name %}
+                                <a class="github" href="https://github.com/{{ person.github_name }}">
+                                    <img width="24" height="24" src="/static/images/webicon-github.png"/>
+                                </a>
+                            {% endif %}
+                            {% if person.google_code_name %}
+                                <a class="google_code" href="https://code.google.com/u/{{ person.google_code_name }}">
+                                    <img width="24" height="24" src="/static/images/webicon-googlecode.png"/>
+                                </a>
+                            {% endif %}{% endcomment %}
+                        {% endfor %}
+                        </div>
+                    </legend>
+                    {% if user|has_group:'ADMIN' %}
+                        <p><strong>Email:</strong> {{ person.user.email }}</p>
                     {% endif %}
-                    {% if person.github_name %}
-                        <a class="github" href="https://github.com/{{ person.github_name }}">
-                            <img width="24" height="24" src="/static/images/webicon-github.png"/>
-                        </a>
-                    {% endif %}
-                    {% if person.google_code_name %}
-                        <a class="google_code" href="https://code.google.com/u/{{ person.google_code_name }}">
-                            <img width="24" height="24" src="/static/images/webicon-googlecode.png"/>
-                        </a>
-                    {% endif %}
-                </div>
-            </legend>
-            {% if user|has_group:'ADMIN' %}
-                <p><strong>Email:</strong> {{ person.user.email }}</p>
-            {% endif %}
-            {% with person|get_card_fields:request.user.id as fields %}
-                {% for key, value in fields.items %}
-                    <p><strong>{{ key }}:</strong> {{ value }}</p>
-                {% endfor %}
-            {% endwith %}
-        </fieldset>
-    </li>
-{% endfor %}
+                    {% for key, value in card.fields.items %}
+                        <p><strong>{{ key }}:</strong> {{ value }}</p>
+                    {% endfor %}
+                </fieldset>
+            </li>
+        {% endwith %}
+    {% endfor %}
 </div>
