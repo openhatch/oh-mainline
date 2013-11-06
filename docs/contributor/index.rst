@@ -2,11 +2,11 @@
 Contributor process
 ===================
 
-* Code style
-
 .. toctree::
   :maxdepth: 2
 
+  contact
+  project_overview
   about_our_community
   chat_on_irc
   getting_started
@@ -15,4 +15,4 @@ Contributor process
   documentation
   login_team
   login_team_agreement
-
+  thanks
