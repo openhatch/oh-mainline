@@ -3,10 +3,10 @@ There are a whole bunch of files here. Here's what you need to know:
 Important files in git
 ----------------------
 
-README.mkd
+README.rst
     Read the README! Read it first.
 
-    It has a ".mkd" extension because it is in Markdown format.
+    (Aside: it has a ".rst" extension because it is in reStructuredText format.)
 
 COPYING
     This file explains what permissions you have, if you want to re-use
