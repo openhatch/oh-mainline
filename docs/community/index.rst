@@ -1,5 +1,5 @@
 ===================
-Contributor process
+Community
 ===================
 
 .. toctree::

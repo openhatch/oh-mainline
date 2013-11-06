@@ -25,7 +25,7 @@ How to join
 * Email asheesh at asheesh.org...
 
   * Include a copy of the OpenHatch Servers Access & Usage Policies at
-    :doc:`/contributor/login_team_agreement`
+    :doc:`/community/login_team_agreement`
   * "Digitally sign" it by typing your name at the end of it (and/or PGP sign,
     if you like)
   * (Here's a summary of the document: You agree to be nice, respectful, and
@@ -54,5 +54,5 @@ What you get, when you're on the login team
 How to deploy new versions
 ==========================
 
-* See :doc:`/deployment/deployment`
+* See :doc:`/advanced/deployment`
 

@@ -128,4 +128,4 @@ For more details on how we use Hudson and how to force a Hudson build, see
 `Continuous integration with Hudson`_.
 
 .. _Login team: https://openhatch.org/wiki/Login_team
-.. _Continuous integration with Hudson: continuous_integration.html
+.. _Continuous integration with Hudson: ../internals/continuous_integration.html
