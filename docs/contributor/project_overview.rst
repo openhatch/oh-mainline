@@ -2,13 +2,18 @@
 Project Overview
 ====================================
 
-OpenHatch is an effort to help people get involved in free, open source software communities. We do that through:
+OpenHatch is an effort to help people get involved in free, open source software communities. 
 
-* Our main website, openhatch.org, with tools to learn about open source projects you can join, interactive lessons to learn the skills needed to get involved, and a place to say what projects you work on or want to help. It is a Python+Django app with jQuery and CSS and HTML on the frontend, and aims for high test coverage (mostly succeeding) and high usability (though it is not there yet).
+Our main website, `openhatch.org <http://openhatch.org>`_, contains tools to find open source projects you can join, interactive lessons ("missions") to learn the skills needed to get involved, and a place to say what projects you work on or want to help.
 
-  * code: https://github.com/openhatch/oh-mainline
-  * docs: http://openhatch.readthedocs.org/
-  * main contact: http://lists.openhatch.org/mailman/listinfo/devel or #openhatch on irc.freenode.net
+We keep the code that runs the website on Github in the repository `oh-mainline <https://github.com/openhatch/oh-mainline>`_.  The documentation
+can be found at `readthedocs.org <http://openhatch.readthedocs.org/>`_.
+
+The website is a Python+Django app with jQuery and CSS and HTML on the frontend, and aims for high test coverage (mostly succeeding) and high usability (though it is not there yet).  You can read more details about how the code is structured in `this document <https://github.com/openhatch/oh-mainline/blob/master/LAYOUT>`_, which we're working to improve.
+
+The best way to contact us about the website is to send an email to `our contributors list <http://lists.openhatch.org/mailman/listinfo/devel>`_ or find us at #openhatch on irc.freenode.net.  (`Other ways to contact us <http://openhatch.readthedocs.org/en/latest/contributor/contact.html>`_.)
+
+Other elements of the OpenHatch project:
 
 * The website is also powered by the "OpenHatch bugimporters," a separate Python-based codebase to download bugs from open source projects' bug trackers, based on Scrapy.
 
