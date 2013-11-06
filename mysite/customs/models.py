@@ -656,9 +656,9 @@ class GitHubQueryModel(TrackerQueryModel):
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
 reversion.register(GitHubQueryModel)
 
-def jira_query_url(base_url, path):
-    return base_url + '/rest/api/2/search?jql=' + mysite.base.unicode_sanity.quote(
-        'updated>=' + path)
+def jira_query_url(base_url, params):
+    base = urlparse.urljoin(base_url, u'/rest/api/2/search?jql=')
+    return base + params
 
 class JiraTrackerModel(TrackerModel):
     '''This model stores the data for individual Jira trackers.'''
@@ -688,7 +688,7 @@ class JiraTrackerModel(TrackerModel):
     short_name = 'jira'
     namestr = 'Jira'
     _form = 'mysite.customs.forms.JiraTrackerForm'
-    _urlmodel = None
+    _urlmodel = 'mysite.customs.models.JiraQueryModel'
     _urlform = None
 
     all_trackers = models.Manager()
@@ -710,7 +710,7 @@ class JiraTrackerModel(TrackerModel):
             return out
 
         query_url = jira_query_url(self.base_url,
-                                     unicode(lowest_last_polled.isoformat()))
+                u'created>=' + unicode(lowest_last_polled.isoformat()))
         out['get_older_bug_data'] = query_url
         return out
 
@@ -723,11 +723,10 @@ class JiraQueryModel(TrackerQueryModel):
 
     tracker = models.ForeignKey(JiraTrackerModel)
     state = models.CharField(max_length=20, default='open')
-    url = models.URLField(max_length=400,
-                          blank=False, null=False)
 
     def get_query_url(self):
-        return self.url
+        return jira_query_url(self.tracker.base_url,
+                u'status=open')
 
 
 reversion.register(JiraTrackerModel, follow=["jiraquerymodel_set"])
