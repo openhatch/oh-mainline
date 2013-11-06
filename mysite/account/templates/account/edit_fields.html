@@ -1,0 +1,79 @@
+{% extends 'account/settings_tab.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+    Edit Profile Fields -
+    {{ block.super }}
+{% endblock title %}
+
+{% block body_id %}widget-settings{% endblock %}
+
+{% block settings_main %}
+    <div class='module-body contains-submodules two-columns' id="edit-fields">
+        <fieldset>
+            <legend><h3>Edit Field Names</h3></legend>
+            <form name='edit-fields' action='/account/settings/fields/edit/do' method='POST'
+                  enctype="multipart/form-data">{% csrf_token %}
+                {% for field in edit_fields_form %}
+                <div class="form-row">
+                    <div>
+                        <label class="header-label">{{ field.label }}</label>
+                    </div>
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+                {% endfor %}
+                <input class='save-button' type='submit' style='clear: left; float: left;' value='Save'/>
+                <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px" href="{% url account.views.set_location %}">Cancel</a>
+            </form>
+        </fieldset>
+        <fieldset>
+            <legend><h3>Fields displayed in search results (cards)</h3></legend>
+            <form name='edit-fields' action='/account/settings/displayed_fields/cards/edit/do' method='POST'
+                  enctype="multipart/form-data">{% csrf_token %}
+                {% for field in edit_displayed_fields_cards_form %}
+                    <div class="form-row">
+                        {{ field.errors }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <input class='save-button' type='submit' style='clear: left; float: left;' value='Save'/>
+                <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px"
+                   href="{% url account.views.set_location %}">Cancel</a>
+            </form>
+        </fieldset>
+        <fieldset>
+            <legend><h3>Fields displayed in search results (list)</h3></legend>
+            <form name='edit-fields' action='/account/settings/displayed_fields/list/edit/do' method='POST'
+                  enctype="multipart/form-data">{% csrf_token %}
+                {% for field in edit_displayed_fields_list_form %}
+                    <div class="form-row">
+                        {{ field.errors }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <input class='save-button' type='submit' style='clear: left; float: left;' value='Save'/>
+                <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px"
+                   href="{% url account.views.set_location %}">Cancel</a>
+            </form>
+        </fieldset>
+    </div>
+{% endblock settings_main %}

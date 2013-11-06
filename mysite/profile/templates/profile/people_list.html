@@ -1,3 +1,5 @@
+{% load base_extras %}
+
 <div id="results">
 {% for person in people %}
     <li class="search_card_profile">
@@ -22,40 +24,12 @@
                     {% endif %}
                 </div>
             </legend>
-            <p><strong>Company:</strong> {{ person.company_name }}</p>
-            <p><strong>Time to Commit:</strong> {{ person.time_to_commit }}</p>
-            <p>
-                <strong>Skills:</strong>
-            </p>
-            <p>
-                {% for skill in person.skill.all %}
-                    {{ skill.name }}{% if forloop.counter < person.skill.all|length %}, {% endif %}
-                {% endfor %}
-            </p>
-            <p>
-                <strong>Causes:</strong>
-            </p>
-            <p>
-                {% for cause in person.cause.all %}
-                    {{ cause.name }}{% if forloop.counter < person.cause.all|length %}, {% endif %}
-                {% endfor %}
-            </p>
-            <p>
-                <strong>Organizations:</strong>
-            </p>
-            <p>
-                {% for organization in person.organization.all %}
-                    {{ organization.name }}{% if forloop.counter < person.organization.all|length %}, {% endif %}
-                {% endfor %}
-            </p>
-            <p>
-                <strong>Languages:</strong>
-            </p>
-            <p>
-                {% for language in person.language.all %}
-                    {{ language.name }}{% if forloop.counter < person.language.all|length %}, {% endif %}
-                {% endfor %}
-            </p>
+            {% if user|has_group:'ADMIN' %}
+                <p><strong>Email:</strong> {{ person.user.email }}</p>
+            {% endif %}
+            {% for key, value in person.get_card_fields.items %}
+                <p><strong>{{ key }}:</strong> {{ value }}</p>
+            {% endfor %}
         </fieldset>
     </li>
 {% endfor %}

@@ -18,7 +18,7 @@
 import django.contrib.auth.forms
 from django.contrib.auth.models import User
 import django.forms
-from mysite.profile.models import Person
+from mysite.profile.models import Person, FormQuestion, CardDisplayedQuestion, ListDisplayedQuestion
 import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -205,3 +205,41 @@ class EmailMeForm(django.forms.ModelForm):
     class Meta:
         model = Person
         fields = ('email_me_re_projects',)
+
+
+class EditFieldsForm(django.forms.Form):
+    questions = []
+
+    def __init__(self, *args, **kwargs):
+        self.questions = FormQuestion.objects.all()
+        super(EditFieldsForm, self).__init__(*args, **kwargs)
+
+        for question in self.questions:
+            self.fields['question_%s' % question.id] = django.forms.CharField(label=question.display_name,
+                                                                              max_length=100,
+                                                                              min_length=1,
+                                                                              required=True,
+                                                                              initial=question.display_name)
+
+
+class EditFieldsDisplayedInSearchForm(django.forms.Form):
+    questions = []
+    displayed_fields = []
+    type = None
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop(u'user')
+        self.questions = FormQuestion.objects.all()
+        self.type = kwargs.pop(u'type')
+        if self.type == 'cards':
+            self.displayed_fields = CardDisplayedQuestion.objects.filter(person__user__pk=self.user.id)
+        else:
+            self.displayed_fields = ListDisplayedQuestion.objects.filter(person__user__pk=self.user.id)
+        super(EditFieldsDisplayedInSearchForm, self).__init__(*args, **kwargs)
+
+        choices = [(question.id, question.display_name) for question in self.questions]
+        initial = [field.question.id for field in self.displayed_fields]
+        self.fields['questions_%s' % self.type] = django.forms.MultipleChoiceField(widget=django.forms.CheckboxSelectMultiple,
+                                                                                   choices=choices,
+                                                                                   initial=initial,
+                                                                                   required=False)

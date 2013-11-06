@@ -27,7 +27,7 @@ import django_authopenid.views
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from mysite.base.models import Experience, Organization, Skill, Language
-from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit, FormQuestion, FormAnswer, FormResponse
+from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit, FormQuestion, FormAnswer, FormResponse, CardDisplayedQuestion, ListDisplayedQuestion
 
 from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
@@ -47,6 +47,7 @@ import mysite.profile.views
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
 from mysite.base.decorators import view
+from forms import EditFieldsForm, EditFieldsDisplayedInSearchForm
 import django.contrib.auth.views
 # }}}
 
@@ -119,6 +120,7 @@ def signup_request(request):
                 form_question = FormQuestion.objects.get(name__iexact=question_name)
             else:
                 form_question = FormQuestion(name=question_name,
+                                             display_name=question_name,
                                              type=question.get(u'inputType'),
                                              required=question.get(u'required'))
                 form_question.save()
@@ -337,6 +339,67 @@ def change_password(request, change_password_form = None):
             {'change_password_form': change_password_form,
              'account_notification': account_notification})
     # }}}
+
+@login_required
+@view
+def edit_fields(request, edit_fields_form = None, edit_displayed_fields_cards_form = None,
+                edit_displayed_fields_list_form = None):
+    if edit_fields_form is None:
+        edit_fields_form = EditFieldsForm()
+    if edit_displayed_fields_cards_form is None:
+        edit_displayed_fields_cards_form = EditFieldsDisplayedInSearchForm(user=request.user, type=u'cards')
+    if edit_displayed_fields_list_form is None:
+        edit_displayed_fields_list_form = EditFieldsDisplayedInSearchForm(user=request.user, type=u'list')
+
+    return (request, 'account/edit_fields.html', {'edit_fields_form': edit_fields_form,
+                                                  'edit_displayed_fields_cards_form': edit_displayed_fields_cards_form,
+                                                  'edit_displayed_fields_list_form': edit_displayed_fields_list_form})
+
+@login_required
+def edit_fields_do(request):
+    edit_fields_form = mysite.account.forms.EditFieldsForm(request.POST)
+    if edit_fields_form.is_valid():
+        for question in edit_fields_form.questions:
+            FormQuestion.objects.filter(pk__exact=question.id).update(display_name=edit_fields_form[
+                'question_%s' % question.id].value())
+
+        return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
+    else:
+        return edit_fields(request, edit_fields_form=edit_fields_form)
+
+@login_required
+def edit_displayed_fields_cards_do(request):
+    edit_displayed_fields_cards_form = mysite.account.forms.EditFieldsDisplayedInSearchForm(request.POST,
+                                                                                            user=request.user,
+                                                                                            type=u'cards')
+    if edit_displayed_fields_cards_form.is_valid():
+        questions = FormQuestion.objects.all()
+        person = Person.objects.get(user__pk__exact=request.user.id)
+        CardDisplayedQuestion.objects.filter(person__user__pk__exact=request.user.id).delete()
+        for id in edit_displayed_fields_cards_form['questions_cards'].value():
+            field = CardDisplayedQuestion(question=questions.get(pk__exact=id), person=person)
+            field.save()
+
+        return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
+    else:
+        return edit_fields(request, edit_displayed_fields_cards_form=edit_displayed_fields_cards_form)
+
+@login_required
+def edit_displayed_fields_list_do(request):
+    edit_displayed_fields_list_form = mysite.account.forms.EditFieldsDisplayedInSearchForm(request.POST,
+                                                                                            user=request.user,
+                                                                                            type=u'list')
+    if edit_displayed_fields_list_form.is_valid():
+        questions = FormQuestion.objects.all()
+        person = Person.objects.get(user__pk__exact=request.user.id)
+        ListDisplayedQuestion.objects.filter(person__user__pk__exact=request.user.id).delete()
+        for id in edit_displayed_fields_list_form['questions_list'].value():
+            field = ListDisplayedQuestion(question=questions.get(pk__exact=id), person=person)
+            field.save()
+
+        return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
+    else:
+        return edit_fields(request, edit_displayed_fields_list_form=edit_displayed_fields_list_form)
 
 @login_required
 @view

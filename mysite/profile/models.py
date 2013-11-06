@@ -110,7 +110,8 @@ class RepositoryCommitter(models.Model):
 
 
 class FormQuestion(models.Model):
-    name = models.CharField(blank=False, null=False, max_length=100)
+    name = models.CharField(blank=False, null=False, max_length=100, unique=True)
+    display_name = models.CharField(blank=False, null=False, max_length=100, unique=True)
     type = models.CharField(blank=False, null=False, max_length=50)
     required = models.BooleanField(default=False, null=False, blank=False)
 
@@ -128,15 +129,23 @@ class FormResponse(models.Model):
         return self.value
 
 
+class CardDisplayedQuestion(models.Model):
+    person = models.ForeignKey('Person', null=False, blank=False)
+    question = models.ForeignKey(FormQuestion, null=False, blank=False)
+
+
+class ListDisplayedQuestion(models.Model):
+    person = models.ForeignKey('Person', null=False, blank=False)
+    question = models.ForeignKey(FormQuestion, null=False, blank=False)
+
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
     company_name = models.CharField(default="", blank=True, null=True, max_length=100)
-    private = models.BooleanField(default=True)
     is_updated = models.BooleanField(default=False)
     zoho_id = models.CharField(default="", blank=True, null=True, max_length=100)
     bio = models.TextField(blank=True)
-    email_me_re_projects = models.BooleanField(default=True)
     homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
@@ -146,23 +155,23 @@ class Person(models.Model):
     expand_next_steps = models.BooleanField(default=True)
     photo = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b),
+                                           generate_person_photo_path(a, b),
                               default='')
     photo_thumbnail = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b, suffix="-thumbnail"),
-                              default='',
-                              null=True)
+                                        lambda a, b: 'static/photos/profile-photos/' +
+                                                     generate_person_photo_path(a, b, suffix="-thumbnail"),
+                                        default='',
+                                        null=True)
 
     photo_thumbnail_30px_wide = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b, suffix="-thumbnail-30px-wide"),
-                              default='', null=True)
+                                                  lambda a, b: 'static/photos/profile-photos/' +
+                                                               generate_person_photo_path(a, b, suffix="-thumbnail-30px-wide"),
+                                                  default='', null=True)
 
     photo_thumbnail_20px_wide = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b, suffix="-thumbnail-20px-wide"),
-                              default='', null=True)
+                                                  lambda a, b: 'static/photos/profile-photos/' +
+                                                               generate_person_photo_path(a, b, suffix="-thumbnail-20px-wide"),
+                                                  default='', null=True)
 
     blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
     dont_guess_my_location = models.BooleanField(default=False)
@@ -177,11 +186,11 @@ class Person(models.Model):
     uploaded_to_zoho = models.BooleanField(default=False)
     resume = models.FileField(upload_to=
                               lambda a, b: 'static/resumes/' +
-                              generate_person_photo_path(a, b),
+                                           generate_person_photo_path(a, b),
                               default='', max_length=100)
-    
+
     email_me_re_projects = models.BooleanField(default=True,
-            verbose_name='Email me periodically about activity in my projects')
+                                               verbose_name='Email me periodically about activity in my projects')
     skill = models.ManyToManyField(Skill)
     organization = models.ManyToManyField(Organization)
     experience = models.ForeignKey(Experience, default=1)
@@ -199,6 +208,31 @@ class Person(models.Model):
     other_name = models.TextField(default="", blank=True)
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
+
+    def get_card_fields(self):
+        fields = dict()
+        displayed_fields = [field.question.id for field in CardDisplayedQuestion.objects.filter(person__pk__exact=self.id)]
+        for response in self.formresponse_set.all():
+            if not response.question.id in displayed_fields:
+                continue
+            if fields.has_key(response.question.display_name):
+                fields[response.question.display_name] += ', %s' % response.value
+            else:
+                fields[response.question.display_name] = response.value
+        return fields
+
+    def get_list_fields(self):
+        fields = dict()
+        displayed_fields = [field.question.id for field in
+                            ListDisplayedQuestion.objects.filter(person__pk__exact=self.id)]
+        for response in self.formresponse_set.all():
+            if not response.question.id in displayed_fields:
+                continue
+            if fields.has_key(response.question.display_name):
+                fields[response.question.display_name] += ', %s' % response.value
+            else:
+                fields[response.question.display_name] = response.value
+        return fields
 
     def get_responses(self):
         return FormResponse.objects.filter(person__pk=self.id)
@@ -266,7 +300,7 @@ class Person(models.Model):
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
-                self.user.first_name, self.user.last_name)
+                                              self.user.first_name, self.user.last_name)
 
     def get_photo_url_or_default(self):
         try:
@@ -284,7 +318,7 @@ class Person(models.Model):
         session_wrapper = session_engine.SessionStore(session_key)
         user_id = session_wrapper.get(SESSION_KEY)
         auth_backend = load_backend(
-                session_wrapper.get(BACKEND_SESSION_KEY))
+            session_wrapper.get(BACKEND_SESSION_KEY))
 
         if user_id and auth_backend:
             return Person.objects.get(user=auth_backend.get_user(user_id))
@@ -356,7 +390,7 @@ class Person(models.Model):
         # if you change this method, be sure to increment the version number in
         # the cache key above
         return list(self.get_published_portfolio_entries().values_list(
-                'project__name', flat=True).distinct())
+            'project__name', flat=True).distinct())
 
     def get_cache_key_for_projects(self):
         return 'projects_for_person_with_pk_%d_v4' % self.pk
@@ -364,7 +398,7 @@ class Person(models.Model):
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_display_names_of_nonarchived_projects(self):
         return list(self.get_nonarchived_published_portfolio_entries().values_list(
-                'project__display_name', flat=True).distinct())
+            'project__display_name', flat=True).distinct())
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -393,8 +427,8 @@ class Person(models.Model):
 
         # Add terms based on projects in citations
         terms.extend(
-                [pfe.project.name for pfe in self.get_published_portfolio_entries()
-                    if pfe.project.name and pfe.project.name.strip()])
+            [pfe.project.name for pfe in self.get_published_portfolio_entries()
+             if pfe.project.name and pfe.project.name.strip()])
 
         # Add terms based on tags
         terms.extend([tag.text for tag in self.get_tags_for_recommendations()])
@@ -411,7 +445,7 @@ class Person(models.Model):
 
     def get_published_citations_flat(self):
         return sum([list(pfe.get_published_citations())
-            for pfe in self.get_published_portfolio_entries()], [])
+                    for pfe in self.get_published_portfolio_entries()], [])
 
     def get_tag_texts_cache_key(self):
         return 'tag_texts_for_person_with_pk_%d_v2' % self.pk
@@ -469,8 +503,8 @@ class Person(models.Model):
 
     def get_full_name_and_username(self):
         full_name_start = ("%s (" % self.get_full_name()
-                if self.user.first_name or self.user.last_name
-                else "")
+                           if self.user.first_name or self.user.last_name
+                           else "")
         full_name_end = (")" if self.user.first_name or self.user.last_name else "")
         return "%s%s%s" % (full_name_start, self.user.username, full_name_end)
 
@@ -513,7 +547,7 @@ class Person(models.Model):
     @property
     def profile_url(self):
         return reverse(mysite.profile.views.display_person_web,
-                kwargs={'user_to_display__id': self.user.id})
+                       kwargs={'user_to_display__id': self.user.id})
 
     @staticmethod
     def get_by_username(username):
@@ -545,7 +579,7 @@ class Person(models.Model):
         token.save()
         return token
 
-    # }}}
+        # }}}
 
 def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
     """Post-save hook for Users. raw is populated from kwargs.
