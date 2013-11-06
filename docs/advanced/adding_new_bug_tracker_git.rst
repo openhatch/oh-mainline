@@ -1,9 +1,8 @@
 ==========================================
-Step-by-step guide on adding a bug tracker
+Adding a new bug tracker via git
 ==========================================
 
-There are other documents about our :ref:`bug_tracker_index`.
-
+(You can also add a bug tracker `via the website <http://openhatch.readthedocs.org/en/latest/tutorials/adding_new_bug_tracker_web.html>`_.)
 
 Clone the repository
 ====================
