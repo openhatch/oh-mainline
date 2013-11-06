@@ -7,6 +7,7 @@ python manage.py migrate
 cat ./mysite/scripts/sql/add_admin.sql | sqlite3 ./mysite/site.db
 sudo pip install xmlbuilder
 sudo pip install django-crontab
+sudo pip install django-file-resubmit
 if [[ `crontab -l` == *manage.py* ]]
 then
     crontab -r
