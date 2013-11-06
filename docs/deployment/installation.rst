@@ -2,32 +2,32 @@
 Installation
 ============
 
+OpenHatch is currently designed to run on Python 2.6 or above.
+
 Overview
 ========
 
-This repository contains (mostly) Python code written on top of Django
+This repository contains (primarily) Python code written on top of Django
 and other Python modules. We bundle a copy of all of the essential
-dependencies so that you can get started immediately.
+dependencies for oh-mainline to run so that you can get started immediately 
+(there is no need to download and configure additional software from other sources).
 
-It should take you 15 minutes or fewer to get the OpenHatch site running.
+It should take you about 15 minutes to get the OpenHatch site running locally on
+your computer.
 
-Here are the steps you'll have to follow:
+Here are the basic steps you'll follow for installation:
 
-* Get the code. (You've probably already done this.)
-* Open a command prompt
+* Open a command prompt [Prerequisite for installation]
+* Get the code from the GitHub repository
 * Set up the database
 * Run the site
 
-Then you can run your own instance of the OpenHatch website and play
-with the code from an interactive shell.
+After running your own instance of the OpenHatch website, you can play
+with the code from an interactive shell on your computer.
 
-That's all you need to get the site going. If you want to work on core
-backend features like the bug importer, or let your local site rescale
-images, then you can also read the `advanced_installation.rst`_ file to
-learn about optional dependencies and automated testing.
-
-OpenHatch is currently designed to run on Python 2.6 or above.
-
+Note: If you want to work on core backend features, like the bug importer,
+or let your local site rescale images, please read the `advanced_installation.rst`_ file
+to learn about optional dependencies and automated testing.
 
 .. _advanced_installation.rst: advanced_installation.html
 
@@ -35,21 +35,11 @@ OpenHatch is currently designed to run on Python 2.6 or above.
 Essentials
 ==========
 
-Get the code
-~~~~~~~~~~~~
-
-If you already have an "oh-mainline" directory on your computer, then
-you already have the code. If you're reading this file on the web,
-then you need to run::
-
-  git clone https://github.com/openhatch/oh-mainline.git
-
-You probably have already done this, though, and can jump to the next
-step.
-
-
-Open up a command prompt
-~~~~~~~~~~~~~~~~~~~~~~~~
+Open up a command prompt [Prerequisite] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Note: Understanding how to open a command prompt for your operating
+system is an important prerequisite to master before continuing with
+the remaining installation instructions.
 
 For the rest of these instructions, you have to open a command prompt:
 
@@ -63,17 +53,40 @@ For the rest of these instructions, you have to open a command prompt:
 * On a Windows computer, click the Start icon, and find the Run
   box. Enter "cmd" into it, and press enter.
 
-Important note:
-Before you run the commands in the next sections, make sure you have
-changed your present working directory to the oh-mainline directory.
+Get the code from the GitHub repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+If you already have an "oh-mainline" directory on your computer, then
+you already have the code. You may skip to the next step.
 
+If you're reading this installation instruction file on the web,
+then you will need to clone the repository from GitHub to your local 
+computer.
+
+Step 1: Open a command prompt on your computer
+
+Step 2: Create a new directory on your computer::
+
+  mkdir localhatch
+  
+Step 3: Change to the new directory::
+
+  cd localhatch
+  
+Step 4: Clone the repository from GitHub to your local computer::
+
+  git clone https://github.com/openhatch/oh-mainline.git
+
+If your commands are executed successfully, you may continue to the next
+step.
 
 Set up the database
 ~~~~~~~~~~~~~~~~~~~
 
-Your local OpenHatch site will store data in a SQLite database. This
-must be done in two steps.
+Important note: Before you run the commands in the this section, make sure you have
+changed your present working directory to the oh-mainline directory.
+
+Your local OpenHatch site will store data in a SQLite database. 
 
 Step 1: Create the database file and add tables for our dependencies
 
@@ -81,9 +94,9 @@ Run this command::
 
   python manage.py syncdb --noinput
 
-This will print some messages and eventually give you your prompt
+This will print some messages and eventually give you your command prompt
 back. If you would like to know if what you got was correct, check
-in the bottom of the file in the section Output Samples.
+at the bottom of this file in the section Output Samples.
 
 (We have to pass "--noinput" to request that Django not ask you
 questions. This is due to a bad interaction between Django's superuser
@@ -110,13 +123,15 @@ a data snapshot. See `maintenance.rst`_ for more info about that.)
 
 Run the site
 ~~~~~~~~~~~~
+Important note: Before you run the commands in the this section, make sure you have
+changed your present working directory to the oh-mainline directory.
 
-Run this command::
+Run this command which will start a web server locally on your computer::
 
   python manage.py runserver
 
-As long as the "runserver" is running, you can visit your version of
-the site in a web browser. So, try surfing to:
+As long as the "runserver" is running, you can visit your local version of
+the OpenHatch site in a web browser. So, try surfing to:
 
 http://localhost:8000/
 
