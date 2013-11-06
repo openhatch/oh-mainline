@@ -67,7 +67,7 @@ Settings
                             Password
                         </a>
                     </li>
-                    {% if request.user|has_group:'ADMIN' %}
+                    {% if request.user|has_group:'ADMIN' or request.user|has_group:'PROJECT_PARTNER' %}
                     <li id='link-edit_fields'>
                         <a href='{% url account.views.edit_fields %}'>
                             Profile fields

@@ -46,7 +46,7 @@ import mysite.profile.views
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
-from mysite.base.decorators import view, has_group
+from mysite.base.decorators import view, has_group, _has_group
 from forms import EditFieldsForm, EditFieldsDisplayedInSearchForm
 import django.contrib.auth.views
 # }}}
@@ -341,10 +341,12 @@ def change_password(request, change_password_form = None):
     # }}}
 
 @login_required
-@has_group('ADMIN')
 @view
 def edit_fields(request, edit_fields_form = None, edit_displayed_fields_cards_form = None,
                 edit_displayed_fields_list_form = None):
+    if not _has_group(request.user, 'ADMIN') and not _has_group(request.user, 'PROJECT_PARTNER'):
+        return (request, 'account/settings.html', {})
+
     if edit_fields_form is None:
         edit_fields_form = EditFieldsForm()
     if edit_displayed_fields_cards_form is None:

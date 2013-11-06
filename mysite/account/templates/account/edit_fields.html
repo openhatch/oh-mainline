@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% load base_extras %}
 
 {% block title %}
     Edit Profile Fields -
@@ -28,6 +29,7 @@
 
 {% block settings_main %}
     <div class='module-body contains-submodules two-columns' id="edit-fields">
+        {% if request.user|has_group:'ADMIN' %}
         <fieldset>
             <legend><h3>Edit Field Names</h3></legend>
             <form name='edit-fields' action='/account/settings/fields/edit/do' method='POST'
@@ -45,6 +47,7 @@
                 <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px" href="{% url account.views.set_location %}">Cancel</a>
             </form>
         </fieldset>
+        {% endif %}
         <fieldset>
             <legend><h3>Fields displayed in search results (cards)</h3></legend>
             <form name='edit-fields' action='/account/settings/displayed_fields/cards/edit/do' method='POST'
