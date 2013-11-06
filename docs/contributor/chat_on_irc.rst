@@ -4,7 +4,7 @@ Chat with us on IRC
 
 You can usually find us on #openhatch on irc.freenode.net
 
-If you don't know how to use IRC, you can just click on `this link to a web
+If you don't know how to use IRC, you can 'use our installation guide <https://openhatch.org/wiki/OSCTC/Laptop_setup#Goal_.231:_install_an_IRC_client>'_ or just click on `this link to a web
 chat interface <http://webchat.freenode.net/?channels=#openhatch>`_.
 
 Are you trying to figure out who everybody is? Many of the people are part of
@@ -31,10 +31,4 @@ Quick start
 
 
 More details: http://www.ircbeginner.com/ircinfo/ircc-commands.html
-
-
-See also
-========
-
-`Getting started - laptop setup <https://openhatch.org/wiki/Open_Source_Comes_to_Campus/UMD/Laptop_setup>`_
 
