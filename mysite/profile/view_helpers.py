@@ -183,7 +183,7 @@ def __does_person_meet_criteria__(person, post_data):
 
     if 'filter_name' in post_data and len(post_data.get('filter_name')) > 0:
         name = post_data.get('filter_name', '')
-        if name not in person.user.username and name not in person.user.first_name and name not in person.user.last_name:
+        if name not in person.user.first_name and name not in person.user.last_name:
             meets_criteria = False
     if 'filter_company_name' in post_data and len(post_data.get('filter_company_name')) > 0:
         company_name = post_data.get('filter_company_name', '')
@@ -193,7 +193,7 @@ def __does_person_meet_criteria__(person, post_data):
         if found_responses.count() == 0:
             meets_criteria = False
     if 'filter_email' in post_data and len(post_data.get('filter_email')) > 0:
-        email = post_data.get('email', '')
+        email = post_data.get('filter_email', '')
         if email not in person.user.email:
             meets_criteria = False
     if 'skills[]' in post_data:
