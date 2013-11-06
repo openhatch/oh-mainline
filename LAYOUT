@@ -15,6 +15,9 @@ COPYING
 vendor/
     This directory contains code from other projects that we rely on.
 
+    (For more information, look at
+    http://kitsune.readthedocs.org/en/latest/vendor.html .)
+
 mysite/
     This directory contains the OpenHatch website and all the "apps" that
     are part of it. Each subdirectory is an app.
