@@ -57,6 +57,29 @@ mysite/
         This Django app contains the views and models necessary to display the volunteer
         opportunity finder, also known as bug search.
 
+    The apps also use other Django features, or Django add-ons. Here is a
+    list of filename => further info URLs:
+
+    */templatetags.py :
+     https://docs.djangoproject.com/en/1.5/howto/custom-template-tags/
+
+    */migrations/ :
+     http://south.aeracode.org/
+
+    */api.py :
+     http://django-tastypie.readthedocs.org/
+
+    */fixtures.json :
+     https://docs.djangoproject.com/en/1.5/howto/initial-data/
+
+    */management/commands :
+     https://docs.djangoproject.com/en/1.5/howto/custom-management-commands/
+
+    */view_helpers.py :
+     http://lists.openhatch.org/pipermail/devel/2013-March/003151.html
+
+    */templates/*/*.html :
+     https://docs.djangoproject.com/en/1.5/topics/templates/
 
 manage.py
     This is the well-known and widely-loved Django management script. (In the past, we used
