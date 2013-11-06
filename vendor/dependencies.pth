@@ -20,14 +20,17 @@ packages/django-registration
 packages/django-reversion/src
 packages/django-tastypie
 packages/django-voting
+packages/docutils
 packages/feedparser/feedparser
 packages/gdata/src
 packages/ghettoq
 packages/html2text
 packages/html5lib
 packages/importlib
+packages/Jinja2
 packages/jsmin
 packages/kombu
+packages/markupsafe
 packages/mechanize
 packages/mimeparse
 packages/mock
@@ -35,6 +38,7 @@ packages/odict/src
 packages/openid
 packages/ordereddict
 packages/pygeoip
+packages/Pygments
 packages/python-dateutil
 packages/python-memcached
 packages/python-openid
@@ -47,6 +51,7 @@ packages/scrapy
 packages/sessionprofile
 packages/six
 packages/south
+packages/sphinx
 packages/staticgenerator
 packages/twill
 packages/twisted
