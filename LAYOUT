@@ -22,8 +22,21 @@ vendor/
     http://kitsune.readthedocs.org/en/latest/vendor.html .)
 
 mysite/
-    This directory contains the OpenHatch website and all the "apps" that
-    are part of it. Each subdirectory is an app.
+    This directory contains the OpenHatch website and all the "Django
+    apps" that are part of it. Each subdirectory is an app.
+
+    Each of the apps has some tests, views, and frequently models and forms.
+    Their file paths are:
+
+    */tests.py
+    */views.py
+    */forms.py
+    */models.py
+
+	You can read more about tests, views, forms, and models in the
+	official Django tutorial:
+
+	https://docs.djangoproject.com/en/1.5/intro/tutorial01/
 
     customs/
         This directory contains "import/export" code like the support for
@@ -43,12 +56,6 @@ mysite/
     search/
         This Django app contains the views and models necessary to display the volunteer
         opportunity finder, also known as bug search.
-
-    */tests.py
-    */views.py
-    */forms.py
-    */models.py
-        Each of the apps has some tests, views, and frequently models and forms.
 
 
 manage.py
