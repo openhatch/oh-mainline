@@ -1,7 +1,7 @@
 .. _oh-getting-started:
 
 =======================================
-Getting started with the OpenHatch code
+Contributor Guide
 =======================================
 
 To get your own instance of OpenHatch running, follow these steps and then get
@@ -31,12 +31,12 @@ kind of a big repository. (Sixty megabytes, or so.)
 How to run a local site
 =======================
 
-Read installation.rst inside
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Read installation.rst inside getting_started directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have the repository, open up the
-:doc:`docs/deployment/installation.rst </deployment/installation>` file in any
+Once you have the repository, open up the installation.rst file in any
 text viewer (like gedit, or your favorite web browser).
+(This is the same file as :doc:`installation`.)
 
 
 Read it, and follow the few short steps to getting your local site going. It
@@ -53,7 +53,7 @@ We really recommend that you get in touch with us. (It's not quite mandatory,
 but we'll all be happier if you do)
 
   1. Join the `Devel mailing list`_ and say hello.
-  2. :doc:`the #openhatch IRC channel in freenode </contributor/chat_on_irc>`.
+  2. :doc:`the #openhatch IRC channel in freenode </community/contact>`.
 
 We used to have weekly development meetings on IRC, but they are on hiatus for now. If you find the idea interesting and would show up, do `email devel@`_ and say so!
 
@@ -90,7 +90,7 @@ haven't gotten around to working on it, leave a note on the ticket saying that
 you are interested in taking it (you can also try asking on IRC).
 
 When you are ready to submit a patch for an issue, follow the guidelines at
-:doc:`/contributor/handling_patches`.
+:doc:`/getting_started/handling_patches`.
 
 If you ever feel like you are getting stuck or could use some design feedback,
 don't hesitate to ask for help on the IRC channel, on the devel mailing list,
