@@ -93,7 +93,7 @@ Volunteers
                     <label for="filter_organizations">Organizations:</label>
                     <a class="collapse-button" href="#">+</a>
                 </div>
-                <ul for="filter_organizations" class="list-hidden">
+                <ul id="filter_organizations" class="list-hidden">
                     {% for organization in organizations %}
                     <li>
                         <input type="checkbox" name="organizations" id="organization_{{ organization.id }}" value="{{ organization.id }}" />
@@ -166,10 +166,7 @@ Volunteers
 
     <script>
         $(document).ready(function() {
-            $('#filter_submit').click(function(e) {
-                e.preventDefault();
-
-                var getCheckboxValues = function(name) {
+            var getCheckboxValues = function(name) {
                     var list = [];
 
                     $('ul.list-hidden input[type="checkbox"][name="' + name + '"]').each(function(index, item) {
@@ -190,7 +187,8 @@ Volunteers
                     return null;
                 };
 
-                post_data = {
+                var getPostData = function () {
+                    post_data = {
                     people_ids: {{ people_ids }},
                     filter_name: $('#filter_name').val(),
                     filter_company_name: $('#filter_company_name').val(),
@@ -200,8 +198,16 @@ Volunteers
                     causes: getCheckboxValues('causes'),
                     languages: getCheckboxValues('languages'),
                     time_to_commit: getCheckboxValues('time_to_commit'),
-                    opensource: getCheckboxValues('opensource')
+                    opensource: getCheckboxValues('opensource'),
+                    order: $('#order').val(),
+                    };
+                    return post_data;
                 };
+
+            $('#filter_submit').click(function(e) {
+                e.preventDefault();
+
+                post_data = getPostData();
 
                 var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
                 var loading = $(document.createElement('div')).addClass('loading').append(img);
@@ -216,6 +222,22 @@ Volunteers
                     var error_msg = '<p class="error-message">Unexpected error!</p>';
                     $('#results').html(error_msg);
                 });
+            });
+
+            $('#order').change(function() {
+                post_data = getPostData()
+
+                var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
+                var loading = $(document.createElement('div')).addClass('loading').append(img);
+                $('#results').html(loading);
+
+                $.post('orderby/', post_data).success(function(response) {
+                    $('#results').replaceWith(response);
+                }).error(function () {
+                    var error_msg = '<p class="error-message">Unexpected error!</p>';
+                    $('#results').html(error_msg);
+                });
+
             });
         });
     </script>
@@ -348,8 +370,9 @@ Volunteers
         <div style="float:right">
             Sort by:
             <select id="order">
-                <option value="last_name" {% ifequal order 'last_name' %} selected="selected"{% endifequal %}>Name</option>
-                <option value="date_joined" {% ifequal order 'date_joined' %} selected="selected"{% endifequal %}>Signup date</option>
+                <option value="date_joined" {% ifequal order 'date_joined' %} selected="selected"{% endifequal %}>Date submitted</option>
+                <option value="relevance" {% ifequal order 'relevance' %} selected="selected"{% endifequal %}>Relevance</option>
+                <option value="last_name" {% ifequal order 'last_name' %} selected="selected"{% endifequal %}>Last name</option>
             </select>
         </div>
         <div id='summary_of_mapped_people'>
@@ -389,9 +412,6 @@ Volunteers
                     .removeAttr("target")
                     .attr("action", ".");
                 e.preventDefault();
-            });
-            $('#order').change(function() {
-                window.location.replace('/people/orderby/' + this.value);
             });
         </script>
     </div>

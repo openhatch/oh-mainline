@@ -183,7 +183,7 @@ def __does_person_meet_criteria__(person, post_data):
 
     if 'filter_name' in post_data and len(post_data.get('filter_name')) > 0:
         name = post_data.get('filter_name', '')
-        if name not in person.user.first_name and name not in person.user.last_name:
+        if name not in person.user.first_name and name not in person.user.last_name and name not in person.get_full_name():
             meets_criteria = False
     if 'filter_company_name' in post_data and len(post_data.get('filter_company_name')) > 0:
         company_name = post_data.get('filter_company_name', '')

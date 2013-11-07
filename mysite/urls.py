@@ -134,7 +134,7 @@ urlpatterns = patterns('',
         (r'^people/$',
             'mysite.profile.views.people'),
 
-        (r'^people/orderby/(?P<order>[A-Za-z_]+)/$', 'mysite.profile.views.people'),
+        (r'^people/orderby/$', 'mysite.profile.views.people_sort'),
 
         (r'^people-export/$',
             'mysite.profile.views.people_export'),

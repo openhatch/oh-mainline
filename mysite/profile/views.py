@@ -26,6 +26,7 @@ import datetime
 import urllib
 import collections
 import logging
+import difflib
 
 from django.utils import simplejson
 
@@ -480,14 +481,37 @@ def people_filter(request):
     people_ids = post_data.getlist(u'people_ids[]')
     people = Person.objects.filter(pk__in=people_ids).order_by('id')
     filtered_people = view_helpers.filter_people(people, post_data)
+    if post_data['order'] == 'relevance':
+        filtered_people = sorted(filtered_people, key=lambda person: difflib.SequenceMatcher(
+            None, post_data['filter_name'],
+            person.get_full_name()).ratio(), reverse=True)
     response = render_to_string(template_name='profile/people_list.html',
         dictionary={'people': filtered_people}, context_instance=RequestContext(request))
+    return HttpResponse(response, mimetype='application/html')
+
+def people_sort(request):
+    post_data = request.POST
+    people_ids = post_data.getlist(u'people_ids[]')
+    if post_data['order'] in ['last_name', 'relevance']:
+        people = Person.objects.filter(pk__in=people_ids)
+        filtered_people = view_helpers.filter_people(people, post_data)
+        filtered_people = sorted(filtered_people, key=lambda person: person.user.last_name.lower())
+        if post_data['order'] == 'relevance':
+            filtered_people = sorted(filtered_people, key=lambda person: difflib.SequenceMatcher(
+                None, post_data['filter_name'],
+                person.user.last_name).ratio(), reverse=True)
+    else:
+        people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order'])
+        filtered_people = view_helpers.filter_people(people, post_data)
+
+    response = render_to_string(template_name='profile/people_list.html',
+                                dictionary={'people': filtered_people}, context_instance=RequestContext(request))
     return HttpResponse(response, mimetype='application/html')
 
 @login_required
 @has_permissions(['can_view_people'])
 @view
-def people(request, order='username'):
+def people(request, order='date_joined'):
     """Display a list of people."""
     data = {}
 
