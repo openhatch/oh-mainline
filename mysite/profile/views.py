@@ -534,7 +534,8 @@ def people(request, order='date_joined'):
     else:
         everybody = Person.objects.all().order_by('user__' + order)
 
-    data['people'] = everybody
+    volunteers = [person for person in everybody if 'VOLUNTEER' in [group.name for group in person.user.groups.all()]]
+    data['people'] = volunteers
 
     # Add JS-friendly version of people data to template
     person_id_ranges = mysite.base.view_helpers.int_list2ranges([x.id for x in everybody])

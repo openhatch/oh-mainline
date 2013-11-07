@@ -24,7 +24,7 @@ from django.contrib.auth.decorators import login_required
 import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
 import django_authopenid.views
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.template.loader import render_to_string
 from mysite.base.models import Experience, Organization, Skill, Language
 from mysite.profile.models import Person, Cause, Heard_From, TimeToCommit, FormQuestion, FormAnswer, FormResponse, CardDisplayedQuestion, ListDisplayedQuestion
@@ -101,6 +101,8 @@ def signup_request(request):
         user = User.objects.create(username=email, email=email, first_name=first_name,
                                    last_name=last_name)
         user.set_password(random_password)
+        if not user.groups.filter(name='VOLUNTEER').count() > 0:
+            user.groups.add(Group.objects.get(name='VOLUNTEER'))
         user.save()
 
         person = user.get_profile()
