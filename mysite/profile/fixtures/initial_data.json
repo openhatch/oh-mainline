@@ -153,7 +153,7 @@
         "fields": {
             "name": "github",
             "display_name": "GitHub",
-            "base_profile_url": "https://gihub.com",
+            "base_profile_url": "https://github.com",
             "icon_url": "/static/images/webicon-github.png"
         }
     },
