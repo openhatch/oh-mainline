@@ -1,0 +1,36 @@
+{% load base_extras %}
+{% load profile_extras %}
+
+<div id="results">
+    {% for person in people %}
+        {% with person|get_card_fields:request.user.id as card %}
+            <li class="search_card_profile">
+                <fieldset>
+                    <legend>
+                        <a class="legend" href="/people/{{ person.user.id }}">{{ person.user.first_name }} {{ person.user.last_name }}</a>
+                        <div class="links">
+                        {% for link in card.icons %}
+                            {% if link.icon.base_profile_url != None %}
+                            <a class="icon" href="{{ link.icon.base_profile_url }}/{{ link.response.value }}" title="{{ link.icon.display_name }} - {{ link.response.value }}">
+                                <img width="24" height="24" src="{{ link.icon.icon_url }}"/>
+                            </a>
+                            {% else %}
+                            <a class="icon" href="{{ link.response.value }}"
+                               title="{{ link.icon.display_name }} - {{ link.response.value }}">
+                                <img width="24" height="24" src="{{ link.icon.icon_url }}"/>
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </legend>
+                    {% if user|has_group:'ADMIN' %}
+                        <p><strong>Email:</strong> {{ person.user.email }}</p>
+                    {% endif %}
+                    {% for key, value in card.fields.items %}
+                        <p><strong>{{ key }}:</strong> {{ value }}</p>
+                    {% endfor %}
+                </fieldset>
+            </li>
+        {% endwith %}
+    {% endfor %}
+</div>

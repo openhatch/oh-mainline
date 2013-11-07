@@ -208,6 +208,21 @@ div.input input[type=text] {
 .stubmit.field {
     margin-right: 0px !important;
 }
+.search_list fieldset {
+    border: none;
+    border-bottom: 1px solid #DDDDDD;
+
+}
+
+.search_list :hover{
+    background-color:yellow;
+}
+
+.search_list {
+    margin-left: 20px;
+    color: #222222;
+    font: 11pt Tuffy,Helvetica,sans-serif;
+}
 
 .search_card_profile {
     width: 430px;

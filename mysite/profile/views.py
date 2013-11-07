@@ -485,7 +485,7 @@ def people_filter(request):
         filtered_people = sorted(filtered_people, key=lambda person: difflib.SequenceMatcher(
             None, post_data['filter_name'],
             person.get_full_name()).ratio(), reverse=True)
-    response = render_to_string(template_name='profile/people_list.html',
+    response = render_to_string(template_name='profile/people_' + post_data['view'] + '.html',
         dictionary={'people': filtered_people}, context_instance=RequestContext(request))
     return HttpResponse(response, mimetype='application/html')
 
@@ -504,7 +504,7 @@ def people_sort(request):
         people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order'])
         filtered_people = view_helpers.filter_people(people, post_data)
 
-    response = render_to_string(template_name='profile/people_list.html',
+    response = render_to_string(template_name='profile/people_' + post_data['view'] + '.html',
                                 dictionary={'people': filtered_people}, context_instance=RequestContext(request))
     return HttpResponse(response, mimetype='application/html')
 
@@ -576,6 +576,7 @@ def people(request, order='date_joined'):
     data['opensource'] = answers['Have you previously contributed to open source projects?']
     data['person_ids'] = simplejson.dumps(person_ids)
     data['order'] = order
+    data['view'] = 'cards'
     return (request, 'profile/search_people.html', data)
 
 def gimme_json_for_portfolio(request):

@@ -178,4 +178,4 @@ def get_list_fields(person, user_id):
             fields[response.question.display_name] += ', %s' % response.value
         else:
             fields[response.question.display_name] = response.value
-    return fields
+    return { 'fields': fields }

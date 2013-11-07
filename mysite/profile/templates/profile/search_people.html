@@ -200,6 +200,7 @@ Volunteers
                     time_to_commit: getCheckboxValues('time_to_commit'),
                     opensource: getCheckboxValues('opensource'),
                     order: $('#order').val(),
+                    view: $('#view').val()
                     };
                     return post_data;
                 };
@@ -224,7 +225,7 @@ Volunteers
                 });
             });
 
-            $('#order').change(function() {
+            $('#order, #view').change(function() {
                 post_data = getPostData()
 
                 var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
@@ -237,7 +238,6 @@ Volunteers
                     var error_msg = '<p class="error-message">Unexpected error!</p>';
                     $('#results').html(error_msg);
                 });
-
             });
         });
     </script>
@@ -367,14 +367,24 @@ Volunteers
             {% endif %}
 
         </div>
+
         <div style="float:right">
-            Sort by:
+            &nbsp&nbsp&nbspSort by:
             <select id="order">
                 <option value="date_joined" {% ifequal order 'date_joined' %} selected="selected"{% endifequal %}>Date submitted</option>
                 <option value="relevance" {% ifequal order 'relevance' %} selected="selected"{% endifequal %}>Relevance</option>
                 <option value="last_name" {% ifequal order 'last_name' %} selected="selected"{% endifequal %}>Last name</option>
             </select>
         </div>
+
+        <div style="float:right">
+            View type:
+            <select id="view">
+                <option value="cards" {% ifequal view 'cards' %} selected="selected"{% endifequal %}>Cards</option>
+                <option value="list" {% ifequal view 'list' %} selected="selected"{% endifequal %}>List</option>
+            </select>
+        </div>
+
         <div id='summary_of_mapped_people'>
             <span id='people_count'>
                     <span>{{ people|length }}</span>
@@ -417,7 +427,12 @@ Volunteers
     </div>
 
     {% if people %}
-    {% include 'profile/people_list.html' %}
+        {% ifequal view 'cards' %}
+            {% include 'profile/people_cards.html' %}
+        {% endifequal %}
+        {% ifequal view 'list' %}
+            {% include 'profile/people_list.html' %}
+        {% endifequal %}
     {% endif %}
 
     {% if not user.is_authenticated and people %}

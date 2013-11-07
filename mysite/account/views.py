@@ -381,9 +381,10 @@ def edit_displayed_fields_cards_do(request):
         questions = FormQuestion.objects.all()
         person = Person.objects.get(user__pk__exact=request.user.id)
         CardDisplayedQuestion.objects.filter(person__user__pk__exact=request.user.id).delete()
-        for id in edit_displayed_fields_cards_form['questions_cards'].value():
-            field = CardDisplayedQuestion(question=questions.get(pk__exact=id), person=person)
-            field.save()
+        if edit_displayed_fields_cards_form['questions_cards'].value():
+            for id in edit_displayed_fields_cards_form['questions_cards'].value():
+                field = CardDisplayedQuestion(question=questions.get(pk__exact=id), person=person)
+                field.save()
 
         return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
     else:
@@ -398,9 +399,10 @@ def edit_displayed_fields_list_do(request):
         questions = FormQuestion.objects.all()
         person = Person.objects.get(user__pk__exact=request.user.id)
         ListDisplayedQuestion.objects.filter(person__user__pk__exact=request.user.id).delete()
-        for id in edit_displayed_fields_list_form['questions_list'].value():
-            field = ListDisplayedQuestion(question=questions.get(pk__exact=id), person=person)
-            field.save()
+        if edit_displayed_fields_list_form['questions_list'].value():
+            for id in edit_displayed_fields_list_form['questions_list'].value():
+                field = ListDisplayedQuestion(question=questions.get(pk__exact=id), person=person)
+                field.save()
 
         return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
     else:
