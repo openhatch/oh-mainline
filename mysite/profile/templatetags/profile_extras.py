@@ -157,6 +157,13 @@ def get_card_fields(person, user_id):
             fields[response.question.display_name] = response.value
     return { 'fields': fields, 'icons': icons }
 
+def get_card_fields_with_icons_together(person, user_id):
+    card_fields_map = get_card_fields(person, user_id)
+    fields_together = card_fields_map['fields']
+    for icon in card_fields_map['icons']:
+        fields_together[icon['response'].question.display_name] = icon['response'].value
+    return fields_together
+
 @register.filter
 def get_list_fields(person, user_id):
     fields = dict()

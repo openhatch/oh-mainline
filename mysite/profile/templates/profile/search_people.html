@@ -209,6 +209,9 @@ Volunteers
 
                 $.post('filter/', post_data).success(function(response) {
                     $('#results').replaceWith(response);
+                    var number_of_volunteers = $('.search_card_profile').size();
+                    var count_form = (number_of_volunteers === 1) ? 'person' : 'people'
+                    $('#people_count').html(number_of_volunteers + ' ' + count_form);
                 }).error(function () {
                     var error_msg = '<p class="error-message">Unexpected error!</p>';
                     $('#results').html(error_msg);
@@ -332,7 +335,7 @@ Volunteers
 
                         If there's *no query*, we list *everybody* in the DB on this page.
                     {% endcomment %}
-                    Everybody on SocialCoding4Good
+                    SocialCoding4Good volunteers
 
                 {% endif %}
 
@@ -351,7 +354,6 @@ Volunteers
         </div>
         <div id='summary_of_mapped_people'>
             <span id='people_count'>
-                    <span>{{ people|length|pluralize:"Just," }}</span>
                     <span>{{ people|length }}</span>
                     {{ people|length|pluralize:"person,people" }}
             </span>

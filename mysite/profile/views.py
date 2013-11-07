@@ -57,11 +57,13 @@ from mysite.profile.models import \
         Link_Project_Tag, Link_Person_Tag, \
         DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, FormResponse, FormQuestion, FormAnswer
 from mysite.search.models import Project
-from mysite.base.decorators import view, as_view, has_permissions, _has_permissions
+from mysite.base.decorators import view, as_view, has_permissions, _has_permissions, _has_group
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
 from django.views.decorators.csrf import csrf_protect
+from mysite.profile.models import CardDisplayedQuestion
+from mysite.profile.templatetags.profile_extras import get_card_fields_with_icons_together
 
 # }}}
 
@@ -382,70 +384,77 @@ def manyToString(many):
         res += obj.name + "; "
     return res
 
-def prepare_person_row(person):
+def prepare_person_row(person, questions_to_export, user_id, can_view_email):
     empty = "N/A"
-    try:
-        time_to_commit = person.time_to_commit.name or empty if person.time_to_commit else empty
-    except ObjectDoesNotExist:
-        time_to_commit = empty
-    return [person.user.username,
-            person.user.email,
-            person.homepage_url or empty,
-            person.company_name or empty,
-            time_to_commit,
-            manyToString(person.cause) or empty,
-            manyToString(person.language) or empty]
 
-def export_to_csv(people):
+    person_responses = get_card_fields_with_icons_together(person, user_id)
+
+    person_row = [person.user.first_name,
+            person.user.last_name]
+    if (can_view_email):
+        person_row.append(person.user.email)
+
+    for field in questions_to_export:
+        person_row.append(person_responses.get(field, empty))
+
+    return person_row
+
+
+def export_to_csv(people, questions_to_export, user_id, can_view_email):
     response = HttpResponse(content_type = "text/csv")
     response['Content-Disposition'] = 'attachment; filename="sc4g-people.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Username', 'E-mail', 'Homepage', 'Company name', 'Time to commit', 'Cause', 'Language'])
+    basic_fields = ['First name', 'Last name']
+    if (can_view_email):
+        basic_fields.append('E-mail')
+    writer.writerow(basic_fields + questions_to_export)
     for person in people:
-        writer.writerow(prepare_person_row(person))
+        writer.writerow(prepare_person_row(person, questions_to_export, user_id, can_view_email))
     return response
 
-def export_to_json(people):
+def export_to_json(people, questions_to_export, user_id, can_view_email):
     response = HttpResponse(content_type = "application/json")
     response['Content-Disposition'] = 'attachment; filename="sc4g-people.json"'
     to_export = []
     for person in people:
-        to_export.append(prepare_person_row(person))
+        to_export.append(get_all_person_fields(person, user_id, can_view_email))
     response.content = simplejson.dumps(to_export)
     return response
 
-def export_to_html(people):
+def get_all_person_fields(person, user_id, can_view_email):
+    fields = get_card_fields_with_icons_together(person, user_id)
+    fields['First name'] = person.user.first_name
+    fields['Last name'] = person.user.last_name
+    if (can_view_email):
+        fields['E-mail'] = person.user.email
+    return fields
+
+def export_to_html(people, questions_to_export, user_id, can_view_email):
     response = HttpResponse(content_type = "text/html")
     response['Content-Disposition'] = 'attachment; filename="sc4g-people.html"'
-    table = HTML.Table(header_row=['Username', 'E-mail', 'Homepage', 'Company name', 'Time to commit', 'Cause', 'Language'])
+    fields_to_export = ['First name', 'Last name']
+    if (can_view_email):
+        fields_to_export.append('E-mail')
+    table = HTML.Table(header_row=fields_to_export + questions_to_export)
     for person in people:
-        table.rows.append(prepare_person_row(person))
+        table.rows.append(prepare_person_row(person, questions_to_export, user_id, can_view_email))
     response.content = str(table)
     return response
 
-def export_to_xml(people):
+def export_to_xml(people, questions_to_export, user_id, can_view_email):
     response = HttpResponse(content_type = "application/xml")
     response['Content-Disposition'] = 'attachment; filename="sc4g-people.xml"'
     xml = XMLBuilder('volunteers')
     for person in people:
         with xml.volunteer:
-            xml.username(person.user.username)
-            xml.email(person.user.email)
-            if person.homepage_url:
-                xml.homepage(person.homepage_url)
-            if person.company_name:
-                xml.companyName(person.company_name)
-            try:
-                if person.time_to_commit:
-                    xml.timeToCommit(person.time_to_commit.name)
-            except ObjectDoesNotExist:
-                pass
-            with xml.causes:
-                for cause in person.cause.all():
-                    xml.cause(cause.name)
-            with xml.languages:
-                for language in person.language.all():
-                    xml.language(language.name)
+            xml.firstName(person.user.first_name)
+            xml.lastName(person.user.last_name)
+            if (can_view_email):
+                xml.email(person.user.email)
+            with xml.form_responses:
+                for key, value in get_card_fields_with_icons_together(person, user_id).items():
+                    xml.form_response(value, question=key)
+
     response.content = str(xml)
     return response
 
@@ -460,9 +469,11 @@ def people_export(request):
 
     people = mysite.profile.view_helpers.filter_people(people, request.POST)
 
+    questions_to_export = [field.question.display_name for field in CardDisplayedQuestion.objects.filter(person__user__pk=request.user.id)]
+
     format = request.GET.get('format', 'csv')
     if format in ['csv', 'json', 'html', 'xml']:
-        return globals()["export_to_" + format](people)
+        return globals()["export_to_" + format](people, questions_to_export, request.user.id, _has_group(request.user, 'ADMIN'))
 
 def people_filter(request):
     post_data = request.POST
