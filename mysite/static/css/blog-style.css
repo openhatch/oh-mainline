@@ -268,3 +268,7 @@ body.wordpress input.a2a_menu_find {
     float: none;
     margin: auto;
 }
+
+body.wordpress #footer {
+    background-image: url(/static/images/dark-hatch.png);
+}
