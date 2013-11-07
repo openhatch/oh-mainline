@@ -320,8 +320,8 @@ def _project_hash(project_name):
 # this is a post handler
 def edit_person_info_do(request):
     # {{{
-    person = request.user.get_profile()
-
+    person_id = request.POST.get(u'person_id')
+    person = Person.objects.get(pk__exact=person_id)
     edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, request.FILES, prefix='edit-tags', person=person)
 
     if edit_info_form.is_valid() != True:
@@ -923,6 +923,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['contact_blurb_error'] = contact_blurb_error
     data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
     data['has_errors'] = has_errors
+    data['person_id'] = person.id
     return request, 'profile/info_wrapper.html', data
 
 @login_required
