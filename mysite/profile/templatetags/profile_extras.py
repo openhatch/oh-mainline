@@ -149,6 +149,8 @@ def get_card_fields(person, user_id):
             continue
         icon = response.question.get_icon(all_icons)
         if icon is not None:
+            if 'url' in response.question.name.lower():
+                icon.base_profile_url = None
             icons.append({'response': response, 'icon': icon})
             continue
         if fields.has_key(response.question.display_name):

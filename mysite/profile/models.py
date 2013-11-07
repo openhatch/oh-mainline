@@ -117,7 +117,7 @@ class FormQuestion(models.Model):
 
     def get_icon(self, all_icons):
         question_name = self.name.lower()
-        if not 'username' in question_name:
+        if not 'username' in question_name and not 'url' in question_name:
             return None
         for icon in all_icons:
             if icon.name.lower() in question_name:

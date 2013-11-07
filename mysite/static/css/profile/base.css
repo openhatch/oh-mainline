@@ -259,35 +259,18 @@ div.input input[type=text] {
     display: inline-block;
 }
 
+.search_card_profile fieldset legend {
+    margin-bottom: 5px;
+}
+
 .search_card_profile fieldset legend div.links {
     position: absolute;
     top: 49px;
     right: 0px;
 }
 
-.search_card_profile fieldset legend a.linked_in {
-    /*position: absolute;
-    top: 12px;
-    right: 48px;*/
+.search_card_profile fieldset legend a.icon {
     float: right;
-}
-
-.search_card_profile fieldset legend a.github {
-    /*position: absolute;
-    top: 12px;
-    right: 24px;*/
-    float: right;
-}
-
-.search_card_profile fieldset legend a.google_code {
-    /*position: absolute;
-    top: 12px;
-    right: 0px;*/
-    float: right;
-}
-
-div#portfolio {
-    width: 100% !important;
 }
 
 body#profile div#info h3 {
