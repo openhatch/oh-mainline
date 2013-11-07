@@ -1237,6 +1237,10 @@ body#profile div#portfolio li.project_list_item div p {
     margin: 22px auto auto 10px;
 }
 
+span.muted {
+    color: #AAAAAA;
+}
+
 body#profile .project-display { float: left; margin-right: 0; width: 705px; }
 body#profile .project-display p { margin: 0; margin-bottom: 10px; }
 body#profile .project-display h2 { font-size: 9pt; margin: 0; margin-bottom: 3px; }
@@ -1880,17 +1884,3 @@ body#people-map #thinking { display: none; margin-right: 1em; padding: 0 2px; ba
 .ui-tabs .ui-tabs-panel { padding: 1em 1.4em; display: block; border-width: 0; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }
 
-#edit-fields input[type=text] {
-    width: 800px;
-}
-
-#edit-fields fieldset {
-    margin: 25px auto 25px auto;
-    padding: 25px;
-    line-height: 25px;
-}
-
-#edit-fields div.form-row li {
-    float: left;
-    width: 50%;
-}

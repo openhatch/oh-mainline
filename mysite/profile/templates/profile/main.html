@@ -87,56 +87,47 @@
         {% endif %}
 
         <div id='nameplate'>
-                <h4>Username</h4>
-
-                <p class="clear">{{ person.user.username }}</p>
-
+            <h4>Location</h4>
+            <p class="clear">
                 {% if person.location_display_name and person.location_confirmed %}
-                    <h4>Location</h4>
-                    <p class="clear">
-                        <a style='color: #555;' href="/people/?center={{ person.location_display_name }}">
-                            {{ person.location_display_name }}
-                        </a>
-                        {% if editable %}
-                            (<a href="{% url mysite.account.views.set_location %}">edit</a>)
-                        {% endif %}
-                    </p>
+                    {{ person.location_display_name }}
                 {% else %}
-                    <h4>Location</h4>
+                    <span class="muted">Unknown</span>
+                {% endif %}
+                {% if request.user|has_group:'ADMIN' %}
+                    <a href="{% url mysite.account.views.set_location %}?person_id={{ person.id }}">(Edit)</a>
+                {% endif %}
+            </p>
+
+            {% if person.user.email %}
+                {% if person.user == user or user|has_group:'ADMIN' %}
+                    <h4>Email</h4>
                     <p class="clear">
-                        <a href="{% url mysite.account.views.set_location %}">Set your location</a>
+                        <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
                     </p>
                 {% endif %}
+            {% endif %}
 
-                {% if person.user.email %}
-                    {% if person.user == user or user|has_group:'ADMIN' %}
-                        <h4>Email</h4>
-                        <p class="clear">
-                            <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
-                        </p>
-                    {% endif %}
-                {% endif %}
+            {% if person.github_name %}
+                <h4>GitHub</h4>
+                <p id="gitHubUrl" style='clear: both;'>
+                    <a href="https://github.com/{{ person.github_name }}">{{ person.github_name }}</a>
+                </p>
+            {% endif %}
 
-                {% if person.github_name %}
-                    <h4>GitHub</h4>
-                    <p id="gitHubUrl" style='clear: both;'>
-                        <a href="https://github.com/{{ person.github_name }}">{{ person.github_name }}</a>
-                    </p>
-                {% endif %}
+            {% if person.google_code_name %}
+                <h4>GoogleCode</h4>
+                <p id="googleCodeUrl" style='clear: both;'>
+                    <a href="https://code.google.com/u/{{ person.google_code_name }}">{{ person.google_code_name }}</a>
+                </p>
+            {% endif %}
 
-                {% if person.google_code_name %}
-                    <h4>GoogleCode</h4>
-                    <p id="googleCodeUrl" style='clear: both;'>
-                        <a href="https://code.google.com/u/{{ person.google_code_name }}">{{ person.google_code_name }}</a>
-                    </p>
-                {% endif %}
-
-                {% if person.linked_in_url %}
-                    <h4>LinkedIn</h4>
-                    <p id="linkedinurl" style='clear: both;'>
-                        <a href="{{ person.linked_in_url }}">{{ person.linked_in_url }}</a>
-                    </p>
-                {% endif %}
+            {% if person.linked_in_url %}
+                <h4>LinkedIn</h4>
+                <p id="linkedinurl" style='clear: both;'>
+                    <a href="{{ person.linked_in_url }}">{{ person.linked_in_url }}</a>
+                </p>
+            {% endif %}
         </div>
         <!-- /.nameplate -->
     </div>

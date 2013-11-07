@@ -445,23 +445,29 @@ def edit_name_do(request):
 def set_location(request, edit_location_form = None):
     # {{{
 
+    person = None
+    user_id = None
+    if 'person_id' in request.GET and _has_group(request.user, 'ADMIN'):
+        person = Person.objects.get(pk__exact=request.GET.get('person_id'))
+    else:
+        person = request.user.get_profile()
+
     data = {}
     initial = {}
+    data['person_id'] = person.id
 
     # If the user's location is the default one, then we create a guess.
-    if (not request.user.get_profile().location_display_name) or (
-        request.user.get_profile().location_display_name ==
-        mysite.profile.models.DEFAULT_LOCATION):
+    if (not person.location_display_name) or (person.location_display_name == mysite.profile.models.DEFAULT_LOCATION):
         geoip_guess = mysite.profile.view_helpers.get_geoip_guess_for_ip(
             mysite.base.middleware.get_user_ip(request))[1]
         initial['location_display_name'] = geoip_guess
     else:
-        initial['location_display_name'] = request.user.get_profile().location_display_name
+        initial['location_display_name'] = person.location_display_name
 
     # Initialize edit location form
     if edit_location_form is None:
         edit_location_form = mysite.account.forms.EditLocationForm(
-                prefix='edit_location', instance=request.user.get_profile(), initial = initial)
+                prefix='edit_location', instance=person, initial=initial)
 
     data['edit_location_form'] = edit_location_form
 
@@ -475,7 +481,11 @@ def set_location(request, edit_location_form = None):
 
 @login_required
 def set_location_do(request):
-    user_profile = request.user.get_profile()
+    if 'person_id' in request.POST and len(request.POST.get('person_id')) > 0\
+        and _has_group(request.user, 'ADMIN'):
+        user_profile = Person.objects.get(pk__exact=request.POST.get('person_id'))
+    else:
+        user_profile = request.user.get_profile()
     edit_location_form = mysite.account.forms.EditLocationForm(
         request.POST,
         instance=user_profile, prefix='edit_location')
@@ -495,7 +505,7 @@ def set_location_do(request):
         edit_location_form.save()
 
         return HttpResponseRedirect(reverse(set_location) +
-                                    '?notification_id=success')
+                                    '?notification_id=success&person_id=%s' % user_profile.id)
     else:
         return set_location(request,
                 edit_location_form=edit_location_form)

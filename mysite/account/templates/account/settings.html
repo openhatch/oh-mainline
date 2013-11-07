@@ -32,7 +32,7 @@ Settings
         <h3>Settings</h3>
 	<ul>
           <li>
-            <a href="{% url mysite.profile.views.display_person_web user.id %}">
+            <a href="{% if person_id and request.user|has_group:'ADMIN' %}{% url mysite.profile.views.display_person_web person_id %}{% else %}{% url mysite.profile.views.display_person_web user.id %}{% endif %}">
               &laquo; Back to profile
             </a>
           </li>

@@ -48,6 +48,7 @@ If you want us to forget your location, empty out the text field and hit save.</
   <span class="notification" style="width: 311px; margin-bottom: 0;">We've tried to guess your location.</span>
 </p>
 {% endif %}
+<input type="hidden" name="person_id" value="{{ person_id }}">
 {{ edit_location_form.as_p }}
 
 {% if user.get_profile.location_display_name %}

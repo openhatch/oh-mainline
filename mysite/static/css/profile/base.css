@@ -356,3 +356,7 @@ body#profile div#portfolio li.project_list_item div {
 body#profile div#portfolio li.project_list_item div p {
     margin: 22px auto auto 10px;
 }
+
+span.muted {
+    color: #AAAAAA;
+}
