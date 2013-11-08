@@ -2,7 +2,7 @@ jQuery(document).ready(function($) {
     'use strict';
 
     (function() {
-        function parseInputFields() {
+        function parseInputFields(formElement) {
             var questions = [];
             var form = $('form.webform-client-form');
 
@@ -106,17 +106,20 @@ jQuery(document).ready(function($) {
 
             $.post('http://127.0.0.1:8000/account/signup', { data: JSON.stringify(questions) })
                 .success(function(response) {
-                    return true;
+                    formElement.attr('data-success', 'true');
+                    formElement.submit();
                 }).error(function(response) {
                     alert('There was an error while processing the form.');
-                    return false;
                 });
         }
 
+        $('form').attr('data-success', 'false');
+
         $('form').submit(function(e) {
-            e.preventDefault();
-            if (parseInputFields()) {
-                $(this).submit();
+            var success = $(this).attr('data-success');
+            if (success === 'false') {
+                e.preventDefault();
+                parseInputFields($(this));
             }
         });
 

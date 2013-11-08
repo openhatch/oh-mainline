@@ -179,7 +179,10 @@ INSTALLED_APPS = (
     'djcelery',
     'djkombu',
     'django_crontab',
+    'corsheaders',
 )
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # testrunner allows us to control which testrunner to use
 TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'

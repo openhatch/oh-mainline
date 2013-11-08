@@ -95,11 +95,15 @@ def signup_request(request):
         last_name = __getFieldValue__(questions_json, u'Last Name')
         if email is None:
             return HttpResponse(status=400)
-        Person.objects.filter(user__email__iexact=email).delete()
-        User.objects.filter(email__iexact=email).delete()
+        exists = Person.objects.filter(user__email__iexact=email).count() > 0
+        if exists:
+            User.objects.filter(email__iexact=email).update(username=email, email=email, first_name=first_name,
+                                                            last_name=last_name)
+            user = Person.objects.get(user__email__iexact=email).user
+        else:
+            user = User.objects.create(username=email, email=email, first_name=first_name,
+                                       last_name=last_name)
         random_password = User.objects.make_random_password(length=10)
-        user = User.objects.create(username=email, email=email, first_name=first_name,
-                                   last_name=last_name)
         user.set_password(random_password)
         if not user.groups.filter(name='VOLUNTEER').count() > 0:
             user.groups.add(Group.objects.get(name='VOLUNTEER'))
@@ -150,7 +154,9 @@ def signup_request(request):
     except (Exception, RuntimeError) as e:
         raise e
 
-    return HttpResponse(status=200)
+    response = HttpResponse(status=200)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 def send_registration_email(email, user, hostname, random_password):
 

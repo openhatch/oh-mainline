@@ -10,6 +10,7 @@ cat ./mysite/scripts/sql/delete_from_zoho_trigger.sql | sqlite3 ./mysite/site.db
 sudo pip install xmlbuilder
 sudo pip install django-crontab
 sudo pip install django-file-resubmit
+sudo pip install django-cors-headers
 if [[ `crontab -l` == *manage.py* ]]
 then
     crontab -r
