@@ -1239,6 +1239,10 @@ span.muted {
     color: #AAAAAA;
 }
 
+div#portfolio {
+    width: 100% !important;
+}
+
 body#profile .project-display { float: left; margin-right: 0; width: 705px; }
 body#profile .project-display p { margin: 0; margin-bottom: 10px; }
 body#profile .project-display h2 { font-size: 9pt; margin: 0; margin-bottom: 3px; }
