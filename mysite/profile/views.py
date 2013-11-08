@@ -576,7 +576,7 @@ def people(request, order='date_joined'):
     data['opensource'] = answers['Have you previously contributed to open source projects?']
     data['person_ids'] = simplejson.dumps(person_ids)
     data['order'] = order
-    data['view'] = 'cards'
+    data['view'] = ('list' if request.user.get_profile().view_list else 'cards')
     return (request, 'profile/search_people.html', data)
 
 def gimme_json_for_portfolio(request):

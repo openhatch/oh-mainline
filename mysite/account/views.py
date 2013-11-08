@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Imports {{{
+from numpy.lib._iotools import str2bool
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 import django.contrib.auth
@@ -47,7 +48,7 @@ import mysite.profile.views
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
 from mysite.base.decorators import view, has_group, _has_group
-from forms import EditFieldsForm, EditFieldsDisplayedInSearchForm
+from forms import EditFieldsForm, EditFieldsDisplayedInSearchForm, EditViewTypeForm
 import django.contrib.auth.views
 # }}}
 
@@ -351,7 +352,7 @@ def change_password(request, change_password_form = None):
 @login_required
 @view
 def edit_fields(request, edit_fields_form = None, edit_displayed_fields_cards_form = None,
-                edit_displayed_fields_list_form = None):
+                edit_displayed_fields_list_form = None, edit_view_type_form=None):
     if not _has_group(request.user, 'ADMIN') and not _has_group(request.user, 'PROJECT_PARTNER'):
         return (request, 'account/settings.html', {})
 
@@ -361,10 +362,13 @@ def edit_fields(request, edit_fields_form = None, edit_displayed_fields_cards_fo
         edit_displayed_fields_cards_form = EditFieldsDisplayedInSearchForm(user=request.user, type=u'cards')
     if edit_displayed_fields_list_form is None:
         edit_displayed_fields_list_form = EditFieldsDisplayedInSearchForm(user=request.user, type=u'list')
+    if edit_view_type_form is None:
+        edit_view_type_form = EditViewTypeForm(initial={"view_list": request.user.get_profile().view_list})
 
     return (request, 'account/edit_fields.html', {'edit_fields_form': edit_fields_form,
                                                   'edit_displayed_fields_cards_form': edit_displayed_fields_cards_form,
-                                                  'edit_displayed_fields_list_form': edit_displayed_fields_list_form})
+                                                  'edit_displayed_fields_list_form': edit_displayed_fields_list_form,
+                                                  'edit_view_type_form': edit_view_type_form})
 
 @login_required
 def edit_fields_do(request):
@@ -377,6 +381,17 @@ def edit_fields_do(request):
         return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
     else:
         return edit_fields(request, edit_fields_form=edit_fields_form)
+
+@login_required
+def edit_view_type_do(request):
+    edit_view_type_form = mysite.account.forms.EditViewTypeForm(request.POST)
+    person = request.user.get_profile()
+    if edit_view_type_form.is_valid():
+        person.view_list = str2bool(edit_view_type_form['view_list'].data)
+        person.save()
+        return HttpResponseRedirect(reverse(edit_fields) + '?notification_id=success')
+    else:
+        return edit_fields(request, edit_view_type_form=edit_view_type_form)
 
 @login_required
 def edit_displayed_fields_cards_do(request):

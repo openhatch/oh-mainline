@@ -206,6 +206,15 @@ class EmailMeForm(django.forms.ModelForm):
         model = Person
         fields = ('email_me_re_projects',)
 
+class EditViewTypeForm(django.forms.ModelForm):
+
+    class Meta:
+        model = Person
+        fields = ('view_list',)
+        widgets = {
+            'view_list': django.forms.RadioSelect
+        }
+
 
 class EditFieldsForm(django.forms.Form):
     questions = []

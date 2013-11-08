@@ -224,6 +224,9 @@ urlpatterns = patterns('',
         (r'^account/settings/edit_fields/$',
          'mysite.account.views.edit_fields'),
 
+        (r'^account/settings/view_type/edit/do$',
+         'mysite.account.views.edit_view_type_do'),
+
         (r'^account/settings/fields/edit/do$',
          'mysite.account.views.edit_fields_do'),
 

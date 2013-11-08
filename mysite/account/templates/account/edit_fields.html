@@ -31,6 +31,17 @@
     <div class='module-body contains-submodules two-columns' id="edit-fields">
         {% if request.user|has_group:'ADMIN' %}
         <fieldset>
+            <legend><h3>Default view type for volunteers list</h3></legend>
+            <form name='edit_view_type_form' action='/account/settings/view_type/edit/do' method='POST'
+                  enctype="multipart/form-data">{% csrf_token %}
+                <div class="form-row">
+                    {{ edit_view_type_form.view_list.errors }}
+                    {{ edit_view_type_form.view_list }}
+                </div>
+                <input class='save-button' type='submit' style='clear: left; float: left;' value='Save'/>
+            </form>
+        </fieldset>
+        <fieldset>
             <legend><h3>Edit Field Names</h3></legend>
             <form name='edit-fields' action='/account/settings/fields/edit/do' method='POST'
                   enctype="multipart/form-data">{% csrf_token %}

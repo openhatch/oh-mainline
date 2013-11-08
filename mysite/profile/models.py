@@ -231,6 +231,9 @@ class Person(models.Model):
     other_name = models.TextField(default="", blank=True)
     google_code_name = models.TextField(default="", blank=True)
     language_spoken = models.TextField(default="", blank=True)
+    BOOL_CHOICES = ((True, 'List'), (False, 'Cards'))
+    view_list = models.BooleanField(default=False, choices=BOOL_CHOICES)
+
 
     def get_responses(self):
         return FormResponse.objects.filter(person__pk=self.id)
