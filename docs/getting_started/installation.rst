@@ -1,5 +1,5 @@
-============
-Installation
+============ 
+Installation 
 ============
 
 *These installation instructions are tested nightly on 
@@ -39,11 +39,11 @@ to learn about optional dependencies and automated testing.
 Essentials
 ==========
 
-Open up a command prompt
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Note: Understanding how to open a command prompt for your operating
-system is an important prerequisite to master before continuing with
-the remaining installation instructions.
+Open up a command prompt 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+Note: Understanding how to open a command prompt for your operating 
+system is an important prerequisite to master before continuing with the remaining installation instructions.
 
 For the rest of these instructions, you have to open a command prompt:
 
@@ -54,10 +54,10 @@ For the rest of these instructions, you have to open a command prompt:
   search for Terminal. This should find the Terminal program, stored in
   /Applications/Utilities. Run it.
 
-* On a Windows computer, you'll need to use Git Bash.  To do so, download and install `this .exe <https://msysgit.googlecode.com/files/Git-1.8.1.2-preview20130201.exe>`_.  (It will ask you a bunch of questions.  You can accept the defaults.)  Once that is installed, launch Git Bash by going to: Start -> All Programs -> Git -> Git Bash
+* On a Windows computer, you'll need to use Git Bash.  To do so, download and install the .exe at `this link <http://openhatch.org/missions/windows-setup/>`_.  (It will ask you a bunch of questions.  You can accept the defaults.)  Once that is installed, launch Git Bash by going to: Start -> All Programs -> Git -> Git Bash
 
 
-Get the code from the GitHub repository
+Get the code from the GitHub repository 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you already have an "oh-mainline" directory on your computer, then
@@ -106,7 +106,7 @@ at the bottom of this file in the section Output Samples.
 questions. This is due to a bad interaction between Django's superuser
 creation system and our custom profiles.)
 
-If you are using Windows and do not have Python installed, you will get the 
+If you are using Windows and do not have Python installed, you may get the 
 error "Python: command not found."  You can follow `these instructions 
 <https://openhatch.org/wiki/Boston_Python_Workshop_8/Friday/Windows_set_up_Python>`_ 
 to install Python.
@@ -152,9 +152,7 @@ Hooray! That's it for the essentials. You have everything you need to
 get the site going, and to start making changes.
 
 Now is a good time to find us on IRC or the email list and say hello!
-We can help you make the changes you want to. See `our contact page 
-<http://openhatch.readthedocs.org/en/latest/contributor/handling_patches.html>`_ for how
-to find us!
+We can help you make the changes you want to. :doc:`../community/contact`!
 
 If you want to read about some optional dependencies, open up
 `advanced_installation.rst`_. You can also read about how to maintain
