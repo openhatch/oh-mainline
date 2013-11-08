@@ -862,7 +862,7 @@ class ExportOldBugDataLinks(django.test.TestCase):
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        expected_url = 'http://jira.twistedmatrix.com/rest/api/2/search?jql=created>=2012-09-15T00:00:00'
+        expected_url = 'http://jira.twistedmatrix.com/rest/api/2/search?maxResults=1000&jql=created>=2012-09-15T00:00:00'
 
         # If you want to sanity-check this, just replace 'twisted' in the
         # above URL with e.g. 'cyanogenmod' or some other valid Jira project.

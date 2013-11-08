@@ -657,7 +657,7 @@ reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
 reversion.register(GitHubQueryModel)
 
 def jira_query_url(base_url, params):
-    base = urlparse.urljoin(base_url, u'/rest/api/2/search?jql=')
+    base = urlparse.urljoin(base_url, u'/rest/api/2/search?maxResults=1000&jql=')
     return base + params
 
 class JiraTrackerModel(TrackerModel):
