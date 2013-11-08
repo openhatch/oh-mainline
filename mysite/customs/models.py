@@ -31,20 +31,25 @@ from model_utils.managers import InheritanceManager
 import django.forms.models
 import mysite.base.unicode_sanity
 
+
 class RecentMessageFromCIA(models.Model):
+
     '''This model logs all messages from CIA.vc.
     At some point, we should examine how and when we want to flush this.'''
     # See http://cia.vc/stats/project/moin/.xml
-    committer_identifier = models.CharField(max_length=255) # author, to cia.vc
-    project_name = models.CharField(max_length=255) # project, to cia.vc
-    path = models.CharField(max_length=255) # files, to cia.vc
-    version = models.CharField(max_length=255) # version, to cia.vc
-    message = models.CharField(max_length=255) # log, to cia.vc
-    module = models.CharField(max_length=255) # module, to cia.vc
-    branch = models.CharField(max_length=255) # branch, to cia.vc
+    # author, to cia.vc
+    committer_identifier = models.CharField(max_length=255)
+    project_name = models.CharField(max_length=255)  # project, to cia.vc
+    path = models.CharField(max_length=255)  # files, to cia.vc
+    version = models.CharField(max_length=255)  # version, to cia.vc
+    message = models.CharField(max_length=255)  # log, to cia.vc
+    module = models.CharField(max_length=255)  # module, to cia.vc
+    branch = models.CharField(max_length=255)  # branch, to cia.vc
     time_received = models.DateTimeField(auto_now_add=True)
 
+
 class WebResponse(models.Model):
+
     '''This model abuses the databases as a network log. We store here
     successful and unsuccessful web requests so that we can refer to
     them later.'''
@@ -53,7 +58,7 @@ class WebResponse(models.Model):
     text = models.TextField()
     url = models.TextField()
     status = models.IntegerField()
-    response_headers = models.TextField() # a long multi-line string
+    response_headers = models.TextField()  # a long multi-line string
 
     @staticmethod
     def create_from_browser(b):
@@ -65,7 +70,7 @@ class WebResponse(models.Model):
 
         ret.url = b.geturl()
 
-        ret.status = 200 # Presumably it worked.
+        ret.status = 200  # Presumably it worked.
 
         # Use ''.join() on the response headers so we get a big ol' string
         ret.response_headers = ''.join(b.response()._headers.headers)
@@ -76,22 +81,24 @@ class WebResponse(models.Model):
     def create_from_http_error(error):
         return None
 
+
 class TrackerModel(models.Model):
+
     '''This is the base Model that tracker types subclass.'''
     max_connections = models.IntegerField(blank=True, default=8,
-            help_text="This is the maximum number of simultaneous connections that our bug importer will make to the tracker server.")
+                                          help_text="This is the maximum number of simultaneous connections that our bug importer will make to the tracker server.")
     created_for_project = models.ForeignKey(
         'search.Project', null=True,
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
 
-    ### Every subclass provides the following attributes. We set
-    ### them to None, here in the superclass.
-    ###
-    ### Additionally, we spell _form, _urlmodel, and _urlform with
-    ### underscores, and we put strings inside. Then, we access those
-    ### via get_form(), get_urlmodel(), and get_urlform(). This may
-    ### look weird, but it saves us from an otherwise-painful circular
-    ### import situation.
+    # Every subclass provides the following attributes. We set
+    # them to None, here in the superclass.
+    #
+    # Additionally, we spell _form, _urlmodel, and _urlform with
+    # underscores, and we put strings inside. Then, we access those
+    # via get_form(), get_urlmodel(), and get_urlform(). This may
+    # look weird, but it saves us from an otherwise-painful circular
+    # import situation.
     short_name = None
     namestr = None
     _form = None
@@ -113,11 +120,11 @@ class TrackerModel(models.Model):
     get_urlmodel = classmethod(importable_or_none('_urlmodel'))
     get_urlform = classmethod(importable_or_none('_urlform'))
 
-    ### This optional attribute specifies a class name, which is intepreted as
-    ### part of the mysite.customs.core_bugimporters module.
-    ###
-    ### If the class is specified, we will use custom code from that class
-    ### when doing bug parsing.
+    # This optional attribute specifies a class name, which is intepreted as
+    # part of the mysite.customs.core_bugimporters module.
+    #
+    # If the class is specified, we will use custom code from that class
+    # when doing bug parsing.
     custom_parser = models.CharField(max_length=200, blank=True, default='',
                                      help_text='(For use by OpenHatch admins) Choose a custom bug parser class for the tracker')
 
@@ -136,17 +143,17 @@ class TrackerModel(models.Model):
             mysite.customs.models.RoundupTrackerModel: 'roundup',
             mysite.customs.models.TracTrackerModel: 'trac',
             mysite.customs.models.LaunchpadTrackerModel: 'launchpad',
-            }
+        }
         out_dict['bugimporter'] = CLASS_NAME2SIMPLE_NAME[self.__class__]
 
         # Then, remove fields that we don't care about
         BLACKLISTED_FIELDS = set([
-                'id', # This is not needed by the importer
-                'trackermodel_ptr', # This is not needed by the importer
-                'created_for_project', # Not needed by importer either
-                'old_trac', # This is useless
-                'max_connections', # This is useless
-                ])
+            'id',  # This is not needed by the importer
+            'trackermodel_ptr',  # This is not needed by the importer
+            'created_for_project',  # Not needed by importer either
+            'old_trac',  # This is useless
+            'max_connections',  # This is useless
+        ])
 
         for field in BLACKLISTED_FIELDS:
             if field in out_dict:
@@ -159,7 +166,7 @@ class TrackerModel(models.Model):
         for querymodel in TrackerQueryModel.__subclasses__():
             queries = querymodel.objects.filter(tracker=self)
             query_urls.extend([
-                    q.get_query_url() for q in queries])
+                q.get_query_url() for q in queries])
         out_dict['queries'] = query_urls
 
         # Add a list of bug URLs we're responsible for.
@@ -186,10 +193,9 @@ class TrackerModel(models.Model):
         the subclasses having a short_name attribute.'''
 
         return reverse('mysite.customs.views.edit_tracker', kwargs={
-                'tracker_id': self.id,
-                'tracker_type': self.short_name,
-                'tracker_name': self.tracker_name})
-
+            'tracker_id': self.id,
+            'tracker_type': self.short_name,
+            'tracker_name': self.tracker_name})
 
     def get_base_url(self):
         # Implement this in a subclass
@@ -204,7 +210,7 @@ class TrackerModel(models.Model):
             if candidate.short_name == tracker_model_name:
                 return candidate
         raise ValueError("No TrackerModel known by name: %s" % (
-                tracker_model_name,))
+            tracker_model_name,))
 
     @classmethod
     def get_instance_by_name(cls, tracker_name):
@@ -240,6 +246,7 @@ class TrackerModel(models.Model):
 
 
 class TrackerQueryModel(models.Model):
+
     '''This model just exists to provide a way to grab a QuerySet
     containing all tracker queries.'''
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
@@ -249,17 +256,19 @@ class TrackerQueryModel(models.Model):
         # Implement this in a subclass
         raise NotImplementedError
 
+
 class BugzillaTrackerModel(TrackerModel):
+
     '''This model stores the data for individual Bugzilla trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False, verify_exists=False,
-            help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
+                               help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
 
-    ### Metadata about the TrackerModel.
+    # Metadata about the TrackerModel.
     short_name = 'bugzilla'
     namestr = 'Bugzilla'
     _form = 'mysite.customs.forms.BugzillaTrackerForm'
@@ -267,27 +276,32 @@ class BugzillaTrackerModel(TrackerModel):
     _urlform = 'mysite.customs.forms.BugzillaQueryForm'
 
     QUERY_URL_TYPES = (
-            ('xml', 'Bug XML query'),
-            ('tracker', 'Tracker bug URL'),
-            )
-    query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES, blank=False, default='xml',
-            help_text="This field is deprecated, and will be removed once all Bugzilla trackers are in the asynchronous framework.")
+        ('xml', 'Bug XML query'),
+        ('tracker', 'Tracker bug URL'),
+    )
+    query_url_type = models.CharField(
+        max_length=20, choices=QUERY_URL_TYPES, blank=False, default='xml',
+        help_text="This field is deprecated, and will be removed once all Bugzilla trackers are in the asynchronous framework.")
     BITESIZED_TYPES = (
-            ('key', 'Keyword'),
-            ('wboard', 'Whiteboard tag'),
-            )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
+        ('key', 'Keyword'),
+        ('wboard', 'Whiteboard tag'),
+    )
+    bitesized_type = models.CharField(
+        max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+                                      help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
     DOCUMENTATION_TYPES = (
-            ('key', 'Keyword'),
-            ('comp', 'Component'),
-            ('prod', 'Product'),
-            )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
-    documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
-    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
+        ('key', 'Keyword'),
+        ('comp', 'Component'),
+        ('prod', 'Product'),
+    )
+    documentation_type = models.CharField(
+        max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
+    documentation_text = models.CharField(
+        max_length=200, blank=True, default='',
+        help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+    as_appears_in_distribution = models.CharField(
+        max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
 
     all_trackers = models.Manager()
 
@@ -297,16 +311,19 @@ class BugzillaTrackerModel(TrackerModel):
     def get_base_url(self):
         return self.base_url
 
+
 class BugzillaQueryModel(TrackerQueryModel):
+
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''
     url = models.URLField(max_length=400,
                           blank=False, null=False)
     QUERY_TYPES = (
-            ('xml', 'Bug XML query'),
-            ('tracker', 'Tracker bug URL'),
-            )
-    query_type = models.CharField(max_length=20, choices=QUERY_TYPES, blank=False, default='xml',
-            help_text="We support two types of bug importing from Bugzilla - search queries that return an XML dump of all the bugs, and tracking bugs that depend on all the bugs to be imported here.")
+        ('xml', 'Bug XML query'),
+        ('tracker', 'Tracker bug URL'),
+    )
+    query_type = models.CharField(
+        max_length=20, choices=QUERY_TYPES, blank=False, default='xml',
+        help_text="We support two types of bug importing from Bugzilla - search queries that return an XML dump of all the bugs, and tracking bugs that depend on all the bugs to be imported here.")
     description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(BugzillaTrackerModel)
 
@@ -316,28 +333,33 @@ class BugzillaQueryModel(TrackerQueryModel):
 reversion.register(BugzillaTrackerModel, follow=["bugzillaquerymodel_set"])
 reversion.register(BugzillaQueryModel)
 
+
 class GoogleTrackerModel(TrackerModel):
+
     '''This model stores the data for individual Google trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
-            help_text="This is the name that OpenHatch will use to identify the project.")
+                                    help_text="This is the name that OpenHatch will use to identify the project.")
     google_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False,
-            help_text="This is the name that Google uses to identify the project.")
+                                   blank=False, null=False,
+                                   help_text="This is the name that Google uses to identify the project.")
     BITESIZED_TYPES = (
-            ('label', 'Label'),
-            )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
+        ('label', 'Label'),
+    )
+    bitesized_type = models.CharField(
+        max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that marks a bug as being ideal for newcomers.")
+                                      help_text="This is the text that marks a bug as being ideal for newcomers.")
     DOCUMENTATION_TYPES = (
-            ('label', 'Label'),
-            )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
-    documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the label that marks a documentation bug.")
+        ('label', 'Label'),
+    )
+    documentation_type = models.CharField(
+        max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
+    documentation_text = models.CharField(
+        max_length=200, blank=True, default='',
+        help_text="This is the label that marks a documentation bug.")
 
-    ### Metadata about the TrackerModel
+    # Metadata about the TrackerModel
     short_name = 'google'
     namestr = 'Google Code'
     _form = 'mysite.customs.forms.GoogleTrackerForm'
@@ -366,6 +388,7 @@ class GoogleTrackerModel(TrackerModel):
     def get_base_url(self):
         return 'http://code.google.com/p/%s/' % self.google_name
 
+
 def google_query_url(project_name, **kwargs):
     extra_data = {u'max-results': u'10000',
                   u'can': u'open',
@@ -375,7 +398,9 @@ def google_query_url(project_name, **kwargs):
     url = base + '?' + mysite.base.unicode_sanity.urlencode(extra_data)
     return url
 
+
 class GoogleQueryModel(TrackerQueryModel):
+
     '''This model stores queries for GoogleTracker objects.
     At present we only allow labels to be queried.'''
     label = models.CharField(max_length=200, blank=True, default='')
@@ -392,6 +417,7 @@ class GoogleQueryModel(TrackerQueryModel):
 reversion.register(GoogleTrackerModel, follow=["googlequerymodel_set"])
 reversion.register(GoogleQueryModel)
 
+
 class TracTimeline(models.Model):
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False)
@@ -400,10 +426,12 @@ class TracTimeline(models.Model):
     all_timelines = models.Manager()
 
     def get_times(self, bug_url):
-        bug_times = self.tracbugtimes_set.get(canonical_bug_link = bug_url)
+        bug_times = self.tracbugtimes_set.get(canonical_bug_link=bug_url)
         return (bug_times.date_reported, bug_times.last_touched)
 
+
 class TracBugTimes(models.Model):
+
     '''This model stores times for bugs extracted from Trac timelines.
     To be nice to the Trac servfers, this is updated all at once,
     before any bugs are updated. As such, it is possible for there
@@ -413,37 +441,44 @@ class TracBugTimes(models.Model):
                                          blank=False, null=False)
     date_reported = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     last_touched = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
-    latest_timeline_status = models.CharField(max_length=15, blank=True, default='')
+    latest_timeline_status = models.CharField(
+        max_length=15, blank=True, default='')
     timeline = models.ForeignKey(TracTimeline)
 
+
 class TracTrackerModel(TrackerModel):
+
     '''This model stores the data for individual Trac trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False, verify_exists=False,
-            help_text="This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.")
+                               help_text="This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     BITESIZED_TYPES = (
-            ('keywords', 'Keyword'),
-            ('priority', 'Priority'),
-            ('difficulty', 'Difficulty'),
-            )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
+        ('keywords', 'Keyword'),
+        ('priority', 'Priority'),
+        ('difficulty', 'Difficulty'),
+    )
+    bitesized_type = models.CharField(
+        max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+                                      help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
     DOCUMENTATION_TYPES = (
-            ('keywords', 'Keyword'),
-            ('component', 'Component'),
-            )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
-    documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
-    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
+        ('keywords', 'Keyword'),
+        ('component', 'Component'),
+    )
+    documentation_type = models.CharField(
+        max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
+    documentation_text = models.CharField(
+        max_length=200, blank=True, default='',
+        help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+    as_appears_in_distribution = models.CharField(
+        max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
     old_trac = models.BooleanField(default=False)
 
-    ### Metadata about the TrackerModel
+    # Metadata about the TrackerModel
     short_name = 'trac'
     namestr = 'Trac'
     _form = 'mysite.customs.forms.TracTrackerForm'
@@ -458,7 +493,9 @@ class TracTrackerModel(TrackerModel):
     def get_base_url(self):
         return self.base_url
 
+
 class TracQueryModel(TrackerQueryModel):
+
     '''This model stores query URLs for TracTracker objects.'''
     url = models.URLField(max_length=400,
                           blank=False, null=False,
@@ -472,27 +509,32 @@ class TracQueryModel(TrackerQueryModel):
 reversion.register(TracTrackerModel, follow=["tracquerymodel_set"])
 reversion.register(TracQueryModel)
 
+
 class RoundupTrackerModel(TrackerModel):
+
     '''This model stores the data for individual Roundup trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
-            help_text="This is the name that OpenHatch will use to identify the project.")
+                                    help_text="This is the name that OpenHatch will use to identify the project.")
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False, verify_exists=False,
-            help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
+                               help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
     closed_status = models.CharField(max_length=200, blank=False,
-            help_text="This is the text that the 'Status' field will contain that indicates a bug is closed. For multiple values to mean 'closed', separate with commas.")
+                                     help_text="This is the text that the 'Status' field will contain that indicates a bug is closed. For multiple values to mean 'closed', separate with commas.")
     bitesized_field = models.CharField(max_length=50, blank=True, default='',
-            help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a bite-sized bug. Leave blank if none.")
+                                       help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a bite-sized bug. Leave blank if none.")
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
-    documentation_field = models.CharField(max_length=50, blank=True, default='',
-            help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a documentation bug. Leave blank if none.")
-    documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
-    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
+                                      help_text="This is the text that the field above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+    documentation_field = models.CharField(
+        max_length=50, blank=True, default='',
+        help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a documentation bug. Leave blank if none.")
+    documentation_text = models.CharField(
+        max_length=200, blank=True, default='',
+        help_text="This is the text that the field above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+    as_appears_in_distribution = models.CharField(
+        max_length=200, blank=True, default='', help_text='If this applies to just one software distribution effort, like Fedora, Debian, Windows Portable Apps, etc., write the name of that here. If not, leave blank.')
 
-    ### Metadata about the TrackerModel
+    # Metadata about the TrackerModel
     short_name = 'roundup'
     namestr = 'Roundup'
     _form = 'mysite.customs.forms.RoundupTrackerForm'
@@ -507,12 +549,14 @@ class RoundupTrackerModel(TrackerModel):
     def get_base_url(self):
         return self.base_url
 
+
 class RoundupQueryModel(TrackerQueryModel):
+
     '''This model stores query URLs for RoundupTracker objects.'''
     url = models.URLField(max_length=400, blank=False, null=False,
-            help_text="This is the URL of the Roundup query containing the bugs that you want us to index. Get it by navigating to the page, query, search etc. that shows the bugs you want indexed, and copy the URL of the 'Download as CSV' link at the bottom of the page.")
+                          help_text="This is the URL of the Roundup query containing the bugs that you want us to index. Get it by navigating to the page, query, search etc. that shows the bugs you want indexed, and copy the URL of the 'Download as CSV' link at the bottom of the page.")
     description = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is just an identifier to help people work out what bugs this URL corresponds to, and isn't used anywhere else.")
+                                   help_text="This is just an identifier to help people work out what bugs this URL corresponds to, and isn't used anywhere else.")
     tracker = models.ForeignKey(RoundupTrackerModel)
 
     def get_query_url(self):
@@ -521,20 +565,22 @@ class RoundupQueryModel(TrackerQueryModel):
 reversion.register(RoundupTrackerModel, follow=["roundupquerymodel_set"])
 reversion.register(RoundupQueryModel)
 
+
 class LaunchpadTrackerModel(TrackerModel):
+
     '''This model stores the data for individual launchpad tracker'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
-            help_text="This is the name that OpenHatch will use to identify the project.")
+                                    help_text="This is the name that OpenHatch will use to identify the project.")
     launchpad_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False,
-            help_text="This is the name that Launchpad.net uses to identify the project.")
+                                      blank=False, null=False,
+                                      help_text="This is the name that Launchpad.net uses to identify the project.")
     bitesized_tag = models.CharField(max_length=50, blank=True,
-            help_text="This is the value of the tag that indicates a bite-sized bug.")
+                                     help_text="This is the value of the tag that indicates a bite-sized bug.")
     documentation_tag = models.CharField(max_length=50, blank=True,
-            help_text="This is the value of the tag that indicates documentation bug.")
+                                         help_text="This is the value of the tag that indicates documentation bug.")
 
-    ### Metadata about the TrackerModel
+    # Metadata about the TrackerModel
     short_name = 'launchpad'
     namestr = 'Launchpad'
     _form = 'mysite.customs.forms.LaunchpadTrackerForm'
@@ -549,7 +595,9 @@ class LaunchpadTrackerModel(TrackerModel):
     def get_base_url(self):
         return '__impossible_to_use_with_launchpad'
 
+
 class LaunchpadQueryModel(TrackerQueryModel):
+
     '''This model stores query URLs for LaunchpadTracker objects.
 
     For bugs in projects hosted on Launchpad, we always download all bugs
@@ -577,26 +625,28 @@ class LaunchpadQueryModel(TrackerQueryModel):
 reversion.register(LaunchpadTrackerModel, follow=["launchpadquerymodel_set"])
 reversion.register(LaunchpadQueryModel)
 
+
 class GitHubTrackerModel(TrackerModel):
+
     '''This model stores the data for individual GitHub repositories'''
     tracker_name = models.CharField(max_length=200, unique=True,
-        blank=False, null=False,
-        help_text="This is the name that OpenHatch will use to identify the project.")
+                                    blank=False, null=False,
+                                    help_text="This is the name that OpenHatch will use to identify the project.")
     github_name = models.CharField(max_length=100, blank=False, null=False,
-        help_text="This is the user or project name on GitHub that owns the project.")
+                                   help_text="This is the user or project name on GitHub that owns the project.")
     github_repo = models.CharField(max_length=100, blank=False, null=False,
-        help_text="This is the repository name that GitHub uses to identify the project.")
+                                   help_text="This is the repository name that GitHub uses to identify the project.")
     bitesized_tag = models.CharField(max_length=50, blank=True,
-        help_text="This is the value of the GitHub label that indicates a bite-sized bug.")
+                                     help_text="This is the value of the GitHub label that indicates a bite-sized bug.")
     documentation_tag = models.CharField(max_length=50, blank=True,
-        help_text="This is the value of the GitHub label that indicates a documentation bug.")
+                                         help_text="This is the value of the GitHub label that indicates a documentation bug.")
 
     class Meta:
         unique_together = (
             ('github_name', 'github_repo'),
         )
 
-    ### Metadata about the TrackerModel
+    # Metadata about the TrackerModel
     short_name = 'github'
     namestr = 'GitHub'
     _form = 'mysite.customs.forms.GitHubTrackerForm'
@@ -622,7 +672,7 @@ class GitHubTrackerModel(TrackerModel):
             return out
 
         query_data = {u'since':
-                          unicode(lowest_last_polled.isoformat())}
+                      unicode(lowest_last_polled.isoformat())}
         query_url = github_query_url(self.github_name,
                                      self.github_repo,
                                      **query_data)
@@ -635,14 +685,17 @@ class GitHubTrackerModel(TrackerModel):
     def get_github_url(self):
         return 'https://github.com/%s/%s' % (self.github_name, self.github_repo)
 
+
 def github_query_url(github_user_name, github_repo_name, **kwargs):
     base_url = ('https://api.github.com/repos/%s/%s/issues' % (
-            mysite.base.unicode_sanity.quote(github_user_name),
-            mysite.base.unicode_sanity.quote(github_repo_name)))
+        mysite.base.unicode_sanity.quote(github_user_name),
+        mysite.base.unicode_sanity.quote(github_repo_name)))
     return base_url + '?' + mysite.base.unicode_sanity.urlencode(
         kwargs)
 
+
 class GitHubQueryModel(TrackerQueryModel):
+
     '''This model stores query URLs for GitHubTracker objects.'''
     tracker = models.ForeignKey(GitHubTrackerModel)
     state = models.CharField(max_length=20, default='open')
@@ -651,40 +704,45 @@ class GitHubQueryModel(TrackerQueryModel):
         return github_query_url(self.tracker.github_name,
                                 self.tracker.github_repo,
                                 **{
-                u'state': u'open'})
+                                    u'state': u'open'})
 
 reversion.register(GitHubTrackerModel, follow=["githubquerymodel_set"])
 reversion.register(GitHubQueryModel)
+
 
 def jira_query_url(base_url, params):
     base = urlparse.urljoin(base_url, u'/rest/api/2/search?jql=')
     return base + params
 
+
 class JiraTrackerModel(TrackerModel):
+
     '''This model stores the data for individual Jira trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False, verify_exists=False,
-            help_text="This is the URL to the homepage of the Jira instance, i.e http://jira.cyanogenmod.org")
+                               help_text="This is the URL to the homepage of the Jira instance, i.e http://jira.cyanogenmod.org")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
 
     BITESIZED_TYPES = (
-            ('label', 'Label'),
-            ('priority', 'Priority')
+        ('label', 'Label'),
+        ('priority', 'Priority')
     )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
+    bitesized_type = models.CharField(
+        max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+                                      help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
 
     DOCUMENTATION_TYPES = (
-            ('label', 'Label')
+        ('label', 'Label')
     )
-    documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+    documentation_text = models.CharField(
+        max_length=200, blank=True, default='',
+        help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
 
-    ### Metadata about the TrackerModel
+    # Metadata about the TrackerModel
     short_name = 'jira'
     namestr = 'Jira'
     _form = 'mysite.customs.forms.JiraTrackerForm'
@@ -710,7 +768,7 @@ class JiraTrackerModel(TrackerModel):
             return out
 
         query_url = jira_query_url(self.base_url,
-                u'created>=' + unicode(lowest_last_polled.isoformat()))
+                                   u'created>=' + unicode(lowest_last_polled.isoformat()))
         out['get_older_bug_data'] = query_url
         return out
 
@@ -719,6 +777,7 @@ class JiraTrackerModel(TrackerModel):
 
 
 class JiraQueryModel(TrackerQueryModel):
+
     '''This model stores query URLs for JiraTracker objects.'''
 
     tracker = models.ForeignKey(JiraTrackerModel)
@@ -726,7 +785,7 @@ class JiraQueryModel(TrackerQueryModel):
 
     def get_query_url(self):
         return jira_query_url(self.tracker.base_url,
-                u'status=open')
+                              u'status=open')
 
 
 reversion.register(JiraTrackerModel, follow=["jiraquerymodel_set"])

@@ -5,16 +5,17 @@ import datetime
 import mysite.base.views
 import sys
 
+
 class Command(BaseCommand):
     help = 'Returns the Nagios exit code for objects that are monitored'
 
     option_list = BaseCommand.option_list + (
         make_option('-m', '--meta', action='store_true',
-            dest='meta', default=False, help='Check the meta data.'),
+                    dest='meta', default=False, help='Check the meta data.'),
 
         make_option('-w', '--weekly', action='store_true',
-            dest='weekly', default=False,
-            help='Check whether last email was sent more than 7 days ago.'),
+                    dest='weekly', default=False,
+                    help='Check whether last email was sent more than 7 days ago.'),
     )
 
     def handle(self, *args, **options):
@@ -32,7 +33,8 @@ class Command(BaseCommand):
     @staticmethod
     def send_weekly_exit_code(covers_things_since=None):
         if covers_things_since is None:
-            covers_things_since = Timestamp.get_timestamp_for_string("What's the endpoint of the time range of the last email we sent out?")
+            covers_things_since = Timestamp.get_timestamp_for_string(
+                "What's the endpoint of the time range of the last email we sent out?")
 
         covers_things_until = datetime.datetime.utcnow()
 

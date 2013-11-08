@@ -11,8 +11,9 @@ import re
 class TrackerModelResource(tastypie.resources.ModelResource):
     # This is a trivial resource that just lets each BugImporter
     # subclass export its data out to the web.
+
     class Meta:
-        fields = [] # Let this be handled by dehydrate()
+        fields = []  # Let this be handled by dehydrate()
         queryset = (mysite.customs.models.TrackerModel.objects.
                     select_subclasses().all())
         list_allowed_methods = ['get']
@@ -21,7 +22,8 @@ class TrackerModelResource(tastypie.resources.ModelResource):
         authorization = tastypie.authorization.DjangoAuthorization()
 
     def get_object_list(self, request):
-        all_objects = super(TrackerModelResource, self).get_object_list(request)
+        all_objects = super(TrackerModelResource,
+                            self).get_object_list(request)
         skip_these_ids = []
         tracker_type = request.GET.get('tracker_type', '')
         # Sanitize tracker_type.
@@ -29,8 +31,8 @@ class TrackerModelResource(tastypie.resources.ModelResource):
         if tracker_type:
             # Note. This is an ugly hack.
             query_for_corresponding_foreign_key = ~django.db.models.Q(**{
-                    tracker_type + 'trackermodel' + '__id': None,
-                    })
+                tracker_type + 'trackermodel' + '__id': None,
+            })
             try:
                 all_objects = all_objects.filter(
                     query_for_corresponding_foreign_key)
@@ -50,7 +52,6 @@ class TrackerModelResource(tastypie.resources.ModelResource):
             else:
                 all_objects = all_objects.filter(id=as_int)
 
-
         if request.GET.get('just_stale', '').lower() == 'yes':
             # Note: This code is of low quality.
             for obj in all_objects:
@@ -67,7 +68,8 @@ class TrackerModelResource(tastypie.resources.ModelResource):
                 # is resolved.
                 oldest_last_polled_data = relevant_bugs.aggregate(
                     django.db.models.Min('last_polled'))
-                oldest_last_polled = oldest_last_polled_data['last_polled__min']
+                oldest_last_polled = oldest_last_polled_data[
+                    'last_polled__min']
                 if (oldest_last_polled and (
                         oldest_last_polled >= (
                             datetime.datetime.utcnow() -

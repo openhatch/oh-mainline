@@ -25,6 +25,7 @@ django.conf.settings.CELERY_ALWAYS_EAGER = True
 
 import mysite.customs.mechanize_helpers
 
+
 class Command(BaseCommand):
     args = '<ohloh>'
     help = """Call this once a day to make sure we run periodic network tasks."""
@@ -32,7 +33,7 @@ class Command(BaseCommand):
     def check_for_broken_ohloh_links(self):
         things_to_do = []
         for citation in mysite.profile.models.Citation.untrashed.filter(
-            data_import_attempt__source__in=('oh', 'rs')):
+                data_import_attempt__source__in=('oh', 'rs')):
             def do_it(citation=citation):
                 # check citation URL for being a 404
                 # if so, remove set the URL to None. Also, log it.
@@ -43,7 +44,7 @@ class Command(BaseCommand):
                     else:
                         # aww shucks, I guess we have to remove it.
                         logging.warning("We had to remove the url %s from the citation whose PK is %d" % (
-                                citation.url, citation.pk))
+                            citation.url, citation.pk))
                         citation.url = None
                         citation.save()
             things_to_do.append(do_it)
@@ -55,9 +56,10 @@ class Command(BaseCommand):
         else:
             cdt_fns = {
                 'ohloh': self.check_for_broken_ohloh_links,
-                }
-        ## Which ones do we plan to do this, time we run?
-        # Well, if the user supplied arguments on the command line, then put those in the list.
+            }
+        # Which ones do we plan to do this, time we run?
+        # Well, if the user supplied arguments on the command line, then put
+        # those in the list.
         if args:
             tasks = args
         else:

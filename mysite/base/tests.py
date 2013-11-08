@@ -51,13 +51,16 @@ import mysite.project.views
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
 
+
 def make_twill_url(url):
     # modify this
     return url.replace("http://openhatch.org/",
-            "http://127.0.0.1:8080/")
+                       "http://127.0.0.1:8080/")
+
 
 def better_make_twill_url(url):
-    return make_twill_url(url.replace('+','%2B'))
+    return make_twill_url(url.replace('+', '%2B'))
+
 
 def twill_goto_view(view_name, kwargs):
     url = "http://openhatch.org" + reverse(view_name, kwargs=kwargs)
@@ -66,7 +69,9 @@ def twill_goto_view(view_name, kwargs):
 mock_get = mock.Mock()
 mock_get.return_value = None
 
+
 class TwillTests(django.test.TestCase):
+
     @staticmethod
     def _twill_setup():
         app = AdminMediaHandler(WSGIHandler())
@@ -79,6 +84,7 @@ class TwillTests(django.test.TestCase):
         twill.set_output(StringIO())
 
     '''Some basic methods needed by other testing classes.'''
+
     def setUp(self):
         self.real_get = django.core.cache.cache.get
         django.core.cache.cache.get = mock_get
@@ -110,10 +116,10 @@ class TwillTests(django.test.TestCase):
         tc.submit()
 
     def login_with_client(self, username='paulproteus',
-            password="paulproteus's unbreakable password"):
+                          password="paulproteus's unbreakable password"):
         client = Client()
         success = client.login(username=username,
-                     password=password)
+                               password=password)
         self.assert_(success)
         return client
 
@@ -124,27 +130,33 @@ class TwillTests(django.test.TestCase):
         """ Used by account.tests.Signup, which is omitted while we use invite codes. """
         pass
 
+
 class MySQLRegex(TwillTests):
+
     def test_escape(self):
         before2after = {
-                'n': '[n]',
-                ']': ']',
-                '[n': '[[][n]'
-                }
+            'n': '[n]',
+            ']': ']',
+            '[n': '[[][n]'
+        }
         for before, after in before2after.items():
             self.assertEqual(
-                    mysite.base.view_helpers.mysql_regex_escape(before),
-                    after)
+                mysite.base.view_helpers.mysql_regex_escape(before),
+                after)
+
 
 class TestUriDataHelper(TwillTests):
+
     def test(self):
         request = mysite.base.view_helpers.ObjectFromDict({
-            'is_secure': lambda : True,
+            'is_secure': lambda: True,
             'META': {'SERVER_PORT': '443',
                      'SERVER_NAME': 'name'}})
-        data = mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(request)
+        data = mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(
+            request)
         self.assertEqual(data, {'uri_scheme': 'https',
                                 'url_prefix': 'name'})
+
 
 class GeocoderCanGeocode(TwillTests):
 
@@ -157,16 +169,20 @@ class GeocoderCanGeocode(TwillTests):
     def test_unicode_string(self):
         self.get_geocoding_in_json_for_unicode_string()
 
+
 class RemoveByteOrderMarker(unittest.TestCase):
+
     def test(self):
         sample_bytes = '\xef\xbb\xbf' + 'hi'
         as_fd = StringIO(sample_bytes)
         self.assertNotEqual('hi', as_fd.read())
         as_fd = StringIO(sample_bytes)
-        cleaned_up_fd = mysite.base.unicode_sanity.wrap_file_object_in_utf8_check(as_fd)
+        cleaned_up_fd = mysite.base.unicode_sanity.wrap_file_object_in_utf8_check(
+            as_fd)
         result = cleaned_up_fd.read()
-        self.assertEqual(type(result), str) # not unicode
+        self.assertEqual(type(result), str)  # not unicode
         self.assertEqual(result, 'hi')
+
 
 class GeocoderCanCache(django.test.TestCase):
 
@@ -177,36 +193,43 @@ class GeocoderCanCache(django.test.TestCase):
         return mysite.base.view_helpers.cached_geocoding_in_json(self.unicode_address)
 
     mock_geocoder = mock.Mock()
+
     @mock.patch("mysite.base.view_helpers._geocode", mock_geocoder)
     def test_unicode_strings_get_cached(self):
 
         # Let's make sure that the first time we run this (with original_json),
         # that the cache is empty, and we populate it with original_json.
-        cache.delete(mysite.base.view_helpers.address2cache_key_name(self.unicode_address))
+        cache.delete(
+            mysite.base.view_helpers.address2cache_key_name(self.unicode_address))
 
-        ### NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
+        # NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
         # When the geocoder's results are being cached properly,
         # the base controller named '_geocode' will not run more than once.
         original_json = "{'key': 'original value'}"
         different_json = "{'key': 'if caching works we should never get this value'}"
         self.mock_geocoder.return_value = eval(original_json)
-        self.assert_('original value' in self.get_geocoding_in_json_for_unicode_string())
+        self.assert_(
+            'original value' in self.get_geocoding_in_json_for_unicode_string())
         self.mock_geocoder.return_value = eval(different_json)
         try:
             json = self.get_geocoding_in_json_for_unicode_string()
             self.assert_('original value' in json)
         except AssertionError:
-            raise AssertionError, "Geocoded location in json was not cached; it now equals " + json
+            raise AssertionError, "Geocoded location in json was not cached; it now equals " + \
+                json
+
 
 class TestUnicodifyDecorator(TwillTests):
+
     def test(self):
-        utf8_data = u'\xc3\xa9'.encode('utf-8') # &eacute;
+        utf8_data = u'\xc3\xa9'.encode('utf-8')  # &eacute;
 
         @mysite.base.decorators.unicodify_strings_when_inputted
         def sample_thing(arg):
             self.assertEqual(type(arg), unicode)
 
         sample_thing(utf8_data)
+
 
 class Feed(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -225,29 +248,33 @@ class Feed(TwillTests):
         for x in range(4):
             mysite.search.models.Answer.create_dummy()
 
-        recent_feed_items = mysite.search.models.Answer.objects.all().order_by('-modified_date')
+        recent_feed_items = mysite.search.models.Answer.objects.all().order_by(
+            '-modified_date')
 
         # Visit the homepage, assert that the feed item data is on the page,
         # ordered by date descending.
-        actual_answer_pks = [answer.pk for answer in get_answers_from_homepage()]
+        actual_answer_pks = [
+            answer.pk for answer in get_answers_from_homepage()]
         expected_answer_pks = [answer.pk for answer in recent_feed_items]
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
     def test_feed_shows_wanna_help(self):
-        ### set things up so there was a wanna help button click
-        person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        # set things up so there was a wanna help button click
+        person = mysite.profile.models.Person.objects.get(
+            user__username='paulproteus')
         p_before = mysite.search.models.Project.create_dummy()
         client = self.login_with_client()
         post_to = reverse(mysite.project.views.wanna_help_do)
         response = client.post(post_to, {u'project': unicode(p_before.pk)})
 
-        ### Now when we GET the home page, we see a Note
-        ### to that effect in the feed
+        # Now when we GET the home page, we see a Note
+        # to that effect in the feed
         response = client.get('/')
         items = response.context[0]['recent_feed_items']
         note_we_want_to_see = mysite.search.models.WannaHelperNote.objects.get(
             person=person, project=p_before)
         self.assert_(note_we_want_to_see in items)
+
 
 class CacheMethod(TwillTests):
 
@@ -256,8 +283,10 @@ class CacheMethod(TwillTests):
         # Step 0: mock_cache.get() needs to return None
         mock_cache.get.return_value = None
 
-        # Step 1: Create a method where we can test if it was cached (+ cache it)
+        # Step 1: Create a method where we can test if it was cached (+ cache
+        # it)
         class SomeClass:
+
             def __init__(self):
                 self.call_counter = 0
 
@@ -274,9 +303,12 @@ class CacheMethod(TwillTests):
         self.assertEqual(sc.some_method(), '1')
 
         # Step 3: See if the cache has it now
-        mock_cache.set.assert_called_with('doodles', '{"value": "1"}', 86400 * 10)
+        mock_cache.set.assert_called_with(
+            'doodles', '{"value": "1"}', 86400 * 10)
+
 
 class RecommendBugs(TwillTests):
+
     @mock.patch('mysite.profile.view_helpers.RecommendBugs')
     def test_no_synchronous_processing_on_empty(self, RecommendBugsMock):
         RecommendBugsMock.is_cache_empty.return_value = True
@@ -289,24 +321,30 @@ class RecommendBugs(TwillTests):
         # No synchronous call to costly recommend() method
         self.assertFalse(RecommendBugsMock.recommend.called)
 
+
 class EnhanceNextWithNewUserMetadata(TwillTests):
+
     def test_easy(self):
         sample_input = '/'
         wanted = '/?newuser=true'
-        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(
+            sample_input)
         self.assertEqual(wanted, got)
 
     def test_with_existing_query_string(self):
         sample_input = '/?a=b'
         wanted = '/?a=b&newuser=true'
-        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(
+            sample_input)
         self.assertEqual(wanted, got)
 
     def test_with_existing_newuser_equals_true(self):
         sample_input = '/?a=b&newuser=true'
         wanted = sample_input
-        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(
+            sample_input)
         self.assertEqual(wanted, got)
+
 
 class Unsubscribe(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -314,47 +352,53 @@ class Unsubscribe(TwillTests):
     def test_verify_unsubscribe_token(self):
         """Generate a valid unsubscribe token. Use it. See that it works. Use
         an invalid one. See that it doesn't work."""
-        dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        dude = mysite.profile.models.Person.objects.get(
+            user__username='paulproteus')
 
         # Generate an invalid token (easiest to do this first)
-        plausible_but_invalid_token_string = dude.generate_new_unsubscribe_token().string
+        plausible_but_invalid_token_string = dude.generate_new_unsubscribe_token(
+        ).string
         # Make that token invalid by nuking the UnsubscribeToken table
         mysite.profile.models.UnsubscribeToken.objects.all().delete()
 
         # Generate a once-valid but now-expired token
         expired_token = dude.generate_new_unsubscribe_token()
-        just_over_three_months_ago = datetime.datetime.utcnow() - datetime.timedelta(days=91)
+        just_over_three_months_ago = datetime.datetime.utcnow(
+        ) - datetime.timedelta(days=91)
         expired_token.created_date = just_over_three_months_ago
         expired_token.save()
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         owner = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-                valid_token_string)
+            valid_token_string)
         self.assertEqual(owner, dude)
 
         # This should definitely be false
-        self.assertNotEqual(valid_token_string, plausible_but_invalid_token_string)
+        self.assertNotEqual(valid_token_string,
+                            plausible_but_invalid_token_string)
 
         # The invalid token should fail
         self.assertFalse(
-                mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-                    plausible_but_invalid_token_string))
+            mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+                plausible_but_invalid_token_string))
 
         self.assertFalse(
-                mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-                    expired_token.string))
+            mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+                expired_token.string))
 
     def test_unsubscribe_view(self):
-        dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        dude = mysite.profile.models.Person.objects.get(
+            user__username='paulproteus')
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         # Test that the unsubscribe view's context contains the owner
-        url = reverse(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
+        url = reverse(mysite.profile.views.unsubscribe,
+                      kwargs={'token_string': valid_token_string})
         response = self.client.get(url)
         self.assertEqual(
-                mysite.profile.models.Person.objects.get(),
-                response.context['unsubscribe_this_user'])
+            mysite.profile.models.Person.objects.get(),
+            response.context['unsubscribe_this_user'])
 
     def test_unsubscribe_post_handler(self):
         def get_dude():
@@ -365,7 +409,7 @@ class Unsubscribe(TwillTests):
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         self.client.post(reverse(mysite.profile.views.unsubscribe_do),
-                {'token_string': valid_token_string})
+                         {'token_string': valid_token_string})
         self.assertFalse(get_dude().email_me_re_projects)
 
     def test_submit_form(self):
@@ -377,62 +421,71 @@ class Unsubscribe(TwillTests):
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         twill_goto_view(mysite.profile.views.unsubscribe,
-                kwargs={'token_string': valid_token_string})
+                        kwargs={'token_string': valid_token_string})
         tc.submit()
         self.assertFalse(get_dude().email_me_re_projects)
 
+
 class TimestampTests(django.test.TestCase):
+
     def test_bugzilla_urls_get_and_update_timestamp_without_errors(self):
         # List of URLs to test (from Bugzila trackers)
         urls = {
-                'Miro bitesized':
-                    'http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
-                'KDE bitesized':
-                    'https://bugs.kde.org/buglist.cgi?query_format=advanced&keywords=junior-jobs&resolution=---',
-                'KDE documentation':
-                    'https://bugs.kde.org/buglist.cgi?query_format=advanced&product=docs&resolution=---',
-                'MediaWiki bitesized':
-                    'https://bugzilla.wikimedia.org/buglist.cgi?keywords=easy&query_format=advanced&resolution=LATER&resolution=---',
-                'MediaWiki documentation':
-                    'https://bugzilla.wikimedia.org/buglist.cgi?query_format=advanced&component=Documentation&resolution=---',
-                'Gnome bitesized':
-                    'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---',
-                'Mozilla bitesized':
-                    'https://bugzilla.mozilla.org/buglist.cgi?resolution=---;status_whiteboard_type=substring;query_format=advanced;status_whiteboard=[good%20first%20bug]',
-                'Songbird helpwanted':
-                    'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&resolution=---&keywords=helpwanted',
-                'Songbird documentation':
-                    'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---',
-                'Apertium':
-                    'http://bugs.apertium.org/cgi-bin/bugzilla/buglist.cgi?query_format=advanced&resolution=---',
-                'RTEMS':
-                    'https://www.rtems.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---',
-                'XOrg bitesized':
-                    'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&keywords=janitor&resolution=---&product=xorg',
-                'XOrg documentation':
-                    'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&component=Docs%2Fother&component=Documentation&component=Fonts%2Fdoc&resolution=---&product=xorg',
-                'Locamotion':
-                    'http://bugs.locamotion.org/buglist.cgi?query_format=advanced&resolution=---',
-                'Hypertriton':
-                    'https://hypertriton.com/bugzilla/buglist.cgi?query_format=advanced&resolution=---&product=Agar&product=EDAcious&product=FabBSD&product=FreeSG',
-                'pygame':
-                    'http://pygame.motherhamster.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---'
-                }
+            'Miro bitesized':
+            'http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+            'KDE bitesized':
+            'https://bugs.kde.org/buglist.cgi?query_format=advanced&keywords=junior-jobs&resolution=---',
+            'KDE documentation':
+            'https://bugs.kde.org/buglist.cgi?query_format=advanced&product=docs&resolution=---',
+            'MediaWiki bitesized':
+            'https://bugzilla.wikimedia.org/buglist.cgi?keywords=easy&query_format=advanced&resolution=LATER&resolution=---',
+            'MediaWiki documentation':
+            'https://bugzilla.wikimedia.org/buglist.cgi?query_format=advanced&component=Documentation&resolution=---',
+            'Gnome bitesized':
+            'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---',
+            'Mozilla bitesized':
+            'https://bugzilla.mozilla.org/buglist.cgi?resolution=---;status_whiteboard_type=substring;query_format=advanced;status_whiteboard=[good%20first%20bug]',
+            'Songbird helpwanted':
+            'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&resolution=---&keywords=helpwanted',
+            'Songbird documentation':
+            'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---',
+            'Apertium':
+            'http://bugs.apertium.org/cgi-bin/bugzilla/buglist.cgi?query_format=advanced&resolution=---',
+            'RTEMS':
+            'https://www.rtems.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---',
+            'XOrg bitesized':
+            'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&keywords=janitor&resolution=---&product=xorg',
+            'XOrg documentation':
+            'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&component=Docs%2Fother&component=Documentation&component=Fonts%2Fdoc&resolution=---&product=xorg',
+            'Locamotion':
+            'http://bugs.locamotion.org/buglist.cgi?query_format=advanced&resolution=---',
+            'Hypertriton':
+            'https://hypertriton.com/bugzilla/buglist.cgi?query_format=advanced&resolution=---&product=Agar&product=EDAcious&product=FabBSD&product=FreeSG',
+            'pygame':
+            'http://pygame.motherhamster.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---'
+        }
         for url_name in urls:
             logging.info('Testing %s bugs URL.' % url_name)
             url = urls[url_name]
             # Check there is no timestamp i.e. get zero o'clock
-            first_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
-            self.assertEqual(first_timestamp, mysite.base.models.Timestamp.ZERO_O_CLOCK)
+            first_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+                url)
+            self.assertEqual(first_timestamp,
+                             mysite.base.models.Timestamp.ZERO_O_CLOCK)
             # Check the timestamp of the URL can be updated
             mysite.base.models.Timestamp.update_timestamp_for_string(url)
             # Check the new timestamp is after zero o'clock
-            new_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
-            self.assertTrue(new_timestamp > mysite.base.models.Timestamp.ZERO_O_CLOCK)
+            new_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+                url)
+            self.assertTrue(new_timestamp >
+                            mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
 # Test cases for Nagios integration
+
+
 class NagiosTests(django.test.TestCase):
     # Test for OK Nagios meta data return (0)
+
     def test_nagios_meta_return_ok(self):
         data = {}
         data['dia_diagnostics'] = {}
@@ -478,7 +531,8 @@ class NagiosTests(django.test.TestCase):
     def test_nagios_weeklymail_return_ok(self):
         newtime = datetime.datetime.utcnow() - datetime.timedelta(days=4)
 
-        self.assertEqual(0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
+        self.assertEqual(
+            0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
 
     # Test for OK Nagios weekly mail return (0) after send_emails is
     # run as a management command
@@ -489,22 +543,29 @@ class NagiosTests(django.test.TestCase):
 
         # Now run to see if the function sees things are ok in the
         # database
-        self.assertEqual(0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
+        self.assertEqual(
+            0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
 
     # Test for CRITICAL Nagios weekly mail return (2)
     def test_nagios_weeklymail_return_critical(self):
         newtime = datetime.datetime.utcnow() - datetime.timedelta(days=8)
 
-        self.assertEqual(2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
+        self.assertEqual(
+            2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
 
     # Test for CRITICAL Nagios weekly mail return (2) on new database
     def test_nagios_weeklymail_return_critical_newdb(self):
-        self.assertEqual(2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
+        self.assertEqual(
+            2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
 
 # Test cases for meta data generation
+
+
 class MetaDataTests(django.test.TestCase):
+
     def test_meta_data_zero_div(self):
         mysite.base.views.meta_data()
+
 
 def find_git_path():
     maybe_git_dir = os.path.abspath(os.getcwd())
@@ -516,7 +577,10 @@ def find_git_path():
     raise ValueError, "Could not find git directory path."
 
 # Test that the git repository has no files that conflict with Windows
+
+
 class WindowsFilesystemCompatibilityTests(unittest.TestCase):
+
     def test(self):
         # Find the base directory
         dir_with_git = find_git_path()
@@ -541,7 +605,9 @@ class WindowsFilesystemCompatibilityTests(unittest.TestCase):
              if ('?' not in x)])
         self.assertEqual(file_set, files_filtered)
 
+
 class GoogleApiTests(unittest.TestCase):
+
     def test_google_api(self):
         """ Test to see if the google api is returning what we expect """
         response_file_path = os.path.join(settings.MEDIA_ROOT, 'sample-data',

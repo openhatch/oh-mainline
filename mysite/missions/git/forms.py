@@ -19,10 +19,12 @@
 import django.forms
 import re
 
+
 class ConfigForm(django.forms.Form):
     BAD_ENDINGS = ['local', 'none', 'host']
 
     user_email = django.forms.EmailField()
+
     def clean_user_email(self):
         for ending in ConfigForm.BAD_ENDINGS:
             if self.cleaned_data['user_email'].endswith(ending):
@@ -30,20 +32,25 @@ class ConfigForm(django.forms.Form):
                     'The email address is invalid '
                     'because it ends with %s' % (ending,))
 
+
 class CheckoutForm(django.forms.Form):
-    secret_word = django.forms.CharField(error_messages={'required': 'No author was given.'})
+    secret_word = django.forms.CharField(
+        error_messages={'required': 'No author was given.'})
+
 
 class DiffForm(django.forms.Form):
-    diff = django.forms.CharField(error_messages={'required': 'No git diff output was given.'}, widget=django.forms.Textarea())
+    diff = django.forms.CharField(
+        error_messages={'required': 'No git diff output was given.'}, widget=django.forms.Textarea())
 
     def clean_diff(self):
         REGEX_DIFF_LINE = '\+print "[H,h]ello,?[ ]+[w,W]orld\!'
         success_count = re.search(REGEX_DIFF_LINE, self.cleaned_data['diff'])
-        if success_count == None :
+        if success_count == None:
             raise django.forms.ValidationError, (
                 "Something doesn't look right.The expected line is '+print... ' Give it another try!")
         return self.cleaned_data['diff']
-               
+
 
 class RebaseForm(django.forms.Form):
-    secret_word = django.forms.CharField(error_messages={'required': 'The password was incorrect.'})
+    secret_word = django.forms.CharField(
+        error_messages={'required': 'The password was incorrect.'})

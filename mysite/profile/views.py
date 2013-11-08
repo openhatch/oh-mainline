@@ -34,7 +34,7 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.core import serializers
 from django.http import \
-        HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
+    HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -47,9 +47,9 @@ import mysite.base.view_helpers
 import mysite.base.unicode_sanity
 import mysite.profile.view_helpers
 from mysite.profile.models import \
-        Person, Tag, TagType, \
-        Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation
+    Person, Tag, TagType, \
+    Link_Project_Tag, Link_Person_Tag, \
+    DataImportAttempt, PortfolioEntry, Citation
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view
 import mysite.profile.forms
@@ -58,6 +58,7 @@ from mysite.base.view_helpers import render_response
 from django.views.decorators.csrf import csrf_protect
 
 # }}}
+
 
 @login_required
 @csrf_protect
@@ -75,15 +76,16 @@ def delete_user_for_being_spammy(request):
             # Send out an email to the poor sap.
             mysite.profile.view_helpers.email_spammy_user(u)
             # Okay... delete the user.
-            u.delete() # hoo boy!
+            u.delete()  # hoo boy!
             return HttpResponseRedirect(reverse(
-                    delete_user_for_being_spammy))
+                delete_user_for_being_spammy))
 
     return as_view(
         request,
         'profile/delete_user.html',
         {'form': form},
         None)
+
 
 @login_required
 def add_citation_manually_do(request):
@@ -92,8 +94,8 @@ def add_citation_manually_do(request):
     form.set_user(request.user)
 
     output = {
-            'form_container_element_id': request.POST['form_container_element_id']
-            }
+        'form_container_element_id': request.POST['form_container_element_id']
+    }
     if form.is_valid():
         citation = form.save()
 
@@ -107,13 +109,14 @@ def add_citation_manually_do(request):
     else:
         error_msgs = []
         for error in form.errors.values():
-            error_msgs.extend(eval(error.__repr__())) # don't ask questions.
+            error_msgs.extend(eval(error.__repr__()))  # don't ask questions.
 
         output['error_msgs'] = error_msgs
         json = simplejson.dumps(output)
         return HttpResponseServerError(json, mimetype='application/json')
 
     #}}}
+
 
 @view
 def display_person_web(request, user_to_display__username=None):
@@ -125,38 +128,47 @@ def display_person_web(request, user_to_display__username=None):
     data = get_personal_data(person)
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = mysite.base.view_helpers.get_notification_from_request(request)
+    data['notifications'] = mysite.base.view_helpers.get_notification_from_request(
+        request)
     data['explain_to_anonymous_users'] = True
-    data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
+    data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(
+        is_archived=True).count()
 
     return (request, 'profile/main.html', data)
 
     # }}}
 
-#FIXME: Create a separate function that just passes the data required for displaying the little user bar on the top right to the template, and leaves out all the data required for displaying the large user bar on the left.
+# FIXME: Create a separate function that just passes the data required for
+# displaying the little user bar on the top right to the template, and
+# leaves out all the data required for displaying the large user bar on
+# the left.
+
+
 def get_personal_data(person):
     # {{{
 
     # FIXME: Make this more readable.
     data_dict = {
-            'person': person,
-            'photo_url': person.get_photo_url_or_default(),
-            }
+        'person': person,
+        'photo_url': person.get_photo_url_or_default(),
+    }
 
     data_dict['tags'] = tags_dict_for_person(person)
     data_dict['tags_flat'] = dict(
-        [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
-          for key in data_dict['tags'] ])
+        [(key, ', '.join([k.text for k in data_dict['tags'][key]]))
+         for key in data_dict['tags']])
 
     data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
-    data_dict['contact_blurb'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
+    data_dict['contact_blurb'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want(
+        person.contact_blurb, person.user)
 
     data_dict['projects_i_wanna_help'] = person.projects_i_wanna_help.all()
 
     return data_dict
 
     # }}}
+
 
 def tags_dict_for_person(person):
     # {{{
@@ -169,6 +181,8 @@ def tags_dict_for_person(person):
     # }}}
 
 # FIXME: Test this.
+
+
 def widget_display_undecorated(request, user_to_display__username):
     """We leave this function unwrapped by @view """
     """so it can referenced by widget_display_string."""
@@ -184,9 +198,12 @@ def widget_display_undecorated(request, user_to_display__username):
 
 widget_display = view(widget_display_undecorated)
 
+
 def widget_display_string(request, user_to_display__username):
-    request, template, data = widget_display_undecorated(request, user_to_display__username)
+    request, template, data = widget_display_undecorated(
+        request, user_to_display__username)
     return render_to_string(template, data)
+
 
 def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
@@ -196,12 +213,13 @@ def widget_display_js(request, user_to_display__username):
     # Note: using application/javascript as suggested by
     # http://www.ietf.org/rfc/rfc4329.txt
     return render_response(request, 'base/append_ourselves.js',
-                              {'in_string': encoded_for_js},
-                              mimetype='application/javascript')
+                           {'in_string': encoded_for_js},
+                           mimetype='application/javascript')
 
 # }}}
 
 # Debtags {{{
+
 
 def add_one_debtag_to_project(project_name, tag_text):
     # {{{
@@ -210,14 +228,15 @@ def add_one_debtag_to_project(project_name, tag_text):
     project, project_created = Project.objects.get_or_create(name=project_name)
 
     tag, tag_created = Tag.objects.get_or_create(
-            text=tag_text, tag_type=tag_type)
+        text=tag_text, tag_type=tag_type)
 
     new_link = Link_Project_Tag.objects.create(
-            tag=tag, project=project,
-            source='Debtags')
+        tag=tag, project=project,
+        source='Debtags')
     new_link.save()
     return new_link
 # }}}
+
 
 def list_debtags_of_project(project_name):
     # {{{
@@ -234,19 +253,21 @@ def list_debtags_of_project(project_name):
         return []
 
     resluts = list(Link_Project_Tag.objects.filter(project=project,
-        tag__tag_type=debtags))
+                                                   tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
     # }}}
 
-def import_debtags(cooked_string = None):
+
+def import_debtags(cooked_string=None):
     # {{{
     if cooked_string is None:
         # Warning: this re-downloads the list from Alioth every time this
         # is called
         import urllib2
         import gzip
-        fd = urllib2.urlopen('http://debtags.alioth.debian.org/tags/tags-current.gz')
-        gzipped_sio = StringIO.StringIO(fd.read()) # this sucks, but I
+        fd = urllib2.urlopen(
+            'http://debtags.alioth.debian.org/tags/tags-current.gz')
+        gzipped_sio = StringIO.StringIO(fd.read())  # this sucks, but I
         # can't stream to
         # gzip.GzipFile because
         # urlopen()'s result
@@ -268,6 +289,7 @@ def import_debtags(cooked_string = None):
 
 # }}}
 
+
 def _project_hash(project_name):
     # {{{
     # This prefix is a sha256 of 1MiB of /dev/urandom
@@ -278,14 +300,17 @@ def _project_hash(project_name):
     return hashed.hexdigest()
     # }}}
 
+
 @login_required
 # this is a post handler
 def edit_person_info_do(request):
     # {{{
     person = request.user.get_profile()
 
-    edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, prefix='edit-tags')
-    contact_blurb_form = mysite.profile.forms.ContactBlurbForm(request.POST, prefix='edit-tags')
+    edit_info_form = mysite.profile.forms.EditInfoForm(
+        request.POST, prefix='edit-tags')
+    contact_blurb_form = mysite.profile.forms.ContactBlurbForm(
+        request.POST, prefix='edit-tags')
     contact_blurb_error = False
     errors_occurred = False
 
@@ -303,24 +328,24 @@ def edit_person_info_do(request):
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
-                           'studying', 'can_pitch_in', 'can_mentor'):
+                                'studying', 'can_pitch_in', 'can_mentor'):
         tag_type, _ = TagType.objects.get_or_create(name=known_tag_type_name)
 
         text = edit_info_form[known_tag_type_name].data or ''
         # Set the tags to this thing
         new_tag_texts_for_this_type_raw = text.split(',')
         new_tag_texts_for_this_type = [tag.strip()
-                for tag in new_tag_texts_for_this_type_raw]
+                                       for tag in new_tag_texts_for_this_type_raw]
         # Now figure out what tags are in the DB
         old_tag_links = Link_Person_Tag.objects.filter(
-                tag__tag_type=tag_type, person=person)
+            tag__tag_type=tag_type, person=person)
 
         # FIXME: Churn, baby churn
         for link in old_tag_links:
             link.delete()
 
         for tag_text in new_tag_texts_for_this_type:
-            if not tag_text.strip(): # Don't save blank tags.
+            if not tag_text.strip():  # Don't save blank tags.
                 continue
 
             # HACK
@@ -336,15 +361,15 @@ def edit_person_info_do(request):
             # data, as you can see, is not very healthy. But I don't think it
             # will make a difference.
             matching_tags = Tag.objects.filter(
-                    text__regex=r"^%s$" % re.escape(tag_text),
-                    tag_type=tag_type)
+                text__regex=r"^%s$" % re.escape(tag_text),
+                tag_type=tag_type)
             if matching_tags:
                 tag = matching_tags[0]
             else:
                 tag = Tag.objects.create(tag_type=tag_type, text=tag_text)
 
             new_link, _ = Link_Person_Tag.objects.get_or_create(
-                    tag=tag, person=person)
+                tag=tag, person=person)
 
     posted_contact_blurb = contact_blurb_form['contact_blurb'].data or ''
     # If their new contact blurb contains $fwd, but they don't have an  email
@@ -373,19 +398,23 @@ def edit_person_info_do(request):
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
 
+
 @login_required
 def ask_for_tag_input(request, username):
     # {{{
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
+
 def cut_list_of_people_in_three_columns(people):
-    third = len(people)/3
-    return [people[0:third], people[third:(third*2)], people[(third*2):]]
+    third = len(people) / 3
+    return [people[0:third], people[third:(third * 2)], people[(third * 2):]]
+
 
 def cut_list_of_people_in_two_columns(people):
-    half = len(people)/2
+    half = len(people) / 2
     return [people[0:half], people[half:]]
+
 
 def permanent_redirect_to_people_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
@@ -402,6 +431,7 @@ def permanent_redirect_to_people_search(request, property, value):
     destination_url = (reverse('mysite.profile.views.people') + '?' +
                        mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
+
 
 @view
 def people(request):
@@ -429,7 +459,8 @@ def people(request):
     data['people'] = everybody
 
     # Add JS-friendly version of people data to template
-    person_id_ranges = mysite.base.view_helpers.int_list2ranges([x.id for x in data['people']])
+    person_id_ranges = mysite.base.view_helpers.int_list2ranges(
+        [x.id for x in data['people']])
     person_ids = ''
     for stop, start in person_id_ranges:
         if stop == start:
@@ -439,6 +470,7 @@ def people(request):
 
     data['person_ids'] = simplejson.dumps(person_ids)
     return (request, 'profile/search_people.html', data)
+
 
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
@@ -461,38 +493,45 @@ def gimme_json_for_portfolio(request):
 
     # Citations don't naturally serialize summaries.
     citations = list(Citation.untrashed.filter(portfolio_entry__person=person))
-    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person, is_deleted=False)
+    portfolio_entries_unserialized = PortfolioEntry.objects.filter(
+        person=person, is_deleted=False)
     projects_unserialized = [p.project for p in portfolio_entries_unserialized]
 
     # Serialize citation summaries
     summaries = {}
     for c in citations:
         summaries[c.pk] = render_to_string(
-                "profile/portfolio/citation_summary.html",
-                {'citation': c})
+            "profile/portfolio/citation_summary.html",
+            {'citation': c})
 
     # FIXME: Maybe we can serialize directly to Python objects.
-    # fixme: zomg       don't recycle variable names for objs of diff types srsly u guys!
+    # fixme: zomg       don't recycle variable names for objs of diff types
+    # srsly u guys!
 
-    five_minutes_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-    recent_dias = DataImportAttempt.objects.filter(person=person, date_created__gt=five_minutes_ago)
-    recent_dias_json = simplejson.loads(serializers.serialize('json', recent_dias))
+    five_minutes_ago = datetime.datetime.utcnow() - \
+        datetime.timedelta(minutes=5)
+    recent_dias = DataImportAttempt.objects.filter(
+        person=person, date_created__gt=five_minutes_ago)
+    recent_dias_json = simplejson.loads(
+        serializers.serialize('json', recent_dias))
     portfolio_entries = simplejson.loads(serializers.serialize('json',
-        portfolio_entries_unserialized))
-    projects = simplejson.loads(serializers.serialize('json', projects_unserialized))
+                                                               portfolio_entries_unserialized))
+    projects = simplejson.loads(
+        serializers.serialize('json', projects_unserialized))
     # FIXME: Don't send like all the flippin projects down the tubes.
     citations = simplejson.loads(serializers.serialize('json', citations))
 
     recent_dias_that_are_completed = recent_dias.filter(completed=True)
     import_running = recent_dias.count() > 0 and (
-            recent_dias_that_are_completed.count() != recent_dias.count())
+        recent_dias_that_are_completed.count() != recent_dias.count())
     progress_percentage = 100
     if import_running:
-        progress_percentage = int(recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
+        progress_percentage = int(
+            recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
     import_data = {
-            'running': import_running,
-            'progress_percentage': progress_percentage,
-            }
+        'running': import_running,
+        'progress_percentage': progress_percentage,
+    }
 
     json = simplejson.dumps({
         'dias': recent_dias_json,
@@ -502,9 +541,10 @@ def gimme_json_for_portfolio(request):
         'projects': projects,
         'summaries': summaries,
         'messages': request.user.get_and_delete_messages(),
-        })
+    })
 
     return HttpResponse(json, mimetype='application/json')
+
 
 def replace_icon_with_default(request):
     "Expected postcondition: project's icon_dict says it is generic."
@@ -515,12 +555,14 @@ def replace_icon_with_default(request):
             'portfolio_entry__pk': 0
     }"""
     portfolio_entry = PortfolioEntry.objects.get(
-            pk=int(request.POST['portfolio_entry__pk']),
-            person__user=request.user)
-    # FIXME: test for naughty people trying to replace others' icons with the default!
+        pk=int(request.POST['portfolio_entry__pk']),
+        person__user=request.user)
+    # FIXME: test for naughty people trying to replace others' icons with the
+    # default!
     project = portfolio_entry.project
 
-    project_before_changes = mysite.search.models.Project.objects.get(pk=project.pk)
+    project_before_changes = mysite.search.models.Project.objects.get(
+        pk=project.pk)
 
     # make a record of the old, wrong project icon in the database
     mysite.search.models.WrongIcon.spawn_from_project(project)
@@ -537,15 +579,16 @@ def replace_icon_with_default(request):
     # email all@ letting them know that we did so
     from mysite.project.tasks import send_email_to_all_because_project_icon_was_marked_as_wrong
     send_email_to_all_because_project_icon_was_marked_as_wrong.delay(
-            project__pk=project_before_changes.pk,
-            project__name=project_before_changes.name,
-            project_icon_url=wrong_icon_url)
+        project__pk=project_before_changes.pk,
+        project__name=project_before_changes.name,
+        project_icon_url=wrong_icon_url)
 
     # prepare output
     data = {}
     data['success'] = True
     data['portfolio_entry__pk'] = portfolio_entry.pk
     return mysite.base.view_helpers.json_response(data)
+
 
 @login_required
 @csrf_exempt
@@ -564,10 +607,12 @@ def prepare_data_import_attempts_do(request):
     # {{{
 
     # For each commit identifier, prepare some DataImportAttempts.
-    prepare_data_import_attempts(identifiers=request.POST.values(), user=request.user)
+    prepare_data_import_attempts(
+        identifiers=request.POST.values(), user=request.user)
 
     return HttpResponse('1')
     # }}}
+
 
 def prepare_data_import_attempts(identifiers, user):
     "Enqueue and track importation tasks."
@@ -580,18 +625,19 @@ def prepare_data_import_attempts(identifiers, user):
 
     # Side-effects: Create DIAs that a user might want to execute.
     for identifier in identifiers:
-        if identifier.strip(): # Skip blanks or whitespace
+        if identifier.strip():  # Skip blanks or whitespace
             for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
                 dia = DataImportAttempt(
-                        query=identifier,
-                        source=source_key,
-                        person=user.get_profile())
+                    query=identifier,
+                    source=source_key,
+                    person=user.get_profile())
                 dia.save()
                 dia.do_what_it_says_on_the_tin()
 
+
 @login_required
 @view
-def importer(request, test_js = False):
+def importer(request, test_js=False):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
@@ -601,7 +647,8 @@ def importer(request, test_js = False):
     # This is used to create a blank 'Add another record' form, which is printed
     # to the bottom of the importer page. The HTML underlying this form is used
     # to generate forms dynamically.
-    data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm(auto_id=False)
+    data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm(
+        auto_id=False)
 
     # This variable is checked in base/templates/base/base.html
     data['test_js'] = test_js or request.GET.get('test', None)
@@ -609,11 +656,13 @@ def importer(request, test_js = False):
     return (request, 'profile/importer.html', data)
     # }}}
 
-#FIXME: Rename importer
+# FIXME: Rename importer
 portfolio_editor = importer
+
 
 def portfolio_editor_test(request):
     return portfolio_editor(request, test_js=True)
+
 
 def filter_by_key_prefix(dict, prefix):
     """Return those and only those items in a dictionary whose keys have the given prefix."""
@@ -622,6 +671,7 @@ def filter_by_key_prefix(dict, prefix):
         if key.startswith(prefix):
             out_dict[key] = value
     return out_dict
+
 
 @login_required
 def user_selected_these_dia_checkboxes(request):
@@ -644,8 +694,8 @@ def user_selected_these_dia_checkboxes(request):
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
                 dia = DataImportAttempt(
-                        identifier, source_key,
-                        request.user.get_profile())
+                    identifier, source_key,
+                    request.user.get_profile())
                 dia.person_wants_data = True
                 dia.save()
                 dia.do_what_it_says_on_the_tin()
@@ -657,6 +707,7 @@ def user_selected_these_dia_checkboxes(request):
 
     return HttpResponse('1')
     # }}}
+
 
 @login_required
 @view
@@ -692,6 +743,7 @@ def display_person_edit_name_do(request):
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
     # }}}
 
+
 @login_required
 def publish_citation_do(request):
     try:
@@ -700,7 +752,8 @@ def publish_citation_do(request):
         return HttpResponse("0")
 
     try:
-        c = Citation.objects.get(pk=pk, portfolio_entry__person__user=request.user)
+        c = Citation.objects.get(
+            pk=pk, portfolio_entry__person__user=request.user)
     except Citation.DoesNotExist:
         return HttpResponse("0")
 
@@ -708,6 +761,7 @@ def publish_citation_do(request):
     c.save()
 
     return HttpResponse("1")
+
 
 @login_required
 def delete_citation_do(request):
@@ -717,7 +771,8 @@ def delete_citation_do(request):
         return HttpResponse("0")
 
     try:
-        c = Citation.objects.get(pk=pk, portfolio_entry__person__user=request.user)
+        c = Citation.objects.get(
+            pk=pk, portfolio_entry__person__user=request.user)
     except Citation.DoesNotExist:
         return HttpResponse("0")
 
@@ -725,6 +780,7 @@ def delete_citation_do(request):
     c.save()
 
     return HttpResponse("1")
+
 
 @login_required
 def delete_portfolio_entry_do(request):
@@ -742,8 +798,8 @@ def delete_portfolio_entry_do(request):
     p.save()
 
     return mysite.base.view_helpers.json_response({
-            'success': True,
-            'portfolio_entry__pk': pk})
+        'success': True,
+        'portfolio_entry__pk': pk})
 
 
 @login_required
@@ -751,14 +807,16 @@ def save_portfolio_entry_do(request):
     pk = request.POST.get('portfolio_entry__pk', 'undefined')
 
     if pk == 'undefined':
-        project, _ = Project.objects.get_or_create(name=request.POST['project_name'])
+        project, _ = Project.objects.get_or_create(
+            name=request.POST['project_name'])
         p = PortfolioEntry(project=project, person=request.user.get_profile())
     else:
         p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
     p.project_description = request.POST['project_description']
     p.experience_description = request.POST['experience_description']
     p.receive_maintainer_updates = \
-        request.POST['receive_maintainer_updates'].lower() not in ('false', '0')
+        request.POST['receive_maintainer_updates'].lower() not in (
+            'false', '0')
     p.is_published = True
     p.save()
 
@@ -769,17 +827,19 @@ def save_portfolio_entry_do(request):
         c.save()
 
     return mysite.base.view_helpers.json_response({
-            'success': True,
-            'pf_entry_element_id': request.POST['pf_entry_element_id'],
-            'project__pk': p.project_id,
-            'portfolio_entry__pk': p.pk
-        })
+        'success': True,
+        'pf_entry_element_id': request.POST['pf_entry_element_id'],
+        'project__pk': p.project_id,
+        'portfolio_entry__pk': p.pk
+    })
+
 
 @login_required
 def dollar_username(request):
     return HttpResponseRedirect(reverse(display_person_web,
-		kwargs={'user_to_display__username':
-                request.user.username}))
+                                        kwargs={'user_to_display__username':
+                                                request.user.username}))
+
 
 @login_required
 def set_expand_next_steps_do(request):
@@ -795,6 +855,7 @@ def set_expand_next_steps_do(request):
 
     return HttpResponseRedirect(person.profile_url)
 
+
 @login_required
 @view
 def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_blurb_form=None, has_errors=False):
@@ -803,25 +864,27 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['info_edit_mode'] = True
     if edit_info_form is None:
         edit_info_form = mysite.profile.forms.EditInfoForm(initial={
-          'bio': person.bio,
-          'homepage_url': person.homepage_url,
-          'irc_nick': person.irc_nick,
-          'understands': data['tags_flat'].get('understands', ''),
-          'understands_not': data['tags_flat'].get('understands_not', ''),
-          'studying': data['tags_flat'].get('studying', ''),
-          'can_pitch_in': data['tags_flat'].get('can_pitch_in', ''),
-          'can_mentor': data['tags_flat'].get('can_mentor', ''),
+            'bio': person.bio,
+            'homepage_url': person.homepage_url,
+            'irc_nick': person.irc_nick,
+            'understands': data['tags_flat'].get('understands', ''),
+            'understands_not': data['tags_flat'].get('understands_not', ''),
+            'studying': data['tags_flat'].get('studying', ''),
+            'can_pitch_in': data['tags_flat'].get('can_pitch_in', ''),
+            'can_mentor': data['tags_flat'].get('can_mentor', ''),
         }, prefix='edit-tags')
     if contact_blurb_form is None:
         contact_blurb_form = mysite.profile.forms.ContactBlurbForm(initial={
-          'contact_blurb': person.contact_blurb,
+            'contact_blurb': person.contact_blurb,
         }, prefix='edit-tags')
     data['form'] = edit_info_form
     data['contact_blurb_form'] = contact_blurb_form
     data['contact_blurb_error'] = contact_blurb_error
-    data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
+    data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want(
+        "$fwd", person.user)
     data['has_errors'] = has_errors
     return request, 'profile/info_wrapper.html', data
+
 
 @login_required
 def set_pfentries_dot_use_my_description_do(request):
@@ -831,31 +894,37 @@ def set_pfentries_dot_use_my_description_do(request):
     for pfe_pk in pfe_pks:
         pfe_before_save = PortfolioEntry.objects.get(pk=pfe_pk)
         form = Form(request.POST,
-                instance=pfe_before_save,
-                prefix=str(pfe_pk))
+                    instance=pfe_before_save,
+                    prefix=str(pfe_pk))
         if form.is_valid():
             pfe_after_save = form.save()
             logging.info("Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" % (
                 request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
     return HttpResponseRedirect(project.get_url())
 
+
 @view
 def unsubscribe(request, token_string):
     context = {'unsubscribe_this_user':
-            mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string),
-            'token_string': token_string}
+               mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+                   token_string),
+               'token_string': token_string}
     return (request, 'unsubscribe.html', context)
+
 
 def unsubscribe_do(request):
     token_string = request.POST.get('token_string', None)
-    person = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string)
+    person = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+        token_string)
     person.email_me_re_projects = False
     person.save()
     return HttpResponseRedirect(reverse(unsubscribe, kwargs={'token_string': token_string}))
 
+
 @login_required
 def bug_recommendation_list_as_template_fragment(request):
-    suggested_searches = request.user.get_profile().get_recommended_search_terms()
+    suggested_searches = request.user.get_profile(
+    ).get_recommended_search_terms()
     recommender = mysite.profile.view_helpers.RecommendBugs(
         suggested_searches, n=5)
     recommended_bugs = list(recommender.recommend())
@@ -865,23 +934,27 @@ def bug_recommendation_list_as_template_fragment(request):
     if recommended_bugs:
         response_data['result'] = 'OK'
         template_path = 'base/recommended_bugs_content.html'
-        context = RequestContext(request, { 'recommended_bugs': recommended_bugs })
+        context = RequestContext(
+            request, {'recommended_bugs': recommended_bugs})
         response_data['html'] = render_to_string(template_path, context)
     else:
         response_data['result'] = 'NO_BUGS'
 
     return HttpResponse(simplejson.dumps(response_data), mimetype='application/json')
 
-### API-y views go below here
+# API-y views go below here
+
+
 class LocationDataApiView(django.views.generic.View):
-    ### Entry point for requests from the web
+    # Entry point for requests from the web
+
     def get(self, request):
         person_ids = self.extract_person_ids(request.GET)
         data_dict = self.raw_data_for_person_ids(person_ids)
         as_json = simplejson.dumps(data_dict)
         return HttpResponse(as_json, mimetype='application/javascript')
 
-    ### Helper functions
+    # Helper functions
     @staticmethod
     def raw_data_for_person_ids(person_ids):
         persons = mysite.profile.models.Person.objects.filter(
@@ -891,8 +964,9 @@ class LocationDataApiView(django.views.generic.View):
     @staticmethod
     def raw_data_for_person_collection(people):
         person_id2data = dict([
-                (person.pk, LocationDataApiView.raw_data_for_one_person(person))
-                for person in people])
+            (person.pk,
+             LocationDataApiView.raw_data_for_one_person(person))
+            for person in people])
         return person_id2data
 
     @staticmethod
@@ -902,12 +976,12 @@ class LocationDataApiView(django.views.generic.View):
         ret = {
             'name': name,
             'location': location,
-            }
+        }
         ret['lat_long_data'] = {
             'is_inaccessible': (location == mysite.profile.models.DEFAULT_LOCATION),
             'latitude': person.get_public_latitude_or_default(),
             'longitude': person.get_public_longitude_or_default(),
-            }
+        }
         extra_person_info = {'username': person.user.username,
                              'photo_thumbnail_url': person.get_photo_url_or_default(),
                              }

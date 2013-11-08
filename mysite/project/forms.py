@@ -18,14 +18,18 @@ import django.forms
 import mysite.search.models
 import mysite.profile.models
 
+
 class WannaHelpForm(django.forms.Form):
-    project = django.forms.ModelChoiceField(mysite.search.models.Project.objects.all())
+    project = django.forms.ModelChoiceField(
+        mysite.search.models.Project.objects.all())
     from_offsite = django.forms.BooleanField(required=False)
+
 
 class MarkContactedForm(django.forms.Form):
     project_id = django.forms.IntegerField(widget=django.forms.HiddenInput())
     person_id = django.forms.IntegerField(widget=django.forms.HiddenInput())
-    checked = django.forms.BooleanField(label="Mark person as contacted", required=True)
+    checked = django.forms.BooleanField(
+        label="Mark person as contacted", required=True)
 
     # We are avoiding the use of ModelChoiceField.
     #
@@ -35,16 +39,17 @@ class MarkContactedForm(django.forms.Form):
     def clean_project_id(self):
         value = self.cleaned_data['project_id']
         if mysite.search.models.Project.objects.filter(
-            id=value):
+                id=value):
             return value
         raise django.forms.ValidationError, "Invalid project ID."
 
     def clean_person_id(self):
         value = self.cleaned_data['person_id']
         if mysite.profile.models.Person.objects.filter(
-            id=value).count():
+                id=value).count():
             return value
         raise django.forms.ValidationError, "Invalid person ID."
+
 
 class ProjectForm(django.forms.ModelForm):
 
@@ -54,14 +59,17 @@ class ProjectForm(django.forms.ModelForm):
 
         # Only save if nothing but capitalization was changed
         if (proposed_name.lower() != self.instance.name.lower()):
-            raise django.forms.ValidationError("You can only make changes to the capitalization of the name.")
+            raise django.forms.ValidationError(
+                "You can only make changes to the capitalization of the name.")
         return proposed_name
 
     def clean_language(self):
         lang = self.cleaned_data['language']
 
-        # Try to use the capitalization of a language already assigned to a project
-        matching_projects = mysite.search.models.Project.objects.filter(language__iexact=lang)
+        # Try to use the capitalization of a language already assigned to a
+        # project
+        matching_projects = mysite.search.models.Project.objects.filter(
+            language__iexact=lang)
         if matching_projects:
             return matching_projects[0].language
         return lang

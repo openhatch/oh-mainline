@@ -19,6 +19,7 @@ import mysite.profile.view_helpers
 import mysite.project.view_helpers
 import staticgenerator.middleware
 
+
 def get_user_ip(request):
 #    return request.META['REMOTE_ADDR']
     if request.META['REMOTE_ADDR'] == '127.0.0.1':
@@ -26,14 +27,16 @@ def get_user_ip(request):
     else:
         return request.META['REMOTE_ADDR']
 
+
 class HandleWannaHelpQueue(object):
+
     def process_request(self, request):
         if not hasattr(request, 'user') or not hasattr(request, 'session'):
             return None
 
         if (hasattr(request, 'user') and
             request.user.is_authenticated() and
-            'wanna_help_queue_handled' not in request.session):
+                'wanna_help_queue_handled' not in request.session):
             mysite.project.view_helpers.flush_session_wanna_help_queue_into_database(
                 request.user, request.session)
             request.session['wanna_help_queue_handled'] = True
@@ -43,21 +46,26 @@ class HandleWannaHelpQueue(object):
 class DetectLogin(object):
     # called every time a page is gotten
     # Checks for work that should be done at login time
+
     def process_response(self, request, response):
         if not hasattr(request, 'user') or not hasattr(request, 'session'):
             return response
 
         if request.user.is_authenticated() and 'post_login_stuff_run' not in request.session:
-            mysite.project.view_helpers.take_control_of_our_answers(request.user, request.session)
+            mysite.project.view_helpers.take_control_of_our_answers(
+                request.user, request.session)
             request.session['post_login_stuff_run'] = True
         return response
 
+
 class StaticGeneratorMiddlewareOnlyWhenAnonymous(object):
+
     '''This is a wrapper around
     staticgenerator.middleware.StaticGeneratorMiddleware that only saves to the
     cache when request.user.is_authenticated() is False.
 
     We never want to do static generation for when people are logged in.'''
+
     def process_response(self, request, response):
         # If somehow the request has no 'user' attribute, bail.
         if not hasattr(request, 'user'):

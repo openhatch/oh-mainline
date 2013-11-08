@@ -45,9 +45,10 @@ import cgi
 import logging
 import hashlib
 
-DEFAULT_LOCATION='Inaccessible Island'
-DEFAULT_LATITUDE=-37.3049962
-DEFAULT_LONGITUDE=-12.6790445
+DEFAULT_LOCATION = 'Inaccessible Island'
+DEFAULT_LATITUDE = -37.3049962
+DEFAULT_LONGITUDE = -12.6790445
+
 
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
@@ -60,17 +61,20 @@ def url2printably_short(url, CUTOFF=50):
         # Logic: If this URL piece is longer than CUTOFF, then stop appending
         # and return.
         if len(url_piece) > CUTOFF:
-            url_piece = url_piece[:CUTOFF-3] + '...'
+            url_piece = url_piece[:CUTOFF - 3] + '...'
             die_next = True
         # always append
         short_enough_pieces_so_far.append(url_piece)
     return '/'.join(short_enough_pieces_so_far)
 
+
 def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
     return random_uuid.hex + suffix
 
+
 class RepositoryCommitter(models.Model):
+
     """Ok, so we need to keep track of repository committers, e.g.
         paulproteus@fspot
     That's because when a user says, 'oy, this data you guys imported isn't
@@ -89,7 +93,9 @@ class RepositoryCommitter(models.Model):
     class Meta:
         unique_together = ('project', 'data_import_attempt')
 
+
 class Person(models.Model):
+
     """ A human bean. """
     # {{{
     homepage_url = models.URLField(default="", blank=True)
@@ -105,22 +111,26 @@ class Person(models.Model):
                               generate_person_photo_path(a, b),
                               default='')
     photo_thumbnail = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b, suffix="-thumbnail"),
-                              default='',
-                              null=True)
+                                        lambda a, b: 'static/photos/profile-photos/' +
+                                        generate_person_photo_path(
+                                            a, b, suffix="-thumbnail"),
+                                        default='',
+                                        null=True)
 
     photo_thumbnail_30px_wide = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b, suffix="-thumbnail-30px-wide"),
-                              default='', null=True)
+                                                  lambda a, b: 'static/photos/profile-photos/' +
+                                                  generate_person_photo_path(
+                                                      a, b, suffix="-thumbnail-30px-wide"),
+                                                  default='', null=True)
 
     photo_thumbnail_20px_wide = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b, suffix="-thumbnail-20px-wide"),
-                              default='', null=True)
+                                                  lambda a, b: 'static/photos/profile-photos/' +
+                                                  generate_person_photo_path(
+                                                      a, b, suffix="-thumbnail-20px-wide"),
+                                                  default='', null=True)
 
-    blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
+    blacklisted_repository_committers = models.ManyToManyField(
+        RepositoryCommitter)
     dont_guess_my_location = models.BooleanField(default=False)
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
@@ -129,7 +139,7 @@ class Person(models.Model):
     latitude = models.FloatField(null=False, default=-37.3049962)
     longitude = models.FloatField(null=False, default=-12.6790445)
     email_me_re_projects = models.BooleanField(default=True,
-            verbose_name='Email me periodically about activity in my projects')
+                                               verbose_name='Email me periodically about activity in my projects')
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
 
@@ -192,7 +202,7 @@ class Person(models.Model):
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
-                self.user.first_name, self.user.last_name)
+                                              self.user.first_name, self.user.last_name)
 
     def get_photo_url_or_default(self):
         try:
@@ -210,7 +220,7 @@ class Person(models.Model):
         session_wrapper = session_engine.SessionStore(session_key)
         user_id = session_wrapper.get(SESSION_KEY)
         auth_backend = load_backend(
-                session_wrapper.get(BACKEND_SESSION_KEY))
+            session_wrapper.get(BACKEND_SESSION_KEY))
 
         if user_id and auth_backend:
             return Person.objects.get(user=auth_backend.get_user(user_id))
@@ -282,7 +292,7 @@ class Person(models.Model):
         # if you change this method, be sure to increment the version number in
         # the cache key above
         return list(self.get_published_portfolio_entries().values_list(
-                'project__name', flat=True).distinct())
+            'project__name', flat=True).distinct())
 
     def get_cache_key_for_projects(self):
         return 'projects_for_person_with_pk_%d_v4' % self.pk
@@ -290,7 +300,7 @@ class Person(models.Model):
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_display_names_of_nonarchived_projects(self):
         return list(self.get_nonarchived_published_portfolio_entries().values_list(
-                'project__display_name', flat=True).distinct())
+            'project__display_name', flat=True).distinct())
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -319,8 +329,8 @@ class Person(models.Model):
 
         # Add terms based on projects in citations
         terms.extend(
-                [pfe.project.name for pfe in self.get_published_portfolio_entries()
-                    if pfe.project.name and pfe.project.name.strip()])
+            [pfe.project.name for pfe in self.get_published_portfolio_entries()
+             if pfe.project.name and pfe.project.name.strip()])
 
         # Add terms based on tags
         terms.extend([tag.text for tag in self.get_tags_for_recommendations()])
@@ -337,7 +347,7 @@ class Person(models.Model):
 
     def get_published_citations_flat(self):
         return sum([list(pfe.get_published_citations())
-            for pfe in self.get_published_portfolio_entries()], [])
+                    for pfe in self.get_published_portfolio_entries()], [])
 
     def get_tag_texts_cache_key(self):
         return 'tag_texts_for_person_with_pk_%d_v2' % self.pk
@@ -345,10 +355,14 @@ class Person(models.Model):
     @mysite.base.decorators.cache_method('get_tag_texts_cache_key')
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
-        my_tag_texts = Tag.objects.filter(link_person_tag__person=self).extra(select={'lowername': 'LOWER(text)'})
-        without_irrelevant_tags = my_tag_texts.exclude(tag_type__name__in=['understands_not', 'studying'])
-        just_distinct_lowername = without_irrelevant_tags.values('lowername').distinct().order_by('lowername')
-        text_and_lower = just_distinct_lowername.values_list('lowername', 'text')
+        my_tag_texts = Tag.objects.filter(link_person_tag__person=self).extra(
+            select={'lowername': 'LOWER(text)'})
+        without_irrelevant_tags = my_tag_texts.exclude(
+            tag_type__name__in=['understands_not', 'studying'])
+        just_distinct_lowername = without_irrelevant_tags.values(
+            'lowername').distinct().order_by('lowername')
+        text_and_lower = just_distinct_lowername.values_list(
+            'lowername', 'text')
         lower_set_so_far = set()
         ret = []
         for (lower, text) in text_and_lower:
@@ -387,7 +401,8 @@ class Person(models.Model):
     def get_full_name_with_nbsps(self):
         full_name = self.get_full_name()
         full_name_escaped = cgi.escape(full_name)
-        full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
+        full_name_escaped_with_nbsps = re.sub(
+            "\s+", "&nbsp;", full_name_escaped)
         return full_name_escaped_with_nbsps
 
     def get_full_name_or_username(self):
@@ -395,9 +410,10 @@ class Person(models.Model):
 
     def get_full_name_and_username(self):
         full_name_start = ("%s (" % self.get_full_name()
-                if self.user.first_name or self.user.last_name
-                else "")
-        full_name_end = (")" if self.user.first_name or self.user.last_name else "")
+                           if self.user.first_name or self.user.last_name
+                           else "")
+        full_name_end = (
+            ")" if self.user.first_name or self.user.last_name else "")
         return "%s%s%s" % (full_name_start, self.user.username, full_name_end)
 
     def generate_thumbnail_from_photo(self):
@@ -418,14 +434,17 @@ class Person(models.Model):
             self.photo_thumbnail_20px_wide.save('', ContentFile(scaled_down))
 
     def get_collaborators_for_landing_page(self, n=9):
-        projects = set([e.project for e in self.get_published_portfolio_entries()])
+        projects = set(
+            [e.project for e in self.get_published_portfolio_entries()])
         infinity = 10000
         collaborator_lists = []
         for project in projects:
-            people = project.get_n_other_contributors_than(n=infinity, person=self)
+            people = project.get_n_other_contributors_than(
+                n=infinity, person=self)
             people = random.sample(people, min(n, len(people)))
             collaborator_lists.append(people)
-        round_robin = mysite.profile.view_helpers.roundrobin(*collaborator_lists)
+        round_robin = mysite.profile.view_helpers.roundrobin(
+            *collaborator_lists)
         collaborators = set()
         while len(collaborators) < n:
             try:
@@ -433,13 +452,14 @@ class Person(models.Model):
             except StopIteration:
                 break
         collaborators = list(collaborators)
-        random.shuffle(collaborators) # don't forget, this has a side effect and returns None
+        # don't forget, this has a side effect and returns None
+        random.shuffle(collaborators)
         return collaborators
 
     @property
     def profile_url(self):
         return reverse(mysite.profile.views.display_person_web,
-                kwargs={'user_to_display__username': self.user.username})
+                       kwargs={'user_to_display__username': self.user.username})
 
     @staticmethod
     def get_by_username(username):
@@ -473,6 +493,7 @@ class Person(models.Model):
 
     # }}}
 
+
 def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
     """Post-save hook for Users. raw is populated from kwargs.
     See Django docs on Signals:
@@ -481,6 +502,7 @@ def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
         person, p_created = Person.objects.get_or_create(user=instance)
 
 models.signals.post_save.connect(create_profile_when_user_created, User)
+
 
 class DataImportAttempt(models.Model):
     # {{{
@@ -492,7 +514,7 @@ class DataImportAttempt(models.Model):
         ('ga', "Github"),
         ('db', "Debian"),
         ('bb', "Bitbucket")
-        )
+    )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
     source = models.CharField(max_length=2,
@@ -500,8 +522,8 @@ class DataImportAttempt(models.Model):
     person = models.ForeignKey(Person)
     query = models.CharField(max_length=200)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    web_response = models.ForeignKey(mysite.customs.models.WebResponse, 
-                                     null=True) # null=True for
+    web_response = models.ForeignKey(mysite.customs.models.WebResponse,
+                                     null=True)  # null=True for
     # now, so the migration doesn't cause data validation errors
 
     def get_formatted_source_description(self):
@@ -536,14 +558,18 @@ Scenario B.
 * The marking method attaches the projects to the user
 '''
 
+
 def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
     if not instance.query.strip():
         raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
 
+
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
     instance.project.update_cached_contributor_count_and_save()
 
-models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
+models.signals.pre_save.connect(
+    reject_when_query_is_only_whitespace, sender=DataImportAttempt)
+
 
 class TagType(models.Model):
     # {{{
@@ -558,6 +584,7 @@ class TagType(models.Model):
         return self.name
 
     # }}}
+
 
 class Tag(models.Model):
     # {{{
@@ -577,7 +604,9 @@ class Tag(models.Model):
         return "%s: %s" % (self.tag_type.name, self.text)
     # }}}
 
+
 class Link_Project_Tag(models.Model):
+
     "Many-to-many relation between Projects and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
@@ -585,7 +614,9 @@ class Link_Project_Tag(models.Model):
     source = models.CharField(max_length=200)
     # }}}
 
+
 class Link_Person_Tag(models.Model):
+
     "Many-to-many relation between Person and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
@@ -593,26 +624,33 @@ class Link_Person_Tag(models.Model):
     source = models.CharField(max_length=200)
     # }}}
 
+
 class SourceForgePerson(models.Model):
+
     '''A person in SourceForge.'''
     # FIXME: Make this unique
     username = models.CharField(max_length=200)
 
+
 class SourceForgeProject(models.Model):
+
     '''A project in SourceForge.'''
     # FIXME: Make this unique
     unixname = models.CharField(max_length=200)
 
+
 class Link_SF_Proj_Dude_FM(models.Model):
+
     '''Link from SourceForge Project to Person, via FlossMOLE'''
-    person  = models.ForeignKey(SourceForgePerson)
+    person = models.ForeignKey(SourceForgePerson)
     project = models.ForeignKey(SourceForgeProject)
     is_admin = models.BooleanField(default=False)
     position = models.CharField(max_length=200)
     date_collected = models.DateTimeField()
+
     class Meta:
         unique_together = [
-            ('person', 'project'),]
+            ('person', 'project'), ]
 
     @staticmethod
     def create_from_flossmole_row_data(dev_loginname, proj_unixname, is_admin,
@@ -627,7 +665,7 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                               proj_unixname)
         is_admin = bool(int(is_admin))
         date_collected = datetime.datetime.strptime(
-            date_collected, '%Y-%m-%d %H:%M:%S') # no time zone
+            date_collected, '%Y-%m-%d %H:%M:%S')  # no time zone
         return Link_SF_Proj_Dude_FM.objects.get_or_create(
             person=person, project=project, is_admin=is_admin,
             position=position, date_collected=date_collected)
@@ -639,23 +677,28 @@ class Link_SF_Proj_Dude_FM(models.Model):
             return None
         if row.startswith('dev_loginname'):
             return None
-        person, proj_unixname, is_admin, position, date_collected = row.split('\t')
+        person, proj_unixname, is_admin, position, date_collected = row.split(
+            '\t')
         return Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(person,
-                                                   proj_unixname,
-                                                   is_admin, position,
-                                                   date_collected)
+                                                                   proj_unixname,
+                                                                   is_admin, position,
+                                                                   date_collected)
+
 
 class PublishedPortfolioEntries(models.Manager):
+
     def get_query_set(self):
         return super(PublishedPortfolioEntries, self).get_query_set().filter(
-                is_deleted=False, is_published=True)
+            is_deleted=False, is_published=True)
+
 
 class PortfolioEntry(models.Model):
     # Managers
     objects = models.Manager()
     published_ones = PublishedPortfolioEntries()
 
-    # FIXME: Constrain this so (person, project) pair uniquely finds a PortfolioEntry
+    # FIXME: Constrain this so (person, project) pair uniquely finds a
+    # PortfolioEntry
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
     project_description = models.TextField(blank=True)
@@ -670,12 +713,12 @@ class PortfolioEntry(models.Model):
 
     def get_published_citations(self):
         return Citation.untrashed.filter(portfolio_entry=self,
-                is_published=True)
+                                         is_published=True)
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = { 'project_description':
-                "DESCRIPTION-----------------------------" + uuid.uuid4().hex }
+        data = {'project_description':
+                "DESCRIPTION-----------------------------" + uuid.uuid4().hex}
         data.update(kwargs)
         ret = PortfolioEntry(**data)
         ret.save()
@@ -692,21 +735,25 @@ class PortfolioEntry(models.Model):
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 
+
 class UntrashedCitationManager(models.Manager):
+
     def get_query_set(self):
         return super(UntrashedCitationManager, self).get_query_set().filter(
 
-                # Was the citation superseded by a previously imported equivalent?
-                ignored_due_to_duplicate=False,
+            # Was the citation superseded by a previously imported
+            # equivalent?
+            ignored_due_to_duplicate=False,
 
-                # Was the citation deleted?
-                is_deleted=False,
+            # Was the citation deleted?
+            is_deleted=False,
 
-                # Was its portfolio entry deleted?
-                portfolio_entry__is_deleted=False)
+            # Was its portfolio entry deleted?
+            portfolio_entry__is_deleted=False)
+
 
 class Citation(models.Model):
-    portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
+    portfolio_entry = models.ForeignKey(PortfolioEntry)  # [0]
     url = models.URLField(null=True, verbose_name="URL")
     contributor_role = models.CharField(max_length=200, null=True)
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
@@ -714,7 +761,7 @@ class Citation(models.Model):
     languages = models.CharField(max_length=200, null=True)
     first_commit_time = models.DateTimeField(null=True)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    is_published = models.BooleanField(default=False) # unpublished == Unread
+    is_published = models.BooleanField(default=False)  # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
     ignored_due_to_duplicate = models.BooleanField(default=False)
     old_summary = models.TextField(null=True, default=None)
@@ -734,31 +781,31 @@ class Citation(models.Model):
 
         if self.data_import_attempt:
             if self.data_import_attempt.source == 'db' and (
-                self.contributor_role == 'Maintainer'):
+                    self.contributor_role == 'Maintainer'):
                 return 'Maintain a package in Debian.'
             if self.data_import_attempt.source == 'db' and (
-                self.contributor_role.startswith('Maintainer of')):
+                    self.contributor_role.startswith('Maintainer of')):
                 return self.contributor_role
             if self.data_import_attempt.source in ('gh', 'ga'):
                 return '%s a repository on Github.' % self.contributor_role
             if self.data_import_attempt.source in ['rs', 'ou']:
                 if not self.languages:
                     return "Committed to codebase (%s)" % (
-                            self.data_import_attempt.get_source_display(),
-                            )
+                        self.data_import_attempt.get_source_display(),
+                    )
                 if self.distinct_months is None:
                     raise ValueError, "Er, Ohloh always gives us a # of months."
                 return "Coded for %d month%s in %s (%s)" % (
-                        self.distinct_months,
-                        suffix,
-                        self.languages,
-                        self.data_import_attempt.get_source_display(),
-                        )
+                    self.distinct_months,
+                    suffix,
+                    self.languages,
+                    self.data_import_attempt.get_source_display(),
+                )
             elif self.data_import_attempt.source == 'lp':
                 return "Participated in %s (%s)" % (
                     self.contributor_role,
                     self.data_import_attempt.get_source_display()
-                    )
+                )
             elif self.data_import_attempt.source == 'bb':
                     return "Created a repository on Bitbucket."
             else:
@@ -767,12 +814,13 @@ class Citation(models.Model):
             return url2printably_short(self.url, CUTOFF=38)
         elif self.distinct_months is not None and self.languages is not None:
             return "Coded for %d month%s in %s." % (
-                    self.distinct_months,
-                    suffix,
-                    self.languages,
-                    )
+                self.distinct_months,
+                suffix,
+                self.languages,
+            )
 
-        raise ValueError("There's no DIA and I don't know how to summarize this.")
+        raise ValueError(
+            "There's no DIA and I don't know how to summarize this.")
 
     def get_languages_as_list(self):
         if self.languages is None:
@@ -786,22 +834,26 @@ class Citation(models.Model):
             if self.data_import_attempt:
                 if self.data_import_attempt.source in ['rs', 'ou']:
                     try:
-                        project_name = unicode(self.portfolio_entry.project.name, 'utf-8')
+                        project_name = unicode(
+                            self.portfolio_entry.project.name, 'utf-8')
                         return "http://www.ohloh.net/search?%s" % mysite.base.unicode_sanity.urlencode(
-                            {u'q': project_name })
+                            {u'q': project_name})
                     except:
-                        logging.warn("During Citation.get_url_or_guess, we failed to encode the project name correctly.")
-                        # This is just a temporary workaround since the above line was causing errors.
+                        logging.warn(
+                            "During Citation.get_url_or_guess, we failed to encode the project name correctly.")
+                        # This is just a temporary workaround since the above
+                        # line was causing errors.
                         return "http://www.ohloh.net/search?q=%s" % self.portfolio_entry.project.name
                 elif self.data_import_attempt.source == 'lp':
                     return "https://launchpad.net/~%s" % urllib.quote(
-                            self.data_import_attempt.query)
+                        self.data_import_attempt.query)
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.
         duplicates = [citation for citation in
-                Citation.objects.filter(portfolio_entry=self.portfolio_entry)
-                if (citation.pk != self.pk) and (citation.summary == self.summary)]
+                      Citation.objects.filter(
+                          portfolio_entry=self.portfolio_entry)
+                      if (citation.pk != self.pk) and (citation.summary == self.summary)]
 
         if duplicates:
             self.ignored_due_to_duplicate = True
@@ -816,15 +868,19 @@ class Citation(models.Model):
             pk = 'unassigned'
         return "pk=%s, summary=%s" % (pk, self.summary)
 
+
 class Forwarder(models.Model):
     user = models.ForeignKey(User)
     address = models.TextField()
     expires_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
-    stops_being_listed_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    stops_being_listed_on = models.DateTimeField(
+        default=datetime.datetime(1970, 1, 1))
     # note about the above: for 3 days, 2 forwarders for the same user work.
     # at worst, you visit someone's profile and find a forwarder that works for 3 more days
     # at best, you visit someone's profile and find a forwarder that works for 5 more days
-    # at worst, we run a postfixifying celery job once every two days for each user
+    # at worst, we run a postfixifying celery job once every two days for each
+    # user
+
     def generate_table_line(self):
         line = '%s %s' % (self.get_email_address(), self.user.email)
         return line
@@ -854,8 +910,8 @@ class Forwarder(models.Model):
             stops_being_listed_on__gt=now).values_list('user__id', flat=True)
 
         user_ids_needing_regeneration = (set(
-                user_ids_that_need_forwarders).difference(
-                set(user_ids_with_up_to_date_forwarders)))
+            user_ids_that_need_forwarders).difference(
+            set(user_ids_with_up_to_date_forwarders)))
         users_needing_regeneration = [User.objects.get(pk=pk)
                                       for pk in user_ids_needing_regeneration]
         for user in users_needing_regeneration:
@@ -873,16 +929,21 @@ class Forwarder(models.Model):
                 lines.append(line)
         return lines
 
+
 class UnsubscribeToken(mysite.search.models.OpenHatchModel):
-    string = models.CharField(null=False, blank=False, unique=True, max_length=255)
+    string = models.CharField(
+        null=False, blank=False, unique=True, max_length=255)
     owner = models.ForeignKey(Person)
+
     @staticmethod
     def whose_token_string_is_this(string):
         try:
-            expiry_date = datetime.datetime.utcnow() - datetime.timedelta(days=90)
+            expiry_date = datetime.datetime.utcnow() - \
+                datetime.timedelta(days=90)
             return UnsubscribeToken.objects.get(string=string, created_date__gte=expiry_date).owner
         except UnsubscribeToken.DoesNotExist:
             return None
+
 
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_person_tag_cache
@@ -891,27 +952,36 @@ def update_link_person_tag_cache(sender, instance, **kwargs):
     except Person.DoesNotExist:
         return
     update_person_tag_cache.delay(person__pk=person__pk)
-    mysite.base.models.Timestamp.update_timestamp_for_string(str(Link_Person_Tag))
+    mysite.base.models.Timestamp.update_timestamp_for_string(
+        str(Link_Person_Tag))
+
 
 def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache
     update_someones_pf_cache.delay(instance.person.pk)
 
+
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
     RegeneratePostfixAliasesForForwarder().run()
 
-models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
-models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
-models.signals.post_save.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
-models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
+models.signals.post_save.connect(
+    update_the_project_cached_contributor_count, sender=PortfolioEntry)
+models.signals.post_save.connect(
+    make_forwarder_actually_work, sender=Forwarder)
+models.signals.post_save.connect(
+    update_link_person_tag_cache, sender=Link_Person_Tag)
+models.signals.post_delete.connect(
+    update_link_person_tag_cache, sender=Link_Person_Tag)
 
 models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
 models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
 
-### The following signals are here so that we clear the cached list
-### of people for the map whenever Person, PortfolioEntry, or LinkPersonTag
-### change.
+# The following signals are here so that we clear the cached list
+# of people for the map whenever Person, PortfolioEntry, or LinkPersonTag
+# change.
+
+
 def flush_map_json_cache(*args, **kwargs):
     path = os.path.join(settings.WEB_ROOT, '+cacheable')
     shutil.rmtree(path, ignore_errors=True)

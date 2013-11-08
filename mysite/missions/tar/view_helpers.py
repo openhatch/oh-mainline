@@ -18,8 +18,10 @@
 
 from mysite.missions.base.view_helpers import *
 
+
 class IncorrectTarFile(Exception):
     pass
+
 
 class TarMission(object):
     WRAPPER_DIR_NAME = 'myproject-0.1'
@@ -32,7 +34,7 @@ int main(void)
   return 0;
 }
 ''',
-      'Makefile': 'hello : hello.o\n'
+        'Makefile': 'hello : hello.o\n'
     }
 
     @classmethod
@@ -46,7 +48,9 @@ int main(void)
             raise IncorrectTarFile, 'Archive is not a valid gzipped tarball'
 
         # Check the filename list.
-        filenames_wanted = [cls.WRAPPER_DIR_NAME] + [os.path.join(cls.WRAPPER_DIR_NAME, filename) for filename in cls.FILES.keys()]
+        filenames_wanted = [cls.WRAPPER_DIR_NAME] + \
+            [os.path.join(cls.WRAPPER_DIR_NAME, filename)
+             for filename in cls.FILES.keys()]
         for member in tfile.getmembers():
             if '/' not in member.name:
                 if member.name in cls.FILES.keys():
@@ -69,7 +73,9 @@ int main(void)
                 if tfile.extractfile(member).read() != cls.FILES[member.name.split('/')[-1]]:
                     raise IncorrectTarFile, 'File "%s" has incorrect contents' % member.name
         if len(filenames_wanted) != 0:
-            raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (', '.join('"%s"' % f for f in filenames_wanted))
+            raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (
+                ', '.join('"%s"' % f for f in filenames_wanted))
+
 
 class UntarMission(object):
     TARBALL_DIR_NAME = 'ghello-0.4'
@@ -80,7 +86,8 @@ class UntarMission(object):
     def synthesize_tarball(cls):
         tdata = StringIO()
         tfile = tarfile.open(fileobj=tdata, mode='w:gz')
-        tfile.add(os.path.join(get_mission_data_path('tar'), cls.TARBALL_DIR_NAME), cls.TARBALL_DIR_NAME)
+        tfile.add(os.path.join(get_mission_data_path('tar'),
+                  cls.TARBALL_DIR_NAME), cls.TARBALL_DIR_NAME)
         tfile.close()
         return tdata.getvalue()
 
@@ -88,4 +95,3 @@ class UntarMission(object):
     def get_contents_we_want(cls):
         '''Get the data for the file we want from the tarball.'''
         return open(os.path.join(get_mission_data_path('tar'), cls.FILE_WE_WANT)).read()
-

@@ -25,26 +25,31 @@ from mysite.missions.base.views import (
     HttpResponseRedirect,
     reverse,
     view,
-    )
+)
 from mysite.missions.base.view_helpers import (
     mission_completed,
     set_mission_completed,
-    )
+)
 from mysite.base.unicode_sanity import utf8
 from mysite.missions.diffpatch import forms, view_helpers
 
-### POST handlers
-###
-### Forms submit to this, and we use these to validate input and/or
-### modify the information stored about the user, such as recording
-### that a mission was successfully completed.
+# POST handlers
+#
+# Forms submit to this, and we use these to validate input and/or
+# modify the information stored about the user, such as recording
+# that a mission was successfully completed.
+
+
 def patchsingle_get_original_file(request):
-    return make_download(open(view_helpers.PatchSingleFileMission.OLD_FILE).read(),
-                         filename=os.path.basename(view_helpers.PatchSingleFileMission.OLD_FILE))
+    return make_download(
+        open(view_helpers.PatchSingleFileMission.OLD_FILE).read(),
+        filename=os.path.basename(view_helpers.PatchSingleFileMission.OLD_FILE))
+
 
 def patchsingle_get_patch(request):
     return make_download(view_helpers.PatchSingleFileMission.get_patch(),
                          filename=view_helpers.PatchSingleFileMission.PATCH_FILENAME)
+
 
 @login_required
 def patchsingle_submit(request):
@@ -57,16 +62,21 @@ def patchsingle_submit(request):
         form = forms.PatchSingleUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if form.cleaned_data['patched_file'].read() == open(view_helpers.PatchSingleFileMission.NEW_FILE).read():
-                set_mission_completed(request.user.get_profile(), 'diffpatch_patchsingle')
+                set_mission_completed(
+                    request.user.get_profile(), 'diffpatch_patchsingle')
                 data['patchsingle_success'] = True
             else:
-                data['patchsingle_error_message'] = 'The file did not match the contents it should have.'
+                data[
+                    'patchsingle_error_message'] = 'The file did not match the contents it should have.'
         data['patchsingle_form'] = form
     return single_file_patch(request, data)
 
+
 def diffsingle_get_original_file(request):
-    return make_download(open(view_helpers.DiffSingleFileMission.OLD_FILE).read(),
-                         filename=os.path.basename(view_helpers.DiffSingleFileMission.OLD_FILE))
+    return make_download(
+        open(view_helpers.DiffSingleFileMission.OLD_FILE).read(),
+        filename=os.path.basename(view_helpers.DiffSingleFileMission.OLD_FILE))
+
 
 @login_required
 def diffsingle_submit(request):
@@ -79,16 +89,20 @@ def diffsingle_submit(request):
         form = forms.DiffSingleUploadForm(request.POST)
         if form.is_valid():
             try:
-                view_helpers.DiffSingleFileMission.validate_patch(form.cleaned_data['diff'])
-                set_mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
+                view_helpers.DiffSingleFileMission.validate_patch(
+                    form.cleaned_data['diff'])
+                set_mission_completed(
+                    request.user.get_profile(), 'diffpatch_diffsingle')
                 data['diffsingle_success'] = True
             except view_helpers.IncorrectPatch, e:
                 data['diffsingle_error_message'] = utf8(e)
         data['diffsingle_form'] = form
     return single_file_diff(request, data)
 
+
 def diffrecursive_get_original_tarball(request):
     return make_download(view_helpers.DiffRecursiveMission.synthesize_tarball(), filename=view_helpers.DiffRecursiveMission.TARBALL_NAME)
+
 
 @login_required
 def diffrecursive_submit(request):
@@ -101,8 +115,10 @@ def diffrecursive_submit(request):
         form = forms.DiffRecursiveUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                view_helpers.DiffRecursiveMission.validate_patch(form.cleaned_data['diff'].read())
-                set_mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive')
+                view_helpers.DiffRecursiveMission.validate_patch(
+                    form.cleaned_data['diff'].read())
+                set_mission_completed(
+                    request.user.get_profile(), 'diffpatch_diffrecursive')
                 data['diffrecursive_success'] = True
             except view_helpers.IncorrectPatch, e:
                 data['diffrecursive_error_message'] = utf8(e)
@@ -115,8 +131,10 @@ def diffrecursive_submit(request):
         data['diffrecursive_form'] = form
     return recursive_diff(request, data)
 
+
 def patchrecursive_get_patch(request):
-    return make_download(view_helpers.PatchRecursiveMission.get_patch(), filename=view_helpers.PatchRecursiveMission.BASE_NAME+'.patch')
+    return make_download(view_helpers.PatchRecursiveMission.get_patch(), filename=view_helpers.PatchRecursiveMission.BASE_NAME + '.patch')
+
 
 @login_required
 def patchrecursive_submit(request):
@@ -127,15 +145,20 @@ def patchrecursive_submit(request):
     if request.method == 'POST':
         form = forms.PatchRecursiveUploadForm(request.POST)
         if form.is_valid():
-            set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
+            set_mission_completed(
+                request.user.get_profile(), 'diffpatch_patchrecursive')
             return HttpResponseRedirect(reverse(recursive_patch))
         data['patchrecursive_form'] = form
     return recursive_patch(request, data)
 
-### State manager
+# State manager
+
+
 class DiffPatchMissionPageState(MissionPageState):
+
     def __init__(self, request, passed_data):
-        super(DiffPatchMissionPageState, self).__init__(request, passed_data, 'Using diff and patch')
+        super(DiffPatchMissionPageState, self).__init__(
+            request, passed_data, 'Using diff and patch')
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
@@ -148,7 +171,8 @@ class DiffPatchMissionPageState(MissionPageState):
             })
         return data
 
-### Normal GET handlers. These are usually pretty short.
+# Normal GET handlers. These are usually pretty short.
+
 
 @view
 def about(request, passed_data={}):
@@ -156,6 +180,7 @@ def about(request, passed_data={}):
     state.this_mission_page_short_name = 'About'
     return (request, 'missions/diffpatch/about.html',
             state.as_dict_for_template_context())
+
 
 @view
 def single_file_diff(request, passed_data={}):
@@ -165,6 +190,7 @@ def single_file_diff(request, passed_data={}):
     data['diffsingle_form'] = forms.DiffSingleUploadForm()
     return (request, 'missions/diffpatch/single_file_diff.html', data)
 
+
 @view
 def single_file_patch(request, passed_data={}):
     state = DiffPatchMissionPageState(request, passed_data)
@@ -172,6 +198,7 @@ def single_file_patch(request, passed_data={}):
     data = state.as_dict_for_template_context()
     data['patchsingle_form'] = forms.PatchSingleUploadForm()
     return (request, 'missions/diffpatch/single_file_patch.html', data)
+
 
 @view
 def recursive_patch(request, passed_data={}):
@@ -181,6 +208,7 @@ def recursive_patch(request, passed_data={}):
     data['patchrecursive_form'] = forms.PatchRecursiveUploadForm()
     data.update(passed_data)
     return (request, 'missions/diffpatch/recursive_patch.html', data)
+
 
 @view
 def recursive_diff(request, passed_data={}):

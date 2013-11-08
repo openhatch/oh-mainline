@@ -25,6 +25,7 @@ import mysite.profile.models
 
 MAX_ERRORS = 5
 
+
 class Command(BaseCommand):
     help = ("For all people whose latitude and longitude are the default, "
             "but whose location display name is not the default, "
@@ -52,12 +53,13 @@ class Command(BaseCommand):
             # If someone has their latitude or longitude set to some real place,
             # skip them.
             if ((person.latitude != mysite.profile.models.DEFAULT_LATITUDE) or
-                (person.longitude != mysite.profile.models.DEFAULT_LONGITUDE)):
+                    (person.longitude != mysite.profile.models.DEFAULT_LONGITUDE)):
                 continue
 
             # Okay, this is a person we should process! Try to geocode them...
             try:
-                as_string = mysite.base.view_helpers.cached_geocoding_in_json(address)
+                as_string = mysite.base.view_helpers.cached_geocoding_in_json(
+                    address)
             except Exception:
                 self.errors_so_far += 1
                 continue
@@ -69,7 +71,8 @@ class Command(BaseCommand):
                 person.save()
             except KeyError:
                 logging.info("FYI, we hit a KeyError. Go figure.")
-                logging.info("In case you're curious, the data was: %s", as_dict)
+                logging.info(
+                    "In case you're curious, the data was: %s", as_dict)
                 self.errors_so_far += 1
                 continue
 

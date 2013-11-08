@@ -23,20 +23,24 @@ from celery.task import Task, task
 
 import mysite.base.view_helpers
 
+
 class PopulateProjectIconFromOhloh(Task):
+
     def run(self, project_id):
         project = mysite.search.models.Project.objects.get(id=project_id)
         project.populate_icon_from_ohloh()
         project.save()
 
+
 class PopulateProjectLanguageFromOhloh(Task):
+
     def run(self, project_id, **kwargs):
         logger = self.get_logger(**kwargs)
         p = mysite.search.models.Project.objects.get(id=project_id)
         if not p.language:
             oh = mysite.customs.ohloh.get_ohloh()
             try:
-                raise KeyError # NOTE: This is known to be broken.
+                raise KeyError  # NOTE: This is known to be broken.
                 # It used to call this:
                 # analysis_id = oh.get_latest_project_analysis_id(p.name)
                 # but the we removed the get_latest_project_analysis_id
@@ -52,7 +56,7 @@ class PopulateProjectLanguageFromOhloh(Task):
                             p.name)
                 return
             if ('main_language_name' in data and
-                data['main_language_name']):
+                    data['main_language_name']):
                 # re-get to minimize race condition time
                 p = mysite.search.models.Project.objects.get(id=project_id)
                 p.language = data['main_language_name']
@@ -60,11 +64,13 @@ class PopulateProjectLanguageFromOhloh(Task):
                 logger.info("Set %s.language to %s" %
                             (p.name, p.language))
 
-### Right now, we cache /search/ pages to disk. We should throw those away
-### under two circumstances.
-### The first such situation has an entry in profile_hourly_tasks.py
+# Right now, we cache /search/ pages to disk. We should throw those away
+# under two circumstances.
+# The first such situation has an entry in profile_hourly_tasks.py
 
-### The second circumstance is if a bug gets marked as closed.
+# The second circumstance is if a bug gets marked as closed.
+
+
 @task
 def clear_search_cache():
     logging.info("Clearing the search cache.")

@@ -36,12 +36,13 @@ from django.utils.unittest import skipIf
 import mysite.base.depends
 from mysite.missions.svn.forms import DiffForm
 
+
 @skipIf(not mysite.base.depends.svnadmin_available(),
         "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
 class SvnBackendTests(TestCase):
 
     def get_info(self, path):
-        svninfo = subproc_check_output(['svn', 'info', 'file://'+path])
+        svninfo = subproc_check_output(['svn', 'info', 'file://' + path])
         info = {}
         for line in svninfo.splitlines():
             if ': ' in line:
@@ -54,7 +55,8 @@ class SvnBackendTests(TestCase):
         random_name = os.path.basename(repo_path)
         os.rmdir(repo_path)
         try:
-            # Check that we can run "svn info" on the created repository to get the UUID.
+            # Check that we can run "svn info" on the created repository to get
+            # the UUID.
             view_helpers.SvnRepository(random_name).reset()
             old_uuid = self.get_info(repo_path)['Repository UUID']
             # Check that resetting the repository changes its UUID.
@@ -64,6 +66,7 @@ class SvnBackendTests(TestCase):
         finally:
             if os.path.isdir(repo_path):
                 shutil.rmtree(repo_path)
+
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
         "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
@@ -84,26 +87,32 @@ class SvnViewTests(TwillTests):
 
     def test_resetrepo_creates_valid_repo(self):
         self.client.post(reverse(views.resetrepo))
-        subprocess.check_call(['svn', 'info', 'file://'+self.repo_path])
+        subprocess.check_call(['svn', 'info', 'file://' + self.repo_path])
 
     def test_do_checkout_mission_correctly(self):
         self.client.post(reverse(views.resetrepo))
         response = self.client.get(reverse('svn_checkout'))
         checkoutdir = tempfile.mkdtemp()
         try:
-            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
-            word = open(os.path.join(checkoutdir, response.context['secret_word_file'])).read().strip()
-            response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
+            subprocess.check_call(
+                ['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            word = open(
+                os.path.join(checkoutdir, response.context['secret_word_file'])).read().strip()
+            response = self.client.post(
+                reverse(views.checkout_submit), {'secret_word': word})
             paulproteus = Person.objects.get(user__username='paulproteus')
-            self.assert_(view_helpers.mission_completed(paulproteus, 'svn_checkout'))
+            self.assert_(
+                view_helpers.mission_completed(paulproteus, 'svn_checkout'))
         finally:
             shutil.rmtree(checkoutdir)
 
     def test_do_checkout_mission_incorrectly(self):
         self.client.post(reverse(views.resetrepo))
-        text = self.client.post(reverse(views.checkout_submit), {'secret_word': 'not_the_secret_word'}).content
+        text = self.client.post(
+            reverse(views.checkout_submit), {'secret_word': 'not_the_secret_word'}).content
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(view_helpers.mission_completed(paulproteus, 'svn_checkout'))
+        self.assertFalse(
+            view_helpers.mission_completed(paulproteus, 'svn_checkout'))
         self.assertTrue('incorrect' in text)
 
     def test_do_diff_mission_correctly(self):
@@ -112,21 +121,28 @@ class SvnViewTests(TwillTests):
         checkoutdir = tempfile.mkdtemp()
         try:
             # Check the repository out and make the required change.
-            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
-            new_contents = open(os.path.join(view_helpers.get_mission_data_path('svn'),
-                              DiffForm.NEW_CONTENT)).read()
-            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED), 'w').write(new_contents)
+            subprocess.check_call(
+                ['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            new_contents = open(
+                os.path.join(view_helpers.get_mission_data_path('svn'),
+                             DiffForm.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED),
+                 'w').write(new_contents)
 
             # Make the diff.
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
 
             # Submit the diff.
-            response = self.client.post(reverse(views.diff_submit), {'diff': diff})
+            response = self.client.post(
+                reverse(views.diff_submit), {'diff': diff})
             paulproteus = Person.objects.get(user__username='paulproteus')
-            self.assert_(view_helpers.mission_completed(paulproteus, 'svn_diff'))
+            self.assert_(
+                view_helpers.mission_completed(paulproteus, 'svn_diff'))
 
-            # Check that there is a new commit that applies to the working copy cleanly.
-            update_output = subproc_check_output(['svn', 'update'], cwd=checkoutdir)
+            # Check that there is a new commit that applies to the working copy
+            # cleanly.
+            update_output = subproc_check_output(
+                ['svn', 'update'], cwd=checkoutdir)
             self.assert_('Updated to revision ' in update_output)
         finally:
             shutil.rmtree(checkoutdir)
@@ -137,33 +153,42 @@ class SvnViewTests(TwillTests):
         checkoutdir = tempfile.mkdtemp()
         try:
             # Check the repository out and make the required change.
-            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
-            new_contents = open(os.path.join(view_helpers.get_mission_data_path('svn'),
-                              DiffForm.NEW_CONTENT)).read()
-            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED), 'w').write(new_contents)
+            subprocess.check_call(
+                ['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            new_contents = open(
+                os.path.join(view_helpers.get_mission_data_path('svn'),
+                             DiffForm.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED),
+                 'w').write(new_contents)
 
             # Make the diff.
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
 
             # Many users fail to copy-paste the diff properly. In particular,
-            # they omit trailing whitespace characters. Let's remove the last line.
+            # they omit trailing whitespace characters. Let's remove the last
+            # line.
             self.assertEqual(' \n', diff[-2:])
             diff = diff[:-2]
 
             # Submit the diff.
-            response = self.client.post(reverse(views.diff_submit), {'diff': diff})
+            response = self.client.post(
+                reverse(views.diff_submit), {'diff': diff})
             paulproteus = Person.objects.get(user__username='paulproteus')
-            self.assert_(view_helpers.mission_completed(paulproteus, 'svn_diff'))
+            self.assert_(
+                view_helpers.mission_completed(paulproteus, 'svn_diff'))
 
-            # Check that there is a new commit that applies to the working copy cleanly.
-            update_output = subproc_check_output(['svn', 'update'], cwd=checkoutdir)
+            # Check that there is a new commit that applies to the working copy
+            # cleanly.
+            update_output = subproc_check_output(
+                ['svn', 'update'], cwd=checkoutdir)
             self.assert_('Updated to revision ' in update_output)
         finally:
             shutil.rmtree(checkoutdir)
 
     def test_diff_without_spaces_works(self):
         self.client.post(reverse(views.resetrepo))
-        self.client.post(reverse(views.diff_submit), {'diff': open(make_testdata_filename('svn', 'svn-diff-without-spaces-on-blank-context-lines.patch')).read()})
+        self.client.post(reverse(views.diff_submit), {'diff': open(
+            make_testdata_filename('svn', 'svn-diff-without-spaces-on-blank-context-lines.patch')).read()})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(view_helpers.mission_completed(paulproteus, 'svn_diff'))
 
@@ -172,11 +197,14 @@ class SvnViewTests(TwillTests):
         response = self.client.post(reverse(views.diff_submit), {'diff': ''})
         self.assertEqual(200, response.status_code)
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(view_helpers.mission_completed(paulproteus, 'svn_diff'))
+        self.assertFalse(
+            view_helpers.mission_completed(paulproteus, 'svn_diff'))
 
     def test_main_page_does_not_complain_about_prereqs(self):
         response = self.client.get(reverse('svn_main_page'))
-        self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
+        self.assertTrue(response.context[0]
+                        ['mission_step_prerequisites_passed'])
+
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
         "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
@@ -190,51 +218,65 @@ class SvnViewTestsWhileLoggedOut(TwillTests):
 
     def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
         response = self.client.get(reverse('svn_main_page'))
-        self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
+        self.assertTrue(response.context[0]
+                        ['mission_step_prerequisites_passed'])
 
 # Mocked-up svnlook output for the pre-commit hook.
+
+
 def mock_get_username(repo, txn):
     return 'paulproteus'
 
+
 def mock_get_changes_good(repo, txn):
-    return [('U', 'trunk/'+view_helpers.SvnCommitMission.SECRET_WORD_FILE),
-            ('U', 'trunk/'+view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED)]
+    return [('U', 'trunk/' + view_helpers.SvnCommitMission.SECRET_WORD_FILE),
+            ('U', 'trunk/' + view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED)]
+
 
 def mock_get_changes_bad_modifies_extra_file(repo, txn):
     return mock_get_changes_good(repo, txn) + [('U', 'foo.txt')]
 
+
 def mock_get_changes_bad_skips_file(repo, txn):
     return mock_get_changes_good(repo, txn)[:-1]
+
 
 def mock_get_changes_bad_adds_file(repo, txn):
     return mock_get_changes_good(repo, txn) + [('A', 'foo.txt')]
 
+
 def mock_get_changes_bad_removes_file(repo, txn):
     return [('D', filename) for action, filename in mock_get_changes_good(repo, txn)]
 
+
 def mock_get_file_good(repo, txn, filename):
-    if filename == 'trunk/'+view_helpers.SvnCommitMission.SECRET_WORD_FILE:
-        return view_helpers.SvnCommitMission.NEW_SECRET_WORD+'\n'
-    elif filename == 'trunk/'+view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED:
+    if filename == 'trunk/' + view_helpers.SvnCommitMission.SECRET_WORD_FILE:
+        return view_helpers.SvnCommitMission.NEW_SECRET_WORD + '\n'
+    elif filename == 'trunk/' + view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED:
         return open(view_helpers.SvnCommitMission.NEW_CONTENT).read()
     else:
         subproc_check_output(['false'])
 
+
 def mock_get_file_bad_secret_word(repo, txn, filename):
-    if filename == 'trunk/'+view_helpers.SvnCommitMission.SECRET_WORD_FILE:
+    if filename == 'trunk/' + view_helpers.SvnCommitMission.SECRET_WORD_FILE:
         return 'bad-secret-word\n'
     return mock_get_file_good(repo, txn, filename)
 
+
 def mock_get_file_bad_readme(repo, txn, filename):
-    if filename == 'trunk/'+view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED:
+    if filename == 'trunk/' + view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED:
         return 'This substitute content is surely wrong.\n'
     return mock_get_file_good(repo, txn, filename)
+
 
 def mock_get_log_good(repo, txn):
     return 'This test log message will be accepted.\n'
 
+
 def mock_get_log_bad(repo, txn):
     return ''
+
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
         "Skipping tests for Subversion training mission for now. To run these tests, install the 'subversion' package in your package manager.")
@@ -242,22 +284,27 @@ class SvnCommitHookTests(DjangoTestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
-        # We fully mock the svnlook output, so the hook doesn't try to inspect a repository at all during the tests.
-        view_helpers.set_mission_completed(Person.objects.get(user__username='paulproteus'), 'svn_diff')
+        # We fully mock the svnlook output, so the hook doesn't try to inspect
+        # a repository at all during the tests.
+        view_helpers.set_mission_completed(
+            Person.objects.get(user__username='paulproteus'), 'svn_diff')
 
     def assert_commit_allowed(self):
-        view_helpers.SvnCommitMission.pre_commit_hook('/fake/repository/path', 'fake-transaction-id')
+        view_helpers.SvnCommitMission.pre_commit_hook(
+            '/fake/repository/path', 'fake-transaction-id')
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(view_helpers.mission_completed(paulproteus, 'svn_commit'))
 
     def assert_commit_not_allowed(self):
         try:
-            view_helpers.SvnCommitMission.pre_commit_hook('/fake/repository/path', 'fake-transaction-id')
+            view_helpers.SvnCommitMission.pre_commit_hook(
+                '/fake/repository/path', 'fake-transaction-id')
             self.fail('No exception was raised.')
         except view_helpers.IncorrectPatch:
             pass
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(view_helpers.mission_completed(paulproteus, 'svn_commit'))
+        self.assertFalse(
+            view_helpers.mission_completed(paulproteus, 'svn_commit'))
 
     @mock.patch('mysite.missions.svn.view_helpers.get_username_for_svn_txn', mock_get_username)
     @mock.patch('mysite.missions.svn.view_helpers.get_changes_for_svn_txn', mock_get_changes_good)

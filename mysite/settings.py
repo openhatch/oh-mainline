@@ -1,17 +1,18 @@
 # Django settings for the basic OpenHatch 'mysite' project
 
-## Imports
+# Imports
 import os
 import logging
 import datetime
 import sys
 import dj_database_url
 
-## Figure out where in the filesystem we are.
+# Figure out where in the filesystem we are.
 DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
-MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY # This is needed for {% version %}
+# This is needed for {% version %}
+MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY
 
-## Now, actual settings
+# Now, actual settings
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -30,7 +31,8 @@ TEST_DATABASE_OPTIONS = {
 }
 
 DATABASE_CHARSET = 'utf8'           # omg I hate you MySQL
-TEST_DATABASE_CHARSET = 'utf8'      # have to apply it to the test database, too
+# have to apply it to the test database, too
+TEST_DATABASE_CHARSET = 'utf8'
 
 DATABASES = {
     'default': {
@@ -97,23 +99,24 @@ ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'k%&pic%c5%6$%(h&eynhgwhibe9-h!_iq&(@ktx#@1-5g2+he)'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-            'django.contrib.auth.context_processors.auth',
-            'django.core.context_processors.debug',
-            'django.core.context_processors.i18n',
-            'django.core.context_processors.media',
-            'django.core.context_processors.request',
-            'django_authopenid.context_processors.authopenid',
-        )
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.request',
+    'django_authopenid.context_processors.authopenid',
+)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.load_template_source',
+    #     'django.template.loaders.eggs.load_template_source',
 )
 
 MIDDLEWARE_CLASSES = [
-    'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
+    # This must live on top of Auth + Session middleware
+    'mysite.base.middleware.DetectLogin',
     'django.middleware.common.CommonMiddleware',
     'mysite.base.middleware.StaticGeneratorMiddlewareOnlyWhenAnonymous',
     'sessionprofile.middleware.SessionProfileMiddleware',
@@ -146,7 +149,7 @@ STATIC_DOC_ROOT = 'static/'
 # Sessions in /tmp
 # mysite.account.view_helpers.clear_user_sessions assumes the DB backend, it
 # will not work otherwise
-SESSION_ENGINE="django.contrib.sessions.backends.db"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 INSTALLED_APPS = (
     'ghettoq',
@@ -191,28 +194,28 @@ TEST_OUTPUT_DESCRIPTIONS = True
 
 TEST_OUTPUT_DIR = "test_output"
 
-## AMQP, Rabbit Queue, Celery
-BROKER_BACKEND='django'
+# AMQP, Rabbit Queue, Celery
+BROKER_BACKEND = 'django'
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
 LOGIN_URL = '/account/login/'
-LOGIN_REDIRECT_URL = '/' # Landing page
+LOGIN_REDIRECT_URL = '/'  # Landing page
 
-OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # This key is called "Oman testing"
+OHLOH_API_KEY = 'JeXHeaQhjXewhdktn4nUw'  # This key is called "Oman testing"
                                         # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
-#OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
+# OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
 logging.basicConfig(
-    level = logging.DEBUG,
-    format = '%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
+    level=logging.DEBUG,
+    format='%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
 )
 
 # Invite codes last seven days
-ACCOUNT_INVITATION_DAYS=7
-INVITE_MODE=False # Enable this on production site ...?
-INVITATIONS_PER_USER=100
+ACCOUNT_INVITATION_DAYS = 7
+INVITE_MODE = False  # Enable this on production site ...?
+INVITATIONS_PER_USER = 100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
@@ -224,10 +227,10 @@ CACHES = {
 }
 
 # Launchpad credentials
-LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0tKMGtwYmNQTkJXOHRQMWR2Ygpjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2ggbGl2ZSBzaXRlCmFjY2Vzc19zZWNyZXQgPSBSNWtrcXBmUERiUjRiWFFQWGJIMkdoc3ZQamw2SjlOc1ZwMzViN0g2d3RjME56Q3R2Z3JKeGhNOVc5a2swU25CSnRHV1hYckdrOFFaMHZwSgoK'
+LP_CREDS_BASE64_ENCODED = 'WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0tKMGtwYmNQTkJXOHRQMWR2Ygpjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2ggbGl2ZSBzaXRlCmFjY2Vzc19zZWNyZXQgPSBSNWtrcXBmUERiUjRiWFFQWGJIMkdoc3ZQamw2SjlOc1ZwMzViN0g2d3RjME56Q3R2Z3JKeGhNOVc5a2swU25CSnRHV1hYckdrOFFaMHZwSgoK'
 
-GITHUB_USERNAME='paulproteus'
-GITHUB_API_TOKEN='ceb85898146b6a0d4283cdf8788d8b6a'
+GITHUB_USERNAME = 'paulproteus'
+GITHUB_API_TOKEN = 'ceb85898146b6a0d4283cdf8788d8b6a'
 
 # How ASSETS_DEBUG works
 # Value     Effect
@@ -247,40 +250,47 @@ WHAT_SORT_OF_IMAGE_CACHE_BUSTING = ASSETS_EXPIRE
 INTERNAL_IPS = ('127.0.0.1',)
 
 FORWARDER_DOMAIN = "forwarder.openhatch.org"
-FORWARDER_LISTINGTIME_TIMEDELTA = datetime.timedelta(days=2) # how long the forwarder is listed
-FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5) # how long the forwarder actually works
+# how long the forwarder is listed
+FORWARDER_LISTINGTIME_TIMEDELTA = datetime.timedelta(days=2)
+# how long the forwarder actually works
+FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5)
 # note about the above: for 3 days, 2 forwarders for the same user work.
 # at worst, you visit someone's profile and find a forwarder that works for 3 more days
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
 # at worst, we run a postfixifying celery job once every two days for each user
 
-POSTFIX_FORWARDER_TABLE_PATH = None # Disabled by default
+POSTFIX_FORWARDER_TABLE_PATH = None  # Disabled by default
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
-#CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.
+# CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.
 
 WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
 
-SERVER_NAME='openhatch.org'
+SERVER_NAME = 'openhatch.org'
 
-SVN_REPO_PATH = os.path.abspath(os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn'))
+SVN_REPO_PATH = os.path.abspath(
+    os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn'))
 
 # This should include a trailing slash.
-SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/' # For local sites, this is what you checkout
+# For local sites, this is what you checkout
+SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/'
 
 # The script to invoke for management commands in this environment.
-PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
+PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(
+    os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
 CELERY_ALWAYS_EAGER = True
 SOUTH_TESTS_MIGRATE = False
 
-GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
-GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you clone
+GIT_REPO_PATH = os.path.join(
+    MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
+# For local sites, this is what you clone
+GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/'
 
 # This setting is used by the customs bug importers.
 TRACKER_POLL_INTERVAL = 1  # Days
 
-### Initialize celery
+# Initialize celery
 import djcelery
 djcelery.setup_loader()
 
@@ -297,18 +307,18 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
-#        'require_debug_false': {
-#            '()': 'django.utils.log.RequireDebugFalse'
-#        },
+        #        'require_debug_false': {
+        #            '()': 'django.utils.log.RequireDebugFalse'
+        #        },
     },
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class':'django.utils.log.NullHandler',
+            'class': 'django.utils.log.NullHandler',
         },
         'mail_admins': {
             'level': 'ERROR',
-#            'filters': ['require_debug_false'],
+            #            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
     },
@@ -316,7 +326,7 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['null'],  # Quiet by default!
             'propagate': False,
-            'level':'DEBUG',
+            'level': 'DEBUG',
         },
         'django.request': {
             'handlers': ['mail_admins'],
@@ -329,28 +339,28 @@ LOGGING = {
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')
 
-### Heroku fix-ups
-### If we are running on Heroku, there will be a DATABASE_URL
-### and/or SHARED_DATABASE_URL that refers to postgres.
-### Our South migrations do not currently run on postgres, so
-### in that case, we skip south.
+# Heroku fix-ups
+# If we are running on Heroku, there will be a DATABASE_URL
+# and/or SHARED_DATABASE_URL that refers to postgres.
+# Our South migrations do not currently run on postgres, so
+# in that case, we skip south.
 _overridden_db = (os.environ.get('DATABASE_URL', '') or
                   os.environ.get('SHARED_DATABASE_URL', ''))
 if _overridden_db.startswith('postgres://'):
     INSTALLED_APPS = tuple([x for x in INSTALLED_APPS
                             if x != 'south'])
 
-### Windows fix-ups
+# Windows fix-ups
 if sys.platform.startswith('win'):
     # staticgenerator seems to act weirdly on Windows, so we disable it.
     MIDDLEWARE_CLASSES.remove(
         'mysite.base.middleware.StaticGeneratorMiddlewareOnlyWhenAnonymous')
 
-### Enable the low-quality, high-load bug recommendation system
-RECOMMEND_BUGS=True
+# Enable the low-quality, high-load bug recommendation system
+RECOMMEND_BUGS = True
 
 ENABLE_NEW_IWH_HANDLER = False
-### Include a user's customizations
+# Include a user's customizations
 try:
     from local_settings import *
 except ImportError:

@@ -21,12 +21,15 @@ import getopt
 
 import sisynala.main
 
+
 def parseApacheLine(s):
     '''Input is in Combined Log Format plus musec, vhost, responsebytes'''
     normal, musecs, vhost, responsebytes = s.rsplit(' ', 3)
     extracted = sisynala.main.logline(normal)
-    extracted.update(dict(musecs=musecs, vhost=vhost, responsebytes=responsebytes))
+    extracted.update(
+        dict(musecs=musecs, vhost=vhost, responsebytes=responsebytes))
     return extracted
+
 
 def parsed2datadict(d):
     '''Input: raw data from parsing
@@ -44,6 +47,7 @@ def parsed2datadict(d):
     else:
         responsebytes = int(d['responsebytes'].strip())
     return dict(url=url, musecs=musecs, responsebytes=responsebytes)
+
 
 def gen_aggregate_stats_from_files(input_files):
     url2musecs = {}
@@ -63,13 +67,14 @@ def gen_aggregate_stats_from_files(input_files):
 
     return url2musecs, url2bytes, url2hitcount
 
+
 def aggregate_stats_to_fake_du_in_cwd(**kwargs):
     for stat_name in kwargs:
         fd = open(stat_name, 'w')
         stat_dict = kwargs[stat_name]
         urls = stat_dict.keys()
-        urls.sort() # du output is sorted
-        ## du output comes summed into directories
+        urls.sort()  # du output is sorted
+        # du output comes summed into directories
         ## this is dumb and slow
         ends_with_slash = []
         for url in urls:
@@ -79,21 +84,23 @@ def aggregate_stats_to_fake_du_in_cwd(**kwargs):
         # they must be summed up
         ends_with_slash.sort()
         ends_with_slash.reverse()
-        ## O(n^2); there is a constant-time speedup which is to associate
-        ## the urls that end in the thing with the thing earlier
+        # O(n^2); there is a constant-time speedup which is to associate
+        # the urls that end in the thing with the thing earlier
         for directory in ends_with_slash:
             for url in urls:
                 if url.startswith(directory):
                     stat_dict[directory] += stat_dict[url]
-        ## NOW the directories have been bloated correctly
+        # NOW the directories have been bloated correctly
         for url in urls:
             print >> fd, stat_dict[url], url
         fd.close()
 
+
 def main():
     import glob
     musecs, bytes, hitcount = gen_aggregate_stats_from_files(sys.argv[1:])
-    aggregate_stats_to_fake_du_in_cwd(musecs=musecs, bytes=bytes, hitcount=hitcount)
+    aggregate_stats_to_fake_du_in_cwd(
+        musecs=musecs, bytes=bytes, hitcount=hitcount)
 
 if __name__ == '__main__':
     main()

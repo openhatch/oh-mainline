@@ -28,18 +28,20 @@ import signal
 import logging
 import mysite.base.depends
 
+
 def generate_safe_temp_file_name():
     fd, name = tempfile.mkstemp()
     os.close(fd)
     return name
+
 
 def override_settings_for_testing():
     settings.CELERY_ALWAYS_EAGER = True
     settings.SVN_REPO_PATH = tempfile.mkdtemp(
         prefix='svn_repo_path_' +
         datetime.datetime.now().isoformat().replace(':', '.'))
-    settings.GITHUB_USERNAME='openhatch-api-testing'
-    settings.GITHUB_API_TOKEN='4a48b94a0f16c4483fee4cf6c46425e8'
+    settings.GITHUB_USERNAME = 'openhatch-api-testing'
+    settings.GITHUB_API_TOKEN = '4a48b94a0f16c4483fee4cf6c46425e8'
     settings.POSTFIX_FORWARDER_TABLE_PATH = generate_safe_temp_file_name()
 
     svnserve_port = random.randint(50000, 50100)
@@ -48,9 +50,11 @@ def override_settings_for_testing():
                                '--listen-port', str(svnserve_port),
                                '--listen-host', '127.0.0.1',
                                '--daemon',
-                               '--pid-file', os.path.join(settings.SVN_REPO_PATH, 'svnserve.pid'),
+                               '--pid-file', os.path.join(settings.SVN_REPO_PATH,
+                                                          'svnserve.pid'),
                                '--root', settings.SVN_REPO_PATH])
     settings.SVN_REPO_URL_PREFIX = 'svn://127.0.0.1:%d/' % svnserve_port
+
 
 def cleanup_after_tests():
     if mysite.base.depends.svnadmin_available():
@@ -65,10 +69,13 @@ def cleanup_after_tests():
 
 
 class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
+
     def run_tests(self, *args, **kwargs):
         if not args or not args[0]:
-            logging.info("You did not specify which tests to run. I will run all the OpenHatch-related ones.")
-            args = (['base', 'profile', 'account', 'project', 'missions', 'search', 'customs'],)
+            logging.info(
+                "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
+            args = (['base', 'profile', 'account', 'project',
+                    'missions', 'search', 'customs'],)
 
         override_settings_for_testing()
         n = 1
@@ -78,11 +85,15 @@ class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
             cleanup_after_tests()
             sys.exit(n)
 
+
 class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
+
     def run_tests(self, *args, **kwargs):
         if not args or not args[0]:
-            logging.info("You did not specify which tests to run. I will run all the OpenHatch-related ones.")
-            args = (['base', 'profile', 'account', 'project', 'missions', 'search', 'customs'],)
+            logging.info(
+                "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
+            args = (['base', 'profile', 'account', 'project',
+                    'missions', 'search', 'customs'],)
 
         override_settings_for_testing()
         n = 1
