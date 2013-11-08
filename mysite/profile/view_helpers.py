@@ -20,8 +20,6 @@ from ast import literal_eval
 import os.path
 import hashlib
 from itertools import cycle, islice
-import itertools
-from django.contrib.sites.models import Site
 
 import pygeoip
 
@@ -353,6 +351,23 @@ def add_people_to_zoho_CRM(people, auth_token = ZOHO_AUTH_TOKEN):
                 index += 1
         else:
             logging.error("Cannot upload people to Zoho CRM. " + response_body)
+
+def delete_people_from_zoho_CRM(people, auth_token = ZOHO_AUTH_TOKEN):
+    for person in people:
+        if not mysite.base.decorators._has_group(person.user, 'VOLUNTEER'):
+            continue
+
+        xml = XMLBuilder('Contacts')
+        data = urllib.urlencode({"authtoken": auth_token, 'scope': 'crmapi', 'id': person.zoho_id})
+        url = 'https://crm.zoho.com/crm/private/xml/Contacts/deleteRecords'
+        req = urllib2.Request(url=url, data=data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+        response = urllib2.urlopen(req)
+        if (response.code != 200):
+            logging.error("Cannot delete person in Zoho CRM. " + response)
+            return
+        person.delete()
+
+    mysite.profile.models.PeopleToRemoveFromZoho.objects.all().delete()
 
 def send_user_export_to_admins(u):
     '''You might want to call this function before deleting a user.

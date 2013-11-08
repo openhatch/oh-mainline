@@ -154,6 +154,14 @@ class Icon(models.Model):
     base_profile_url = models.URLField(blank=False, null=False, max_length=255)
     icon_url = models.URLField(blank=False, null=False, max_length=255)
 
+
+class PeopleToRemoveFromZoho(models.Model):
+    zoho_id = models.IntegerField(unique=True, blank=False, null=False)
+
+    class Meta:
+        db_table = 'profile_people_to_remove_from_zoho'
+
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
