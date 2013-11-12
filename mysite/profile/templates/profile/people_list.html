@@ -6,17 +6,16 @@
         {% with person|get_list_fields:request.user.id as entry %}
     <a href="/people/{{ person.user.id }}" style="text-decoration: none;">
             <li class="search_list">
-
-                    <fieldset>
-                            <h3>{{ person.user.first_name }} {{ person.user.last_name }}</h3>
-                        {% if user|has_group:'ADMIN' %}
-                            &nbsp&nbsp&nbsp&nbsp&nbsp<strong>Email: </strong> {{ person.user.email }}
-                        {% endif %}
-                        {% for key, value in entry.fields.items %}
-                            <strong>&nbsp&nbsp {{ key }}:</strong> {{ value }}
-                        {% endfor %}
-                    </fieldset>
-
+                <fieldset>
+                        <h3>{{ person.user.first_name }} {{ person.user.last_name }}</h3>
+                    {% if user|has_group:'ADMIN' %}
+                        &nbsp&nbsp&nbsp&nbsp&nbsp<strong>Email: </strong> {{ person.user.email }}
+                    {% endif %}
+                    {% for key, value in entry.fields.items %}
+                        <strong>&nbsp&nbsp {{ key }}:</strong> {{ value }}
+                    {% endfor %}
+                    <p class="date">Date added: {{ person.date_added|date }}</p>
+                </fieldset>
             </li>
         </a>
         {% endwith %}

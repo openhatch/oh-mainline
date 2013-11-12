@@ -30,6 +30,9 @@
                         <p><strong>{{ key }}:</strong> {{ value }}</p>
                     {% endfor %}
                 </fieldset>
+                <div class="footer">
+                    <p class="date">Date added: {{ person.date_added|date }}</p>
+                </div>
             </li>
         {% endwith %}
     {% endfor %}
