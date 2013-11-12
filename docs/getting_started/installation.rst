@@ -33,7 +33,7 @@ Note: If you want to work on core backend features, like the bug importer,
 or let your local site rescale images, please read the `advanced_installation.rst`_ file
 to learn about optional dependencies and automated testing.
 
-.. _advanced_installation.rst: advanced_installation.html
+.. _advanced_installation.rst: ../advanced/advanced_installation.html
 
 
 Essentials
@@ -127,7 +127,7 @@ with data like what is on the main OpenHatch.org site, you can import
 a data snapshot. See `maintenance.rst`_ for more info about that.)
 
 
-.. _maintenance.rst: maintenance.html
+.. _maintenance.rst: ../advanced/maintenance.html
 
 
 Run the site
