@@ -532,10 +532,9 @@ def people(request, order='date_joined'):
         everybody, extra_data = search_results.people, search_results.template_data
         data.update(extra_data)
     else:
-        everybody = Person.objects.all().order_by('user__' + order)
+        everybody = Person.objects.filter(user__groups__name__iexact='VOLUNTEER').order_by('user__' + order)
 
-    volunteers = [person for person in everybody if 'VOLUNTEER' in [group.name for group in person.user.groups.all()]]
-    data['people'] = volunteers
+    data['people'] = everybody
 
     # Add JS-friendly version of people data to template
     person_id_ranges = mysite.base.view_helpers.int_list2ranges([x.id for x in everybody])

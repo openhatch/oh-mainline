@@ -1243,6 +1243,25 @@ div#portfolio {
     width: 100% !important;
 }
 
+.search_card_profile div.footer {
+    width: 100%;
+}
+
+.search_card_profile div.footer p.date {
+    font-size: 75%;
+    color: #666666;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.search_list p.date {
+    font-size: 75%;
+    color: #666666;
+    padding-right: 5px;
+    float: right;
+    clear: both;
+}
+
 body#profile .project-display { float: left; margin-right: 0; width: 705px; }
 body#profile .project-display p { margin: 0; margin-bottom: 10px; }
 body#profile .project-display h2 { font-size: 9pt; margin: 0; margin-bottom: 3px; }

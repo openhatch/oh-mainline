@@ -176,62 +176,63 @@ def filter_people(people, post_data):
     return [person for person in people if __does_person_meet_criteria__(person, post_data)]
 
 def __does_person_meet_criteria__(person, post_data):
-    meets_criteria = True
     responses = person.formresponse_set.all()
 
+    if person.user.groups.filter(name__iexact='VOLUNTEER').count() == 0:
+        return False
     if 'filter_name' in post_data and len(post_data.get('filter_name')) > 0:
         name = post_data.get('filter_name', '')
         if name not in person.user.first_name and name not in person.user.last_name and name not in person.get_full_name():
-            meets_criteria = False
+            return False
     if 'filter_company_name' in post_data and len(post_data.get('filter_company_name')) > 0:
         company_name = post_data.get('filter_company_name', '')
         found_responses = responses.filter(Q(question__name__iexact='Company, Organization, or Event Where You Learned '
                                                                   'About SocialCoding4Good') and
                                            Q(value__contains=company_name))
         if found_responses.count() == 0:
-            meets_criteria = False
+            return False
     if 'filter_email' in post_data and len(post_data.get('filter_email')) > 0:
         email = post_data.get('filter_email', '')
         if email not in person.user.email:
-            meets_criteria = False
+            return False
     if 'skills[]' in post_data:
         skills = post_data.getlist('skills[]')
         answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=skills)
         found = __is_any_answer_in_responses__(answers, responses)
         if not found:
-            meets_criteria = False
+            return False
     if 'organizations[]' in post_data:
         organizations = post_data.getlist('organizations[]')
         answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=organizations)
         found = __is_any_answer_in_responses__(answers, responses)
         if not found:
-            meets_criteria = False
+            return False
     if 'causes[]' in post_data:
         causes = post_data.getlist('causes[]')
         answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=causes)
         found = __is_any_answer_in_responses__(answers, responses)
         if not found:
-            meets_criteria = False
+            return False
     if 'languages[]' in post_data:
         languages = post_data.getlist('languages[]')
         answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=languages)
         found = __is_any_answer_in_responses__(answers, responses)
         if not found:
-            meets_criteria = False
+            return False
     if 'time_to_commit[]' in post_data:
         time_to_commit = post_data.getlist('time_to_commit[]')
         answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=time_to_commit)
         found = __is_any_answer_in_responses__(answers, responses)
         if not found:
-            meets_criteria = False
+            return False
     if 'opensource[]' in post_data:
         opensource = post_data.get('opensource[]')
         answers = mysite.profile.models.FormAnswer.objects.filter(pk__in=opensource)
         found = __is_any_answer_in_responses__(answers, responses)
         if not found:
-            meets_criteria = False
+            return False
 
-    return meets_criteria
+    return True
 
 def __is_any_answer_in_responses__(answers, responses):
     for answer in answers:
