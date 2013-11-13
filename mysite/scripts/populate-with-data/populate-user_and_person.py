@@ -8,10 +8,8 @@ DATABASE_FILE_PATH='../../site.db'
 MAX_USERS = 100
 user_data = []
 person_data = []
-person_skill_data = []
-person_language_data = []
-person_organization_data = []
-person_cause_data = []
+responses = []
+groups = []
 
 for arg in sys.argv:
     argument = str(arg)
@@ -33,7 +31,7 @@ print 'Starting with id: %s' % next_id
 for u in xrange(0, MAX_USERS):
     id = next_id
     next_id += 1
-    username = u'user_%s' % id
+    username = u'email_%s' % id
     first_name = u'first_name_%s' % id
     last_name = u'last_name_%s' % id
     email = u'email_%s@email.org' % id
@@ -42,16 +40,22 @@ for u in xrange(0, MAX_USERS):
     last_login = datetime.now()
     date_joined = datetime.now()
     user_data.append((id, username, first_name, last_name, email, password, 0, 1, 0, last_login, date_joined))
+    groups.append((id, 3))
     # Many to Many
-    skill_id = random.randint(1, 9)
-    language_id = random.randint(1, 14)
-    organization_id = random.randint(1, 7)
-    cause_id = random.randint(1, 11)
 
-    person_skill_data.append((id, skill_id))
-    person_language_data.append((id, language_id))
-    person_organization_data.append((id, organization_id))
-    person_cause_data.append((id, cause_id))
+    cursor.execute('SELECT x.value from profile_formanswer x where x.id = ?', (random.randint(30, 38),))
+    skill = str(cursor.fetchone()[0])
+    cursor.execute('SELECT x.value from profile_formanswer x where x.id = ?', (random.randint(41, 59),))
+    language = str(cursor.fetchone()[0])
+    cursor.execute('SELECT x.value from profile_formanswer x where x.id = ?', (random.randint(1, 11),))
+    organization = str(cursor.fetchone()[0])
+    cursor.execute('SELECT x.value from profile_formanswer x where x.id = ?', (random.randint(12, 22),))
+    cause = str(cursor.fetchone()[0])
+
+    responses.append((id, skill, 5))
+    responses.append((id, language, 12))
+    responses.append((id, organization, 2))
+    responses.append((id, cause, 3))
 
 next_id -= MAX_USERS
 for p in xrange(next_id, next_id + MAX_USERS):
@@ -101,6 +105,11 @@ cursor.executemany(
     user_sql,
     user_data)
 connection.commit()
+user_sql = u'INSERT INTO auth_user_groups (user_id, group_id) VALUES (?, ?)'
+cursor.executemany(
+    user_sql,
+    groups)
+connection.commit()
 print '%s user rows added.' % MAX_USERS
 
 print 'Adding person rows...'
@@ -114,25 +123,10 @@ person_sql = u'INSERT INTO profile_person (photo, photo_thumbnail_30px_wide, pho
 cursor.executemany(person_sql, person_data)
 connection.commit()
 
-person_skill_sql = u'INSERT INTO profile_person_skill (person_id, skill_id) VALUES (?, ?)'
+person_skill_sql = u'INSERT INTO profile_formresponse (person_id, value, question_id) VALUES (?, ?, ?)'
 cursor.executemany(
     person_skill_sql,
-    person_skill_data)
-
-person_language_sql = u'INSERT INTO profile_person_language (person_id, language_id) VALUES(?, ?)'
-cursor.executemany(
-    person_language_sql,
-    person_language_data)
-
-person_organization_sql = u'INSERT INTO profile_person_organization (person_id, organization_id) VALUES (?, ?)'
-cursor.executemany(
-    person_organization_sql,
-    person_organization_data)
-
-person_cause_sql = u'INSERT INTO profile_person_cause (person_id, cause_id) VALUES(?, ?)'
-cursor.executemany(
-    person_cause_sql,
-    person_cause_data)
+    responses)
 
 connection.commit()
 print '%s person rows added.' % MAX_USERS
