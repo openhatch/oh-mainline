@@ -133,7 +133,22 @@ jQuery(document).ready(function($) {
                 questions.push(question);
             });
 
-            if (!errors) {
+            if (errors) {
+                window.scrollTo(0, 0);
+
+                if ($('#top-error').length <= 0) {
+                    var topErrorDiv = document.createElement('div');
+                    $(topErrorDiv).addClass('error error-top').attr('id', 'top-error')
+                        .text('Please fill out all required fields.');
+                    $('form').first().before(topErrorDiv);
+                }
+                alert('Please fill out all required fields.');
+            } else {
+                var topError = $('#top-error');
+                if (topError.length > 0) {
+                    $(topError).remove();
+                }
+
                 $.post('http://127.0.0.1:8000/account/signup', { data: JSON.stringify(questions) })
                     .success(function(response) {
                         formElement.attr('data-success', 'true');
