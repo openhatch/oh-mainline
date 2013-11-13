@@ -214,18 +214,10 @@ def add_project(request):
 @view
 def edit_project(request, project__name):
     data = {}
+
     project = get_object_or_404(Project, name=project__name)
-    project_data_form = mysite.project.forms.ProjectForm(initial={
-        'name': project.name,
-        'display_name': project.display_name,
-        'language': project.language,
-        'homepage': project.homepage,
-        'organization': project.organization,
-        'duration': project.duration,
-        'skills': Skill.objects.filter(project=project._get_pk_val),
-        'languages': Language.objects.filter(project=project._get_pk_val),
-        'pk': project._get_pk_val,
-    })
+    project_data_form=mysite.project.forms.ProjectForm(instance=project)
+
     data['form'] = project_data_form
 
     return request, 'project/edit_project.html', data
@@ -237,19 +229,23 @@ def edit_project_do(request):
     project_form = mysite.project.forms.ProjectForm()
     data['form'] = project_form
 
-    project_to_update = Project.objects.get(pk=request.POST.get('pk'))
+    project_to_update = Project.objects.get(pk=request.POST.get('id'))
     if request.POST:
         project_data_form = mysite.project.forms.ProjectForm(request.POST, request.FILES, instance=project_to_update)
 
         if project_data_form.is_valid():
             project = project_data_form.save()
-            project.update_scaled_icons_from_self_icon()
+            if project.icon_raw:
+                project.update_scaled_icons_from_self_icon()
+            elif not project.icon_raw:
+                project.empty_all_kind_of_icons()
+            project.save()
             return HttpResponseRedirect("/projects/" + project.name)
         else:
             data['form'] = project_data_form
             data['has_errors'] = True
 
-    return mysite.base.decorators.as_view(request, "project/add_project.html", data, projects.__name__)
+    return mysite.base.decorators.as_view(request, "project/edit_project.html", data, projects.__name__)
 
 def project_filter(request):
     post_data = request.POST

@@ -18,7 +18,7 @@ import django.forms
 from mysite.base.models import Organization, Duration, Skill, Language
 import mysite.search.models
 import mysite.profile.models
-from file_resubmit.admin import AdminResubmitImageWidget
+from file_resubmit.admin import AdminResubmitFileWidget
 
 class WannaHelpForm(django.forms.Form):
     project = django.forms.ModelChoiceField(mysite.search.models.Project.objects.all())
@@ -53,13 +53,22 @@ class ProjectForm(django.forms.ModelForm):
     display_name = django.forms.CharField(required=True, widget=django.forms.TextInput)
     language = django.forms.CharField(required=False, widget=django.forms.TextInput)
     homepage = django.forms.URLField(required=False)
-    organization = django.forms.ModelChoiceField(required=True, queryset=Organization.objects.all(), widget=django.forms.Select)
-    duration = django.forms.ModelChoiceField(required=True, queryset=Duration.objects.all(), widget=django.forms.Select)
-    skills = django.forms.ModelMultipleChoiceField(required=True, queryset=Skill.objects.all(), widget=django.forms.CheckboxSelectMultiple)
-    languages = django.forms.ModelMultipleChoiceField(required=True, queryset=Language.objects.all(), widget=django.forms.CheckboxSelectMultiple)
-    icon_raw = django.forms.ImageField(required=False, widget=AdminResubmitImageWidget())
-    pk = django.forms.IntegerField(required=False)
+    organization = django.forms.ModelChoiceField(required=True,
+                                                 queryset=Organization.objects.all(),
+                                                 widget=django.forms.Select)
+    duration = django.forms.ModelChoiceField(required=True,
+                                             queryset=Duration.objects.all(),
+                                             widget=django.forms.Select)
+    skills = django.forms.ModelMultipleChoiceField(required=True,
+                                                   queryset=Skill.objects.all(),
+                                                   widget=django.forms.CheckboxSelectMultiple)
+    languages = django.forms.ModelMultipleChoiceField(required=True,
+                                                      queryset=Language.objects.all(),
+                                                      widget=django.forms.CheckboxSelectMultiple)
+    icon_raw = django.forms.ImageField(required=False, widget=AdminResubmitFileWidget)
+    id = django.forms.IntegerField(required=False)
 
     class Meta:
         model = mysite.search.models.Project
-        fields = ("name", "display_name", "language", "homepage", "skills", "duration", "organization", "languages", "icon_raw")
+        fields = ("name", "display_name", "language", "homepage", "skills", "duration", "organization",
+                  "languages", "icon_raw", "id")
