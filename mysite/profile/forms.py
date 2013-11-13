@@ -20,6 +20,7 @@ from mysite.base.fields import QuestionFormField
 import mysite.profile.models
 from mysite.profile.models import FormResponse, FormAnswer, FormQuestion
 from mysite.search.models import Project
+from mysite.settings import MEDIA_URL
 
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
@@ -66,6 +67,18 @@ class EditInfoForm(django.forms.Form):
 
     def __select_initial_response__(self, field, question):
         initial = []
+
+        # Hack class created for setting up "currently" value for ClearableFileInput widget..
+        # can't think of more elegant way to do it..
+        class HackObj(object):
+            name = None
+            url = None
+            def __init__(self, dict):
+                self.__dict__ = dict
+
+            def __str__(self):
+                return self.name
+
         for a, response in enumerate(self.responses):
             if response.question.id == question.id:
                 initial.append(response.value)
@@ -73,6 +86,15 @@ class EditInfoForm(django.forms.Form):
                     break
         if field.type == 'multi':
             field.initial = initial
+        elif field.type == 'file':
+            if not initial:
+                return
+            url = MEDIA_URL + str(initial[0])
+            before, sep, after = url.rpartition("/")
+            obj = HackObj({'url': MEDIA_URL + str(initial[0]),
+                           'name': after})
+
+            field.initial = obj
         else:
             if len(initial) > 0:
                 field.initial = str(initial[0]).replace('\\r\\n', '\n').replace('\\n', '\n')

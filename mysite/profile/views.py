@@ -44,7 +44,6 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 import csv
-from django.core.exceptions import ObjectDoesNotExist
 from mysite.libs import HTML
 from xmlbuilder import XMLBuilder
 
@@ -56,7 +55,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
         Person, Tag, TagType, \
         Link_Project_Tag, Link_Person_Tag, \
-        DataImportAttempt, PortfolioEntry, Citation, Language, Skill, Organization, TimeToCommit, Cause, FormResponse, FormQuestion, FormAnswer
+        DataImportAttempt, PortfolioEntry, Citation, FormResponse, FormQuestion, FormAnswer
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view, has_permissions, _has_permissions, _has_group
 import mysite.profile.forms
@@ -65,6 +64,8 @@ from mysite.base.view_helpers import render_response
 from django.views.decorators.csrf import csrf_protect
 from mysite.profile.models import CardDisplayedQuestion
 from mysite.profile.templatetags.profile_extras import get_card_fields_with_icons_together
+import mysite.account.views
+from mysite.settings import MEDIA_ROOT
 
 # }}}
 
@@ -342,6 +343,13 @@ def edit_person_info_do(request):
             if type(edit_info_form['question_' + str(question.id)].data) == list:
                 for i, answer in enumerate(edit_info_form['question_' + str(question.id)].data):
                     mysite.profile.models.FormResponse(person=person, question=question, value=edit_info_form['question_' + str(question.id)].data[i]).save()
+            elif type(edit_info_form['question_' + str(question.id)].data) == django.core.files.uploadedfile.InMemoryUploadedFile:
+                file_from_form = edit_info_form['question_' + str(question.id)].data
+                new_file_path = mysite.account.views.generate_random_file_path(file_from_form.name)
+                with open(MEDIA_ROOT + '/' + new_file_path, "wb") as file:
+                    file.write(file_from_form.read())
+                    file.close()
+                mysite.profile.models.FormResponse(person=person, question=question, value=new_file_path).save()
             else:
                 mysite.profile.models.FormResponse(person=person, question=question, value=edit_info_form['question_' + str(question.id)].data).save()
     return HttpResponseRedirect(person.profile_url)
