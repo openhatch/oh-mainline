@@ -235,7 +235,7 @@ def edit_project_do(request):
 
         if project_data_form.is_valid():
             project = project_data_form.save()
-            if project.icon_raw:
+            if project_data_form['icon_raw'].data:
                 project.update_scaled_icons_from_self_icon()
             elif not project.icon_raw:
                 project.empty_all_kind_of_icons()

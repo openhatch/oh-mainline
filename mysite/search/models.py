@@ -273,11 +273,11 @@ class Project(OpenHatchModel):
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
     def empty_all_kind_of_icons(self):
-        if self.icon_raw:
-            self.icon_raw=None
-            self.icon_for_profile=None
-            self.icon_smaller_for_badge=None
-            self.icon_for_search_result=None
+        self.icon_raw=None
+        self.icon_for_profile=None
+        self.icon_smaller_for_badge=None
+        self.icon_for_search_result=None
+        self.save()
 
     def get_contributors(self):
         """Return a list of Person objects who are contributors to
