@@ -127,12 +127,17 @@ def signup_request(request):
             form_question = None
             if question.get(u'inputType') == 'file' and len(question.get(u'responses')) != 0 and question.get(u'responses')[0] != '':
                 filename = question.get(u'responses')[0]
-                response = urllib2.urlopen(SC4G_FILES_URL + filename)
-                new_file_path = generate_random_file_path(filename)
-                with open(MEDIA_ROOT + '/' + new_file_path, "wb") as file:
-                    file.write(response.read())
-                    file.close()
-                question.get(u'responses')[0] = new_file_path
+                try:
+                    response = urllib2.urlopen(SC4G_FILES_URL + filename)
+                    new_file_path = generate_random_file_path(filename)
+                    with open(MEDIA_ROOT + '/' + new_file_path, "wb") as file:
+                        file.write(response.read())
+                        file.close()
+                    question.get(u'responses')[0] = new_file_path
+                except urllib2.HTTPError as e:
+                    if e.code == 404:
+                        question[u'responses'] = []
+
             if FormQuestion.objects.filter(name__iexact=question_name).count() > 0:
                 FormQuestion.objects.filter(name__iexact=question_name) \
                     .update(type=question.get(u'inputType'), required=question.get(u'required'))
