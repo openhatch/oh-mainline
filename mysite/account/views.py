@@ -34,8 +34,11 @@ from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
 
 import urllib
+import urllib2
 import logging
 import json
+import uuid
+import os
 
 import mysite.base.views
 import mysite.base.view_helpers
@@ -43,6 +46,7 @@ import mysite.account.forms
 from mysite.base.view_helpers import render_response
 from mysite.account.view_helpers import clear_user_sessions
 import mysite.profile.views
+from mysite.settings import MEDIA_ROOT, SC4G_FILES_URL
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
@@ -121,6 +125,14 @@ def signup_request(request):
             if question_name in ['First Name', 'Last Name', 'Email']:
                 continue
             form_question = None
+            if question.get(u'inputType') == 'file' and len(question.get(u'responses')) != 0 and question.get(u'responses')[0] != '':
+                filename = question.get(u'responses')[0]
+                response = urllib2.urlopen(SC4G_FILES_URL + filename)
+                new_file_path = generate_random_file_path(filename)
+                with open(MEDIA_ROOT + '/' + new_file_path, "wb") as file:
+                    file.write(response.read())
+                    file.close()
+                question.get(u'responses')[0] = new_file_path
             if FormQuestion.objects.filter(name__iexact=question_name).count() > 0:
                 FormQuestion.objects.filter(name__iexact=question_name) \
                     .update(type=question.get(u'inputType'), required=question.get(u'required'))
@@ -158,6 +170,14 @@ def signup_request(request):
     response = HttpResponse(status=200)
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+def generate_random_file_path(filename):
+    # MEDIA_ROOT is prefixed automatically.
+    random_directory = ('volunteer-files/%s/') % uuid.uuid4().hex
+    random_directory_path = MEDIA_ROOT + '/' + random_directory
+    if not os.path.exists(random_directory_path):
+        os.makedirs(random_directory_path)
+    return random_directory + filename
 
 def send_registration_email(email, user, hostname, random_password):
 

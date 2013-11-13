@@ -356,11 +356,15 @@ RECOMMEND_BUGS=True
 
 ENABLE_NEW_IWH_HANDLER = False
 
+### SocialCoding4Good
+
 CRONTAB_DJANGO_MANAGE_PATH = PATH_TO_MANAGEMENT_SCRIPT
 
 CRONJOBS = [
     ('@daily', 'mysite.cron.push_volunteers_to_zoho_crm')
 ]
+
+SC4G_FILES_URL = 'http://test.socialcoding4good.org/sites/default/files/webform/'
 
 ### Include a user's customizations
 try:

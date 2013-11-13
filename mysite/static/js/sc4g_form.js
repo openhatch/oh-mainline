@@ -81,6 +81,8 @@ jQuery(document).ready(function($) {
                     if (required && value.length > 0) { required_filled = true; }
                 } else if ($(this).find('input[type=file]').length > 0) {
                     inputType = 'file';
+                    value = $(this).find('input[type=file]').val();
+                    responses = [ value ];
                     if (required && $(this).find('input[type=file]').val().length > 0) { required_filled = true; }
                 } else if ($(this).find('input[type=radio]').length > 0) {
                     inputType = 'single';
