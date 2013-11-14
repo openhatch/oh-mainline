@@ -187,10 +187,19 @@
         <div class='module-body'>
             {% for item in questions %}
                 <div>
-                    <h4>{{ item.question.name }}</h4>
+                    {% if item.question.type != 'file' or person.user == user or user|has_group:'ADMIN' %}
+                        <h4>{{ item.question.name }}</h4>
+                    {% endif %}
                     <p>
                         {% for response in item.responses %}
-                            {{ response.value|linebreaksbr }}{% if forloop.counter < item.responses|length %}, {% endif %}
+                            {% if item.question.type == 'file' %}
+                                {% if person.user == user or user|has_group:'ADMIN' %}
+                                    <a href="{{ url_begin|add:response.value|linebreaksbr }}" target="_blank">Download</a>
+                                {% endif %}
+                            {% else %}
+                                {{ response.value|linebreaksbr }}
+                            {% endif %}
+                            {% if forloop.counter < item.responses|length %}, {% endif %}
                         {% endfor %}
                     </p>
                 </div>

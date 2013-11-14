@@ -42,6 +42,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.safestring import mark_safe
 import django.views.generic
 import csv
 from mysite.libs import HTML
@@ -65,7 +66,7 @@ from django.views.decorators.csrf import csrf_protect
 from mysite.profile.models import CardDisplayedQuestion
 from mysite.profile.templatetags.profile_extras import get_card_fields_with_icons_together
 import mysite.account.views
-from mysite.settings import MEDIA_ROOT
+from mysite.settings import MEDIA_ROOT, MEDIA_URL
 
 # }}}
 
@@ -146,6 +147,7 @@ def display_person_web(request, user_to_display__id=None):
     data['notifications'] = mysite.base.view_helpers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
     data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
+    data['url_begin'] = mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), MEDIA_URL))
 
     if request.method == 'POST':
         projects_form = mysite.profile.forms.SelectProjectsForm(request.POST)
