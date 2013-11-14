@@ -1,10 +1,7 @@
-{% extends 'base/one_column.html' %}
+
 {% comment %}
 # This file is part of OpenHatch.
-# Copyright (C) 2010 Parker Phinney
-# Copyright (C) 2009 Karen Rustad
-# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
-# Copyright (C) 2011 Krzysztof Tarnowski
+# Copyright (C) 2013 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -20,77 +17,544 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
-{% load cache %}
-{% load base_extras %}
-{% load profile_extras %}
+<!doctype html>
+<head>
+<title>OpenHatch 2014 Fundraising Drive</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="/static/donation-media/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/donation-media/css/style.css" type="text/css">
+<!-- <link rel="stylesheet" href="/static/donation-media/less/style.less" type="text/less">
+<script src="/static/donation-media/js/less.min.js" type="text/javascript"></script> -->
+</head>
+<body>
 
-{% block title %}
-Donate to OpenHatch and support community engagement
-{% endblock title %}
+<div class="container">
+    <section class="header">
+        <div class="row">
+            <div class="col-sm-2 hidden-xs">
+                <a href="/"><img src="/static/donation-media/img/logo.png" class="logo img-responsive" style="padding-top:30px;"></a></div>
+            <div class="col-sm-10">
+                <h2>
+                    We are raising money to continue our work on diversity and outreach in free, open source software communities.
+                    <strong>You can help!</strong>
+                </h2>
+            </div>
+        </div>
+        <h1 id="donate"><img height="150" src="/static/donation-media/img/donate.png">&nbsp;&nbsp;&nbsp;<span class="visible-xs"><br></span>Support OpenHatch!</h1>
+    </section>
+    <section id="donation-form">
+        <div class="row">
+            <div class="col-md-12">
+                <table>
+                    <thead>
+                        <th>Level</th>
+                        <th style="min-width: 9em;">Monthly</th>
+                        <th style="min-width: 6.5em;">Lump-sum</th>
+                        <th>Thank you gift</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fan</td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&no_note=1&src=1&a3=5%2e00&p3=1&t3=M&currency_code=USD&bn=PP%2dSubscriptionsBF%3abtn_subscribeCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$5/month</a></td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&amount=20%2e00&currency_code=USD&no_note=0&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$20</a></td>
+                            <td>
+                                <p><a href="#stickers">Stickers</a> and our sincere thanks!</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Supporter</td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&no_note=1&src=1&a3=10%2e00&p3=1&t3=M&currency_code=USD&bn=PP%2dSubscriptionsBF%3abtn_subscribeCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$10/month</a>
+                            </td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&amount=150%2e00&currency_code=USD&no_note=0&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$150</a>
+                            </td>
+                            <td>
+                                <p>
+                                    Thanks, stickers, and an <a href="#shirt">OpenHatch t-shirt</a>!
+                                    <br>
+                                    <span class="help">(please specify size in comments during checkout)</span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>Aficionado</td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&no_note=1&src=1&a3=20%2e00&p3=1&t3=M&currency_code=USD&bn=PP%2dSubscriptionsBF%3abtn_subscribeCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$20/month</a></td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&amount=300%2e00&currency_code=USD&no_note=0&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$300</a></td>
+                            <td>
+                                <p>
+                                    All of the above, plus an <a href="#sketch">original, custom sketch</a> of Sufjan the baby penguin!
+                                    <br>
+                                    <span class="help">(requests welcome in checkout comments)</span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Impresario</td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&no_note=1&src=1&a3=60%2e00&p3=1&t3=M&currency_code=USD&bn=PP%2dSubscriptionsBF%3abtn_subscribeCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$60/month</a></td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&amount=1000%2e00&currency_code=USD&no_note=0&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$1000</a></td>
+                            <td>
+                                <p>All of the above, and an <a href="#scarf">OpenHatch soccer-style knit scarf</a>!</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Patron</td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&no_note=1&src=1&a3=120%2e00&p3=1&t3=M&currency_code=USD&bn=PP%2dSubscriptionsBF%3abtn_subscribeCC_LG%2egif%3aNonHostedGuest" class="donation-button green">$120/month</a></td>
+                            <td>
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=openhatch%2dpaypal%40opensource%2eorg&lc=US&item_name=OpenHatch&amount=2000%2e00&currency_code=USD&no_note=0&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest"  class="donation-button green">$2000</a></td>
+                            <td>
+                                <p>
+                                    All of the above, plus we will send you <a href="#pie">a delicious pie</a>.
+                                    <br>
+                                    <span class="help">
+                                        (please note any dietary restrictions in the checkout comments)
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Maverick</td>
+                            <td>
+                            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                                <input type="hidden" name="cmd" value="_xclick-subscriptions">
+                                <input type="hidden" name="business" value="openhatch-paypal@opensource.org">
+                                <input type="hidden" name="lc" value="US">
+                                <input type="hidden" name="item_name" value="OpenHatch">
+                                <input type="hidden" name="no_note" value="1">
+                                <input type="hidden" name="src" value="1">
+                                <input type="hidden" name="p3" value="1">
+                                <input type="hidden" name="t3" value="M">
+                                <input type="hidden" name="currency_code" value="USD">
+                                <input type="hidden" name="bn" value="PP-SubscriptionsBF:btn_subscribeCC_LG.gif:NonHostedGuest">
+                                <input name="a3" type="text" size="4">/month
+                                <input type="submit" class="donation-button green" value="Donate!" style="margin-top: 4px;">
+                            </form>
+                            </td>
+                            <td>
+                            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                                <input type="hidden" name="cmd" value="_donations">
+                                <input type="hidden" name="business" value="openhatch-paypal@opensource.org">
+                                <input type="hidden" name="lc" value="US">
+                                <input type="hidden" name="item_name" value="OpenHatch">
+                                <input type="hidden" name="currency_code" value="USD">
+                                <input type="hidden" name="no_note" value="0">
+                                <input type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest">
+                                <input name="amount" type="text" size="8">
+                                <input type="submit" class="donation-button green" value="Donate!" style="margin-top: 4px;">
+                            </form>
+                            <td>
+                                <p>
+                                    Custom donation amount.
+                                    <span class="help">
+                                        We will still give you the thank-you gifts for the appropriate tier, unless you tell us not to!
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-{% block body_class %}{{ block.super }} missions{% endblock %}
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="help">Donation payments are processed by Paypal. (If you would prefer to use a different method, <a href="mailto:hello@openhatch.org">please email us</a>.) Donations are handled by our sponsoring nonprofit, the <a href="http://opensource.org/">Open Source Initiative</a>, while OpenHatch waits on the IRS for full 501(c)3 status.</p>
+            </div>
+        </div>
+    </section>
+    <section id="why">
+        <h2>Why support OpenHatch?</h2>
+        <p>
+            OpenHatch is a non-profit that seeks to make free, open source software communities more vibrant, friendly, and diverse.
+        </p>
+        <p>
+            How do we work towards those goals?
+        </p>
+        <div class="row">
+            <div class="col-md-12">
+                <img src="/static/donation-media/img/happy-osctc-people.jpg" class="img-responsive">
+            </div>
+        </div>
+        <h2 id="this-year">What we did in 2013</h2>
 
-{% block js_in_head %}
-{{ block.super }}
-<script type="text/javascript">
-document.documentElement.className = 'javascript_is_enabled';
-</script>
-{% endblock %}
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Open Source Comes to Campus</h3>
+                <img src="/static/donation-media/img/osctc-status.png" class="img-responsive">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <img src="/static/donation-media/img/osctc-help.jpg" class="img-responsive">
+            </div>
+            <div class="col-sm-6">
+                <p>
+                    <a href="http://campus.openhatch.org/">Open Source Comes to Campus</a>
+                    is a series of workshops held on college campuses for introducing students to free software ideals, concepts, and tools, and walking them through making their first contributions to a free software project of their choice. For each event, we bring local free software project leaders to campus to help students get started in their project and meet real people who improve free software for work and for fun.
+                    <!-- Additionally, each event is co-organized with a related on-campus organization&ndash;such as an ACM or Society of Women Engineers chapter&ndash;to ensure that event attendees have a free software-friendly community within their school to continue learning with. --> </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <blockquote><span class="quote">"Today has been very empowering for me regarding my computer and the ways I can manipulate it."</span>
+                <span class="help">&mdash; Attendee at Harvard's Open Source Comes to Campus event</span></blockquote>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <a href="#donate" class="donation-button">Convinced? Donate now!</a>
+            </div>
+        </div>
+        <div class="row extra-space">
+            <div class="col-md-12">
+                <h3>Resources for free software communities</h3>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <a href="http://openhatch.org/blog/2013/psf-funds-openhatch-to-reach-out-to-and-help-python-user-groups/">
+                            <img src="/static/donation-media/img/python.png" class="img-responsive"></a>
+                    </div>
+                    <div class="col-sm-6">
+                        <p>
+                            OpenHatch
+                            <a href="http://openhatch.org/blog/2013/psf-funds-openhatch-to-reach-out-to-and-help-python-user-groups/">won a grant from the Python Software foundation</a>
+                            this year to check in with Python user group organizers, enable communication and cross-pollination between user groups,
+                    consult with user groups to help make their events more welcoming, exciting, well-attended, and newcomer-friendly.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p>
+                            OpenHatch representatives had productive discussions with community managers and event organizers from all over the country and in a variety of language communities, both about making their communities successful and
+                            <a href="https://openhatch.org/wiki/Women_and_their_friends#Kicking_someone_out_of_the_group">handling sticky situations</a>
+                            for
+                            <a href="http://openhatch.org/blog/2013/dealing-with-uncomfortable/">their group</a>.
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="http://openhatch.org/blog/2013/dealing-with-uncomfortable/">
+                            <img src="/static/donation-media/img/serene.jpg" class="img-responsive">
+                        </a>
+                        <span class="credit">Photo by <a href="http://www.flickr.com/photos/mikecogh/5083370083/">Michael Coglan</a>, CC BY-SA</span>
+                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/cookbook-cover.png" class="img-responsive"></div>
+                    <div class="col-sm-6">
+                        <p>
+                            OpenHatch board members Asheesh Laroia, Karen Rustad, and Deb Nicholson, along with OpenHatch friends Lydia Pintscher and Marina Zhurakhinskaya, prepared a draft of The Outreach Cookbook, a written guide for free software project maintainers and user group leaders with tips and tricks for running successful events and maintaining healthy communities.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p>
+                            <a href="http://openhatch.org/blog/2013/post-pycon-2013/">At PyCon US this year</a>, OpenHatch representatives gave
+                            <a href="https://openhatch.org/blog/2013/at-pycon/">six talks and tutorials</a>, answered questions at the OpenHatch expo hall booth, and participated in the PyCon Sprints. OpenHatch representatives were also present at OSCON, Open Source Bridge, SCALE, LibrePlanet, AdaCamp, linux.conf.au, and other conferences.
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="http://openhatch.org/blog/2013/post-pycon-2013/">
+                            <img src="/static/donation-media/img/pycon2013.jpg" class="img-responsive"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="#donate" class="donation-button">Convinced? Donate now!</a>
+            </div>
+        </div>
+        <div class="row extra-space">
+            <div class="col-md-12">
+                <h3>Tools for new contributors</h3>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/training-missions.png" class="img-responsive"></div>
+                    <div class="col-sm-6">
+                        <p>
+                            The
+                            <a href="http://openhatch.org/missions/">training missions</a>
+                            on
+                            <a href="https://openhatch.org">openhatch.org</a>
+                            teach basic prerequisite skills for contributing to open source software, such as tar, diff and patch, and git version control.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p>
+                            OpenHatch also maintains a
+                            <a href="http://openhatch.org/search/">project rolodex</a>
+                            on
+                            <a href="https://openhatch.org">openhatch.org</a>
+                            which automatically gathers "bitesized" bugs and other small, newcomer-friendly tasks from a wide variety of open source software projects. One can browse projects and bugs based on interests and desired programming languages. This makes it easier for potential free software contributors who don't know where to start to find a place to volunteer.
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/volunteer-opportunities.png" class="img-responsive"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/cat-irc.jpg" class="img-responsive">
+                        <span class="credit">Photo by <a href="https://commons.wikimedia.org/wiki/File:Gato_leyendo_canal_IRC_de_Wikipedia_en_espa%C3%B1ol.jpg">Diego Grez</a>, CC BY-SA</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <p>
+                            OpenHatch's IRC channel,
+                            <a href="https://openhatch.org/wiki/Contact">#openhatch on freenode</a>
+                            , is a lively community where we mentor a bunch of new contributors, both on OpenHatch and on other projects. It's a great place to ask questions and get help working on bugs in a friendly, low-pressure environment. We've helped many people contribute to open source projects for the first time through this channel.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p>
+                            OpenHatch itself is a free software project. Over 26 people contributed to
+                            <a href="https://github.com/openhatch/oh-mainline">the main git repository</a>
+                            that runs openhatch.org in 2013!
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/teh-icons/2bdf820f298588fef18a33de5779836a.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/b.png" width="60" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/02f2e87b57887ab383b209e3a7ce535a.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/5ae1346bc1eac4cab70d67305d710242.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/33ebe0f1fd49862dbf8e43336333f5f2.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/617ae4bcd7ed946ab5512313f82cfbec.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/2386c66668cd638cf97ea248cc7d0d18.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/92480dcf5ce06b0987e01a09689ca2bc.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/a.png" width="60" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/a731099bb357198d1dcb8552adbcdb43.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/b7c7c168cd76bbae514d1c97f55b8fee.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/c.png" width="60" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/c81c074f30e159a0466d88797543401e.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/cc57918c88bf891c3269ccff78b73095.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/cec3156142d4e3e4842eb0dae1f6fce4.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/cfbbaa096fed7142ff2f4b1c2f38e67a.png" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/d.png" width="60" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/d682ace3f3a6945d9b40090966f57c7e.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/de1d60091d95f2dfeacc99b3f7f7aa38.jpeg" align='left'>
+                        <img src="/static/donation-media/img/teh-icons/e.png" width="60" align='left'></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="/static/donation-media/img/gsoc.jpg" class="img-responsive"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>
+                            OpenHatch also mentored two Google Summer of Code (GSoC) students this year!
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/sunu.jpg" class="pull-left">
+                        <h4>sunu's GSoC project</h4>
+                        <p>
+                            Tarashish Mistra ("sunu" in #openhatch) has been working on modernizing the OpenHatch training missions by rewriting them on top of AngularJS and <a href="https://code.google.com/p/oppia/">Oppia</a>, an open source interactive teaching framework built at Google. You can track his progress at
+                            <a href="https://github.com/openhatch/oh-missions-oppia-beta">https://github.com/openhatch/oh-missions-oppia-beta</a>
+                            , and try out the beta at <a href="http://missions-beta.openhatch.org">http://missions-beta.openhatch.org</a>. Work progresses on merging this into the main openhatch.org website.
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/teh-icons/b.png" class="pull-left" width="180">
+                        <h4>daveeloo's GSoC project</h4>
+                        <p>
+                            David Lu ("daveeloo" in #openhatch) worked with us to help take Ubuntu's state of the art contributor outreach system, named the Developer Advisory Team, and make it a pluggable Django app that can be used by any project. You can track his progress on
+                            <a href="http://lists.openhatch.org/mailman/listinfo/greenhouse">the Greenhouse mailing list</a>
+                            and our work together with the Debian Welcome Team
+                            <a href="http://lists.alioth.debian.org/mailman/listinfo/welcome-team">on their email list</a>
+                            .
+                        </p>
+                    </div>
+                </div>
 
-{% block main %}
-<div class="module">
-  <div class='module-head'>
-    <ul>
-      <li>
-	<a href="/">&laquo; Back to front page</a>
-      </li>
-    </ul>
-    <h3>Donate to OpenHatch!</h3>
-  </div>
-  <div class='module-body contains-submodules one-column'>
-      <img width="300" class="left" src="/static/images/donate.png" />
-    <p>OpenHatch is a <a href="//openhatch.org/about/">non-profit</a> that maintains this website,
-      organizes outreach events to grow the open source community, and brings diversity
-      to programming groups.
-    </p>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <blockquote><span class="quote">"Open source has opened doors for me continuously for more than a decade. With open source, I have touched the lives of millions. I believe and hope that helping OpenHatch will help to open similar doors for many others."</span>
+                        <span class="help">&mdash; Anonymous OpenHatch donor</span></blockquote>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="#donate" class="donation-button">Convinced? Donate now!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <p>We depend on donations from companies and individuals to continue these efforts.
-      If you are able, we deeply appreciate <em>any</em> donation you can make.</p>
+        <div class="row">
+            <div class="col-md-12">
+                <img src="/static/donation-media/img/plotting.jpg" class="img-responsive">
+                <span class="credit">Photo by <a href="https://secure.flickr.com/photos/crschmidt/6979927268/in/set-72157629928149003">Christopher Schmidt</a>, CC BY</span>
+                <h2 id="next-year">The plan for next year</h2>
+                <div class="row">
+                    <div class="col-md-12">
+                    <h3>Scaling Open Source Comes to Campus</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/laptop-smile.jpg" class="img-responsive">
+                    </div>
+                    <div class="col-sm-6">
+                        <ul>
+                            <li>Training others to run OSCTC events and providing them with remote support</li>
+                            <li>Better documentation of everything involved in running OSCTC events</li>
+                            <li>Better tools for curating newcomer-friendly tasks for individual events</li>
+                            <li>Further curriculum development</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                    <h3>OpenHatch-affiliated projects</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/helping.jpg" class="img-responsive">
+                    </div>
+                    <div class="col-sm-6">
+                        <ul>
+                            <li>Provide set of guidelines that are best practices for newcomer-friendly free software projects</li>
+                            <li>Work with interested projects to help them better meet guidelines</li>
+                            <li>List and promote affiliated projects that meet guidelines</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                    <h3>Quantitative community management</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="/static/donation-media/img/lecture.jpg" class="img-responsive">
+                        <span class="credit">Photo by <a href="https://secure.flickr.com/photos/crschmidt/7126019987/in/set-72157629928149003">Christopher Schmidt</a>, CC BY</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <ul>
+                            <li>Track event attendance and diversity metrics</li>
+                            <li>Keep track of and get feedback from event attendees on a set schedule</li>
+                            <li>Help with <a href="http://lists.openhatch.org/mailman/listinfo/greenhouse">Greenhouse</a> roll-out in Debian and see how it affects contributions</li>
+                            <li>Track #openhatch IRC channel activity and population</li>
+                            <li>Finish Python User Group check-ins and publish results</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <img src="/static/donation-media/img/awesome-picture.jpg" class="img-responsive">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>
+                    We depend entirely on donations from companies and individuals to continue OpenHatch's efforts. If you are able, we deeply appreciate any donation you can make.
+                </p>
 
-    <div>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_donations">
-<input type="hidden" name="business" value="donate@openhatch.org">
-<input type="hidden" name="lc" value="US">
-<input type="hidden" name="item_name" value="OpenHatch">
-<input type="hidden" name="no_note" value="0">
-<input type="hidden" name="currency_code" value="USD">
-<table cellpadding="5" cellspacing="0" width="1%">
-  <tbody>
-    <tr>
-      <td width="1%">$</td>
-      <td><input type="text" style="width: 4em;" name="amount" maxlength="15" value="100"></td>
-    </tr>
-  </tbody>
-</table>
-<input style="display: inline;" type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-    </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="#donate" class="donation-button">Donate now!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <p style="margin-top: 2em;">If you are willing to try something unusual, you can also donate to us using Dwolla or a check in the mail and save us some fees. <a href="//openhatch.org/contact/">Contact us</a> to arrange non-PayPal donations or to share your ideas for helping support OpenHatch.</p>
-    <h3>Sponsors</h3>
-    <p>We are excited to talk with companies about how we can work together. You can read more about that,
-      and see our thank-yous, on our <a href="/sponsors/">sponsors page</a>.</p>
-  </div>
+    <section id="gifts">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>2014 donation thank-you gifts</h2>
+                <h3 id="stickers">Stickers: For &gt;=$20 or $5/month</h3>
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                        <img src="/static/donation-media/img/sticker-live.jpg" class="img-responsive"></div>
+                    <div class="col-sm-6 col-md-8">
+                        <p><a href="/static/donation-media/img/sticker.png">Stickers!!!</a> Everyone loves stickers!</p>
+                        <p>
+                            These are about 2"x2.5" vinyl stickers featuring OpenHatch's mascot, Sufjan the baby penguin.
+                        </p>
+                    </div>
+                </div>
+
+                <h3 id="shirt">T-shirt: For &gt;=$150 or $10/month</h3>
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                        <a href="/static/donation-media/img/oh-shirt-design.png">
+                            <img src="/static/donation-media/img/shirt-front.png" class="img-responsive"></a>
+                    </div>
+                    <div class="col-sm-6 col-md-8">
+                        <p>
+                            Want to proudly mark yourself as a supporter of community growth and newcomer-friendliness in open source? Want a shirt with a cute baby penguin on it? Well.
+                        </p>
+                        <p>
+                            The design has <a href="/static/donation-media/img/oh-shirt-design.png">two sides</a>--the art to the left on the front, the text "free software's welcoming committee" on the back. The two-sided design is printed on navy American Apparel t-shirts, made in the US and printed by a SF Bay area silkscreen printing company. Shirts are available in men's and women's sizes, XS to 2XL.
+                        </p>
+                        <p>
+                            Please let us know your shirt size in the comments field when you donate!
+                        </p>
+                    </div>
+                </div>
+
+                <h3 id="sketch">Custom sketch: For &gt;=$300 or $20/month</h3>
+                <div class="row">
+                    <div class="col-sm-6 col-md-4"><img src="/static/donation-media/img/sketch.jpg" class="img-responsive"><span class="credit">Photo by <a href="https://secure.flickr.com/photos/flixel/5319938918/">David</a>, CC BY-NC</span></div>
+                    <div class="col-sm-6 col-md-8">
+                        <p>
+                            Want a drawing of a baby penguin riding a dinosaur to liven up your office? Donate to OpenHatch at this level and Karen Rustad, OpenHatch's lead designer, will draw you a custom doodle of OpenHatch's mascot Sufjan on 80 lb paper.
+                        </p>
+                        <p>
+                            If you have an idea for what you want in your sketch, leave it in the comments field when you donate! Final sketch contents up to artist's discretion.
+                        </p>
+                    </div>
+                </div>
+
+                <h3 id="scarf">Scarf: For &gt;=$1000 or $60/month</h3>
+                <div class="row">
+                    <div class="col-sm-6 col-md-4"><img src="/static/donation-media/img/scarf-demo.png" class="img-responsive"></div>
+                    <div class="col-sm-6 col-md-8">
+                        <p>
+                            It's almost winter (in the northern hemisphere, anyway) and it's getting chilly. Possibly too chilly for people to see you walking around in your OpenHatch t-shirt! But never fear. Show your love with a knit acrylic stadium-style <a href="/static/donation-media/img/scarf.png">OpenHatch scarf</a>.
+                        </p>
+                    </div>
+                </div>
+
+                <h3 id="pie">Pie: For &gt;=$2000 or $150/month</h3>
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                        <img src="/static/donation-media/img/pie.jpg" class="img-responsive">
+                        <span class="credit">Photo by <a href="https://secure.flickr.com/photos/kitchenwench/2408588559/">Alicia</a>, CC BY-NC</span>
+                    </div>
+                    <div class="col-sm-6 col-md-8">
+                        <p>
+                            You are just too awesome. You overwhelm us. The only way we have to express our gratitude is by giving you a delicious pie.
+                        </p>
+                        <p>
+                            The pie will most likely come from the most delicious bakery we can find in your vicinity. If you are local to the San Francisco Bay Area or Boston area, we might bake it and deliver it ourselves!
+                        </p>
+                        <p>
+                            Please include any dietary restrictions/allergies/&c. in the comments when you donate.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="#donate" class="donation-button">Donate now!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
-{% endblock main %}
 
-{% block js %}
-{{ block.super }}
-<script type='text/javascript'>
-  $(function () {$('#tab_me').tabs();});
-</script>
-{% endblock js %}
-
+</body>
+</html>
