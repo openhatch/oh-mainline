@@ -2736,11 +2736,8 @@ class UserProfile(TwillTests):
 
     def test_profile_avatar_div_contains_info(self):
         content = self.__get_page_content()
-        self.assertTrue('<h4>Location</h4>' in content)
-        self.assertTrue('<h4>Email</h4>' in content)
-        self.assertTrue('<h4>LinkedIn</h4>' in content)
-        self.assertTrue('<h4>GitHub</h4>' in content)
-        self.assertTrue('<h4>GoogleCode</h4>' in content)
+        self.assertTrue('Location' in content)
+        self.assertTrue('Email' in content)
 
     @skip('Dynamically created fields')
     def test_profile_contains_info(self):

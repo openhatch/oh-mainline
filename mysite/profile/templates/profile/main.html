@@ -37,38 +37,14 @@
     is involved in <abbr title='that is, Free, Libre Open Source Software'>FLOSS</abbr>
 {% endblock %}
 
-{% block pagetop %}
-    <div id='nameplate'>
-    {% if person.user.first_name or person.user.last_name %}
-        <h1 class='name'>
-            {{ person.user.first_name }}
-            {{ person.user.last_name }}
-                    <span class='username' style="font-size: .7em;">
-                        {{ person.username }}
-                    </span>
-        </h1>
-    {% else %}
-        <h1 class='name'>
-            <a href='/people/{{ person.user.id }}'>
-                <div class='name'>
-                    {{ person.user.username }}
-                </div>
-            </a>
-        </h1>
 
-        {% if editable %}
-            <a href='{% url account.views.edit_name %}' class="edit-name-link">
-            </a>
-        {% endif %}
-    {% endif %}
-{% endblock %}
 
 {% block content %}
+
     <div id='avatar' class='module'>
         {% if editable %}
             {% if person.photo %}
                 <img src={% version photo_url %}>
-                <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
             {% else %}
                 {# Haven't uploaded a photo yet #}
                 <style>
@@ -85,48 +61,59 @@
             <img src={% version photo_url %}>
 
         {% endif %}
-
         <div id='nameplate'>
-            <h4>Location</h4>
+            {% if person.user.first_name or person.user.last_name %}
+                <h1 class='name'>
+                    {{ person.user.first_name }}
+                    {{ person.user.last_name }}
+                    <span class='username' style="font-size: .7em;">
+                        {{ person.username }}
+                        {% if user|has_permission:'change_user' and not info_edit_mode %}
+                            (<a href='/profile/views/edit_info/{{ person.user.username }}'>Edit</a>)
+                        {% endif %}
+                    </span>
+                </h1>
+            {% else %}
+                <h1 class='name'>
+                    <a href='/people/{{ person.user.id }}'>
+                        <div class='name'>
+                            {{ person.user.username }}
+                        </div>
+                    </a>
+                </h1>
+            {% endif %}
+            {% if editable and person.photo %}
+                <p class="clear" />
+                <a href="/account/edit/photo/">Change photo</a>
+            {% endif %}
+        </div>
+        <div id='nameplate'>
+            <h4>
+                Location
+                {% if request.user|has_group:'ADMIN' %}
+                    (<a href="{% url mysite.account.views.set_location %}?person_id={{ person.id }}">Edit</a>)
+                {% endif %}
+            </h4>
             <p class="clear">
                 {% if person.location_display_name and person.location_confirmed %}
                     {{ person.location_display_name }}
                 {% else %}
                     <span class="muted">Unknown</span>
                 {% endif %}
-                {% if request.user|has_group:'ADMIN' %}
-                    <a href="{% url mysite.account.views.set_location %}?person_id={{ person.id }}">(Edit)</a>
-                {% endif %}
             </p>
 
             {% if person.user.email %}
                 {% if person.user == user or user|has_group:'ADMIN' %}
-                    <h4>Email</h4>
+                    <h4>
+                        Email
+                        {% if user|has_permission:'change_user' and not info_edit_mode %}
+                            (<a href='/profile/views/edit_info/{{ person.user.username }}'>Edit</a>)
+                        {% endif %}
+                    </h4>
                     <p class="clear">
                         <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
                     </p>
                 {% endif %}
-            {% endif %}
-
-            {% if person.github_name %}
-                <h4>GitHub</h4>
-                <p id="gitHubUrl" style='clear: both;'>
-                    <a href="https://github.com/{{ person.github_name }}">{{ person.github_name }}</a>
-                </p>
-            {% endif %}
-
-            {% if person.google_code_name %}
-                <h4>GoogleCode</h4>
-                <p id="googleCodeUrl" style='clear: both;'>
-                    <a href="https://code.google.com/u/{{ person.google_code_name }}">{{ person.google_code_name }}</a>
-                </p>
-            {% endif %}
-
-            {% if person.linked_in_url %}
-                <h4>LinkedIn</h4>
-                <p id="linkedinurl" style='clear: both;'>
-                    <a href="{{ person.linked_in_url }}">{{ person.linked_in_url }}</a>
-                </p>
             {% endif %}
         </div>
         <!-- /.nameplate -->
