@@ -385,6 +385,12 @@ Volunteers
             </select>
         </div>
 
+        <script>
+            $('#view').on('change', function() {
+                $.post("save_view", {'view': this.value})
+            });
+        </script>
+
         <div id='summary_of_mapped_people'>
             <span id='people_count'>
                     <span>{{ people|length }}</span>

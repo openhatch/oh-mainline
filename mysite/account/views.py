@@ -89,6 +89,7 @@ def signup(request, signup_form=None):
         signup_form = mysite.account.forms.UserCreationFormWithEmail()
     return render_response(request, 'account/signup.html', {'form': signup_form})
 
+
 def signup_request(request):
     try:
         post_data = request.POST
@@ -175,6 +176,21 @@ def signup_request(request):
     response = HttpResponse(status=200)
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+def save_view(request):
+    try:
+        person = request.user.get_profile()
+        view = request.POST.get('view')
+        if view == 'list':
+            person.view_list = True
+        elif view == 'cards':
+            person.view_list = False
+        else:
+            return HttpResponse(status=400)
+        person.save()
+        return HttpResponse(status=200)
+    except (Exception, RuntimeError) as e:
+        return HttpResponse(status=400)
 
 def generate_random_file_path(filename):
     # MEDIA_ROOT is prefixed automatically.

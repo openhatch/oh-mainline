@@ -177,6 +177,8 @@ urlpatterns = patterns('',
 
         (r'^account/signup$', 'mysite.account.views.signup_request'),
 
+        (r'^people/save_view$', 'mysite.account.views.save_view'),
+
         (r'^people/(?P<user_to_display__id>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 
