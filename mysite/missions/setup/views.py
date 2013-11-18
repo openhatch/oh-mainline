@@ -30,7 +30,7 @@ class SetupIndex(MissionBaseView):
 
 class SetupGitBash(MissionBaseView):
     url = '/install-git-bash'
-    template_name='missions/windows-setup/install-git-bash.html'
+    template_name = 'missions/windows-setup/install-git-bash.html'
     title = 'Install Git Bash'
 
 

@@ -28,12 +28,14 @@ import logging
 
 CCT = 'hit_count_cache_timestamp'
 
+
 def order_bugs(query):
     # Minus sign: reverse order
     # Minus good for newcomers: this means true values
     # (like 1) appear before false values (like 0)
     # Minus last touched: Old bugs last.
     return query.order_by('-good_for_newcomers', '-last_touched')
+
 
 class Query:
 
@@ -84,13 +86,14 @@ class Query:
         for facet in possible_facets:
             if GET.get(facet):
                 active_facet_options[facet] = GET.get(facet)
-            elif GET.get(facet) == '': # Only select any_facet if a facet is empty string, not None
+            # Only select any_facet if a facet is empty string, not None
+            elif GET.get(facet) == '':
                 any_facet_options.append(facet)
         terms_string = GET.get('q', u'')
         terms = Query.split_into_terms(terms_string)
 
         return Query(terms=terms, active_facet_options=active_facet_options,
-                any_facet_options=any_facet_options, terms_string=terms_string)
+                     any_facet_options=any_facet_options, terms_string=terms_string)
 
     def get_bugs_unordered(self):
         return mysite.search.models.Bug.open_ones.filter(self.get_Q())
@@ -119,7 +122,7 @@ class Query:
         if u'language' in self.active_facet_options and not exclude_language:
             language_value = self.active_facet_options[u'language']
             if language_value == 'Unknown':
-                language_value=''
+                language_value = ''
             q &= Q(project__language__iexact=language_value)
 
         # project facet
@@ -160,7 +163,7 @@ class Query:
 
                     # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__iregex=whole_word)
-                    )
+                )
             else:
                 terms_disjunction = (
                     Q(project__language__icontains=word) |
@@ -170,7 +173,7 @@ class Query:
 
                     # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__icontains=word)
-                    )
+                )
 
             q &= terms_disjunction
 
@@ -187,7 +190,7 @@ class Query:
         GET_data.update({
             u'q': unicode(self.terms_string),
             unicode(facet_name): unicode(option_name),
-            })
+        })
         query_string = mysite.base.unicode_sanity.urlencode(GET_data)
         query = Query.create_from_GET_data(GET_data)
         the_all_option = u'any'
@@ -209,17 +212,18 @@ class Query:
             is_active = True
 
         return {
-                'name': name,
-                'count': query.get_or_create_cached_hit_count(),
-                'query_string': query_string,
-                'is_active': is_active
-                }
+            'name': name,
+            'count': query.get_or_create_cached_hit_count(),
+            'query_string': query_string,
+            'is_active': is_active
+        }
 
     def get_facet_options(self, facet_name, option_names):
         # Assert that there are only unicode strings in this list
         option_names = mysite.base.decorators.no_str_in_the_list(option_names)
 
-        options = [self.get_facet_option_data(facet_name, n) for n in option_names]
+        options = [self.get_facet_option_data(facet_name, n)
+                   for n in option_names]
         # ^^ that's a list of facet options, where each "option" is a
         # dictionary that looks like this:
         # {
@@ -240,13 +244,14 @@ class Query:
         # Sort alphabetically by name. (This appears first because it has the
         # lowest precedence.)
 
-        options.sort(key=lambda x: x['count'], reverse=True) # 3 sorts before 50
+        # 3 sorts before 50
+        options.sort(key=lambda x: x['count'], reverse=True)
         # We want facet options that contain lots of bugs to appear at the top.
         # If you sort (naively) by x['count'], then the lower numbers appear
         # higher in the list. Let's reverse that with reverse=True.
 
         options.sort(
-                key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
+            key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
         # We want the Unknown language to appear last, unless it's active. If
         # the key lambda function returns False, then those options appear
         # first (because False appears before True), which is what we want.
@@ -260,49 +265,52 @@ class Query:
 
     def get_possible_facets(self):
 
-        project_options = self.get_facet_options(u'project', self.get_project_names())
+        project_options = self.get_facet_options(
+            u'project', self.get_project_names())
 
         toughness_options = self.get_facet_options(u'toughness', [u'bitesize'])
 
         contribution_type_options = self.get_facet_options(
             u'contribution_type', [u'documentation'])
 
-        language_options = self.get_facet_options(u'language', self.get_language_names())
+        language_options = self.get_facet_options(
+            u'language', self.get_language_names())
 
         # looks something like:
         # [{'count': 1180L, 'query_string': 'q=&language=Python', 'is_active': False, 'name': u'Python'}, {'count': 478L, 'query_string': 'q=&language=C%23', 'is_active': False, 'name': u'C#'}, {'count': 184L, 'query_string': 'q=&language=Unknown', 'is_active': False, 'name': 'Unknown'}, {'count': 532L, 'query_string': 'q=&language=C', 'is_active': False, 'name': u'C'}, {'count': 2374L, 'query_string': 'q=&language=', 'is_active': True, 'name': 'any'}]
 
         possible_facets = (
-                # The languages facet is based on the project languages, "for now"
-                (u'language', {
-                    u'name_in_GET': u"language",
-                    u'sidebar_heading': u"Languages (# of bugs)",
-                    u'description_above_results': u"projects primarily coded in %s",
-                    u'options': language_options,
-                    u'the_any_option': self.get_facet_options(u'language', [u''])[0],
-                    }),
-                (u'project', {
-                    u'name_in_GET': u'project',
-                    u'sidebar_heading': u'Projects (# of bugs)',
-                    u'description_above_results': 'in the %s project',
-                    u'options': project_options,
-                    u'the_any_option': self.get_facet_options(u'project', [u''])[0],
-                }),
-                (u'toughness', {
-                    u'name_in_GET': u"toughness",
-                    u'sidebar_heading': u"Toughness (# of bugs)",
-                    u'description_above_results': u"where toughness = %s",
-                    u'options': toughness_options,
-                    u'the_any_option': self.get_facet_options(u'toughness', [u''])[0],
-                }),
-                (u'contribution type', {
-                    u'name_in_GET': u"contribution_type",
-                    u'sidebar_heading': u"Just bugs labeled... (# of bugs)",
-                    u'description_above_results': u"which need %s",
-                    u'options': contribution_type_options,
-                    u'the_any_option': self.get_facet_options(u'contribution_type', [u''])[0],
-                    })
-            )
+            # The languages facet is based on the project languages, "for
+            # now"
+            (u'language', {
+                u'name_in_GET': u"language",
+                u'sidebar_heading': u"Languages (# of bugs)",
+                u'description_above_results': u"projects primarily coded in %s",
+                u'options': language_options,
+                u'the_any_option': self.get_facet_options(u'language', [u''])[0],
+            }),
+            (u'project', {
+                u'name_in_GET': u'project',
+                u'sidebar_heading': u'Projects (# of bugs)',
+                u'description_above_results': 'in the %s project',
+                u'options': project_options,
+                u'the_any_option': self.get_facet_options(u'project', [u''])[0],
+            }),
+            (u'toughness', {
+                u'name_in_GET': u"toughness",
+                u'sidebar_heading': u"Toughness (# of bugs)",
+                u'description_above_results': u"where toughness = %s",
+                u'options': toughness_options,
+                u'the_any_option': self.get_facet_options(u'toughness', [u''])[0],
+            }),
+            (u'contribution type', {
+                u'name_in_GET': u"contribution_type",
+                u'sidebar_heading': u"Just bugs labeled... (# of bugs)",
+                u'description_above_results': u"which need %s",
+                u'options': contribution_type_options,
+                u'the_any_option': self.get_facet_options(u'contribution_type', [u''])[0],
+            })
+        )
 
         return possible_facets
 
@@ -319,8 +327,10 @@ class Query:
         query_without_language_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_language_facet.get_bugs_unordered()
-        distinct_language_columns = bugs.values(u'project__language').distinct()
-        languages = [x[u'project__language'] for x in distinct_language_columns]
+        distinct_language_columns = bugs.values(
+            u'project__language').distinct()
+        languages = [x[u'project__language']
+                     for x in distinct_language_columns]
         languages = [l or u'Unknown' for l in languages]
 
         # Add the active language facet, if there is one
@@ -348,9 +358,11 @@ class Query:
         query_without_project_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_project_facet.get_bugs_unordered()
-        project_ids = list(bugs.values_list(u'project__id', flat=True).distinct())
+        project_ids = list(
+            bugs.values_list(u'project__id', flat=True).distinct())
         projects = Project.objects.filter(id__in=project_ids)
-        project_names = [project.display_name or u'Unknown' for project in projects]
+        project_names = [
+            project.display_name or u'Unknown' for project in projects]
 
         # Add the active project facet, if there is one
         if u'project' in self.active_facet_options:
@@ -369,16 +381,20 @@ class Query:
         simple_dictionary[u'terms'] = str(sorted(self.terms))
 
         # add active_facet_options
-        simple_dictionary[u'active_facet_options'] = str(sorted(self.active_facet_options.items()))
+        simple_dictionary[u'active_facet_options'] = str(
+            sorted(self.active_facet_options.items()))
 
         stringified = str(sorted(simple_dictionary.items()))
         # then return a hash of our sorted items self.
-        return hashlib.sha1(stringified).hexdigest() # sadly we cause a 2x space blowup here
+        # sadly we cause a 2x space blowup here
+        return hashlib.sha1(stringified).hexdigest()
 
     def get_hit_count_cache_key(self):
         hashed_query = self.get_sha1()
-        hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(CCT)
-        hit_count_cache_key = "hcc_%s_%s" % (hashlib.sha1(hcc_timestamp.__str__()).hexdigest(), hashed_query)
+        hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+            CCT)
+        hit_count_cache_key = "hcc_%s_%s" % (
+            hashlib.sha1(hcc_timestamp.__str__()).hexdigest(), hashed_query)
         return hit_count_cache_key
 
     def get_or_create_cached_hit_count(self):
@@ -386,7 +402,7 @@ class Query:
         hit_count_cache_key = self.get_hit_count_cache_key()
         # Fetch the hit count from the cache.
         hit_count = django.core.cache.cache.get(hit_count_cache_key)
-        logging.debug( "Cached hit count: " + str(hit_count))
+        logging.debug("Cached hit count: " + str(hit_count))
         # We need to be careful to check if the count is None, rather than just if the
         # count is a false value. That's because a value of zero is still a cached value;
         # if we just use a boolean test, we would mistake the zero value for an empty
@@ -410,10 +426,12 @@ class Query:
         logging.info("Query is " + query_string)
         return query_string
 
+
 def get_project_count():
     """Retrieve the number of projects currently indexed."""
     bugs = mysite.search.models.Bug.all_bugs.all()
     return bugs.values(u'project').distinct().count()
+
 
 def get_projects_with_bugs():
     """
@@ -424,7 +442,9 @@ def get_projects_with_bugs():
         bug_count__gt=0).order_by(u'display_name')
     return projects
 
+
 def get_cited_projects_lacking_bugs():
-    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all().values_list('project_id', flat=True)
+    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all().values_list(
+        'project_id', flat=True)
     return mysite.search.models.Project.objects.filter(id__in=project_ids).annotate(
         bug_count=Count('bug')).filter(bug_count=0)

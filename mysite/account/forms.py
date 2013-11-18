@@ -25,38 +25,42 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import logging
 import mysite.base.depends
 
-RESERVED_USERNAMES =  (
-        'admin',
-        'anonymous',
-        'sufjan',
-        'Spam cleanup script',
-        )
+RESERVED_USERNAMES = (
+    'admin',
+    'anonymous',
+    'sufjan',
+    'Spam cleanup script',
+)
+
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
-    username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
-        help_text = "<span class='help_text'>Pick a username with length < 31 characters. Stick to letters, digits and underscores.</span>",
-        error_messages = {'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
+    username = django.forms.RegexField(
+        label="Username", max_length=30, regex=r'^\w+$',
+        help_text="<span class='help_text'>Pick a username with length < 31 characters. Stick to letters, digits and underscores.</span>",
+        error_messages={'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
     email = django.forms.EmailField(error_messages={
         'required': "Your email address is required. We promise to use it respectfully.",
         'invalid': "This email address looks fishy. Real, or malarkey?"})
+
     class Meta:
         model = django.contrib.auth.models.User
         fields = ('username', 'email', 'password1')
 
     def __init__(self, *args, **kw):
         super(django.contrib.auth.forms.UserCreationForm,
-                self).__init__(*args, **kw)
+              self).__init__(*args, **kw)
 
         custom_error_messages = {}
         custom_error_messages_dict = {
-                "A user with that username already exists.": "Oops, we've already got a user in our database with that username. Pick another one!",
-                "A user with that email already exists.": "We've already got a user in our database with that email address. Have you signed up before?",
-                }
+            "A user with that username already exists.": "Oops, we've already got a user in our database with that username. Pick another one!",
+            "A user with that email already exists.": "We've already got a user in our database with that email address. Have you signed up before?",
+        }
 
         for fieldname in self.errors:
             for index, error_text in enumerate(self.errors[fieldname]):
                 uet = unicode(error_text)
-                self.errors[fieldname][index] = custom_error_messages_dict.get(uet, uet)
+                self.errors[fieldname][
+                    index] = custom_error_messages_dict.get(uet, uet)
 
     def clean_username(self):
         username = super(UserCreationFormWithEmail, self).clean_username()
@@ -81,10 +85,14 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
         raise django.forms.ValidationError(
             "A user with that email already exists.")
 
+
 class ShowEmailForm(django.forms.Form):
-    show_email = django.forms.BooleanField(required=False, label="Make email publicly visible?")
+    show_email = django.forms.BooleanField(
+        required=False, label="Make email publicly visible?")
+
 
 class EditEmailForm(django.forms.ModelForm):
+
     class Meta:
         model = django.contrib.auth.models.User
         fields = ('email',)
@@ -93,18 +101,21 @@ class EditEmailForm(django.forms.ModelForm):
         """Verify that their email is unique."""
         email = self.cleaned_data["email"]
         other_users_with_this_email = list(
-                User.objects.filter(email=email).exclude(
-                    username=self.instance.username))
+            User.objects.filter(email=email).exclude(
+                username=self.instance.username))
         if not other_users_with_this_email:
             return email
         else:
             raise django.forms.ValidationError(
                 "A user with that email already exists.")
 
+
 class EditLocationForm(django.forms.ModelForm):
+
     class Meta:
         model = Person
         fields = ('location_display_name',)
+
     def clean_location_display_name(self):
         address = self.cleaned_data['location_display_name'].strip()
         # Synchronously try to geocode it. This will prime the cache, and
@@ -118,24 +129,29 @@ class EditLocationForm(django.forms.ModelForm):
                 "An error occurred while geocoding. Make sure the address is a valid place. If you think this is our error, contact us.")
         return address
 
+
 class EditNameForm(django.forms.ModelForm):
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'username')
 
+
 class EditPhotoForm(django.forms.ModelForm):
+
     class Meta:
         model = Person
         fields = ('photo',)
-    
+
     def clean_photo(self):
-        ### If PIL is missing, proceed by providing the default
-        ### profile image.
+        # If PIL is missing, proceed by providing the default
+        # profile image.
         if not mysite.base.depends.Image:
-            ## FIXME This is fail-safe, not fail-secure, behavior.
-            ## If an image is too big, and the Python Imaging Library
-            ## is not installed, we simply do not resize it.E
-            logging.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
+            # FIXME This is fail-safe, not fail-secure, behavior.
+            # If an image is too big, and the Python Imaging Library
+            # is not installed, we simply do not resize it.E
+            logging.info(
+                "NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
             return self.cleaned_data['photo']
 
         # Safe copy of data...
@@ -170,17 +186,22 @@ class EditPhotoForm(django.forms.ModelForm):
             self.cleaned_data['photo'] = new_image_uploaded_file
         return self.cleaned_data['photo']
 
+
 class SignUpIfYouWantToHelpForm(django.forms.Form):
     how_should_people_contact_you = django.forms.ChoiceField(
-            initial='forwarder',
-            widget=django.forms.RadioSelect,
-            label="You've expressed interest in helping out a project. How can people from that project contact you?",
-            choices=(
-                ('forwarder', 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
-                ('public_email', 'By email; just display my real email address'),
-                ))
+        initial='forwarder',
+        widget=django.forms.RadioSelect,
+        label="You've expressed interest in helping out a project. How can people from that project contact you?",
+        choices=(
+                ('forwarder',
+                 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
+            ('public_email',
+             'By email; just display my real email address'),
+        ))
+
 
 class EmailMeForm(django.forms.ModelForm):
+
     class Meta:
         model = Person
         fields = ('email_me_re_projects',)

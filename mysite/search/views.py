@@ -22,11 +22,11 @@ from django.core.urlresolvers import reverse
 try:
     from urlparse import parse_qsl
 except ImportError:
-    from cgi import parse_qsl # Python 2.5 on deployment
+    from cgi import parse_qsl  # Python 2.5 on deployment
 
 
 from mysite.search.models import Project
-import mysite.search.view_helpers 
+import mysite.search.view_helpers
 import mysite.base.view_helpers
 import mysite.base.unicode_sanity
 from mysite.base.view_helpers import render_response
@@ -39,13 +39,17 @@ import mysite.search.forms
 import mysite.base.decorators
 
 # Via http://www.djangosnippets.org/snippets/1435/
+
+
 def encode_datetime(obj):
     if isinstance(obj, datetime.date):
-        fixed = datetime.datetime(obj.year, obj.month, obj.day, tzinfo=pytz.utc)
+        fixed = datetime.datetime(
+            obj.year, obj.month, obj.day, tzinfo=pytz.utc)
         obj = fixed
     if isinstance(obj, datetime.datetime):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
+
 
 def search_index(request, invalid_subscribe_to_alert_form=None):
     # Make the query string keys lowercase using a redirect.
@@ -79,7 +83,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
         total_bug_count = bugs.count()
 
-        bugs = bugs[start-1:end]
+        bugs = bugs[start - 1:end]
 
     else:
         bugs = []
@@ -113,10 +117,11 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
-    data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(request.GET)
+    data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(
+        request.GET)
 
     is_this_page_1 = (start <= 1)
-    is_this_the_last_page = ( end >= (total_bug_count - 1) )
+    is_this_the_last_page = (end >= (total_bug_count - 1))
     data['show_prev_page_link'] = not is_this_page_1
     data['show_next_page_link'] = not is_this_the_last_page
 
@@ -130,12 +135,13 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
             alert_form = invalid_subscribe_to_alert_form
         else:
             initial = {
-                    'query_string': request.META['QUERY_STRING'],
-                    'how_many_bugs_at_time_of_request': len(bugs)
-                    }
+                'query_string': request.META['QUERY_STRING'],
+                'how_many_bugs_at_time_of_request': len(bugs)
+            }
             if request.user.is_authenticated():
                 initial['email'] = request.user.email
-            alert_form = mysite.search.forms.BugAlertSubscriptionForm(initial=initial)
+            alert_form = mysite.search.forms.BugAlertSubscriptionForm(
+                initial=initial)
         data['subscribe_to_alert_form'] = alert_form
 
     # FIXME
@@ -149,15 +155,19 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
     Bug = mysite.search.models.Bug
     from django.db.models import Q, Count
-    data['popular_projects'] = list(Project.objects.filter(name__in=['Miro', 'GnuCash', 'brasero', 'Evolution Exchange', 'songbird']).order_by('name').reverse())
-    data['all_projects'] = Project.objects.values('pk','name').filter(bug__looks_closed=False).annotate(Count('bug')).order_by('name')
+    data['popular_projects'] = list(Project.objects.filter(
+        name__in=['Miro', 'GnuCash', 'brasero', 'Evolution Exchange', 'songbird']).order_by('name').reverse())
+    data['all_projects'] = Project.objects.values('pk', 'name').filter(
+        bug__looks_closed=False).annotate(Count('bug')).order_by('name')
 
     Person = mysite.profile.models.Person
     import random
     random_start = int(random.random() * 700)
-    data['contributors'] = Person.objects.all()[random_start:random_start+5]
-    data['contributors2'] = Person.objects.all()[random_start+10:random_start+15]
-    data['languages'] = Project.objects.all().values_list('language', flat=True).order_by('language').exclude(language='').distinct()[:4]
+    data['contributors'] = Person.objects.all()[random_start:random_start + 5]
+    data['contributors2'] = Person.objects.all(
+    )[random_start + 10:random_start + 15]
+    data['languages'] = Project.objects.all().values_list(
+        'language', flat=True).order_by('language').exclude(language='').distinct()[:4]
 
     if format == 'json':
         # FIXME: Why `alert`?
@@ -174,17 +184,18 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
         return mysite.base.decorators.as_view(request, 'search/search.html', data, slug=None)
 
+
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     """ The search results page accesses this view via jQuery's getJSON method, 
     and loads its results into the DOM."""
     # Purpose of this code: Serialize the list of bugs
     # Step 1: Pull the bugs out of the database, getting them back
     #   as simple Python objects
-    
+
     obj_serializer = serializers.get_serializer('python')()
     bugs = obj_serializer.serialize(bunch_of_bugs)
 
-    # Step 2: With a (tragically) large number of database calls, 
+    # Step 2: With a (tragically) large number of database calls,
     # loop over these objects, replacing project primary keys with project
     # display names.
     for bug in bugs:
@@ -198,10 +209,12 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     json_as_string = simplejson.dumps(data_list, default=encode_datetime)
 
     # Step 5: Prefix it with the desired callback function name
-    json_string_with_callback = callback_function_name + '(' + json_as_string + ')'
+    json_string_with_callback = callback_function_name + \
+        '(' + json_as_string + ')'
 
     # Step 6: Return that.
     return HttpResponse(json_string_with_callback)
+
 
 def request_jquery_autocompletion_suggestions(request):
     """
@@ -222,21 +235,26 @@ def request_jquery_autocompletion_suggestions(request):
 
     suggestions_list = get_autocompletion_suggestions(partial_query)
     suggestions_string = list_to_jquery_autocompletion_format(
-                suggestions_list)
+        suggestions_list)
     return HttpResponse(suggestions_string)
+
 
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
     jQuery's autocomplete plugin."""
     return "\n".join(list)
 
+
 class SearchableField:
+
     "A field in the database you can search."
     fields_by_prefix = {}
+
     def __init__(self, _prefix):
         self.prefix = _prefix
         self.is_queried = False
         self.fields_by_prefix[self.prefix] = self
+
 
 def get_autocompletion_suggestions(input):
     """
@@ -272,7 +290,7 @@ def get_autocompletion_suggestions(input):
     else:
         for p in SearchableField.fields_by_prefix:
             SearchableField.fields_by_prefix[
-                    p].is_queried = True
+                p].is_queried = True
         partial_query = input
 
     project_max = 5
@@ -287,7 +305,7 @@ def get_autocompletion_suggestions(input):
         # likely to be trying to type. And also because it is display_name that
         # search uses to query projects.
         projects_by_name = Project.objects.filter(
-                display_name__istartswith=partial_query)
+            display_name__istartswith=partial_query)
         # FIXME: Is __istartswith faster than
         # lowercasing and using startswith?
 
@@ -298,30 +316,31 @@ def get_autocompletion_suggestions(input):
         project_names = project_names[:project_max]
 
         suggestions += [sf_project.prefix + separator + name
-                for name in project_names]
+                        for name in project_names]
 
     if sf_language.is_queried:
 
         # For languages, get projects first
         projects_by_lang = Project.objects.filter(
-                language__istartswith=partial_query)
+            language__istartswith=partial_query)
 
         # Then use bugs to compile a list of languages.
         langs = projects_by_lang.values_list(
-                'language', flat=True).order_by(
-                        'language')[:lang_max]
+            'language', flat=True).order_by(
+            'language')[:lang_max]
 
         if langs:
 
             suggestions += [sf_language.prefix + separator + lang
-                    for lang in langs]
+                            for lang in langs]
 
     return suggestions
+
 
 def subscribe_to_bug_alert_do(request):
     confirmation_query_string_fragment = "&confirm_email_alert_signup=1"
     alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
-    query_string = request.POST.get('query_string', '') # Lacks initial '?'
+    query_string = request.POST.get('query_string', '')  # Lacks initial '?'
     query_string = query_string.replace(confirmation_query_string_fragment, '')
     next = reverse(search_index) + '?' + query_string
     if alert_form.is_valid():
@@ -341,6 +360,7 @@ def subscribe_to_bug_alert_do(request):
     else:
         # If user tries to do a different bug search after invalid form input
         return HttpResponseRedirect(next + request.META['QUERY_STRING'])
+
 
 def project_has_icon(request, project_name):
     p = get_object_or_404(Project, name=project_name)

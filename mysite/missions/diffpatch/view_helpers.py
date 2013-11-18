@@ -28,7 +28,9 @@ from mysite.missions.base.view_helpers import (
     patch,
     get_mission_data_path)
 
+
 class SingleFilePatch(object):
+
     @classmethod
     def get_patch(cls):
         oldlines = open(cls.OLD_FILE).readlines()
@@ -74,7 +76,7 @@ class SingleFilePatch(object):
         to get to modifiedfile.txt, do "diff -u originalfile.txt modifiedfile.txt".'
 
         # Check that it will apply correctly to the file.
-        #if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
+        # if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
         #   raise IncorrectPatch, 'The patch will not apply correctly to the original file.'
 
         resulting_contents = SingleFilePatch.apply_patch(
@@ -95,15 +97,23 @@ class SingleFilePatch(object):
         # Otherwise, we give a generic error message.
         raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
 
+
 class PatchSingleFileMission(SingleFilePatch):
-    OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'oven-pancake.txt')
-    NEW_FILE = os.path.join(get_mission_data_path('diffpatch'), 'oven-pancake_result.txt')
-    # This does not correspond to a real file but is merely the filename the download is presented as.
+    OLD_FILE = os.path.join(
+        get_mission_data_path('diffpatch'), 'oven-pancake.txt')
+    NEW_FILE = os.path.join(
+        get_mission_data_path('diffpatch'), 'oven-pancake_result.txt')
+    # This does not correspond to a real file but is merely the filename the
+    # download is presented as.
     PATCH_FILENAME = 'add-oven-temp.patch'
 
+
 class DiffSingleFileMission(SingleFilePatch):
-    OLD_FILE = os.path.join(get_mission_data_path('diffpatch'), 'nutty-pancake.txt')
-    NEW_FILE = os.path.join(get_mission_data_path('diffpatch'), 'nutty-pancake_result.txt')
+    OLD_FILE = os.path.join(
+        get_mission_data_path('diffpatch'), 'nutty-pancake.txt')
+    NEW_FILE = os.path.join(
+        get_mission_data_path('diffpatch'), 'nutty-pancake_result.txt')
+
 
 class DiffRecursiveMission(object):
     ORIG_DIR = 'recipes'
@@ -149,7 +159,8 @@ class DiffRecursiveMission(object):
     def synthesize_tarball(cls):
         tdata = StringIO()
         tfile = tarfile.open(fileobj=tdata, mode='w:gz')
-        tfile.add(os.path.join(get_mission_data_path('diffpatch'), cls.ORIG_DIR), cls.ORIG_DIR)
+        tfile.add(os.path.join(get_mission_data_path('diffpatch'),
+                  cls.ORIG_DIR), cls.ORIG_DIR)
         tfile.close()
         return tdata.getvalue()
 
@@ -165,8 +176,10 @@ class DiffRecursiveMission(object):
             cls.check_for_leading_dot_slash_in_filename(filename)
             the_patch.target[i] = cls.strip_filename_one_path_level(filename)
 
-        # Go through the files and check that ones that should be mentioned in the patch are so mentioned.
-        path_to_mission_files = os.path.join(get_mission_data_path('diffpatch'), cls.ORIG_DIR)
+        # Go through the files and check that ones that should be mentioned in
+        # the patch are so mentioned.
+        path_to_mission_files = os.path.join(
+            get_mission_data_path('diffpatch'), cls.ORIG_DIR)
         for filename in os.listdir(path_to_mission_files):
             old_style_filename = filename
             full_filename = os.path.join(path_to_mission_files, filename)
@@ -190,14 +203,15 @@ class DiffRecursiveMission(object):
                 # We did rename a bunch of the files a little while ago.
                 # Maybe we can process their submission anyway by looking for
                 # the old filename in the patch header.
-                old_style_filename = DiffRecursiveMission.name_new2old(filename)
+                old_style_filename = DiffRecursiveMission.name_new2old(
+                    filename)
                 try:
                     index = the_patch.source.index(old_style_filename)
                 except ValueError:
                     raise IncorrectPatch, 'Patch does not modify file "%s", which it should modify.' % filename
 
             if (the_patch.target[index] != filename and
-                the_patch.target[index] != old_style_filename):
+                    the_patch.target[index] != old_style_filename):
                 raise IncorrectPatch, 'Patch headers for file "%s" have inconsistent filenames.' % filename
 
             hunks = the_patch.hunks[index]
@@ -211,14 +225,14 @@ class DiffRecursiveMission(object):
 
                 # Check for reverse patch by seeing if there is "-firstSubstitute" and "+firstOriginal" in the diff.
                 # (If they did everything perfectly and reversed the patch, there will be two lines following these conditions)
-                if patchdata.find('-'+ cls.SUBSTITUTIONS[1][1]) != -1 and patchdata.find('+'+ cls.SUBSTITUTIONS[1][0]) != -1:
+                if patchdata.find('-' + cls.SUBSTITUTIONS[1][1]) != -1 and patchdata.find('+' + cls.SUBSTITUTIONS[1][0]) != -1:
                     raise IncorrectPatch, 'You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.'
                 else:
                     raise IncorrectPatch, 'The modifications to "%s" will not apply correctly to the original file.' % filename
 
             # Check for BOM issues.  Likely a Windows-only issue, and only when using a text editor that
             # includes UTF-8 BOM markers when saving files.
-            if '\xef\xbb\xbf' in ''.join(the_patch.patch_stream(StringIO(old_contents),hunks)):
+            if '\xef\xbb\xbf' in ''.join(the_patch.patch_stream(StringIO(old_contents), hunks)):
                 raise IncorrectPatch, 'It appears the text editor you used to modify "%s" leaves UTF-8 BOM characters.  Try an editor like Notepad++ or something similar.' % filename
 
             # Check that the resulting file matches what is expected.
@@ -226,11 +240,14 @@ class DiffRecursiveMission(object):
                 raise IncorrectPatch, 'The modifications to "%s" do not result in the correct contents. Make sure you replaced "Aubergine", too!' % filename
 
         if len(the_patch.source) != 0:
-            raise IncorrectPatch, 'The patch modifies files that it should not modify: %s' % ', '.join(the_patch.source)
+            raise IncorrectPatch, 'The patch modifies files that it should not modify: %s' % ', '.join(
+                the_patch.source)
+
 
 class PatchRecursiveMission(object):
     OLD_DIR = os.path.join(get_mission_data_path('diffpatch'), 'recipes')
-    NEW_DIR = os.path.join(get_mission_data_path('diffpatch'), 'recipes.more-garlic')
+    NEW_DIR = os.path.join(
+        get_mission_data_path('diffpatch'), 'recipes.more-garlic')
     BASE_NAME = 'recipes'
     ANSWERS = {'amount_of_garlic': 3}
 
@@ -247,6 +264,8 @@ class PatchRecursiveMission(object):
 
             oldlines = open(oldname).readlines()
             newlines = open(newname).readlines()
-            patchfile.writelines(difflib.unified_diff(oldlines, newlines, 'a/%s/%s' % (cls.BASE_NAME, name), 'b/%s/%s' % (cls.BASE_NAME, name)))
+            patchfile.writelines(
+                difflib.unified_diff(oldlines, newlines, 'a/%s/%s' %
+                                     (cls.BASE_NAME, name), 'b/%s/%s' % (cls.BASE_NAME, name)))
 
         return patchfile.getvalue()

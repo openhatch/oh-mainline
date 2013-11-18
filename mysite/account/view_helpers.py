@@ -1,6 +1,7 @@
 from django.contrib.sessions.models import Session
 import datetime
 
+
 def clear_user_sessions(user, session_to_omit=None):
     user_sessions = []
     for session in Session.objects.filter(expire_date__gte=datetime.datetime.now()):

@@ -25,6 +25,7 @@ from mysite.search.models import Bug
 
 import django.db.models
 
+
 def import_one_bug_item(d):
     '''Accepts one ParsedBug object, as a Python dict.
 
@@ -52,7 +53,8 @@ def import_one_bug_item(d):
         logging.error(repr(d))
         return
 
-    project, created = mysite.search.models.Project.objects.get_or_create(name=d['_project_name'])
+    project, created = mysite.search.models.Project.objects.get_or_create(
+        name=d['_project_name'])
     if created:
         logging.error("FYI we created: %s", d['_project_name'])
 
@@ -69,22 +71,22 @@ def import_one_bug_item(d):
         bug = mysite.search.models.Bug()
 
     if deleted:
-        if bug.pk: # meaning, is the bug already in the DB?
+        if bug.pk:  # meaning, is the bug already in the DB?
             # If so, delete it.
             bug.delete()
         # Either way, stop further processing.
         return
 
     datetime_field_names = set([
-            field.name
-            for field in bug._meta.fields
-            if isinstance(field,
-                          django.db.models.fields.DateTimeField)])
+        field.name
+        for field in bug._meta.fields
+        if isinstance(field,
+                      django.db.models.fields.DateTimeField)])
 
     for key in d:
         value = d[key]
         if key in datetime_field_names and (
-            not isinstance(value, datetime.datetime)):
+                not isinstance(value, datetime.datetime)):
             value = dateutil.parser.parse(value)
         if getattr(bug, key) != value:
             setattr(bug, key, value)
@@ -96,6 +98,7 @@ def import_one_bug_item(d):
 
     bug.save()
     return bug
+
 
 class AddTrackerForeignKeysToBugs(object):
 
@@ -110,16 +113,19 @@ class AddTrackerForeignKeysToBugs(object):
         bug_urls = [bug_url for (bug_url, bug_data) in list_of_url_data_pairs]
         # Fetch a list of all Bugs that are stale.
         bugs = Bug.all_bugs.filter(canonical_bug_link__in=bug_urls)
-        tms = mysite.customs.models.TrackerModel.objects.all().select_subclasses()
+        tms = mysite.customs.models.TrackerModel.objects.all(
+        ).select_subclasses()
         # For each TrackerModel, process its stale Bugs.
         bugs_to_retry = []
         for bug in bugs:
-            tms_shortlist = [tm for tm in tms if tm.get_base_url() in bug.canonical_bug_link]
+            tms_shortlist = [
+                tm for tm in tms if tm.get_base_url() in bug.canonical_bug_link]
             # Check that we actually got something back, otherwise bug.tracker would get
             # set to None, and self.rm.update_bugs would send it right back here, causing
             # infinite recursion.
             if len(tms_shortlist) > 0:
-                # Ideally this should now just be one object, so just take the first.
+                # Ideally this should now just be one object, so just take the
+                # first.
                 bug.tracker = tms_shortlist[0]
                 bug.save()
                 bugs_to_retry.append(bug)

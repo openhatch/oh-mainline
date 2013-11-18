@@ -18,6 +18,7 @@ import yaml
 from django.core.management.base import BaseCommand
 import mysite.customs.models
 
+
 class Command(BaseCommand):
     help = "Print a YAML file with configuration all Trac-based trackers"
 

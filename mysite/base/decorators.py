@@ -33,9 +33,10 @@ from mysite.base.view_helpers import render_response
 from django.core.urlresolvers import reverse, resolve
 import django.contrib.auth.decorators
 
+
 def as_view(request, template, data, slug, just_modify_data=False):
-    ### add settings to the request so that the template
-    ### can adjust what it displays depending on settings.
+    # add settings to the request so that the template
+    # can adjust what it displays depending on settings.
     data['settings'] = django.conf.settings
     if request.user.is_authenticated() or 'cookies_work' in request.session:
         # Great! Cookies work.
@@ -46,13 +47,12 @@ def as_view(request, template, data, slug, just_modify_data=False):
             request.session.delete_test_cookie()
             request.session['cookies_work'] = True
 
-
     # Where should the user be sent if she clicks 'logout'?
     # Depends on whether this is a login-requiring page.
     try:
         view_function, _, _ = resolve(request.path)
         is_login_required = isinstance(view_function,
-                django.contrib.auth.decorators._CheckLogin)
+                                       django.contrib.auth.decorators._CheckLogin)
         if is_login_required:
             data['go_here_after_logging_in_or_out'] = '/'
         else:
@@ -60,7 +60,7 @@ def as_view(request, template, data, slug, just_modify_data=False):
     except:
         data['go_here_after_logging_in_or_out'] = '/'
 
-    data['slug'] = slug # Account settings uses this.
+    data['slug'] = slug  # Account settings uses this.
     if just_modify_data:
         return data
     else:
@@ -71,10 +71,11 @@ def as_view(request, template, data, slug, just_modify_data=False):
 def view(func, *args, **kw):
     """Decorator for views."""
     request, template, view_data = func(*args, **kw)
-    slug = func.__name__ # Used by account settings
+    slug = func.__name__  # Used by account settings
     return as_view(request, template, view_data, slug)
 
 # vim: ai ts=3 sts=4 et sw=4 nu
+
 
 @decorator
 def unicodify_strings_when_inputted(func, *args, **kwargs):
@@ -95,6 +96,7 @@ def unicodify_strings_when_inputted(func, *args, **kwargs):
             kwargs[key] = unicode(arg, 'utf-8')
     return func(*args_as_list, **kwargs)
 
+
 def no_str_in_the_dict(d):
     if not d:
         return d
@@ -105,6 +107,7 @@ def no_str_in_the_dict(d):
         mysite.base.view_helpers.assert_or_pdb(type(value) != str)
     return d
 
+
 def no_str_in_the_list(l):
     if not l:
         return l
@@ -113,13 +116,16 @@ def no_str_in_the_list(l):
         mysite.base.view_helpers.assert_or_pdb(type(l) != str)
     return l
 
-def decorator_factory(decfac): # partial is functools.partial
+
+def decorator_factory(decfac):  # partial is functools.partial
     "decorator_factory(decfac) returns a one-parameter family of decorators"
     return partial(lambda df, param: decorator(partial(df, param)), decfac)
 
+
 @decorator
 def cache_function_that_takes_request(func, *args, **kwargs):
-    # Let's check to see whether we can avoid all this expensive DB jiggery after all
+    # Let's check to see whether we can avoid all this expensive DB jiggery
+    # after all
     request = args[0]
 
     # Calculate the cache key...
@@ -134,7 +140,8 @@ def cache_function_that_takes_request(func, *args, **kwargs):
     # 3. query string
     key_data.append(request.META.get('QUERY_STRING', ''))
 
-    key_string = 'cache_request_function_' + hashlib.sha1(repr(key_data)).hexdigest()
+    key_string = 'cache_request_function_' + \
+        hashlib.sha1(repr(key_data)).hexdigest()
     content = django.core.cache.cache.get(key_string, None)
     if content:
         logging.info("Cache hot for %s", repr(key_data))
@@ -143,8 +150,10 @@ def cache_function_that_takes_request(func, *args, **kwargs):
         logging.info("Cache cold for %s", repr(key_data))
         response = func(*args, **kwargs)
         content = response.content
-        django.core.cache.cache.set(key_string, content, 360) # uh, six minutes, sure
+        # uh, six minutes, sure
+        django.core.cache.cache.set(key_string, content, 360)
     return response
+
 
 @decorator_factory
 def cache_method(cache_key_getter_name, func, *args, **kwargs):
@@ -154,7 +163,8 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
     # The object implicitly passed to this function has an instance method we
     # can use to calculate the cache key. That instance method's name is stored
     # in cache_key_getter_name. Let's get the cache key. Notice that the cache
-    # key also varies based on what arguments get passed to the decorated function.
+    # key also varies based on what arguments get passed to the decorated
+    # function.
     self = args[0]
     cache_key = getattr(self, cache_key_getter_name)(*args[1:], **kwargs)
 
@@ -179,13 +189,16 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
 
         logging.debug('cached output of %s: %s' % (func.__name__, cached_json))
     else:
-        # Sweet, no need to run the expensive method. Just use the cached output.
+        # Sweet, no need to run the expensive method. Just use the cached
+        # output.
         value = simplejson.loads(cached_json)['value']
 
     return value
 
+
 def cached_property(f):
     """returns a cached property that is calculated by function f"""
+
     def get(self):
         try:
             return self._property_cache[f]

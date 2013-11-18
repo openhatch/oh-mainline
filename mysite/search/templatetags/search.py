@@ -1,17 +1,17 @@
 # From <http://www.djangosnippets.org/snippets/661/>
 #
 # Copyright (c) 2009 Brian Beck
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,20 +28,22 @@ from django.utils.datastructures import SortedDict
 from itertools import ifilter, takewhile
 import re
 from django.utils.html import escape
-import cgi # raffi and asheesh added this
+import cgi  # raffi and asheesh added this
 
 register = template.Library()
 
 SETTINGS_PREFIX = 'SEARCH_'
 SETTINGS_DEFAULTS = {
-        'CONTEXT_WORDS': 10,
-        'IGNORE_CASE': True,
-        'WORD_BOUNDARY': True,
-        'HIGHLIGHT_CLASS': "highlight"
-        }
+    'CONTEXT_WORDS': 10,
+    'IGNORE_CASE': True,
+    'WORD_BOUNDARY': True,
+    'HIGHLIGHT_CLASS': "highlight"
+}
+
 
 def get_setting(name):
     return getattr(settings, SETTINGS_PREFIX + name, SETTINGS_DEFAULTS[name])
+
 
 def searchexcerpt(text, phrases, context_words=None, ignore_case=None, word_boundary=None):
     if isinstance(phrases, basestring):
@@ -101,7 +103,9 @@ def searchexcerpt(text, phrases, context_words=None, ignore_case=None, word_boun
 
     return dict(original=text, excerpt="".join(output), hits=len(index))
 
+
 class FunctionProxyNode(Node):
+
     def __init__(self, nodelist, args, variable_name=None):
         self.nodelist = nodelist
         self.args = args
@@ -123,12 +127,15 @@ class FunctionProxyNode(Node):
     def string_value(self, value):
         return value
 
+
 class SearchContextNode(FunctionProxyNode):
+
     def get_value(self, *args):
         return searchexcerpt(*args)
 
     def string_value(self, value):
         return value['excerpt']
+
 
 @register.tag(name='searchexcerpt')
 def searchexcerpt_tag(parser, token):
@@ -151,10 +158,12 @@ def searchexcerpt_tag(parser, token):
     parser.delete_first_token()
     return SearchContextNode(nodelist, map(parser.compile_filter, args), name)
 
+
 @register.filter(name='searchexcerpt')
 def searchexcerpt_filter(value, arg):
     return searchexcerpt(value, arg)['excerpt']
 searchexcerpt_filter.is_safe = True
+
 
 def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=None):
     if isinstance(phrases, basestring):
@@ -188,12 +197,15 @@ def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=No
     count = len(matches)
     return dict(original=text, highlighted=highlighted, hits=count)
 
+
 class HighlightNode(FunctionProxyNode):
+
     def get_value(self, *args):
         return highlight(*args)
 
     def string_value(self, value):
         return value['highlighted']
+
 
 @register.tag(name='highlight')
 def highlight_tag(parser, token):
@@ -216,9 +228,11 @@ def highlight_tag(parser, token):
     parser.delete_first_token()
     return HighlightNode(nodelist, map(parser.compile_filter, args), name)
 
+
 @register.filter(name='highlight')
 def highlight_filter(value, arg):
     return highlight(value, arg)['highlighted']
+
 
 def hits(text, phrases, ignore_case=None, word_boundary=None):
     if isinstance(phrases, basestring):
@@ -226,7 +240,7 @@ def hits(text, phrases, ignore_case=None, word_boundary=None):
     if ignore_case is None:
         ignore_case = get_setting('IGNORE_CASE')
     if word_boundary is None:
-        word_boundary = get_setting('WORD_BOUNDARY')    
+        word_boundary = get_setting('WORD_BOUNDARY')
 
     phrases = map(re.escape, phrases)
     flags = ignore_case and re.I or 0
@@ -234,12 +248,15 @@ def hits(text, phrases, ignore_case=None, word_boundary=None):
     expr = re.compile(re_template % "|".join(phrases), flags)
     return len(expr.findall(text))
 
+
 class HitsNode(FunctionProxyNode):
+
     def get_value(self, *args):
         return hits(*args)
 
     def string_value(self, value):
         return "%d" % value
+
 
 @register.tag(name='hits')
 def hits_tag(parser, token):
@@ -262,11 +279,13 @@ def hits_tag(parser, token):
     parser.delete_first_token()
     return HitsNode(nodelist, map(parser.compile_filter, args), name)
 
+
 @register.filter(name='hits')
 def hits_filter(value, arg):
     return hits(value, arg)
 hits.is_safe = True
 
+
 @register.filter
-def in_list(value,arg):
+def in_list(value, arg):
     return value in arg

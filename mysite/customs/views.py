@@ -27,6 +27,8 @@ import mysite.customs.forms
 import mysite.customs.models
 
 # Trivial helper to avoid repeated exception handling
+
+
 def get_tracker_model_or_404(tracker_model_name):
     try:
         return mysite.customs.models.TrackerModel.get_by_name(tracker_model_name)
@@ -34,12 +36,14 @@ def get_tracker_model_or_404(tracker_model_name):
         raise Http404
 
 # Lists all the stored trackers of a selected type (Bugzilla, Trac etc.)
+
+
 @mysite.base.decorators.view
 def list_trackers(request, tracker_types_form=None):
     data = {}
     if request.POST:
         tracker_types_form = mysite.customs.forms.TrackerTypesForm(
-                request.POST, prefix='list_trackers')
+            request.POST, prefix='list_trackers')
         if tracker_types_form.is_valid():
             tracker_type = tracker_types_form.cleaned_data['tracker_type']
         else:
@@ -52,17 +56,19 @@ def list_trackers(request, tracker_types_form=None):
     data['trackers'] = trackers
     notification_id = request.GET.get('notification_id', None)
     notifications = {
-            'add-success': 'Bugtracker successfully added! Bugs from this tracker should start appearing within 24 hours.',
-            'edit-success': 'Bugtracker successfully edited! New settings should take effect within 24 hours.',
-            'delete-success': 'Bugtracker successfully deleted!',
-            'tracker-existence-fail': 'Hmm, could not find the requested tracker.',
-            'tracker-url-existence-fail': 'Hmm, could not find the requested tracker URL.',
-            }
+        'add-success': 'Bugtracker successfully added! Bugs from this tracker should start appearing within 24 hours.',
+        'edit-success': 'Bugtracker successfully edited! New settings should take effect within 24 hours.',
+        'delete-success': 'Bugtracker successfully deleted!',
+        'tracker-existence-fail': 'Hmm, could not find the requested tracker.',
+        'tracker-url-existence-fail': 'Hmm, could not find the requested tracker URL.',
+    }
     data['customs_notification'] = notifications.get(notification_id, '')
     if tracker_types_form is None:
-        tracker_types_form = mysite.customs.forms.TrackerTypesForm(prefix='list_trackers')
+        tracker_types_form = mysite.customs.forms.TrackerTypesForm(
+            prefix='list_trackers')
     data['tracker_types_form'] = tracker_types_form
     return (request, 'customs/list_trackers.html', data)
+
 
 @login_required
 def add_tracker(request, tracker_type, tracker_form=None):
@@ -80,10 +86,11 @@ def add_tracker(request, tracker_type, tracker_form=None):
         project_id = request.GET.get('project_id', None)
         if project_id is not None:
             try:
-                project = mysite.search.models.Project.objects.get(id=project_id)
+                project = mysite.search.models.Project.objects.get(
+                    id=project_id)
                 initial_data['created_for_project'] = project
             except mysite.search.models.Project.DoesNotExist:
-                pass # no biggie
+                pass  # no biggie
 
         tracker_form = tracker_model.get_form()(
             prefix='add_tracker',
@@ -91,6 +98,7 @@ def add_tracker(request, tracker_type, tracker_form=None):
 
     data['tracker_form'] = tracker_form
     return mysite.base.decorators.as_view(request, 'customs/add_tracker.html', data, None)
+
 
 @login_required
 @revision.create_on_success
@@ -123,24 +131,26 @@ def add_tracker_url(request, tracker_type, tracker_id, tracker_name, url_form=No
                 tracker_obj = mysite.customs.models.TrackerModel.get_instance_by_id(
                     tracker_id)
                 url_obj = tracker_model.get_urlmodel()(
-                        tracker=tracker_obj)
+                    tracker=tracker_obj)
                 url_form = tracker_model.get_urlform()(
-                        instance=url_obj, prefix='add_tracker_url')
+                    instance=url_obj, prefix='add_tracker_url')
             except tracker_model.DoesNotExist:
-                url_form = tracker_model.get_urlform()(prefix='add_tracker_url')
+                url_form = tracker_model.get_urlform()(
+                    prefix='add_tracker_url')
         data['url_form'] = url_form
         data['tracker_name'] = tracker_name
         data['tracker_id'] = tracker_id
         data['cancel_url'] = reverse(edit_tracker, args=[
-                tracker_type, tracker_id, tracker_name])
+            tracker_type, tracker_id, tracker_name])
         data['add_more_url'] = reverse(add_tracker_url_do, args=[
-                tracker_type, tracker_id, tracker_name])
+            tracker_type, tracker_id, tracker_name])
         data['finish_url'] = reverse(add_tracker_url_do, args=[
-                tracker_type, tracker_id, tracker_name])
+            tracker_type, tracker_id, tracker_name])
         data['finish_url'] += '?finished=true'
         return mysite.base.decorators.as_view(request, 'customs/add_tracker_url.html', data, None)
     else:
         return HttpResponseRedirect(reverse(list_trackers))
+
 
 @login_required
 @revision.create_on_success
@@ -162,7 +172,7 @@ def add_tracker_url_do(request, tracker_type, tracker_id, tracker_name):
         # Do they want to add another URL?
         if request.GET.get('finished', None) == 'true':
             return HttpResponseRedirect(reverse(list_trackers) +
-                                    '?notification_id=add-success')
+                                        '?notification_id=add-success')
         else:
             return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, tracker_id, tracker_name]))
     else:
@@ -172,6 +182,7 @@ def add_tracker_url_do(request, tracker_type, tracker_id, tracker_name):
             tracker_type=tracker_type,
             tracker_name=tracker_name,
             url_form=url_form)
+
 
 @login_required
 def edit_tracker(request, tracker_type, tracker_id, tracker_name, tracker_form=None):
@@ -186,7 +197,8 @@ def edit_tracker(request, tracker_type, tracker_id, tracker_name, tracker_form=N
                     instance=tracker_obj, prefix='edit_tracker')
                 # Set the initial value for github_url field
                 if tracker_type == 'github':
-                    tracker_form.initial['github_url'] = tracker_form.instance.get_github_url()
+                    tracker_form.initial[
+                        'github_url'] = tracker_form.instance.get_github_url()
             tracker_urlmodel = tracker_model.get_urlmodel()
             tracker_urlform = tracker_model.get_urlform()
             if tracker_urlmodel:
@@ -209,6 +221,7 @@ def edit_tracker(request, tracker_type, tracker_id, tracker_name, tracker_form=N
     else:
         return HttpResponseRedirect(reverse(list_trackers))
 
+
 @login_required
 @revision.create_on_success
 def edit_tracker_do(request, tracker_type, tracker_id, tracker_name):
@@ -223,13 +236,14 @@ def edit_tracker_do(request, tracker_type, tracker_id, tracker_name):
         revision.user = request.user
         revision.comment = 'Edited the %s tracker' % tracker_name
         return HttpResponseRedirect(reverse(list_trackers) +
-                            '?notification_id=edit-success')
+                                    '?notification_id=edit-success')
     else:
         return edit_tracker(request,
                             tracker_type=tracker_type,
                             tracker_id=tracker_id,
                             tracker_name=tracker_name,
                             tracker_form=tracker_form)
+
 
 @login_required
 def edit_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id, url_form=None):
@@ -250,8 +264,10 @@ def edit_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id, ur
     data['url_id'] = url_id
     data['url_form'] = url_form
 
-    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, tracker_id, tracker_name])
+    data['cancel_url'] = reverse(
+        edit_tracker, args=[tracker_type, tracker_id, tracker_name])
     return mysite.base.decorators.as_view(request, 'customs/edit_tracker_url.html', data, None)
+
 
 @login_required
 @revision.create_on_success
@@ -268,7 +284,7 @@ def edit_tracker_url_do(request, tracker_type, tracker_id, tracker_name, url_id)
         revision.user = request.user
         revision.comment = 'Edited URL for the %s tracker' % tracker_name
         return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, tracker_id, tracker_name]) +
-                                        '?edit-url-success')
+                                    '?edit-url-success')
     else:
         return edit_tracker_url(request,
                                 tracker_type=tracker_type,
@@ -276,6 +292,7 @@ def edit_tracker_url_do(request, tracker_type, tracker_id, tracker_name, url_id)
                                 tracker_name=tracker_name,
                                 url_id=url_id,
                                 url_form=url_form)
+
 
 @login_required
 def delete_tracker(request, tracker_type, tracker_id, tracker_name):
@@ -295,6 +312,7 @@ def delete_tracker(request, tracker_type, tracker_id, tracker_name):
     data['tracker_id'] = tracker_id
     return mysite.base.decorators.as_view(request, 'customs/delete_tracker.html', data, None)
 
+
 @login_required
 @revision.create_on_success
 def delete_tracker_do(request, tracker_type, tracker_id, tracker_name):
@@ -307,7 +325,8 @@ def delete_tracker_do(request, tracker_type, tracker_id, tracker_name):
     revision.comment = 'Deleted the %s tracker' % tracker_name
     # Tell them it worked.
     return HttpResponseRedirect(reverse(list_trackers) +
-                        '?notification_id=delete-success')
+                                '?notification_id=delete-success')
+
 
 @login_required
 def delete_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id):
@@ -320,6 +339,7 @@ def delete_tracker_url(request, tracker_type, tracker_id, tracker_name, url_id):
     data['url_id'] = url_id
     data['url'] = url_obj.url
     return mysite.base.decorators.as_view(request, 'customs/delete_tracker_url.html', data, None)
+
 
 @login_required
 @revision.create_on_success

@@ -14,18 +14,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-### I will not be afraid of Unicode.
+# I will not be afraid of Unicode.
 
-### I do want to monkey-patch away Python stdlib functions
-### that stress me out.
+# I do want to monkey-patch away Python stdlib functions
+# that stress me out.
 
-### Sadly our dependencies use them, so I can't.
+# Sadly our dependencies use them, so I can't.
 import urllib
 import cStringIO as StringIO
 
 import decorator
 
 _urlencode = urllib.urlencode
+
 
 def urlencode(unicode_dict):
     utf8_dict = {}
@@ -37,12 +38,14 @@ def urlencode(unicode_dict):
             bad_keys.append(key)
         if type(value) == str:
             bad_values.append(value)
-        utf8_dict[unicode(key).encode('utf-8')] = unicode(value).encode('utf-8')
+        utf8_dict[unicode(key).encode('utf-8')
+                  ] = unicode(value).encode('utf-8')
     if bad_keys or bad_values:
         raise ValueError
         #import pdb
-        #pdb.set_trace()
+        # pdb.set_trace()
     return _urlencode(utf8_dict)
+
 
 @decorator.decorator
 def unicodify_strings_when_inputted(func, *args, **kwargs):
@@ -63,13 +66,15 @@ def unicodify_strings_when_inputted(func, *args, **kwargs):
             kwargs[key] = unicode(arg, 'utf-8')
     return func(*args_as_list, **kwargs)
 
+
 @unicodify_strings_when_inputted
 def quote(str):
     return urllib.quote(str.encode('utf-8'))
 
+
 def wrap_file_object_in_utf8_check(f):
-    ### For now, this does the horrifying thing of reading in the whole file.
-    ### Better ways would be apprediated.
+    # For now, this does the horrifying thing of reading in the whole file.
+    # Better ways would be apprediated.
     bytes = f.read()
     if type(bytes) == unicode:
         as_unicode = bytes
@@ -77,6 +82,7 @@ def wrap_file_object_in_utf8_check(f):
         as_unicode = unicode(bytes, 'utf-8-sig')
     as_utf8 = as_unicode.encode('utf-8')
     return StringIO.StringIO(as_utf8)
+
 
 def utf8(s):
     '''This function takes a bytestring or a Unicode object

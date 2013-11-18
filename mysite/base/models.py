@@ -18,6 +18,7 @@ from django.db import models
 import datetime
 import hashlib
 
+
 class Timestamp(models.Model):
 
     # This is very simply a mapping from strings to timestamps. Use the method
@@ -40,14 +41,14 @@ class Timestamp(models.Model):
         try:
             return Timestamp.objects.get(key=Timestamp.hash(s)).timestamp
         except Timestamp.DoesNotExist:
-            return Timestamp.ZERO_O_CLOCK 
+            return Timestamp.ZERO_O_CLOCK
 
     @staticmethod
     def update_timestamp_for_string(s, override_time=None):
         timestamp, _ = Timestamp.objects.get_or_create(key=Timestamp.hash(s), defaults={
             'timestamp': datetime.datetime.utcnow()})
         timestamp.timestamp = override_time or datetime.datetime.utcnow()
-        timestamp.save() # definitely!
+        timestamp.save()  # definitely!
         return timestamp
 
     @staticmethod
@@ -60,12 +61,15 @@ class Timestamp(models.Model):
         s = 'model last updated ' + cls.__module__ + '.' + cls.__name__
         return s
 
-### Adjustments to default Django sqlite3 behavior
+# Adjustments to default Django sqlite3 behavior
+
+
 def activate_foreign_keys(sender, connection, **kwargs):
     """Enable integrity constraint with sqlite."""
     if connection.vendor == 'sqlite':
         cursor = connection.cursor()
         cursor.execute('PRAGMA foreign_keys = ON;')
+
 
 def set_asynchronous_for_sqlite(sender, connection, **kwargs):
     """Make sqlite3 be asynchronous. This is risky in case your

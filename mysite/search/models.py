@@ -43,14 +43,17 @@ import django.contrib.contenttypes.models
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
     class Meta:
         abstract = True
 
+
 def get_image_data_scaled(image_data, width):
-    ### NOTE: We refuse to scale images if we do not
-    ### have the Python Imaging Library.
+    # NOTE: We refuse to scale images if we do not
+    # have the Python Imaging Library.
     if not mysite.base.depends.Image:
-        logging.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
+        logging.info(
+            "NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
         return image_data
 
     # scale it
@@ -77,6 +80,7 @@ def get_image_data_scaled(image_data, width):
 
 
 class Project(OpenHatchModel):
+
     def save(self, *args, **kwargs):
         if not self.display_name:
             self.display_name = self.name
@@ -89,7 +93,7 @@ class Project(OpenHatchModel):
         This is probably pretty inefficient, but it's not called very often.'''
         # Grab all the bug trackers that bugs refer to
         all_corresponding_bug_trackers = set([b.tracker for b in self.bug_set.all()
-                                          if b.tracker])
+                                              if b.tracker])
         # Grab all the bug trackers that refer to the project
         for tracker in mysite.customs.models.TrackerModel.objects.filter(created_for_project=self).select_subclasses():
             all_corresponding_bug_trackers.add(tracker)
@@ -118,14 +122,15 @@ class Project(OpenHatchModel):
         import mysite.profile.view_helpers
         for way_a_mentor_can_help in (self.name, self.language):
             tq = mysite.profile.view_helpers.TagQuery('can_mentor',
-                                                     way_a_mentor_can_help)
-            all_mentor_person_ids.update(tq.people.values_list('id', flat=True))
+                                                      way_a_mentor_can_help)
+            all_mentor_person_ids.update(
+                tq.people.values_list('id', flat=True))
         return len(all_mentor_person_ids)
 
     @staticmethod
     def create_dummy(**kwargs):
         data = dict(name=uuid.uuid4().hex,
-                icon_raw='/static/no-project-icon.png',
+                    icon_raw='/static/no-project-icon.png',
                     language='C')
         data.update(kwargs)
         ret = Project(**data)
@@ -135,7 +140,7 @@ class Project(OpenHatchModel):
     @staticmethod
     def create_dummy_no_icon(**kwargs):
         data = dict(name=uuid.uuid4().hex,
-                icon_raw='',
+                    icon_raw='',
                     language='C')
         data.update(kwargs)
         ret = Project(**data)
@@ -143,14 +148,14 @@ class Project(OpenHatchModel):
         return ret
 
     name = models.CharField(max_length=200, unique=True,
-            help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
+                            help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',) * 2))
     display_name = models.CharField(max_length=200, default='',
-            help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
+                                    help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
     display_name = models.CharField(max_length=200, default='')
     homepage = models.URLField(max_length=200, blank=True, default='',
-            verbose_name='Project homepage URL')
+                               verbose_name='Project homepage URL')
     language = models.CharField(max_length=200, blank=True, default='',
-            verbose_name='Primary programming language')
+                                verbose_name='Primary programming language')
 
     def invalidate_all_icons(self):
         self.icon_raw = None
@@ -174,27 +179,28 @@ class Project(OpenHatchModel):
     icon_url = models.URLField(max_length=200)
 
     icon_raw = models.ImageField(
-            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
-            null=True,
-            default=None,
-            blank=True,
-            verbose_name='Icon',
-            )
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
+        null=True,
+        default=None,
+        blank=True,
+        verbose_name='Icon',
+    )
 
-    date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
+    date_icon_was_fetched_from_ohloh = models.DateTimeField(
+        null=True, default=None)
 
     icon_for_profile = models.ImageField(
-        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
         null=True,
         default=None)
 
     icon_smaller_for_badge = models.ImageField(
-        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
         null=True,
         default=None)
 
     icon_for_search_result = models.ImageField(
-        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
         null=True,
         default=None)
 
@@ -203,7 +209,8 @@ class Project(OpenHatchModel):
     people_who_wanna_help = models.ManyToManyField('profile.Person',
                                                    related_name='projects_i_wanna_help')
 
-    # Cache the number of OpenHatch members who have contributed to this project.
+    # Cache the number of OpenHatch members who have contributed to this
+    # project.
     cached_contributor_count = models.IntegerField(default=0, null=True)
 
     def populate_icon_from_ohloh(self):
@@ -264,19 +271,21 @@ class Project(OpenHatchModel):
         badge_icon_data = get_image_data_scaled(raw_icon_data, 40)
         self.icon_smaller_for_badge.save('', ContentFile(badge_icon_data))
 
-        # Scale normal-sized icon down to a size that fits in the search results--20px by 20px
+        # Scale normal-sized icon down to a size that fits in the search
+        # results--20px by 20px
         search_result_icon_data = get_image_data_scaled(raw_icon_data, 20)
-        self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
+        self.icon_for_search_result.save(
+            '', ContentFile(search_result_icon_data))
 
     def get_contributors(self):
         """Return a list of Person objects who are contributors to
         this Project."""
         from mysite.profile.models import Person
         return Person.objects.filter(
-                portfolioentry__project=self,
-                portfolioentry__is_deleted=False,
-                portfolioentry__is_published=True
-                ).distinct()
+            portfolioentry__project=self,
+            portfolioentry__is_deleted=False,
+            portfolioentry__is_published=True
+        ).distinct()
 
     def get_contributor_count(self):
         """Return the number of Person objects who are contributors to
@@ -297,8 +306,10 @@ class Project(OpenHatchModel):
         random.shuffle(pf_entries)
         other_contributors = [p.person for p in pf_entries]
 
-        photod_people = [person for person in other_contributors if person.photo]
-        unphotod_people = [person for person in other_contributors if not person.photo]
+        photod_people = [
+            person for person in other_contributors if person.photo]
+        unphotod_people = [
+            person for person in other_contributors if not person.photo]
         ret = []
         ret.extend(photod_people)
         ret.extend(unphotod_people)
@@ -311,24 +322,25 @@ class Project(OpenHatchModel):
     def get_url(self):
         import mysite.project.views
         return reverse(mysite.project.views.project,
-                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
+                       kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
 
     def get_edit_page_url(self):
         import mysite.project.views
         return reverse(mysite.project.views.edit_project,
-                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
+                       kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
 
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
         import mysite.profile.view_helpers
         mentors_available = bool(mysite.profile.view_helpers.TagQuery(
-                'can_mentor', self.name).people)
+            'can_mentor', self.name).people)
         if mentors_available or self.language:
             query_var = self.name
             if not mentors_available:
                 query_var = self.language
-            query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
-                                             query_var})
+            query_string = mysite.base.unicode_sanity.urlencode(
+                {u'q': u'can_mentor:"%s"' %
+                 query_var})
             return reverse(mysite.profile.views.people) + '?' + query_string
         else:
             return ""
@@ -345,7 +357,8 @@ class Project(OpenHatchModel):
         return self.get_open_bugs().order_by('?')
 
     def get_pfentries_with_descriptions(self, listen_to_the_community=False, **kwargs):
-        pfentries = self.portfolioentry_set.exclude(project_description='').filter(**kwargs)
+        pfentries = self.portfolioentry_set.exclude(
+            project_description='').filter(**kwargs)
         if listen_to_the_community:
             # Exclude pfentries that have been unchecked on the project edit page's
             # descriptions section.
@@ -363,6 +376,7 @@ class Project(OpenHatchModel):
         else:
             return None
 
+
 def populate_icon_on_project_creation(instance, raw, created, *args, **kwargs):
     if raw:
         return
@@ -371,6 +385,7 @@ def populate_icon_on_project_creation(instance, raw, created, *args, **kwargs):
     if created and not instance.icon_raw:
         task = mysite.search.tasks.PopulateProjectIconFromOhloh()
         task.delay(project_id=instance.id)
+
 
 def grab_project_language_from_ohloh(instance, raw, created, *args,
                                      **kwargs):
@@ -384,6 +399,7 @@ def grab_project_language_from_ohloh(instance, raw, created, *args,
 
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
+
 
 class WrongIcon(OpenHatchModel):
 
@@ -403,65 +419,74 @@ class WrongIcon(OpenHatchModel):
         wrong_icon_obj.save()
         return wrong_icon_obj
 
-
     project = models.ForeignKey(Project)
 
     icon_url = models.URLField(max_length=200)
 
     icon_raw = models.ImageField(
-            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
-            null=True,
-            default=None)
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
+        null=True,
+        default=None)
 
-    date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
+    date_icon_was_fetched_from_ohloh = models.DateTimeField(
+        null=True, default=None)
 
     icon_for_profile = models.ImageField(
-        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
         null=True,
         default=None)
 
     icon_smaller_for_badge = models.ImageField(
-        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
         null=True,
         default=None)
 
     icon_for_search_result = models.ImageField(
-        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        upload_to=lambda a, b: Project.generate_random_icon_path(a, b),
         null=True,
         default=None)
 
     logo_contains_name = models.BooleanField(default=False)
 
+
 class Buildhelper(OpenHatchModel):
+
     '''Model where all the steps in the buildhelper live'''
     project = models.ForeignKey(Project)
     default_frustration_handler = models.URLField(max_length=200, default='')
 
-    def addStep(self, name, time, is_prerequisite = False, description='', command='', hint='', frustration_handler = None):
+    def addStep(self, name, time, is_prerequisite=False, description='', command='', hint='', frustration_handler=None):
         '''creates and saves a BuildhelperStep object'''
         if frustration_handler is None:
-            import pdb; pdb.set_trace()
+            import pdb
+            pdb.set_trace()
             frustration_handler = self.default_frustration_handler
-        s = BuildhelperStep(buildhelper = self,is_prerequisite = is_prerequisite, name = name, description = description, command = command, time = time, hint= hint, frustration_handler = frustration_handler)
+        s = BuildhelperStep(
+            buildhelper=self, is_prerequisite=is_prerequisite, name=name, description=description,
+            command=command, time=time, hint=hint, frustration_handler=frustration_handler)
         s.save()
 
     def __unicode__(self):
-        return self.project.display_name +"'s Buildhelper"
+        return self.project.display_name + "'s Buildhelper"
 
 
 class BuildhelperStep(OpenHatchModel):
+
     '''A single step in the buildhelper'''
     buildhelper = models.ForeignKey(Buildhelper)
     is_prerequisite = models.BooleanField(default=False)
     is_checked = models.BooleanField(default=False)
     name = models.CharField(max_length=255)
-    description = models.TextField(default='',blank=True)
-    command = models.TextField(default='',blank=True)
+    description = models.TextField(default='', blank=True)
+    command = models.TextField(default='', blank=True)
     time = models.IntegerField(default=0)
-    hint = models.URLField(max_length=200, default='http://cuteoverload.com',blank=True)
+    hint = models.URLField(
+        max_length=200, default='http://cuteoverload.com', blank=True)
     frustration_handler = models.URLField(max_length=200, blank=True)
+
     def __unicode__(self):
         return "Buildhelper step for project " + self.buildhelper.project.display_name + ": " + self.name
+
 
 class ProjectInvolvementQuestion(OpenHatchModel):
     key_string = models.CharField(max_length=255)
@@ -470,7 +495,7 @@ class ProjectInvolvementQuestion(OpenHatchModel):
 
     def get_answers_for_project(self, a_project):
         def get_score(obj):
-            return (-1)* voting.models.Vote.objects.get_score(obj)['score']
+            return (-1) * voting.models.Vote.objects.get_score(obj)['score']
         the_answers = list(self.answers.filter(project=a_project))
         # TODO: sort them
         the_answers.sort(key=get_score)
@@ -484,51 +509,56 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         ret.save()
         return ret
 
+
 class OwnedAnswersManager(models.Manager):
+
     def get_query_set(self):
         return super(OwnedAnswersManager, self).get_query_set().filter(
             author__isnull=False)
+
 
 class Answer(OpenHatchModel):
     title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
     author = models.ForeignKey(User, null=True)
-    question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
+    question = models.ForeignKey(
+        ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
     objects = OwnedAnswersManager()
     all_even_unowned = models.Manager()
 
     def get_question_text(self, mention_project_name=True):
         if self.question.key_string == 'where_to_start':
-            retval =  "I'd like to participate%s. How do I begin?" % (
-                        " in %s" % self.project.display_name if mention_project_name else "")
+            retval = "I'd like to participate%s. How do I begin?" % (
+                " in %s" % self.project.display_name if mention_project_name else "")
         elif self.question.key_string == 'stress':
             retval = "What is a bug or issue%s that you've been putting off, neglecting or just plain avoiding?" % (
-                        " with %s" % self.project.display_name if mention_project_name else "")
+                " with %s" % self.project.display_name if mention_project_name else "")
         elif self.question.key_string == 'newcomers':
-            retval =  "What's a good bug%s for a newcomer to tackle?" % (
-                        " in %s" % self.project.display_name if mention_project_name else "")
+            retval = "What's a good bug%s for a newcomer to tackle?" % (
+                " in %s" % self.project.display_name if mention_project_name else "")
         elif self.question.key_string == 'non_code_participation':
-            retval =  "Other than writing code, how can I contribute%s?" % (
-                        " to %s" % self.project.display_name if mention_project_name else "")
-        else: # Shouldn't get here.
+            retval = "Other than writing code, how can I contribute%s?" % (
+                " to %s" % self.project.display_name if mention_project_name else "")
+        else:  # Shouldn't get here.
             retval = ""
         return retval
 
-    #TODO: This is bull****; what the heck is this template stuff doing in the models? Need refactoring!
+    # TODO: This is bull****; what the heck is this template stuff doing in
+    # the models? Need refactoring!
     @property
     def template_for_feed(self):
         return 'base/answer-in-feed.html'
 
     def get_title_for_atom(self):
         return "%s added an answer for %s" % (
-                self.author.get_profile().get_full_name_and_username(),
-                self.project.display_name)
+            self.author.get_profile().get_full_name_and_username(),
+            self.project.display_name)
 
     def get_description_for_atom(self):
         return "%s added an answer to the question \"%s\"" % (
-                self.author.get_profile().get_full_name_and_username(),
-                self.get_question_text())
+            self.author.get_profile().get_full_name_and_username(),
+            self.get_question_text())
 
     def get_absolute_url(self):
         return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#answer_whose_pk_is_%d" % self.pk)
@@ -536,12 +566,12 @@ class Answer(OpenHatchModel):
     @staticmethod
     def create_dummy(**kwargs):
         data = {
-                'text': 'i am doing well',
-                'author': User.objects.get_or_create(username='yooz0r')[0],
-                'question': ProjectInvolvementQuestion.objects.get_or_create(
+            'text': 'i am doing well',
+            'author': User.objects.get_or_create(username='yooz0r')[0],
+            'question': ProjectInvolvementQuestion.objects.get_or_create(
                     key_string='where_to_start', is_bug_style=False)[0],
-                'project': Project.create_dummy()
-                }
+            'project': Project.create_dummy()
+        }
         data.update(kwargs)
         ret = Answer(**data)
         ret.save()
@@ -549,9 +579,10 @@ class Answer(OpenHatchModel):
 
 
 class OpenBugsManager(models.Manager):
+
     def get_query_set(self):
         return super(OpenBugsManager, self).get_query_set().filter(
-                looks_closed=False)
+            looks_closed=False)
 
 
 class Bug(OpenHatchModel):
@@ -605,7 +636,8 @@ class Bug(OpenHatchModel):
 
         now = datetime.datetime.utcnow()
         n = str(Bug.all_bugs.count())
-        # FIXME (?) Project.objects.all()[0] call below makes an out-of-bounds error in testing...
+        # FIXME (?) Project.objects.all()[0] call below makes an out-of-bounds
+        # error in testing...
         data = dict(
             title=n, project=Project.objects.all()[0],
             tracker_id=ttm.id,
@@ -626,18 +658,22 @@ class Bug(OpenHatchModel):
         kwargs['project'] = Project.create_dummy()
         return Bug.create_dummy(**kwargs)
 
+
 class BugAlert(OpenHatchModel):
     user = models.ForeignKey(User, null=True)
     query_string = models.CharField(max_length=255)
     how_many_bugs_at_time_of_request = models.IntegerField()
     email = models.EmailField(max_length=255)
 
+
 class WannaHelperNote(OpenHatchModel):
+
     class Meta:
         unique_together = [('project', 'person')]
     person = models.ForeignKey('profile.Person')
     project = models.ForeignKey(Project)
-    contacted_by = models.ForeignKey(User, related_name="contacted_by_user", blank=True, null=True)
+    contacted_by = models.ForeignKey(
+        User, related_name="contacted_by_user", blank=True, null=True)
     contacted_on = models.DateField(blank=True, null=True)
 
     @staticmethod
@@ -660,7 +696,7 @@ class WannaHelperNote(OpenHatchModel):
 
     def get_title_for_atom(self):
         return "%s is willing to help %s" % (
-                self.person.get_full_name_and_username(), self.project.display_name)
+            self.person.get_full_name_and_username(), self.project.display_name)
 
     def get_description_for_atom(self):
         return self.get_title_for_atom()
@@ -672,7 +708,8 @@ class WannaHelperNote(OpenHatchModel):
 def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, **kwargs):
     # always bump it
     import mysite.base.models
-    mysite.base.models.Timestamp.update_timestamp_for_string('hit_count_cache_timestamp'),
+    mysite.base.models.Timestamp.update_timestamp_for_string(
+        'hit_count_cache_timestamp'),
 
 # Clear the hit count cache whenever Bugs are added or removed. This is
 # simply done by bumping the Timestamp used to generate the cache keys.
