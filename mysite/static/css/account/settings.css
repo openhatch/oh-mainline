@@ -1,4 +1,19 @@
-body.settings,body.missions .submodule.skinny { padding: 0 ! important; border: 0; background-color: transparent ! important; }
-body.settings,body.missions .submodule.skinny .body { padding: 10px ! important; background-color: transparent ! important; }
-body.settings,body.missions .submodule.skinny ul li { margin-bottom: 10px; font-size: 11pt; }
 body.settings,body.missions #main .submodule .body { background-color: #fff; padding: 3% 5%; }
+
+div#tabs {
+    margin: 50px 0px 10px 0px;
+}
+
+div#tabs ul li {
+    background-color: rgba(100, 200, 255, 0.3);
+    display: inline-block;
+    padding: 10px;
+}
+
+div#tabs ul li:not(:first-child) {
+    margin-left: 5px;
+}
+
+#map_canvas {
+    margin: 20px !important;
+}

@@ -185,7 +185,7 @@ h1 {
 
 #nav-container {
     width: 100%;
-    height: 67px;
+    height: 145px;
     .nav-bg;
     }
 
@@ -198,6 +198,16 @@ h1 {
     h1 { float: left; }
     ul { list-style: none; margin: 0; float: right; }
     li { float: right; margin-left: 20px; margin-top: 10px; }
+}
+
+form[name=a_settings_tab_form] {
+    label:not([type=submit]) {
+        float: left !important;
+        clear: both !important;
+        min-width: 125px !important;
+        text-align: right !important;
+        padding: 7px !important;
+    }
 }
 
 #pagetop { padding: 0; clear: both; .width-and-padding(@total-width, @standard-padding);}

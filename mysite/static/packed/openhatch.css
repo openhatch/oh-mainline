@@ -850,10 +850,25 @@ body.auth .foot input[type='submit'] { float: right; left: 0; }
 body#signup_with_password .module { margin: 0 305px; width: 350px; }
 body#signup_with_password input { float: none; display: block;width: 90% }
 .help_text { font-size: .85em;}
-body.settings,body.missions .submodule.skinny { padding: 0 ! important; border: 0; background-color: transparent ! important; }
-body.settings,body.missions .submodule.skinny .body { padding: 10px ! important; background-color: transparent ! important; }
-body.settings,body.missions .submodule.skinny ul li { margin-bottom: 10px; font-size: 11pt; }
 body.settings,body.missions #main .submodule .body { background-color: #fff; padding: 3% 5%; }
+
+div#tabs {
+    margin: 50px 0px 10px 0px;
+}
+
+div#tabs ul li {
+    background-color: rgba(100, 200, 255, 0.3);
+    display: inline-block;
+    padding: 10px;
+}
+
+div#tabs ul li:not(:first-child) {
+    margin-left: 5px;
+}
+
+#map_canvas {
+    margin: 20px !important;
+}
 
 #widget-settings textarea { width: 500px; font: 8pt monospace; height: 300px; }
 #widget-settings #widget-instructions { margin-left: 30px; margin-top: 10px; float: left; width: 240px; padding: 21px; background-color: #ffc; }
@@ -907,7 +922,7 @@ body#profile #nameplate form h3 { width: 280px; }
 body#profile #left .notification a{ font-weight: bold;  }
 body#profile #left .notification { width: 82%; padding: 8px; padding-bottom: 0; margin: 10px;}
 body#profile #left .module .body.has_notification { border: 0; padding: 0; width: 99% }
-body#profile #avatar { border: 4px solid #fff; padding: 0; background: #fff; }
+body#profile #avatar { padding: 0; background: #fff; }
 body#profile #avatar img, #avatar .default_image { float: left; margin: 10px 20px; width: 260px;}
 body#profile #avatar.edit { width: 180px; padding: 10px; background-color: #f5f5f5; }
 #avatar .notification { color: inherit; font-size: 1.2em; text-align: center; margin: 0; font-weight: bold; padding: 16px 8px ! important; margin-left: 70px; width: 100px;}
@@ -1168,6 +1183,10 @@ div.input input[type=text] {
     float: right;
 }
 
+body#profile div#info {
+    background: #ffffff;
+}
+
 body#profile div#info h3 {
     display: inline-block !important;
 }
@@ -1241,6 +1260,7 @@ span.muted {
 
 div#portfolio {
     width: 100% !important;
+    background: #ffffff;
 }
 
 .search_card_profile div.footer {

@@ -39,43 +39,60 @@ Settings
         </ul>
     </div>
     <div class='module-body contains-submodules two-columns'>
-        <div class='submodule skinny'>
-            <div class='submodule-body'>
-                <ul>
-                    <style>
-                        #link-{{ slug }} a {
-                            font-weight: bold;
-                        }
-                    </style>
-                    <li id='link-set_location'>
-                        <a href='{% url account.views.set_location %}'>
-                            Location
-                        </a>
-                    </li>
-                    <li id='link-widget'>
-                        <a href='{% url account.views.widget %}'>
-                            Widgetize yourself
-                        </a>
-                    </li>
-                    <li id='link-invite_someone'>
-                        <a href='{% url account.views.invite_someone %}'>
-                            Tell a friend about SocialCoding4Good
-                        </a>
-                    </li>
-                    <li id='link-change_password'>
-                        <a href='{% url account.views.change_password %}'>
-                            Password
-                        </a>
-                    </li>
-                    {% if request.user|has_group:'ADMIN' or request.user|has_group:'PROJECT_PARTNER' %}
-                    <li id='link-edit_fields'>
-                        <a href='{% url account.views.edit_fields %}'>
-                            Profile fields
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
+        <!--<ul>
+            <style>
+                #link-{{ slug }} a {
+                    font-weight: bold;
+                }
+            </style>
+            <li id='link-set_location'>
+                <a href='{% url account.views.set_location %}'>
+                    Location
+                </a>
+            </li>
+            <li id='link-widget'>
+                <a href='{% url account.views.widget %}'>
+                    Widgetize yourself
+                </a>
+            </li>
+            <li id='link-invite_someone'>
+                <a href='{% url account.views.invite_someone %}'>
+                    Tell a friend about SC4G
+                </a>
+            </li>
+            <li id='link-change_password'>
+                <a href='{% url account.views.change_password %}'>
+                    Password
+                </a>
+            </li>
+            {% if request.user|has_group:'ADMIN' or request.user|has_group:'PROJECT_PARTNER' %}
+            <li id='link-edit_fields'>
+                <a href='{% url account.views.edit_fields %}'>
+                    Profile fields
+                </a>
+            </li>
+            {% endif %}
+        </ul>-->
+        <div id="tabs">
+            <ul>
+                <li id="link-set_location">
+                    <a href="{% url account.views.set_location %}">Location</a>
+                </li>
+                <li id="link-widget">
+                    <a href="{% url account.views.widget %}">Widgetize yourself</a>
+                </li>
+                <li id="link-invite_someone">
+                    <a href="{% url account.views.invite_someone %}">Tell a friend about SC4G</a>
+                </li>
+                <li id="link-change_password">
+                    <a href="{% url account.views.change_password %}">Password</a>
+                </li>
+                {% if request.user|has_group:'ADMIN' or request.user|has_group:'PROJECT_PARTNER' %}
+                <li id="link-edit_fields">
+                    <a href="{% url account.views.edit_fields %}">Profile fields</a>
+                </li>
+                {% endif %}
+            </ul>
         </div>
         {% block settings_main %}
         {% endblock settings_main %}
