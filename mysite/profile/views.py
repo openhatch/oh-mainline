@@ -502,16 +502,23 @@ def people_filter(request):
 def people_sort(request):
     post_data = request.POST
     people_ids = post_data.getlist(u'people_ids[]')
+    if post_data['inorder'] == 'ascending':
+        inorder = False
+    else:
+        inorder = True
     if post_data['order'] in ['last_name', 'relevance']:
         people = Person.objects.filter(pk__in=people_ids)
         filtered_people = view_helpers.filter_people(people, post_data)
-        filtered_people = sorted(filtered_people, key=lambda person: person.user.last_name.lower())
+        filtered_people = sorted(filtered_people, key=lambda person: person.user.last_name.lower(), reverse=inorder)
         if post_data['order'] == 'relevance':
             filtered_people = sorted(filtered_people, key=lambda person: difflib.SequenceMatcher(
                 None, post_data['filter_name'],
-                person.user.last_name).ratio(), reverse=True)
+                person.user.last_name).ratio(), reverse=inorder)
     else:
-        people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order'])
+        if inorder:
+            people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order']).reverse()
+        else:
+            people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order'])
         filtered_people = view_helpers.filter_people(people, post_data)
 
     response = render_to_string(template_name='profile/people_' + post_data['view'] + '.html',
