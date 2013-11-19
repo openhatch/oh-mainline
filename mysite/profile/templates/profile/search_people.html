@@ -200,7 +200,8 @@ Volunteers
                     time_to_commit: getCheckboxValues('time_to_commit'),
                     opensource: getCheckboxValues('opensource'),
                     order: $('#order').val(),
-                    view: $('#view').val()
+                    view: $('#view').val(),
+                    inorder: $('#inorder').val()
                     };
                     return post_data;
                 };
@@ -225,7 +226,7 @@ Volunteers
                 });
             });
 
-            $('#order, #view').change(function() {
+            $('#order, #view,#inorder').change(function() {
                 post_data = getPostData()
 
                 var img = $(document.createElement('img')).attr('src', '/static/images/loading.gif');
@@ -366,6 +367,13 @@ Volunteers
                 {% endif %}
             {% endif %}
 
+        </div>
+
+         <div style="float:right">
+            <select id="inorder">
+                <option value="ascending" {%  ifequal inorder 'ascending' %} selected="selected"{% endifequal %}>Ascending</option>
+                <option value="descending" {% ifequal inorder 'descending' %} selected="selected"{% endifequal %}>Descending</option>
+            </select>
         </div>
 
         <div style="float:right">
