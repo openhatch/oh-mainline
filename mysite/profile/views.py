@@ -448,7 +448,7 @@ def people(request):
     parsed_query = mysite.profile.view_helpers.parse_string_query(query)
     data.update(parsed_query)
 
-    as_string = mysite.base.view_helpers.cached_geocoding_in_json(request.GET.get('center',''))
+    as_string = mysite.base.view_helpers.cached_geocoding_in_json(request.GET.get(u'center',u''))
 
     # Get the list of people to display.
     if parsed_query['q'].strip():
@@ -963,7 +963,7 @@ class LocationDataApiView(django.views.generic.View):
     # Helper functions
     @staticmethod
     def get_center_location(get_data):
-        center = get_data.get('center','')
+        center = get_data.get(u'center', u'')
         as_string = mysite.base.view_helpers.cached_geocoding_in_json(center)
         as_dict = simplejson.loads(as_string)
         return as_dict
