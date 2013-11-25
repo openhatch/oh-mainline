@@ -956,7 +956,9 @@ class LocationDataApiView(django.views.generic.View):
     def get(self, request):
         person_ids = self.extract_person_ids(request.GET)
         data_dict = self.raw_data_for_person_ids(person_ids)
-        data_dict['center'] = self.get_center_location(request.GET)
+        center_location = self.get_center_location(request.GET)
+        if center_location:
+            data_dict['center'] = center_location
         as_json = simplejson.dumps(data_dict)
         return HttpResponse(as_json, mimetype='application/javascript')
 
@@ -964,6 +966,8 @@ class LocationDataApiView(django.views.generic.View):
     @staticmethod
     def get_center_location(get_data):
         center = get_data.get(u'center', u'')
+        if center == u'':
+            return {}
         as_string = mysite.base.view_helpers.cached_geocoding_in_json(center)
         as_dict = simplejson.loads(as_string)
         return as_dict
