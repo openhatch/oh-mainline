@@ -129,7 +129,7 @@ def signup_request(request):
             if question.get(u'inputType') == 'file' and len(question.get(u'responses')) != 0 and question.get(u'responses')[0] != '':
                 file_url = question.get(u'responses')[0]
                 try:
-                    filename = str(file_url).split('/').reverse()[0]
+                    filename = str(file_url).split('/')[-1]
                     new_request = urllib2.Request(SC4G_FILES_URL + filename)
                     new_request.add_header('Authorization', 'Basic %s' % SC4G_BASIC_AUTH_TOKEN)
                     new_response = urllib2.urlopen(new_request)
