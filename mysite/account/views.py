@@ -24,6 +24,7 @@ import django.contrib.auth
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth.forms
 from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
 import django_authopenid.views
 from django.contrib.auth.models import User, Group
 from django.template.loader import render_to_string
@@ -46,7 +47,7 @@ import mysite.account.forms
 from mysite.base.view_helpers import render_response
 from mysite.account.view_helpers import clear_user_sessions
 import mysite.profile.views
-from mysite.settings import MEDIA_ROOT, SC4G_FILES_URL
+from mysite.settings import MEDIA_ROOT, SC4G_BASIC_AUTH_TOKEN, SC4G_FILES_URL, MEDIA_URL
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
@@ -107,8 +108,7 @@ def signup_request(request):
                                                             last_name=last_name)
             user = Person.objects.get(user__email__iexact=email).user
         else:
-            user = User.objects.create(username=email, email=email, first_name=first_name,
-                                       last_name=last_name)
+            user = User.objects.create(username=email, email=email, first_name=first_name, last_name=last_name)
         random_password = User.objects.make_random_password(length=10)
         user.set_password(random_password)
         if not user.groups.filter(name='VOLUNTEER').count() > 0:
@@ -127,14 +127,20 @@ def signup_request(request):
                 continue
             form_question = None
             if question.get(u'inputType') == 'file' and len(question.get(u'responses')) != 0 and question.get(u'responses')[0] != '':
-                filename = question.get(u'responses')[0]
+                file_url = question.get(u'responses')[0]
                 try:
-                    response = urllib2.urlopen(SC4G_FILES_URL + filename)
+                    filename = str(file_url).split('/').reverse()[0]
+                    new_request = urllib2.Request(SC4G_FILES_URL + filename)
+                    new_request.add_header('Authorization', 'Basic %s' % SC4G_BASIC_AUTH_TOKEN)
+                    new_response = urllib2.urlopen(new_request)
+
                     new_file_path = generate_random_file_path(filename)
                     with open(MEDIA_ROOT + '/' + new_file_path, "wb") as file:
-                        file.write(response.read())
+                        file.write(new_response.read())
                         file.close()
-                    question.get(u'responses')[0] = new_file_path
+                    host = mark_safe('%s://%s%s' % (request.is_secure() and 'https' or 'http',
+                                                     request.get_host(), MEDIA_URL))
+                    question.get(u'responses')[0] = host + new_file_path
                 except urllib2.HTTPError as e:
                     if e.code == 404:
                         question[u'responses'] = []
@@ -149,7 +155,6 @@ def signup_request(request):
                                              type=question.get(u'inputType'),
                                              required=question.get(u'required'))
                 form_question.save()
-                # TODO: adjust possible answers based on input type
             questions.append(form_question)
             answers[form_question.name] = []
             responses[form_question.name] = []

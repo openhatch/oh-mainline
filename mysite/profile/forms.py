@@ -89,9 +89,9 @@ class EditInfoForm(django.forms.Form):
         elif field.type == 'file':
             if not initial:
                 return
-            url = MEDIA_URL + str(initial[0])
+            url = str(initial[0])
             before, sep, after = url.rpartition("/")
-            obj = HackObj({'url': MEDIA_URL + str(initial[0]),
+            obj = HackObj({'url': str(initial[0]),
                            'name': after})
 
             field.initial = obj

@@ -181,7 +181,7 @@
                         {% for response in item.responses %}
                             {% if item.question.type == 'file' %}
                                 {% if person.user == user or user|has_group:'ADMIN' %}
-                                    <a href="{{ url_begin|add:response.value|linebreaksbr }}" target="_blank">Download</a>
+                                    <a href="{{ response.value|linebreaksbr }}" target="_blank">Download</a>
                                 {% endif %}
                             {% else %}
                                 {{ response.value|linebreaksbr }}

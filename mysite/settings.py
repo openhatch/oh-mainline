@@ -364,6 +364,7 @@ CRONJOBS = [
     ('@daily', 'mysite.cron.push_volunteers_to_zoho_crm')
 ]
 
+SC4G_BASIC_AUTH_TOKEN = 'a2FsYTprYWxh'
 SC4G_FILES_URL = 'http://test.socialcoding4good.org/sites/default/files/webform/'
 
 ### Include a user's customizations

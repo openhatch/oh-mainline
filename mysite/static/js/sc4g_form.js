@@ -79,6 +79,11 @@ jQuery(document).ready(function($) {
                     value = $(this).find('input[type=email]').val();
                     responses = [ value ];
                     if (required && value.length > 0) { required_filled = true; }
+                } else if ($(this).find('span.file a').length > 0) {
+                    inputType = 'file';
+                    value = $(this).find('span.file a').attr('href');
+                    responses = [ value ];
+                    if (required && $(this).find('span.file a').attr('href').length > 0) { required_filled = true; }
                 } else if ($(this).find('input[type=file]').length > 0) {
                     inputType = 'file';
                     value = $(this).find('input[type=file]').val();
