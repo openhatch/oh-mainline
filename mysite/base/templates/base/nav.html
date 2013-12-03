@@ -74,11 +74,21 @@
                             <li><a href='{% url mysite.profile.views.people%}'>volunteers</a></li>
                             {% endif %}
                         </ul>
+                        <script>
+                            $(function() {
+                                var url = window.location.href;
+                                $(".nav a").each(function() {
+                                    if(url == (this.href)) {
+                                        $(this).closest("li").addClass("active");
+                                    }
+                                });
+                            });
+                        </script>
                     </div>
                 </div>
-
             </div>
         </div>
     </nav>
+
 </header>
 {# vim: set filetype=htmldjango: #}
