@@ -5,3 +5,8 @@ south
 setuptools
 psycopg2
 PIL
+xmlbuilder
+django-crontab
+django-file-resubmit
+django-cors-headers
+numpy

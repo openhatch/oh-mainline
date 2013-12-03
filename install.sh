@@ -1,10 +1,14 @@
 #!/bin/bash
 set -e
 
+sudo apt-get install python-pip
+sudo apt-get install sqlite3
+sudo apt-get install python-dev
 sudo pip install xmlbuilder
 sudo pip install django-crontab
 sudo pip install django-file-resubmit
 sudo pip install django-cors-headers
+sudo pip install numpy
 rm -vf mysite/site.db
 python manage.py syncdb --noinput
 python manage.py migrate
