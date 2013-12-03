@@ -620,19 +620,8 @@ def widget(request):
 
 @login_required
 @view
-def invite_someone(request, form=None,success_message=''):
-    if form is None:
-        invite_someone_form = InvitationKeyForm()
-    else:
-        invite_someone_form = form
-
-    remaining_invites = InvitationKey.objects.remaining_invitations_for_user(
-        request.user)
-
-    return (request, 'account/invite_someone.html', {
-            'success_message': success_message,
-            'invite_someone_form': invite_someone_form,
-            'remaining_invites': remaining_invites})
+def invite_someone(request):
+    return (request, 'account/invite_someone.html', {})
 
 def proxyconnect_sso(request):
     '''This function implements the ProxyConnect single

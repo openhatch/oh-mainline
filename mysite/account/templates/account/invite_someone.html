@@ -1,4 +1,4 @@
-{% extends 'account/settings_tab.html' %}
+{% extends 'account/settings.html' %}
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
@@ -18,25 +18,60 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% block settings_main %}
+{% comment %}
+NB: All forms in pages that descend from this have the same name.
+{% endcomment %}
+<div class='submodule fat'>
+    <div class='submodule-head'>
+        <h3>{% block submodule_head %}{% endblock %}</h3>
+    </div>
+    <div class='submodule-body'>
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+        <div class="fb-share-button" data-href="http://www.socialcoding4good.org/" data-type="button_count"></div>
 
-{% block title %}
-Tell a friend or enemy
-{% endblock title %}
+        <a href="https://twitter.com/share" class="twitter-share-button"
+           data-text="Just volunteered @sc4g - contributing my tech skills to nonprofit, open source software projects for good! www.socialcoding4good.org"
+           data-url="www.socialcoding4good.org">Tweet</a>
+        <script>
+    !function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+    'script', 'twitter-wjs');</script>
 
-{% block form_action %}'{% url mysite.account.views.invite_someone_do %}'{% endblock %}
+        <script src="//platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
+        <div class="linkedin-share-button">
+            <script type="IN/Share" data-url="www.socialcoding4good.org" data-counter="right"></script>
+        </div>
 
-{% block submodule_head %}Tell a friend (or enemy) about SocialCoding4Good{% endblock %}
-
-{% block submodule_body %}
-{% for field in invite_someone_form %}
-<div class='form-row'>
-    {{ field.errors }}
-    <label>Your friend's email address:</label>
-    {{ field }}
+        <div class="google-plus-share-button">
+            <div class="g-plus" data-action="share" data-annotation="bubble"
+                 data-href="http://www.socialcoding4good.org"></div>
+            <script type="text/javascript">
+    (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/platform.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+    })();
+    </script>
+        </div>
+    </div>
 </div>
-{% endfor %}
-{% endblock %}
-
-{% block submit_button_attributes %}
-value='Send'
+{% endblock settings_main %}
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+    $(function () {
+        $('#clear_message').click(function () {
+            $(this).parent().parent().hide();
+            return false;
+        });
+    });
+</script>
 {% endblock %}

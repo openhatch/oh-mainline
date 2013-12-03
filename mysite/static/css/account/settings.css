@@ -17,3 +17,9 @@ div#tabs ul li:not(:first-child) {
 #map_canvas {
     margin: 20px !important;
 }
+
+.fb-share-button, .twitter-share-button, .linkedin-share-button, .google-plus-share-button {
+    float: left;
+    clear: both;
+    margin: 15px;
+}
