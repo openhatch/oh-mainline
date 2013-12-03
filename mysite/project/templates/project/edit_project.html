@@ -42,14 +42,6 @@
 about the projects we index
 {% endblock %}
 
-{% block pagetop %}
-<h3>
-    <a href='{% url mysite.project.views.projects %}'>
-        <img alt='Projects on SC4G' id='projects' src={% version '/static/images/projects_alt.png' %} width='960' height='141'/>
-    </a>
-</h3>
-{% endblock pagetop %}
-
 {% block main %}
 <div id='edit-project' class='module'>
     <div class='module-head'>
