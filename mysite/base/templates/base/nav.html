@@ -66,6 +66,7 @@
                             {% endif %}
                         </ul>
                         <ul class="nav">
+                            <li><a href='http://www.socialcoding4good.org'>home</a></li>
                             {% if user|has_permission:'can_view_projects' %}
                             <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
                             {% endif%}
