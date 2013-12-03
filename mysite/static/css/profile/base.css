@@ -221,7 +221,7 @@ div.input input[type=text] {
 .search_list {
     margin-left: 20px;
     color: #222222;
-    font: 11pt Tuffy,Helvetica,sans-serif;
+    font: 11pt "Open Sans";
 }
 
 .search_card_profile {
@@ -252,7 +252,7 @@ div.input input[type=text] {
 
 .search_card_profile fieldset legend {
     position: relative;
-    font-family: Helvetica;
+    font-family: "Open Sans";
     font-weight: bold;
     border-bottom: 1px solid #DDDDDD;
     width: 400px;

@@ -195,7 +195,7 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
 	padding: 				10px;
 	margin-top: 			5px;
 	margin-bottom: 			5px;
-	font-family: 			"Liberation Sans", Arial, Helvetica, sans-serif;
+	font-family: 			"Open Sans";
 	font-size: 				14px;
 	text-align: 			left;
 	display: 				none;
@@ -343,7 +343,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
         body#search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
 
-        body#search #results li .second-line .description p { font-family: sans-serif; display: inline; }
+        body#search #results li .second-line .description p { font-family: "Open Sans"; display: inline; }
         body#search #results li .good-for-beginners { background-color: #dcffcc; padding: 1px; }
 
         body#search a.title { font-size: 1.1em; }
@@ -358,7 +358,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .description-container { width: 98.5%; padding: .3em 0; font-size: 0.8em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             body#search #results li .description-container * { display: inline; }
             body#search #results li .description-container br { display: none; }
-        body#search #results li .description { font-family: monospace; }
+        body#search #results li .description { font-family: "Open Sans"; }
 
         body#search #results li.expanded { border-color: #dedede; background: #fff; white-space: normal; }
             body#search #results li.expanded .title { font-weight: bold; text-shadow: 0 1px 0 #fff; }
@@ -368,7 +368,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
             body#search #results li.expanded .below_the_fold { margin-top: 1.5em; font-size: .75em; display: block; }
 
                 body#search #results li.expanded .meta-data { float: left; width: 100%; }
-                body#search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
+                body#search #results li.expanded .description-container p { font-family: "Open Sans"; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 body#search #results li.expanded .description-container br { display: inherit; }
                 body#search #results li.expanded .description-container .description { width: 100%; margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px dashed #dedede; max-height: 400px; overflow-y: auto; }
             body#search #results li.expanded .second-line { border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; overflow: visible; }
@@ -458,7 +458,7 @@ body#project ul.answers > li:last-child { border: 0; }
 body#project .show_when_editing { display: none; }
 body#project .blur { color: #888; }
 body#project textarea { height: 60px; }
-body#project textarea, body#project input[type='text'] { font-family: sans-serif; }
+body#project textarea, body#project input[type='text'] { font-family: "Open Sans"; }
 body#project ul.answers textarea.blur { height: 1.2em; }
 body#project .questions > li { float: left; width: 100%; margin: 10px 0 30px; }
 
@@ -525,11 +525,11 @@ div#nav-container div#nav h1 {
 
 body#project #wannahelp { width: 101% ! important; padding: 0; background: transparent; }
 body#project #wanna_help_thanks_tipsy_closer {float: right;}
-body#project #wannahelp-button { -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 10px 20px; color: #444; float: right; border: 3px solid #fff; white-space: normal; font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background-color: #c8e29d; background-repeat: repeat-x; background-position: top; font-size: 13pt; }
+body#project #wannahelp-button { -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 10px 20px; color: #444; float: right; border: 3px solid #fff; white-space: normal; font-family: "Open Sans"; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background-color: #c8e29d; background-repeat: repeat-x; background-position: top; font-size: 13pt; }
 body#project #wannahelp-button:active { background-position: bottom;}
 body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { text-decoration: none; color: #222; }
 
-body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
+body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: "Open Sans"; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
 body#project #message_for_helpers input[type='image']:hover { background-color: #d3d3d3; }
 body#project #next_steps { display: block; text-align: right; margin-top: 1em; }
 
@@ -657,7 +657,7 @@ body#project .tab_nav .ui-state-active h3 {
     margin: 0 1px 0 20px;
     padding: 1px 10px;
     background-color: rgba(225, 225, 200, 0.5);
-    font-family: monospace;
+    font-family: "Open Sans";
     font-size: .9em;
     border: 2pt dashed #dedede;
     }
@@ -811,7 +811,7 @@ li.search_card_project fieldset p {
 }
 
 li.search_card_project fieldset legend {
-    font-family: Helvetica;
+    font-family: "Open Sans";
     font-weight: bold;
     border-bottom: 1px solid #DDDDDD;
     width: 400px;
@@ -881,23 +881,23 @@ div#tabs ul li:not(:first-child) {
 #widget-settings xmp { white-space: normal; margin-bottom: 0; }
 #widget-settings .submodule p { padding: 5px; margin: 0; }
 
-h1#qunit-header { padding: 15px; font-size: large; background-color: #06b; color: white; font-family: 'trebuchet ms', verdana, arial; margin: 0; }
+h1#qunit-header { padding: 15px; font-size: large; background-color: #06b; color: white; font-family: "Open Sans"; margin: 0; }
 h1#qunit-header a { color: white; }
 
-h2#qunit-banner { height: 2em; border-bottom: 1px solid white; background-color: #eee; margin: 0; font-family: 'trebuchet ms', verdana, arial; }
+h2#qunit-banner { height: 2em; border-bottom: 1px solid white; background-color: #eee; margin: 0; font-family: "Open Sans"; }
 h2#qunit-banner.pass { background-color: green; }
 h2#qunit-banner.fail { background-color: red; }
 
-h2#qunit-userAgent { padding: 10px; background-color: #eee; color: black; margin: 0; font-size: small; font-weight: normal; font-family: 'trebuchet ms', verdana, arial; font-size: 10pt; }
+h2#qunit-userAgent { padding: 10px; background-color: #eee; color: black; margin: 0; font-size: small; font-weight: normal; font-family: "Open Sans"; font-size: 10pt; }
 
-div#qunit-testrunner-toolbar { background: #eee; border-top: 1px solid black; padding: 10px; font-family: 'trebuchet ms', verdana, arial; margin: 0; font-size: 10pt; }
+div#qunit-testrunner-toolbar { background: #eee; border-top: 1px solid black; padding: 10px; font-family: "Open Sans"; margin: 0; font-size: 10pt; }
 
-ol#qunit-tests { font-family: 'trebuchet ms', verdana, arial; font-size: 10pt; }
+ol#qunit-tests { font-family: "Open Sans"; font-size: 10pt; }
 ol#qunit-tests li strong { cursor:pointer; }
 ol#qunit-tests .pass { color: green; } 
 ol#qunit-tests .fail { color: red; } 
 
-p#qunit-testresult { margin-left: 1em; font-size: 10pt; font-family: 'trebuchet ms', verdana, arial; }
+p#qunit-testresult { margin-left: 1em; font-size: 10pt; font-family: "Open Sans"; }
 
 body#profile #bio { margin: 0; padding: 0 0 10px 0; }
 body#profile #tags-links li { list-style: square outside; margin: 0 0 0 15px; }
@@ -1122,7 +1122,7 @@ div.input input[type=text] {
 .search_list {
     margin-left: 20px;
     color: #222222;
-    font: 11pt Tuffy,Helvetica,sans-serif;
+    font: 11pt "Open Sans";
 }
 
 .search_card_profile {
@@ -1153,7 +1153,7 @@ div.input input[type=text] {
 
 .search_card_profile fieldset legend {
     position: relative;
-    font-family: Helvetica;
+    font-family: "Open Sans";
     font-weight: bold;
     border-bottom: 1px solid #DDDDDD;
     width: 400px;
@@ -1362,7 +1362,7 @@ body#profile .portfolio_entry.adding .add { display: none; } /* Don't display 'A
 body#profile .portfolio_entry label { color: #777; font-size: 10pt; margin: 0 0 2px 0; padding: 0; width: 100%; }
 body#profile .portfolio_entry .citation-forms label { font-weight: bold; }
 body#profile .portfolio_entry .experience_description-wrapper { width: 100%; }
-body#profile .portfolio_entry textarea { font-size: 9pt; font-family: sans-serif; }
+body#profile .portfolio_entry textarea { font-size: 9pt; font-family: "Open Sans"; }
 body#profile .portfolio_entry .project_description-wrapper textarea { height: 40px; }
 body#profile .portfolio_entry .experience_description-wrapper textarea { height: 80px; }
 body#profile .citations > li { color: #777; float: left; list-style: circle; margin-left: 20px; margin-top: 5px; width: 90%; }
@@ -1673,8 +1673,8 @@ body#people-map #thinking { display: none; margin-right: 1em; padding: 0 2px; ba
 
 /* Component containers
 ----------------------------------*/
-.ui-widget { font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; font-size: 1.1em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; font-size: 1em; }
+.ui-widget { font-family: "Open Sans"; font-size: 1.1em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: "Open Sans"; font-size: 1em; }
 .ui-widget-content { border: 1px solid #dddddd; background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x; color: #333333; }
 .ui-widget-content a { color: #333333; }
 .ui-widget-header { border: 1px solid #e78f08; background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
