@@ -1,9 +1,9 @@
 /* fonts */
 
-@font-face { font-family: Tuffy; src: url('/static/fonts/tuffy_regular.ttf');}
-@font-face { font-family: Tuffy; font-weight: bold; src: url('/static/fonts/tuffy_bold.ttf');}
-@font-face { font-family: Tuffy; font-style: italic; src: url('/static/fonts/tuffy_italic.ttf');}
-@font-face { font-family: Tuffy; font-weight: bold; font-style: italic; src: url('/static/fonts/tuffy_bold_italic.ttf');}
+@font-face { font-family: "Open Sans"; src: url('/static/fonts/OpenSans-Regular.ttf.ttf');}
+@font-face { font-family: "Open Sans"; font-weight: bold; src: url('/static/fonts/OpenSans-Bold.ttf');}
+@font-face { font-family: "Open Sans"; font-style: italic; src: url('/static/fonts/OpenSans-Italic.ttf');}
+@font-face { font-family: "Open Sans"; font-weight: bold; font-style: italic; src: url('/static/fonts/OpenSans-BoldItalic.ttf');}
 
 /* coloration */
 
@@ -84,7 +84,7 @@
 
 /* styles */
 
-body { font: @normal-size Tuffy, Helvetica, sans-serif; background: @lightest-grey url('/static/images/light-hatch.png') repeat; color: @default-text-color; width: 100%; .centered; padding: 0; }
+body { font: @normal-size "Open Sans"; background: @lightest-grey url('/static/images/light-hatch.png') repeat; color: @default-text-color; width: 100%; .centered; padding: 0; }
 
 .link_like, a, body .ui-widget-content a { color: @orange; text-decoration: none; cursor:pointer; cursor:hand; }
 
@@ -258,7 +258,7 @@ ul#links { margin-left: 20px; }
         text-transform: lowercase;
         font-weight: bold;
         letter-spacing: 1px;
-        font-family: Helvetica, sans-serif;
+        font-family: "Open Sans";
     }
 }
 
@@ -388,7 +388,7 @@ body ul.raquo_bullets {
     list-style: none; 
     li { margin-bottom: .4em; 
         &:last-child { margin-bottom: 0; }
-        &:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
+        &:before { color: #999; font-family: "Open Sans"; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
     }
 }
 

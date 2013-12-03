@@ -72,7 +72,7 @@ body#profile .portfolio_entry.adding .add { display: none; } /* Don't display 'A
 body#profile .portfolio_entry label { color: #777; font-size: 10pt; margin: 0 0 2px 0; padding: 0; width: 100%; }
 body#profile .portfolio_entry .citation-forms label { font-weight: bold; }
 body#profile .portfolio_entry .experience_description-wrapper { width: 100%; }
-body#profile .portfolio_entry textarea { font-size: 9pt; font-family: sans-serif; }
+body#profile .portfolio_entry textarea { font-size: 9pt; font-family: "Open Sans"; }
 body#profile .portfolio_entry .project_description-wrapper textarea { height: 40px; }
 body#profile .portfolio_entry .experience_description-wrapper textarea { height: 80px; }
 body#profile .citations > li { color: #777; float: left; list-style: circle; margin-left: 20px; margin-top: 5px; width: 90%; }

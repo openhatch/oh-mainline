@@ -104,7 +104,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
         body#search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
 
-        body#search #results li .second-line .description p { font-family: sans-serif; display: inline; }
+        body#search #results li .second-line .description p { font-family: "Open Sans"; display: inline; }
         body#search #results li .good-for-beginners { background-color: #dcffcc; padding: 1px; }
 
         body#search a.title { font-size: 1.1em; }
@@ -119,7 +119,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .description-container { width: 98.5%; padding: .3em 0; font-size: 0.8em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             body#search #results li .description-container * { display: inline; }
             body#search #results li .description-container br { display: none; }
-        body#search #results li .description { font-family: monospace; }
+        body#search #results li .description { font-family: "Open Sans"; }
 
         body#search #results li.expanded { border-color: #dedede; background: #fff; white-space: normal; }
             body#search #results li.expanded .title { font-weight: bold; text-shadow: 0 1px 0 #fff; }
@@ -129,7 +129,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
             body#search #results li.expanded .below_the_fold { margin-top: 1.5em; font-size: .75em; display: block; }
 
                 body#search #results li.expanded .meta-data { float: left; width: 100%; }
-                body#search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
+                body#search #results li.expanded .description-container p { font-family:"Open Sans"; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 body#search #results li.expanded .description-container br { display: inherit; }
                 body#search #results li.expanded .description-container .description { width: 100%; margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px dashed #dedede; max-height: 400px; overflow-y: auto; }
             body#search #results li.expanded .second-line { border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; overflow: visible; }
