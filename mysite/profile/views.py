@@ -513,12 +513,16 @@ def people_sort(request):
             filtered_people = sorted(filtered_people, key=lambda person: difflib.SequenceMatcher(
                 None, post_data['filter_name'],
                 person.user.last_name).ratio(), reverse=inorder)
-    else:
+    elif post_data['order'] == 'date_joined':
         if inorder:
             people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order']).reverse()
         else:
             people = Person.objects.all().filter(pk__in=people_ids).order_by('user__' + post_data['order'])
         filtered_people = view_helpers.filter_people(people, post_data)
+    elif post_data['order'] == 'location':
+        people = Person.objects.filter(pk__in=people_ids)
+        filtered_people = view_helpers.filter_people(people, post_data)
+        filtered_people = sorted(filtered_people, key=lambda person: person.location_display_name.lower(), reverse=inorder)
 
     response = render_to_string(template_name='profile/people_' + post_data['view'] + '.html',
                                 dictionary={'people': filtered_people}, context_instance=RequestContext(request))
