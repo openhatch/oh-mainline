@@ -20,6 +20,7 @@
 
 import django.test
 from django.core.urlresolvers import reverse
+import django.db
 
 import twill
 from twill import commands as tc
@@ -93,6 +94,10 @@ class TwillTests(django.test.TestCase):
         settings.DEBUG_PROPAGATE_EXCEPTIONS = True
         TwillTests._twill_setup()
         TwillTests._twill_quiet()
+        # Commit a transaction right here. This avoids a race where,
+        # especially on MySQL (and not on sqlite, it seems), the fixtures
+        # are not avaiable to twill-based tests.
+        django.db.connection.commit()
 
     def tearDown(self):
         # If you get an error on one of these lines,
@@ -114,6 +119,17 @@ class TwillTests(django.test.TestCase):
         tc.fv('login', 'username', username)
         tc.fv('login', 'password', password)
         tc.submit()
+
+        # Validate that it worked
+        LOGIN_FAIL_STRING = 'Please enter a correct username and password.'
+        try:
+            tc.find(LOGIN_FAIL_STRING)
+        except AssertionError:
+            # Hooray, we did not find the string. Return successfully.
+            return
+
+        # If we get to this line, it means login failed. Wonder why!
+        assert False, "We attempted to log in but could not."
 
     def login_with_client(self, username='paulproteus',
                           password="paulproteus's unbreakable password"):
