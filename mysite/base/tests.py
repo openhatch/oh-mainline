@@ -20,6 +20,7 @@
 
 import django.test
 from django.core.urlresolvers import reverse
+import django.db
 
 import twill
 from twill import commands as tc
@@ -93,6 +94,10 @@ class TwillTests(django.test.TestCase):
         settings.DEBUG_PROPAGATE_EXCEPTIONS = True
         TwillTests._twill_setup()
         TwillTests._twill_quiet()
+        # Commit a transaction right here. This avoids a race where,
+        # especially on MySQL (and not on sqlite, it seems), the fixtures
+        # are not avaiable to twill-based tests.
+        django.db.connection.commit()
 
     def tearDown(self):
         # If you get an error on one of these lines,
