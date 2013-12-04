@@ -120,6 +120,17 @@ class TwillTests(django.test.TestCase):
         tc.fv('login', 'password', password)
         tc.submit()
 
+        # Validate that it worked
+        LOGIN_FAIL_STRING = 'Please enter a correct username and password.'
+        try:
+            tc.find(LOGIN_FAIL_STRING)
+        except AssertionError:
+            # Hooray, we did not find the string. Return successfully.
+            return
+
+        # If we get to this line, it means login failed. Wonder why!
+        assert False, "We attempted to log in but could not."
+
     def login_with_client(self, username='paulproteus',
                           password="paulproteus's unbreakable password"):
         client = Client()
