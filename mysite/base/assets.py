@@ -52,6 +52,7 @@ register('openhatch_js',
                 'jquery-ui-1.7.3/ui/ui.sortable.js',
                 'jquery-ui-1.7.3/ui/ui.progressbar.js',
                 'jquery-ui-1.7.3/ui/ui.tabs.js',
+                'jquery-ui-1.7.3/ui/ui.dialog.js',
                 ),
 
          # jQuery Tools

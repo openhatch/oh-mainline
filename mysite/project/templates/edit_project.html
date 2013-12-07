@@ -140,10 +140,14 @@ Editing project - {{ project.display_name }}
 		    stores bugs for your project:</p>
 		  <ul class="raquo_bullets">
 		    {% for tracker in trackers %}
-		    <li><a href="{{ tracker.get_edit_url }}">
+		    <li><a onclick="return getPage('{{ tracker.get_edit_url }}');" href="{{ tracker.get_edit_url }}">
 			{{ tracker.tracker_name }}
 		    </a></li>
 		    {% endfor %}
+            <div id="modal_dialog" title="Customs - Edit tracker" class="module-head">
+                <div id="modal_content">
+                </div>
+            </div>
 		  </ul>
 		    {% else %}
 		  <p>If you register bug trackers with OpenHatch, we will crawl them
@@ -172,8 +176,24 @@ Editing project - {{ project.display_name }}
     <script type='text/javascript'>
         $(function () { 
             $('#tabbed_container').tabs();
+            $('#modal_dialog').dialog({
+                autoOpen: false,
+                // these numbers should probably be relative. 
+                height: 800,
+                width: 1000, 
+                modal: true
+            });
         });
+
+        function getPage(url) {
+            $.get(url, function(data){
+               $("#modal_content").html( $(data).find('#content').html());
+              });
+            $( "#modal_dialog" ).dialog('open');
+            return false;
+        }
     </script>
+
     {% if not project.icon_for_profile %}
     <script type='text/javascript'>
         $(function () {
