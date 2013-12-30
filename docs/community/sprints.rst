@@ -78,4 +78,16 @@ physically at the sprint.
 
 .. _The In-Person Event Handbook: http://opensource-events.com/
 
+Food sponsorship logistics notes
+--------------------------------
 
+Typically, the Python Software Foundation (or any food sponsor) wants
+to see an itemized receipt with the food and drink items on it. If the
+sprint is at a venue where people typically order one item at a time,
+you can simplify life by leaving a tab open and having just one person
+pay the bill. Then that person can be the one to get reimbursed.
+
+If a person with an OpenHatch Foundation card is around (such as
+Asheesh or Shauna), a good idea is to have that card be the one that
+pays the tab. Then the owner of that card is the only one who has to
+deal with the reimbursement logistics.
