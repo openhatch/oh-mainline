@@ -9,4 +9,5 @@ Community
   contact
   login_team
   login_team_agreement
+  sprints
   thanks
