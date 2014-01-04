@@ -122,7 +122,7 @@ create a database for it to use.
 
 To do that, run this command::
 
-  heroku addons:add --app better-frobulator shared-database
+  heroku addons:add --app better-frobulator heroku-postgresql:dev
 
 (Replace "better-frobulator" with the name of your Heroku app.) This will
 add a free-of-cost Postgres database to your app.
