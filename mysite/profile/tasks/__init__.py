@@ -56,8 +56,7 @@ source2result_handler = {
 class GarbageCollectForwarders:
 
     def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started garbage collecting profile email forwarders")
+        logging.info("Started garbage collecting profile email forwarders")
         deleted_any = mysite.profile.models.Forwarder.garbage_collect()
         return deleted_any
 
@@ -89,21 +88,20 @@ class FetchPersonDataFromOhloh:
     def run(self, dia_id, **kwargs):
         dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
         try:
-            logger = self.get_logger(**kwargs)
-            logger.info("Starting job for <%s>" % dia)
+            logging.info("Starting job for <%s>" % dia)
             if dia.completed:
-                logger.info("Bailing out job for <%s>" % dia)
+                logging.info("Bailing out job for <%s>" % dia)
                 return
             results = source2actual_action[dia.source](dia)
             source2result_handler[dia.source](dia.id, results)
-            logger.info("Results: %s" % repr(results))
+            logging.info("Results: %s" % repr(results))
 
         except Exception, e:
             # if the task is in debugging mode, bubble-up the exception
             if getattr(self, 'debugging', None):
                 raise
-            logger.error("Traceback: ")
-            logger.error(traceback.format_exc())
+            logging.error("Traceback: ")
+            logging.error(traceback.format_exc())
 
             # else let the exception be logged but not bubble up
             dia.completed = True
@@ -117,7 +115,7 @@ class FetchPersonDataFromOhloh:
                 url = str(e.geturl())
             else:
                 raise
-            logger.error('Dying: ' + code + ' getting ' + url)
+            logging.error('Dying: ' + code + ' getting ' + url)
             raise ValueError, {'code': code, 'url': url}
 
 
