@@ -115,7 +115,7 @@ class Migration:
         },
         'search.projectinvolvementquestion': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_bug_style': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'is_bug_style': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'text': ('django.db.models.fields.TextField', [], {})
         }
     }

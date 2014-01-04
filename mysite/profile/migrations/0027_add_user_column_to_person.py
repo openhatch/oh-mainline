@@ -26,17 +26,6 @@ class Migration:
         # Adding field 'Person.user'
         db.add_column('profile_person', 'user', models.ForeignKey(orm['auth.User'], null=True))
         
-        # Adding field 'TagType.name'
-        try:
-            db.add_column('profile_tagtype', 'name', models.CharField(max_length=100))
-        except Exception, e:
-            raise_the_exception = True
-            for thing in e.args:
-                if 'Duplicate column' in unicode(thing):
-                    raise_the_exception = False
-            if raise_the_exception:
-                raise
-        
         # Changing field 'Person.time_record_was_created'
         db.alter_column('profile_person', 'time_record_was_created', models.DateTimeField(default=datetime.datetime(2009, 7, 10, 14, 41, 1, 589909)))
         

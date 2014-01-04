@@ -11,8 +11,11 @@ class Migration(SchemaMigration):
         # Deleting field 'Buildhelper.num_steps'
         db.delete_column('search_buildhelper', 'num_steps')
 
-        # Changing field 'BuildhelperStep.time'
-        db.alter_column('search_buildhelperstep', 'time', self.gf('django.db.models.fields.IntegerField')())
+        # Delete field 'BuildhelperStep.time'
+        db.delete_column('search_buildhelperstep', 'time')
+
+        # Add field because PostgreSQL doesn't like when we already a TimeField to a IntegerField
+        db.add_column('search_buildhelperstep', 'time', self.gf('django.db.models.fields.IntegerField')())
 
 
     def backwards(self, orm):
