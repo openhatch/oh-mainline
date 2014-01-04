@@ -339,16 +339,6 @@ LOGGING = {
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')
 
-# Heroku fix-ups
-# If we are running on Heroku, there will be a DATABASE_URL
-# and/or SHARED_DATABASE_URL that refers to postgres.
-# Our South migrations do not currently run on postgres, so
-# in that case, we skip south.
-_overridden_db = (os.environ.get('DATABASE_URL', '') or
-                  os.environ.get('SHARED_DATABASE_URL', ''))
-if _overridden_db.startswith('postgres://'):
-    INSTALLED_APPS = tuple([x for x in INSTALLED_APPS
-                            if x != 'south'])
 
 # Windows fix-ups
 if sys.platform.startswith('win'):
