@@ -88,7 +88,6 @@ $.fn.toggleDisplay = function() {
 }
 
 $(function () {
-    $("input[rel='hint']").hint();
     $("a[rel='facebox']").facebox();
 });
 
