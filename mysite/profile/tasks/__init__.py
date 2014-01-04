@@ -58,6 +58,10 @@ class GarbageCollectForwarders:
     def run(self, **kwargs):
         logging.info("Started garbage collecting profile email forwarders")
         deleted_any = mysite.profile.models.Forwarder.garbage_collect()
+        if deleted_any:
+            # Well, in that case, we should purge the staticgenerator-generated
+            # cache of the people pages.
+            clear_people_page_cache()
         return deleted_any
 
 
@@ -131,6 +135,15 @@ def update_person_tag_cache(person__pk):
     return person.get_tag_texts_for_map()
 
 
+def update_someones_pf_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_cache_key_for_projects()
+    django.core.cache.cache.delete(cache_key)
+
+    # This getter will populate the cache
+    return person.get_display_names_of_nonarchived_projects()
+
+
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
@@ -163,3 +176,23 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
         logging.info("Whee! Bumped the timestamp. Guess I'll fill the cache.")
         fill_recommended_bugs_cache()
     logging.info("Done syncing bug timestamp.")
+
+
+def clear_people_page_cache(*args, **kwargs):
+    shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
+                               'people'),
+                  ignore_errors=True)
+
+
+def fill_people_page_cache():
+    staticgenerator.quick_publish('/people/')
+
+for model in [mysite.profile.models.PortfolioEntry,
+              mysite.profile.models.Person,
+              mysite.profile.models.Link_Person_Tag]:
+    for signal_to_hook in [
+        django.db.models.signals.post_save,
+            django.db.models.signals.post_delete]:
+        signal_to_hook.connect(
+            clear_people_page_cache,
+            sender=model)
