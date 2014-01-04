@@ -207,7 +207,7 @@ about how you can help {{ project.display_name }}
                     <img src="/static/images/buildhelper/time.png" height="35" /> {{ step.time }} min{{ step.time|pluralize }}
                     </div>
                     {% if step.hint %}
-                        <a href="{{ step.hint }}" class="step-button step-button-hint" placeholder="Want a hint?"><img src="/static/images/buildhelper/tutorial-button.png" height="40" /></a>
+                        <a href="{{ step.hint }}" class="step-button step-button-hint" title="Want a hint?"><img src="/static/images/buildhelper/tutorial-button.png" height="40" /></a>
                     {% endif %}
                     {% if step.frustration_handler %}
                         <a href="{{ step.frustration_handler }}" class="step-button step-button-frustration" title="Frustrated?"><img src="/static/images/buildhelper/frustration-handler.png" height="40" /></a>
