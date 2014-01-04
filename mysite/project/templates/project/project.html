@@ -77,7 +77,7 @@ about how you can help {{ project.display_name }}
                 <ul class='raquo_bullets'>
                     <li><a href='{% url mysite.profile.views.edit_info %}'>
                             Talk about your skills and interests on your profile</a></li>
-                    <li><a href='{% url mysite.search.views.fetch_bugs %}?q={{ project.name|urlencode }}&toughness=bitesize'>
+                    <li><a href='{% url mysite.search.views.search_index %}?q={{ project.name|urlencode }}&toughness=bitesize'>
                             Find a bite-size bug in {{ project.display_name }}
                         </a></li>
                     <li><a href='{% url mysite.profile.views.edit_info %}#contact_blurb'>

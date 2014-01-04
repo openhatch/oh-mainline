@@ -18,8 +18,10 @@
 
 from mysite.missions.base.view_helpers import *
 
+
 class SvnRepository(object):
-    INITIAL_CONTENT = os.path.join(get_mission_data_path('svn'), 'svn-initial.svndump')
+    INITIAL_CONTENT = os.path.join(
+        get_mission_data_path('svn'), 'svn-initial.svndump')
 
     def __init__(self, username):
         self.username = username
@@ -31,10 +33,13 @@ class SvnRepository(object):
     def reset(self):
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
-        subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', self.repo_path])
+        subprocess.check_call(
+            ['svnadmin', 'create', '--fs-type', 'fsfs', self.repo_path])
 
-        # Configure the repository so svnserve uses a password file stored within it.
-        svnserve_conf_path = os.path.join(self.repo_path, 'conf', 'svnserve.conf')
+        # Configure the repository so svnserve uses a password file stored
+        # within it.
+        svnserve_conf_path = os.path.join(
+            self.repo_path, 'conf', 'svnserve.conf')
         svnserve_conf = RawConfigParser()
         svnserve_conf.read(svnserve_conf_path)
         svnserve_conf.set('general', 'anon-access', 'read')
@@ -43,20 +48,23 @@ class SvnRepository(object):
         svnserve_conf.write(open(svnserve_conf_path, 'w'))
 
         # Assign a password for the user.
-        password = ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)), format='words').lower().split()[:3])
+        password = ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)),
+                            format='words').lower().split()[:3])
         passwd_path = os.path.join(self.repo_path, 'conf', 'passwd')
         passwd_file = RawConfigParser()
         passwd_file.read(passwd_path)
         passwd_file.set('users', self.username, password)
         passwd_file.write(open(passwd_path, 'w'))
 
-        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', self.repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        dumploader = subprocess.Popen(
+            ['svnadmin', 'load', '--ignore-uuid', self.repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         dumploader.communicate(open(self.INITIAL_CONTENT).read())
         if dumploader.returncode != 0:
             raise RuntimeError, 'svnadmin load failed'
 
         # Install the pre-commit hook.
-        precommit_hook_path = os.path.join(self.repo_path, 'hooks', 'pre-commit')
+        precommit_hook_path = os.path.join(
+            self.repo_path, 'hooks', 'pre-commit')
         open(precommit_hook_path, 'w').write('''#!/bin/sh -e
 export PATH=%s
 exec %s -W ignore %s svn_precommit "$@"
@@ -83,11 +91,15 @@ exec %s -W ignore %s svn_precommit "$@"
 
 # Helpers for the hook scripts for the svn commit mission.
 # We can mock these in the tests.
+
+
 def get_username_for_svn_txn(repo_path, txn_id):
     return subproc_check_output(['svnlook', 'author', repo_path, '-t', txn_id]).strip()
 
+
 def get_changes_for_svn_txn(repo_path, txn_id):
-    changes = subproc_check_output(['svnlook', 'changed', repo_path, '-t', txn_id])
+    changes = subproc_check_output(
+        ['svnlook', 'changed', repo_path, '-t', txn_id])
     # Lines are in the form:
     # <one letter for operation> <three spaces> <path in repository> <newline>
     # as in:
@@ -95,17 +107,21 @@ def get_changes_for_svn_txn(repo_path, txn_id):
     for line in StringIO(changes):
         yield line[0], line[4:-1]
 
+
 def get_file_for_svn_txn(repo_path, txn_id, filename):
     return subproc_check_output(['svnlook', 'cat', repo_path, '-t', txn_id, filename])
 
+
 def get_log_for_svn_txn(repo_path, txn_id):
     return subproc_check_output(['svnlook', 'log', repo_path, '-t', txn_id])
+
 
 class SvnCommitMission(object):
     SECRET_WORD_FILE = 'word.txt'
     NEW_SECRET_WORD = 'plenipotentiary'
     FILE_TO_BE_PATCHED = 'README'
-    NEW_CONTENT = os.path.join(get_mission_data_path('svn'), 'README-new-for-svn-commit')
+    NEW_CONTENT = os.path.join(
+        get_mission_data_path('svn'), 'README-new-for-svn-commit')
 
     @classmethod
     def pre_commit_hook(cls, repo_path, txn_id):
@@ -119,7 +135,8 @@ class SvnCommitMission(object):
             raise IncorrectPatch, 'The svn diff mission must be completed before the svn commit mission.'
 
         # Check that the correct files are modified.
-        paths_that_should_be_modified = ['trunk/' + cls.SECRET_WORD_FILE, 'trunk/' + cls.FILE_TO_BE_PATCHED]
+        paths_that_should_be_modified = [
+            'trunk/' + cls.SECRET_WORD_FILE, 'trunk/' + cls.FILE_TO_BE_PATCHED]
         for action, path in get_changes_for_svn_txn(repo_path, txn_id):
             if action != 'U':
                 raise IncorrectPatch, 'No files should have been added or removed.'
@@ -128,14 +145,15 @@ class SvnCommitMission(object):
             paths_that_should_be_modified.remove(path)
 
         if len(paths_that_should_be_modified):
-            raise IncorrectPatch, 'File "%s" should have been modified.' % paths_that_should_be_modified[0]
+            raise IncorrectPatch, 'File "%s" should have been modified.' % paths_that_should_be_modified[
+                0]
 
         # Check the secret word.
-        if get_file_for_svn_txn(repo_path, txn_id, 'trunk/'+cls.SECRET_WORD_FILE).strip() != cls.NEW_SECRET_WORD:
+        if get_file_for_svn_txn(repo_path, txn_id, 'trunk/' + cls.SECRET_WORD_FILE).strip() != cls.NEW_SECRET_WORD:
             raise IncorrectPatch, 'The new secret word is incorrect.'
 
         # Check the other patched file.
-        if get_file_for_svn_txn(repo_path, txn_id, 'trunk/'+cls.FILE_TO_BE_PATCHED) != open(cls.NEW_CONTENT).read():
+        if get_file_for_svn_txn(repo_path, txn_id, 'trunk/' + cls.FILE_TO_BE_PATCHED) != open(cls.NEW_CONTENT).read():
             raise IncorrectPatch, 'The new content of %s is incorrect.' % cls.FILE_TO_BE_PATCHED
 
         # Check for a log message.

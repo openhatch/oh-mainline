@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-### This is the "base" set of views for the OpenHatch missions.
+# This is the "base" set of views for the OpenHatch missions.
 
 from mysite.base.decorators import view
 import mysite.base.decorators
@@ -45,14 +45,19 @@ import collections
 #
 # By using it, you can force the web browser to show a "Save as..."
 # dialog box rather than show the file inside the browser.
+
+
 def make_download(content, filename, mimetype='application/octet-stream'):
     resp = HttpResponse(content)
     resp['Content-Disposition'] = 'attachment; filename=%s' % filename
     resp['Content-Type'] = mimetype
     return resp
 
-### Generic state manager
+# Generic state manager
+
+
 class MissionPageState(object):
+
     def __init__(self, request, passed_data, mission_name):
         self.mission_name = mission_name
         self.mission_parts = None
@@ -77,7 +82,7 @@ class MissionPageState(object):
             if self.mission_step_prerequisite:
                 data['mission_step_prerequisites_passed'
                      ] = view_helpers.mission_completed(person,
-                                                       self.mission_step_prerequisite)
+                                                        self.mission_step_prerequisite)
             else:
                 data['mission_step_prerequisites_passed'] = True
         return (data, person)
@@ -99,6 +104,7 @@ class MissionPageState(object):
 
 
 class MissionViewMixin(object):
+
     """Support code for Mission Views."""
 
     login_required = False
@@ -141,16 +147,16 @@ class MissionViewMixin(object):
                                        data=data,
                                        slug=None,
                                        just_modify_data=True)
-        ### Transitional:
-        ### While some missions do not have a prev_step_url,
-        ### we make that optional here.
+        # Transitional:
+        # While some missions do not have a prev_step_url,
+        # we make that optional here.
         if getattr(self.mission, 'prev_step_url', None):
             data.update({
                 'prev_step_url': self.mission.prev_step_url(self),
                 'next_step_url': self.mission.next_step_url(self),
-                })
+            })
 
-        ### Always set these template data values
+        # Always set these template data values
         data.update({
             'mission': self.mission,
             'this_mission_page_short_name': self.page_title,
@@ -176,19 +182,22 @@ class MissionViewMixin(object):
 
 
 class MissionBaseView(MissionViewMixin, django.views.generic.base.TemplateView):
+
     """A Template-based Page in a Mission."""
 
 
 class MissionBaseFormView(MissionViewMixin, django.views.generic.edit.BaseFormView):
+
     """A Form-based Page in a Mission."""
 
     def form_valid(self, form):
 
         view_helpers.set_mission_completed(request.user.get_profile(),
-                                          self.mission_step)
+                                           self.mission_step)
 
 
 class IncompleteConfiguration(ValueError):
+
     """Exception raised when a Mission[View] is not fully configured."""
 
 
@@ -240,7 +249,7 @@ class Mission(object):
         urls = tuple(
             url('%s$' % v.url, v.as_view(mission=mission),
                 name='missions-%s-%s' % (mission.mission_id, v.name(),),
-            )
+                )
 
             for v in cls.view_classes
         )
@@ -277,7 +286,6 @@ class Mission(object):
         return self.step_url(self.view_classes.index(step.__class__) - 1)
 
 
-
 # This is the /missions/ page.
 @view
 def main_page(request):
@@ -288,23 +296,23 @@ def main_page(request):
         for c in StepCompletion.objects.filter(person=request.user.get_profile()):
             completed_missions[c.step.name] = True
 
-        ### FIXME: Below is a hack. It should be easier to find out if a
-        ### training mission is fully completed.
+        # FIXME: Below is a hack. It should be easier to find out if a
+        # training mission is fully completed.
         if (completed_missions['tar'] and
-            completed_missions['tar_extract']):
+                completed_missions['tar_extract']):
             fully_completed_missions['tar'] = True
         if (completed_missions['diffpatch_diffsingle'] and
             completed_missions['diffpatch_patchsingle'] and
             completed_missions['diffpatch_diffrecursive'] and
-            completed_missions['diffpatch_patchrecursive']):
+                completed_missions['diffpatch_patchrecursive']):
             fully_completed_missions['diffpatch'] = True
         if (completed_missions['svn_checkout'] and
             completed_missions['svn_diff'] and
-            completed_missions['svn_commit']):
+                completed_missions['svn_commit']):
             fully_completed_missions['svn'] = True
         if (completed_missions['git_checkout'] and
             completed_missions['git_diff'] and
-            completed_missions['git_rebase']):
+                completed_missions['git_rebase']):
             fully_completed_missions['git'] = True
 
     return (request, 'missions/main.html', {

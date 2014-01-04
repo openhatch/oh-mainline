@@ -26,7 +26,7 @@ from mysite.profile.models import Person
 import mysite.profile.models
 import mysite.search.view_helpers
 from mysite.search.models import Project, Bug, \
-        ProjectInvolvementQuestion, Answer, BugAlert
+    ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import datetime
 import mysite.project.views
@@ -44,6 +44,7 @@ import django.core.cache
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
+
 
 class SearchTest(TwillTests):
 
@@ -87,7 +88,9 @@ class SearchTest(TwillTests):
                 print >> sys.stderr, sorted_two
                 raise
 
+
 class AutoCompleteTests(SearchTest):
+
     """
     Test whether the autocomplete can handle
      - a field-specific query
@@ -96,17 +99,22 @@ class AutoCompleteTests(SearchTest):
 
     def setUp(self):
         SearchTest.setUp(self)
-        self.project_chat = Project.create_dummy(name=u'ComicChat', language=u'C++')
-        self.project_kazaa = Project.create_dummy(name=u'Kazaa', language=u'Vogon')
+        self.project_chat = Project.create_dummy(
+            name=u'ComicChat', language=u'C++')
+        self.project_kazaa = Project.create_dummy(
+            name=u'Kazaa', language=u'Vogon')
         self.bug_in_chat = Bug.create_dummy(project=self.project_chat,
-                people_involved=2,
-                date_reported=datetime.date(2009, 4, 1),
-                last_touched=datetime.date(2009, 4, 2),
-                last_polled=datetime.date(2009, 4, 2),
-                submitter_realname="Zaphod Beeblebrox",
-                submitter_username="zb",
-                canonical_bug_link="http://example.com/",
-                )
+                                            people_involved=2,
+                                            date_reported=datetime.date(
+                                                2009, 4, 1),
+                                            last_touched=datetime.date(
+                                                2009, 4, 2),
+                                            last_polled=datetime.date(
+                                                2009, 4, 2),
+                                            submitter_realname="Zaphod Beeblebrox",
+                                            submitter_username="zb",
+                                            canonical_bug_link="http://example.com/",
+                                            )
 
     def testSuggestionsMinimallyWorks(self):
         suggestions = views.get_autocompletion_suggestions(u'')
@@ -123,7 +131,7 @@ class AutoCompleteTests(SearchTest):
 
     def testQueryFieldSpecific(self):
         lang_C_suggestions = views.get_autocompletion_suggestions(
-                u'lang:C')
+            u'lang:C')
         self.assert_(u'lang:C++' in lang_C_suggestions)
         self.assert_(u'lang:Python' not in lang_C_suggestions)
         self.assert_(u'project:ComicChat' not in lang_C_suggestions)
@@ -131,28 +139,31 @@ class AutoCompleteTests(SearchTest):
     def testSuggestsCorrectStringsFormattedForJQueryAutocompletePlugin(self):
         suggestions_list = views.get_autocompletion_suggestions(u'')
         suggestions_string = views.list_to_jquery_autocompletion_format(
-                suggestions_list)
+            suggestions_list)
         suggestions_list_reconstructed = suggestions_string.split("\n")
         self.assert_("project:ComicChat" in suggestions_list_reconstructed)
         self.assert_("lang:Vogon" in suggestions_list_reconstructed)
         self.assert_("lang:C++" in suggestions_list_reconstructed)
 
     def testSuggestsSomethingOverHttp(self):
-        response = self.client.get( u'/search/get_suggestions', {u'q': u'C'})
+        response = self.client.get(u'/search/get_suggestions', {u'q': u'C'})
         self.assertContains(response, "project:ComicChat\nlang:C++")
 
     def testSuggesterFailsOnEmptyString(self):
-        response = self.client.get( u'/search/get_suggestions', {u'q': u''})
+        response = self.client.get(u'/search/get_suggestions', {u'q': u''})
         self.assertEquals(response.status_code, 500)
 
     def testSuggesterFailsWithImproperQueryString(self):
-        response = self.client.get( u'/search/get_suggestions', {})
+        response = self.client.get(u'/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
+
 class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
+
     def test(self):
         difficult = "With spaces (and parens)"
-        query = mysite.search.view_helpers.Query.create_from_GET_data({u'q': u'"%s"' % difficult})
+        query = mysite.search.view_helpers.Query.create_from_GET_data(
+            {u'q': u'"%s"' % difficult})
         self.assertEqual(query.terms, [difficult])
         # Make there be a bug to find
         project = Project.create_dummy(name=difficult)
@@ -160,6 +171,7 @@ class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
         # How many bugs?
         num_bugs = query.get_bugs_unordered().count()
         self.assertEqual(num_bugs, 1)
+
 
 class SearchResults(TwillTests):
     fixtures = [u'bugs-for-two-projects.json']
@@ -172,11 +184,13 @@ class SearchResults(TwillTests):
         # Call up search page with no query.
         response = self.client.get(u'/search/')
 
-        # The variable u'bunch_of_bugs', passed to the template, is a blank list.
+        # The variable u'bunch_of_bugs', passed to the template, is a blank
+        # list.
         self.assertEqual(response.context[0][u'bunch_of_bugs'], [])
 
     def test_json_view(self):
-        tc.go(make_twill_url(u'http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
+        tc.go(make_twill_url(
+            u'http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
         response = tc.show()
         self.assert_(response.startswith(u'callback'))
         json_string_with_parens = response.split(u'callback', 1)[1]
@@ -194,7 +208,7 @@ class SearchResults(TwillTests):
 
         # Grab descriptions of first 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  u'Exaile').order_by(u'-last_touched')[:10]
+                                   u'Exaile').order_by(u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -204,7 +218,7 @@ class SearchResults(TwillTests):
 
         # Grab descriptions of next 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  u'Exaile').order_by(u'-last_touched')[10:20]
+                                   u'Exaile').order_by(u'-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -236,7 +250,7 @@ class SearchResults(TwillTests):
 
         # Grab descriptions of first 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  u'Exaile').order_by(u'-last_touched')[:10]
+                                   u'Exaile').order_by(u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -246,7 +260,7 @@ class SearchResults(TwillTests):
 
         # Grab descriptions of next 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  u'Exaile').order_by(u'-last_touched')[10:20]
+                                   u'Exaile').order_by(u'-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -257,18 +271,19 @@ class SearchResults(TwillTests):
 
         # Grab descriptions of first 10 GNOME-Do bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  u'GNOME-Do').order_by(
+                                   u'GNOME-Do').order_by(
             u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
 
+
 class RecommendationsCanBeDisabled(SearchTest):
     fixtures = ['user-paulproteus.json',
-            'person-paulproteus.json',
-            'cchost-data-imported-from-ohloh.json',
-            'bugs-for-two-projects.json',
-            'extra-fake-cchost-related-citations.json']
+                'person-paulproteus.json',
+                'cchost-data-imported-from-ohloh.json',
+                'bugs-for-two-projects.json',
+                'extra-fake-cchost-related-citations.json']
 
     def setUp(self, *args, **kwargs):
         super(RecommendationsCanBeDisabled, self).setUp(*args, **kwargs)
@@ -282,7 +297,8 @@ class RecommendationsCanBeDisabled(SearchTest):
     @mock.patch('mysite.profile.models.Person._get_recommended_search_terms')
     def test(self, mock):
         # Create the Person object
-        p = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        p = mysite.profile.models.Person.objects.get(
+            user__username='paulproteus')
         # Call the method to get recommendations
         terms = p.get_recommended_search_terms()
         # Assert it is empty, but moreover, assert that the real worker function
@@ -290,16 +306,18 @@ class RecommendationsCanBeDisabled(SearchTest):
         self.assertFalse(terms)
         self.assertFalse(mock.called)
 
+
 class Recommend(SearchTest):
     fixtures = ['user-paulproteus.json',
-            'person-paulproteus.json',
-            'cchost-data-imported-from-ohloh.json',
-            'bugs-for-two-projects.json',
-            'extra-fake-cchost-related-citations.json',
-            'tags']
+                'person-paulproteus.json',
+                'cchost-data-imported-from-ohloh.json',
+                'bugs-for-two-projects.json',
+                'extra-fake-cchost-related-citations.json',
+                'tags']
 
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
-    # Use that to exclude 'will never understand' tags from recommended search terms.
+    # Use that to exclude 'will never understand' tags from recommended search
+    # terms.
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     @mock.patch('mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
     def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
@@ -316,17 +334,17 @@ class Recommend(SearchTest):
 
         # By 'source' I mean a source of recommendations.
         source2terms = {
-                'languages in citations': ['Automake', 'C#', 'C++', 'Make',
-                    'Python', 'shell script', 'XUL'],
-                'projects in citations': ['Mozilla Firefox'],
-                'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
-                }
+            'languages in citations': ['Automake', 'C#', 'C++', 'Make',
+                                       'Python', 'shell script', 'XUL'],
+            'projects in citations': ['Mozilla Firefox'],
+            'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+        }
 
         for source, terms in source2terms.items():
             for term in terms:
                 self.assert_(term in recommended_terms,
-                        "Expected %s in recommended search terms "
-                        "inspired by %s." % (term, source))
+                             "Expected %s in recommended search terms "
+                             "inspired by %s." % (term, source))
 
     # FIXME: Include recommendations from tags.
 
@@ -345,19 +363,20 @@ class Recommend(SearchTest):
         response = client.get('/search/')
 
         source2terms = {
-                'languages in citations': ['Automake', 'C#', 'C++', 'Make',
-                    'Python', 'shell script', 'XUL'],
-                'projects in citations': ['Mozilla Firefox'],
-                'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
-                }
+            'languages in citations': ['Automake', 'C#', 'C++', 'Make',
+                                       'Python', 'shell script', 'XUL'],
+            'projects in citations': ['Mozilla Firefox'],
+            'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+        }
 
-        tags_in_template = [tup[1] for tup in response.context[0]['suggestions']]
+        tags_in_template = [tup[1]
+                            for tup in response.context[0]['suggestions']]
 
         for source, terms in source2terms.items():
             for term in terms:
                 self.assert_(term in tags_in_template,
-                        "Expected %s in template"
-                        "inspired by %s." % (term, source))
+                             "Expected %s in template"
+                             "inspired by %s." % (term, source))
 
         expected_tags = sum(source2terms.values(), [])
         self.compare_lists(expected_tags, tags_in_template)
@@ -366,29 +385,29 @@ class Recommend(SearchTest):
 #    def test_recommendations_with_twill(self):
 #        self.login_with_twill()
 #        tc.go(make_twill_url('http://openhatch.org/search/'))
-#        tc.fv('suggested_searches', 'use_0', '0') # Automake
-#        tc.fv('suggested_searches', 'use_1', '0') # C
-#        tc.fv('suggested_searches', 'use_2', '0') # C++
-#        tc.fv('suggested_searches', 'use_3', '0') # Firefox
-#        tc.fv('suggested_searches', 'use_4', '0') # Python
-#        tc.fv('suggested_searches', 'use_5', '1') # XUL
+# tc.fv('suggested_searches', 'use_0', '0') # Automake
+# tc.fv('suggested_searches', 'use_1', '0') # C
+# tc.fv('suggested_searches', 'use_2', '0') # C++
+# tc.fv('suggested_searches', 'use_3', '0') # Firefox
+# tc.fv('suggested_searches', 'use_4', '0') # Python
+# tc.fv('suggested_searches', 'use_5', '1') # XUL
 #        tc.fv('suggested_searches', 'start', '0')
 #        tc.fv('suggested_searches', 'end', '100')
 #        tc.submit()
 #
-#        # Check that if you click checkboxes,
-#        # you get the right list of bugs.
-#        # Test for bugs that ought to be there
-#        # and bugs that ought not to be.
+# Check that if you click checkboxes,
+# you get the right list of bugs.
+# Test for bugs that ought to be there
+# and bugs that ought not to be.
 #        tc.find("Yo! This is a bug in XUL but not Firefox")
 #        tc.find("Oy! This is a bug in XUL and Firefox")
 #
-#        tc.fv('suggested_searches', 'use_0', '0') # Automake
-#        tc.fv('suggested_searches', 'use_1', '0') # C
-#        tc.fv('suggested_searches', 'use_2', '0') # C++
-#        tc.fv('suggested_searches', 'use_3', '1') # Firefox
-#        tc.fv('suggested_searches', 'use_4', '0') # Python
-#        tc.fv('suggested_searches', 'use_5', '1') # XUL
+# tc.fv('suggested_searches', 'use_0', '0') # Automake
+# tc.fv('suggested_searches', 'use_1', '0') # C
+# tc.fv('suggested_searches', 'use_2', '0') # C++
+# tc.fv('suggested_searches', 'use_3', '1') # Firefox
+# tc.fv('suggested_searches', 'use_4', '0') # Python
+# tc.fv('suggested_searches', 'use_5', '1') # XUL
 #        tc.fv('suggested_searches', 'start', '0')
 #        tc.fv('suggested_searches', 'end', '100')
 #        tc.submit()
@@ -396,22 +415,25 @@ class Recommend(SearchTest):
 #        tc.notfind("Yo! This is a bug in XUL but not Firefox")
 #        tc.find("Oy! This is a bug in XUL and Firefox")
 
+
 class SplitIntoTerms(TestCase):
+
     def test_split_into_terms(self):
         easy = '1 2 3'
         self.assertEqual(
-                mysite.search.view_helpers.Query.split_into_terms(easy),
-                ['1', '2', '3'])
+            mysite.search.view_helpers.Query.split_into_terms(easy),
+            ['1', '2', '3'])
 
         easy = '"1"'
         self.assertEqual(
-                mysite.search.view_helpers.Query.split_into_terms(easy),
-                ['1'])
+            mysite.search.view_helpers.Query.split_into_terms(easy),
+            ['1'])
 
         easy = 'c#'
         self.assertEqual(
-                mysite.search.view_helpers.Query.split_into_terms(easy),
-                ['c#'])
+            mysite.search.view_helpers.Query.split_into_terms(easy),
+            ['c#'])
+
 
 class IconGetsScaled(SearchTest):
 
@@ -423,7 +445,8 @@ class IconGetsScaled(SearchTest):
 
         # Step 1: Create a project with an icon
         p = mysite.search.models.Project.create_dummy()
-        image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
+        image_data = open(
+            mysite.account.tests.photo('static/sample-photo.png')).read()
         p.icon_raw.save('', ContentFile(image_data))
         p.save()
 
@@ -470,10 +493,13 @@ class IconGetsScaled(SearchTest):
                          "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
         # Assertion 3: Verify that it has the right height
-        # If we want to scale exactly we'll get 11.25 pixels, which rounds to 11.
+        # If we want to scale exactly we'll get 11.25 pixels, which rounds to
+        # 11.
         self.assertEqual(p.icon_smaller_for_badge.height, 11)
 
+
 class SearchOnFullWords(SearchTest):
+
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_find_perl_not_properly(self):
         Project.create_dummy()
@@ -481,17 +507,21 @@ class SearchOnFullWords(SearchTest):
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
         results = mysite.search.view_helpers.Query(
-                terms=['perl']).get_bugs_unordered()
+            terms=['perl']).get_bugs_unordered()
         self.assertEqual(list(results), [perl_bug])
 
+
 class SearchTemplateDecodesQueryString(SearchTest):
+
     def test_facets_appear_in_search_template_context(self):
         response = self.client.get('/search/', {'language': 'Python'})
-        expected_facets = { 'language': 'Python' }
+        expected_facets = {'language': 'Python'}
         self.assertEqual(response.context['query'].active_facet_options,
                          expected_facets)
 
+
 class FacetsFilterResults(SearchTest):
+
     def test_facets_filter_results(self):
         facets = {u'language': u'Python'}
 
@@ -504,11 +534,11 @@ class FacetsFilterResults(SearchTest):
         Bug.create_dummy(project=not_python_project)
 
         results = mysite.search.view_helpers.Query(
-                terms=[], active_facet_options=facets).get_bugs_unordered()
+            terms=[], active_facet_options=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
 
     def test_any_facet(self):
-        """In the fetch_bugs() method in the search module, the truthfulness of
+        """In the search_index() method in the search module, the truthfulness of
         the Query object is evaluated to determine whether or not any results
         should be returned. Here, we test that if a facet in the GET data
         is the empty string, the query is still considered to be True. A facet
@@ -519,14 +549,16 @@ class FacetsFilterResults(SearchTest):
         """
 
         language_query = mysite.search.view_helpers.Query.create_from_GET_data(
-                {'language': ''})
+            {'language': ''})
         project_query = mysite.search.view_helpers.Query.create_from_GET_data(
-                {'project': ''})
+            {'project': ''})
 
         self.assertTrue(language_query)
         self.assertTrue(project_query)
 
+
 class QueryGetPossibleFacets(SearchTest):
+
     """Ask a query, what facets are you going to show on the left?
     E.g., search for gtk, it says C (541)."""
 
@@ -537,15 +569,16 @@ class QueryGetPossibleFacets(SearchTest):
         project3 = Project.create_dummy(language=u'e')
 
         # Give each project a bug
-        Bug.create_dummy(project=project1, description=u'bug', good_for_newcomers=True)
+        Bug.create_dummy(project=project1, description=u'bug',
+                         good_for_newcomers=True)
         Bug.create_dummy(project=project2, description=u'bug')
         Bug.create_dummy(project=project3, description=u'bAg')
 
         # Search for bugs matching "bug", while constraining to the language C
         query = mysite.search.view_helpers.Query(
-                terms=[u'bug'],
-                terms_string=u'bug',
-                active_facet_options={u'language': u'c'})
+            terms=[u'bug'],
+            terms_string=u'bug',
+            active_facet_options={u'language': u'c'})
         possible_facets = dict(query.get_possible_facets())
 
         self.assertEqual(query.get_bugs_unordered().count(), 1)
@@ -553,33 +586,34 @@ class QueryGetPossibleFacets(SearchTest):
         # We expect that, language-wise, you should be able to select any of
         # the other languages, or 'deselect' your language constraint.
         self.compare_lists_of_dicts(
-                possible_facets[u'language'][u'options'],
-                [
-                    { u'name': u'c', u'query_string': u'q=bug&language=c',
-                        u'is_active': True, u'count': 1 },
-                    { u'name': u'd', u'query_string': u'q=bug&language=d',
-                        u'is_active': False, u'count': 1 },
-                    # e is excluded because its bug (u'bAg') doesn't match the term 'bug'
-                    ],
-                sort_key=u'name'
-                )
+            possible_facets[u'language'][u'options'],
+            [
+                {u'name': u'c', u'query_string': u'q=bug&language=c',
+                 u'is_active': True, u'count': 1},
+                {u'name': u'd', u'query_string': u'q=bug&language=d',
+                 u'is_active': False, u'count': 1},
+                # e is excluded because its bug (u'bAg') doesn't match the
+                # term 'bug'
+            ],
+            sort_key=u'name'
+        )
 
         self.compare_lists_of_dicts(
-                possible_facets[u'toughness'][u'options'],
-                [
-                    # There's no 'any' option for toughness unless you've
-                    # selected a specific toughness value
-                    { u'name': u'bitesize', u'is_active': False,
-                        u'query_string': u'q=bug&toughness=bitesize&language=c', u'count': 1 },
-                    ],
-                sort_key=u'name'
-                )
+            possible_facets[u'toughness'][u'options'],
+            [
+                # There's no 'any' option for toughness unless you've
+                # selected a specific toughness value
+                {u'name': u'bitesize', u'is_active': False,
+                 u'query_string': u'q=bug&toughness=bitesize&language=c', u'count': 1},
+            ],
+            sort_key=u'name'
+        )
 
         self.assertEqual(
-                possible_facets['language']['the_any_option'],
-                { u'name': u'any', u'query_string': u'q=bug&language=',
-                    u'is_active': False, u'count': 2 },
-                )
+            possible_facets['language']['the_any_option'],
+            {u'name': u'any', u'query_string': u'q=bug&language=',
+             u'is_active': False, u'count': 2},
+        )
 
     def test_possible_facets_always_includes_active_facet(self):
         # even when active facet has no results.
@@ -588,13 +622,17 @@ class QueryGetPossibleFacets(SearchTest):
         Project.create_dummy(language=u'e')
         Bug.create_dummy(project=c, description=u'bug')
         query = mysite.search.view_helpers.Query.create_from_GET_data(
-                {u'q': u'nothing matches this', u'language': u'c'})
+            {u'q': u'nothing matches this', u'language': u'c'})
 
-        language_options = dict(query.get_possible_facets())['language']['options']
-        language_options_named_c = [opt for opt in language_options if opt['name'] == 'c']
+        language_options = dict(
+            query.get_possible_facets())['language']['options']
+        language_options_named_c = [
+            opt for opt in language_options if opt['name'] == 'c']
         self.assertEqual(len(language_options_named_c), 1)
 
+
 class SingleTerm(SearchTest):
+
     """Search for just a single term."""
 
     def setUp(self):
@@ -619,58 +657,60 @@ class SingleTerm(SearchTest):
         Bug.create_dummy(project=c_project, good_for_newcomers=False,
                          description='toast')
 
-        GET_data = { 'q': 'screensaver' }
+        GET_data = {'q': 'screensaver'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
         self.assertEqual(query.terms, ['screensaver'])
-        self.assertFalse(query.active_facet_options) # No facets
+        self.assertFalse(query.active_facet_options)  # No facets
 
         self.output_possible_facets = dict(query.get_possible_facets())
 
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
-                'is_active': False,
-                'query_string': 'q=screensaver&toughness=bitesize'}
+                                     'is_active': False,
+                                     'query_string': 'q=screensaver&toughness=bitesize'}
         toughness_option_any = {'name': 'any', 'count': 3,
-                'is_active': True,
-                'query_string': 'q=screensaver&toughness='}
+                                'is_active': True,
+                                'query_string': 'q=screensaver&toughness='}
         expected_toughness_facet_options = [toughness_option_bitesize]
 
         self.assertEqual(
-                self.output_possible_facets['toughness']['options'],
-                expected_toughness_facet_options
-                )
+            self.output_possible_facets['toughness']['options'],
+            expected_toughness_facet_options
+        )
         self.assertEqual(
-                self.output_possible_facets['toughness']['the_any_option'],
-                toughness_option_any
-                )
+            self.output_possible_facets['toughness']['the_any_option'],
+            toughness_option_any
+        )
 
     def test_languages_facet(self):
         # What options do we expect?
         languages_option_python = {'name': 'Python', 'count': 2,
-                'is_active': False,
-                'query_string': 'q=screensaver&language=Python'}
+                                   'is_active': False,
+                                   'query_string': 'q=screensaver&language=Python'}
         languages_option_perl = {'name': 'Perl', 'count': 1,
-                'is_active': False,
-                'query_string': 'q=screensaver&language=Perl'}
+                                 'is_active': False,
+                                 'query_string': 'q=screensaver&language=Perl'}
         languages_option_any = {'name': 'any', 'count': 3,
-                'is_active': True,
-                'query_string': 'q=screensaver&language='}
+                                'is_active': True,
+                                'query_string': 'q=screensaver&language='}
         expected_languages_facet_options = [
-                languages_option_python,
-                languages_option_perl,
-                ]
+            languages_option_python,
+            languages_option_perl,
+        ]
 
         self.compare_lists_of_dicts(
-                self.output_possible_facets['language']['options'],
-                expected_languages_facet_options
-                )
+            self.output_possible_facets['language']['options'],
+            expected_languages_facet_options
+        )
 
         self.assertEqual(
-                self.output_possible_facets['language']['the_any_option'],
-                languages_option_any)
+            self.output_possible_facets['language']['the_any_option'],
+            languages_option_any)
+
 
 class SingleFacetOption(SearchTest):
+
     """Browse bugs matching a single facet option."""
 
     def setUp(self):
@@ -695,9 +735,9 @@ class SingleFacetOption(SearchTest):
         Bug.create_dummy(project=c_project, good_for_newcomers=False,
                          description='toast')
 
-        GET_data = { u'language': u'Python' }
+        GET_data = {u'language': u'Python'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
-        self.assertFalse(query.terms) # No terms
+        self.assertFalse(query.terms)  # No terms
         self.assertEqual(query.active_facet_options, {u'language': u'Python'})
 
         self.output_possible_facets = dict(query.get_possible_facets())
@@ -705,53 +745,55 @@ class SingleFacetOption(SearchTest):
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {u'name': u'bitesize', u'count': 1,
-                u'is_active': False,
-                u'query_string': u'q=&toughness=bitesize&language=Python'}
+                                     u'is_active': False,
+                                     u'query_string': u'q=&toughness=bitesize&language=Python'}
         toughness_option_any = {u'name': u'any', u'count': 2,
-                u'is_active': True,
-                u'query_string': u'q=&toughness=&language=Python'}
+                                u'is_active': True,
+                                u'query_string': u'q=&toughness=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize]
 
         self.compare_lists_of_dicts(
-                self.output_possible_facets[u'toughness'][u'options'],
-                expected_toughness_facet_options
-                )
+            self.output_possible_facets[u'toughness'][u'options'],
+            expected_toughness_facet_options
+        )
         self.assertEqual(
-                self.output_possible_facets[u'toughness'][u'the_any_option'],
-                toughness_option_any
-                )
+            self.output_possible_facets[u'toughness'][u'the_any_option'],
+            toughness_option_any
+        )
 
     def test_languages_facet(self):
         # What options do we expect?
         languages_option_python = {u'name': u'Python', u'count': 2,
-                u'is_active': True,
-                u'query_string': u'q=&language=Python'}
+                                   u'is_active': True,
+                                   u'query_string': u'q=&language=Python'}
         languages_option_perl = {u'name': u'Perl', u'count': 1,
-                u'is_active': False,
-                u'query_string': u'q=&language=Perl'}
+                                 u'is_active': False,
+                                 u'query_string': u'q=&language=Perl'}
         languages_option_c = {u'name': u'C', u'count': 1,
-                u'is_active': False,
-                u'query_string': u'q=&language=C'}
+                              u'is_active': False,
+                              u'query_string': u'q=&language=C'}
         languages_option_any = {u'name': u'any', u'count': 4,
-                u'is_active': False,
-                u'query_string': u'q=&language='}
+                                u'is_active': False,
+                                u'query_string': u'q=&language='}
         expected_languages_facet_options = [
-                languages_option_python,
-                languages_option_perl,
-                languages_option_c,
-                ]
+            languages_option_python,
+            languages_option_perl,
+            languages_option_c,
+        ]
 
         self.compare_lists_of_dicts(
-                self.output_possible_facets[u'language'][u'options'],
-                expected_languages_facet_options
-                )
+            self.output_possible_facets[u'language'][u'options'],
+            expected_languages_facet_options
+        )
 
         self.assertEqual(
-                self.output_possible_facets[u'language'][u'the_any_option'],
-                languages_option_any,
-                )
+            self.output_possible_facets[u'language'][u'the_any_option'],
+            languages_option_any,
+        )
+
 
 class QueryGetToughnessFacetOptions(SearchTest):
+
     def test_get_toughness_facet_options(self):
         # We create three "bitesize" bugs, but constrain the Query so
         # that we're only looking at bugs in Python.
@@ -767,8 +809,8 @@ class QueryGetToughnessFacetOptions(SearchTest):
         Bug.create_dummy(project=perl_project, good_for_newcomers=True)
 
         query = mysite.search.view_helpers.Query(
-                active_facet_options={u'language': u'Python'},
-                terms_string=u'')
+            active_facet_options={u'language': u'Python'},
+            terms_string=u'')
         output = query.get_facet_options(u'toughness', [u'bitesize', u''])
         bitesize_dict = [d for d in output if d[u'name'] == u'bitesize'][0]
         all_dict = [d for d in output if d[u'name'] == u'any'][0]
@@ -798,6 +840,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
         self.assertEqual(bitesize_dict[u'count'], 1)
         self.assertEqual(all_dict[u'count'], 2)
 
+
 class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
@@ -823,8 +866,8 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
-                sorted(language_names),
-                sorted([u'Python', u'Perl']))
+            sorted(language_names),
+            sorted([u'Python', u'Perl']))
 
     def test_with_active_language_facet(self):
         # In the setUp we create bugs in three languages.
@@ -837,8 +880,8 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
-                sorted(language_names),
-                sorted([u'Python', u'Perl', u'C', u'Unknown']))
+            sorted(language_names),
+            sorted([u'Python', u'Perl', u'C', u'Unknown']))
 
     def test_with_language_as_unknown(self):
         # In the setUp we create bugs in three languages.
@@ -851,8 +894,8 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
-                sorted(language_names),
-                sorted([u'Python', u'Perl', u'C', u'Unknown']))
+            sorted(language_names),
+            sorted([u'Python', u'Perl', u'C', u'Unknown']))
 
     def test_with_language_as_unknown_and_query(self):
         # In the setUp we create bugs in three languages.
@@ -867,26 +910,29 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
         self.assertEqual(match_count, 1)
 
+
 class QueryGetPossibleProjectFacetOptions(SearchTest):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     def setUp(self, do_nothing):
         SearchTest.setUp(self)
         projects = [
-                Project.create_dummy(name=u'Miro'),
-                Project.create_dummy(name=u'Dali'),
-                Project.create_dummy(name=u'Magritte')
-                ]
+            Project.create_dummy(name=u'Miro'),
+            Project.create_dummy(name=u'Dali'),
+            Project.create_dummy(name=u'Magritte')
+        ]
         for p in projects:
             Bug.create_dummy(project=p)
 
     def test_select_a_project_and_see_other_project_options(self):
         GET_data = {u'project': u'Miro'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
-        possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
+        possible_project_names = [x['name']
+                                  for x in dict(query.get_possible_facets())['project']['options']]
         self.assertEqual(
-                sorted(possible_project_names),
-                sorted(list(Project.objects.values_list('name', flat=True))))
+            sorted(possible_project_names),
+            sorted(list(Project.objects.values_list('name', flat=True))))
+
 
 class QueryContributionType(SearchTest):
 
@@ -905,7 +951,8 @@ class QueryContributionType(SearchTest):
         GET_data = {}
         starting_query = mysite.search.view_helpers.Query.create_from_GET_data(
             GET_data)
-        self.assert_(u'contribution type' in dict(starting_query.get_possible_facets()))
+        self.assert_(
+            u'contribution type' in dict(starting_query.get_possible_facets()))
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}
@@ -914,9 +961,11 @@ class QueryContributionType(SearchTest):
         cto = starting_query.get_facet_options(u'contribution_type',
                                                [u'documentation'])
         documentation_one, = [k for k in cto if k[u'name'] == u'documentation']
-        any_one = starting_query.get_facet_options(u'contribution_type', [u''])[0]
+        any_one = starting_query.get_facet_options(
+            u'contribution_type', [u''])[0]
         self.assertEqual(documentation_one[u'count'], 1)
         self.assertEqual(any_one[u'count'], 3)
+
 
 class QueryProject(SearchTest):
 
@@ -944,11 +993,12 @@ class QueryProject(SearchTest):
             GET_data)
         cto = starting_query.get_facet_options(u'project',
                                                [u'thingamajig',
-                                                u'thingamabob' ])
+                                                u'thingamabob'])
         jig_ones, = [k for k in cto if k[u'name'] == u'thingamajig']
         any_one = starting_query.get_facet_options(u'project', [u''])[0]
         self.assertEqual(jig_ones[u'count'], 2)
         self.assertEqual(any_one[u'count'], 3)
+
 
 class QueryStringCaseInsensitive(SearchTest):
 
@@ -956,8 +1006,10 @@ class QueryStringCaseInsensitive(SearchTest):
         """Do we redirect queries that use non-lowercase facet keys to pages
         that use lowercase facet keys?"""
         redirects = self.client.get(u'/search/',
-                {u'LANguaGE': u'pytHon'}, follow=True).redirect_chain
-        self.assertEqual(redirects, [(u'http://testserver/search/?language=pytHon', 302)])
+                                    {u'LANguaGE': u'pytHon'}, follow=True).redirect_chain
+        self.assertEqual(
+            redirects, [(u'http://testserver/search/?language=pytHon', 302)])
+
 
 class HashQueryData(SearchTest):
 
@@ -983,13 +1035,18 @@ class HashQueryData(SearchTest):
 
     # How on earth do we test for collisions?
 
+
 class FakeCache(object):
+
     def __init__(self):
         self._data = {}
+
     def get(self, key):
         return self._data.get(key, None)
+
     def set(self, key, value):
         self._data[key] = value
+
 
 class QueryGrabHitCount(SearchTest):
 
@@ -1006,7 +1063,8 @@ class QueryGrabHitCount(SearchTest):
         # Test that it is fetched correctly.
         self.assertEqual(stored_hit_count,
                          django.core.cache.cache.get(hit_count_cache_key))
-        self.assertEqual(query.get_or_create_cached_hit_count(), stored_hit_count)
+        self.assertEqual(query.get_or_create_cached_hit_count(),
+                         stored_hit_count)
 
     @mock.patch('django.core.cache')
     def test_shoutnow_cache_hitcount_on_grab(self, fake_cache):
@@ -1019,7 +1077,8 @@ class QueryGrabHitCount(SearchTest):
         query = mysite.search.view_helpers.Query.create_from_GET_data(data)
 
         expected_hit_count = 1
-        self.assertEqual(query.get_or_create_cached_hit_count(), expected_hit_count)
+        self.assertEqual(query.get_or_create_cached_hit_count(),
+                         expected_hit_count)
 
         # Get the cache key used to store the hit count.
         hit_count_cache_key = query.get_hit_count_cache_key()
@@ -1029,6 +1088,7 @@ class QueryGrabHitCount(SearchTest):
         # Test that it was stored correctly.
         self.assertEqual(stored_hit_count, expected_hit_count)
 
+
 class ClearCacheWhenBugsChange(SearchTest):
 
     def test_cached_cleared_after_bug_save_or_delete(self):
@@ -1036,12 +1096,12 @@ class ClearCacheWhenBugsChange(SearchTest):
         query = mysite.search.view_helpers.Query.create_from_GET_data(data)
 
         old_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-        'hit_count_cache_timestamp')
+            'hit_count_cache_timestamp')
 
         # Cache entry created after hit count retrieval
         query.get_or_create_cached_hit_count()
         new_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
+            'hit_count_cache_timestamp')
         self.assertEqual(old_hcc_timestamp, new_hcc_timestamp)
         # Cache cleared after bug save
         project = Project.create_dummy(language=u'shoutNOW')
@@ -1052,37 +1112,42 @@ class ClearCacheWhenBugsChange(SearchTest):
         # Cache entry created after hit count retrieval
         query.get_or_create_cached_hit_count()
         newest_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
+            'hit_count_cache_timestamp')
         self.assertEqual(newer_hcc_timestamp, newest_hcc_timestamp)
         # Cache cleared after bug deletion
         bug.delete()
         newester_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-             'hit_count_cache_timestamp'),
+            'hit_count_cache_timestamp'),
         self.assertNotEqual(newest_hcc_timestamp, newester_hcc_timestamp)
+
 
 class DontRecommendFutileSearchTerms(TwillTests):
 
     def test_removal_of_futile_terms(self):
-        mysite.search.models.Bug.create_dummy_with_project(description=u'useful')
+        mysite.search.models.Bug.create_dummy_with_project(
+            description=u'useful')
         self.assertEqual(
-                Person.only_terms_with_results([u'useful', u'futile']),
-                [u'useful'])
+            Person.only_terms_with_results([u'useful', u'futile']),
+            [u'useful'])
 
 
 class PublicizeBugTrackerIndex(SearchTest):
 
     def setUp(self):
         SearchTest.setUp(self)
-        self.search_page_response = self.client.get(reverse(mysite.search.views.fetch_bugs))
+        self.search_page_response = self.client.get(
+            reverse(mysite.search.views.search_index))
         self.bug_tracker_count = mysite.search.view_helpers.get_project_count()
 
     def test_search_template_contains_bug_tracker_count(self):
         self.assertEqual(
-                self.search_page_response.context[0][u'project_count'],
-                self.bug_tracker_count)
+            self.search_page_response.context[0][u'project_count'],
+            self.bug_tracker_count)
+
 
 class TestPotentialMentors(TwillTests):
-    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'user-barry',
+                'person-barry', 'person-paulproteus']
 
     def test(self):
         '''Create a Banshee mentor who can do C#
@@ -1090,7 +1155,8 @@ class TestPotentialMentors(TwillTests):
         two potential mentors.'''
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
-        can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(name=u'can_mentor')
+        can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(
+            name=u'can_mentor')
 
         willing_to_mentor_banshee, _ = mysite.profile.models.Tag.objects.get_or_create(
             tag_type=can_mentor,
@@ -1118,6 +1184,7 @@ class TestPotentialMentors(TwillTests):
         banshee_mentor_count = banshee.potential_mentor_count
         self.assertEqual(2, banshee_mentor_count)
 
+
 class SuggestAlertOnLastResultsPage(TwillTests):
     fixtures = ['user-paulproteus']
 
@@ -1137,19 +1204,23 @@ class SuggestAlertOnLastResultsPage(TwillTests):
             b.save()
 
         # Visit the first page of a vol. opp. search results page.
-        opps_view = mysite.search.views.fetch_bugs
+        opps_view = mysite.search.views.search_index
         query = u'ruby'
-        opps_query_string = { u'q': query, u'start': 1, u'end': 10}
-        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
+        opps_query_string = {u'q': query, u'start': 1, u'end': 10}
+        opps_url = make_twill_url('http://openhatch.org' + reverse(opps_view)
+                                  + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
         tc.go(opps_url)
 
-        # Make sure we *don't* have the comment that flags this as a page that offers an email alert subscription button
-        tc.notfind("this page should offer a link to sign up for an email alert")
+        # Make sure we *don't* have the comment that flags this as a page that
+        # offers an email alert subscription button
+        tc.notfind(
+            "this page should offer a link to sign up for an email alert")
 
         # Visit the last page of results
-        GET = { u'q': query, u'start': 11, u'end': 20}
+        GET = {u'q': query, u'start': 11, u'end': 20}
         query_string = mysite.base.unicode_sanity.urlencode(GET)
-        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + query_string)
+        opps_url = make_twill_url(
+            'http://openhatch.org' + reverse(opps_view) + '?' + query_string)
         tc.go(opps_url)
         # make sure we /do/ have the comment that flags this as a page that
         # offers an email alert subscription button
@@ -1170,15 +1241,15 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         else:
             client = self.login_with_client()
 
-
         alert_data_in_form = {
-                'query_string': query_string,
-                'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
-                'email': email_address,
-                }
+            'query_string': query_string,
+            'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
+            'email': email_address,
+        }
         # Twill fails here for some reason, so let's continue the journey with
         # Django's built-in testing sweeeet
-        response = client.post(reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
+        response = client.post(
+            reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
 
         # This response should be a HTTP redirect instruction
         self.assertEqual(response.status_code, 302)
@@ -1187,7 +1258,8 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         # The page redirects to the old kk
         response = client.get(redirect_target_url)
-        self.assertContains(response, "this page should confirm that an email alert has been registered")
+        self.assertContains(
+            response, "this page should confirm that an email alert has been registered")
 
         # At this point, make sure that the DB contains a record of
         #     * What the query was.
@@ -1206,15 +1278,18 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # identity of the user who made the alert request.
 
         if not anonymous:
-            assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
+            assert_that_record_has_this_data[
+                'user'] = User.objects.get(username='paulproteus')
 
         for key, expected_value in assert_that_record_has_this_data.items():
-            self.assertEqual(alert_record.__getattribute__(key), expected_value,
-                    'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
+            self.assertEqual(
+                alert_record.__getattribute__(key), expected_value,
+                'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
 
     # run the above test for our two use cases: logged in and not
     def test_alert_anon(self):
         self.exercise_alert(anonymous=True)
+
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_alert_logged_in(self):
         self.exercise_alert(anonymous=False)
@@ -1228,16 +1303,19 @@ class DeleteAnswer(TwillTests):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
         question__pk = 0
-        q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=False)
+        q = ProjectInvolvementQuestion.create_dummy(
+            pk=question__pk, is_bug_style=False)
         # create our dummy answer
-        a = Answer.create_dummy(text='i am saying thigns', question=q, project=p, author=User.objects.get(username='paulproteus'))
+        a = Answer.create_dummy(text='i am saying thigns', question=q,
+                                project=p, author=User.objects.get(username='paulproteus'))
         # delete our answer
         POST_data = {
-                'answer__pk': a.pk,
-                }
+            'answer__pk': a.pk,
+        }
         POST_handler = reverse(mysite.project.views.delete_paragraph_answer_do)
         response = self.login_with_client().post(POST_handler, POST_data)
-        # go back to the project page and make sure that our answer isn't there anymore
+        # go back to the project page and make sure that our answer isn't there
+        # anymore
         project_url = p.get_url()
         self.assertRedirects(response, project_url)
         project_page = self.login_with_client().get(project_url)
@@ -1256,16 +1334,20 @@ class DeleteAnswer(TwillTests):
         # get_or_create will try to create, but it won't be able to because of
         # a unique key error
         question__pk = 2
-        q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
+        q = ProjectInvolvementQuestion.create_dummy(
+            pk=question__pk, is_bug_style=True)
         # create our dummy answer
-        a = Answer.create_dummy(title='i want this bug fixed', text='for these reasons',question=q, project=p, author=User.objects.get(username='paulproteus'))
+        a = Answer.create_dummy(
+            title='i want this bug fixed', text='for these reasons',
+            question=q, project=p, author=User.objects.get(username='paulproteus'))
         # delete our answer
         POST_data = {
-                'answer__pk': a.pk,
-                }
+            'answer__pk': a.pk,
+        }
         POST_handler = reverse(mysite.project.views.delete_paragraph_answer_do)
         response = self.login_with_client().post(POST_handler, POST_data)
-        # go back to the project page and make sure that our answer isn't there anymore
+        # go back to the project page and make sure that our answer isn't there
+        # anymore
         project_url = p.get_url()
         self.assertRedirects(response, project_url)
         project_page = self.login_with_client().get(project_url)
@@ -1276,25 +1358,25 @@ class DeleteAnswer(TwillTests):
         self.assertEqual(Answer.objects.filter(pk=a.pk).count(), 0)
 
 
-
 class CreateBugAnswer(TwillTests):
     fixtures = ['user-paulproteus']
+
     @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_create_bug_answer(self):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
         question__pk = 1
         question = ProjectInvolvementQuestion.create_dummy(
-                key_string='non_code_participation', is_bug_style=True)
+            key_string='non_code_participation', is_bug_style=True)
         question.save()
         title = 'omfg i wish this bug would go away'
         text = 'kthxbai'
         POST_data = {
-                'project__pk': p.pk,
-                'question__pk': str(question__pk),
-                'answer__title': title,
-                'answer__text': text
-                }
+            'project__pk': p.pk,
+            'question__pk': str(question__pk),
+            'answer__title': title,
+            'answer__text': text
+        }
         POST_handler = reverse(mysite.project.views.create_answer_do)
         response = self.login_with_client().post(POST_handler, POST_data)
 
@@ -1315,6 +1397,7 @@ class CreateBugAnswer(TwillTests):
         self.assertContains(project_page, title)
         self.assertContains(project_page, text)
 
+
 class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -1331,11 +1414,13 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
         self.assertFalse(Answer.objects.all())
 
         # Store the Answer IDs in the session
-        mysite.project.view_helpers.note_in_session_we_control_answer_id(session, answer.id)
+        mysite.project.view_helpers.note_in_session_we_control_answer_id(
+            session, answer.id)
         self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
 
         # If you want to look at those answers, you can this way:
-        stored_answers = mysite.project.view_helpers.get_unsaved_answers_from_session(session)
+        stored_answers = mysite.project.view_helpers.get_unsaved_answers_from_session(
+            session)
         self.assertEqual([answer.id for answer in stored_answers], [answer.id])
 
         # Verify that the Answer object is still not available by .objects()
@@ -1347,6 +1432,7 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
 
         # And now we own it!
         self.assertEqual(Answer.objects.all().count(), 1)
+
 
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
@@ -1361,7 +1447,7 @@ class CreateAnonymousAnswer(TwillTests):
 
         p = Project.create_dummy(name='Myproject')
         q = ProjectInvolvementQuestion.create_dummy(
-                key_string='where_to_start', is_bug_style=False)
+            key_string='where_to_start', is_bug_style=False)
 
         # Do a GET on the project page to prove cookies work.
         self.client.get(p.get_url())
@@ -1369,14 +1455,15 @@ class CreateAnonymousAnswer(TwillTests):
         # POST some text to the answer creation post handler
         answer_text = """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy."""
         POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
-                'answer__text': answer_text,
-                    }
-        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
-                                    follow=True)
+            'project__pk': p.pk,
+            'question__pk': q.pk,
+            'answer__text': answer_text,
+        }
+        response = self.client.post(
+            reverse(mysite.project.views.create_answer_do), POST_data,
+            follow=True)
         self.assertEqual(response.redirect_chain,
-            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
+                         [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
 
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like
@@ -1384,20 +1471,21 @@ class CreateAnonymousAnswer(TwillTests):
 
         # check that the db contains a record with this text
         try:
-            record = Answer.all_even_unowned.get(text=POST_data['answer__text'])
+            record = Answer.all_even_unowned.get(
+                text=POST_data['answer__text'])
         except Answer.DoesNotExist:
             print "All Answers:", Answer.all_even_unowned.all()
             raise Answer.DoesNotExist
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
-        self.assertFalse(Answer.objects.all()) # it's unowned
+        self.assertFalse(Answer.objects.all())  # it's unowned
 
         # Now, the session will know about the answer, but the answer will not be published.
-        # Visit the login page, assert that the page contains the text of the answer.
+        # Visit the login page, assert that the page contains the text of the
+        # answer.
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
-
 
         # But when the user is logged in and *then* visits the project page
         login_worked = self.client.login(username='paulproteus',
@@ -1411,9 +1499,11 @@ class CreateAnonymousAnswer(TwillTests):
         self.assertEqual(answer.text, POST_data['answer__text'])
         self.assertEqual(answer.author.username, 'paulproteus')
 
-        # Finally, go to the project page and make sure that our Answer has appeared
+        # Finally, go to the project page and make sure that our Answer has
+        # appeared
         response = self.client.get(p.get_url())
         self.assertContains(response, answer_text)
+
 
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
@@ -1422,17 +1512,18 @@ class CreateAnswer(TwillTests):
 
         p = Project.create_dummy()
         q = ProjectInvolvementQuestion.create_dummy(
-                key_string='where_to_start', is_bug_style=False)
+            key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
+            'project__pk': p.pk,
+            'question__pk': q.pk,
                 'answer__text': """Help produce official documentation, share \
 the solution to a problem, or check, proof and test other documents for \
 accuracy.""",
-                    }
-        self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
+        }
+        self.login_with_client().post(
+            reverse(mysite.project.views.create_answer_do), POST_data)
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like
         #   self.assertEqual(response.content, '1')
@@ -1443,7 +1534,8 @@ accuracy.""",
         except Answer.DoesNotExist:
             print "All Answers:", Answer.objects.all()
             raise Answer.DoesNotExist
-        self.assertEqual(record.author, User.objects.get(username='paulproteus'))
+        self.assertEqual(record.author,
+                         User.objects.get(username='paulproteus'))
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
@@ -1467,10 +1559,10 @@ accuracy.""",
                 'This is the second paragraph.',
                 'This is the third paragraph.']
         POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
-                'answer__text': "\n".join(text)
-                }
+            'project__pk': p.pk,
+            'question__pk': q.pk,
+            'answer__text': "\n".join(text)
+        }
 
         POST_handler = reverse(mysite.project.views.create_answer_do)
         self.login_with_client().post(POST_handler, POST_data)
@@ -1491,10 +1583,10 @@ accuracy.""",
         q.save()
         text = u'<p style="background-color: red;">red</p>'
         POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
-                'answer__text': text
-                }
+            'project__pk': p.pk,
+            'question__pk': q.pk,
+            'answer__text': text
+        }
 
         # Submit the data while logged in
         POST_handler = reverse(mysite.project.views.create_answer_do)
@@ -1507,7 +1599,9 @@ accuracy.""",
         self.assertNotContains(project_page,
                             '''background-color: red''')
 
+
 class BugKnowsItsFreshness(TestCase):
+
     def test(self):
         b = mysite.search.models.Bug.create_dummy_with_project()
         b.last_polled = datetime.datetime.now()
@@ -1516,7 +1610,9 @@ class BugKnowsItsFreshness(TestCase):
             days=1, hours=1)
         self.assertFalse(b.data_is_more_fresh_than_one_day())
 
+
 class WeCanPollSomethingToCheckIfAProjectIconIsLoaded(TestCase):
+
     def test(self):
         # Create a dummy project
         p = Project.create_dummy()

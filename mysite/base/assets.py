@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from django_assets import Bundle, register
-#http://elsdoerfer.name/docs/django-assets/bundles.html
+# http://elsdoerfer.name/docs/django-assets/bundles.html
 
 register('openhatch_css',
          Bundle("css/jquery.autocomplete.css",
@@ -20,14 +20,14 @@ register('openhatch_css',
                 "css/facebox.css",
                 "css/missions/base.css",
                 ),
-         Bundle(#TODO: does assetizer follow includes inside css files?
-                #"jquery-ui-1.7.3/themes/ui-lightness/ui.all.css",
-                "jquery-ui-1.7.3/themes/base/ui.base.css",
-                "jquery-ui-1.7.3/themes/ui-lightness/ui.theme.css",
-                "jquery-ui-1.7.3/themes/base/ui.base.css",
-                "jquery-ui-1.7.3/themes/base/ui.progressbar.css",
-                "jquery-ui-1.7.3/themes/base/ui.tabs.css",
-                ),
+         Bundle(  # TODO: does assetizer follow includes inside css files?
+             #"jquery-ui-1.7.3/themes/ui-lightness/ui.all.css",
+             "jquery-ui-1.7.3/themes/base/ui.base.css",
+             "jquery-ui-1.7.3/themes/ui-lightness/ui.theme.css",
+             "jquery-ui-1.7.3/themes/base/ui.base.css",
+             "jquery-ui-1.7.3/themes/base/ui.progressbar.css",
+             "jquery-ui-1.7.3/themes/base/ui.tabs.css",
+         ),
          output="packed/openhatch.css")
 register('header_js',
          # jQuery
@@ -43,7 +43,7 @@ register('openhatch_js',
                 'js/jquery.form.js',
                 'js/jquery.jgrowl.js',
                 'js/jquery.tipsy.js',
-                'js/tipsy-onload.js', #not really jQuery
+                'js/tipsy-onload.js',  # not really jQuery
                 'js/jquery.cookie.js',
                 'js/facebox.js',
                 ),
@@ -59,8 +59,8 @@ register('openhatch_js',
                 'js/facebox.js',
                 ),
          # Other 3rd party
-         #Bundle('js/filedrop.js',
-         #       'js/filedrop-onload.js', # OpenHatch specific
+         # Bundle('js/filedrop.js',
+         # 'js/filedrop-onload.js', # OpenHatch specific
          #       ),
          # OpenHatch
          Bundle('js/base.js',
@@ -72,4 +72,3 @@ register('openhatch_js',
                 ),
          filter='jsmin',
          output='packed/openhatch.js')
-

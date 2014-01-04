@@ -3,10 +3,13 @@ There are a whole bunch of files here. Here's what you need to know:
 Important files in git
 ----------------------
 
-README.mkd
+README.rst
     Read the README! Read it first.
 
-    It has a ".mkd" extension because it is in Markdown format.
+    It points to our main documentation; this file is just a quick
+    thumbnail view of what different files in here are.
+
+    (Aside: it has a ".rst" extension because it is in reStructuredText format.)
 
 COPYING
     This file explains what permissions you have, if you want to re-use
@@ -15,9 +18,25 @@ COPYING
 vendor/
     This directory contains code from other projects that we rely on.
 
+    (For more information, look at
+    http://kitsune.readthedocs.org/en/latest/vendor.html .)
+
 mysite/
-    This directory contains the OpenHatch website and all the "apps" that
-    are part of it. Each subdirectory is an app.
+    This directory contains the OpenHatch website and all the "Django
+    apps" that are part of it. Each subdirectory is an app.
+
+    Each of the apps has some tests, views, and frequently models and forms.
+    Their file paths are:
+
+    */tests.py
+    */views.py
+    */forms.py
+    */models.py
+
+	You can read more about tests, views, forms, and models in the
+	official Django tutorial:
+
+	https://docs.djangoproject.com/en/1.5/intro/tutorial01/
 
     customs/
         This directory contains "import/export" code like the support for
@@ -38,12 +57,29 @@ mysite/
         This Django app contains the views and models necessary to display the volunteer
         opportunity finder, also known as bug search.
 
-    */tests.py
-    */views.py
-    */forms.py
-    */models.py
-        Each of the apps has some tests, views, and frequently models and forms.
+    The apps also use other Django features, or Django add-ons. Here is a
+    list of filename => further info URLs:
 
+    */templatetags.py :
+     https://docs.djangoproject.com/en/1.5/howto/custom-template-tags/
+
+    */migrations/ :
+     http://south.aeracode.org/
+
+    */api.py :
+     http://django-tastypie.readthedocs.org/
+
+    */fixtures.json :
+     https://docs.djangoproject.com/en/1.5/howto/initial-data/
+
+    */management/commands :
+     https://docs.djangoproject.com/en/1.5/howto/custom-management-commands/
+
+    */view_helpers.py :
+     http://lists.openhatch.org/pipermail/devel/2013-March/003151.html
+
+    */templates/*/*.html :
+     https://docs.djangoproject.com/en/1.5/topics/templates/
 
 manage.py
     This is the well-known and widely-loved Django management script. (In the past, we used

@@ -40,13 +40,14 @@ from twill import commands as tc
 import mysite.base.depends
 #}}}
 
+
 class Login(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
+
     def test_login(self):
         user = authenticate(username='paulproteus',
-                password="paulproteus's unbreakable password")
+                            password="paulproteus's unbreakable password")
         self.assert_(user and user.is_active)
 
     def test_login_web(self):
@@ -62,10 +63,13 @@ class Login(TwillTests):
         tc.find('log in')
     # }}}
 
+
 class ProfileGetsCreatedWhenUserIsCreated(TwillTests):
+
     """django-authopenid only creates User objects, but we need Person objects
     in all such cases. Test that creating a User will automatically create
     a Person in our project."""
+
     def test_login_creates_person_profile(self):
         # Create a user object
         u = User.objects.create(username='paulproteus')
@@ -74,7 +78,9 @@ class ProfileGetsCreatedWhenUserIsCreated(TwillTests):
         # fixture, a Person object is created.
         self.assert_(list(Person.objects.filter(user__username='paulproteus')))
 
+
 class Signup(TwillTests):
+
     """ Tests for signup without invite code. """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -109,11 +115,13 @@ class Signup(TwillTests):
         tc.find('That username is reserved.')
     # }}}
 
+
 class EditPassword(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def change_password(self, old_pass, new_pass,
-            should_succeed = True):
+                        should_succeed=True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('settings')
         tc.follow('Password')
@@ -126,9 +134,9 @@ class EditPassword(TwillTests):
 
         # Try to log in with the new password now
         client = Client()
-        username='paulproteus'
+        username = 'paulproteus'
         success = client.login(username=username,
-                password=new_pass)
+                               password=new_pass)
         if should_succeed:
             success = success
         else:
@@ -137,21 +145,23 @@ class EditPassword(TwillTests):
 
     def test_change_password(self):
         self.login_with_twill()
-        oldpass="paulproteus's unbreakable password"
-        newpass='new'
+        oldpass = "paulproteus's unbreakable password"
+        newpass = 'new'
         self.change_password(oldpass, newpass)
 
     def test_change_password_should_fail(self):
         self.login_with_twill()
-        oldpass="wrong"
-        newpass='new'
+        oldpass = "wrong"
+        newpass = 'new'
         self.change_password(oldpass, newpass,
-                should_succeed = False)
+                             should_succeed=False)
 #}}}
+
 
 class EditContactInfo(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def test_edit_email_address(self):
         # Opt out of the periodic emails. This way, the only "checked"
         # checkbox is the one for if the user's email address gets shown.
@@ -160,7 +170,6 @@ class EditContactInfo(TwillTests):
         paulproteus.save()
 
         self.login_with_twill()
-        
 
         _url = 'http://openhatch.org/account/settings/contact-info/'
         url = make_twill_url(_url)
@@ -178,13 +187,13 @@ class EditContactInfo(TwillTests):
         # Edit email
         tc.fv("a_settings_tab_form", 'edit_email-email', email)
         # Show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '1') # [1]
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '1')  # [1]
         tc.submit()
 
         # Form submission ought to redirect us back to the form.
         tc.url(url)
 
-        # Was email successfully edited? 
+        # Was email successfully edited?
         tc.find(email)
 
         # Was email visibility successfully edited? [2]
@@ -192,21 +201,21 @@ class EditContactInfo(TwillTests):
 
         # And does the email address show up on the profile?
         tc.go(make_twill_url(
-                'http://openhatch.org/people/paulproteus'))
+            'http://openhatch.org/people/paulproteus'))
         tc.find(email)
 
         # 2. And when we uncheck, does it go away?
-        
+
         # 2.1. Go to contact info form
         tc.go(url)
 
         # 2.2. Don't show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '0') # [1]
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '0')  # [1]
         tc.submit()
 
         # 2.3. Verify it's not on profile anymore
         tc.go(make_twill_url(
-                'http://openhatch.org/people/paulproteus'))
+            'http://openhatch.org/people/paulproteus'))
         tc.notfind(email)
 
         # [1]: This email suggests that twill only accepts
@@ -218,7 +227,8 @@ class EditContactInfo(TwillTests):
 
 photos = [os.path.join(os.path.dirname(__file__),
                        '..', '..', 'sample-photo.' + ext)
-                       for ext in ('png', 'jpg')]
+          for ext in ('png', 'jpg')]
+
 
 def photo(f):
     filename = os.path.join(
@@ -227,10 +237,12 @@ def photo(f):
     assert os.path.exists(filename)
     return filename
 
+
 @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
 class EditPhoto(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def test_set_avatar(self):
         self.login_with_twill()
         for image in [photo('static/sample-photo.png'),
@@ -245,12 +257,14 @@ class EditPhoto(TwillTests):
             self.assert_(p.photo.read() ==
                          open(image).read())
 
-            response = self.login_with_client().get(reverse(mysite.account.views.edit_photo))
-            self.assertEqual( response.context[0]['photo_url'], p.photo.url,
-                    "Test that once you've uploaded a photo via the photo editor, "
-                    "the template's photo_url variable is correct.")
+            response = self.login_with_client().get(
+                reverse(mysite.account.views.edit_photo))
+            self.assertEqual(response.context[0]['photo_url'], p.photo.url,
+                             "Test that once you've uploaded a photo via the photo editor, "
+                             "the template's photo_url variable is correct.")
             self.assert_(p.photo_thumbnail)
-            thumbnail_as_stored = mysite.base.depends.Image.open(p.photo_thumbnail.file)
+            thumbnail_as_stored = mysite.base.depends.Image.open(
+                p.photo_thumbnail.file)
             w, h = thumbnail_as_stored.size
             self.assertEqual(w, 40)
 
@@ -312,7 +326,8 @@ class EditPhoto(TwillTests):
         tc.follow('photo')
         # This is a special image from issue166 that passes Django's image
         # validation tests but causes an exception during zlib decompression.
-        tc.formfile('edit_photo', 'photo', photo('static/images/corrupted.png'))
+        tc.formfile('edit_photo', 'photo',
+                    photo('static/images/corrupted.png'))
         tc.submit()
         tc.code(200)
 
@@ -326,10 +341,12 @@ class EditPhoto(TwillTests):
 
     #}}}
 
+
 @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
 class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
+
     def test_set_avatar(self):
         self.login_with_twill()
         for image in (photo('static/sample-photo.png'),
@@ -342,15 +359,18 @@ class EditPhotoWithOldPerson(TwillTests):
             # Now check that the photo == what we uploaded
             p = Person.objects.get(user__username='paulproteus')
             self.assert_(p.photo.read() ==
-                    open(image).read())
+                         open(image).read())
     #}}}
+
 
 class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     mock_ip = mock.Mock()
-    mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
+    # Located in Rochester, New York, U.S.A.
+    mock_ip.return_value = "128.151.2.1"
+
     @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_accessing_edit_location_form(self):
@@ -366,14 +386,16 @@ class GuessLocationOnLogin(TwillTests):
         self.assertContains(response, "Rochester, NY, United States")
 
     mock_ip = mock.Mock()
-    mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
+    # Located in Rochester, New York, U.S.A.
+    mock_ip.return_value = "128.151.2.1"
+
     @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_do_not_guess_if_have_location_set(self):
         person = Person.objects.get(user__username="paulproteus")
         person.location_display_name = 'The White House'
-        person.latitude=38.898748
-        person.longitude=-77.037684
+        person.latitude = 38.898748
+        person.longitude = -77.037684
         person.location_confirmed = True
         person.save()
 
@@ -386,64 +408,73 @@ class GuessLocationOnLogin(TwillTests):
 
     def test_yes_response(self):
         person = Person.objects.get(user__username="paulproteus")
-        #logging in
+        # logging in
         client = self.login_with_client()
         # sending http request to correct page for "yes" response
-        response = client.post(reverse(mysite.account.views.confirm_location_suggestion_do))
-        #asserting that we get back an http status code of 200
+        response = client.post(
+            reverse(mysite.account.views.confirm_location_suggestion_do))
+        # asserting that we get back an http status code of 200
         person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(response.status_code, 200)
-        #asserting that database was updated
+        # asserting that database was updated
         self.assertTrue(person.location_confirmed)
 
     def test_dont_guess_response(self):
         person = Person.objects.get(user__username="paulproteus")
-        #logging in
+        # logging in
         client = self.login_with_client()
         # sending http request to correct page for "don't guess" response
-        response = client.post(reverse(mysite.account.views.dont_guess_location_do))
-        #asserting that we get back an http status code of 200
+        response = client.post(
+            reverse(mysite.account.views.dont_guess_location_do))
+        # asserting that we get back an http status code of 200
         person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(response.status_code, 200)
-        #asserting that database was updated
+        # asserting that database was updated
         self.assertTrue(person.dont_guess_my_location)
 
     #}}}
 
+
 class SignupWithNoPassword(TwillTests):
+
     def test(self):
         POST_data = {'username': 'mister_roboto'}
-        response = self.client.post(reverse(mysite.account.views.signup_do), POST_data)
+        response = self.client.post(
+            reverse(mysite.account.views.signup_do), POST_data)
         form = response.context['form']
         self.assertFalse(form.is_valid())
         self.assertEqual(User.objects.count(), 0)
 
+
 class LoginPageContainsUnsavedAnswer(TwillTests):
-    
+
     def test(self):
         # Create an answer whose author isn't specified. This replicates the
         # situation where the user isn't logged in.
         p = Project.create_dummy(name='Myproject')
         q = ProjectInvolvementQuestion.create_dummy(
-                key_string='where_to_start', is_bug_style=False)
+            key_string='where_to_start', is_bug_style=False)
 
         # Do a GET on the project page to prove cookies work.
         self.client.get(p.get_url())
 
         # POST some text to the answer creation post handler
         POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
+            'project__pk': p.pk,
+            'question__pk': q.pk,
                 'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
-                    }
-        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
-                                    follow=True)
+        }
+        response = self.client.post(
+            reverse(mysite.project.views.create_answer_do), POST_data,
+            follow=True)
 
         # Now, the session will know about the answer, but the answer will not be published.
-        # Visit the login page, assert that the page contains the text of the answer.
+        # Visit the login page, assert that the page contains the text of the
+        # answer.
 
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
+
 
 class ClearSessionsOnPasswordChange(TwillTests):
     fixtures = ['user-paulproteus']
@@ -466,8 +497,9 @@ class ClearSessionsOnPasswordChange(TwillTests):
         self.assertTrue(self.user_logged_in(client2.session))
 
         client1.post(reverse(mysite.account.views.change_password_do),
-                data={'old_password': password, 'new_password1': new_password,
-                    'new_password2': new_password})
+                     data={
+                         'old_password': password, 'new_password1': new_password,
+                         'new_password2': new_password})
 
         self.assertTrue(self.user_logged_in(client1.session))
         self.assertFalse(self.user_logged_in(client2.session))

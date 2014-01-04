@@ -28,20 +28,21 @@ from mysite.missions.base.view_helpers import *
 from mysite.missions.models import Step, StepCompletion
 from mysite.profile.models import Person
 
+
 class MissionCompletionTestCase(django.test.TestCase):
     fixtures = ['user-paulproteus.json', 'person-paulproteus.json']
-        
+
     def test_unset_mission_completed_sets_is_currently_completed_to_false(self):
         """When user unsets step completion
         'StepCompletion' object 'is_currently_completed' param becomes true"""
         profile = Person.objects.all()[0]
-        step = Step.objects.all()[0]	
-        #creates StepCompletion object
+        step = Step.objects.all()[0]
+        # creates StepCompletion object
         set_mission_completed(profile, step.name)
 
         unset_mission_completed(profile, step.name)
-        obj_after = StepCompletion.objects.get(person = profile, step = step)
-		
+        obj_after = StepCompletion.objects.get(person=profile, step=step)
+
         self.assertTrue(mission_completed_at_least_once(profile, step.name))
         self.assertFalse(mission_completed(profile, step.name))
         self.assertFalse(obj_after.is_currently_completed)
@@ -55,10 +56,10 @@ class MissionCompletionTestCase(django.test.TestCase):
         set_mission_completed(profile, step.name)
         # sets StepCompletion.is_currently_completed to True
         unset_mission_completed(profile, step.name)
-        # should make StepCompletion.is_currently_completed False again 
+        # should make StepCompletion.is_currently_completed False again
         set_mission_completed(profile, step.name)
-        obj_after = StepCompletion.objects.get(person = profile, step = step)
-        
+        obj_after = StepCompletion.objects.get(person=profile, step=step)
+
         self.assertTrue(mission_completed(profile, step.name))
         self.assertTrue(obj_after.is_currently_completed)
 
@@ -71,7 +72,7 @@ class MissionCompletionTestCase(django.test.TestCase):
         # sets StepCompletion.is_currently_completed to True
 
         # Simulate the user resetting the mission
-        obj_after = StepCompletion.objects.get(person = profile, step = step)
+        obj_after = StepCompletion.objects.get(person=profile, step=step)
 
         self.assertGreater(obj_after.created_date, now)
         self.assertGreater(obj_after.modified_date, now)
@@ -82,6 +83,6 @@ class MissionCompletionTestCase(django.test.TestCase):
         # And if we set it again... modified_date should increase,
         # but not created_date.
         unset_mission_completed(profile, step.name)
-        obj_after = StepCompletion.objects.get(person = profile, step = step)
+        obj_after = StepCompletion.objects.get(person=profile, step=step)
         self.assertGreater(obj_after.modified_date, modified_date)
         self.assertEqual(obj_after.created_date, created_date)

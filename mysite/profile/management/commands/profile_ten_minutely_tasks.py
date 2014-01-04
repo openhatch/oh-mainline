@@ -21,6 +21,7 @@ from django.core.management.base import BaseCommand
 
 import staticgenerator
 
+
 class Command(BaseCommand):
     help = "Run this once every 10 minutes for the OpenHatch profile app."
 

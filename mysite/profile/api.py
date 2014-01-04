@@ -4,7 +4,9 @@ import tastypie.fields
 import tastypie.resources
 import tastypie.authorization
 
+
 class PerPersonModelResource(tastypie.resources.ModelResource):
+
     '''This ModelResource subclass overrides a few methods in
     ModelResource to filter database queries to only affect
     data from the user currently logged-in.'''
@@ -26,9 +28,11 @@ class PerPersonModelResource(tastypie.resources.ModelResource):
         # but it will do for now.
         return []
 
+
 class PortfolioEntryResource(PerPersonModelResource):
     # First, we indicate what fields we're willing to copy
     # out of the profile.PortfolioEntry model:
+
     class Meta:
         excludes = ['person', 'project', 'date_created']
         queryset = mysite.profile.models.PortfolioEntry.objects.all()
@@ -43,7 +47,7 @@ class PortfolioEntryResource(PerPersonModelResource):
     # deal with just one Resource, and not deal with nesting.
     project__name = tastypie.fields.CharField(readonly=True)
     project__icon = tastypie.fields.CharField(readonly=True)
-    project__url =  tastypie.fields.CharField(readonly=True)
+    project__url = tastypie.fields.CharField(readonly=True)
 
     def dehydrate_project__icon(self, bundle):
         pfe = bundle.obj
@@ -61,6 +65,7 @@ class PortfolioEntryResource(PerPersonModelResource):
     # can deal only with the PortfolioEntryResource, and not a separate
     # CitationResource.
     citation_list = tastypie.fields.ListField()
+
     def dehydrate_citation_list(self, bundle):
         '''This exposes the citation list as a flat list.'''
         pfe = bundle.obj

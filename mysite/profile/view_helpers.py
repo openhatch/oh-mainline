@@ -36,11 +36,12 @@ import mysite.search.models
 import mysite.profile.models
 import mysite.base.decorators
 
-## roundrobin() taken from http://docs.python.org/library/itertools.html
+# roundrobin() taken from http://docs.python.org/library/itertools.html
 
 # Name constants
 SUGGESTION_COUNT = 6
 DEFAULT_CACHE_TIMESPAN = 86400 * 7
+
 
 def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
@@ -55,7 +56,9 @@ def roundrobin(*iterables):
             pending -= 1
             nexts = cycle(islice(nexts, pending))
 
+
 class RecommendBugs(object):
+
     def __init__(self, terms, n):
         self.terms = terms
         self.n = n
@@ -67,7 +70,8 @@ class RecommendBugs(object):
         suffix_input = [self.terms, self.n, bug_timestamp]
         return prefix + '_' + hashlib.sha1(repr(suffix_input)).hexdigest()
 
-    def is_cache_empty(self): return cache.get(self.get_cache_key()) == None
+    def is_cache_empty(self):
+        return cache.get(self.get_cache_key()) == None
 
     def recommend(self):
         ret = []
@@ -110,8 +114,11 @@ class RecommendBugs(object):
             yield bug.id
 
 geoip_database = None
+
+
 def geoip_city_database_available():
     return os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH)
+
 
 def get_geoip_guess_for_ip(ip_as_string):
     # initialize database
@@ -126,7 +133,7 @@ def get_geoip_guess_for_ip(ip_as_string):
         if os.path.exists(settings.DOWNLOADED_GEOLITECITY_PATH):
             geoip_database = pygeoip.GeoIP(downloaded_geolitecity_path)
 
-    if geoip_database is None: # still?
+    if geoip_database is None:  # still?
         logging.warn("Uh, we could not find the GeoIP database.")
         return False, u''
 
@@ -164,14 +171,16 @@ def get_geoip_guess_for_ip(ip_as_string):
         return True, as_unicode
     return False, u''
 
+
 def parse_string_query(s):
     parsed = {}
     valid_prefixes = ['project', 'icanhelp']
-    valid_prefixes.extend(mysite.profile.models.TagType.short_name2long_name.keys())
+    valid_prefixes.extend(
+        mysite.profile.models.TagType.short_name2long_name.keys())
 
     pieces_from_splitting_on_first_colon = s.split(':', 1)
     if (len(pieces_from_splitting_on_first_colon) > 1 and
-        pieces_from_splitting_on_first_colon[0] in valid_prefixes):
+            pieces_from_splitting_on_first_colon[0] in valid_prefixes):
         first, rest = pieces_from_splitting_on_first_colon
         parsed['query_type'], parsed['q'] = first, rest
     else:
@@ -179,9 +188,9 @@ def parse_string_query(s):
         parsed['q'] = s
 
     # Now, clean up the q to parse out quotation marks
-    parsed['q'] = parsed['q'].strip() # trim whitespace
+    parsed['q'] = parsed['q'].strip()  # trim whitespace
     if len(parsed['q']) >= 2 and (
-        parsed['q'][0] == '"' == parsed['q'][-1]):
+            parsed['q'][0] == '"' == parsed['q'][-1]):
         parsed['q'] = parsed['q'][1:-1]
 
     # If this is not a project-related search, but there are projects
@@ -194,6 +203,7 @@ def parse_string_query(s):
         return _query2results(query_type, search_string)
     parsed['callable_searcher'] = callable_searcher
     return parsed
+
 
 def email_spammy_user(u):
     message = '''Dear user of OpenHatch,
@@ -219,6 +229,7 @@ Sincerely,
                                              in django.conf.settings.ADMINS],
                                         )
     msg.send()
+
 
 def send_user_export_to_admins(u):
     '''You might want to call this function before deleting a user.
@@ -248,11 +259,11 @@ def generate_user_export(u):
                           for a in u.answer_set.all()]
     out['tags'] = [django.forms.models.model_to_dict(t)
                    for t in mysite.profile.models.Tag.objects.filter(
-            link_person_tag__person__user=u)]
+                       link_person_tag__person__user=u)]
     out['user'] = django.forms.models.model_to_dict(u)
     del out['user']['password']
     person = u.get_profile()
-    ### Skip columns that can't be easily JSON serialized
+    # Skip columns that can't be easily JSON serialized
     person.photo = None
     person.photo_thumbnail = None
     person.photo_thumbnail_30px_wide = None
@@ -261,8 +272,9 @@ def generate_user_export(u):
         u.get_profile(), exclude=[
             'photo', 'photo_thumbnail', 'photo_thumbnail_20px_wide',
             'photo_thumbnail_30px_wide',
-            ])
+        ])
     return out
+
 
 def _query2results(query_type, search_string):
     if query_type == 'project':
@@ -278,6 +290,8 @@ def _query2results(query_type, search_string):
                     search_string=search_string)
 
 # These are helper functions for showing information about the query.
+
+
 def query_type2query_summary(template_data):
     output_dict = {}
 
@@ -288,7 +302,8 @@ def query_type2query_summary(template_data):
         output_dict['this_query_summary'] = 'who have contributed to '
         output_dict['query_is_a_project_name'] = True
     elif template_data['query_type'] == 'icanhelp':
-        output_dict['this_query_summary'] = 'willing to contribute to the project '
+        output_dict[
+            'this_query_summary'] = 'willing to contribute to the project '
         output_dict['query_is_a_project_name'] = True
     elif template_data['query_type'] == 'all_tags':
         output_dict['this_query_summary'] = 'who have listed'
@@ -300,9 +315,9 @@ def query_type2query_summary(template_data):
     elif template_data['query_type'] == 'studying':
         output_dict['this_query_summary'] = 'who are currently studying '
     else:
-        long_name = mysite.profile.models.TagType.short_name2long_name[template_data['query_type']]
+        long_name = mysite.profile.models.TagType.short_name2long_name[
+            template_data['query_type']]
         output_dict['this_query_summary'] = 'who ' + long_name
-
 
     if template_data['query_type'] == 'icanhelp' and not template_data['people']:
         output_dict['total_query_summary'] = (
@@ -311,21 +326,25 @@ def query_type2query_summary(template_data):
 
     return output_dict
 
+
 def provide_project_query_hint(parsed_query):
     output_dict = {}
 
     if parsed_query['query_type'] != 'project':
         # Figure out which projects happen to match that
         projects_that_match_q_exactly = []
-        for word in [parsed_query['q']]: # This is now tokenized smartly.
-            name_matches = mysite.search.models.Project.objects.filter(name__iexact=word)
+        for word in [parsed_query['q']]:  # This is now tokenized smartly.
+            name_matches = mysite.search.models.Project.objects.filter(
+                name__iexact=word)
             for project in name_matches:
                 if project.cached_contributor_count:
                     # only add those projects that have people in them
                     projects_that_match_q_exactly.append(project)
-        output_dict['projects_that_match_q_exactly'] = projects_that_match_q_exactly
+        output_dict[
+            'projects_that_match_q_exactly'] = projects_that_match_q_exactly
 
     return output_dict
+
 
 def get_most_popular_projects():
     # FIXME: This code is presumably terrible.
@@ -333,24 +352,27 @@ def get_most_popular_projects():
     popular_projects = cache.get(key_name)
     if popular_projects is None:
         projects = mysite.search.models.Project.objects.all()
-        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
-        #extract just the names from the projects
+        popular_projects = sorted(
+            projects, key=lambda proj: len(proj.get_contributors()) * (-1))[:SUGGESTION_COUNT]
+        # extract just the names from the projects
         popular_projects = [project.name for project in popular_projects]
         # cache it for a week
         cache.set(key_name, popular_projects, DEFAULT_CACHE_TIMESPAN)
     return popular_projects
+
 
 def get_matching_project_suggestions(search_text):
     # FIXME: This code is presumably terrible.
     mps1 = mysite.search.models.Project.objects.filter(
         cached_contributor_count__gt=0, name__icontains=search_text).filter(
         ~Q(name__iexact=search_text)).order_by(
-            '-cached_contributor_count')
+        '-cached_contributor_count')
     mps2 = mysite.search.models.Project.objects.filter(
-            cached_contributor_count__gt=0, display_name__icontains=search_text).filter(
-            ~Q(name__iexact=search_text)).order_by(
-                '-cached_contributor_count')
+        cached_contributor_count__gt=0, display_name__icontains=search_text).filter(
+        ~Q(name__iexact=search_text)).order_by(
+        '-cached_contributor_count')
     return mps1 | mps2
+
 
 def get_most_popular_tags():
     # FIXME: This code is presumably terrible.
@@ -364,16 +386,20 @@ def get_most_popular_tags():
         # lowercase them all and then remove duplicates
         # take the popular ones
         # cache it for a week
-        popular_tags = [] # FIXME: I removed the implementation of this.
+        popular_tags = []  # FIXME: I removed the implementation of this.
         cache.set(key_name, popular_tags, DEFAULT_CACHE_TIMESPAN)
     return popular_tags
 
-### This code finds the right people to show on /people/, gathering a list
-### of people and optional extra template data for the map.
+# This code finds the right people to show on /people/, gathering a list
+# of people and optional extra template data for the map.
+
+
 class PeopleFinder(object):
+
     '''Subclasses of PeopleFinder take a query string as the only argument
     to __init__.py, and they create the self.template_data and self.people
     attributes.'''
+
     def __init__(self, search_string):
         raise NotImplementedError
 
@@ -382,18 +408,22 @@ class PeopleFinder(object):
             pk__in=person_ids).select_related().order_by('user__username')
 
     def calculate_project(self, search_string):
-        orm_projects = mysite.search.models.Project.objects.filter(name__iexact=search_string)
+        orm_projects = mysite.search.models.Project.objects.filter(
+            name__iexact=search_string)
         if orm_projects:
             self.project = orm_projects[0]
             self.template_data['queried_project'] = self.project
         else:
             self.project = None
-            self.template_data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
+            self.template_data[
+                'total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % search_string
 
     def add_query_summary(self):
         raise NotImplementedError
 
+
 class WannaHelpQuery(PeopleFinder):
+
     def __init__(self, search_string):
         self.template_data = {}
         self.calculate_project(search_string)
@@ -403,11 +433,14 @@ class WannaHelpQuery(PeopleFinder):
         self.add_query_summary()
 
     def add_query_summary(self):
-        self.template_data['this_query_summary'] = 'willing to contribute to the project '
+        self.template_data[
+            'this_query_summary'] = 'willing to contribute to the project '
         self.template_data['query_is_a_project_name'] = True
+
 
 class TagQuery(PeopleFinder):
     # FIXME: Probably we should add a add_query_summary() method.
+
     def __init__(self, tag_short_name, search_string):
         self.template_data = {}
         self.people = []
@@ -417,7 +450,8 @@ class TagQuery(PeopleFinder):
                 tag_type, search_string)
 
     def get_tag_type(self, tag_short_name):
-        tag_types = mysite.profile.models.TagType.objects.filter(name=tag_short_name)
+        tag_types = mysite.profile.models.TagType.objects.filter(
+            name=tag_short_name)
         if not tag_types:
             return None
         return tag_types[0]
@@ -429,8 +463,10 @@ class TagQuery(PeopleFinder):
             tag__id__in=tag_ids).values_list('person_id', flat=True)
         return self.get_person_instances_from_person_ids(person_ids)
 
+
 class AllTagsQuery(PeopleFinder):
     # FIXME: Probably we should add a add_query_summary() method.
+
     def __init__(self, search_string):
         self.template_data = {}
         self.people = mysite.profile.models.Person.objects.none()
@@ -444,25 +480,25 @@ class AllTagsQuery(PeopleFinder):
 
         # get search based on username
         user_results = mysite.profile.models.Person.objects.none()
-        if len(search_list) == 1: 
-          user_results = self.get_persons_by_username(
-              search_string)
+        if len(search_list) == 1:
+            user_results = self.get_persons_by_username(
+                search_string)
 
         # get search based on last name
         lastname_results = mysite.profile.models.Person.objects.none()
         lastname_results2 = mysite.profile.models.Person.objects.none()
         for search_word in search_list:
-          lastname_results2 = self.get_persons_by_lastname(
-              search_word)
-          lastname_results = lastname_results | lastname_results2;
+            lastname_results2 = self.get_persons_by_lastname(
+                search_word)
+            lastname_results = lastname_results | lastname_results2
 
         # get search based on first name
         firstname_results = mysite.profile.models.Person.objects.none()
         firstname_results2 = mysite.profile.models.Person.objects.none()
         for search_word in search_list:
-          firstname_results2 = self.get_persons_by_firstname(
-              search_word)
-          firstname_results =  firstname_results | firstname_results2
+            firstname_results2 = self.get_persons_by_firstname(
+                search_word)
+            firstname_results = firstname_results | firstname_results2
 
         # Chain all the search results together
         self.people = tag_results | user_results | lastname_results | firstname_results
@@ -488,6 +524,7 @@ class AllTagsQuery(PeopleFinder):
 
 
 class ProjectQuery(PeopleFinder):
+
     def __init__(self, search_string):
         self.template_data = {}
         self.people = []
@@ -507,9 +544,9 @@ class ProjectQuery(PeopleFinder):
         self.people = self.get_person_instances_from_person_ids(person_ids)
 
     def add_wanna_help_count(self):
-        self.template_data['icanhelp_count'] = self.project.people_who_wanna_help.count()
+        self.template_data[
+            'icanhelp_count'] = self.project.people_who_wanna_help.count()
 
     def add_query_summary(self):
         self.template_data['this_query_summary'] = 'who have contributed to '
         self.template_data['query_is_a_project_name'] = True
-

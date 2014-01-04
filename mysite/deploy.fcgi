@@ -1,5 +1,6 @@
 #!/usr/bin/python
-import sys, os
+import sys
+import os
 sys.path.append('/home/deploy/milestone-a')
 
 try:
@@ -12,4 +13,3 @@ os.environ['DJANGO_SETTINGS_MODULE'] = "settings"
 
 from django.core.servers.fastcgi import runfastcgi
 runfastcgi(method="threaded", daemonize="false")
-

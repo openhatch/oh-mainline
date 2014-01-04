@@ -272,3 +272,8 @@ body.wordpress input.a2a_menu_find {
 body.wordpress #footer {
     background-image: url(/static/images/dark-hatch.png);
 }
+
+/* attempt to make captions work */
+body.wordpress .wp-caption-text {
+	font-size:9px;
+}

@@ -28,8 +28,8 @@ import django.core.serializers.json
 import mysite.search.views
 
 
-## You can run this, and it generates a JSON file that can be
-## passed to loaddata.
+# You can run this, and it generates a JSON file that can be
+# passed to loaddata.
 
 
 class Command(BaseCommand):
@@ -47,12 +47,14 @@ class Command(BaseCommand):
                     # copy it into the safe dictionary
                     fields_that_are_safe_to_export[key] = value
                 else:
-                    pass # by failing to copy it in, we remove it from the perspective of the dump
+                    # by failing to copy it in, we remove it from the
+                    # perspective of the dump
+                    pass
 
             # Now, in obj, replace the fields with a safe version
             obj['fields'] = fields_that_are_safe_to_export
         return all
-        
+
     def serialize_objects_except(self, query_set, blacklisted_columns):
         obj_serializer = django.core.serializers.get_serializer('python')()
         all = obj_serializer.serialize(query_set)
@@ -62,7 +64,9 @@ class Command(BaseCommand):
                 value = obj['fields'][key]
 
                 if key in blacklisted_columns:
-                    pass # by failing to copy it in, we remove it from the perspective of the dump
+                    # by failing to copy it in, we remove it from the
+                    # perspective of the dump
+                    pass
                 else:
                     # copy into the safe dictionary
                     fields_that_are_safe_to_export[key] = value
@@ -70,7 +74,7 @@ class Command(BaseCommand):
             # Now, in obj, replace the fields with a safe version
             obj['fields'] = fields_that_are_safe_to_export
         return all
-        
+
     def serialize_all_objects(self, query_set):
         obj_serializer = django.core.serializers.get_serializer('python')()
         all = obj_serializer.serialize(query_set)
@@ -95,18 +99,19 @@ class Command(BaseCommand):
         for user in all_user_objects:
             try:
                 if user.get_profile().show_email:
-                    pass # do not mutate the email address
+                    pass  # do not mutate the email address
                 else:
                     # anonymize email address
                     user.email = 'user_id_%d_has_hidden_email_address@example.com' % user.id
             except Person.DoesNotExist:
-                pass # it is okay if the user has no prefs
+                pass  # it is okay if the user has no prefs
         public_user_data = self.serialize_objects(query_set=all_user_objects,
-                                whitelisted_columns = ['id', 'username', 'first_name', 'last_name', 'email'])
+                                                  whitelisted_columns=['id', 'username', 'first_name', 'last_name', 'email'])
         data.extend(public_user_data)
 
         # location_confirmed should be hidden -- that's private data
-        # location_display_name should be set to the result of Person.get_public_location_or_default()
+        # location_display_name should be set to the result of
+        # Person.get_public_location_or_default()
         everyone = Person.objects.all()
         for dude in everyone:
             dude.location_display_name = dude.get_public_location_or_default()
@@ -118,28 +123,34 @@ class Command(BaseCommand):
         # exporting Project data
         public_project_data = self.serialize_objects_except(
             query_set=Project.objects.all(),
-            blacklisted_columns = ['icon_url','icon_raw'])
+            blacklisted_columns=['icon_url', 'icon_raw'])
         data.extend(public_project_data)
-        
+
         # Timestamp data needs export
-        public_timestamp_data = self.serialize_all_objects(query_set=Timestamp.objects.all())
+        public_timestamp_data = self.serialize_all_objects(
+            query_set=Timestamp.objects.all())
         data.extend(public_timestamp_data)
-        
+
         # exporting Bug data
-        public_bug_data = self.serialize_all_objects(query_set=Bug.all_bugs.all())
+        public_bug_data = self.serialize_all_objects(
+            query_set=Bug.all_bugs.all())
         data.extend(public_bug_data)
 
-        #exporting tagtypes
-        public_tagtypes_data = self.serialize_all_objects(query_set=TagType.objects.all())
+        # exporting tagtypes
+        public_tagtypes_data = self.serialize_all_objects(
+            query_set=TagType.objects.all())
         data.extend(public_tagtypes_data)
 
-        #exporting tags
-        public_tags_data = self.serialize_all_objects(query_set=Tag.objects.all())
+        # exporting tags
+        public_tags_data = self.serialize_all_objects(
+            query_set=Tag.objects.all())
         data.extend(public_tags_data)
 
-        #exporting tags-persons links
-        public_persons_tags_links = self.serialize_all_objects(query_set=Link_Person_Tag.objects.all())
+        # exporting tags-persons links
+        public_persons_tags_links = self.serialize_all_objects(
+            query_set=Link_Person_Tag.objects.all())
         data.extend(public_persons_tags_links)
 
-        ### anyway, now we stream all this data out using simplejson
-        simplejson.dump(data, output,cls=django.core.serializers.json.DjangoJSONEncoder)
+        # anyway, now we stream all this data out using simplejson
+        simplejson.dump(data, output,
+                        cls=django.core.serializers.json.DjangoJSONEncoder)

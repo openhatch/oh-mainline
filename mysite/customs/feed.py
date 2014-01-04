@@ -24,7 +24,8 @@ OPENHATCH_BLOG_FEED_URL = 'http://openhatch.org/blog/feed/atom/'
 
 
 def summary2html(html_string):
-    soup = BeautifulSoup.BeautifulSoup(html_string, convertEntities=BeautifulSoup.BeautifulSoup.ALL_ENTITIES)
+    soup = BeautifulSoup.BeautifulSoup(
+        html_string, convertEntities=BeautifulSoup.BeautifulSoup.ALL_ENTITIES)
     return u' '.join(soup.findAll(text=True))
 
 

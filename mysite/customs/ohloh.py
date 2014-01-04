@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-### This file is just a wrapper around the Ohloh.net API that helps
-### us get icons for projects.
+# This file is just a wrapper around the Ohloh.net API that helps
+# us get icons for projects.
 
 import mysite.base.unicode_sanity
 import xml.etree.ElementTree as ET
@@ -27,6 +27,7 @@ import cStringIO as StringIO
 from django.conf import settings
 import mysite.customs.models
 
+
 def uni_text(s):
     if type(s) == unicode:
         return s
@@ -34,7 +35,8 @@ def uni_text(s):
 
 import mysite.customs.mechanize_helpers
 
-def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
+
+def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None, person=None):
     '''Input: A URL to get,
     a bunch of parameters to toss onto the end url-encoded,
     many (a boolean) indicating if we should return a list of just one datum,
@@ -47,10 +49,10 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
     if API_KEY is None:
         API_KEY = settings.OHLOH_API_KEY
 
-
     my_params = {u'api_key': unicode(API_KEY)}
     my_params.update(params)
-    params = my_params ; del my_params
+    params = my_params
+    del my_params
 
     # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
@@ -60,7 +62,8 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
     try:
         b = mysite.customs.mechanize_helpers.mechanize_get(url, person)
         web_response = mysite.customs.models.WebResponse.create_from_browser(b)
-        web_response.save() # Always save the WebResponse, even if we don't know
+        # Always save the WebResponse, even if we don't know
+        web_response.save()
         # that any other object will store a pointer here.
     except urllib2.HTTPError, e:
         # FIXME: Also return a web_response for error cases
@@ -97,6 +100,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         return ret[0], web_response
     return None, web_response
 
+
 def process_logo_filename(logo_filename):
     if logo_filename == 'no_logo.png':
         # The Ohloh API used to not provide any data
@@ -107,6 +111,7 @@ def process_logo_filename(logo_filename):
         raise KeyError, ("Simulating KeyError "
                          "to convince caller the logo is not there.")
     return logo_filename
+
 
 class Ohloh(object):
 
@@ -159,25 +164,29 @@ class Ohloh(object):
         args = {u'query': unicode(project_name_query)}
         data, web_response = ohloh_url2data(url=unicode(url),
                                             selector='result/project',
-                                            params= args,
+                                            params=args,
                                             many=True)
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
         # we see if the project dicts have an exact match by project name.
 
         if not data:
-            return None # If there is no matching project possibilit at all, get out now.
+            # If there is no matching project possibilit at all, get out now.
+            return None
 
-        exact_match_on_project_name = [ datum for datum in data
-                                        if datum.get('name', None).lower() == project_name_query.lower()]
+        exact_match_on_project_name = [datum for datum in data
+                                       if datum.get('name', None).lower() == project_name_query.lower()]
         if exact_match_on_project_name:
             # If there's an exact match on the project name, return this datum
             return exact_match_on_project_name[0]
 
-        # Otherwise, trust Ohloh's full-text relevance ranking and return the first hit
+        # Otherwise, trust Ohloh's full-text relevance ranking and return the
+        # first hit
         return data[0]
 
 _ohloh = Ohloh()
+
+
 def get_ohloh():
     return _ohloh
 

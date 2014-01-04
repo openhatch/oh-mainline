@@ -24,6 +24,7 @@ import mechanize
 import mysite.base.unicode_sanity
 import mysite.customs.models
 
+
 def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     """Input: Some stuff regarding a web URL to request.
     Output: A browser instance that just open()'d that, plus an unsaved
@@ -37,7 +38,7 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
-                     'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
+                   'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
     if referrer is not None:
         b.set_handle_referer(False)
         addheaders.extend([('Referer',
@@ -59,7 +60,7 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
         else:
             raise
 
-    ## Okay, so sometimes we should retry:
+    # Okay, so sometimes we should retry:
     if retry and attempts_remaining > 0:
         # FIXME: Test with mock object.
         message_schema = "Tried to talk to %s, got %s, retrying %d more times..."
@@ -68,11 +69,12 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
 
         if person:
             short_message = message_schema % (urlparse(url).hostname,
-                    reason, attempts_remaining)
+                                              reason, attempts_remaining)
             person.user.message_set.create(message=short_message)
-        return mechanize_get(url, referrer, attempts_remaining-1, person)
+        return mechanize_get(url, referrer, attempts_remaining - 1, person)
 
     return b
+
 
 def link_works(url):
     try:

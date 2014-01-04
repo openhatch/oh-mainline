@@ -17,10 +17,12 @@
 from mysite.search.models import Project, Bug, Buildhelper, BuildhelperStep
 from django.contrib import admin
 
+
 class BuildhelperStepInline(admin.StackedInline):
     model = BuildhelperStep
     extra = 1
-    
+
+
 class BuildhelperAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['project']}),

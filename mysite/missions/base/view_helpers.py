@@ -37,28 +37,36 @@ import tempfile
 import pipes
 import logging
 
+
 def get_mission_data_path(mission_type):
     base_path = os.path.abspath(os.path.dirname(__file__))
     new_path = os.path.join(base_path, '..', mission_type, 'data')
     absolute_ified = os.path.abspath(new_path)
     return absolute_ified
 
+
 def set_mission_completed(profile, mission_name):
-    s, _ = StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
+    s, _ = StepCompletion.objects.get_or_create(
+        person=profile, step=Step.objects.get(name=mission_name))
     s.is_currently_completed = True
     s.save()
 
+
 def unset_mission_completed(profile, mission_name):
-    s = StepCompletion.objects.filter(person=profile, step=Step.objects.get(name=mission_name), is_currently_completed=True)
+    s = StepCompletion.objects.filter(
+        person=profile, step=Step.objects.get(name=mission_name), is_currently_completed=True)
     if len(s):
         s[0].is_currently_completed = False
         s[0].save()
 
+
 def mission_completed(profile, mission_name):
     return len(StepCompletion.objects.filter(step__name=mission_name, person=profile, is_currently_completed=True)) != 0
 
+
 def mission_completed_at_least_once(profile, mission_name):
     return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
+
 
 class IncorrectPatch(Exception):
     pass
