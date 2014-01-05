@@ -908,7 +908,6 @@ Importer.Inputs.init = function () {
             "Type a repository username here");
     Importer.Inputs.getInputs().eq(1).attr('title',
             "Type an email address here");
-    Importer.Inputs.getInputs().hint();
 };
 Importer.Inputs.makeNew = function () {
 
@@ -1025,7 +1024,6 @@ PortfolioEntry.Add.clickHandler = function (project_name) {
     }
 
     PortfolioEntry.bindEventHandlers();
-    $add_a_pf_entry.find('input[title]').hint();
 
     return false;
 };

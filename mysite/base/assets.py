@@ -39,7 +39,6 @@ register('header_js',
 register('openhatch_js',
          # jQuery
          Bundle('js/jquery.json.js',
-                'js/jquery.hint.js',
                 'js/jquery.form.js',
                 'js/jquery.jgrowl.js',
                 'js/jquery.tipsy.js',

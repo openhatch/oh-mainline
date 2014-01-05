@@ -401,12 +401,10 @@ $(function(){
                     $form.find('input:text, textarea').unbind('blur');
                 });
 
-            $('input:text, textarea').hint();
             // Bind a function to the 'x' on input forms.  this function collapses the form
             $('.collapse_answer_form').click(function(){
                 $form = $(this).parent().parent();
                 $form.removeClass('active');
-                $form.find('input:text, textarea').hint();
                 if($form.hasClass('is_edit_form')){
                     $form.hide();
                     answer_id = $(this).attr('id').split('_')[3];

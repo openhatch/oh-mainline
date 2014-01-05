@@ -197,7 +197,7 @@ Volunteer opportunities in free and open source software
         <div class='module-body'>
             <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.search_index %}'> 
                 <input type='text' name='q' id='q' rel='hint'
-                title='Textual search'
+                placeholder='Textual search'
                 value='{{ query.terms_string }}' />
 
                 {% for facet, value in query.active_facet_options.items %}
