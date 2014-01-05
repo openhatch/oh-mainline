@@ -161,7 +161,7 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'interested_in_working_on': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1024'}),
             'last_polled': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(1970, 1, 1, 0, 0)'}),
-            'location_display_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'location_display_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'default': "''"}),
             'photo': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100'}),
             'photo_thumbnail': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'null': 'True'}),
             'show_email': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
