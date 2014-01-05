@@ -20,8 +20,6 @@ import logging
 import os
 import mysite.base.models
 import mysite.profile.models
-from celery.task import Task, task
-import celery.registry
 import traceback
 import mysite.profile.view_helpers
 import shutil
@@ -55,11 +53,10 @@ source2result_handler = {
 }
 
 
-class GarbageCollectForwarders(Task):
+class GarbageCollectForwarders:
 
     def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started garbage collecting profile email forwarders")
+        logging.info("Started garbage collecting profile email forwarders")
         deleted_any = mysite.profile.models.Forwarder.garbage_collect()
         if deleted_any:
             # Well, in that case, we should purge the staticgenerator-generated
@@ -68,7 +65,7 @@ class GarbageCollectForwarders(Task):
         return deleted_any
 
 
-class RegeneratePostfixAliasesForForwarder(Task):
+class RegeneratePostfixAliasesForForwarder:
 
     def run(self, **kwargs):
         if django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH:
@@ -89,27 +86,26 @@ class RegeneratePostfixAliasesForForwarder(Task):
             os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps')
 
 
-class FetchPersonDataFromOhloh(Task):
+class FetchPersonDataFromOhloh:
     name = "profile.FetchPersonDataFromOhloh"
 
     def run(self, dia_id, **kwargs):
         dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
         try:
-            logger = self.get_logger(**kwargs)
-            logger.info("Starting job for <%s>" % dia)
+            logging.info("Starting job for <%s>" % dia)
             if dia.completed:
-                logger.info("Bailing out job for <%s>" % dia)
+                logging.info("Bailing out job for <%s>" % dia)
                 return
             results = source2actual_action[dia.source](dia)
             source2result_handler[dia.source](dia.id, results)
-            logger.info("Results: %s" % repr(results))
+            logging.info("Results: %s" % repr(results))
 
         except Exception, e:
             # if the task is in debugging mode, bubble-up the exception
             if getattr(self, 'debugging', None):
                 raise
-            logger.error("Traceback: ")
-            logger.error(traceback.format_exc())
+            logging.error("Traceback: ")
+            logging.error(traceback.format_exc())
 
             # else let the exception be logged but not bubble up
             dia.completed = True
@@ -123,18 +119,10 @@ class FetchPersonDataFromOhloh(Task):
                 url = str(e.geturl())
             else:
                 raise
-            logger.error('Dying: ' + code + ' getting ' + url)
+            logging.error('Dying: ' + code + ' getting ' + url)
             raise ValueError, {'code': code, 'url': url}
 
-try:
-    celery.registry.tasks.register(RegeneratePostfixAliasesForForwarder)
-    celery.registry.tasks.register(FetchPersonDataFromOhloh)
-    celery.registry.tasks.register(GarbageCollectForwarders)
-except celery.registry.AlreadyRegistered:
-    pass
 
-
-@task
 def update_person_tag_cache(person__pk):
     try:
         person = mysite.profile.models.Person.objects.get(pk=person__pk)
@@ -147,7 +135,6 @@ def update_person_tag_cache(person__pk):
     return person.get_tag_texts_for_map()
 
 
-@task
 def update_someones_pf_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_cache_key_for_projects()
@@ -164,7 +151,6 @@ def fill_recommended_bugs_cache():
     logging.info("Finished filling recommended bugs cache for all people.")
 
 
-@task
 def fill_one_person_recommend_bugs_cache(person_id):
     p = mysite.profile.models.Person.objects.get(id=person_id)
     logging.info("Recommending bugs for %s" % p)
@@ -192,15 +178,10 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
     logging.info("Done syncing bug timestamp.")
 
 
-@task
-def clear_people_page_cache():
+def clear_people_page_cache(*args, **kwargs):
     shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
                                'people'),
                   ignore_errors=True)
-
-
-def clear_people_page_cache_task(*args, **kwargs):
-    return clear_people_page_cache.delay()
 
 
 def fill_people_page_cache():
@@ -213,5 +194,5 @@ for model in [mysite.profile.models.PortfolioEntry,
         django.db.models.signals.post_save,
             django.db.models.signals.post_delete]:
         signal_to_hook.connect(
-            clear_people_page_cache_task,
+            clear_people_page_cache,
             sender=model)

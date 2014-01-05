@@ -576,13 +576,6 @@ def replace_icon_with_default(request):
     project.invalidate_all_icons()
     project.save()
 
-    # email all@ letting them know that we did so
-    from mysite.project.tasks import send_email_to_all_because_project_icon_was_marked_as_wrong
-    send_email_to_all_because_project_icon_was_marked_as_wrong.delay(
-        project__pk=project_before_changes.pk,
-        project__name=project_before_changes.name,
-        project_icon_url=wrong_icon_url)
-
     # prepare output
     data = {}
     data['success'] = True
@@ -632,7 +625,6 @@ def prepare_data_import_attempts(identifiers, user):
                     source=source_key,
                     person=user.get_profile())
                 dia.save()
-                dia.do_what_it_says_on_the_tin()
 
 
 @login_required
@@ -698,7 +690,6 @@ def user_selected_these_dia_checkboxes(request):
                     request.user.get_profile())
                 dia.person_wants_data = True
                 dia.save()
-                dia.do_what_it_says_on_the_tin()
 
                 # There may be data waiting or not,
                 # but no matter; this function may

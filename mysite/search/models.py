@@ -377,30 +377,6 @@ class Project(OpenHatchModel):
             return None
 
 
-def populate_icon_on_project_creation(instance, raw, created, *args, **kwargs):
-    if raw:
-        return
-
-    import mysite.search.tasks
-    if created and not instance.icon_raw:
-        task = mysite.search.tasks.PopulateProjectIconFromOhloh()
-        task.delay(project_id=instance.id)
-
-
-def grab_project_language_from_ohloh(instance, raw, created, *args,
-                                     **kwargs):
-    if raw:
-        return
-
-    import mysite.search.tasks
-    if created and not instance.language:
-        task = mysite.search.tasks.PopulateProjectLanguageFromOhloh()
-        task.delay(project_id=instance.id)
-
-models.signals.post_save.connect(populate_icon_on_project_creation, Project)
-models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
-
-
 class WrongIcon(OpenHatchModel):
 
     @staticmethod

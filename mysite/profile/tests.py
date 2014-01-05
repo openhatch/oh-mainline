@@ -240,94 +240,6 @@ mock_gcibou.return_value = ([{
 class MockFetchPersonDataFromOhloh(object):
     real_task_class = tasks.FetchPersonDataFromOhloh
 
-    @classmethod
-    def delay(*args, **kwargs):
-        "Don't enqueue a background task. Just run the task."
-        args = args[1:]  # FIXME: Wonder why I need this
-        task = MockFetchPersonDataFromOhloh.real_task_class()
-        task.debugging = True  # See FetchPersonDataFromOhloh
-        task.run(*args, **kwargs)
-
-
-class BaseCeleryTest(TwillTests):
-
-    def _test_data_source_via_emulated_bgtask(self, source, data_we_expect, summaries_we_expect):
-        "1. Go to the page that has paulproteus' data. "
-        "2. Verify that the page doesn't yet know about ccHost. "
-        "3. Prepare an object that will import data from ccHost. "
-        "The object is a DataImportAttempt. The DataImportAttempt has a method "
-        "that will create a background task using the celery package. The method "
-        "is called do_what_it_says_on_the_tin, because it will attempt to "
-        "import data. "
-        "3. Run the celery task ourselves, but instead of going to Ohloh, "
-        "we hand-prepare data for it."""
-
-        # Let's run this test using a sample user, paulproteus.
-        username = 'paulproteus'
-        person = Person.objects.get(user__username=username)
-
-        # Store a note in the DB that we're about to run a background task
-        dia = DataImportAttempt(query=username, source=source, person=person)
-        dia.save()
-
-        gimme_json_url = reverse(mysite.profile.views.gimme_json_for_portfolio)
-
-        client = self.login_with_client()
-
-        # Ask if background task has been completed.
-        # We haven't even created the background task, so
-        # the answer should be no.
-        response_before_task_is_run = client.get(gimme_json_url)
-        response_json = simplejson.loads(response_before_task_is_run.content)
-        self.assertEqual(response_json['dias'][0]['pk'], dia.id)
-        self.assertFalse(response_json['dias'][0]['fields']['completed'])
-
-        # Are there any PortfolioEntries for ccHost
-        # before we import data? Expected: no.
-        portfolio_entries = PortfolioEntry.objects.filter(
-            project__name='MOCK ccHost')
-        self.assertEqual(portfolio_entries.count(), 0)
-
-        dia.do_what_it_says_on_the_tin()
-        # NB: The task is being run, but the communication with the external data source
-        # is mocked out.
-
-        # Now that we have synchronously run the task, it should be
-        # marked as completed.
-        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
-
-        #
-        # Let's see if the browser's method of checking agrees.
-        #
-
-        # First, request the JSON again.
-        response_after = client.get(gimme_json_url)
-
-        # Ask if background task has been completed. (Hoping for yes.)
-        response_json = simplejson.loads(response_after.content)
-        self.assertEquals(response_json['dias'][0]['pk'], dia.id)
-        self.assert_(response_json['dias'][0]['fields']['completed'])
-
-        # There ought now to be a PortfolioEntry for ccHost...
-        portfolio_entry = PortfolioEntry.objects.get(
-            person=person, project__name='MOCK ccHost')
-
-        # ...and the expected number of citations.
-        citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
-
-        self.assert_(citations.count() > 0)
-
-        # Let's make sure we got the data we expected.
-        partial_citation_dicts = list(
-            citations.values(*data_we_expect[0].keys()))
-        self.assertEqual(partial_citation_dicts, data_we_expect)
-
-        # Let's make sure that these citations are linked with the
-        # DataImportAttempt we used to import them.
-        for n, citation in enumerate(citations):
-            self.assertEqual(citation.data_import_attempt, dia)
-            self.assertEqual(citation.summary, summaries_we_expect[n])
-
 # Mockup of stump's contribution list as given by ohloh, stripped down and
 # slightly tweaked for the purposes of testing.
 stumps_ohloh_results = mock.Mock()
@@ -371,44 +283,6 @@ class Portfolio(TwillTests):
     # zero Citations at the beginning of test_person_gets_data_iff_they_want_it
 
     form_url = "http://openhatch.org/people/portfolio/import/"
-
-    @mock.patch('mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin')
-    def test_create_data_import_attempts(self, mock_do_what_it_says_on_the_tin):
-        """Test profile.views.start_importing_do."""
-
-        paulproteus = Person.objects.get(user__username='paulproteus')
-        input = {
-            'identifier_0': 'paulproteus',
-            'identifier_1': 'asheesh@asheesh.org',
-        }
-
-        self.assertEqual(
-            DataImportAttempt.objects.filter(person=paulproteus).count(),
-            0,
-            "Pre-condition: "
-            "No tasks for paulproteus.")
-        client = self.login_with_client()
-        response = client.post(
-            reverse(mysite.profile.views.prepare_data_import_attempts_do),
-            input)
-        # FIXME: We should also check that we call this function
-        # once for each data source.
-        self.assert_(mock_do_what_it_says_on_the_tin.called)
-
-        self.assertEqual(response.content, "1",
-                         "Post-condition: "
-                         "profile.views.start_importing sent a success message via JSON.")
-
-        for identifier in input.values():
-            for (source_key, _) in DataImportAttempt.SOURCE_CHOICES:
-                self.assertEqual(
-                    DataImportAttempt.objects.filter(
-                        person=paulproteus, source=source_key, query=identifier).count(
-                    ),
-                    1,
-                    "Post-condition: "
-                    "paulproteus has a task recorded in the DB "
-                    "for source %s." % source_key)
 
     def _test_get_import_status(self, client, but_first=None, must_find_nothing=False):
         "Just make sure that the JSON returned by the view is "
@@ -947,78 +821,6 @@ class AddCitationManually(TwillTests):
         # Check that an error is reported in the response.
         self.assert_(
             len(simplejson.loads(response.content)['error_msgs']) == 1)
-
-
-class ReplaceIconWithDefault(TwillTests):
-    fixtures = ['user-paulproteus', 'user-barry',
-                'person-barry', 'person-paulproteus']
-
-    # mock out the django email function
-    @mock.patch("mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong.delay")
-    def test_view(self, send_mail_mock):
-        project = Project.objects.get_or_create(name='project name')[0]
-        portfolio_entry = PortfolioEntry.objects.get_or_create(project=project,
-                                                               person=Person.objects.get(user__username='paulproteus'))[0]
-        url = reverse(mysite.profile.views.replace_icon_with_default)
-        data = {
-            'portfolio_entry__pk': portfolio_entry.pk
-        }
-
-        image_data = open(
-            mysite.account.tests.photo('static/sample-photo.png')).read()
-        portfolio_entry.project.icon_raw.save('', ContentFile(image_data))
-        self.assert_(portfolio_entry.project.icon_raw,
-                     "Expected precondition: project has a nongeneric icon.")
-
-        response = self.login_with_client().post(url, data)
-
-        # Check output
-        response_obj = simplejson.loads(response.content)
-        """response obj will look something like this:
-        {
-            'success': true,
-                'portfolio_entry__pk': 0,
-            }
-                """
-        self.assert_(response_obj['success'])
-        self.assertEqual(
-            response_obj['portfolio_entry__pk'], portfolio_entry.pk)
-
-        # Make sure that all@ was emailed
-        # first check that the task itself was run with the args that we expect
-        self.assert_(send_mail_mock.called)
-
-        expected_call_args = {
-            'project__pk': project.pk,
-            'project__name': project.name,
-            'project_icon_url': "icon_url",
-        }
-        # we have to take [1] here because call_args puts an empty tuple at 0.
-        # this is the empty list of non-kw-args
-        self.assertEqual(send_mail_mock.call_args[1], expected_call_args)
-
-        # TODO: next, make sure that the task itself actually sends an email
-        mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong(
-            **expected_call_args)
-        outbox = django.core.mail.outbox
-        self.assertEqual(len(outbox), 1)
-        sent_msg = outbox[0]
-        subject = '[OH]- ' + project.name + ' icon was marked as incorrect'
-        self.assertEqual(sent_msg.subject, subject)
-
-        # Check that we correctly created our WrongIcon object
-        # note that 'project' still contains the old project data (before the
-        # icon was marked as wrong)
-        wrong_icon = mysite.search.models.WrongIcon.objects.get(
-            project=project)
-        self.assertEqual(wrong_icon.icon_url, project.icon_url)
-        self.assertEqual(wrong_icon.icon_raw, project.icon_raw)
-
-        # Check side-effect
-        portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
-        self.assertFalse(portfolio_entry.project.icon_raw,
-                         "Expected postcondition: portfolio entry's icon evaluates to False "
-                         "because it is generic.")
 
 
 class SavePortfolioEntry(TwillTests):
@@ -2022,7 +1824,7 @@ class EmailForwarderGarbageCollection(TwillTests):
         invalid = create_forwarder('purple@domain.com', 0, 0)
         # with any luck, the below will call this:
         # mysite.profile.models.Forwarder.garbage_collect()
-        mysite.profile.tasks.GarbageCollectForwarders.apply()
+        mysite.profile.tasks.GarbageCollectForwarders().run()
         # valid_new should still be in the database
         # there should be no other forwarders for the address that valid_new
         # has
@@ -2043,7 +1845,7 @@ class EmailForwarderGarbageCollection(TwillTests):
         # Now if we delete both those forwarders, and re-generate, we get one
         # in the DB.
         mysite.profile.models.Forwarder.objects.all().delete()
-        mysite.profile.tasks.GarbageCollectForwarders.apply()
+        mysite.profile.tasks.GarbageCollectForwarders().run()
         forwarders = mysite.profile.models.Forwarder.objects.all()
         self.assertEqual(1, forwarders.count())
 

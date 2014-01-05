@@ -529,12 +529,6 @@ class DataImportAttempt(models.Model):
     def get_formatted_source_description(self):
         return self.get_source_display() % self.query
 
-    def do_what_it_says_on_the_tin(self):
-        """Attempt to import data by enqueuing a job in celery."""
-        # We need to import here to avoid vicious cyclical imports.
-        import mysite.profile.tasks
-        mysite.profile.tasks.FetchPersonDataFromOhloh.delay(self.id)
-
     def __unicode__(self):
         return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.get_source_display(), self.person, self.query)
 
@@ -878,8 +872,6 @@ class Forwarder(models.Model):
     # note about the above: for 3 days, 2 forwarders for the same user work.
     # at worst, you visit someone's profile and find a forwarder that works for 3 more days
     # at best, you visit someone's profile and find a forwarder that works for 5 more days
-    # at worst, we run a postfixifying celery job once every two days for each
-    # user
 
     def generate_table_line(self):
         line = '%s %s' % (self.get_email_address(), self.user.email)
@@ -951,14 +943,14 @@ def update_link_person_tag_cache(sender, instance, **kwargs):
         person__pk = instance.person.pk
     except Person.DoesNotExist:
         return
-    update_person_tag_cache.delay(person__pk=person__pk)
+    update_person_tag_cache(person__pk=person__pk)
     mysite.base.models.Timestamp.update_timestamp_for_string(
         str(Link_Person_Tag))
 
 
 def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache
-    update_someones_pf_cache.delay(instance.person.pk)
+    update_someones_pf_cache(instance.person.pk)
 
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
