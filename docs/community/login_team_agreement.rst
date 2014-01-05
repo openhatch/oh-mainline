@@ -127,7 +127,7 @@ necessary Login Team will clean up such processes without warning.
 **WWW pages**: In general, web space on the OpenHatch Servers is provided
 specifically for the purpose of serving the webapps of OpenHatch itself, whose
 goal is to help OSS projects get new contributors. Using your login account to
-create private 'vanity' pages on Openhatch Servers is discouraged. (Obviously,
+create private 'vanity' pages on OpenHatch Servers is discouraged. (Obviously,
 the OpenHatch web app itself provides a way to create vanity pages; you may
 use that.)
 

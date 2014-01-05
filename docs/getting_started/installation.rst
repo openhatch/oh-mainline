@@ -85,7 +85,7 @@ If your commands are executed successfully, you may continue to the next
 step.
 
 **Note:** For most Django projects, you would need to install the dependencies 
-at this point (using `pip install -r requirements.txt`), but for the Openhatch 
+at this point (using `pip install -r requirements.txt`), but for the OpenHatch 
 project, these packages have been bundled for your convenience in the `vendor` 
 directory, so they don't need to be installed separately.
 
