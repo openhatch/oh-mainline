@@ -1,26 +1,26 @@
 =====================
-How we handle patches
+How we handle contributions
 =====================
 
-We use git/Github to handle patches.  If you're new to git, you may 
+We use git/Github to handle contributions.  If you're new to git, you may
 appreciate `this guide <https://openhatch.org/wiki/Git_Basics#Create_pull_request>`_.
 
-As a patch submitter
+As a pull request submitter
 ====================
 
 Creating a pull request
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Get the latest version of master
-###############################  
+###############################
 
 Before creating a pull request, update the master branch of your local
-repository with the latest version of the OpenHatch-owned repository. In 
-git, you can achieve this by `developing on a branch`_ and rebasing your 
+repository with the latest version of the OpenHatch-owned repository. In
+git, you can achieve this by `developing on a branch`_ and rebasing your
 branch commits on top of master with `git rebase master`_. You can also use
-git rebase -i master for an interactive rebase, in which you can reorder 
+git rebase -i master for an interactive rebase, in which you can reorder
 and edit commits. We prefer rebasing to merging because rebasing preserves
-a linear commit history, which can be easier to keep track of and reason 
+a linear commit history, which can be easier to keep track of and reason
 about.
 
 Test your changes
@@ -43,9 +43,9 @@ Test your changes
 Generate a pull request
 #######################
 
-Generate a pull request by pushing your changes to your personal remote.  
+Generate a pull request by pushing your changes to your personal remote.
 You can then create a pull request to the OpenHatch repository. In the commit
-message, include the issue the pull request addresses. For example: "Closes: 
+message, include the issue the pull request addresses. For example: "Closes:
 http://openhatch.org/bugs/issue398"
 
 .. _developing on a branch: http://www.kernel.org/pub/software/scm/git/docs/gittutorial.html#_managing_branches
@@ -83,9 +83,9 @@ As a patch reviewer
 Apply the patch to your local repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Find the URL of the pull request by going to the main pull request page on 
+Find the URL of the pull request by going to the main pull request page on
 Github and clicking on the link named 'command line'.  Github will give you
-instructions, including the URL of the pull request.  Follow all of the 
+instructions, including the URL of the pull request.  Follow all of the
 instructions except the last one, which tells you to push back to the origin.
 
 Review the patch for correctness and cleanliness
