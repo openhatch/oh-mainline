@@ -123,27 +123,6 @@ class FetchPersonDataFromOhloh:
             raise ValueError, {'code': code, 'url': url}
 
 
-def update_person_tag_cache(person__pk):
-    try:
-        person = mysite.profile.models.Person.objects.get(pk=person__pk)
-    except mysite.profile.models.Person.DoesNotExist:
-        return
-    cache_key = person.get_tag_texts_cache_key()
-    django.core.cache.cache.delete(cache_key)
-
-    # This getter will populate the cache
-    return person.get_tag_texts_for_map()
-
-
-def update_someones_pf_cache(person__pk):
-    person = mysite.profile.models.Person.objects.get(pk=person__pk)
-    cache_key = person.get_cache_key_for_projects()
-    django.core.cache.cache.delete(cache_key)
-
-    # This getter will populate the cache
-    return person.get_display_names_of_nonarchived_projects()
-
-
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
