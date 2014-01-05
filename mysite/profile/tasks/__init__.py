@@ -126,7 +126,7 @@ class FetchPersonDataFromOhloh:
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
-        fill_one_person_recommend_bugs_cache.apply(person_id=person.id)
+        fill_one_person_recommend_bugs_cache(person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
 
 
