@@ -70,7 +70,7 @@ mock_get = mock.Mock()
 mock_get.return_value = None
 
 
-class TwillTests(django.test.TestCase):
+class TwillTests(django.test.TransactionTestCase):
 
     @staticmethod
     def _twill_setup():
