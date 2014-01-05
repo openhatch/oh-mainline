@@ -23,6 +23,10 @@ class Migration:
     
     no_dry_run = True
 
+    depends_on = (
+        ("customs", "0001_webresponse"),
+    )
+
     def forwards(self, orm):
         "Write your forwards migration here"
 

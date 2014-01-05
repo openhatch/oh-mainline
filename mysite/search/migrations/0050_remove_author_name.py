@@ -21,6 +21,10 @@ from mysite.search.models import *
 
 class Migration:
     
+    depends_on = (
+        ("profile", "0001_initial"),
+    )
+
     def forwards(self, orm):
         # Deleting field 'Answer.author_name'
         db.delete_column('search_answer', 'author_name')
