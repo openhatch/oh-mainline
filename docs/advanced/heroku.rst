@@ -164,7 +164,6 @@ Troubleshooting
 * You can verify the status of your application with::
 
   $ heroku ps
-
   === web (1X): `./mysite/manage.py runserver 0.0.0.0:$PORT`
   web.1: up 2014/01/04 13:48:55 (~ 17m ago)
 
