@@ -2950,7 +2950,7 @@ class TestBreakLongWordsFilter(TwillTests):
 
     def test_simple_break(self):
         nine_chars = 'abcdefghi'
-        nine_chars_plus_wbr = 'abcdefgh<wbr />i'
+        nine_chars_plus_wbr = u'abcdefgh\u200bi'
         output = mysite.profile.templatetags.profile_extras.break_long_words(
             nine_chars)
         self.assertEqual(output, nine_chars_plus_wbr)

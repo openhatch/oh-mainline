@@ -121,7 +121,7 @@ def break_long_words(value, max_word_length=8):
         if word:
             broken_words += re_too_many_letters_in_a_row.split(word)
     broken_words = filter(lambda x: x, broken_words)
-    return "<wbr />".join(broken_words)
+    return u"\u200B".join(broken_words)
 
 
 @register.filter
