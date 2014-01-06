@@ -323,7 +323,7 @@
                         <a href='{{uri_scheme}}://{{ url_prefix }}{% url mysite.project.views.project project.name %}'>
                             <img alt='logo' title='{{ project.display_name}}'
                             src='{{uri_scheme}}://{{ url_prefix }}{% version project.get_url_of_badge_size_icon_or_generic %}' width='40'/>
-                            <div class='project-name'>{{ project.display_name|break_long_words|safe }}</div>
+                            <div class='project-name'>{{ project.display_name|break_long_words }}</div>
                         </a>
                     </div>
                 </div>
