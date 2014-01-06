@@ -19,6 +19,7 @@
 from django import template
 import re
 from django.utils.html import escape
+import django.utils.html
 from urlparse import urlparse
 import logging
 
@@ -96,24 +97,14 @@ def sub(value, arg):
 
 
 def break_long_words(value, max_word_length=8):
-    # if the word is really long, insert a <wbr> occasionally.
+    '''This filter does two things:
 
-    # We really want "value" to be Unicode. Sometimes it is, and sometimes it
-    # isn't. So...
-    if type(value) == str:
-        # Django 2.6 sometimes gives us the empty string as '', not u''.
-        # Are there other cases where we do get a byte string, not a Unicode
-        # string?
-        if value != '':
-            logging.warn(
-                "Wanted %r to be unicode. Instead it's %s. Moving on with life." %
-                (value, type(value)))
+    * It removes all HTML tags from the input.
 
-        # In all cases, I guess we should just buckle up and move on with life.
-        value = unicode(value, 'utf-8')
-
+    * It then adds a Unicode non-breaking spaces between long words.'''
+    tagless = django.utils.html.strip_tags(value)
     re_capitalized_word = re.compile(r'([A-Z][a-z][a-z]+)', re.UNICODE)
-    words = re_capitalized_word.split(value)
+    words = re_capitalized_word.split(tagless)
     re_too_many_letters_in_a_row = re.compile(
         r'([\w]{%d}|[.\_^/])' % max_word_length, re.UNICODE)
     broken_words = []
