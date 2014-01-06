@@ -30,6 +30,7 @@ import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
 import mysite.profile.view_helpers
+import mysite.profile.templatetags.profile_extras
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
@@ -2939,5 +2940,19 @@ class TestUserDeletion(TwillTests):
         self.assertFalse(django.contrib.auth.models.User.objects.filter(
             username='barry'))
         self.assertEqual(2, len(django.core.mail.outbox))
+
+class TestBreakLongWordsFilter(TwillTests):
+    def test_too_shirt_to_break(self):
+        eight_chars = 'abcdefgh'
+        output = mysite.profile.templatetags.profile_extras.break_long_words(
+            eight_chars)
+        self.assertEqual(output, eight_chars)
+
+    def test_simple_break(self):
+        nine_chars = 'abcdefghi'
+        nine_chars_plus_wbr = 'abcdefgh<wbr />i'
+        output = mysite.profile.templatetags.profile_extras.break_long_words(
+            nine_chars)
+        self.assertEqual(output, nine_chars_plus_wbr)
 
 # vim: set ai et ts=4 sw=4 nu:
