@@ -260,9 +260,6 @@ urlpatterns = patterns('',
                        (r'^people/$',
                         'mysite.profile.views.people'),
 
-                       (r'^\+profile_api/location_data/$',
-                        mysite.profile.views.LocationDataApiView.as_view()),
-
                        (r'^\+people/list/$', lambda x:
                         HttpResponsePermanentRedirect('/people/')),
 
