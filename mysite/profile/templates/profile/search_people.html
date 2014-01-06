@@ -192,43 +192,37 @@ People Search
                     <span>{{ people|length }}</span>
                     {{ people|length|pluralize:"person,people" }}
             </span>
-            <span class='dont_show_until_map_loads'>
-            &middot;
-                <span id='how_many_people_are_visible'></span> visible on the map<span style="display: none;" id="people_without_locations">, including those with no location set <a id='about_uninhabited_island' href='#'>(?)</a></span>.
-                <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
-            </span>
 
         </div>
     </div><!-- /#search_summary -->
 
     {% if people %}
 
-    {% comment %}
-        Google loads a map here -- replacing #map_loading_msg, among other things.
-        The background image will hide, as intended, a few seconds after page load.
-        However, this doesn't seem to work properly when the image is specified
-        via an external stylesheet.
-    {% endcomment %}
-    <div id="map_canvas">
-      <noscript>
-	<p>If you enable JavaScript, you'll see a map here.</p>
-      </noscript>
-    </div>
-
     {# Here's the big list of everybody with an account on the site. #}
     <div id="results">
-    <ul class="people-list people-list-map{%if center_json and not geocode_failed %} dont_show_until_map_loads{%endif%}">
+    <ul class="people-list people-list-map">
+        {% for person in people|slice:":1000" %}
+                {% if person.user.first_name and person.user.last_name %}
+                    <div>
+                        <a class="person" href="/people/{{person.user.username}}">
+                            {{person.user.first_name}} {{person.user.last_name}}
+                        </a> {{person.location_display_name}}
+                    </div>
+                {% else %}
+                    <div>
+                        <a class="person" href="/people/{{person.user.username}}">
+                            {{person.user.username}}
+                        </a> {{person.location_display_name}}
+                    </div>
+                 {% endif %}
+        {% endfor %}
+        {% if people|length >= 1000 %}
+            <div>and {{ people|length|add:"-1000" }} more users.</div>
+        {% endif %}
     </ul>
-    <p>Loading the map...</p>
+    
     </div>
 
-    {% endif %}
-
-    {% if not user.is_authenticated and people %}
-            <span style="float: right; padding: 5px 0 0 0;">
-                <a href="{% url account.views.set_location %}">
-                    Add yourself to the map&nbsp;&raquo;</a>
-            </span>
     {% endif %}
 
     {% if q and matching_project_suggestions %}
@@ -262,44 +256,3 @@ People Search
     {% endif %}
 
 {% endblock people_main %}
-
-{% block js_in_head %}
-{{ block.super }}
-    <script src="http://openlayers.org/api/OpenLayers.js"></script>
-    <script src="/static/js/profile/map-v2.js?1322161889"></script>
-{% endblock %}
-
-
-{% block js_before_bundle %}
-    <script type="text/javascript">
-        {% comment %}
-        Normally, we nudge user about the location when they click the
-        uninhabited island question mark.
-        {% endcomment %}
-        nudgeUserAboutLocation = true;
-
-        {% if user.get_profile.location_is_public %}
-        {# Unless they've confirmed the display of a location. #}
-        nudgeUserAboutLocation = false;
-        {% endif %}
-    </script>
-
-{% endblock js_before_bundle %}
-
-{% block js %}
-{{ block.super }}
-<script type="text/javascript">
-var person_ids = {{ person_ids|safe }};
-$(init);
-</script>
-{% endblock js %}
-
-{% block js_tests %}
-{% comment %}
-    This block only shows up if this page has a query string with ?test=1.
-    These are JavaScript unit tests. Unless /static/js/tester.js has changed,
-    they will run with FireUnit <http://fireunit.org>, which is an extension for
-    Firebug <http://getfirebug.com>.
-{% endcomment %}
-<script type='text/javascript' src="/static/js/profile/map-tests.js"></script>
-{% endblock js_tests %}

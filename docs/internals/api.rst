@@ -39,22 +39,3 @@ the Tastypie Django app.
 More information:
 
 * Django Tastypie documentation: http://django-tastypie.readthedocs.org/en/latest/toc.html
-
-Profile API (for location data)
-===============================
-
-The URL /+profile_api/location_data/ accepts IDs as input through the
-*person_ids* parameter, and it returns a JSON dictionary with user IDs
-and values of a dictionary of data about the user.
-
-(This "API" is implemented in mysite/profile/views.py, and it doesn't
-use any sort of API system like Tastypie. We should probably convert
-it to use Tastypie.)
-
-If you want to try this URL with cURL, try running this command from
-your computer's command prompt::
-
- curl http://127.0.0.1:8000/+profile_api/location_data/?person_ids=1,2,3,4
-
-You should see JSON data with location and other information for those
-person IDs.
