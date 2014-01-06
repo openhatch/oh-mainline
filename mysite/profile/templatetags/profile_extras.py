@@ -101,7 +101,12 @@ def break_long_words(value, max_word_length=8):
 
     * It removes all HTML tags from the input.
 
-    * It then adds a Unicode non-breaking spaces between long words.'''
+    * It then adds a Unicode non-breaking spaces between long words.
+
+    Even though this called striptags earlier, it should not
+    be considered a "safe" string. It is essential that any consumer
+    of this function permit Django's default template escaping
+    apply to the output.'''
     tagless = django.utils.html.strip_tags(value)
     re_capitalized_word = re.compile(r'([A-Z][a-z][a-z]+)', re.UNICODE)
     words = re_capitalized_word.split(tagless)
