@@ -83,10 +83,31 @@ As a patch reviewer
 Apply the patch to your local repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Find the URL of the pull request by going to the main pull request page on 
-Github and clicking on the link named 'command line'.  Github will give you
-instructions, including the URL of the pull request.  Follow all of the 
-instructions except the last one, which tells you to push back to the origin.
+Follow these steps to view the patch in your local repository:
+
+    1. Tell your computer where to access the patch by adding a remote::
+
+        git remote add $username-of-submitter https://github.com/$username-of-submitter/oh-mainline.git
+       
+       Where $username-of-submitter should be the submitter's github username.
+       (Technically you can call the remote whatever you want, but it's
+       nice to give things simple, accurate names.)
+
+    2. Get the patch from Github::
+
+        git fetch $username-of-submitter
+
+    3. Create a new branch to view the changes in::
+
+        git checkout $username-of-submitter/$branch -b $branch
+
+       You can figure out what branch was submitted in the pull request by
+       looking at the top of the request, where Github helpfully displays 
+       the text "$username wants to merge X commits into openhatch:master
+       from $username:$branch".
+
+You should now be able to review and test the changes.
+
 
 Review the patch for correctness and cleanliness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,9 +132,13 @@ Things to think about:
 Push and deploy
 ~~~~~~~~~~~~~~~
 
-You might need to rope someone else in for this. Anyone in the `Login team <http://openhatch.readthedocs.org/en/latest/community/login_team.html>`_ can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the
-traditional person to do this, but it's good to ask someone else so they get
-practice!
+If you want to deploy the changes, and you have push access to the repository, you 
+can do so by following the steps listed in the section labeled `Deployment <http://openhatch.readthedocs.org/en/latest/advanced/deployment.html>`_.
+
+If you don't have push access, you will need to rope someone else in for this. Anyone 
+in the `Login team <http://openhatch.readthedocs.org/en/latest/community/login_team.html>`_ 
+can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the traditional 
+person to do this, but it's good to ask someone else so they get practice!
 
 Things to know:
 
