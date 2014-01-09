@@ -4,6 +4,9 @@
 set -e
 
 BASE_DIR="/var/web/inside.openhatch.org/crawl-logs"
+if [ ! -z "$1" ] ; then
+    BASE_DIR="$1"
+fi
 BUG_TRACKER_LIST="$(mktemp --suffix=.yaml /tmp/bug-trackers.$(date -I).XXXX)"
 SCRAPY_RESULT_FILE="$(mktemp --suffix=.jsonlines /tmp/scrapy-results.$(date -I).XXXX)"
 SCRAPY_LOG="$(mktemp --suffix=.log $BASE_DIR/scrapy.$(date -I).XXXX)"
