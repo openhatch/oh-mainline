@@ -549,7 +549,7 @@ drawAddCitationForm = function() {
 
 Notifier = {};
 Notifier.displayMessage = function(message) {
-    $.jGrowl(message, {'life': 5000});
+    $.jGrowl($('<div/>').text(message)).html(), {'life': 5000});
 };
 
 /******************
