@@ -55,6 +55,20 @@ Recommended way to use the deploy script
 It's really important to make the separate branch so that you don't accidentally
 push random local work into the live site.
 
+Notes about the deployment
+==========================
+
+Here are some relevant details of how web requests get routed to the OpenHatch code.
+
+* Web requests hit CloudFlare, which proxies them to linode.openhatch.org.
+
+* linode.openhatch.org has an nginx that dispatches them to Apache.
+
+* Apache mod_wsgi dispatches them to the mysite/scripts/app.wsgi.
+
+* In production, we use a mysite/local_settings.py file that imports mysite/deployment_settings.py and overrides the Django SECRET_KEY.
+
+
 Other sites we host
 ===================
 
