@@ -439,15 +439,13 @@ def people(request):
     data = {}
 
     # pull in q from GET
-    query = request.GET.get('q', '')
-
+    query_person = request.GET.get('q', '')
+    query_mentors = request.GET.get('can_mentor:', '')
+    query_people_who_understand = request.GET.get('understands:', '')
+    full_query = query_person + query_mentors + query_people_who_understand
     # Store the raw query in the template data
-    data['raw_query'] = query
-
     # Parse the query, and store that in the template.
-    parsed_query = mysite.profile.view_helpers.parse_string_query(query)
-    data.update(parsed_query)
-
+    parsed_query = mysite.profile.view_helpers.parse_string_query(full_query)
     # Get the list of people to display.
     if parsed_query['q'].strip():
         search_results = parsed_query['callable_searcher']()

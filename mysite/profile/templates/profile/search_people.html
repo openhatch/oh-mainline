@@ -41,22 +41,22 @@ People Search
     <form action=".">
         <div id='search'>
             <div class='keyword field'>
-                <label for='search_profiles'>Search for</label>
-                <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
+                <label for='search_profiles'>Search for a person's name</label>
+                <input id='search_profiles' type='text' width="18" value="{{ raw_query }}" name="q">
             </div>
-            <div class='location field'>
-              <div class="input-and-labels">
-                <label for='location_for_map_centering'>Near</label>
-                <p class="map-error">We couldn't find that location.</p>
-                <input id="location_for_map_centering" name="center"
-                       type="text" value="{{ center_name }}"/>
-          </div>
+            <div class='keyword field'>
+                <label for='search_profiles'>Search for mentors in</label>
+                <input id='search_profiles' type='text' width="18" value="{{ raw_query }}" name="can_mentor:">
             </div>
-            <div class='stubmit field'>
+            <div class='keyword field'>
+                <label for='search_profiles'>Search for people who understand</label>
+                <input id='search_profiles' type='text' width="18" value="{{ raw_query }}" name="understands:">
+            </div>
+            </div>
+            <div class='submit field'>
               <div class="input-and-labels">
-                <label for='search_locations'>&nbsp;</label>
-                <input id="center_the_map" type="submit" value="Search"/>
-          </div>
+                <input type="submit" value="Search"/>
+              </div>
             </div>
             
         </div>
@@ -216,7 +216,9 @@ People Search
                     </div>
                  {% endif %}
         {% endfor %}
-    <div>and {{ people|length|add:"-1000" }} more users.</div>
+     {% if people|length >= 1000 %}
+        <div>and {{ people|length|add:"-1000" }} more users.</div>
+    {% endif %}
     </ul>
     
     </div>
