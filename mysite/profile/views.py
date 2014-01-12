@@ -439,15 +439,13 @@ def people(request):
     data = {}
 
     # pull in q from GET
-    query = request.GET.get('q', '')
-
+    query_person = request.GET.get('q', '')
+    query_mentors = request.GET.get('can_mentor:', '')
+    query_people_who_understand = request.GET.get('understands:', '')
+    full_query = query_person + query_mentors + query_people_who_understand
     # Store the raw query in the template data
-    data['raw_query'] = query
-
     # Parse the query, and store that in the template.
-    parsed_query = mysite.profile.view_helpers.parse_string_query(query)
-    data.update(parsed_query)
-
+    parsed_query = mysite.profile.view_helpers.parse_string_query(full_query)
     # Get the list of people to display.
     if parsed_query['q'].strip():
         search_results = parsed_query['callable_searcher']()
@@ -934,85 +932,5 @@ def bug_recommendation_list_as_template_fragment(request):
     return HttpResponse(simplejson.dumps(response_data), mimetype='application/json')
 
 # API-y views go below here
-
-
-class LocationDataApiView(django.views.generic.View):
-    # Entry point for requests from the web
-
-    def get(self, request):
-        person_ids = self.extract_person_ids(request.GET)
-        data_dict = self.raw_data_for_person_ids(person_ids)
-        as_json = simplejson.dumps(data_dict)
-        return HttpResponse(as_json, mimetype='application/javascript')
-
-    # Helper functions
-    @staticmethod
-    def raw_data_for_person_ids(person_ids):
-        persons = mysite.profile.models.Person.objects.filter(
-            id__in=person_ids).select_related()
-        return LocationDataApiView.raw_data_for_person_collection(persons)
-
-    @staticmethod
-    def raw_data_for_person_collection(people):
-        person_id2data = dict([
-            (person.pk,
-             LocationDataApiView.raw_data_for_one_person(person))
-            for person in people])
-        return person_id2data
-
-    @staticmethod
-    def raw_data_for_one_person(person):
-        location = person.get_public_location_or_default()
-        name = person.get_full_name_or_username()
-        ret = {
-            'name': name,
-            'location': location,
-        }
-        ret['lat_long_data'] = {
-            'is_inaccessible': (location == mysite.profile.models.DEFAULT_LOCATION),
-            'latitude': person.get_public_latitude_or_default(),
-            'longitude': person.get_public_longitude_or_default(),
-        }
-        extra_person_info = {'username': person.user.username,
-                             'photo_thumbnail_url': person.get_photo_url_or_default(),
-                             }
-        ret['extra_person_info'] = extra_person_info
-        return ret
-
-    @staticmethod
-    def range_from_string(s):
-        on_hyphens = s.split('-')
-        if len(on_hyphens) != 2:
-            return None
-
-        try:
-            from_, to = map(int, on_hyphens)
-        except ValueError:
-            return None
-
-        return range(from_, to + 1)
-
-    @staticmethod
-    def extract_person_ids(get_data):
-        person_ids_as_string = get_data.get('person_ids', '')
-        id_set = set()
-        if not person_ids_as_string:
-            return id_set
-
-        splitted_from_commas = person_ids_as_string.split(',')
-        for item in splitted_from_commas:
-            if '-' in item:
-                as_ints = LocationDataApiView.range_from_string(item)
-                if as_ints is not None:
-                    id_set.update(as_ints)
-                continue
-
-            try:
-                as_int = int(item)
-            except ValueError:
-                continue
-            id_set.add(as_int)
-        return id_set
-
 
 # vim: ai ts=3 sts=4 et sw=4 nu
