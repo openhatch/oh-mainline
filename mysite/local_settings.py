@@ -1,0 +1,1 @@
+DOWNLOADED_GEOLITECITY_PATH  = "/usr/local/share/GeoIp/GeoLiteCity.dat"
