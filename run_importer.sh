@@ -28,7 +28,7 @@ fi
 URL=https://openhatch.org/+api/v1/customs/tracker_model/\?just_stale\=yes\&format\=yaml\&limit\="$MAX_TRACKERS"\&tracker_id="$TRACKER_ID"
 
 # It's OK if curl has to try 4 times.
-(curl "$URL" || curl "$URL" || curl "$URL" || curl "$URL" -O-) > "$BUG_TRACKER_LIST"
+(curl "$URL" || curl "$URL" || curl "$URL" || curl "$URL") > "$BUG_TRACKER_LIST"
 
 pushd ../oh-bugimporters
 env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FILE"
