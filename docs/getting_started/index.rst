@@ -9,6 +9,6 @@ Confused?  `Contact us <http://openhatch.readthedocs.org/en/latest/contributor/c
 
     getting_started
     installation
-    handling_patches
+    handling_contributions
     documentation
     project_overview
