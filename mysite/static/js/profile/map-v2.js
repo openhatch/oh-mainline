@@ -57,6 +57,7 @@ function handleResults(data) {
 
     for (key in data) {
 	if (data.hasOwnProperty(key)) {
+        if(key !== 'center') {
             person = data[key];
             feature = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(
 		person.lat_long_data.longitude,
@@ -64,6 +65,20 @@ function handleResults(data) {
 						    {'name':person.name, 'location': person.location, 'all_data': person});
             feature.geometry.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
             features.push(feature);
+        } else {
+            coords = data[key];
+            if(!coords.is_inaccessible && 'latitude' in coords && 'longitude' in coords) {
+                /*Since we the map is in a different projection than latitude and longitude, we need to transform
+                  the coordinates to the projection the map is using */
+                var proj900913 = new OpenLayers.Projection("EPSG:900913");
+                var mapProj = new OpenLayers.Projection(map.projection);
+                var lonLat = new OpenLayers.LonLat(coords.longitude, coords.latitude)   
+                lonLat = lonLat.transform(mapProj, proj900913);
+                // Set the map center to the location in the query, and set the zoom level to 6 to provide
+                // a reasonable amount of locality
+                map.setCenter(lonLat, 6);
+            }
+        }
 	}
     }
     layer.destroyFeatures();
@@ -96,7 +111,7 @@ function init() {
     map.addLayer(layer);
     s.activate();
     map.setCenter(new OpenLayers.LonLat(0, 0), 1);
-    var query_string = 'person_ids=' + person_ids;
+    var query_string = 'person_ids=' + person_ids + '&center=' + center_name;
     jQuery.getJSON("/+profile_api/location_data/?" + query_string, handleResults);
     map.events.register("moveend", null, drawResults);
 }

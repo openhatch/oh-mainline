@@ -448,6 +448,8 @@ def people(request):
     parsed_query = mysite.profile.view_helpers.parse_string_query(query)
     data.update(parsed_query)
 
+    as_string = mysite.base.view_helpers.cached_geocoding_in_json(request.GET.get(u'center',u''))
+
     # Get the list of people to display.
     if parsed_query['q'].strip():
         search_results = parsed_query['callable_searcher']()
@@ -469,6 +471,9 @@ def people(request):
             person_ids += '%d-%d,' % (stop, start)
 
     data['person_ids'] = simplejson.dumps(person_ids)
+    center_name = request.GET.get('center', '')
+    data['center_name_raw'] = center_name
+    data['center_name'] = simplejson.dumps(center_name)
     return (request, 'profile/search_people.html', data)
 
 
@@ -942,10 +947,22 @@ class LocationDataApiView(django.views.generic.View):
     def get(self, request):
         person_ids = self.extract_person_ids(request.GET)
         data_dict = self.raw_data_for_person_ids(person_ids)
+        center_location = self.get_center_location(request.GET)
+        if center_location:
+            data_dict['center'] = center_location
         as_json = simplejson.dumps(data_dict)
         return HttpResponse(as_json, mimetype='application/javascript')
 
     # Helper functions
+    @staticmethod
+    def get_center_location(get_data):
+        center = get_data.get(u'center', u'')
+        if center == u'':
+            return {}
+        as_string = mysite.base.view_helpers.cached_geocoding_in_json(center)
+        as_dict = simplejson.loads(as_string)
+        return as_dict
+
     @staticmethod
     def raw_data_for_person_ids(person_ids):
         persons = mysite.profile.models.Person.objects.filter(

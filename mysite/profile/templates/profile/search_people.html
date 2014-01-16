@@ -49,7 +49,7 @@ People Search
                 <label for='location_for_map_centering'>Near</label>
                 <p class="map-error">We couldn't find that location.</p>
                 <input id="location_for_map_centering" name="center"
-                       type="text" value="{{ center_name }}"/>
+                       type="text" value="{{ center_name_raw }}"/>
           </div>
             </div>
             <div class='stubmit field'>
@@ -290,6 +290,7 @@ People Search
 {{ block.super }}
 <script type="text/javascript">
 var person_ids = {{ person_ids|safe }};
+var center_name = {{ center_name|safe }};
 $(init);
 </script>
 {% endblock js %}
