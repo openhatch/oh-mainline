@@ -77,23 +77,23 @@ Permit us to share your work
         can be shared under the terms of CC Zero 1.0.
 
 
-As a patch reviewer
-===================
+As a contribution reviewer
+==========================
 
-Apply the patch to your local repository
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Apply the pull request to your local repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Find the URL of the pull request by going to the main pull request page on
 Github and clicking on the link named 'command line'.  Github will give you
 instructions, including the URL of the pull request.  Follow all of the
 instructions except the last one, which tells you to push back to the origin.
 
-Review the patch for correctness and cleanliness
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Review the pull request for correctness and cleanliness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Things to think about:
 
-    1. Does the patch make sense? Does it look readable?::
+    1. Does the pull request make sense? Does it look readable?::
 
         git log -p
 
@@ -104,8 +104,8 @@ Things to think about:
        option'."
 
     3. If you have revisions you'd like to see made, change the issue status to
-       "in-progress", re-assign the issue to the patch submitter if it isn't
-       already, and leave your review feedback on the pull request.
+       "in-progress", re-assign the issue to the pull request submitter if
+       it isn't already, and leave your review feedback on the pull request.
 
 
 Push and deploy
