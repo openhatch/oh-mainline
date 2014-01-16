@@ -1,18 +1,18 @@
-=====================
+===========================
 How we handle contributions
-=====================
+===========================
 
 We use git/Github to handle contributions.  If you're new to git, you may
 appreciate `this guide <https://openhatch.org/wiki/Git_Basics#Create_pull_request>`_.
 
 As a pull request submitter
-====================
+===========================
 
 Creating a pull request
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Get the latest version of master
-###############################
+################################
 
 Before creating a pull request, update the master branch of your local
 repository with the latest version of the OpenHatch-owned repository. In
@@ -54,7 +54,7 @@ http://openhatch.org/bugs/issue398"
 
 
 Submitting a pull request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
     1. Add a link to the pull request in the issue ticket at https://openhatch.org/bugs.
     2. Change the issue status to "need-review".
