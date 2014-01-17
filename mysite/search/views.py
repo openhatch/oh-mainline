@@ -28,13 +28,12 @@ except ImportError:
 from mysite.search.models import Project
 import mysite.search.view_helpers
 import mysite.base.view_helpers
-import mysite.base.unicode_sanity
 from mysite.base.view_helpers import render_response
 
 import datetime
 from dateutil import tz
 import pytz
-from django.utils import simplejson
+from django.utils import simplejson, http
 import mysite.search.forms
 import mysite.base.decorators
 
@@ -57,7 +56,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
         new_GET = {}
         for key in request.GET.keys():
             new_GET[key.lower()] = request.GET[key]
-        return HttpResponseRedirect(reverse(search_index) + '?' + mysite.base.unicode_sanity.urlencode(new_GET))
+        return HttpResponseRedirect(reverse(search_index) + '?' + http.urlencode(new_GET))
 
     if request.user.is_authenticated():
         person = request.user.get_profile()
@@ -117,8 +116,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
-    data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(
-        request.GET)
+    data['this_page_query_str'] = http.urlencode(request.GET)
 
     is_this_page_1 = (start <= 1)
     is_this_the_last_page = (end >= (total_bug_count - 1))
