@@ -41,10 +41,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
+from django.utils import http
 
 # OpenHatch apps
 import mysite.base.view_helpers
-import mysite.base.unicode_sanity
 import mysite.profile.view_helpers
 from mysite.profile.models import \
     Person, Tag, TagType, \
@@ -428,8 +428,8 @@ def permanent_redirect_to_people_search(request, property, value):
 
     q = '%s:%s' % (property, escaped_value)
     get_args = {u'q': q}
-    destination_url = (reverse('mysite.profile.views.people') + '?' +
-                       mysite.base.unicode_sanity.urlencode(get_args))
+    destination_url = (reverse('mysite.profile.views.people') + '?' + 
+                       http.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
 
