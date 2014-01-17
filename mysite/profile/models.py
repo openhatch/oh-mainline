@@ -25,7 +25,6 @@ from mysite.search.models import Project, get_image_data_scaled
 import mysite.customs.models
 import mysite.profile.view_helpers
 import mysite.base.models
-import mysite.base.unicode_sanity
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -34,6 +33,7 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.utils import http
 
 import datetime
 import uuid
@@ -830,8 +830,7 @@ class Citation(models.Model):
                     try:
                         project_name = unicode(
                             self.portfolio_entry.project.name, 'utf-8')
-                        return "http://www.ohloh.net/search?%s" % mysite.base.unicode_sanity.urlencode(
-                            {u'q': project_name})
+                        return "http://www.ohloh.net/search?%s" % http.urlencode({u'q': project_name})
                     except:
                         logging.warn(
                             "During Citation.get_url_or_guess, we failed to encode the project name correctly.")
