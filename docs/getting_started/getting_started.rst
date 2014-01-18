@@ -77,7 +77,7 @@ You can find things to work on by browsing our `bug tracker`_ or asking us!
 .. _bug tracker: http://openhatch.org/bugs/
 
 
-Start contributing patches!
+Start contributing!
 ===========================
 
 We mark issues that are particularly good for new contributors with the
@@ -89,8 +89,8 @@ bug tracker). If it is assigned to someone already, but it looks like they
 haven't gotten around to working on it, leave a note on the ticket saying that
 you are interested in taking it (you can also try asking on IRC).
 
-When you are ready to submit a patch for an issue, follow the guidelines at
-:doc:`/getting_started/handling_patches`.
+When you are ready to submit a contribution for an issue, follow the guidelines at
+:doc:`/getting_started/handling_contributions`.
 
 If you ever feel like you are getting stuck or could use some design feedback,
 don't hesitate to ask for help on the IRC channel, on the devel mailing list,
