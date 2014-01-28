@@ -389,16 +389,16 @@ def invite_someone(request, form=None, success_message=''):
     remaining_invites = InvitationKey.objects.remaining_invitations_for_user(
         request.user)
 
-    if request.GET.get('invited', None):
-        account_notification = "Email has been sent."
+    if request.GET.get('invited'):
+        account_notification = 'E-mail has been sent.'
     else:
-        account_notification = ""
+        account_notification = ''
 
     return (request, 'account/invite_someone.html', {
             'success_message': success_message,
             'invite_someone_form': invite_someone_form,
             'remaining_invites': remaining_invites,
-            'account_notification': account_notification
+            'account_notification': account_notification,
             })
 
 
