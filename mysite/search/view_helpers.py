@@ -149,7 +149,7 @@ class Query:
         if connection.vendor == 'sqlite':
             use_regexes = False
         else:
-            use_regexes = True
+            use_regexes = False # HACK for now, while Hacker News is visiting
 
         for word in self.terms:
             if use_regexes:
