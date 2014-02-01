@@ -44,27 +44,30 @@ document.documentElement.className = 'javascript_is_enabled';
 
     <div class="module" id="landing-module">
         <div class="module-body">
-            <p id="landing-message"><img src="/static/images/penguin.png" style="float: left; padding: 0 20px 20px 10px;" height="120" /><a href="/about/" title="Community for free and open source software">OpenHatch</a> is a <a href="/about/">non-profit</a> dedicated to matching prospective free software contributors with communities, tools, and education.
-	      </p>
+            <p id="landing-message">
+                <img class="penguin" src="/static/images/penguin.png" /><a href="/about/" title="Community for free and open source software">OpenHatch</a> is a <a href="/about/">non-profit</a> dedicated to matching prospective free software contributors with communities, tools, and education.
+	</p>
 
+            </br><p id="landing-message">We provide online tools for new contributors</p>
             <div class="submodule-container">
                 <div class="submodule">
-                    <h4><a href='{% url mysite.missions.base.views.main_page %}'>build skills</a></h4>
+                    <h4><a href='{% url mysite.missions.base.views.main_page %}'>Build skills</a></h4>
                     <p>practice with common <abbr title="Free, open source software">FOSS</abbr> technologies with our <a href='{% url mysite.missions.base.views.main_page %}'>training missions &raquo;</a></p>
                 </div>
                 <div class="submodule">
-                    <h4><a href='{% url mysite.search.views.search_index %}'>find a project</a></h4>
+                    <h4><a href='{% url mysite.search.views.search_index %}'>Find a project</a></h4>
                     <p>browse tasks across open source <a href='{% url mysite.search.views.search_index %}'>by skill, difficulty, or project &raquo;</a></p>
                 </div>
                 <div class="submodule">
-                    <h4><a href="/events/">attend events</a></h4>
-                    <p>discover tutorials, project nights, and other <a href="/events/">online and face-to-face events &raquo;</a></p>
+                    <h4><a href="/events/">Get help</a></h4>
+                    <p>ask us questions about <a href="https://openhatch.org/wiki/Contact">finding projects and contributing  &raquo;</a></p>
                 </div>
                 <div class="submodule">
-                    <h4><a href='/guide/'>open up your project</a></h4>
-                    <p>use this site to <a href='/guide/'>make your favorite project more friendly &raquo;</a></p>
+                    <h4><a href='/guide/'>Add your project</a></h4>
+                    <p>use this site to <a href='/guide/'>make your favorite project more welcoming &raquo;</a></p>
                 </div>
             </div>
+             {% include 'outreach.html' %}
         </div>
     </div>
 
