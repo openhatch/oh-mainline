@@ -31,7 +31,7 @@ def summary2html(html_string):
 
 
 def _blog_entries():
-    if django.conf.settings.DEPRESSINGLY_BREAK_FRONT_PAGE_BLOG_FEED:
+    if True: # HN HACK
         return []
     try:
         text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
