@@ -34,8 +34,8 @@ def _blog_entries():
     if django.conf.settings.DEPRESSINGLY_BREAK_FRONT_PAGE_BLOG_FEED:
         return []
     try:
-        # text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
-        # content = text.encode('utf-8', 'ignore')
+        text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
+        content = text.encode('utf-8', 'ignore')
     except requests.exceptions.Timeout:
         content = ''
 
