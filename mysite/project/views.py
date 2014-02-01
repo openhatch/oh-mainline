@@ -33,6 +33,7 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
 from django.utils.datastructures import MultiValueDictKeyError
+from django.utils import http
 
 
 def create_project_page_do(request):
@@ -252,8 +253,7 @@ def create_answer_do(request):
         # If user isn't logged in, send them to the login page with next
         # parameter populated.
         url = reverse('oh_login')
-        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
-                                                           unicode(answer.project.get_url())})
+        url += "?" + http.urlencode({u'next':unicode(answer.project.get_url())})
         return HttpResponseRedirect(url)
     else:
         answer.author = request.user
@@ -350,8 +350,7 @@ def wanna_help_do(request):
         # parameter populated.
         url = reverse('oh_login')
         url += "?"
-        url += mysite.base.unicode_sanity.urlencode({u'next':
-                                                     unicode(project.get_url()) + '?wanna_help=true'})
+        url += http.urlencode({u'next':unicode(project.get_url()) + '?wanna_help=true'})
         if request.is_ajax():
             return HttpResponse("redirect: " + url)
         else:

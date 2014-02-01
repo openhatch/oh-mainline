@@ -18,7 +18,6 @@
 # This file is just a wrapper around the Ohloh.net API that helps
 # us get icons for projects.
 
-import mysite.base.unicode_sanity
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 import urllib
@@ -26,6 +25,7 @@ import urllib2
 import cStringIO as StringIO
 from django.conf import settings
 import mysite.customs.models
+from django.utils import http
 
 
 def uni_text(s):
@@ -57,7 +57,7 @@ def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None, person=No
     # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
 
-    encoded = mysite.base.unicode_sanity.urlencode(params)
+    encoded = http.urlencode(params)
     url += encoded
     try:
         b = mysite.customs.mechanize_helpers.mechanize_get(url, person)

@@ -17,7 +17,6 @@
 
 import mysite.search.models
 import mysite.search.views
-import mysite.base.unicode_sanity
 import mysite.base.decorators
 import re
 import hashlib
@@ -25,6 +24,7 @@ import django.core.cache
 from django.db import connection
 from django.db.models import Q, Count
 import logging
+from django.utils import http
 
 CCT = 'hit_count_cache_timestamp'
 
@@ -191,7 +191,7 @@ class Query:
             u'q': unicode(self.terms_string),
             unicode(facet_name): unicode(option_name),
         })
-        query_string = mysite.base.unicode_sanity.urlencode(GET_data)
+        query_string = http.urlencode(GET_data)
         query = Query.create_from_GET_data(GET_data)
         the_all_option = u'any'
         name = option_name or the_all_option
@@ -422,7 +422,7 @@ class Query:
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
-        query_string = mysite.base.unicode_sanity.urlencode(GET_data)
+        query_string = http.urlencode(GET_data)
         logging.info("Query is " + query_string)
         return query_string
 

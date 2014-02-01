@@ -38,6 +38,7 @@ import mysite.customs.ohloh
 import mysite.base.depends
 import mysite.base.decorators
 import django.contrib.contenttypes.models
+from django.utils import http
 
 
 class OpenHatchModel(models.Model):
@@ -338,9 +339,7 @@ class Project(OpenHatchModel):
             query_var = self.name
             if not mentors_available:
                 query_var = self.language
-            query_string = mysite.base.unicode_sanity.urlencode(
-                {u'q': u'can_mentor:"%s"' %
-                 query_var})
+            query_string = http.urlencode({u'q': u'can_mentor:"%s"' % query_var})
             return reverse(mysite.profile.views.people) + '?' + query_string
         else:
             return ""

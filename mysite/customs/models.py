@@ -30,6 +30,7 @@ from model_utils.managers import InheritanceManager
 
 import django.forms.models
 import mysite.base.unicode_sanity
+from django.utils import http
 
 
 class RecentMessageFromCIA(models.Model):
@@ -395,7 +396,7 @@ def google_query_url(project_name, **kwargs):
                   }
     extra_data.update(kwargs)
     base = 'https://code.google.com/feeds/issues/p/%s/issues/full' % (project_name,)
-    url = base + '?' + mysite.base.unicode_sanity.urlencode(extra_data)
+    url = base + '?' + http.urlencode(extra_data)
     return url
 
 
@@ -690,8 +691,7 @@ def github_query_url(github_user_name, github_repo_name, **kwargs):
     base_url = ('https://api.github.com/repos/%s/%s/issues' % (
         mysite.base.unicode_sanity.quote(github_user_name),
         mysite.base.unicode_sanity.quote(github_repo_name)))
-    return base_url + '?' + mysite.base.unicode_sanity.urlencode(
-        kwargs)
+    return base_url + '?' + http.urlencode(kwargs)
 
 
 class GitHubQueryModel(TrackerQueryModel):

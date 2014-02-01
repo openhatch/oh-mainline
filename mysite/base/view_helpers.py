@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.utils import simplejson
+from django.utils import simplejson, http
 import urllib
 import os
 import os.path
@@ -175,7 +175,6 @@ def get_object_or_none(klass, *args, **kwargs):
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.base.unicode_sanity
 import mysite.base.disk_cache
 from django.utils import simplejson
 from django.core.cache import cache
@@ -274,8 +273,7 @@ def _geocode(address=None, response_data=None):
     mapsUrl = 'https://maps.googleapis.com/maps/api/geocode/json?'
 
     # This joins the parts of the URL together into one string.
-    query_string = mysite.base.unicode_sanity.urlencode(
-        {u'address': address, u'sensor': u'false'})
+    query_string = http.urlencode({u'address': address, u'sensor': u'false'})
     # This retrieves the URL from Google, parses out the longitude and latitude,
     # and then returns them as a string.
     try:

@@ -19,7 +19,6 @@
 
 from mysite.base.tests import make_twill_url, TwillTests
 import mysite.base.models
-import mysite.base.unicode_sanity
 
 import mysite.account.tests
 from mysite.profile.models import Person
@@ -35,7 +34,7 @@ from django.utils.unittest import skipIf
 import django.db
 import django.conf
 
-from django.utils import simplejson
+from django.utils import simplejson, http
 import mock
 from twill import commands as tc
 
@@ -1208,7 +1207,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         query = u'ruby'
         opps_query_string = {u'q': query, u'start': 1, u'end': 10}
         opps_url = make_twill_url('http://openhatch.org' + reverse(opps_view)
-                                  + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
+                                  + '?' + http.urlencode(opps_query_string))
         tc.go(opps_url)
 
         # Make sure we *don't* have the comment that flags this as a page that
@@ -1218,7 +1217,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         # Visit the last page of results
         GET = {u'q': query, u'start': 11, u'end': 20}
-        query_string = mysite.base.unicode_sanity.urlencode(GET)
+        query_string = http.urlencode(GET)
         opps_url = make_twill_url(
             'http://openhatch.org' + reverse(opps_view) + '?' + query_string)
         tc.go(opps_url)
