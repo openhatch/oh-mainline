@@ -294,10 +294,6 @@ class Person(models.Model):
         return list(self.get_published_portfolio_entries().values_list(
             'project__name', flat=True).distinct())
 
-    def get_cache_key_for_projects(self):
-        return 'projects_for_person_with_pk_%d_v4' % self.pk
-
-    @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_display_names_of_nonarchived_projects(self):
         return list(self.get_nonarchived_published_portfolio_entries().values_list(
             'project__display_name', flat=True).distinct())
@@ -349,10 +345,6 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
                     for pfe in self.get_published_portfolio_entries()], [])
 
-    def get_tag_texts_cache_key(self):
-        return 'tag_texts_for_person_with_pk_%d_v2' % self.pk
-
-    @mysite.base.decorators.cache_method('get_tag_texts_cache_key')
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         my_tag_texts = Tag.objects.filter(link_person_tag__person=self).extra(
@@ -937,22 +929,6 @@ class UnsubscribeToken(mysite.search.models.OpenHatchModel):
             return None
 
 
-def update_link_person_tag_cache(sender, instance, **kwargs):
-    from mysite.profile.tasks import update_person_tag_cache
-    try:
-        person__pk = instance.person.pk
-    except Person.DoesNotExist:
-        return
-    update_person_tag_cache(person__pk=person__pk)
-    mysite.base.models.Timestamp.update_timestamp_for_string(
-        str(Link_Person_Tag))
-
-
-def update_pf_cache(sender, instance, **kwargs):
-    from mysite.profile.tasks import update_someones_pf_cache
-    update_someones_pf_cache(instance.person.pk)
-
-
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
     RegeneratePostfixAliasesForForwarder().run()
@@ -961,13 +937,6 @@ models.signals.post_save.connect(
     update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(
     make_forwarder_actually_work, sender=Forwarder)
-models.signals.post_save.connect(
-    update_link_person_tag_cache, sender=Link_Person_Tag)
-models.signals.post_delete.connect(
-    update_link_person_tag_cache, sender=Link_Person_Tag)
-
-models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
-models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
 
 # The following signals are here so that we clear the cached list
 # of people for the map whenever Person, PortfolioEntry, or LinkPersonTag
