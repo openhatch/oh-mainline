@@ -19,6 +19,7 @@ import BeautifulSoup
 import feedparser
 import requests
 from django.core.cache import cache
+import django.conf
 
 OPENHATCH_BLOG_FEED_URL = 'http://openhatch.org/blog/feed/atom/'
 
@@ -30,9 +31,11 @@ def summary2html(html_string):
 
 
 def _blog_entries():
+    if django.conf.settings.DEPRESSINGLY_BREAK_FRONT_PAGE_BLOG_FEED:
+        return []
     try:
-        text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
-        content = text.encode('utf-8', 'ignore')
+        # text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
+        # content = text.encode('utf-8', 'ignore')
     except requests.exceptions.Timeout:
         content = ''
 

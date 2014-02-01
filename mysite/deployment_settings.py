@@ -61,3 +61,5 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 import logging
 logger = logging.getLogger('')
 logger.setLevel(logging.WARNING)
+
+DEPRESSINGLY_BREAK_FRONT_PAGE_BLOG_FEED=True
