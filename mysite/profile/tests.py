@@ -2832,49 +2832,6 @@ class PeopleLocationData(TwillTests):
             pprint.pprint(openhatchy_queries)
             self.assertEqual(1, len(openhatchy_queries))
 
-    def test_api_view_with_one_person(self):
-        json = self.client.get('/+profile_api/location_data/?person_ids=%d' % (
-            mysite.profile.models.Person.objects.get(user__username='paulproteus').id,))
-        self.assertTrue(json)
-
-    def test_api_view_with_two_persons(self):
-        json = self.client.get('/+profile_api/location_data/?person_ids=%d,%d' % tuple(
-            x.id for x in mysite.profile.models.Person.objects.all()))
-        self.assertTrue(json)
-
-    def test_api_view_with_two_persons_as_range(self):
-        json = self.client.get('/+profile_api/location_data/?person_ids=%d-%d' % tuple(
-            sorted(x.id for x in mysite.profile.models.Person.objects.all()))).content
-        self.assertTrue(simplejson.loads(json))
-
-    def test_api_view_with_invalid_range(self):
-        json = self.client.get('/+profile_api/location_data/?person_ids=-%d,%d-' % tuple(
-            sorted(x.id for x in mysite.profile.models.Person.objects.all()))).content
-        self.assertFalse(simplejson.loads(json))
-
-
-class PeopleLocationDict(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test_for_one_person(self):
-        paulproteus = mysite.profile.models.Person.objects.get(
-            user__username='paulproteus')
-        data = mysite.profile.views.LocationDataApiView.raw_data_for_one_person(
-            paulproteus)
-        self.assertTrue(data)
-        self.assertTrue(data['lat_long_data']['is_inaccessible'])
-
-    def test_backend(self):
-        persons = mysite.profile.models.Person.objects.all()
-        as_dict = mysite.profile.views.LocationDataApiView.raw_data_for_person_collection(
-            persons)
-        self.assertTrue(as_dict)
-
-    def test_api_view(self):
-        json = self.client.get('/+profile_api/location_data/?person_ids=%d' % (
-            mysite.profile.models.Person.objects.get().id,))
-        self.assertTrue(json)
-
 
 class ProfileApiTest(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
