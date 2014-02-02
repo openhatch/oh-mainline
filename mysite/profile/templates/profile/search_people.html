@@ -174,9 +174,10 @@ People Search
                 {% else %}
                     {% comment %}
 
-                        If there's *no query*, we list *everybody* in the DB on this page.
+                    If there's *no query*, we say nothing, letting the visitor
+		    use the search box.
                     {% endcomment %}
-                    Everybody on OpenHatch
+
                 {% endif %}
 
                 {% if people %}
@@ -188,9 +189,11 @@ People Search
 
         <div id='summary_of_mapped_people'>
             <span id='people_count'>
+	      {% if people|length %}
                     <span>{{ people|length|pluralize:"Just," }}</span>
                     <span>{{ people|length }}</span>
                     {{ people|length|pluralize:"person,people" }}
+              {% endif %}
             </span>
 
         </div>
