@@ -253,7 +253,7 @@ FORWARDER_DOMAIN = "forwarder.openhatch.org"
 # how long the forwarder is listed
 FORWARDER_LISTINGTIME_TIMEDELTA = datetime.timedelta(days=2)
 # how long the forwarder actually works
-FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5)
+FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=10)
 # note about the above: for 3 days, 2 forwarders for the same user work.
 # at worst, you visit someone's profile and find a forwarder that works for 3 more days
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
