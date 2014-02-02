@@ -206,21 +206,25 @@ People Search
     <ul class="people-list people-list-map">
         {% for person in people|slice:":1000" %}
                 {% if person.user.first_name and person.user.last_name %}
-                    <div>
-                        <a class="person" href="/people/{{person.user.username}}">
-                            {{person.user.first_name}} {{person.user.last_name}}
-                        </a> {{person.location_display_name}}
-                    </div>
+                    <li>
+                        <div class="person_info">
+                            <a class="person" href="/people/{{person.user.username}}">
+                                {{person.user.first_name}} {{person.user.last_name}}
+                            </a> {{person.location_display_name}}
+                        </div>
+                    </li>
                 {% else %}
-                    <div>
-                        <a class="person" href="/people/{{person.user.username}}">
-                            {{person.user.username}}
-                        </a> {{person.location_display_name}}
-                    </div>
+                    <li>
+                        <div class="person_info">
+                            <a class="person" href="/people/{{person.user.username}}">
+                                {{person.user.username}}
+                            </a> {{person.location_display_name}}
+                        </div>
+                    </li>
                  {% endif %}
         {% endfor %}
         {% if people|length >= 1000 %}
-            <div>and {{ people|length|add:"-1000" }} more users.</div>
+            <li><div>and {{ people|length|add:"-1000" }} more users.</div></li>
         {% endif %}
     </ul>
     
