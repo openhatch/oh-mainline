@@ -39,7 +39,7 @@ free to send another email that is CC: devel@lists.openhatch.org.
 What you get, when you're on the team
 =====================================
 
-* CloudFlare DNS password.
+* CloudFlare DNS password. (Username is openhatch.)
 
 
 Information useful to members
