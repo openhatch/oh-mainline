@@ -10,6 +10,7 @@ Community
   login_team
   login_team_agreement
   web_analytics_team
+  domain_team
   collaboration_tools
   sprints
   thanks
