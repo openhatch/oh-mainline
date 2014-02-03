@@ -20,7 +20,7 @@ us there.
 
 
 Email lists
-===========
+-----------
 
 We use the email lists at http://lists.openhatch.org/ (hosted by the
 free-software Mailman package).
@@ -32,7 +32,7 @@ loved.
 
 
 Etherpad
-========
+--------
 
 Etherpad is a real-time, rich-text capable, free software text editor.
 
@@ -61,7 +61,7 @@ to the devel list.
 
 
 Google Docs
-===========
+-----------
 
 Google Docs is a free-of-cost collection of collaboration tools for
 writing text documents, spreadsheets, and other such things.
