@@ -1,15 +1,15 @@
-==================================
-Continuous integration with Hudson
-==================================
+===================================
+Continuous integration with Jenkins
+===================================
 
 
 Overview
 ========
 
 The OpenHatch code has a suite of tests. It's important that when we deploy the
-code to the website, the tests all pass.
+code to the website, all tests pass.
 
-Hudson is a "continuous integration" tool (read `more on Wikipedia`_). It wakes
+Jenkins is a "continuous integration" tool (read `more on Wikipedia`_). It wakes
 up once an hour, checks the git repository for new commits, and runs the test
 suite.
 
@@ -17,18 +17,31 @@ suite.
 .. _more on Wikipedia: https://en.wikipedia.org/wiki/Continuous_integration
 
 
-Specifics of the OpenHatch setup
-================================
+For additional information about Jenkins, read `more on Jenkins`_.
 
-Hudson on the web: http://vm3.openhatch.org:8080/
+
+.. _more on Jenkins: https://jenkins-ci.org
+
+
+Jenkins Dashboard for OpenHatch
+===============================
+
+Status information about continuous integration projects can be found on 
+OpenHatch's Jenkins dashboard : http://vm3.openhatch.org:8080/
 
 
 Configuration
 =============
 
-There are three "projects" in Hudson. Different ones run different suites of
+There are number of "projects" in Jenkins. Different ones run different suites of
 tests in the OpenHatch codebase. They include or exclude different Django apps
 from the OpenHatch codebase.
+
+For example,
+
+* Test the "installation" instructions
+
+  - This tests the OpenHatch developer instructions for building OpenHatch.
 
 * Test the "customs" app
 
@@ -48,38 +61,35 @@ from the OpenHatch codebase.
 How to see the list of tests that failed or passed
 ==================================================
 
-* Go to http://linode2.openhatch.org:8080/
+* Go to http://vm3.openhatch.org:8080/
 * Choose a project (for example, `Test the search app`_)
 * Click on "Latest Test Result"
 
 
-.. _Test the search app: http://linode2.openhatch.org:8080/job/Test%20the%20%22search%22%20app/
+.. _Test the search app: http://vm3.openhatch.org:8080/job/Test%20the%20%22search%22%20app/
 
 
 Permissions
 ===========
 
-Right now, only Raffi and Asheesh can modify the configuration of Hudson.
+Right now, only Raffi and Asheesh can modify the configuration of Jenkins.
 
 Anyone can enqueue a run of the test suite by clicking a "Build" link within
-Hudson. That's a good thing.
+a Jenkins project. That's a good thing.
 
 
 IRC
 ===
 
-It hangs out on #openhatch as openhatch_hudson. Type !hudsonhelp to find out the
+It hangs out on #openhatch as openhatch_Hudson. Type !Hudsonhelp to find out the
 bot's commands.
 
 
 Future work
 ===========
 
-It would be nice if Hudson notified us on IRC when we "break the build"
-(introduce changes that break tests). `Bug filed`_.
-
 It would be super nice if, whenever there was a commit to Github master that
-passed all the tests, Hudson automatically deployed it.
+passed all the tests, Jenkins automatically deployed it.
 
 
 .. _Bug filed: https://openhatch.org/bugs/issue173
