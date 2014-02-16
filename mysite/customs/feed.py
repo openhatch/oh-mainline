@@ -31,7 +31,7 @@ def summary2html(html_string):
 
 def _blog_entries():
     try:
-        text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=0.2).text
+        text = requests.get(OPENHATCH_BLOG_FEED_URL, timeout=3).text
         content = text.encode('utf-8', 'ignore')
     except requests.exceptions.Timeout:
         content = ''
