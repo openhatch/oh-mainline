@@ -12,5 +12,6 @@ Community
   web_analytics_team
   domain_team
   collaboration_tools
+  ticket_tracking
   sprints
   thanks
