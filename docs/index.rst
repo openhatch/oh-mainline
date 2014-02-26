@@ -22,6 +22,7 @@ Content
     tutorials/index
     community/index
     internals/index
+    css/index
 
 :ref:`search`
 
