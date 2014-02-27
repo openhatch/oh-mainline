@@ -121,7 +121,7 @@ person to do this, but it's good to ask someone else so they get practice!
 
 Things to know:
 
-    * If you push to origin/master, Hudson will test it.
+    * If you push to origin/master, Jenkins will test it.
     * Once you're happy, you can run the deploy script, but note that will push
       the current HEAD to origin/master. ::
 
@@ -131,8 +131,8 @@ Things to know:
 
     * When you deploy, check a page or two to make sure things are okay.
 
-For more details on how we use Hudson and how to force a Hudson build, see
-`Continuous integration with Hudson`_.
+For more details on how we use Jenkins and how to force a Jenkins build, see
+`Continuous integration with Jenkins and Travis CI`_.
 
 .. _Login team: https://openhatch.org/wiki/Login_team
-.. _Continuous integration with Hudson: ../internals/continuous_integration.html
+.. _Continuous integration with Jenkins and Travis CI: ../internals/continuous_integration.html
