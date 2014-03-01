@@ -12,5 +12,6 @@ If you've made it this far without `saying hello <http://openhatch.readthedocs.o
     heroku
     maintenance
     adding_new_bug_tracker_git
+    css
 
 * Backups of the live site
