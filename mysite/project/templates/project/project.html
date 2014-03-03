@@ -95,11 +95,6 @@ about how you can help {{ project.display_name }}
                     <li class='ui-state-active'>
                         <h3><a href='#chatter'>Q&A</a></h3>
                     </li>
-                    {% if buildhelper_steps %}
-                    <li >
-                        <h3><a href='#buildhelper'>Buildhelper</a></h3>
-                    </li>
-                    {% endif %}
                      {% if settings.ENABLE_NEW_IWH_HANDLER and people_to_show%}
                         <li >
                             <h3><a href='#iwh_handler'>IWH Handler</a></h3>
@@ -180,45 +175,6 @@ about how you can help {{ project.display_name }}
             What else do you want to talk about?
         </a>
     </strong>
-    </div>
-    {% if buildhelper_steps %}
-        <div id="buildhelper" class='module-body tab invisible_if_js'>
-            <div class="explanation">
-                <p>This is the buildhelper for the {{ project.display_name }} project. It should help you get a working {{ project.display_name }} developer environment up and running on your computer. Click the checkboxes to track your progress!</p> 
-                <p>If you run into trouble with a certain step, look for a <span class="hint">hint</span> link for more information, or if you're stumped, a <span class="frustration">frustration</span> link to get help from {{ project.display_name }} volunteers.</p>
-            </div>
-            <ul>
-            {% for step in buildhelper_steps %}
-            <li class="step {% if step.is_prerequisite %}prereq{% endif %}">
-                <h3 class="step-name">{% if step.is_checked %}<a href="" class="step-checkbox step-checkbox-unchecked">&nbsp;</a>{% else %}<a href="" class="step-checkbox step-checkbox-unchecked">&nbsp;</a>{% endif %}<span class="step-name-text">{% if step.is_prerequisite %}<b>Prerequisite:</b> {% endif %}{{ step.name }}</span></h3>
-                {% if step.command.strip %}
-                <code class="step-commands">
-                {{ step.command|linebreaks }}
-                </code>
-                {% endif %}
-                {% if step.description %}
-                <div class="step-description">
-                {{ step.description|linebreaks }}
-                </div>
-                {% endif %}
-                <div class="step-icon-holder">
-                    <span class="step-icons">
-                    <div class="step-button">
-                    <img src="/static/images/buildhelper/time.png" height="35" /> {{ step.time }} min{{ step.time|pluralize }}
-                    </div>
-                    {% if step.hint %}
-                        <a href="{{ step.hint }}" class="step-button step-button-hint" title="Want a hint?"><img src="/static/images/buildhelper/tutorial-button.png" height="40" /></a>
-                    {% endif %}
-                    {% if step.frustration_handler %}
-                        <a href="{{ step.frustration_handler }}" class="step-button step-button-frustration" title="Frustrated?"><img src="/static/images/buildhelper/frustration-handler.png" height="40" /></a>
-                    {% endif %}
-                    </span>
-                </div>
-            </li>
-            {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
 </div><!-- /.module #requests -->
 
 {% endblock left %}
