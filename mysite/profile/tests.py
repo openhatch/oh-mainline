@@ -1903,65 +1903,6 @@ class EmailForwarderResolver(TwillTests):
         test_possible_forwarder_address("oranges", True, False, False)
 
 
-class PersonTagCache(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('django.core.cache.cache')
-    def test(self, mock_cache):
-        '''This test:
-        * Creates one person whose tag_texts say he can mentor in Banshee
-        * Ensures that get_tag_texts_for_map() caches that
-        * Deletes the Link_Person_Tag object
-        * Ensures the celery task re-fills the cache entry as being empty.'''
-
-        # 0. Our fake cache is empty always
-        mock_cache.get.return_value = None
-
-        # 1. Set link
-        paulproteus = Person.objects.get(user__username='paulproteus')
-        Project.create_dummy(name='Banshee')
-        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
-
-        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
-            tag_type=can_mentor,
-            text='Banshee')
-        link = Link_Person_Tag(person=paulproteus,
-                               tag=willing_to_mentor_banshee)
-        link.save()
-
-        # 2. Call get_tag_texts_for_map() and make sure we cached it
-        paulproteus.get_tag_texts_for_map()
-        mock_cache.set.assert_called_with(
-            paulproteus.get_tag_texts_cache_key(),
-            simplejson.dumps(
-                {'value': ['Banshee']}),
-            86400 * 10)
-        mock_cache.set.reset_mock()
-
-        # 3. Delete the link() and make sure the cache has the right value
-        # should enqueue a task to update the cache (post-delete)
-        link.delete()
-        mock_cache.delete.assert_called_with(
-            paulproteus.get_tag_texts_cache_key())
-
-        mock_cache.set.assert_called_with(
-            paulproteus.get_tag_texts_cache_key(),
-            simplejson.dumps({'value': []}),
-            86400 * 10)
-        mock_cache.set.reset_mock()
-
-        # 4. Create a new Link and make sure it's cached properly again
-        link = Link_Person_Tag(person=paulproteus,
-                               tag=willing_to_mentor_banshee)
-        # should fire bgtask to update the cache (post-save signal)
-        link.save()
-        mock_cache.set.assert_called_with(
-            paulproteus.get_tag_texts_cache_key(),
-            simplejson.dumps(
-                {'value': ['Banshee']}),
-            86400 * 10)
-
-
 class ForwarderGetsCreated(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
