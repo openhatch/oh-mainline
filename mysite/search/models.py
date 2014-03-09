@@ -424,45 +424,6 @@ class WrongIcon(OpenHatchModel):
     logo_contains_name = models.BooleanField(default=False)
 
 
-class Buildhelper(OpenHatchModel):
-
-    '''Model where all the steps in the buildhelper live'''
-    project = models.ForeignKey(Project)
-    default_frustration_handler = models.URLField(max_length=200, default='')
-
-    def addStep(self, name, time, is_prerequisite=False, description='', command='', hint='', frustration_handler=None):
-        '''creates and saves a BuildhelperStep object'''
-        if frustration_handler is None:
-            import pdb
-            pdb.set_trace()
-            frustration_handler = self.default_frustration_handler
-        s = BuildhelperStep(
-            buildhelper=self, is_prerequisite=is_prerequisite, name=name, description=description,
-            command=command, time=time, hint=hint, frustration_handler=frustration_handler)
-        s.save()
-
-    def __unicode__(self):
-        return self.project.display_name + "'s Buildhelper"
-
-
-class BuildhelperStep(OpenHatchModel):
-
-    '''A single step in the buildhelper'''
-    buildhelper = models.ForeignKey(Buildhelper)
-    is_prerequisite = models.BooleanField(default=False)
-    is_checked = models.BooleanField(default=False)
-    name = models.CharField(max_length=255)
-    description = models.TextField(default='', blank=True)
-    command = models.TextField(default='', blank=True)
-    time = models.IntegerField(default=0)
-    hint = models.URLField(
-        max_length=200, default='http://cuteoverload.com', blank=True)
-    frustration_handler = models.URLField(max_length=200, blank=True)
-
-    def __unicode__(self):
-        return "Buildhelper step for project " + self.buildhelper.project.display_name + ": " + self.name
-
-
 class ProjectInvolvementQuestion(OpenHatchModel):
     key_string = models.CharField(max_length=255)
     text = models.TextField()
