@@ -235,17 +235,19 @@ about how you can help {{ project.display_name }}
         </div>
     </div>
 
-    <div class='module' id='wannahelp'>
-        {% if not user_wants_to_help %}
-        <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
-            <input type='hidden' name='project' value='{{project.id}}'>
-            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
-        </form>
-        {% endif %}
-    </div>
+
+    {% if not user_wants_to_help %}
+        <div class='module' id='wannahelp'>
+            <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
+                <input type='hidden' name='project' value='{{project.id}}'>
+                <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
+            </form>
+        </div>
+    {% endif %}
+
 
 <div class='module' id='wanna_help'>
-{% include 'project/project-wanna-help-box.html' %}
+    {% include 'project/project-wanna-help-box.html' %}
 </div>
 
 <div class='module' id='contributors'>
