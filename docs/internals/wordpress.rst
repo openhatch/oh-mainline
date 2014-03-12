@@ -34,6 +34,11 @@ django-debug-toolbar gets this pull request landed
 <https://github.com/django-debug-toolbar/django-debug-toolbar/pull/303>,
 we can use that in the instructions.)
 
+Editing the wordpress css
+=========================
+
+If you wish to contribute or add any change(s) in the blog, you need to edit the it's css separately at https://github.com/openhatch/oh-mainline/blob/master/mysite/static/css/blog-style.css  
+
 Related
 =======
 
