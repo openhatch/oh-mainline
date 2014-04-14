@@ -176,6 +176,7 @@ def get_object_or_none(klass, *args, **kwargs):
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import mysite.base.disk_cache
+import mysite.profile.models
 from django.utils import simplejson
 from django.core.cache import cache
 from django.conf import settings
@@ -316,7 +317,7 @@ def address2cache_key_name(address):
 def cached_geocoding_in_json(address):
     A_LONG_TIME_IN_SECONDS = 60 * 60 * 24 * 7
     JUST_FIVE_MINUTES_IN_SECONDS = 5 * 60
-    if address == 'Inaccessible Island':
+    if address == mysite.profile.models.DEFAULT_LOCATION:
         is_inaccessible = True
     else:
         is_inaccessible = False
