@@ -370,6 +370,12 @@ class Person(models.Model):
             ret[link.tag.tag_type.name].add(link.tag.text.lower())
         return ret
 
+    def get_tags_as_list(self):
+        ret = []
+        for link in self.link_person_tag_set.all():
+            ret.append(link)
+        return ret
+
     def get_tag_descriptions_for_keyword(self, keyword):
         keyword = keyword.lower()
         d = self.get_tags_as_dict()
