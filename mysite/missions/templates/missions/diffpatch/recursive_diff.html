@@ -117,7 +117,7 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	curl {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %} > recipes.tar.gz
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
       </pre>
       <p>Unzip the archive file, but do not extract it.</p>
       <pre>
