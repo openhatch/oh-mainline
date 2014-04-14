@@ -176,8 +176,9 @@ def get_object_or_none(klass, *args, **kwargs):
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import mysite.base.disk_cache
+import mysite.profile.models
 from django.utils import simplejson
-from django.core.cache import cache
+from django.core.cache import cache as django_cache
 from django.conf import settings
 import hashlib
 import re
@@ -188,6 +189,7 @@ import datetime
 import base64
 import os
 import random
+
 
 notifications_dictionary = {
     "edit_password_done":
@@ -314,34 +316,25 @@ def address2cache_key_name(address):
 
 
 def cached_geocoding_in_json(address):
-    A_LONG_TIME_IN_SECONDS = 60 * 60 * 24 * 7
-    JUST_FIVE_MINUTES_IN_SECONDS = 5 * 60
-    if address == 'Inaccessible Island':
+    if address == mysite.profile.models.DEFAULT_LOCATION:
         is_inaccessible = True
     else:
         is_inaccessible = False
     key_name = address2cache_key_name(address)
     geocoded = None
-    if settings.DEBUG:
-        geocoded_in_json = mysite.base.disk_cache.get(key_name)
-    else:
-        geocoded_in_json = cache.get(key_name)
-
-    if geocoded_in_json is None:
+    received_result = False
+    cache = Cache(settings.DEBUG)
+    geocoded_in_json = cache.get(key_name)
+    
+    if not cache.get(key_name):
         geocoded = _geocode(address) or {}
         geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
         geocoded_and_inaccessible.update(geocoded)
         geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
-        if geocoded:
-            # cache for a week, which should be plenty
-            cache_duration = A_LONG_TIME_IN_SECONDS + \
-                random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
-        else:
-            cache_duration = random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
-        if settings.DEBUG:
-            mysite.base.disk_cache.set(key_name, geocoded_in_json)
-        else:
-            cache.set(key_name, geocoded_in_json, cache_duration)
+    
+    if geocoded:
+        received_result = True
+    cache.set(received_result, key_name, geocoded_in_json)
     return geocoded_in_json
 
 
@@ -366,3 +359,35 @@ def get_uri_metadata_for_generating_absolute_links(request):
     data['url_prefix'] = url_prefix
     data['uri_scheme'] = uri_scheme
     return data
+
+
+class Cache():
+    def __init__(self, debug):
+        self.debug = debug
+        self.cache = self._get_cache()
+
+    def _get_cache(self):
+        if self.debug:
+            return mysite.base.disk_cache
+        return django_cache
+
+    def _get_duration(cls, value):
+        A_LONG_TIME_IN_SECONDS = 60 * 60 * 24 * 7
+        JUST_FIVE_MINUTES_IN_SECONDS = 5 * 60
+
+        if value:
+            cache_duration = A_LONG_TIME_IN_SECONDS + \
+            random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
+        else:
+            cache_duration = random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
+        return cache_duration
+    
+    def get(self, key):
+        return self.cache.get(key)
+
+    def set(self, has_result, key_name, value):
+        if self.debug:
+            self.cache.set(key_name, value)
+        else:
+            cache_duration = self._get_duration(value)
+            self.cache.set(key_name, value, cache_duration)
