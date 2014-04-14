@@ -108,8 +108,8 @@
       </pre>
       <p>Then, download the original file and the modified file.</p>
       <pre>
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}
       </pre>
       <p>Then, use the <tt>patch</tt> command to apply the changes.</p>
       <pre>

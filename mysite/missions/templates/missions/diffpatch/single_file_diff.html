@@ -96,9 +96,8 @@
 	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
     </div>
     <div id="low">
-      <pre>man diff</pre>
-      <p>or
-	<a href="http://linux.die.net/man/1/diff">read the man page online</a>.</p>
+    <a href="http://linux.die.net/man/1/patch">Read the man page online</a>,
+      <p>or if you are on Mac OSX or Linux, use the terminal command:<pre> man patch</pre></p>
     </div>
     <div id="medium">
       <p>In this mission, you have to do a few things. Tips:</p>
@@ -117,8 +116,8 @@
       </pre>
       <p>Then, download the original file twice. (You'll only modify one.)</p>
       <pre>
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %} -O original
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %} -O original
       </pre>
       <p>Open <tt>nutty-pancake.txt</tt> in your favorite text editor, and look for the two occurrences of "almond". Replace them both with "walnut".</p>
       <p>Go back to the terminal and run this command.</p>
