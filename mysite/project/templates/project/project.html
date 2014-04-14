@@ -90,91 +90,91 @@ about how you can help {{ project.display_name }}
 {% endblock pagetop %}
 
 {% block left %}
-    <div id='project-tab-container' class='module contains_questions'>
-            <ul class='module-head tab_nav'>
-                    <li class='ui-state-active'>
-                        <h3><a href='#chatter'>Q&A</a></h3>
-                    </li>
-                     {% if settings.ENABLE_NEW_IWH_HANDLER and people_to_show%}
-                        <li >
-                            <h3><a href='#iwh_handler'>IWH Handler</a></h3>
-                        </li>
-                    {% endif %}
-            </ul>
-        <div id="chatter" class='module-body tab'>
-            <div style="font-size: 1.3em" class="you-are-missing-things">
-            {% if cookies_disabled %}
-            <div>Please enable cookies in order to post answers.</div>
+<div id='project-tab-container' class='module contains_questions'>
+    <ul class='module-head tab_nav'>
+            <li class='ui-state-active'>
+                <h3><a href='#chatter'>Q&A</a></h3>
+            </li>
+             {% if settings.ENABLE_NEW_IWH_HANDLER and people_to_show%}
+                <li >
+                    <h3><a href='#iwh_handler'>IWH Handler</a></h3>
+                </li>
             {% endif %}
-            <noscript><div>Please enable javascript in order to post answers.</div></noscript>
-            </div>
-            <ul id='paragraph_questions' class='questions'>
-                {% for question, answers in question2answer %}
-                    <li>
-                        <h3><strong>Q:</strong>
-                            {% include 'question_text.html' %}
-                        </h3>
-                        <ul class='answers'>
-                            {% for answer in answers %}
-                                <li id='answer_whose_pk_is_{{ answer.pk }}'>
-                                    {% include 'project/voting_controls.html' %}
-                                    {% if not question.is_bug_style %}
+    </ul>
+    <div id="chatter" class='module-body tab'>
+        <div style="font-size: 1.3em" class="you-are-missing-things">
+        {% if cookies_disabled %}
+        <div>Please enable cookies in order to post answers.</div>
+        {% endif %}
+        <noscript><div>Please enable javascript in order to post answers.</div></noscript>
+        </div>
+        <ul id='paragraph_questions' class='questions'>
+            {% for question, answers in question2answer %}
+                <li>
+                    <h3><strong>Q:</strong>
+                        {% include 'question_text.html' %}
+                    </h3>
+                    <ul class='answers'>
+                        {% for answer in answers %}
+                            <li id='answer_whose_pk_is_{{ answer.pk }}'>
+                                {% include 'project/voting_controls.html' %}
+                                {% if not question.is_bug_style %}
 
-                                        {% ifequal user answer.author %}
-                                            {% with 1 as edit_form %}
-                                                {% include 'project/forms/paragraph.html' %}
-                                            {% endwith %}
-                                        {% endifequal %}
+                                    {% ifequal user answer.author %}
+                                        {% with 1 as edit_form %}
+                                            {% include 'project/forms/paragraph.html' %}
+                                        {% endwith %}
+                                    {% endifequal %}
 
-                                        <span class="answer" id="answer_{{answer.pk}}">
-                                            {{ answer.text|bleach_urlize|linebreaks }}
-                                            <br/>
-                                            {% include 'project/byline.html' %}
-                                        </span>
+                                    <span class="answer" id="answer_{{answer.pk}}">
+                                        {{ answer.text|bleach_urlize|linebreaks }}
+                                        <br/>
+                                        {% include 'project/byline.html' %}
+                                    </span>
 
-                                    {% else %}
+                                {% else %}
 
-                                        {% ifequal user answer.author %}
-                                            {% with 1 as edit_form %}
-                                                {% include 'project/forms/bug.html' %}
-                                            {% endwith %}
-                                        {% endifequal %}
+                                    {% ifequal user answer.author %}
+                                        {% with 1 as edit_form %}
+                                            {% include 'project/forms/bug.html' %}
+                                        {% endwith %}
+                                    {% endifequal %}
 
-                                        <span class="answer" id="answer_{{answer.pk}}">
+                                    <span class="answer" id="answer_{{answer.pk}}">
 
-                                            <div class="bug_answer_title">
-                                                {% ifequal user answer.author %}
-                                                {% endifequal %}
-                                                <strong>{{answer.title}}</strong>
-                                            </div>
-                                            {{answer.text|urlize_without_escaping_percent_signs|safe|linebreaks}}
-                                            <br/>
-                                            {% include 'project/byline.html' %}
-                                        </span>
+                                        <div class="bug_answer_title">
+                                            {% ifequal user answer.author %}
+                                            {% endifequal %}
+                                            <strong>{{answer.title}}</strong>
+                                        </div>
+                                        {{answer.text|urlize_without_escaping_percent_signs|safe|linebreaks}}
+                                        <br/>
+                                        {% include 'project/byline.html' %}
+                                    </span>
 
-                                    {% endif %}
+                                {% endif %}
 
-                            </span>
                             </li>
                         {% endfor %}
 
-                    {# this li allows you to add an answer #}
-                    <li>
-                        {% if question.is_bug_style %}
-                            {% include 'project/forms/bug.html' %}
-                        {% else %}
-                            {% include 'project/forms/paragraph.html' %}
-                        {% endif %}
-                    </li>
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
-    <strong id="other-questions">
-        <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
-            What else do you want to talk about?
-        </a>
-    </strong>
+                        {# this li allows you to add an answer #}
+                        <li>
+                            {% if question.is_bug_style %}
+                                {% include 'project/forms/bug.html' %}
+                            {% else %}
+                                {% include 'project/forms/paragraph.html' %}
+                            {% endif %}
+                        </li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+        <strong id="other-questions">
+            <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
+                What else do you want to talk about?
+            </a>
+        </strong>
+    </div><!-- /#chatter -->
 </div><!-- /.module #requests -->
 
 {% endblock left %}
