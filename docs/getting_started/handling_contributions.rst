@@ -31,14 +31,14 @@ Test your changes
        additions. Try to apply `pep8`_ standards.
     3. Test your changes on a local instance of the website. Prove to yourself
        that your changes address the issue they are supposed to address.
-    4. Run the :doc:`test suite </advanced/advanced_installation>`, and make sure your unit tests pass and all tests that
+    4. Run the `test suite`_, and make sure your unit tests pass and all tests that
        passed before your changes still pass.
     5. Use a tool like `PyChecker`_ to check for bugs.
 
 
 .. _pep8: http://pypi.python.org/pypi/pep8
 .. _PyChecker: http://pypi.python.org/pypi/PyChecker/0.8.12
-
+.. _test suite: ../internals/continuous_integration.html
 
 Generate a pull request
 #######################
