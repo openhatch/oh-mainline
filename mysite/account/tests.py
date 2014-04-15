@@ -61,6 +61,26 @@ class Login(TwillTests):
         tc.notfind('log in')
         tc.follow('log out')
         tc.find('log in')
+
+    def test_logout_no_open_redirect(self):
+        client = Client()
+        # All test cases should redirect to the OpenHatch root.
+        # Verify existing logout still behaves as before:
+        response  = client.get('/account/logout/?next=/')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
+        # Verify appended redirect url is ignored:
+        # Before the fix for issue 952, urlparse() redirected this url to
+        # /account/logout/.
+        response  = client.get('/account/logout/?next=http://www.example.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
+        # Verify appended redirect url is ignored
+        # Before the fix for issue 952, urlparse() redirected this url to
+        # example.com.
+        response  = client.get('/account/logout/?next=http:///www.example.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
     # }}}
 
 
