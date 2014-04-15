@@ -114,7 +114,7 @@ Debian/Ubuntu systems, do::
 Maintenance
 ===========
 
-You may want to about how to maintain an OpenHatchsite. `maintenance.rst`_ tells
+You may want to read about how to maintain an OpenHatch site. `maintenance.rst`_ tells
 you about that.
 
 
