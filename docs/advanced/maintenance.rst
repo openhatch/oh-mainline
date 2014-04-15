@@ -74,6 +74,7 @@ person does the right thing.
 Editing the website's CSS
 ==========================
 
-The CSS files for openHatch repository can be found in the static folder of the oh-mainline repo: https://github.com/openhatch/oh-mainline/tree/master/mysite/static
+The CSS files for OpenHatch repository can be found in the static folder of the oh-mainline repository:
+https://github.com/openhatch/oh-mainline/tree/master/mysite/static
 
-These CSS files has been written in LESS format. Not sure what LESS is? read the official `documentation <http://lesscss.org/>`_.
+These CSS files has been written in Less format. Not sure what Less is? Read the official `documentation <http://lesscss.org/>`_.
