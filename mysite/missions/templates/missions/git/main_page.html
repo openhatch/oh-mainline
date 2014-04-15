@@ -40,7 +40,7 @@ and rebase your work onto the new version provided by the maintainer.</p>
 <p>You already have a repository that you can use for these missions, but if
 you want to start over fresh, you can reset it.</p>
 
-<form method="post" action="{% url mysite.missions.git.views.resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
+<form method="post" action="{% url mysite.missions.git.views.resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">{% csrf_token %}
     <input type="submit" value="Reset your repository" />
 </form><br style="clear: left;" />
 
@@ -51,7 +51,7 @@ you want to start over fresh, you can reset it.</p>
   repository will reside on the OpenHatch server, specifically for your use in
   these missions.  Then you can go on and interact with it.</p>
 
-<form method="post" action="{% url mysite.missions.git.views.resetrepo %}">
+<form method="post" action="{% url mysite.missions.git.views.resetrepo %}">{% csrf_token %}
   <input type="submit" value="Create your repository and start the missions &raquo;" />
   </form><br style="clear: left;" />
 

@@ -46,7 +46,7 @@
 <p class="next_mission_link">
   <a href="{% url mysite.missions.git.views.rebase %}">Updating your local project with changes from the master repository &raquo;</a></p>
 {% else %}
-<form method="post" action="{% url mysite.missions.git.views.diff_submit %}#gitdiff-form">
+<form method="post" action="{% url mysite.missions.git.views.diff_submit %}#gitdiff-form">{% csrf_token %}
   <div class="form-row">
     <a name="gitdiff-form"></a>
     {% if git_diff_error_message %}
