@@ -284,31 +284,35 @@ class Query:
             # now"
             (u'language', {
                 u'name_in_GET': u"language",
-                u'sidebar_heading': u"Languages (# of bugs)",
+                u'sidebar_heading': u"Languages",
                 u'description_above_results': u"projects primarily coded in %s",
                 u'options': language_options,
                 u'the_any_option': self.get_facet_options(u'language', [u''])[0],
+                u'sorted_by': u'(# of bugs)',
             }),
             (u'project', {
                 u'name_in_GET': u'project',
-                u'sidebar_heading': u'Projects (# of bugs)',
+                u'sidebar_heading': u'Projects',
                 u'description_above_results': 'in the %s project',
                 u'options': project_options,
                 u'the_any_option': self.get_facet_options(u'project', [u''])[0],
+                u'sorted_by': u'(# of bugs)',
             }),
             (u'toughness', {
                 u'name_in_GET': u"toughness",
-                u'sidebar_heading': u"Toughness (# of bugs)",
+                u'sidebar_heading': u"Toughness",
                 u'description_above_results': u"where toughness = %s",
                 u'options': toughness_options,
                 u'the_any_option': self.get_facet_options(u'toughness', [u''])[0],
+                u'sorted_by': u'(# of bugs)',
             }),
             (u'contribution type', {
                 u'name_in_GET': u"contribution_type",
-                u'sidebar_heading': u"Just bugs labeled... (# of bugs)",
+                u'sidebar_heading': u"Just bugs labeled...",
                 u'description_above_results': u"which need %s",
                 u'options': contribution_type_options,
                 u'the_any_option': self.get_facet_options(u'contribution_type', [u''])[0],
+                u'sorted_by': u'(# of bugs)',
             })
         )
 
