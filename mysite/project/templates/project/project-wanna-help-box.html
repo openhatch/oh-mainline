@@ -78,6 +78,7 @@
 {% endwith %}
 {% if user_wants_to_help %}
             <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
+                {% csrf_token %}
                 <input type='hidden' name='project' value='{{project.id}}'>
                 <input type='submit' style='float: left; margin-left: 10px;' id='delist_helper_button' value='De-list me!'>
             </form>
