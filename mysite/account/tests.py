@@ -61,6 +61,18 @@ class Login(TwillTests):
         tc.notfind('log in')
         tc.follow('log out')
         tc.find('log in')
+
+    def test_logout_no_open_redirect(self):
+        client = Client()
+        response  = client.get('/account/logout/?next=/')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
+        response  = client.get('/account/logout/?next=http://www.example.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
+        response  = client.get('/account/logout/?next=http:///www.example.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
     # }}}
 
 
