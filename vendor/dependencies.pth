@@ -27,6 +27,7 @@ packages/ghettoq
 packages/html2text
 packages/html5lib
 packages/importlib
+packages/irc
 packages/Jinja2
 packages/jsmin
 packages/kombu

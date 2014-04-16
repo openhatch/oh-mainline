@@ -211,6 +211,11 @@ urlpatterns = patterns('',
                         include(
                             mysite.missions.setup.views.WindowsSetup.urls())),
 
+                       (r'^missions/irc$',
+                        'mysite.missions.irc.views.irc_mission'),
+                       (r'^missions/irc/sessioninfo$',
+                        'mysite.missions.irc.views.irc_session_password_submit'),
+
                        # Customs-related URLs
                        (r'^customs/$', 'mysite.customs.views.list_trackers'),
                        (r'^customs/add/(?P<tracker_type>\w*)$',
