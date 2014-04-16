@@ -1,25 +1,79 @@
-There are a whole bunch of files here. Here's what you need to know:
+The git repository for oh-mainline contains many files and directory.
+Here's a brief layout of the oh-mainline repository and the purpose of 
+various files and directories. Please consult OpenHatch documentation for
+more details.
 
-Important files in git
-----------------------
-
+-------------------
+Informational Files
+-------------------
 README.rst
     Read the README! Read it first.
 
-    It points to our main documentation; this file is just a quick
+    It points to our main documentation; this LAYOUT file is just a quick
     thumbnail view of what different files in here are.
 
-    (Aside: it has a ".rst" extension because it is in reStructuredText format.)
+    (Aside: The ".rst" extension indicates reStructuredText format is used.)
 
-COPYING
+LICENSE
     This file explains what permissions you have, if you want to re-use
     source code you find in this repository.
 
-vendor/
-    This directory contains code from other projects that we rely on.
+CREDITS
+    This file gives credit for files used by OpenHatch.
 
-    (For more information, look at
-    http://kitsune.readthedocs.org/en/latest/vendor.html .)
+LAYOUT
+    This file (the one that you are viewing now) gives an overview of the
+    project high-level directory and file structure.
+
+--------
+dotfiles
+--------
+In general, dotfiles provide configuration details.
+
+    .coverage          coverage testing
+    .coveragerc        coverage testing configuration
+    .gitattributes     Git
+    .gitignore         Files ignored by git 
+    .travis.yml        Travis continuous integration configuration 
+
+--------------------------
+files and executable files
+--------------------------
+coveragerc
+
+manage.py
+    This is the well-known and widely-loved Django management script.
+
+Procfile
+    A file used when deploying the site.
+
+requirements.txt
+    This file indicates packages (i.e. ones that are not pure Python code
+    and contain compiled code) that are installed in a different manner than
+    packages found in the vendor directory.
+
+run_importer.sh
+    This shell script is used for deployment and running of scraping of 
+    projects for suitable bugs for contributors. [FUTURE: This file may
+    be relocated to a different place.]
+
+setup.py
+    This file lists the dependencies of the OpenHatch codebase.
+
+-----------
+directories
+-----------
+docs/
+    This directory contains documentation files for OpenHatch and is
+    rendered at RTD.
+
+downloads/
+    This directory may be used by deployment for temporary storage.
+    [FUTURE: It may be possible to remove this directory in a later
+    release.]
+
+htmlcov/
+    This directory stores reports created by the coverage testing tool.
 
 mysite/
     This directory contains the OpenHatch website and all the "Django
@@ -28,62 +82,66 @@ mysite/
     Each of the apps has some tests, views, and frequently models and forms.
     Their file paths are:
 
-    */tests.py
-    */views.py
-    */forms.py
-    */models.py
+        */tests.py
+        */views.py
+        */forms.py
+        */models.py
 
-	You can read more about tests, views, forms, and models in the
-	official Django tutorial:
+    You can read more about tests, views, forms, and models in the
+    official Django tutorial:
 
-	https://docs.djangoproject.com/en/1.5/intro/tutorial01/
+        https://docs.djangoproject.com/en/1.5/intro/tutorial01/
 
     customs/
         This directory contains "import/export" code like the support for
         loading and saving snapshots of the OpenHatch database, downloading
-        data from bug trackers, and scanning other websites for information about
-        OpenHatch members.
+        data from bug trackers, and scanning other websites for information
+        about OpenHatch members.
 
     profile/
-        This app contains code to show information about the users of OpenHatch.
+        This app contains code on information about OpenHatch users.
 
     account/
-        This app (mostly) contains code to let users edit their own information.
+        This app (mostly) contains code to let a user edit their information.
 
     missions/
         This is the Django app where the training missions live.
 
     search/
-        This Django app contains the views and models necessary to display the volunteer
-        opportunity finder, also known as bug search.
+        This Django app contains the views and models necessary to display
+        the volunteer opportunity finder, also known as bug search.
 
     The apps also use other Django features, or Django add-ons. Here is a
-    list of filename => further info URLs:
+    list by filename and a URL reference to further info:
 
     */templatetags.py :
-     https://docs.djangoproject.com/en/1.5/howto/custom-template-tags/
+        https://docs.djangoproject.com/en/1.5/howto/custom-template-tags/
 
     */migrations/ :
-     http://south.aeracode.org/
+        http://south.aeracode.org/
 
     */api.py :
-     http://django-tastypie.readthedocs.org/
+        http://django-tastypie.readthedocs.org/
 
     */fixtures.json :
-     https://docs.djangoproject.com/en/1.5/howto/initial-data/
+        https://docs.djangoproject.com/en/1.5/howto/initial-data/
 
     */management/commands :
-     https://docs.djangoproject.com/en/1.5/howto/custom-management-commands/
+       https://docs.djangoproject.com/en/1.5/howto/custom-management-commands/
 
     */view_helpers.py :
-     http://lists.openhatch.org/pipermail/devel/2013-March/003151.html
+       http://lists.openhatch.org/pipermail/devel/2013-March/003151.html
 
     */templates/*/*.html :
-     https://docs.djangoproject.com/en/1.5/topics/templates/
+       https://docs.djangoproject.com/en/1.5/topics/templates/
 
-manage.py
-    This is the well-known and widely-loved Django management script. (In the past, we used
-    to wrap it with ./bin/mysite or ./bin/production. No longer!)
+tools/
+    This directory contains helper tools that make things easier for a
+    contributor (for example, a script for rendering docs).
 
-setup.py
-    This file lists the dependencies of the OpenHatch codebase.
+vendor/
+    This directory contains code from other projects that we rely on.
+    (For more information, look at
+    http://kitsune.readthedocs.org/en/latest/vendor.html .)
+
+
