@@ -2619,7 +2619,7 @@ class PeopleMapSummariesAreCheap(TwillTests):
         # Link them to the Person
         for tag in Tag.objects.all():
             Link_Person_Tag.objects.create(person=self.paulproteus, tag=tag)
-        n = len(self.paulproteus.get_tags_as_list())
+        n = self.paulproteus.link_person_tag_set.all().count()
         self.assertEquals(3, n)
 
         # Give paulproteus some projects
