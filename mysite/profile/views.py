@@ -61,7 +61,6 @@ from django.views.decorators.csrf import csrf_protect
 
 
 @login_required
-@csrf_protect
 def delete_user_for_being_spammy(request):
     form = mysite.profile.forms.DeleteUser()
     if request.method == 'POST':
