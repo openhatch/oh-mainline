@@ -53,6 +53,7 @@ document.documentElement.className = 'javascript_is_enabled';
     <p>Thanks for pre-ordering an OpenHatch t-shirt! The shirts look great and we're really excited to see people wearing them. :)</p>
     
     <form id="init-shirt-form" action="">
+        {% csrf_token %}
     # of shirts: <input id="num-shirts" maxlength="1" size="1" value="1"></input><br/>
     XXL? (XXL shirts cost $2 more) <input id="is-xxl" type="checkbox"></input><br/>
     Shipping? <select id="shipping">
@@ -71,6 +72,7 @@ document.documentElement.className = 'javascript_is_enabled';
     <div id="paypal-form" class="hidden">
     <p>Your total comes to <strong>$<span id="total">20.00</span></strong>. Click the button below to checkout via PayPal.</p>
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+        {% csrf_token %}
 <input type="hidden" name="cmd" value="_donations">
 <input type="hidden" name="business" value="donate@openhatch.org">
 <input type="hidden" name="lc" value="US">

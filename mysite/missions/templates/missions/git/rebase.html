@@ -45,6 +45,7 @@
 {% else %}
 <form method="post" action="{% url mysite.missions.git.views.rebase_submit %}#gitrebase-form">
   <div class="form-row">
+      {% csrf_token %}
     <a name="gitrebase-form"></a>
     {% if git_rebase_error_message %}
     <ul class="errorlist"><li>{{ git_rebase_error_message }}</li></ul>
