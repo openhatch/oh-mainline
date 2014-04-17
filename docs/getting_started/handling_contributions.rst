@@ -60,9 +60,15 @@ Submitting a pull request
     2. Change the issue status to "need-review".
     3. Join IRC and say that you have an issue ready for review.
 
+The pull request will be checked for code style errors (such as `pep8`_ violations) by the lint-review bot. To know more about the bot, see `Checking code style errors in pull requests with lint-review`_.
+
 If the reviewer says it's ready to go, your request will get merged in short
 order. If the reviewer has feedback he/she wants addressed, make the necessary
 revisions and start back at the "Check/test your changes" section.
+
+.. _pep8: http://pypi.python.org/pypi/pep8
+.. _Checking coding style errors in pull requests with lint-review: ../internals/pull_request_linting.html
+
 
 Permit us to share your work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,12 +117,12 @@ Things to think about:
 Push and deploy
 ~~~~~~~~~~~~~~~
 
-If you want to deploy the changes, and you have push access to the repository, you 
+If you want to deploy the changes, and you have push access to the repository, you
 can do so by following the steps listed in the section labeled `Deployment <http://openhatch.readthedocs.org/en/latest/advanced/deployment.html>`_.
 
-If you don't have push access, you will need to rope someone else in for this. Anyone 
-in the `Login team <http://openhatch.readthedocs.org/en/latest/community/login_team.html>`_ 
-can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the traditional 
+If you don't have push access, you will need to rope someone else in for this. Anyone
+in the `Login team <http://openhatch.readthedocs.org/en/latest/community/login_team.html>`_
+can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the traditional
 person to do this, but it's good to ask someone else so they get practice!
 
 Things to know:

@@ -13,6 +13,7 @@ Here's more information about our project structure that may be useful.
   emergency_operations
   wordpress
   api
+  pull_request_linting
 
 Sections to add:
 
