@@ -33,3 +33,4 @@ mysite/static/twisted-ping-dir/twisted-ping-file
 mysite/missions-userdata/git/*
 mysite/site.db
 mysite/local_settings.py
+.idea/
