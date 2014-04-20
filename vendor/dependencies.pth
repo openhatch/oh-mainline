@@ -37,7 +37,6 @@ packages/mock
 packages/odict/src
 packages/openid
 packages/ordereddict
-packages/pygeoip
 packages/Pygments
 packages/python-dateutil
 packages/python-memcached

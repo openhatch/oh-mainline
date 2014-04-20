@@ -282,13 +282,11 @@ def set_location(request, edit_location_form=None):
     data = {}
     initial = {}
 
-    # If the user's location is the default one, then we create a guess.
-    if (not request.user.get_profile().location_display_name) or (
-        request.user.get_profile().location_display_name ==
+    # If the user's location is the default one, we leave it blank so
+    # that the template will use javascript to form a guess
+    if (request.user.get_profile().location_display_name ==
             mysite.profile.models.DEFAULT_LOCATION):
-        geoip_guess = mysite.profile.view_helpers.get_geoip_guess_for_ip(
-            mysite.base.middleware.get_user_ip(request))[1]
-        initial['location_display_name'] = geoip_guess
+        initial['location_display_name'] = ''
     else:
         initial['location_display_name'] = request.user.get_profile(
         ).location_display_name

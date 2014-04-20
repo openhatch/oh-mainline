@@ -18,7 +18,6 @@
 
 #{{{ imports
 import os
-import mock
 import tempfile
 import StringIO
 import logging
@@ -387,31 +386,17 @@ class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    mock_ip = mock.Mock()
-    # Located in Rochester, New York, U.S.A.
-    mock_ip.return_value = "128.151.2.1"
-
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
-    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
-    def test_guess_location_on_accessing_edit_location_form(self):
+    def test_location_is_empty_if_has_not_been_set(self):
         person = Person.objects.get(user__username="paulproteus")
-        self.assertFalse(person.location_confirmed)
-        self.assertEqual('Inaccessible Island',
-                         person.get_public_location_or_default())
+        person.save()
 
         client = self.login_with_client()
         response = client.get(reverse(mysite.account.views.set_location))
         self.assertContains(response, "OpenHatch")
-        person = Person.objects.get(user__username="paulproteus")
-        self.assertContains(response, "Rochester, NY, United States")
+        self.assertEqual(
+            response.context['edit_location_form'].initial['location_display_name'], '')
 
-    mock_ip = mock.Mock()
-    # Located in Rochester, New York, U.S.A.
-    mock_ip.return_value = "128.151.2.1"
-
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
-    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
-    def test_do_not_guess_if_have_location_set(self):
+    def test_location_is_populated_if_location_has_been_set(self):
         person = Person.objects.get(user__username="paulproteus")
         person.location_display_name = 'The White House'
         person.latitude = 38.898748
@@ -423,8 +408,10 @@ class GuessLocationOnLogin(TwillTests):
         response = client.get(reverse(mysite.account.views.set_location))
         self.assertContains(response, "OpenHatch")
         person = Person.objects.get(user__username="paulproteus")
-        self.assertNotContains(response, "Rochester, NY, United States")
         self.assertContains(response, "The White House")
+        self.assertEqual(
+            response.context['edit_location_form'].initial['location_display_name'],
+            "The White House")
 
     def test_yes_response(self):
         person = Person.objects.get(user__username="paulproteus")
