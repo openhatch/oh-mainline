@@ -71,6 +71,7 @@ git.</p>
           working copy &raquo;</a></p>
         {% else %}
         <form method="post" action="{% url mysite.missions.git.views.long_description_submit %}#gitconfig-form">
+            {% csrf_token %}
             <div class="form-row">
             <a name="gitconfig-form"></a>
             <br style="clear: left;" />

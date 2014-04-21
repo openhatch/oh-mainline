@@ -121,6 +121,7 @@
                             <td>Maverick</td>
                             <td>
                             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                                {% csrf_token %}
                                 <input type="hidden" name="cmd" value="_xclick-subscriptions">
                                 <input type="hidden" name="business" value="openhatch-paypal@opensource.org">
                                 <input type="hidden" name="lc" value="US">
@@ -137,6 +138,7 @@
                             </td>
                             <td>
                             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                                {% csrf_token %}
                                 <input type="hidden" name="cmd" value="_donations">
                                 <input type="hidden" name="business" value="openhatch-paypal@opensource.org">
                                 <input type="hidden" name="lc" value="US">
