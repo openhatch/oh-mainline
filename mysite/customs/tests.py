@@ -851,10 +851,19 @@ class ExportOldBugDataLinks(django.test.TestCase):
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        expected_url = 'https://code.google.com/feeds/issues/p/twisted/issues/full?max-results=10000&can=all&updated-min=2012-09-15T00%3A00%3A00'
+
+        expected_url = 'https://code.google.com/p/twisted/issues/csv'
+        colspec = ('colspec=ID+Status+Priority+Owner+Summary+Stars+Opened+'
+                   'Closed+Reporter+Cc+Difficulty+Modified+Type')
+
+        root, querystr = url.split('?')
+
         # If you want to sanity-check this, just replace 'twisted' in the
         # above URL with e.g. 'sympy' or some other valid Google Code project.
-        self.assertEqual(expected_url, url)
+        assert expected_url == root
+        assert 'can=1' in querystr  # All issues
+        assert 'num=1000' in querystr  # Maximum issues we can retrieve
+        assert colspec in querystr
 
     def test_github_tracker(self):
         # Set up the Twisted TrackerModel that will be used here.
@@ -1149,3 +1158,25 @@ class ImportBugsFromFiles(django.test.TestCase):
         self.assertFalse(Bug.all_bugs.all())
         mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
         self.assertTrue(Bug.all_bugs.all())
+
+
+class GoogleQueryUrlTestCase(django.test.TestCase):
+
+    def test_google_query_url(self):
+        url = mysite.customs.models.google_query_url('myproj')
+        root, querystr = url.split('?')
+
+        # Expected colspec
+        colspec = ('colspec=ID+Status+Priority+Owner+Summary+Stars+Opened+'
+                   'Closed+Reporter+Cc+Difficulty+Modified+Type')
+
+        assert root == 'https://code.google.com/p/myproj/issues/csv'
+        assert 'num=1000' in querystr
+        assert 'can=2' in querystr
+        assert colspec in querystr
+
+    def test_google_query_url_accepts_overrides(self):
+        url = mysite.customs.models.google_query_url('myproj', can='foo')
+        _, querystr = url.split('?')
+
+        assert 'can=foo' in querystr
