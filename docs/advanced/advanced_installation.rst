@@ -7,7 +7,7 @@ you're a completionist or really just like installing dependencies or
 reading the OpenHatch documentation, keep reading.
 
 Overriding local settings
-=================
+=========================
 
 If you wish to override the default settings, you may create a
 separate file with individual settings you wish to change.
