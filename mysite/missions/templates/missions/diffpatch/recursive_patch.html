@@ -58,6 +58,12 @@
       <div class="form-row">
         <a name="patchrecursive-form"></a>
 	<br style="clear: left;" />
+    {% if patchrecursive_form.amount_of_garlic.errors %}
+        <ul class="errorlist">
+            <li style="width: inherit;">{{ patchrecursive_form.amount_of_garlic.errors }}</li>
+        </ul>
+        <br style="clear: left;" />
+    {% endif %}
 	How many cloves of garlic would now be required to cook both recipes in the recipes/ directory? <br style="clear: left;" />
 	{{ patchrecursive_form.amount_of_garlic }}
 	<br style="clear: left;" />
