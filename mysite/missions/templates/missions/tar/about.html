@@ -20,14 +20,7 @@
 
 {% block mission_main %}
 <div class='submodule fat'>
-  <div class='submodule-head head'>
-    <h3>Using tar</h3>
-  </div>
   <div class="submodule-body body">
-      <p>Open source software is commonly released in the form of archives called <em>tarballs</em>.  The tar program creates, unpacks, and manipulates such archives.</p>
-      <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
-
-      <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
       {%if create_done and unpack_done %}
       <div id="success-msg" class="successmsg">
         <p><strong>You have successfully completed this mission.</strong></p>
@@ -41,11 +34,17 @@
         OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
         OH.Page['mission_parts'] = 'tar,tar_extract';
         </script>
+        <script type="text/javascript">
+          window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
+            window.location = "{% url mysite.missions.tar.views.unpacking %}";
+            }
+        </script>
         {% endblock %}
       </div>
       {% endif %}
-      <p class="next_mission_link">
-	<a href="{% url mysite.missions.tar.views.unpacking %}">Get started with unpacking &raquo;</a></p>
+      <div class="mission-step">
+        <oppia oppia-id="10" exploration-version="1" src="http://missions-beta.openhatch.org">
+      </div>
   </div>
 </div>
 {% endblock mission_main %}
