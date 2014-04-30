@@ -44,17 +44,24 @@
       <!-- create status: failure -->
       {% endif %}
       <div class="mission-step">
-        <oppia oppia-id="11" exploration-version="2" src="http://missions-beta.openhatch.org">
+        <oppia oppia-id="11" exploration-version="3" src="http://missions-beta.openhatch.org">
       </div>
       <script type="text/javascript">
-        window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-          $.post(
-                 "{% url mysite.missions.tar.views.create_mission_success %}",
-                 {create_success: true},
-                 function (response) {
-                  window.location = "{% url mysite.missions.base.views.main_page %}";
-                 });
+        window.OPPIA_PLAYER.onStateTransitionPostHook = function(
+            iframeNode, oldStateName, jsonAnswer, newStateName) {
+          if (newStateName == 'success') {
+            $('#link-creating').removeClass('cross-progress').addClass('tick-progress');
+            $.post(
+                   "{% url mysite.missions.tar.views.create_mission_success %}",
+                   {create_success: true},
+                   function (response) {
+                     console.log(response);
+                   });
           }
+        };
+        window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
+          window.location = "{% url mysite.missions.base.views.main_page %}";
+        };
       </script>
   </div>
 </div>
