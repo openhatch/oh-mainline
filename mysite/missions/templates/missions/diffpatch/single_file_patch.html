@@ -97,7 +97,7 @@
 	</div>
     <div id="medium">
 	 <p>One way to accomplish this is by running a command like</p>
-	 <tt>patch -p0 &lt; patch_file</tt> 
+	 <tt>patch &lt; patch_file</tt> 
 	 <p>from the command-line, in the directory containing both <tt>patch_file</tt> and the original file (replace <tt>"patch_file"</tt> with the actual name of the file you downloaded).</p> 
 	 <p>This command says "use the patch program to apply the diff in <tt>patch_file</tt> to a file in the current directory".</p> 
 	 <p>You can read more about the <tt>patch</tt> program in its <a href="http://linux.die.net/man/1/patch">man page</a> or if you are on Mac or Linux, type: <pre>man patch</pre> at the command-line.</p>
@@ -116,7 +116,7 @@
       </pre>
       <p>Then, use the <tt>patch</tt> command to apply the changes.</p>
       <pre>
-	patch -p0 &lt; add-oven-temp.patch
+	patch &lt; add-oven-temp.patch
       </pre>
       <p>At this point, oven-pancake.txt has been modified. You can
 	verify that by opening that file in your favorite text editor.</p>
