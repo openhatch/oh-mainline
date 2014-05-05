@@ -31,13 +31,6 @@
 
 <p>Your mission is this: The file <code>{{ file_for_git_diff }}</code> contains a terrible error.  Fix it in your working copy to print "Hello world!", rather than "Goodbye world!". Submit your changes as a format-patch file. (You can use your working copy from the previous mission.)</p>
 
-<ul class="raquo_bullets">
-  <li>Edit the file to fix the error. Remember that you need to edit files before running git commands!</li>
-  <li>Tell git you want to prepare these changes for committing: <code>git add {{ file_for_git_diff }}</code></li>
-  <li>Tell git you want to record those changes as a commit, and provide a short message to summarize your commit. For example: <code>git commit -m "Fixed hello world"</code></li>
-  <li>Create a file containing the patch: <code>git format-patch origin/master</code></li>
-  <li>Open the patch file with a text editor and paste the results in the box below.</li>
-</ul>
 <br style="clear: left;" />
 {% if git_diff_done %}
 <div class="successmsg">
@@ -62,4 +55,90 @@
 </form>
 <p>Note: Files created by <code>git format-patch</code> are like normal <a href="{% url mysite.missions.diffpatch.views.about %}">patch files</a>, but they also carry information about the <code>git commit</code> that created the patch: the author, the date, and the commit log message are all there at the top of the patch.</p>
 {% endif %}
+<div id="hint_tabs">
+	<ul>
+	  <li><a href="#hints">Hints</a></li>
+	  <li><a href="#low">Low</a></li>
+	  <li><a href="#high">High</a></li>
+	</ul>
+	<div id="hints">
+	  <p>If you need help with this step, try clicking through these hints.</p>
+	  <p>The "low" hint level is perfect if you're just confused as to what to do.</p>
+	  <p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
+	</div>
+	<div id="low">
+	  <p>Try some of these commands:</p>
+	  <ul class="raquo_bullets">
+	  <li><tt>git status</tt></li>
+   	  <li><tt>git add</tt></li>
+          <li><tt>git commit -m "Your message"</tt></li>
+	  <li><tt>git log --decorate</tt></li>
+	  <li><tt>git format-patch origin/master</tt></li>
+	</div>
+        
+	</div>
+	<div id="high">
+	  <p>Edit the file to fix the error. Remember that you need to edit files before running git commands!</p>
+	  <p>After you have edited the file, check the status of the repository by running this command:</p>
+	  <ul class="raquo_bullets">
+	  <li><tt>git status</tt></li>
+	  </ul>
+	  <p>And it should display this:</p>
+	  <code># On branch master<br>
+		# Changes not staged for commit: <br>
+		#	(use "git add <file>..." to update what will be committed)<br>
+		#	(use "git checkout -- <file>..." to discard changes in working directory<br>
+		#
+		#		modified:	hello.py<br>
+		#
+	  </code>
+	  <p>Tell git you want to prepare these changes for committing: </p> 
+	  <ul class="raquo_bullets">
+	  <li><tt>git add {{ file_for_git_diff }} </tt></li>
+	  </ul>
+	  <p>Display the status of the repository one more time. It should display:</p>
+	  <code># On branch master<br>
+		# Changes to be committed:<br>
+		#	(use "git reset HEAD <file>...." to unstage)<br>
+		#<br>
+		#		modified: hello.py<br>
+		#<br>
+	  </code>
+	  <p>Tell git you want to record those changes as a commit, and provide a short message to summarize your commit. For example: </p>
+	  <ul class="raquo_bullets">
+	  <li><tt>git commit -m "Fixed hello world"</tt></li>
+	  </ul>
+	  <p>And it should display:</P>
+	  <code>[master 084334ce] Fixed hello world<br>
+		1 file changed, 1 insertion(+), 1 deletion(-)</code>
+	  <p>Check the status of the repository one last time. It should display:</p>
+	  <code># On branch master<br>
+		# Your branch is ahead of 'origin/master' by 1 commit.<br>
+		#<br>
+		nothing to commit (working directory clean)<br>
+	  </code>
+	  <p>Let's check the reference names of any commits done on the repository. To do that run this command:</p>
+	  <ul class="raquo_bullets">
+	  <li><tt>git log --decorate</tt></li>
+	  </ul>
+	  <p>It should display:</p>
+	  <code>commit c82a587dc30d37c7f21b5745c161e53b6b2ef1d3<br>
+		Author: John Smith JohnSmith@email.com<br>
+		Date: Sat May 3 15:18:04 2014 -0400<br>
+
+		"Your commit message"<br><br>
+		commit e43c513eb6f3ca24e37e3c96cc8da6d29317454b<br>
+		Author: The Brain deploy@linnode.openhatch.org<br>
+		Date: Sat May 3 15:18:04 2014 -0400<br><br>
+
+			"Initial commit"</code>
+	  <p>Create a file containing the patch:</p>
+	  <ul class="raquo_bullets">
+  	  <li><tt>git format-patch origin/master</tt></li>
+ 	  </ul>
+	  <p>Display:</p>
+	  <code> 0001-Fixed-hello-world.patch </code>
+  	  <p>Open the patch file with a text editor and paste the results in the box above.</p>
+	  </ul>
+        </div>
 {% endblock %}
