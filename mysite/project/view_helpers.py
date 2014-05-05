@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.search.models
 import logging
+import mysite.search.models
+
 KEY = 'answer_ids_that_are_ours'
 PROJECTS_TO_HELP_OUT_KEY = 'projects_we_want_to_help_out'
 
@@ -40,8 +41,10 @@ def get_unsaved_answers_from_session(session):
             ret.append(
                 mysite.search.models.Answer.all_even_unowned.get(id=answer_id))
         except mysite.search.models.Answer.DoesNotExist:
-            logging.warn("Whoa, the answer has gone away. Session and Answer IDs: " +
-                         str(session) + str(answer_id))
+            logging.warn(
+                "Whoa, the answer has gone away. Session and Answer IDs: " +
+                str(session) +
+                str(answer_id))
     return ret
 
 
@@ -58,8 +61,10 @@ def take_control_of_our_answers(user, session, KEY=KEY):
         del session[KEY]
 
 
-def flush_session_wanna_help_queue_into_database(user, session,
-                                                 PROJECTS_TO_HELP_OUT_KEY=PROJECTS_TO_HELP_OUT_KEY):
+def flush_session_wanna_help_queue_into_database(
+        user,
+        session,
+        PROJECTS_TO_HELP_OUT_KEY=PROJECTS_TO_HELP_OUT_KEY):
     # FIXME: This really ought to be some sort of thread-safe queue,
     # or stored in the database, or something.
     for project_id in session.get(PROJECTS_TO_HELP_OUT_KEY, []):

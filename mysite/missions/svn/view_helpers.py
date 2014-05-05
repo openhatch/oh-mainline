@@ -48,19 +48,27 @@ class SvnRepository(object):
         svnserve_conf.write(open(svnserve_conf_path, 'w'))
 
         # Assign a password for the user.
-        password = ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)),
-                            format='words').lower().split()[:3])
+        password = ' '.join(
+            otp.OTP().reformat(
+                binascii.hexlify(
+                    os.urandom(8)),
+                format='words').lower().split()[
+                :3])
         passwd_path = os.path.join(self.repo_path, 'conf', 'passwd')
         passwd_file = RawConfigParser()
         passwd_file.read(passwd_path)
         passwd_file.set('users', self.username, password)
         passwd_file.write(open(passwd_path, 'w'))
 
-        dumploader = subprocess.Popen(
-            ['svnadmin', 'load', '--ignore-uuid', self.repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        dumploader = subprocess.Popen(['svnadmin',
+                                       'load',
+                                       '--ignore-uuid',
+                                       self.repo_path],
+                                      stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE)
         dumploader.communicate(open(self.INITIAL_CONTENT).read())
         if dumploader.returncode != 0:
-            raise RuntimeError, 'svnadmin load failed'
+            raise RuntimeError('svnadmin load failed')
 
         # Install the pre-commit hook.
         precommit_hook_path = os.path.join(
@@ -69,7 +77,7 @@ class SvnRepository(object):
 export PATH=%s
 exec %s -W ignore %s svn_precommit "$@"
 ''' % (pipes.quote(os.environ['PATH']), pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
-        os.chmod(precommit_hook_path, 0755)
+        os.chmod(precommit_hook_path, 0o755)
 
     def exists(self):
         return os.path.isdir(self.repo_path)
@@ -94,7 +102,8 @@ exec %s -W ignore %s svn_precommit "$@"
 
 
 def get_username_for_svn_txn(repo_path, txn_id):
-    return subproc_check_output(['svnlook', 'author', repo_path, '-t', txn_id]).strip()
+    return subproc_check_output(
+        ['svnlook', 'author', repo_path, '-t', txn_id]).strip()
 
 
 def get_changes_for_svn_txn(repo_path, txn_id):
@@ -109,7 +118,8 @@ def get_changes_for_svn_txn(repo_path, txn_id):
 
 
 def get_file_for_svn_txn(repo_path, txn_id, filename):
-    return subproc_check_output(['svnlook', 'cat', repo_path, '-t', txn_id, filename])
+    return subproc_check_output(
+        ['svnlook', 'cat', repo_path, '-t', txn_id, filename])
 
 
 def get_log_for_svn_txn(repo_path, txn_id):
@@ -132,33 +142,40 @@ class SvnCommitMission(object):
         person = Person.objects.get(user__username=username)
 
         if not mission_completed(person, 'svn_diff'):
-            raise IncorrectPatch, 'The svn diff mission must be completed before the svn commit mission.'
+            raise IncorrectPatch(
+                'The svn diff mission must be completed before the svn commit mission.')
 
         # Check that the correct files are modified.
         paths_that_should_be_modified = [
             'trunk/' + cls.SECRET_WORD_FILE, 'trunk/' + cls.FILE_TO_BE_PATCHED]
         for action, path in get_changes_for_svn_txn(repo_path, txn_id):
             if action != 'U':
-                raise IncorrectPatch, 'No files should have been added or removed.'
+                raise IncorrectPatch(
+                    'No files should have been added or removed.')
             if path not in paths_that_should_be_modified:
-                raise IncorrectPatch, 'File "%s" should not have been modified.' % path
+                raise IncorrectPatch(
+                    'File "%s" should not have been modified.' %
+                    path)
             paths_that_should_be_modified.remove(path)
 
         if len(paths_that_should_be_modified):
-            raise IncorrectPatch, 'File "%s" should have been modified.' % paths_that_should_be_modified[
-                0]
+            raise IncorrectPatch(
+                'File "%s" should have been modified.' %
+                paths_that_should_be_modified[0])
 
         # Check the secret word.
         if get_file_for_svn_txn(repo_path, txn_id, 'trunk/' + cls.SECRET_WORD_FILE).strip() != cls.NEW_SECRET_WORD:
-            raise IncorrectPatch, 'The new secret word is incorrect.'
+            raise IncorrectPatch('The new secret word is incorrect.')
 
         # Check the other patched file.
         if get_file_for_svn_txn(repo_path, txn_id, 'trunk/' + cls.FILE_TO_BE_PATCHED) != open(cls.NEW_CONTENT).read():
-            raise IncorrectPatch, 'The new content of %s is incorrect.' % cls.FILE_TO_BE_PATCHED
+            raise IncorrectPatch(
+                'The new content of %s is incorrect.' %
+                cls.FILE_TO_BE_PATCHED)
 
         # Check for a log message.
         if get_log_for_svn_txn(repo_path, txn_id).strip() == '':
-            raise IncorrectPatch, 'No log message was provided.'
+            raise IncorrectPatch('No log message was provided.')
 
         set_mission_completed(person, 'svn_commit')
         # And let the commit in...

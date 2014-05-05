@@ -18,26 +18,24 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import django.test
-from django.core.urlresolvers import reverse
-
-import twill
-from twill import commands as tc
-from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler
-from StringIO import StringIO
-from django.test.client import Client
 import os
 import os.path
 import subprocess
-
-from django.core.cache import cache
-from django.conf import settings
-
+from StringIO import StringIO
 import mock
 import datetime
 import logging
+
+import django.test
+from django.core.urlresolvers import reverse
+from django.core.handlers.wsgi import WSGIHandler
+from django.core.servers.basehttp import AdminMediaHandler
+from django.test.client import Client
+from django.core.cache import cache
+from django.conf import settings
 from django.utils import unittest
+import twill
+from twill import commands as tc
 
 import mysite.base.view_helpers
 import mysite.base.decorators
@@ -47,7 +45,6 @@ import mysite.base.unicode_sanity
 import mysite.profile.views
 import mysite.base.views
 import mysite.project.views
-
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
 
@@ -190,7 +187,8 @@ class GeocoderCanCache(django.test.TestCase):
 
     def get_geocoding_in_json_for_unicode_string(self):
         # Just exercise the geocoder and ensure it doesn't blow up.
-        return mysite.base.view_helpers.cached_geocoding_in_json(self.unicode_address)
+        return mysite.base.view_helpers.cached_geocoding_in_json(
+            self.unicode_address)
 
     mock_geocoder = mock.Mock()
 
@@ -200,7 +198,8 @@ class GeocoderCanCache(django.test.TestCase):
         # Let's make sure that the first time we run this (with original_json),
         # that the cache is empty, and we populate it with original_json.
         cache.delete(
-            mysite.base.view_helpers.address2cache_key_name(self.unicode_address))
+            mysite.base.view_helpers.address2cache_key_name(
+                self.unicode_address))
 
         # NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
         # When the geocoder's results are being cached properly,
@@ -215,8 +214,9 @@ class GeocoderCanCache(django.test.TestCase):
             json = self.get_geocoding_in_json_for_unicode_string()
             self.assert_('original value' in json)
         except AssertionError:
-            raise AssertionError, "Geocoded location in json was not cached; it now equals " + \
-                json
+            raise AssertionError(
+                "Geocoded location in json was not cached; it now equals " +
+                json)
 
 
 class TestUnicodifyDecorator(TwillTests):
@@ -402,7 +402,8 @@ class Unsubscribe(TwillTests):
 
     def test_unsubscribe_post_handler(self):
         def get_dude():
-            return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+            return mysite.profile.models.Person.objects.get(
+                user__username='paulproteus')
         dude = get_dude()
         self.assert_(get_dude().email_me_re_projects)
 
@@ -414,7 +415,8 @@ class Unsubscribe(TwillTests):
 
     def test_submit_form(self):
         def get_dude():
-            return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+            return mysite.profile.models.Person.objects.get(
+                user__username='paulproteus')
         dude = get_dude()
         self.assert_(get_dude().email_me_re_projects)
 
@@ -480,8 +482,6 @@ class TimestampTests(django.test.TestCase):
             self.assertTrue(new_timestamp >
                             mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
-# Test cases for Nagios integration
-
 
 class NagiosTests(django.test.TestCase):
     # Test for OK Nagios meta data return (0)
@@ -532,7 +532,8 @@ class NagiosTests(django.test.TestCase):
         newtime = datetime.datetime.utcnow() - datetime.timedelta(days=4)
 
         self.assertEqual(
-            0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
+            0,
+            mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
 
     # Test for OK Nagios weekly mail return (0) after send_emails is
     # run as a management command
@@ -544,21 +545,22 @@ class NagiosTests(django.test.TestCase):
         # Now run to see if the function sees things are ok in the
         # database
         self.assertEqual(
-            0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
+            0,
+            mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
 
     # Test for CRITICAL Nagios weekly mail return (2)
     def test_nagios_weeklymail_return_critical(self):
         newtime = datetime.datetime.utcnow() - datetime.timedelta(days=8)
 
         self.assertEqual(
-            2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
+            2,
+            mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
 
     # Test for CRITICAL Nagios weekly mail return (2) on new database
     def test_nagios_weeklymail_return_critical_newdb(self):
         self.assertEqual(
-            2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
-
-# Test cases for meta data generation
+            2,
+            mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
 
 
 class MetaDataTests(django.test.TestCase):
@@ -574,7 +576,7 @@ def find_git_path():
 
     if os.path.exists(os.path.join(maybe_git_dir, '.git')):
         return maybe_git_dir
-    raise ValueError, "Could not find git directory path."
+    raise ValueError("Could not find git directory path.")
 
 # Test that the git repository has no files that conflict with Windows
 
@@ -618,4 +620,5 @@ class GoogleApiTests(unittest.TestCase):
         # Check that latitude and longitude are returned and status is 'OK'
         geocode = mysite.base.view_helpers._geocode(response_data=response)
         self.assertNotEqual(geocode, None)
+
 # vim: set ai et ts=4 sw=4 nu:

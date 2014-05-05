@@ -41,14 +41,14 @@ class MarkContactedForm(django.forms.Form):
         if mysite.search.models.Project.objects.filter(
                 id=value):
             return value
-        raise django.forms.ValidationError, "Invalid project ID."
+        raise django.forms.ValidationError("Invalid project ID.")
 
     def clean_person_id(self):
         value = self.cleaned_data['person_id']
         if mysite.profile.models.Person.objects.filter(
                 id=value).count():
             return value
-        raise django.forms.ValidationError, "Invalid person ID."
+        raise django.forms.ValidationError("Invalid person ID.")
 
 
 class ProjectForm(django.forms.ModelForm):

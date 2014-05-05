@@ -20,6 +20,27 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+from . import tasks
+import mock
+import os
+
+from django.utils.unittest import skipIf
+from django.utils import simplejson
+from django.core import mail
+from django.conf import settings
+import django.test
+import django.conf
+import django.db
+from django.core import serializers
+from django.core.files.base import ContentFile
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+import pprint
+import BeautifulSoup
+from twill import commands as tc
+import quopri
+
 from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.view_helpers import ObjectFromDict
 from mysite.base.models import Timestamp
@@ -34,27 +55,6 @@ import mysite.profile.templatetags.profile_extras
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
-from django.utils.unittest import skipIf
-import pprint
-
-from django.utils import simplejson
-import BeautifulSoup
-import datetime
-import tasks
-import mock
-import os
-from twill import commands as tc
-import quopri
-
-from django.core import mail
-from django.conf import settings
-import django.test
-import django.conf
-import django.db
-from django.core import serializers
-from django.core.files.base import ContentFile
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 
 
 class StarlingTests(TwillTests):
@@ -66,7 +66,7 @@ class StarlingTests(TwillTests):
 
 
 class ProfileTests(TwillTests):
-    # {{{
+
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'cchost-data-imported-from-ohloh']
 
@@ -74,7 +74,7 @@ class ProfileTests(TwillTests):
         self.client.get('/people/')
 
     def test__portfolio_updates_when_citation_added_to_db(self):
-       # {{{
+
         paulproteus = Person.objects.get(user__username='paulproteus')
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
@@ -88,12 +88,9 @@ class ProfileTests(TwillTests):
         citation.save()
 
         # Verify that get_publish_portfolio_entries() works
-        self.assert_('project name' in [
-                     pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
-
-        # }}}
-
-    # }}}
+        self.assert_(
+            'project name' in [
+                pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
 
     def test_get_full_name_and_username(self):
         # Test case with first name and last name.
@@ -122,7 +119,6 @@ class ProfileTests(TwillTests):
 
 
 class DebTagsTests(TwillTests):
-    # {{{
 
     def testAddOneDebtag(self):
         views.add_one_debtag_to_project('alpine', 'implemented-in::c')
@@ -130,11 +126,11 @@ class DebTagsTests(TwillTests):
                          ['implemented-in::c'])
 
     def testImportDebtags(self):
-        views.import_debtags(cooked_string=
-                             'alpine: works-with::mail, protocol::smtp')  # side effects galore!
+        # side effects galore!
+        views.import_debtags(
+            cooked_string='alpine: works-with::mail, protocol::smtp')
         self.assertEqual(set(views.list_debtags_of_project('alpine')),
                          set(['works-with::mail', 'protocol::smtp']))
-    # }}}
 
 # class ExpTag(TwillTests):
 
@@ -143,7 +139,7 @@ class DebTagsTests(TwillTests):
 
 
 class Info(TwillTests):
-    # {{{
+
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
@@ -165,7 +161,7 @@ class Info(TwillTests):
 
     # FIXME: Write a unit test for this.
     def update_tags(self, tag_dict):
-        # {{{
+
         url = reverse(mysite.profile.views.edit_info)
         tc.go(make_twill_url(url))
         for tag_type_name in tag_dict:
@@ -174,8 +170,11 @@ class Info(TwillTests):
         tc.submit()
 
         # Check that at least the first tag made it into the database.
-        self.assert_(list(Link_Person_Tag.objects.filter(
-            tag__text=tag_dict.values()[0][0], person__user__username='paulproteus')))
+        self.assert_(
+            list(
+                Link_Person_Tag.objects.filter(
+                    tag__text=tag_dict.values()[0][0],
+                    person__user__username='paulproteus')))
 
         # Check that the output is correct.
         soup = BeautifulSoup.BeautifulSoup(tc.show())
@@ -188,22 +187,16 @@ class Info(TwillTests):
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
         tc.find(tag_dict.values()[0][0])
-        # }}}
 
     def test_tag_edit_once(self):
-        # {{{
         self.login_with_twill()
         self.update_tags(self.tags)
-        # }}}
 
     def test_tag_edit_twice(self):
-        # {{{
         self.login_with_twill()
         self.update_tags(self.tags)
         self.update_tags(self.tags_2)
-        # }}}
 
-    # }}}
 
 # Create a mock Ohloh get_contribution_info_by_username
 mock_gcibu = mock.Mock()
@@ -252,16 +245,17 @@ stumps_ohloh_results.return_value = ([
 ], WebResponse())
 stumps_project_lookup = mock.Mock()
 stumps_project_lookup.return_value = {
-    u'name': u'WinKexec', u'homepage_url': u'https://www.jstump.com/projects/kexec/'}
+    u'name': u'WinKexec',
+    u'homepage_url': u'https://www.jstump.com/projects/kexec/'}
 
 
 class UserListTests(TwillTests):
-    # {{{
+
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'user-barry', 'person-barry']
 
     def test_display_list_of_users_web(self):
-        # {{{
+
         self.login_with_twill()
         url = 'http://openhatch.org/%2Bpeople/list/'
         url = make_twill_url(url)
@@ -271,13 +265,10 @@ class UserListTests(TwillTests):
         tc.follow('paulproteus')
         tc.url('people/paulproteus')
         tc.find('paulproteus')
-        # }}}
-
-    # }}}
 
 
 class Portfolio(TwillTests):
-    # {{{
+
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
     # Don't include cchost-paulproteus, because we need paulproteus to have
@@ -285,7 +276,11 @@ class Portfolio(TwillTests):
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
-    def _test_get_import_status(self, client, but_first=None, must_find_nothing=False):
+    def _test_get_import_status(
+            self,
+            client,
+            but_first=None,
+            must_find_nothing=False):
         "Just make sure that the JSON returned by the view is "
         "appropriate considering what's in the database."
         #
@@ -301,8 +296,10 @@ class Portfolio(TwillTests):
             distinct_months=1,
             languages='Python',
             data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
-        )
+                source='rs',
+                query='paulproteus',
+                completed=True,
+                person=paulproteus)[0])
         citation.save()
 
         finished_dia = citation.data_import_attempt
@@ -383,8 +380,10 @@ class Portfolio(TwillTests):
             distinct_months=1,
             languages='Python',
             data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
-        )
+                source='rs',
+                query='paulproteus',
+                completed=True,
+                person=paulproteus)[0])
         citation.save()
 
         # finished dia
@@ -411,8 +410,6 @@ class Portfolio(TwillTests):
         self.assertEqual(len(response_decoded['citations']), 0,
                          "Expected no citations back.")
         # Who cares about DIAS.
-
-    # }}}
 
 
 class ImporterPublishCitation(TwillTests):
@@ -537,11 +534,11 @@ class ImporterDeleteCitation(TwillTests):
 
 class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    # {{{
 
     def test_show_email(self):
-        """This test: (a) verifies my@ema.il does not appear on paulproteus's profile page, then goes to his account settings and opts in to showing it, and then verifies it does appear."""
-        # {{{
+        """This test: (a) verifies my@ema.il does not appear on paulproteus's
+        profile page then goes to his account settings and opts in to showing
+        it, and then verifies it does appear."""
         self.login_with_twill()
 
         tc.go('/people/paulproteus/')
@@ -554,8 +551,6 @@ class UserCanShowEmailAddress(TwillTests):
 
         tc.go('/people/paulproteus/')
         tc.find('my@ema.il')
-        # }}}
-    # }}}
 
 
 # Create a mock Launchpad get_info_for_launchpad_username
@@ -642,14 +637,18 @@ class Widget(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_widget_display(self):
-        widget_url = reverse(mysite.profile.views.widget_display,
-                             kwargs={'user_to_display__username': 'paulproteus'})
+        widget_url = reverse(
+            mysite.profile.views.widget_display,
+            kwargs={
+                'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
         client.get(widget_url)
 
     def test_widget_display_js(self):
-        widget_js_url = reverse(mysite.profile.views.widget_display_js,
-                                kwargs={'user_to_display__username': 'paulproteus'})
+        widget_js_url = reverse(
+            mysite.profile.views.widget_display_js,
+            kwargs={
+                'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
         client.get(widget_js_url)
 
@@ -710,8 +709,9 @@ class DeletePortfolioEntry(TwillTests):
         self.assertFalse(portfolio_entry.is_deleted)
 
         view = mysite.profile.views.delete_portfolio_entry_do
-        response = self.login_with_client().post(reverse(view),
-                                                 {'portfolio_entry__pk': portfolio_entry.pk})
+        response = self.login_with_client().post(
+            reverse(view), {
+                'portfolio_entry__pk': portfolio_entry.pk})
 
         response_decoded = simplejson.loads(response.content)
 
@@ -724,7 +724,8 @@ class DeletePortfolioEntry(TwillTests):
         self.assert_(PortfolioEntry.objects.get(pk=portfolio_entry.pk)
                      .is_deleted)
 
-    def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(self):
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(
+            self):
         failing_pk = 0
         self.assertEqual(
             PortfolioEntry.objects.filter(pk=failing_pk).count(), 0)
@@ -790,10 +791,12 @@ class AddCitationManually(TwillTests):
 
         # Check that a citation was created.
         c = Citation.untrashed.get(url=input_data['url'])
-        self.assertEqual(c.portfolio_entry, portfolio_entry,
-                         "The portfolio entry for the new citation is the exactly "
-                         "the one whose id we POST'd to "
-                         "profile.views.add_citation_manually.")
+        self.assertEqual(
+            c.portfolio_entry,
+            portfolio_entry,
+            "The portfolio entry for the new citation is the exactly "
+            "the one whose id we POST'd to "
+            "profile.views.add_citation_manually.")
 
         self.assert_(c.is_published,
                      "Manually added citations are published by default.")
@@ -922,7 +925,8 @@ class GimmeJsonTellsAboutImport(TwillTests):
         return simplejson.loads(response.content)
 
     def get_paulproteus(self):
-        return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        return mysite.profile.models.Person.objects.get(
+            user__username='paulproteus')
 
     def get_barry(self):
         return mysite.profile.models.Person.objects.get(user__username='barry')
@@ -971,18 +975,21 @@ class GimmeJsonTellsAboutImport(TwillTests):
             query="bananas")
         not_my_dia.save()
 
-        self.assert_(self.gimme_json()['import']['running'],
-                     "Expected that the JSON reports that an import is running")
+        self.assert_(
+            self.gimme_json()['import']['running'],
+            "Expected that the JSON reports that an import is running")
         self.assertEqual(
-            self.gimme_json()['import']['progress_percentage'], 50,
+            self.gimme_json()['import']['progress_percentage'],
+            50,
             "Expected that the JSON reports that the import is at 50% progress")
 
         # Now let's make them all completed
         my_incomplete_recent_dia.completed = True
         my_incomplete_recent_dia.save()
 
-        self.assertFalse(self.gimme_json()['import']['running'],
-                         "After all DIAs are completed, expected that the JSON reports that no import is running.")
+        self.assertFalse(
+            self.gimme_json()['import']['running'],
+            "After all DIAs are completed, expected that the JSON reports that no import is running.")
 
 
 class PortfolioEntryAdd(TwillTests):
@@ -991,12 +998,15 @@ class PortfolioEntryAdd(TwillTests):
     def test_portfolio_entry_add(self):
         # preconditions
         self.assertEqual(
-            Project.objects.filter(name='new project name').count(),
-            0, "expected precondition: there's no project named 'new project name'")
+            Project.objects.filter(
+                name='new project name').count(),
+            0,
+            "expected precondition: there's no project named 'new project name'")
         self.assertEqual(
             PortfolioEntry.objects.filter(
                 project__name='new project name').count(),
-            0, "expected precondition: there's no portfolio entry for a project "
+            0,
+            "expected precondition: there's no portfolio entry for a project "
             "named 'new project name'")
 
         # Here is what the JavaScript seems to POST.
@@ -1013,13 +1023,16 @@ class PortfolioEntryAdd(TwillTests):
         # Check side-effects
 
         self.assertEqual(
-            Project.objects.filter(name='new project name').count(),
-            1, "expected: after POSTing to view, there's a project named 'new project name'")
+            Project.objects.filter(
+                name='new project name').count(),
+            1,
+            "expected: after POSTing to view, there's a project named 'new project name'")
         self.assertEqual(
             PortfolioEntry.objects.filter(
                 person__user__username='paulproteus',
                 project__name='new project name').count(),
-            1, "expected: after POSTing to view, there's a portfolio entry for paulproteus"
+            1,
+            "expected: after POSTing to view, there's a portfolio entry for paulproteus"
             "for a project named 'new project name'")
 
         new_pk = PortfolioEntry.objects.get(
@@ -1092,7 +1105,10 @@ class IgnoreNewDuplicateCitations(TwillTests):
         project1 = Project.create_dummy(name='1')
         project2 = Project.create_dummy(name='2')
         repo_search = DataImportAttempt.objects.get_or_create(
-            source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+            source='rs',
+            query='paulproteus',
+            completed=True,
+            person=paulproteus)[0]
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
                 project=project1,
@@ -1112,8 +1128,10 @@ class IgnoreNewDuplicateCitations(TwillTests):
             distinct_months=1,
             languages='Python',
             data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
-        )
+                source='rs',
+                query='paulproteus',
+                completed=True,
+                person=paulproteus)[0])
         citation_of_different_project.save_and_check_for_duplicates()
 
         # This is the normal case: citations of different projects
@@ -1125,7 +1143,10 @@ class IgnoreNewDuplicateCitations(TwillTests):
         # Create a second citation with all the same attributes as the first.
         # We will test that this one is superseded by its predecessor.
         username_search = DataImportAttempt.objects.get_or_create(
-            source='ou', query='paulproteus', completed=True, person=paulproteus)[0]
+            source='ou',
+            query='paulproteus',
+            completed=True,
+            person=paulproteus)[0]
         # As is realistic, this citation comes from an
         # Ohloh username search with the same results.
         citation2 = Citation(
@@ -1228,7 +1249,9 @@ class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(
+        not mysite.profile.view_helpers.geoip_city_database_available(),
+        "Skipping because high-resolution GeoIP data not available.")
     def test(self):
         data = {}
         data['geoip_has_suggestion'], data[
@@ -1236,7 +1259,9 @@ class SuggestLocation(TwillTests):
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(
+        not mysite.profile.view_helpers.geoip_city_database_available(),
+        "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
         """We wrote this test because MaxMind gives us back a city in Iceland. That city
         has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
@@ -1279,7 +1304,8 @@ class EditLocation(TwillTests):
         tc.notfind('Timbuktu')
 
         # Now go edit my "contact info"
-        tc.go(make_twill_url('http://openhatch.org/account/settings/location/'))
+        tc.go(
+            make_twill_url('http://openhatch.org/account/settings/location/'))
         # set the location in ze form
         tc.fv("a_settings_tab_form", 'location_display_name', 'Timbuktu')
         tc.submit()
@@ -1415,8 +1441,10 @@ class EditContactBlurbForwarderification(TwillTests):
         mystr = "email me here: $fwd.  it'll be great"
         user_to_forward_to = User.objects.get(username='paulproteus')
         # we run this string through a controller called forwarderify
-        mystr_forwarderified = (mysite.base.view_helpers.
-                                put_forwarder_in_contact_blurb_if_they_want(mystr, user_to_forward_to))
+        mystr_forwarderified = (
+            mysite.base.view_helpers. put_forwarder_in_contact_blurb_if_they_want(
+                mystr,
+                user_to_forward_to))
         our_forwarder = mysite.profile.models.Forwarder.objects.get(
             user=user_to_forward_to)
         output = "email me here: %s@%s .  it'll be great" % (
@@ -1696,7 +1724,8 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['q'], 'a_tag_name_or_whatever')
         self.assertEqual(data['query_type'], 'all_tags')
 
-    def test_tokenizer_parses_quotation_marks_correctly_but_if_they_are_missing_greedily_assumes_they_were_there(self):
+    def test_tokenizer_parses_quotation_marks_correctly_but_if_they_are_missing_greedily_assumes_they_were_there(
+            self):
         data = mysite.profile.view_helpers.parse_string_query(
             'project:"Debian GNU/Linux"')
         self.assertEqual(data['q'], 'Debian GNU/Linux')
@@ -1727,7 +1756,8 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
         self.original_value = django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH
         django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = None
 
-    @mock.patch('mysite.profile.tasks.RegeneratePostfixAliasesForForwarder.update_table')
+    @mock.patch(
+        'mysite.profile.tasks.RegeneratePostfixAliasesForForwarder.update_table')
     def test(self, mock_update_table):
         task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
         task.run()
@@ -1789,8 +1819,8 @@ class PostFixGeneratorList(TwillTests):
 class EmailForwarderGarbageCollection(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # create a bunch of forwarders
-        # all possibilitied given the options: "expired," "should no longer be displayed"
-            # except if it's expired we it definitely should no longer be displayed
+    # all possibilitied given the options: "expired," "should no longer be displayed"
+    # except if it's expired we it definitely should no longer be displayed
     # run garbage collection
     # make sure that whatever should have happened has happened
 
@@ -1808,8 +1838,11 @@ class EmailForwarderGarbageCollection(TwillTests):
             stops_being_listed_on = datetime.datetime.utcnow(
             ) + stops_being_listed_on_future_number * datetime.timedelta(minutes=10)
             user = User.objects.get(username="paulproteus")
-            new_mapping = mysite.profile.models.Forwarder(address=address,
-                                                          expires_on=expires_on, user=user, stops_being_listed_on=stops_being_listed_on)
+            new_mapping = mysite.profile.models.Forwarder(
+                address=address,
+                expires_on=expires_on,
+                user=user,
+                stops_being_listed_on=stops_being_listed_on)
             new_mapping.save()
             return new_mapping
         # asheesh wants a forwarder in his profile.  oh yes he does.
@@ -1830,15 +1863,21 @@ class EmailForwarderGarbageCollection(TwillTests):
         # there should be no other forwarders for the address that valid_new
         # has
         self.assertEqual(
-            1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())
+            1,
+            mysite.profile.models.Forwarder.objects.filter(
+                pk=valid_new.pk).count())
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
             address=valid_new.address).count())
         # valid_old should still be in the database
         self.assertEqual(
-            1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
+            1,
+            mysite.profile.models.Forwarder.objects.filter(
+                pk=valid_old.pk).count())
         # invalid should not be in the database
         self.assertEqual(
-            0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
+            0,
+            mysite.profile.models.Forwarder.objects.filter(
+                pk=invalid.pk).count())
         # there should be 2 forwarders in total: we lost one
         forwarders = mysite.profile.models.Forwarder.objects.all()
         self.assertEqual(2, forwarders.count())
@@ -1873,18 +1912,26 @@ class EmailForwarderResolver(TwillTests):
             # if it isn't return the user's real email address
             # if it is expired, or if it's not in the table at all, return None
             try:
-                return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
+                return Forwarder.objects.get(
+                    address=forwarder_address,
+                    expires_on__gt=datetime.datetime.utcnow()).user.email
             except Forwarder.DoesNotExist:
                 return None
 
-        def test_possible_forwarder_address(address, future, actually_create, should_work):
+        def test_possible_forwarder_address(
+                address,
+                future,
+                actually_create,
+                should_work):
             future_number = future and 1 or -1
             if actually_create:
                 expiry_date = datetime.datetime.utcnow(
                 ) + future_number * datetime.timedelta(minutes=10)
                 user = User.objects.get(username="paulproteus")
-                new_mapping = mysite.profile.models.Forwarder(address=address,
-                                                              expires_on=expiry_date, user=user)
+                new_mapping = mysite.profile.models.Forwarder(
+                    address=address,
+                    expires_on=expiry_date,
+                    user=user)
                 new_mapping.save()
 
             output = get_email_address_from_forwarder_address(address)
@@ -1938,7 +1985,7 @@ class EditYourName(TwillTests):
         tc.fv(1, 'last_name', 'Leibniz')
         tc.submit()
         tc.go(make_twill_url('http://openhatch.org' +
-              Person.objects.get().profile_url))
+                             Person.objects.get().profile_url))
         tc.find('Gottfried Leibniz')
         tc.notfind('Asheesh Laroia')
 
@@ -2170,9 +2217,12 @@ class Notifications(TwillTests):
 
         self.assertFalse(paul.email_me_re_projects)
 
-    def add_two_people_to_a_project_and_send_emails(self,
-                                                    people_want_emails=True, how_to_add_people=None, outbox_or_context=None,
-                                                    emails_should_actually_be_sent=True):
+    def add_two_people_to_a_project_and_send_emails(
+            self,
+            people_want_emails=True,
+            how_to_add_people=None,
+            outbox_or_context=None,
+            emails_should_actually_be_sent=True):
 
         self.assert_(outbox_or_context in ['outbox', 'context'])
 
@@ -2292,8 +2342,11 @@ class Notifications(TwillTests):
         veteran = Person.create_dummy()
         veteran.user.first_name = 'VETERAN'
         veteran.user.save()
-        PortfolioEntry.create_dummy(person=veteran, project=project,
-                                    is_published=True, date_created=eight_days_ago)
+        PortfolioEntry.create_dummy(
+            person=veteran,
+            project=project,
+            is_published=True,
+            date_created=eight_days_ago)
 
         # Psst, notice that we have sent out a round of emails since the
         # veteran added the project to her profile. So the veteran should not
@@ -2411,7 +2464,8 @@ class Notifications(TwillTests):
         # The second project doesn't appear
         self.assertEqual(len(project2people), 1)
 
-    def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(self):
+    def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(
+            self):
         # This recipient is the only recent member of her projects
         no_news_for_me = Person.create_dummy(email='dont_email_me@example.com')
         PortfolioEntry.create_dummy_with_project(
@@ -2497,7 +2551,8 @@ class Notifications(TwillTests):
         # recorded that we sent emails within 24 hours.
         self.try_to_send_some_emails(expect_success=False)
 
-    def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(self):
+    def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(
+            self):
 
         # Now let's make sure that the converse scenario works as expected. We
         # sent the emails over 24 hours ago, and somebody runs the
@@ -2787,7 +2842,9 @@ class TestUserDeletion(TwillTests):
             username='barry'))
         self.assertEqual(2, len(django.core.mail.outbox))
 
+
 class TestBreakLongWordsFilter(TwillTests):
+
     def test_too_shirt_to_break(self):
         eight_chars = 'abcdefgh'
         output = mysite.profile.templatetags.profile_extras.break_long_words(

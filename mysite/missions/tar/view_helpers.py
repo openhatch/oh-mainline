@@ -26,7 +26,7 @@ class IncorrectTarFile(Exception):
 class TarMission(object):
     WRAPPER_DIR_NAME = 'myproject-0.1'
     FILES = {
-      'hello.c': '''#include <stdio.h>
+        'hello.c': '''#include <stdio.h>
 
 int main(void)
 {
@@ -45,7 +45,7 @@ int main(void)
         try:
             tfile = tarfile.open(fileobj=StringIO(tardata), mode='r:gz')
         except tarfile.ReadError:
-            raise IncorrectTarFile, 'Archive is not a valid gzipped tarball'
+            raise IncorrectTarFile('Archive is not a valid gzipped tarball')
 
         # Check the filename list.
         filenames_wanted = [cls.WRAPPER_DIR_NAME] + \
@@ -54,27 +54,38 @@ int main(void)
         for member in tfile.getmembers():
             if '/' not in member.name:
                 if member.name in cls.FILES.keys():
-                    raise IncorrectTarFile, 'No wrapper directory is present'
+                    raise IncorrectTarFile('No wrapper directory is present')
                 elif member.isdir() and member.name != cls.WRAPPER_DIR_NAME:
-                    raise IncorrectTarFile, 'Wrapper directory name is incorrect: "%s"' % member.name
+                    raise IncorrectTarFile(
+                        'Wrapper directory name is incorrect: "%s"' %
+                        member.name)
             if member.name not in filenames_wanted:
                 msg = 'An unexpected entry "%s" is present' % member.name
                 if '/._' in member.name:
                     # This is an Apple Double file.
                     msg += '. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.'
-                raise IncorrectTarFile, msg
+                raise IncorrectTarFile(msg)
             filenames_wanted.remove(member.name)
             if member.name == cls.WRAPPER_DIR_NAME:
                 if not member.isdir():
-                    raise IncorrectTarFile, '"%s" should be a directory but is not' % member.name
+                    raise IncorrectTarFile(
+                        '"%s" should be a directory but is not' %
+                        member.name)
             else:
                 if not member.isfile():
-                    raise IncorrectTarFile, 'Entry "%s" is not a file' % member.name
+                    raise IncorrectTarFile(
+                        'Entry "%s" is not a file' %
+                        member.name)
                 if tfile.extractfile(member).read() != cls.FILES[member.name.split('/')[-1]]:
-                    raise IncorrectTarFile, 'File "%s" has incorrect contents' % member.name
+                    raise IncorrectTarFile(
+                        'File "%s" has incorrect contents' %
+                        member.name)
         if len(filenames_wanted) != 0:
-            raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (
-                ', '.join('"%s"' % f for f in filenames_wanted))
+            raise IncorrectTarFile(
+                'Archive does not contain all expected files (missing %s)' %
+                (', '.join(
+                    '"%s"' %
+                    f for f in filenames_wanted)))
 
 
 class UntarMission(object):
@@ -87,11 +98,14 @@ class UntarMission(object):
         tdata = StringIO()
         tfile = tarfile.open(fileobj=tdata, mode='w:gz')
         tfile.add(os.path.join(get_mission_data_path('tar'),
-                  cls.TARBALL_DIR_NAME), cls.TARBALL_DIR_NAME)
+                               cls.TARBALL_DIR_NAME), cls.TARBALL_DIR_NAME)
         tfile.close()
         return tdata.getvalue()
 
     @classmethod
     def get_contents_we_want(cls):
         '''Get the data for the file we want from the tarball.'''
-        return open(os.path.join(get_mission_data_path('tar'), cls.FILE_WE_WANT)).read()
+        return open(
+            os.path.join(
+                get_mission_data_path('tar'),
+                cls.FILE_WE_WANT)).read()

@@ -58,8 +58,10 @@ class PatchSingleFileTests(TwillTests):
                 view_helpers.PatchSingleFileMission.get_patch())
             self.assertEqual(patch_process.returncode, 0)
 
-            self.assertEqual(open(file_to_patch).read(),
-                             open(view_helpers.PatchSingleFileMission.NEW_FILE).read())
+            self.assertEqual(
+                open(file_to_patch).read(),
+                open(
+                    view_helpers.PatchSingleFileMission.NEW_FILE).read())
 
         finally:
             os.unlink(file_to_patch)
@@ -91,7 +93,9 @@ class PatchSingleFileTests(TwillTests):
             self.assertEqual(patch_process.returncode, 0)
 
             submit_response = self.client.post(
-                reverse(views.patchsingle_submit), {'patched_file': open(file_to_patch)})
+                reverse(
+                    views.patchsingle_submit), {
+                    'patched_file': open(file_to_patch)})
             self.assert_(submit_response.context['patchsingle_success'])
 
             paulproteus = Person.objects.get(user__username='paulproteus')
@@ -126,7 +130,12 @@ class DiffSingleFileTests(TwillTests):
             view_helpers.DiffSingleFileMission.OLD_FILE).readlines()
         newlines = open(
             view_helpers.DiffSingleFileMission.NEW_FILE).readlines()
-        return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
+        return ''.join(
+            difflib.unified_diff(
+                oldlines,
+                newlines,
+                'old.txt',
+                'new.txt'))
 
     def make_wrong_src_patch(self):
         # Make a patch that will not apply correctly.
@@ -135,7 +144,12 @@ class DiffSingleFileTests(TwillTests):
         newlines = open(
             view_helpers.DiffSingleFileMission.NEW_FILE).readlines()
         del oldlines[0]
-        return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
+        return ''.join(
+            difflib.unified_diff(
+                oldlines,
+                newlines,
+                'old.txt',
+                'new.txt'))
 
     def make_patch_without_trailing_whitespace(self):
         # Make a patch that will not apply correctly.
@@ -154,7 +168,12 @@ class DiffSingleFileTests(TwillTests):
         newlines = open(
             view_helpers.DiffSingleFileMission.NEW_FILE).readlines()
         del newlines[0]
-        return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
+        return ''.join(
+            difflib.unified_diff(
+                oldlines,
+                newlines,
+                'old.txt',
+                'new.txt'))
 
     def make_swapped_patch(self):
         # make a backwards diff.
@@ -162,11 +181,20 @@ class DiffSingleFileTests(TwillTests):
             view_helpers.DiffSingleFileMission.OLD_FILE).readlines()
         newlines = open(
             view_helpers.DiffSingleFileMission.NEW_FILE).readlines()
-        return ''.join(difflib.unified_diff(newlines, oldlines, 'new.txt', 'old.txt'))
+        return ''.join(
+            difflib.unified_diff(
+                newlines,
+                oldlines,
+                'new.txt',
+                'old.txt'))
 
     def make_copy_paste_error_patch(self):
         file_path = get_mission_test_data_path('diffpatch')
-        return ''.join(open(os.path.join(file_path, "copy_paste_error_pancake_diff.txt")).readlines())
+        return ''.join(
+            open(
+                os.path.join(
+                    file_path,
+                    "copy_paste_error_pancake_diff.txt")).readlines())
 
     def test_good_patch(self):
         view_helpers.DiffSingleFileMission.validate_patch(
@@ -176,24 +204,16 @@ class DiffSingleFileTests(TwillTests):
         try:
             view_helpers.DiffSingleFileMission.validate_patch(
                 self.make_good_patch() * 2)
-        except view_helpers.IncorrectPatch, e:
+        except view_helpers.IncorrectPatch as e:
             self.assert_('affects more than one file' in utf8(e))
         else:
             self.fail('no exception raised')
-
-    # def test_does_not_apply_correctly(self):
-    #    try:
-    #        view_helpers.DiffSingleFileMission.validate_patch(self.make_wrong_src_patch())
-    #    except view_helpers.IncorrectPatch, e:
-    #        self.assert_('will not apply' in utf8(e))
-    #    else:
-    #        self.fail('no exception raised')
 
     def test_produces_wrong_file(self):
         try:
             view_helpers.DiffSingleFileMission.validate_patch(
                 self.make_wrong_dest_patch())
-        except view_helpers.IncorrectPatch, e:
+        except view_helpers.IncorrectPatch as e:
             self.assert_('does not have the correct contents' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -205,7 +225,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             view_helpers.DiffSingleFileMission.validate_patch(
                 self.make_swapped_patch())
-        except view_helpers.IncorrectPatch, e:
+        except view_helpers.IncorrectPatch as e:
             self.assert_(
                 'order of files passed to diff was flipped' in utf8(e))
         else:
@@ -213,12 +233,13 @@ class DiffSingleFileTests(TwillTests):
 
     def test_copy_paste_white_space_error(self):
         """
-        A diff that is corrupted by the removal of white space while copying from terminal (mostly in the case of windows)
+        A diff that is corrupted by the removal of white space while
+        copying from terminal (mostly in the case of windows)
         """
         try:
             view_helpers.DiffSingleFileMission.validate_patch(
                 self.make_copy_paste_error_patch())
-        except view_helpers.IncorrectPatch, e:
+        except view_helpers.IncorrectPatch as e:
             self.assert_('copy and paste from the terminal' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -231,7 +252,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             view_helpers.DiffSingleFileMission.validate_patch(
                 self.make_patch_without_trailing_whitespace())
-        except view_helpers.IncorrectPatch, e:
+        except view_helpers.IncorrectPatch as e:
             self.assert_('removed the space' in utf8(e))
         else:
             self.fail('no exception raised')
@@ -244,7 +265,7 @@ class DiffSingleFileTests(TwillTests):
         try:
             view_helpers.DiffSingleFileMission.validate_patch(
                 "I lack headers.")
-        except view_helpers.IncorrectPatch, e:
+        except view_helpers.IncorrectPatch as e:
             self.assert_(
                 'Make sure you are including the diff headers' in utf8(e))
         else:
@@ -272,7 +293,9 @@ class DiffSingleFileTests(TwillTests):
         Submitting a generically incorrect diff generates a generic failure message.
         """
         submit_response = self.client.post(
-            reverse(views.diffsingle_submit), {'diff': self.make_wrong_dest_patch()})
+            reverse(
+                views.diffsingle_submit), {
+                'diff': self.make_wrong_dest_patch()})
         self.assert_(
             'does not have the correct contents' in submit_response.content)
         self.assertFalse(submit_response.context['diffsingle_success'])
@@ -286,7 +309,9 @@ class DiffSingleFileTests(TwillTests):
         Submitting a backwards diff generates a special failure message.
         """
         submit_response = self.client.post(
-            reverse(views.diffsingle_submit), {'diff': self.make_swapped_patch()})
+            reverse(
+                views.diffsingle_submit), {
+                'diff': self.make_swapped_patch()})
         self.assert_(
             'order of files passed to diff was flipped' in submit_response.content)
         self.assertFalse(submit_response.context['diffsingle_success'])
@@ -315,7 +340,12 @@ class DiffRecursiveTests(TwillTests):
                     line = line.replace(old, new)
                 newlines.append(line)
             lines_for_output = list(
-                difflib.unified_diff(oldlines, newlines, 'orig-' + fileinfo.name, fileinfo.name))
+                difflib.unified_diff(
+                    oldlines,
+                    newlines,
+                    'orig-' +
+                    fileinfo.name,
+                    fileinfo.name))
             bytes_for_output = ''.join(lines_for_output)
             if dos_line_endings:
                 bytes_for_output = bytes_for_output.replace('\n', '\r\n')
@@ -444,7 +474,12 @@ class DiffRecursiveTests(TwillTests):
             # We're very similar to test_do_mission-correctly, but here we
             # switch newlines and oldlines, to create a reverse patch
             diff.writelines(
-                difflib.unified_diff(newlines, oldlines, 'orig-' + fileinfo.name, fileinfo.name))
+                difflib.unified_diff(
+                    newlines,
+                    oldlines,
+                    'orig-' +
+                    fileinfo.name,
+                    fileinfo.name))
         diff.seek(0)
         diff.name = 'foo.patch'
 
@@ -477,7 +512,9 @@ class DiffRecursiveTests(TwillTests):
             with open(filename) as f:
                 leading_dot_slash_diff = f.read()
             submit_response = self.client.post(
-                reverse(views.diffrecursive_submit), {'diff': leading_dot_slash_diff})
+                reverse(
+                    views.diffrecursive_submit), {
+                    'diff': leading_dot_slash_diff})
             self.assertFalse(submit_response.context['diffrecursive_success'])
 
             paulproteus = Person.objects.get(user__username='paulproteus')
@@ -494,9 +531,10 @@ class DiffRecursiveTests(TwillTests):
             try:
                 view_helpers.DiffRecursiveMission.validate_patch(
                     leading_dot_slash_diff)
-            except view_helpers.IncorrectPatch, e:
+            except view_helpers.IncorrectPatch as e:
                 self.assertEqual(
-                    'The diff you submitted will not apply properly because it has filename(s) starting with "./". Make sure that when you run the diff command, you do not add unnecessary "./" path prefixes. This is important because it affects the arguments needed to run the patch command for whoever applies the patch.', utf8(e))
+                    'The diff you submitted will not apply properly because it has filename(s) starting with "./". Make sure that when you run the diff command, you do not add unnecessary "./" path prefixes. This is important because it affects the arguments needed to run the patch command for whoever applies the patch.',
+                    utf8(e))
             else:
                 self.fail('no exception raised')
 
@@ -529,7 +567,9 @@ class PatchRecursiveTests(TwillTests):
 
     def test_do_mission_correctly(self):
         response = self.client.post(
-            reverse(views.patchrecursive_submit), view_helpers.PatchRecursiveMission.ANSWERS)
+            reverse(
+                views.patchrecursive_submit),
+            view_helpers.PatchRecursiveMission.ANSWERS)
         self.assert_(response.status_code, 302)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -544,7 +584,9 @@ class PatchRecursiveTests(TwillTests):
             reverse(views.patchrecursive_submit), answers)
 
         self.assertFalse(response.context['patchrecursive_success'])
-        self.assertIn('That is not the right number of garlic cloves', response.content)
+        self.assertIn(
+            'That is not the right number of garlic cloves',
+            response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(

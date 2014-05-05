@@ -20,10 +20,8 @@
 
 # This is the "base" set of views for the OpenHatch missions.
 
-from mysite.base.decorators import view
-import mysite.base.decorators
-from mysite.missions.models import Step, StepCompletion
-from mysite.missions.base import view_helpers
+import os
+import collections
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.conf.urls.defaults import (
@@ -36,10 +34,12 @@ from django.utils.decorators import method_decorator
 import django.views.generic.base
 import django.views.generic.edit
 import django.conf
-
-import os
 from django.utils import simplejson
-import collections
+
+from mysite.base.decorators import view
+import mysite.base.decorators
+from mysite.missions.models import Step, StepCompletion
+from mysite.missions.base import view_helpers
 
 # Other missions use this helper.
 #
@@ -73,26 +73,29 @@ class MissionPageState(object):
         data = {
             'this_mission_page_short_name': self.this_mission_page_short_name,
             'mission_name': self.mission_name,
-            'url_prefix': getattr(django.conf.settings, 'URL_PREFIX', 'http://127.0.0.1:8000'),
+            'url_prefix': getattr(
+                django.conf.settings,
+                'URL_PREFIX',
+                'http://127.0.0.1:8000'),
             'mission_step_prerequisites_passed': not self.mission_step_prerequisite}
         if (self.passed_data):
             data.update(self.passed_data)
         if user.is_authenticated():
             person = self.request.user.get_profile()
             if self.mission_step_prerequisite:
-                data['mission_step_prerequisites_passed'
-                     ] = view_helpers.mission_completed(person,
-                                                        self.mission_step_prerequisite)
+                data['mission_step_prerequisites_passed'] = view_helpers.mission_completed(
+                    person,
+                    self.mission_step_prerequisite)
             else:
                 data['mission_step_prerequisites_passed'] = True
         return (data, person)
 
     def reset(self, mission_parts=None):
-        ''' Resets whole mission or selected steps.
+        """Resets whole mission or selected steps.
 
         Args:
             mission_parts: A list of names for mission steps to reset.
-        '''
+        """
         mission_parts = mission_parts and mission_parts or self.mission_parts
 
         if mission_parts:
@@ -181,12 +184,16 @@ class MissionViewMixin(object):
             return do_it()
 
 
-class MissionBaseView(MissionViewMixin, django.views.generic.base.TemplateView):
+class MissionBaseView(
+        MissionViewMixin,
+        django.views.generic.base.TemplateView):
 
     """A Template-based Page in a Mission."""
 
 
-class MissionBaseFormView(MissionViewMixin, django.views.generic.edit.BaseFormView):
+class MissionBaseFormView(
+        MissionViewMixin,
+        django.views.generic.edit.BaseFormView):
 
     """A Form-based Page in a Mission."""
 

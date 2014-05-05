@@ -23,49 +23,45 @@ from __future__ import absolute_import
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-# Imports {{{
-from mysite.base.tests import TwillTests
-from mysite.search.models import Bug, Project
-from mysite.base.models import Timestamp
-from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
-import mysite.profile.views
-from mysite.customs import ohloh
-import mysite.customs.views
-import mysite.base.depends
-import mysite.customs.api
-import mysite.customs.core_bugimporters
-
-from django.core.urlresolvers import reverse
-
 import logging
 import mock
 import os
+from StringIO import StringIO
+import datetime
 
+from django.core.urlresolvers import reverse
 import django.test
 import django.contrib.auth.models
 import django.core.serializers
 from django.conf import settings
-
-from StringIO import StringIO
-import datetime
-
-import mysite.customs.feed
-
 from django.utils.unittest import skipIf
 
+from mysite.base.tests import TwillTests
+from mysite.base.models import Timestamp
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
+import mysite.profile.views
+import mysite.base.depends
+import mysite.customs.api
+import mysite.customs.core_bugimporters
+import mysite.customs.feed
 import mysite.customs.models
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.snapshot_public_data
+from mysite.customs import ohloh
+import mysite.customs.views
+from mysite.search.models import Bug, Project
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class OhlohIconTests(django.test.TestCase):
 
     '''Test that we can grab icons from Ohloh.'''
-    # {{{
 
-    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+    @skipIf(
+        not mysite.base.depends.Image,
+        "Skipping photo tests since PIL is needed. See Advanced Installation docs.")
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
@@ -112,7 +108,9 @@ class OhlohIconTests(django.test.TestCase):
     # }}}
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class BlogCrawl(django.test.TestCase):
 
     def test_summary2html(self):
@@ -134,7 +132,9 @@ class BlogCrawl(django.test.TestCase):
                          u'Yo \xe9')
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class DataExport(django.test.TestCase):
 
     def test_snapshot_user_table_without_passwords(self):
@@ -206,8 +206,10 @@ class DataExport(django.test.TestCase):
         # Django user objects really should have an email address
         # so, if we hid it, we make one up based on the user ID
         new_p1 = Person.objects.get(user__username='privateguy')
-        self.assertEquals(new_p1.user.email,
-                          'user_id_%d_has_hidden_email_address@example.com' % new_p1.user.id)
+        self.assertEquals(
+            new_p1.user.email,
+            'user_id_%d_has_hidden_email_address@example.com' %
+            new_p1.user.id)
 
         new_p2 = Person.objects.get(user__username='publicguy')
         self.assertEquals(new_p2.user.email, 'public@example.com')
@@ -497,7 +499,9 @@ class DataExport(django.test.TestCase):
 # vim: set nu:
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class BugTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -516,8 +520,9 @@ class BugTrackerEditingViews(TwillTests):
         for url in [
             'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
                 'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
-            mysite.customs.models.TracQueryModel.objects.create(url=url,
-                                                                tracker=self.tm)
+            mysite.customs.models.TracQueryModel.objects.create(
+                url=url,
+                tracker=self.tm)
 
     def test_slash_does_not_crash_tracker_editor(self):
         mysite.customs.models.TracTrackerModel.all_trackers.create(
@@ -533,8 +538,9 @@ class BugTrackerEditingViews(TwillTests):
                       kwargs={'tracker_type': 'trac'}
                       ) + '?project_id=%d' % (self.twisted.id, )
         response = client.get(url)
-        self.assertEqual(self.twisted,
-                         response.context['tracker_form'].initial['created_for_project'])
+        self.assertEqual(
+            self.twisted,
+            response.context['tracker_form'].initial['created_for_project'])
 
     def test_bug_tracker_edit_url_missing_url_id_302s(self):
         client = self.login_with_client()
@@ -563,7 +569,9 @@ class BugTrackerEditingViews(TwillTests):
         self.assertEquals(r.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class BugzillaTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -573,8 +581,9 @@ class BugzillaTrackerEditingViews(TwillTests):
 
     def test_form_create_bugzilla_tracker(self):
         # We start with no BugzillaTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
             'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
@@ -587,13 +596,15 @@ class BugzillaTrackerEditingViews(TwillTests):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
 
     def test_form_create_bugzilla_tracker_with_custom_parser(self):
         # We start with no BugzillaTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
             'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
@@ -607,14 +618,17 @@ class BugzillaTrackerEditingViews(TwillTests):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         btm = mysite.customs.models.BugzillaTrackerModel.objects.all(
         ).select_subclasses().get()
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class BugzillaTrackerListing(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -651,7 +665,9 @@ class BugzillaTrackerListing(TwillTests):
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class LaunchpadTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -661,8 +677,9 @@ class LaunchpadTrackerEditingViews(TwillTests):
 
     def test_form_create_launchpad_tracker(self):
         # We start with no LaunchpadTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.LaunchpadTrackerForm({
             'tracker_name': 'KDE Bugzill',
             'launchpad_name': 'https://bugs.kde.org/',
@@ -676,13 +693,17 @@ class LaunchpadTrackerEditingViews(TwillTests):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
-        self.assertEqual(1,
-                         mysite.customs.models.LaunchpadQueryModel.objects.all().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.LaunchpadQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class GitHubTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -692,8 +713,9 @@ class GitHubTrackerEditingViews(TwillTests):
 
     def test_form_create_github_tracker(self):
         # We start with no GitHubTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.GitHubTrackerForm({
             'tracker_name': 'KDE Github',
             'github_url': 'https://github.com/kde/project-A',
@@ -706,13 +728,17 @@ class GitHubTrackerEditingViews(TwillTests):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
-        self.assertEqual(2,
-                         mysite.customs.models.GitHubQueryModel.objects.all().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            2,
+            mysite.customs.models.GitHubQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class GitHubTrackerListing(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -734,7 +760,9 @@ class GitHubTrackerListing(TwillTests):
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(
+    mysite.base.depends.lxml.html is None,
+    "To run these tests, please install lxml. See Advanced Installation docs.")
 class JiraTrackerEditingViews(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -743,8 +771,9 @@ class JiraTrackerEditingViews(TwillTests):
         self.kde = mysite.search.models.Project.create_dummy(name='kde')
 
     def test_form_create_jira_tracker(self):
-        self.assertEqual(0,
-                         mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
 
         form = mysite.customs.forms.JiraTrackerForm({
             'tracker_name': 'KDE Jira',
@@ -760,10 +789,12 @@ class JiraTrackerEditingViews(TwillTests):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
-        self.assertEqual(2,
-                         mysite.customs.models.JiraQueryModel.objects.all().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            2,
+            mysite.customs.models.JiraQueryModel.objects.all().count())
 
 # Tests for importing bug data from YAML files, as emitted by oh-bugimporters
 
@@ -783,26 +814,29 @@ class ExportTrackerAsDict(django.test.TestCase):
         for url in [
             'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
                 'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
-            mysite.customs.models.TracQueryModel.objects.create(url=url,
-                                                                tracker=self.tm)
+            mysite.customs.models.TracQueryModel.objects.create(
+                url=url,
+                tracker=self.tm)
 
     def test_export(self):
         exported = self.tm.as_dict()
-        golden = {'documentation_text': 'documentation',
-                  'documentation_type': 'keywords',
-                  'queries': [u'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
-                              u'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'],
-                  'base_url': 'http://twistedmatrix.com/trac/',
-                  'bitesized_text': 'easy',
-                  'bitesized_type': 'keywords',
-                  'bug_project_name_format': '{tracker_name}',
-                  'tracker_name': 'Twisted',
-                  'as_appears_in_distribution': '',
-                  'custom_parser': '',
-                  'bugimporter': 'trac',
-                  'existing_bug_urls': [],
-                  'get_older_bug_data': None,
-                  }
+        golden = {
+            'documentation_text': 'documentation',
+            'documentation_type': 'keywords',
+            'queries': [
+                u'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                u'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'],
+            'base_url': 'http://twistedmatrix.com/trac/',
+            'bitesized_text': 'easy',
+            'bitesized_type': 'keywords',
+            'bug_project_name_format': '{tracker_name}',
+            'tracker_name': 'Twisted',
+            'as_appears_in_distribution': '',
+            'custom_parser': '',
+            'bugimporter': 'trac',
+            'existing_bug_urls': [],
+            'get_older_bug_data': None,
+        }
         self.assertEqual(golden, exported)
 
     def test_export_includes_existing_bugs(self):

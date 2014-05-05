@@ -29,7 +29,8 @@ class BugAlertSubscriptionForm(django.forms.ModelForm):
 
     email = django.forms.EmailField(
         label="Email address",
-        error_messages={'invalid': 'This email address doesn\'t look right. Real or malarkey?'})
+        error_messages={
+            'invalid': 'This email address doesn\'t look right. Real or malarkey?'})
 
     class Meta:
         model = mysite.search.models.BugAlert

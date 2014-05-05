@@ -20,11 +20,15 @@
 
 import os.path
 import shutil
-
-from mysite.search.models import Project, get_image_data_scaled
-import mysite.customs.models
-import mysite.profile.view_helpers
-import mysite.base.models
+import datetime
+import uuid
+import urllib
+import random
+import collections
+import re
+import cgi
+import logging
+import hashlib
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -35,15 +39,11 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.utils import http
 
-import datetime
-import uuid
-import urllib
-import random
-import collections
-import re
-import cgi
-import logging
-import hashlib
+from mysite.search.models import Project, get_image_data_scaled
+import mysite.customs.models
+import mysite.profile.view_helpers
+import mysite.base.models
+
 
 DEFAULT_LOCATION = 'Inaccessible Island'
 DEFAULT_LATITUDE = -37.3049962
@@ -97,7 +97,6 @@ class RepositoryCommitter(models.Model):
 class Person(models.Model):
 
     """ A human bean. """
-    # {{{
     homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
@@ -106,28 +105,42 @@ class Person(models.Model):
     bio = models.TextField(blank=True)
     contact_blurb = models.TextField(blank=True)
     expand_next_steps = models.BooleanField(default=True)
-    photo = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b),
-                              default='')
-    photo_thumbnail = models.ImageField(upload_to=
-                                        lambda a, b: 'static/photos/profile-photos/' +
-                                        generate_person_photo_path(
-                                            a, b, suffix="-thumbnail"),
-                                        default='',
-                                        null=True)
+    photo = models.ImageField(
+        upload_to=lambda a,
+        b: 'static/photos/profile-photos/' +
+        generate_person_photo_path(
+            a,
+            b),
+        default='')
+    photo_thumbnail = models.ImageField(
+        upload_to=lambda a,
+        b: 'static/photos/profile-photos/' +
+        generate_person_photo_path(
+            a,
+            b,
+            suffix="-thumbnail"),
+        default='',
+        null=True)
 
-    photo_thumbnail_30px_wide = models.ImageField(upload_to=
-                                                  lambda a, b: 'static/photos/profile-photos/' +
-                                                  generate_person_photo_path(
-                                                      a, b, suffix="-thumbnail-30px-wide"),
-                                                  default='', null=True)
+    photo_thumbnail_30px_wide = models.ImageField(
+        upload_to=lambda a,
+        b: 'static/photos/profile-photos/' +
+        generate_person_photo_path(
+            a,
+            b,
+            suffix="-thumbnail-30px-wide"),
+        default='',
+        null=True)
 
-    photo_thumbnail_20px_wide = models.ImageField(upload_to=
-                                                  lambda a, b: 'static/photos/profile-photos/' +
-                                                  generate_person_photo_path(
-                                                      a, b, suffix="-thumbnail-20px-wide"),
-                                                  default='', null=True)
+    photo_thumbnail_20px_wide = models.ImageField(
+        upload_to=lambda a,
+        b: 'static/photos/profile-photos/' +
+        generate_person_photo_path(
+            a,
+            b,
+            suffix="-thumbnail-20px-wide"),
+        default='',
+        null=True)
 
     blacklisted_repository_committers = models.ManyToManyField(
         RepositoryCommitter)
@@ -138,8 +151,9 @@ class Person(models.Model):
                                              verbose_name='Location')
     latitude = models.FloatField(null=False, default=-37.3049962)
     longitude = models.FloatField(null=False, default=-12.6790445)
-    email_me_re_projects = models.BooleanField(default=True,
-                                               verbose_name='Email me periodically about activity in my projects')
+    email_me_re_projects = models.BooleanField(
+        default=True,
+        verbose_name='Email me periodically about activity in my projects')
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
 
@@ -180,7 +194,8 @@ class Person(models.Model):
     def inaccessible_islanders():
         # If you change this method, change the method immediately above this
         # one (location_is_public)
-        return Person.objects.filter(Q(location_confirmed=False) | Q(location_display_name=''))
+        return Person.objects.filter(
+            Q(location_confirmed=False) | Q(location_display_name=''))
 
     def get_public_location_or_default(self):
         if self.location_is_public():
@@ -201,8 +216,8 @@ class Person(models.Model):
             return DEFAULT_LONGITUDE
 
     def __unicode__(self):
-        return "username: %s, name: %s %s" % (self.user.username,
-                                              self.user.first_name, self.user.last_name)
+        return "username: %s, name: %s %s" % (
+            self.user.username, self.user.first_name, self.user.last_name)
 
     def get_photo_url_or_default(self):
         try:
@@ -273,15 +288,18 @@ class Person(models.Model):
         return PortfolioEntry.published_ones.filter(person=self)
 
     def get_nonarchived_published_portfolio_entries(self):
-        return PortfolioEntry.published_ones.filter(person=self, is_archived=False)
+        return PortfolioEntry.published_ones.filter(
+            person=self,
+            is_archived=False)
 
     def get_maintainer_portfolio_entries(self):
         """
         Return the PortfolioEntries for which this person wants to receive
         maintainer updates.
         """
-        return PortfolioEntry.published_ones.filter(person=self,
-                                                    receive_maintainer_updates=True)
+        return PortfolioEntry.published_ones.filter(
+            person=self,
+            receive_maintainer_updates=True)
 
     def get_list_of_all_published_projects(self):
         # This method looks familiar but testing -- jl
@@ -295,8 +313,10 @@ class Person(models.Model):
             'project__name', flat=True).distinct())
 
     def get_display_names_of_nonarchived_projects(self):
-        return list(self.get_nonarchived_published_portfolio_entries().values_list(
-            'project__display_name', flat=True).distinct())
+        return list(
+            self.get_nonarchived_published_portfolio_entries().values_list(
+                'project__display_name',
+                flat=True).distinct())
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -339,8 +359,6 @@ class Person(models.Model):
         # FIXME: Add support for recommended projects.
         # FIXME: Add support for recommended project tags.
 
-        # }}}
-
     def get_published_citations_flat(self):
         return sum([list(pfe.get_published_citations())
                     for pfe in self.get_published_portfolio_entries()], [])
@@ -379,7 +397,8 @@ class Person(models.Model):
     def get_tags_for_recommendations(self):
         """Return a list of Tags linked to this Person.  For use with bug recommendations."""
         exclude_me = TagType.objects.filter(name='understands_not')
-        return [link.tag for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me]
+        return [link.tag for link in self.link_person_tag_set.all(
+        ) if link.tag.tag_type not in exclude_me]
 
     def get_full_name(self):
         # {{{
@@ -450,8 +469,10 @@ class Person(models.Model):
 
     @property
     def profile_url(self):
-        return reverse(mysite.profile.views.display_person_web,
-                       kwargs={'user_to_display__username': self.user.username})
+        return reverse(
+            mysite.profile.views.display_person_web,
+            kwargs={
+                'user_to_display__username': self.user.username})
 
     @staticmethod
     def get_by_username(username):
@@ -483,8 +504,6 @@ class Person(models.Model):
         token.save()
         return token
 
-    # }}}
-
 
 def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
     """Post-save hook for Users. raw is populated from kwargs.
@@ -497,7 +516,7 @@ models.signals.post_save.connect(create_profile_when_user_created, User)
 
 
 class DataImportAttempt(models.Model):
-    # {{{
+
     SOURCE_CHOICES = (
         ('rs', "Ohloh"),
         ('ou', "Ohloh"),
@@ -522,9 +541,9 @@ class DataImportAttempt(models.Model):
         return self.get_source_display() % self.query
 
     def __unicode__(self):
-        return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.get_source_display(), self.person, self.query)
+        return "Attempt to import data, source = %s, person = <%s>, query = %s" % (
+            self.get_source_display(), self.person, self.query)
 
-    # }}}
 
 '''
 Scenario A.
@@ -547,7 +566,8 @@ Scenario B.
 
 def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
     if not instance.query.strip():
-        raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
+        raise ValueError(
+            "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it.")
 
 
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
@@ -558,7 +578,7 @@ models.signals.pre_save.connect(
 
 
 class TagType(models.Model):
-    # {{{
+
     short_name2long_name = {'understands': 'understands',
                             'can_mentor': 'can mentor in',
                             'can_pitch_in': 'can pitch in with',
@@ -569,11 +589,9 @@ class TagType(models.Model):
     def __unicode__(self):
         return self.name
 
-    # }}}
-
 
 class Tag(models.Model):
-    # {{{
+
     text = models.CharField(null=False, max_length=255)
     tag_type = models.ForeignKey(TagType)
 
@@ -588,27 +606,22 @@ class Tag(models.Model):
 
     def __unicode__(self):
         return "%s: %s" % (self.tag_type.name, self.text)
-    # }}}
 
 
 class Link_Project_Tag(models.Model):
 
     "Many-to-many relation between Projects and Tags."
-    # {{{
     tag = models.ForeignKey(Tag)
     project = models.ForeignKey(Project)
     source = models.CharField(max_length=200)
-    # }}}
 
 
 class Link_Person_Tag(models.Model):
 
     "Many-to-many relation between Person and Tags."
-    # {{{
     tag = models.ForeignKey(Tag)
     person = models.ForeignKey(Person)
     source = models.CharField(max_length=200)
-    # }}}
 
 
 class SourceForgePerson(models.Model):
@@ -645,10 +658,10 @@ class Link_SF_Proj_Dude_FM(models.Model):
         {'dev_loginname': x, 'proj_unixname': y, is_admin: z,
         'position': a, 'date_collected': b}, return a
         SourceForgeProjectMembershipFromFlossMole instance."""
-        person, _ = SourceForgePerson.objects.get_or_create(username=
-                                                            dev_loginname)
-        project, _ = SourceForgeProject.objects.get_or_create(unixname=
-                                                              proj_unixname)
+        person, _ = SourceForgePerson.objects.get_or_create(
+            username=dev_loginname)
+        project, _ = SourceForgeProject.objects.get_or_create(
+            unixname=proj_unixname)
         is_admin = bool(int(is_admin))
         date_collected = datetime.datetime.strptime(
             date_collected, '%Y-%m-%d %H:%M:%S')  # no time zone
@@ -665,10 +678,12 @@ class Link_SF_Proj_Dude_FM(models.Model):
             return None
         person, proj_unixname, is_admin, position, date_collected = row.split(
             '\t')
-        return Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(person,
-                                                                   proj_unixname,
-                                                                   is_admin, position,
-                                                                   date_collected)
+        return Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(
+            person,
+            proj_unixname,
+            is_admin,
+            position,
+            date_collected)
 
 
 class PublishedPortfolioEntries(models.Manager):
@@ -780,7 +795,8 @@ class Citation(models.Model):
                         self.data_import_attempt.get_source_display(),
                     )
                 if self.distinct_months is None:
-                    raise ValueError, "Er, Ohloh always gives us a # of months."
+                    raise ValueError(
+                        "Er, Ohloh always gives us a # of months.")
                 return "Coded for %d month%s in %s (%s)" % (
                     self.distinct_months,
                     suffix,
@@ -793,9 +809,10 @@ class Citation(models.Model):
                     self.data_import_attempt.get_source_display()
                 )
             elif self.data_import_attempt.source == 'bb':
-                    return "Created a repository on Bitbucket."
+                return "Created a repository on Bitbucket."
             else:
-                raise ValueError, "There's a DIA of a kind I don't know how to summarize."
+                raise ValueError(
+                    "There's a DIA of a kind I don't know how to summarize.")
         elif self.url is not None:
             return url2printably_short(self.url, CUTOFF=38)
         elif self.distinct_months is not None and self.languages is not None:
@@ -811,7 +828,8 @@ class Citation(models.Model):
     def get_languages_as_list(self):
         if self.languages is None:
             return []
-        return [lang.strip() for lang in self.languages.split(",") if lang.strip()]
+        return [lang.strip()
+                for lang in self.languages.split(",") if lang.strip()]
 
     def get_url_or_guess(self):
         if self.url:
@@ -822,7 +840,8 @@ class Citation(models.Model):
                     try:
                         project_name = unicode(
                             self.portfolio_entry.project.name, 'utf-8')
-                        return "http://www.ohloh.net/search?%s" % http.urlencode({u'q': project_name})
+                        return "http://www.ohloh.net/search?%s" % http.urlencode(
+                            {u'q': project_name})
                     except:
                         logging.warn(
                             "During Citation.get_url_or_guess, we failed to encode the project name correctly.")
@@ -835,10 +854,11 @@ class Citation(models.Model):
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.
-        duplicates = [citation for citation in
-                      Citation.objects.filter(
-                          portfolio_entry=self.portfolio_entry)
-                      if (citation.pk != self.pk) and (citation.summary == self.summary)]
+        duplicates = [
+            citation for citation in Citation.objects.filter(
+                portfolio_entry=self.portfolio_entry) if (
+                citation.pk != self.pk) and (
+                citation.summary == self.summary)]
 
         if duplicates:
             self.ignored_due_to_duplicate = True
@@ -862,7 +882,8 @@ class Forwarder(models.Model):
         default=datetime.datetime(1970, 1, 1))
     # note about the above: for 3 days, 2 forwarders for the same user work.
     # at worst, you visit someone's profile and find a forwarder that works for 3 more days
-    # at best, you visit someone's profile and find a forwarder that works for 5 more days
+    # at best, you visit someone's profile and find a forwarder that works for
+    # 5 more days
 
     def generate_table_line(self):
         line = '%s %s' % (self.get_email_address(), self.user.email)
@@ -923,7 +944,9 @@ class UnsubscribeToken(mysite.search.models.OpenHatchModel):
         try:
             expiry_date = datetime.datetime.utcnow() - \
                 datetime.timedelta(days=90)
-            return UnsubscribeToken.objects.get(string=string, created_date__gte=expiry_date).owner
+            return UnsubscribeToken.objects.get(
+                string=string,
+                created_date__gte=expiry_date).owner
         except UnsubscribeToken.DoesNotExist:
             return None
 

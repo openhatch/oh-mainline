@@ -24,7 +24,6 @@
 import StringIO
 import datetime
 import urllib
-from django.utils import simplejson
 import re
 import collections
 import logging
@@ -42,6 +41,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 from django.utils import http
+from django.utils import simplejson
 
 # OpenHatch apps
 import mysite.base.view_helpers
@@ -56,8 +56,6 @@ import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
 from django.views.decorators.csrf import csrf_protect
-
-# }}}
 
 
 @login_required
@@ -115,12 +113,9 @@ def add_citation_manually_do(request):
         json = simplejson.dumps(output)
         return HttpResponseServerError(json, mimetype='application/json')
 
-    #}}}
-
 
 @view
 def display_person_web(request, user_to_display__username=None):
-    # {{{
 
     user = get_object_or_404(User, username=user_to_display__username)
     person, was_created = Person.objects.get_or_create(user=user)
@@ -131,12 +126,11 @@ def display_person_web(request, user_to_display__username=None):
     data['notifications'] = mysite.base.view_helpers.get_notification_from_request(
         request)
     data['explain_to_anonymous_users'] = True
-    data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(
-        is_archived=True).count()
+    data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries(
+    ).filter(is_archived=True).count()
 
     return (request, 'profile/main.html', data)
 
-    # }}}
 
 # FIXME: Create a separate function that just passes the data required for
 # displaying the little user bar on the top right to the template, and
@@ -145,7 +139,6 @@ def display_person_web(request, user_to_display__username=None):
 
 
 def get_personal_data(person):
-    # {{{
 
     # FIXME: Make this more readable.
     data_dict = {
@@ -161,24 +154,23 @@ def get_personal_data(person):
     data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
     data_dict['contact_blurb'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want(
-        person.contact_blurb, person.user)
+        person.contact_blurb,
+        person.user)
 
     data_dict['projects_i_wanna_help'] = person.projects_i_wanna_help.all()
 
     return data_dict
 
-    # }}}
-
 
 def tags_dict_for_person(person):
-    # {{{
+
     ret = collections.defaultdict(list)
     links = Link_Person_Tag.objects.filter(person=person).order_by('id')
     for link in links:
         ret[link.tag.tag_type.name].append(link.tag)
 
     return ret
-    # }}}
+
 
 # FIXME: Test this.
 
@@ -186,15 +178,13 @@ def tags_dict_for_person(person):
 def widget_display_undecorated(request, user_to_display__username):
     """We leave this function unwrapped by @view """
     """so it can referenced by widget_display_string."""
-    # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
-    data.update(mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(
-        request))
+    data.update(
+        mysite.base.view_helpers.get_uri_metadata_for_generating_absolute_links(request))
     return (request, 'profile/widget.html', data)
-    # }}}
 
 widget_display = view(widget_display_undecorated)
 
@@ -216,13 +206,9 @@ def widget_display_js(request, user_to_display__username):
                            {'in_string': encoded_for_js},
                            mimetype='application/javascript')
 
-# }}}
-
-# Debtags {{{
-
 
 def add_one_debtag_to_project(project_name, tag_text):
-    # {{{
+
     tag_type, created = TagType.objects.get_or_create(name='Debtags')
 
     project, project_created = Project.objects.get_or_create(name=project_name)
@@ -235,11 +221,9 @@ def add_one_debtag_to_project(project_name, tag_text):
         source='Debtags')
     new_link.save()
     return new_link
-# }}}
 
 
 def list_debtags_of_project(project_name):
-    # {{{
     debtags_list = list(TagType.objects.filter(name='Debtags'))
     if debtags_list:
         debtags = debtags_list[0]
@@ -255,11 +239,9 @@ def list_debtags_of_project(project_name):
     resluts = list(Link_Project_Tag.objects.filter(project=project,
                                                    tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
-    # }}}
 
 
 def import_debtags(cooked_string=None):
-    # {{{
     if cooked_string is None:
         # Warning: this re-downloads the list from Alioth every time this
         # is called
@@ -281,30 +263,22 @@ def import_debtags(cooked_string=None):
             tags = map(lambda s: s.strip(), tagstring.split(','))
             for tag in tags:
                 add_one_debtag_to_project(package, tag)
-    # }}}
-
-# }}}
-
-# Project experience tags {{{
-
-# }}}
 
 
 def _project_hash(project_name):
-    # {{{
+
     # This prefix is a sha256 of 1MiB of /dev/urandom
     PREFIX = '_project_hash_2136870e40a759b56b9ba97a0'
     PREFIX += 'd7f60b84dbc90097a32da284306e871105d96cd'
     import hashlib
     hashed = hashlib.sha256(PREFIX + project_name)
     return hashed.hexdigest()
-    # }}}
 
 
 @login_required
 # this is a post handler
 def edit_person_info_do(request):
-    # {{{
+
     person = request.user.get_profile()
 
     edit_info_form = mysite.profile.forms.EditInfoForm(
@@ -349,7 +323,7 @@ def edit_person_info_do(request):
                 continue
 
             # HACK
-            if type(tag_text) == str:
+            if isinstance(tag_text, str):
                 tag_text = unicode(tag_text, 'utf-8')
 
             # The following code gets the first matching tag or creates one. We
@@ -396,14 +370,12 @@ def edit_person_info_do(request):
         return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
-    # }}}
 
 
 @login_required
 def ask_for_tag_input(request, username):
-    # {{{
+
     return display_person_web(request, username, 'tags', edit='1')
-    # }}}
 
 
 def cut_list_of_people_in_three_columns(people):
@@ -428,7 +400,7 @@ def permanent_redirect_to_people_search(request, property, value):
 
     q = '%s:%s' % (property, escaped_value)
     get_args = {u'q': q}
-    destination_url = (reverse('mysite.profile.views.people') + '?' + 
+    destination_url = (reverse('mysite.profile.views.people') + '?' +
                        http.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
@@ -512,8 +484,10 @@ def gimme_json_for_portfolio(request):
         person=person, date_created__gt=five_minutes_ago)
     recent_dias_json = simplejson.loads(
         serializers.serialize('json', recent_dias))
-    portfolio_entries = simplejson.loads(serializers.serialize('json',
-                                                               portfolio_entries_unserialized))
+    portfolio_entries = simplejson.loads(
+        serializers.serialize(
+            'json',
+            portfolio_entries_unserialized))
     projects = simplejson.loads(
         serializers.serialize('json', projects_unserialized))
     # FIXME: Don't send like all the flippin projects down the tubes.
@@ -525,7 +499,9 @@ def gimme_json_for_portfolio(request):
     progress_percentage = 100
     if import_running:
         progress_percentage = int(
-            recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
+            recent_dias_that_are_completed.count() *
+            100.0 /
+            recent_dias.count())
     import_data = {
         'running': import_running,
         'progress_percentage': progress_percentage,
@@ -595,14 +571,12 @@ def prepare_data_import_attempts_do(request):
     non-existent accounts on remote networks. And what *that* means is,
     before bothering the user, ask those networks beforehand if they even
     have accounts named identifiers[0], etc."""
-    # {{{
 
     # For each commit identifier, prepare some DataImportAttempts.
     prepare_data_import_attempts(
         identifiers=request.POST.values(), user=request.user)
 
     return HttpResponse('1')
-    # }}}
 
 
 def prepare_data_import_attempts(identifiers, user):
@@ -629,7 +603,6 @@ def prepare_data_import_attempts(identifiers, user):
 @view
 def importer(request, test_js=False):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
-    # {{{
 
     person = request.user.get_profile()
     data = get_personal_data(person)
@@ -644,7 +617,6 @@ def importer(request, test_js=False):
     data['test_js'] = test_js or request.GET.get('test', None)
 
     return (request, 'profile/importer.html', data)
-    # }}}
 
 # FIXME: Rename importer
 portfolio_editor = importer
@@ -669,7 +641,6 @@ def user_selected_these_dia_checkboxes(request):
     Side-effect: Make a note on the DIA that its affiliated person wants it.
     Output: Success?
     """
-    # {{{
 
     prepare_data_import_attempts(request.POST, request.user)
 
@@ -695,7 +666,6 @@ def user_selected_these_dia_checkboxes(request):
                 dia.give_data_to_person()
 
     return HttpResponse('1')
-    # }}}
 
 
 @login_required
@@ -706,12 +676,10 @@ def display_person_edit_name(request, name_edit_mode):
     Why separately handle first and last names? The Django user
     model already stores them separately.
     '''
-    # {{{
     data = get_personal_data(request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
     data['editable'] = True
     return (request, 'profile/main.html', data)
-    # }}}
 
 
 @login_required
@@ -719,7 +687,6 @@ def display_person_edit_name_do(request):
     '''Take the new first name and last name out of the POST.
 
     Jam them into the Django user model.'''
-    # {{{
     user = request.user
 
     new_first = request.POST['first_name']
@@ -730,7 +697,6 @@ def display_person_edit_name_do(request):
     user.save()
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
-    # }}}
 
 
 @login_required
@@ -847,7 +813,12 @@ def set_expand_next_steps_do(request):
 
 @login_required
 @view
-def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_blurb_form=None, has_errors=False):
+def edit_info(
+        request,
+        contact_blurb_error=False,
+        edit_info_form=None,
+        contact_blurb_form=None,
+        has_errors=False):
     person = request.user.get_profile()
     data = get_personal_data(person)
     data['info_edit_mode'] = True
@@ -870,7 +841,8 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['contact_blurb_form'] = contact_blurb_form
     data['contact_blurb_error'] = contact_blurb_error
     data['forwarder_sample'] = mysite.base.view_helpers.put_forwarder_in_contact_blurb_if_they_want(
-        "$fwd", person.user)
+        "$fwd",
+        person.user)
     data['has_errors'] = has_errors
     return request, 'profile/info_wrapper.html', data
 
@@ -887,8 +859,9 @@ def set_pfentries_dot_use_my_description_do(request):
                     prefix=str(pfe_pk))
         if form.is_valid():
             pfe_after_save = form.save()
-            logging.info("Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" % (
-                request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
+            logging.info(
+                "Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" %
+                (request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
     return HttpResponseRedirect(project.get_url())
 
 
@@ -907,7 +880,11 @@ def unsubscribe_do(request):
         token_string)
     person.email_me_re_projects = False
     person.save()
-    return HttpResponseRedirect(reverse(unsubscribe, kwargs={'token_string': token_string}))
+    return HttpResponseRedirect(
+        reverse(
+            unsubscribe,
+            kwargs={
+                'token_string': token_string}))
 
 
 @login_required
@@ -929,7 +906,9 @@ def bug_recommendation_list_as_template_fragment(request):
     else:
         response_data['result'] = 'NO_BUGS'
 
-    return HttpResponse(simplejson.dumps(response_data), mimetype='application/json')
+    return HttpResponse(
+        simplejson.dumps(response_data),
+        mimetype='application/json')
 
 # API-y views go below here
 

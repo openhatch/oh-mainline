@@ -15,16 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.search.models
-import mysite.search.views
-import mysite.base.decorators
+import logging
 import re
 import hashlib
+
 import django.core.cache
 from django.db import connection
 from django.db.models import Q, Count
-import logging
 from django.utils import http
+
+import mysite.search.models
+import mysite.search.views
+import mysite.base.decorators
+
 
 CCT = 'hit_count_cache_timestamp'
 
@@ -39,12 +42,17 @@ def order_bugs(query):
 
 class Query:
 
-    def __init__(self, terms=None, active_facet_options=None, any_facet_options=False, terms_string=None):
+    def __init__(
+            self,
+            terms=None,
+            active_facet_options=None,
+            any_facet_options=False,
+            terms_string=None):
         self.terms = terms or []
-        self.active_facet_options = (mysite.base.decorators.no_str_in_the_dict(active_facet_options)
-                                     or {})
+        self.active_facet_options = (
+            mysite.base.decorators.no_str_in_the_dict(active_facet_options) or {})
         self.any_facet_options = any_facet_options or []
-        if type(terms_string) == str:
+        if isinstance(terms_string, str):
             terms_string = unicode(terms_string, 'utf-8')
         self._terms_string = terms_string
 
@@ -92,8 +100,11 @@ class Query:
         terms_string = GET.get('q', u'')
         terms = Query.split_into_terms(terms_string)
 
-        return Query(terms=terms, active_facet_options=active_facet_options,
-                     any_facet_options=any_facet_options, terms_string=terms_string)
+        return Query(
+            terms=terms,
+            active_facet_options=active_facet_options,
+            any_facet_options=any_facet_options,
+            terms_string=terms_string)
 
     def get_bugs_unordered(self):
         return mysite.search.models.Bug.open_ones.filter(self.get_Q())
@@ -149,7 +160,7 @@ class Query:
         if connection.vendor == 'sqlite':
             use_regexes = False
         else:
-            use_regexes = False # HACK for now, while Hacker News is visiting
+            use_regexes = False  # HACK for now, while Hacker News is visiting
 
         for word in self.terms:
             if use_regexes:
@@ -251,7 +262,9 @@ class Query:
         # higher in the list. Let's reverse that with reverse=True.
 
         options.sort(
-            key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
+            key=lambda x: (
+                facet_name == 'language') and (
+                x['name'] == 'Unknown'))
         # We want the Unknown language to appear last, unless it's active. If
         # the key lambda function returns False, then those options appear
         # first (because False appears before True), which is what we want.
@@ -444,7 +457,9 @@ def get_projects_with_bugs():
 
 
 def get_cited_projects_lacking_bugs():
-    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all().values_list(
-        'project_id', flat=True)
-    return mysite.search.models.Project.objects.filter(id__in=project_ids).annotate(
-        bug_count=Count('bug')).filter(bug_count=0)
+    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all(
+    ).values_list('project_id', flat=True)
+    return mysite.search.models.Project.objects.filter(
+        id__in=project_ids).annotate(
+        bug_count=Count('bug')).filter(
+            bug_count=0)

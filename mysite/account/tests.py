@@ -16,12 +16,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#{{{ imports
 import os
 import mock
 import tempfile
 import StringIO
 import logging
+
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.test.client import Client
+from django.core.urlresolvers import reverse
+from django.utils.unittest import skipIf
+from twill import commands as tc
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
@@ -29,20 +35,10 @@ import mysite.account.forms
 from mysite.search.models import Project, ProjectInvolvementQuestion
 import mysite.project.views
 import mysite.account.views
-
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-from django.test.client import Client
-from django.core.urlresolvers import reverse
-from django.utils.unittest import skipIf
-
-from twill import commands as tc
 import mysite.base.depends
-#}}}
 
 
 class Login(TwillTests):
-    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_login(self):
@@ -66,22 +62,21 @@ class Login(TwillTests):
         client = Client()
         # All test cases should redirect to the OpenHatch root.
         # Verify existing logout still behaves as before:
-        response  = client.get('/account/logout/?next=/')
+        response = client.get('/account/logout/?next=/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
         # Verify appended redirect url is ignored:
         # Before the fix for issue 952, urlparse() redirected this url to
         # /account/logout/.
-        response  = client.get('/account/logout/?next=http://www.example.com')
+        response = client.get('/account/logout/?next=http://www.example.com')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
         # Verify appended redirect url is ignored
         # Before the fix for issue 952, urlparse() redirected this url to
         # example.com.
-        response  = client.get('/account/logout/?next=http:///www.example.com')
+        response = client.get('/account/logout/?next=http:///www.example.com')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
-    # }}}
 
 
 class ProfileGetsCreatedWhenUserIsCreated(TwillTests):
@@ -133,11 +128,9 @@ class Signup(TwillTests):
         tc.fv('signup', 'password2', 'blahblahblah')
         tc.submit()
         tc.find('That username is reserved.')
-    # }}}
 
 
 class EditPassword(TwillTests):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def change_password(self, old_pass, new_pass,
@@ -175,11 +168,9 @@ class EditPassword(TwillTests):
         newpass = 'new'
         self.change_password(oldpass, newpass,
                              should_succeed=False)
-#}}}
 
 
 class EditContactInfo(TwillTests):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_edit_email_address(self):
@@ -243,7 +234,7 @@ class EditContactInfo(TwillTests):
         # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
         #
         # [2]: This assertion works b/c there's only one checkbox.
-    #}}}
+
 
 photos = [os.path.join(os.path.dirname(__file__),
                        '..', '..', 'sample-photo.' + ext)
@@ -258,9 +249,10 @@ def photo(f):
     return filename
 
 
-@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+@skipIf(
+    not mysite.base.depends.Image,
+    "Skipping photo tests. PIL is needed (see Advanced Installation docs).")
 class EditPhoto(TwillTests):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_set_avatar(self):
@@ -279,9 +271,11 @@ class EditPhoto(TwillTests):
 
             response = self.login_with_client().get(
                 reverse(mysite.account.views.edit_photo))
-            self.assertEqual(response.context[0]['photo_url'], p.photo.url,
-                             "Test that once you've uploaded a photo via the photo editor, "
-                             "the template's photo_url variable is correct.")
+            self.assertEqual(
+                response.context[0]['photo_url'],
+                p.photo.url,
+                "Test that once you've uploaded a photo via the photo editor, "
+                "the template's photo_url variable is correct.")
             self.assert_(p.photo_thumbnail)
             thumbnail_as_stored = mysite.base.depends.Image.open(
                 p.photo_thumbnail.file)
@@ -359,12 +353,11 @@ class EditPhoto(TwillTests):
         self.assert_("zlib.error" in string_log.getvalue())
         logger.removeHandler(my_log)
 
-    #}}}
 
-
-@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+@skipIf(
+    not mysite.base.depends.Image,
+    "Skipping photo tests. PIL is needed (see Advanced Installation docs).")
 class EditPhotoWithOldPerson(TwillTests):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
 
     def test_set_avatar(self):
@@ -380,18 +373,18 @@ class EditPhotoWithOldPerson(TwillTests):
             p = Person.objects.get(user__username='paulproteus')
             self.assert_(p.photo.read() ==
                          open(image).read())
-    #}}}
 
 
 class GuessLocationOnLogin(TwillTests):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     mock_ip = mock.Mock()
     # Located in Rochester, New York, U.S.A.
     mock_ip.return_value = "128.151.2.1"
 
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(
+        not mysite.profile.view_helpers.geoip_city_database_available(),
+        "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_accessing_edit_location_form(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -409,7 +402,9 @@ class GuessLocationOnLogin(TwillTests):
     # Located in Rochester, New York, U.S.A.
     mock_ip.return_value = "128.151.2.1"
 
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
+    @skipIf(
+        not mysite.profile.view_helpers.geoip_city_database_available(),
+        "Skipping because high-resolution GeoIP data not available.")
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_do_not_guess_if_have_location_set(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -452,8 +447,6 @@ class GuessLocationOnLogin(TwillTests):
         # asserting that database was updated
         self.assertTrue(person.dont_guess_my_location)
 
-    #}}}
-
 
 class SignupWithNoPassword(TwillTests):
 
@@ -482,7 +475,8 @@ class LoginPageContainsUnsavedAnswer(TwillTests):
         POST_data = {
             'project__pk': p.pk,
             'question__pk': q.pk,
-                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
+            'answer__text': """Help produce official documentation, share the solution \
+             to a problem, or check, proof and test other documents for accuracy.""",
         }
         response = self.client.post(
             reverse(mysite.project.views.create_answer_do), POST_data,
@@ -516,13 +510,15 @@ class ClearSessionsOnPasswordChange(TwillTests):
         self.assertTrue(self.user_logged_in(client1.session))
         self.assertTrue(self.user_logged_in(client2.session))
 
-        client1.post(reverse(mysite.account.views.change_password_do),
-                     data={
-                         'old_password': password, 'new_password1': new_password,
-                         'new_password2': new_password})
+        client1.post(
+            reverse(
+                mysite.account.views.change_password_do),
+            data={
+                'old_password': password,
+                'new_password1': new_password,
+                'new_password2': new_password})
 
         self.assertTrue(self.user_logged_in(client1.session))
         self.assertFalse(self.user_logged_in(client2.session))
-
 
 # vim: set nu:

@@ -15,9 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf import settings
-import xmlrunner.extra.djangotestrunner
-import django.test.simple
 import tempfile
 import os
 import sys
@@ -26,8 +23,12 @@ import random
 import subprocess
 import signal
 import logging
-import mysite.base.depends
 
+from django.conf import settings
+import django.test.simple
+import xmlrunner.extra.djangotestrunner
+
+import mysite.base.depends
 
 def generate_safe_temp_file_name():
     fd, name = tempfile.mkstemp()
@@ -47,12 +48,16 @@ def override_settings_for_testing():
     svnserve_port = random.randint(50000, 50100)
     if mysite.base.depends.svnadmin_available():
         subprocess.check_call(['svnserve',
-                               '--listen-port', str(svnserve_port),
-                               '--listen-host', '127.0.0.1',
+                               '--listen-port',
+                               str(svnserve_port),
+                               '--listen-host',
+                               '127.0.0.1',
                                '--daemon',
-                               '--pid-file', os.path.join(settings.SVN_REPO_PATH,
-                                                          'svnserve.pid'),
-                               '--root', settings.SVN_REPO_PATH])
+                               '--pid-file',
+                               os.path.join(settings.SVN_REPO_PATH,
+                                            'svnserve.pid'),
+                               '--root',
+                               settings.SVN_REPO_PATH])
     settings.SVN_REPO_URL_PREFIX = 'svn://127.0.0.1:%d/' % svnserve_port
 
 
@@ -73,9 +78,9 @@ class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
     def run_tests(self, *args, **kwargs):
         if not args or not args[0]:
             logging.info(
-                "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
+                "Running all the OpenHatch-related tests.")
             args = (['base', 'profile', 'account', 'project',
-                    'missions', 'search', 'customs'],)
+                     'missions', 'search', 'customs'],)
 
         override_settings_for_testing()
         n = 1
@@ -91,9 +96,9 @@ class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
     def run_tests(self, *args, **kwargs):
         if not args or not args[0]:
             logging.info(
-                "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
+                "Running all the OpenHatch-related tests.")
             args = (['base', 'profile', 'account', 'project',
-                    'missions', 'search', 'customs'],)
+                     'missions', 'search', 'customs'],)
 
         override_settings_for_testing()
         n = 1

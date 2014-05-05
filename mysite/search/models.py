@@ -17,6 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+import StringIO
+import logging
+import uuid
+from urlparse import urljoin
+import random
+import voting
+
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
@@ -24,21 +32,15 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.conf import settings
-import datetime
-import StringIO
-import logging
-import uuid
-from urlparse import urljoin
-import random
+import django.contrib.contenttypes.models
+from django.utils import http
+from django.core.urlresolvers import reverse
+
 import mysite.customs
 import mysite.base.unicode_sanity
-from django.core.urlresolvers import reverse
-import voting
 import mysite.customs.ohloh
 import mysite.base.depends
 import mysite.base.decorators
-import django.contrib.contenttypes.models
-from django.utils import http
 
 
 class OpenHatchModel(models.Model):
@@ -93,8 +95,8 @@ class Project(OpenHatchModel):
 
         This is probably pretty inefficient, but it's not called very often.'''
         # Grab all the bug trackers that bugs refer to
-        all_corresponding_bug_trackers = set([b.tracker for b in self.bug_set.all()
-                                              if b.tracker])
+        all_corresponding_bug_trackers = set(
+            [b.tracker for b in self.bug_set.all() if b.tracker])
         # Grab all the bug trackers that refer to the project
         for tracker in mysite.customs.models.TrackerModel.objects.filter(created_for_project=self).select_subclasses():
             all_corresponding_bug_trackers.add(tracker)
@@ -148,10 +150,17 @@ class Project(OpenHatchModel):
         ret.save()
         return ret
 
-    name = models.CharField(max_length=200, unique=True,
-                            help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',) * 2))
-    display_name = models.CharField(max_length=200, default='',
-                                    help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
+    name = models.CharField(
+        max_length=200,
+        unique=True,
+        help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' %
+        (('hello@openhatch.org',
+          ) *
+         2))
+    display_name = models.CharField(
+        max_length=200,
+        default='',
+        help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
     display_name = models.CharField(max_length=200, default='')
     homepage = models.URLField(max_length=200, blank=True, default='',
                                verbose_name='Project homepage URL')
@@ -207,8 +216,9 @@ class Project(OpenHatchModel):
 
     logo_contains_name = models.BooleanField(default=False)
 
-    people_who_wanna_help = models.ManyToManyField('profile.Person',
-                                                   related_name='projects_i_wanna_help')
+    people_who_wanna_help = models.ManyToManyField(
+        'profile.Person',
+        related_name='projects_i_wanna_help')
 
     # Cache the number of OpenHatch members who have contributed to this
     # project.
@@ -318,17 +328,24 @@ class Project(OpenHatchModel):
         return ret[:n]
 
     def __unicode__(self):
-        return "name='%s' display_name='%s' language='%s'" % (self.name, self.display_name, self.language)
+        return "name='%s' display_name='%s' language='%s'" % (
+            self.name, self.display_name, self.language)
 
     def get_url(self):
         import mysite.project.views
-        return reverse(mysite.project.views.project,
-                       kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
+        return reverse(
+            mysite.project.views.project,
+            kwargs={
+                'project__name': mysite.base.unicode_sanity.quote(
+                    self.name)})
 
     def get_edit_page_url(self):
         import mysite.project.views
-        return reverse(mysite.project.views.edit_project,
-                       kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
+        return reverse(
+            mysite.project.views.edit_project,
+            kwargs={
+                'project__name': mysite.base.unicode_sanity.quote(
+                    self.name)})
 
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
@@ -339,7 +356,8 @@ class Project(OpenHatchModel):
             query_var = self.name
             if not mentors_available:
                 query_var = self.language
-            query_string = http.urlencode({u'q': u'can_mentor:"%s"' % query_var})
+            query_string = http.urlencode(
+                {u'q': u'can_mentor:"%s"' % query_var})
             return reverse(mysite.profile.views.people) + '?' + query_string
         else:
             return ""
@@ -355,7 +373,10 @@ class Project(OpenHatchModel):
     def get_open_bugs_randomly_ordered(self):
         return self.get_open_bugs().order_by('?')
 
-    def get_pfentries_with_descriptions(self, listen_to_the_community=False, **kwargs):
+    def get_pfentries_with_descriptions(
+            self,
+            listen_to_the_community=False,
+            **kwargs):
         pfentries = self.portfolioentry_set.exclude(
             project_description='').filter(**kwargs)
         if listen_to_the_community:
@@ -366,7 +387,8 @@ class Project(OpenHatchModel):
         return filter(has_a_description, pfentries)
 
     def get_pfentries_with_usable_descriptions(self):
-        return self.get_pfentries_with_descriptions(listen_to_the_community=True)
+        return self.get_pfentries_with_descriptions(
+            listen_to_the_community=True)
 
     def get_random_description(self):
         pfentries = self.get_pfentries_with_usable_descriptions()
@@ -497,7 +519,13 @@ class Answer(OpenHatchModel):
             self.get_question_text())
 
     def get_absolute_url(self):
-        return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#answer_whose_pk_is_%d" % self.pk)
+        return urljoin(
+            reverse(
+                'mysite.project.views.project',
+                args=[
+                    self.project.name]),
+            "#answer_whose_pk_is_%d" %
+            self.pk)
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -553,7 +581,8 @@ class Bug(OpenHatchModel):
         return seems_really_fresh
 
     def __unicode__(self):
-        return "title='%s' project='%s' project__language='%s' description='%s...'" % (self.title, self.project.name, self.project.language, self.description[:50])
+        return "title='%s' project='%s' project__language='%s' description='%s...'" % (
+            self.title, self.project.name, self.project.language, self.description[:50])
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -638,10 +667,19 @@ class WannaHelperNote(OpenHatchModel):
         return self.get_title_for_atom()
 
     def get_absolute_url(self):
-        return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#person_summary_%d" % self.person.pk)
+        return urljoin(
+            reverse(
+                'mysite.project.views.project',
+                args=[
+                    self.project.name]),
+            "#person_summary_%d" %
+            self.person.pk)
 
 
-def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, **kwargs):
+def post_bug_save_delete_increment_hit_count_cache_timestamp(
+        sender,
+        instance,
+        **kwargs):
     # always bump it
     import mysite.base.models
     mysite.base.models.Timestamp.update_timestamp_for_string(

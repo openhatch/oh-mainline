@@ -17,9 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+
+from django.test import TestCase
+import django.core.cache
+from django.core.urlresolvers import reverse
+from django.core.files.base import ContentFile
+from django.contrib.auth.models import User
+from django.utils.unittest import skipIf
+import django.db
+import django.conf
+from django.utils import simplejson, http
+import mock
+from twill import commands as tc
+
 from mysite.base.tests import make_twill_url, TwillTests
 import mysite.base.models
-
 import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.profile.models
@@ -27,22 +40,7 @@ import mysite.search.view_helpers
 from mysite.search.models import Project, Bug, \
     ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
-import datetime
 import mysite.project.views
-
-from django.utils.unittest import skipIf
-import django.db
-import django.conf
-
-from django.utils import simplejson, http
-import mock
-from twill import commands as tc
-
-from django.test import TestCase
-import django.core.cache
-from django.core.urlresolvers import reverse
-from django.core.files.base import ContentFile
-from django.contrib.auth.models import User
 
 
 class SearchTest(TwillTests):
@@ -102,18 +100,25 @@ class AutoCompleteTests(SearchTest):
             name=u'ComicChat', language=u'C++')
         self.project_kazaa = Project.create_dummy(
             name=u'Kazaa', language=u'Vogon')
-        self.bug_in_chat = Bug.create_dummy(project=self.project_chat,
-                                            people_involved=2,
-                                            date_reported=datetime.date(
-                                                2009, 4, 1),
-                                            last_touched=datetime.date(
-                                                2009, 4, 2),
-                                            last_polled=datetime.date(
-                                                2009, 4, 2),
-                                            submitter_realname="Zaphod Beeblebrox",
-                                            submitter_username="zb",
-                                            canonical_bug_link="http://example.com/",
-                                            )
+        self.bug_in_chat = Bug.create_dummy(
+            project=self.project_chat,
+            people_involved=2,
+            date_reported=datetime.date(
+                2009,
+                4,
+                1),
+            last_touched=datetime.date(
+                2009,
+                4,
+                2),
+            last_polled=datetime.date(
+                2009,
+                4,
+                2),
+            submitter_realname="Zaphod Beeblebrox",
+            submitter_username="zb",
+            canonical_bug_link="http://example.com/",
+        )
 
     def testSuggestionsMinimallyWorks(self):
         suggestions = views.get_autocompletion_suggestions(u'')
@@ -206,8 +211,8 @@ class SearchResults(TwillTests):
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.all_bugs.filter(project__name=
-                                   u'Exaile').order_by(u'-last_touched')[:10]
+        bugs = Bug.all_bugs.filter(
+            project__name=u'Exaile').order_by(u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -216,8 +221,8 @@ class SearchResults(TwillTests):
         tc.follow(u'Next')
 
         # Grab descriptions of next 10 Exaile bugs
-        bugs = Bug.all_bugs.filter(project__name=
-                                   u'Exaile').order_by(u'-last_touched')[10:20]
+        bugs = Bug.all_bugs.filter(project__name=u'Exaile').order_by(
+            u'-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -248,8 +253,8 @@ class SearchResults(TwillTests):
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.all_bugs.filter(project__name=
-                                   u'Exaile').order_by(u'-last_touched')[:10]
+        bugs = Bug.all_bugs.filter(
+            project__name=u'Exaile').order_by(u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -258,8 +263,8 @@ class SearchResults(TwillTests):
         tc.follow(u'Next')
 
         # Grab descriptions of next 10 Exaile bugs
-        bugs = Bug.all_bugs.filter(project__name=
-                                   u'Exaile').order_by(u'-last_touched')[10:20]
+        bugs = Bug.all_bugs.filter(project__name=u'Exaile').order_by(
+            u'-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
@@ -269,8 +274,7 @@ class SearchResults(TwillTests):
         tc.submit()
 
         # Grab descriptions of first 10 GNOME-Do bugs
-        bugs = Bug.all_bugs.filter(project__name=
-                                   u'GNOME-Do').order_by(
+        bugs = Bug.all_bugs.filter(project__name=u'GNOME-Do').order_by(
             u'-last_touched')[:10]
 
         for bug in bugs:
@@ -317,8 +321,11 @@ class Recommend(SearchTest):
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
     # Use that to exclude 'will never understand' tags from recommended search
     # terms.
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
-    @mock.patch('mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
+    @mock.patch(
+        'mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
     def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
 
         # Make all the search terms appear to return results, so
@@ -347,9 +354,14 @@ class Recommend(SearchTest):
 
     # FIXME: Include recommendations from tags.
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
-    @mock.patch('mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
-    def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
+    @mock.patch(
+        'mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
+    def test_search_page_context_includes_recommendations(
+            self,
+            mocked_hit_counter):
 
         # Make all the search terms appear to return results, so
         # that none are excluded when we try to trim away
@@ -436,7 +448,9 @@ class SplitIntoTerms(TestCase):
 
 class IconGetsScaled(SearchTest):
 
-    @skipIf(not mysite.base.depends.Image, "Skipping this test. Install PIL to run it; see ADVANCED_INSTALLATION.mkd.")
+    @skipIf(
+        not mysite.base.depends.Image,
+        "Skipping this test. Install PIL to run it; see ADVANCED_INSTALLATION.mkd.")
     def test_project_scales_its_icon_down_for_use_in_badge(self):
         '''This test shows that the Project class successfully stores
         a scaled-down version of its icon in the icon_smaller_for_badge
@@ -461,10 +475,14 @@ class IconGetsScaled(SearchTest):
                      "Expected p.icon_smaller_for_badge to be a true value.")
 
         # Assertion 3: Verify that it has the right width
-        self.assertEqual(p.icon_smaller_for_badge.width, 40,
-                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+        self.assertEqual(
+            p.icon_smaller_for_badge.width,
+            40,
+            "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
-    @skipIf(not mysite.base.depends.Image, "Skipping this test. Install PIL to run it; see ADVANCED_INSTALLATION.mkd.")
+    @skipIf(
+        not mysite.base.depends.Image,
+        "Skipping this test. Install PIL to run it; see ADVANCED_INSTALLATION.mkd.")
     def test_short_icon_is_scaled_correctly(self):
         '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
         # Step 1: Create a project with an icon
@@ -488,8 +506,10 @@ class IconGetsScaled(SearchTest):
                      "Expected p.icon_smaller_for_badge to be a true value.")
 
         # Assertion 3: Verify that it has the right width
-        self.assertEqual(p.icon_smaller_for_badge.width, 40,
-                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+        self.assertEqual(
+            p.icon_smaller_for_badge.width,
+            40,
+            "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
         # Assertion 3: Verify that it has the right height
         # If we want to scale exactly we'll get 11.25 pixels, which rounds to
@@ -499,7 +519,9 @@ class IconGetsScaled(SearchTest):
 
 class SearchOnFullWords(SearchTest):
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_find_perl_not_properly(self):
         Project.create_dummy()
         Bug.create_dummy(description='properly')
@@ -665,9 +687,11 @@ class SingleTerm(SearchTest):
 
     def test_toughness_facet(self):
         # What options do we expect?
-        toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
-                                     'is_active': False,
-                                     'query_string': 'q=screensaver&toughness=bitesize'}
+        toughness_option_bitesize = {
+            'name': 'bitesize',
+            'count': 1,
+            'is_active': False,
+            'query_string': 'q=screensaver&toughness=bitesize'}
         toughness_option_any = {'name': 'any', 'count': 3,
                                 'is_active': True,
                                 'query_string': 'q=screensaver&toughness='}
@@ -684,9 +708,11 @@ class SingleTerm(SearchTest):
 
     def test_languages_facet(self):
         # What options do we expect?
-        languages_option_python = {'name': 'Python', 'count': 2,
-                                   'is_active': False,
-                                   'query_string': 'q=screensaver&language=Python'}
+        languages_option_python = {
+            'name': 'Python',
+            'count': 2,
+            'is_active': False,
+            'query_string': 'q=screensaver&language=Python'}
         languages_option_perl = {'name': 'Perl', 'count': 1,
                                  'is_active': False,
                                  'query_string': 'q=screensaver&language=Perl'}
@@ -743,12 +769,16 @@ class SingleFacetOption(SearchTest):
 
     def test_toughness_facet(self):
         # What options do we expect?
-        toughness_option_bitesize = {u'name': u'bitesize', u'count': 1,
-                                     u'is_active': False,
-                                     u'query_string': u'q=&toughness=bitesize&language=Python'}
-        toughness_option_any = {u'name': u'any', u'count': 2,
-                                u'is_active': True,
-                                u'query_string': u'q=&toughness=&language=Python'}
+        toughness_option_bitesize = {
+            u'name': u'bitesize',
+            u'count': 1,
+            u'is_active': False,
+            u'query_string': u'q=&toughness=bitesize&language=Python'}
+        toughness_option_any = {
+            u'name': u'any',
+            u'count': 2,
+            u'is_active': True,
+            u'query_string': u'q=&toughness=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize]
 
         self.compare_lists_of_dicts(
@@ -816,7 +846,9 @@ class QueryGetToughnessFacetOptions(SearchTest):
         self.assertEqual(bitesize_dict[u'count'], 1)
         self.assertEqual(all_dict[u'count'], 2)
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_get_toughness_facet_options_with_terms(self):
 
         python_project = Project.create_dummy(language=u'Python')
@@ -855,7 +887,9 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         Bug.create_dummy(project=c_project, title=u'b')
         Bug.create_dummy(project=unknown_project, title=u'unknowable')
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
         # a search for 'a'. They are in two different languages, so let's make
@@ -926,8 +960,9 @@ class QueryGetPossibleProjectFacetOptions(SearchTest):
     def test_select_a_project_and_see_other_project_options(self):
         GET_data = {u'project': u'Miro'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
-        possible_project_names = [x['name']
-                                  for x in dict(query.get_possible_facets())['project']['options']]
+        possible_project_names = [
+            x['name'] for x in dict(
+                query.get_possible_facets())['project']['options']]
         self.assertEqual(
             sorted(possible_project_names),
             sorted(list(Project.objects.values_list('name', flat=True))))
@@ -1005,7 +1040,8 @@ class QueryStringCaseInsensitive(SearchTest):
         """Do we redirect queries that use non-lowercase facet keys to pages
         that use lowercase facet keys?"""
         redirects = self.client.get(u'/search/',
-                                    {u'LANguaGE': u'pytHon'}, follow=True).redirect_chain
+                                    {u'LANguaGE': u'pytHon'},
+                                    follow=True).redirect_chain
         self.assertEqual(
             redirects, [(u'http://testserver/search/?language=pytHon', 302)])
 
@@ -1242,13 +1278,16 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         alert_data_in_form = {
             'query_string': query_string,
-            'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
+            'how_many_bugs_at_time_of_request': Bug.open_ones.filter(
+                project=p).count(),
             'email': email_address,
         }
         # Twill fails here for some reason, so let's continue the journey with
         # Django's built-in testing sweeeet
         response = client.post(
-            reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
+            reverse(
+                mysite.search.views.subscribe_to_bug_alert_do),
+            alert_data_in_form)
 
         # This response should be a HTTP redirect instruction
         self.assertEqual(response.status_code, 302)
@@ -1258,7 +1297,8 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # The page redirects to the old kk
         response = client.get(redirect_target_url)
         self.assertContains(
-            response, "this page should confirm that an email alert has been registered")
+            response,
+            "this page should confirm that an email alert has been registered")
 
         # At this point, make sure that the DB contains a record of
         #     * What the query was.
@@ -1282,14 +1322,20 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         for key, expected_value in assert_that_record_has_this_data.items():
             self.assertEqual(
-                alert_record.__getattribute__(key), expected_value,
-                'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
+                alert_record.__getattribute__(key),
+                expected_value,
+                'alert.%s = %s not (expected) %s' %
+                (key,
+                 alert_record.__getattribute__(key),
+                 expected_value))
 
     # run the above test for our two use cases: logged in and not
     def test_alert_anon(self):
         self.exercise_alert(anonymous=True)
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_alert_logged_in(self):
         self.exercise_alert(anonymous=False)
 
@@ -1297,7 +1343,9 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_delete_paragraph_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
@@ -1305,8 +1353,12 @@ class DeleteAnswer(TwillTests):
         q = ProjectInvolvementQuestion.create_dummy(
             pk=question__pk, is_bug_style=False)
         # create our dummy answer
-        a = Answer.create_dummy(text='i am saying thigns', question=q,
-                                project=p, author=User.objects.get(username='paulproteus'))
+        a = Answer.create_dummy(
+            text='i am saying thigns',
+            question=q,
+            project=p,
+            author=User.objects.get(
+                username='paulproteus'))
         # delete our answer
         POST_data = {
             'answer__pk': a.pk,
@@ -1324,7 +1376,9 @@ class DeleteAnswer(TwillTests):
         # and make sure our answer isn't in the db anymore
         self.assertEqual(Answer.objects.filter(pk=a.pk).count(), 0)
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_delete_bug_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
@@ -1337,8 +1391,12 @@ class DeleteAnswer(TwillTests):
             pk=question__pk, is_bug_style=True)
         # create our dummy answer
         a = Answer.create_dummy(
-            title='i want this bug fixed', text='for these reasons',
-            question=q, project=p, author=User.objects.get(username='paulproteus'))
+            title='i want this bug fixed',
+            text='for these reasons',
+            question=q,
+            project=p,
+            author=User.objects.get(
+                username='paulproteus'))
         # delete our answer
         POST_data = {
             'answer__pk': a.pk,
@@ -1360,7 +1418,9 @@ class DeleteAnswer(TwillTests):
 class CreateBugAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_create_bug_answer(self):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
@@ -1436,7 +1496,9 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_create_answer_anonymously(self):
         # Steps for this test
         # 1. User fills in the form anonymously
@@ -1461,8 +1523,9 @@ class CreateAnonymousAnswer(TwillTests):
         response = self.client.post(
             reverse(mysite.project.views.create_answer_do), POST_data,
             follow=True)
-        self.assertEqual(response.redirect_chain,
-                         [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
+        self.assertEqual(
+            response.redirect_chain, [
+                ('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
 
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like
@@ -1487,8 +1550,9 @@ class CreateAnonymousAnswer(TwillTests):
         self.assertContains(response, POST_data['answer__text'])
 
         # But when the user is logged in and *then* visits the project page
-        login_worked = self.client.login(username='paulproteus',
-                                         password="paulproteus's unbreakable password")
+        login_worked = self.client.login(
+            username='paulproteus',
+            password="paulproteus's unbreakable password")
         self.assert_(login_worked)
 
         self.client.get(p.get_url())
@@ -1517,7 +1581,7 @@ class CreateAnswer(TwillTests):
         POST_data = {
             'project__pk': p.pk,
             'question__pk': q.pk,
-                'answer__text': """Help produce official documentation, share \
+            'answer__text': """Help produce official documentation, share \
 the solution to a problem, or check, proof and test other documents for \
 accuracy.""",
         }
@@ -1543,7 +1607,9 @@ accuracy.""",
         self.assertContains(project_page, POST_data['answer__text'])
         self.assertContains(project_page, record.author.username)
 
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
+    @skipIf(
+        django.db.connection.vendor == 'sqlite',
+        "Skipping because using sqlite database")
     def test_multiparagraph_answer(self):
         """
         If a multi-paragraph answer is submitted, display it as a
@@ -1596,7 +1662,7 @@ accuracy.""",
 
         # The urlize filter in the template should make sure we get a link
         self.assertNotContains(project_page,
-                            '''background-color: red''')
+                               '''background-color: red''')
 
 
 class BugKnowsItsFreshness(TestCase):

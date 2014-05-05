@@ -64,8 +64,12 @@ class GitDiffMission(object):
 
          Come to my house for a dinner party.
          Knock 3 times and give the secret password: Pinky.""" % username
-            subprocess.Popen(
-                ['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)
+            subprocess.Popen(['git',
+                              'commit',
+                              '--allow-empty',
+                              '-m',
+                              commit_msg],
+                             cwd=repo.repo_path)
             return True
         else:
             subprocess.check_call(['git', 'am', '--abort'], cwd=repo.repo_path)

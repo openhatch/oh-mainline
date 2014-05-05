@@ -58,7 +58,7 @@ def upload(request):
                 data['create_success'] = True
                 view_helpers.set_mission_completed(
                     request.user.get_profile(), 'tar')
-            except view_helpers.IncorrectTarFile, e:
+            except view_helpers.IncorrectTarFile as e:
                 data['what_was_wrong_with_the_tarball'] = utf8(e)
         data['create_form'] = form
     return creating(request, data)
