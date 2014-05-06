@@ -1334,6 +1334,7 @@ class EditBio(TwillTests):
         * enters a string as bio
         * checks that his bio now contains string
         '''
+        logger.debug("Entering EditBio test")
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         # not so vain.. yet
@@ -1346,6 +1347,7 @@ class EditBio(TwillTests):
         tc.submit()
         # find the string we just submitted as our bio
         tc.find('lookatme!')
+        logger.debug("check assertion")
         self.assertEqual(Person.get_by_username('paulproteus')
                          .bio, "lookatme!")
         # now we should see our bio in the edit form

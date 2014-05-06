@@ -545,8 +545,7 @@ class NagiosTests(django.test.TestCase):
         command = mysite.profile.management.commands.send_emails.Command()
         command.handle()
 
-        # Now run to see if the function sees things are ok in the
-        # database
+        # Now run to see if the function sees things are ok in the database
         self.assertEqual(
             0,
             mysite.base.management.commands.nagios.Command.send_weekly_exit_code())

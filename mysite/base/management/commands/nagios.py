@@ -47,8 +47,8 @@ class Command(BaseCommand):
         EIGHT_DAYS = datetime.timedelta(days=8)
 
         if ((covers_things_until - EIGHT_DAYS) < covers_things_since):
-            logging.info("OK - Last email sent less than 8 days ago")
+            logger.info("OK - Last email sent less than 8 days ago")
             return 0
         else:
-            logging.warning("CRITICAL - Last email sent more than 8 days ago")
+            logger.warning("CRITICAL - Last email sent more than 8 days ago")
             return 2
