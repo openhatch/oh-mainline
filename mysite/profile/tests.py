@@ -24,6 +24,7 @@ import datetime
 from . import tasks
 import mock
 import os
+import logging
 
 from django.utils.unittest import skipIf
 from django.utils import simplejson
@@ -55,6 +56,9 @@ import mysite.profile.templatetags.profile_extras
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
+
+
+logger = logging.getLogger(__name__)
 
 
 class StarlingTests(TwillTests):

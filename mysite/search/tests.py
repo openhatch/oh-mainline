@@ -454,11 +454,13 @@ class IconGetsScaled(SearchTest):
 
     @skipIf(
         not mysite.base.depends.Image,
-        "Skipping this test. Install PIL to run it; see ADVANCED_INSTALLATION.mkd.")
+        "Skipping test. PIL is needed. See advanced installation docs.")
     def test_project_scales_its_icon_down_for_use_in_badge(self):
-        '''This test shows that the Project class successfully stores
+        """
+        This test shows that the Project class successfully stores
         a scaled-down version of its icon in the icon_smaller_for_badge
-        field.'''
+        field.
+        """
 
         # Step 1: Create a project with an icon
         p = mysite.search.models.Project.create_dummy()
@@ -486,9 +488,13 @@ class IconGetsScaled(SearchTest):
 
     @skipIf(
         not mysite.base.depends.Image,
-        "Skipping this test. Install PIL to run it; see ADVANCED_INSTALLATION.mkd.")
+        "Skipping test. PIL is needed. See advanced installation docs.")
     def test_short_icon_is_scaled_correctly(self):
-        '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
+        """
+        Sometimes icons are rectangular and more wide than long. These icons
+        shouldn't be trammeled into a square, but scaled respectfully of their
+        original ratios.
+        """
         # Step 1: Create a project with an icon
         p = mysite.search.models.Project.create_dummy()
 
@@ -563,13 +569,14 @@ class FacetsFilterResults(SearchTest):
         self.assertEqual(list(results), [python_bug])
 
     def test_any_facet(self):
-        """In the search_index() method in the search module, the truthfulness of
+        """
+        In the search_index() method in the search module, the truthfulness of
         the Query object is evaluated to determine whether or not any results
         should be returned. Here, we test that if a facet in the GET data
         is the empty string, the query is still considered to be True. A facet
         set to the empty string is used to signify that the user selected the
-        "any" option on the search page. If a facet is not provided at all, the
-        user did not select anything on the search page, meaning no results
+        "any" option on the search page. If a facet is not provided at all,
+        the user did not select anything on the search page, meaning no results
         should be returned.
         """
 
@@ -583,9 +590,10 @@ class FacetsFilterResults(SearchTest):
 
 
 class QueryGetPossibleFacets(SearchTest):
-
-    """Ask a query, what facets are you going to show on the left?
-    E.g., search for gtk, it says C (541)."""
+    """
+    Ask a query, what facets are you going to show on the left?
+    E.g., search for gtk, it says C (541).
+    """
 
     def test_get_possible_facets(self):
         # Create three projects
@@ -1041,8 +1049,10 @@ class QueryProject(SearchTest):
 class QueryStringCaseInsensitive(SearchTest):
 
     def test_Language(self):
-        """Do we redirect queries that use non-lowercase facet keys to pages
-        that use lowercase facet keys?"""
+        """
+        Do we redirect queries that use non-lowercase facet keys to pages
+        that use lowercase facet keys?
+        """
         redirects = self.client.get(u'/search/',
                                     {u'LANguaGE': u'pytHon'},
                                     follow=True).redirect_chain
