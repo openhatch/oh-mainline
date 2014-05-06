@@ -39,6 +39,9 @@ from mysite.profile.models import Person
 from mysite.base.view_helpers import subproc_check_output
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_mission_data_path(mission_type):
     base_path = os.path.abspath(os.path.dirname(__file__))
     new_path = os.path.join(base_path, '..', mission_type, 'data')

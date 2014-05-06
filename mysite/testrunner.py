@@ -30,6 +30,9 @@ import xmlrunner.extra.djangotestrunner
 
 import mysite.base.depends
 
+logger = logging.getLogger(__name__)
+
+
 def generate_safe_temp_file_name():
     fd, name = tempfile.mkstemp()
     os.close(fd)
@@ -77,8 +80,8 @@ class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
 
     def run_tests(self, *args, **kwargs):
         if not args or not args[0]:
-            logging.info(
-                "Running all the OpenHatch-related tests.")
+            logger.info(
+                "Running all tests. See testing docs to run a subset.")
             args = (['base', 'profile', 'account', 'project',
                      'missions', 'search', 'customs'],)
 
@@ -95,8 +98,8 @@ class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
 
     def run_tests(self, *args, **kwargs):
         if not args or not args[0]:
-            logging.info(
-                "Running all the OpenHatch-related tests.")
+            logger.info(
+                "Running all tests. See testing docs to run a subset.")
             args = (['base', 'profile', 'account', 'project',
                      'missions', 'search', 'customs'],)
 

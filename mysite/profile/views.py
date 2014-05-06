@@ -18,9 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Imports {{{
-
-# Python
 import StringIO
 import datetime
 import urllib
@@ -28,7 +25,6 @@ import re
 import collections
 import logging
 
-# Django
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.core import serializers
@@ -42,8 +38,8 @@ from django.views.decorators.csrf import csrf_exempt
 import django.views.generic
 from django.utils import http
 from django.utils import simplejson
+from django.views.decorators.csrf import csrf_protect
 
-# OpenHatch apps
 import mysite.base.view_helpers
 import mysite.profile.view_helpers
 from mysite.profile.models import \
@@ -55,7 +51,9 @@ from mysite.base.decorators import view, as_view
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
-from django.views.decorators.csrf import csrf_protect
+
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -859,7 +857,7 @@ def set_pfentries_dot_use_my_description_do(request):
                     prefix=str(pfe_pk))
         if form.is_valid():
             pfe_after_save = form.save()
-            logging.info(
+            logger.info(
                 "Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" %
                 (request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
     return HttpResponseRedirect(project.get_url())

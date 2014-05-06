@@ -1,9 +1,15 @@
-from django.core.management.base import BaseCommand
-from mysite.base.models import Timestamp
+import sys
 from optparse import make_option
 import datetime
+import logging
+
+from django.core.management.base import BaseCommand
+
+from mysite.base.models import Timestamp
 import mysite.base.views
-import sys
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -41,8 +47,8 @@ class Command(BaseCommand):
         EIGHT_DAYS = datetime.timedelta(days=8)
 
         if ((covers_things_until - EIGHT_DAYS) < covers_things_since):
-            print "OK - Last email sent less than 8 days ago"
+            logging.info("OK - Last email sent less than 8 days ago")
             return 0
         else:
-            print "CRITICAL - Last email sent more than 8 days ago"
+            logging.warning("CRITICAL - Last email sent more than 8 days ago")
             return 2

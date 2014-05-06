@@ -50,6 +50,9 @@ DEFAULT_LATITUDE = -37.3049962
 DEFAULT_LONGITUDE = -12.6790445
 
 
+logger = logging.getLogger(__name__)
+
+
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
     die_next = False
@@ -843,7 +846,7 @@ class Citation(models.Model):
                         return "http://www.ohloh.net/search?%s" % http.urlencode(
                             {u'q': project_name})
                     except:
-                        logging.warn(
+                        logger.warn(
                             "During Citation.get_url_or_guess, we failed to encode the project name correctly.")
                         # This is just a temporary workaround since the above
                         # line was causing errors.

@@ -29,6 +29,10 @@
 import os
 import logging
 
+
+logger = logging.getLogger(__name__)
+
+
 # Wrap lxml and the modules that are part of it
 
 
@@ -45,8 +49,8 @@ except:
     lxml.html = None
 
 if lxml.html is None:
-    logging.info("Some parts of the OpenHatch site may fail because the lxml"
-                 " library is not installed. Look in ADVANCED_INSTALLATION.mkd for"
+    logger.info("Some parts of the OpenHatch site may fail because the lxml"
+                 " library is not installed. Look in Advanced Installation docs for"
                  " information about lxml.")
 
 # Provide a helper to check if svnadmin is available. If not,
@@ -84,7 +88,7 @@ def postmap_available(already_emitted_warning=[]):
             pass
         else:
             already_emitted_warning.append(True)
-            logging.warning(
-                'postmap binary not found at {0}. Look in ADVANCED_INSTALLATION for the section about postfix for more information.'.format(POSTMAP_PATH))
+            logger.warning(
+                'postmap binary not found at {0}. Look in Advanced Installation docs about postfix for more information.'.format(POSTMAP_PATH))
         return False
     return True

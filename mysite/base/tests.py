@@ -49,6 +49,9 @@ import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
 
 
+logger = logging.getLogger(__name__)
+
+
 def make_twill_url(url):
     # modify this
     return url.replace("http://openhatch.org/",
@@ -467,7 +470,7 @@ class TimestampTests(django.test.TestCase):
             'http://pygame.motherhamster.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---'
         }
         for url_name in urls:
-            logging.info('Testing %s bugs URL.' % url_name)
+            logger.info('Testing %s bugs URL.' % url_name)
             url = urls[url_name]
             # Check there is no timestamp i.e. get zero o'clock
             first_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(

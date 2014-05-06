@@ -2,9 +2,9 @@
 
 # Imports
 import os
-import logging
 import datetime
 import sys
+import logging
 import dj_database_url
 
 # Figure out where in the filesystem we are.
@@ -132,10 +132,9 @@ MIDDLEWARE_CLASSES = [
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Strings, ie "/home/html/django_templates" or "C:/www/django/templates"
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-
 )
 
 STATIC_GENERATOR_URLS = (
@@ -183,16 +182,85 @@ INSTALLED_APPS = (
     'djkombu',
 )
 
-# testrunner allows us to control which testrunner to use
+
 TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
-# Optionally, use XML reporting
 if os.environ.get('USE_XML_TEST_REPORTING', None):
     TEST_RUNNER = 'mysite.testrunner.OpenHatchXMLTestRunner'
 
-# Make test names prettier
 TEST_OUTPUT_DESCRIPTIONS = True
-
 TEST_OUTPUT_DIR = "test_output"
+
+
+# By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
+# that off.  If you want to see all SQL queries (e.g., when running a
+# management command locally), remove the stanza related to django.db.backends.
+#
+# Also, this setup sends an email to the site admins on every HTTP 500 error
+# when DEBUG=False.
+#
+# The lines relating to 'require_debug_false' should be enabled when the
+# project is upgraded to use Django 1.4.
+logging.basicConfig(filename='example.log', filemode='w', level=logging.DEBUG)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': "[%(asctime)s]  %(levelname)-8s  [%(name)s:%(lineno)s] "
+                      "%(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '[%(levelname)-8s]  %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': "mysite.log",
+            'formatter': 'verbose'
+        },
+        'null': {
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+            'formatter': 'simple'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'mysite': {
+            'handlers': ['file'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'django.db.backends': {
+            'handlers': ['null'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'propagate': True,
+            'level': 'ERROR',
+        },
+    }
+}
+
 
 # AMQP, Rabbit Queue, Celery
 BROKER_BACKEND = 'django'
@@ -203,14 +271,11 @@ AUTH_PROFILE_MODULE = "profile.Person"
 LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/'  # Landing page
 
-OHLOH_API_KEY = 'JeXHeaQhjXewhdktn4nUw'  # This key is called "Oman testing"
-                                        # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
-# OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
-)
+# This key is called "Oman testing at
+# <https://www.ohloh.net/accounts/paulproteus/api_keys>"
+OHLOH_API_KEY = 'JeXHeaQhjXewhdktn4nUw'
+# This key is called "API testing"
+# OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ'
 
 # Invite codes last seven days
 ACCOUNT_INVITATION_DAYS = 7
@@ -255,9 +320,9 @@ FORWARDER_LISTINGTIME_TIMEDELTA = datetime.timedelta(days=2)
 # how long the forwarder actually works
 FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=10)
 # note about the above: for 3 days, 2 forwarders for the same user work.
-# at worst, you visit someone's profile and find a forwarder that works for 3 more days
-# at best, you visit someone's profile and find a forwarder that works for 5 more days
-# at worst, we run a postfixifying celery job once every two days for each user
+# at worst, visit a profile and find a forwarder that works for 3 more days
+# at best, visit a profile and find a forwarder that works for 5 more days
+# at worst, we run a postfixifying celery job once every 2 days for each user
 
 POSTFIX_FORWARDER_TABLE_PATH = None  # Disabled by default
 
@@ -294,47 +359,6 @@ TRACKER_POLL_INTERVAL = 1  # Days
 import djcelery
 djcelery.setup_loader()
 
-# By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
-# that off.  If you want to see all SQL queries (e.g., when running a
-# management command locally), remove the stanza related to django.db.backends.
-#
-# Also, this setup sends an email to the site admins on every HTTP 500 error
-# when DEBUG=False.
-#
-# The lines relating to 'require_debug_false' should be enabled when the
-# project is upgraded to use Django 1.4.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        #        'require_debug_false': {
-        #            '()': 'django.utils.log.RequireDebugFalse'
-        #        },
-    },
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            #            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'handlers': ['null'],  # Quiet by default!
-            'propagate': False,
-            'level': 'DEBUG',
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
 
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')

@@ -16,12 +16,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django import template
 import re
+import logging
+from urlparse import urlparse
+
+from django import template
 from django.utils.html import escape
 import django.utils.html
-from urlparse import urlparse
-import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 register = template.Library()
 

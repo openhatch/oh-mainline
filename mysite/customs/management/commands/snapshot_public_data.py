@@ -14,18 +14,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import logging
 
 from django.contrib.auth.models import User
-from mysite.search.models import Bug, Project
-from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
-from mysite.base.models import Timestamp
-import sys
 from django.utils import simplejson
 from django.core.management.base import BaseCommand
 import django.core.serializers
 import django.core.serializers.json
+
 import mysite.search.views
+from mysite.search.models import Bug, Project
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
+from mysite.base.models import Timestamp
+
+
+logger = logging.getLogger(__name__)
 
 
 # You can run this, and it generates a JSON file that can be

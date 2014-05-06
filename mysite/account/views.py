@@ -16,22 +16,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Imports {{{
-from django.http import HttpResponse, HttpResponseRedirect
-import django.contrib.auth
-from django.contrib.auth.decorators import login_required
-import django.contrib.auth.forms
-from django.core.urlresolvers import reverse
-import django_authopenid.views
-
-from django.contrib.sessions.models import Session
-
-from invitation.forms import InvitationKeyForm
-from invitation.models import InvitationKey
 
 import urllib
 import logging
 import json
+
+from django.http import HttpResponse, HttpResponseRedirect
+import django.contrib.auth
+from django.contrib.auth.decorators import login_required
+import django.contrib.auth.forms
+import django.contrib.auth.views
+from django.core.urlresolvers import reverse
+import django_authopenid.views
+from django.contrib.sessions.models import Session
+from invitation.forms import InvitationKeyForm
+from invitation.models import InvitationKey
 
 import mysite.base.views
 import mysite.base.view_helpers
@@ -39,17 +38,13 @@ import mysite.account.forms
 from mysite.base.view_helpers import render_response
 from mysite.account.view_helpers import clear_user_sessions
 import mysite.profile.views
-
-# FIXME: We did this because this decorator used to live here
-# and lots of other modules refer to it as mysite.account.views.view.
-# Let's fix this soon.
 from mysite.base.decorators import view
-import django.contrib.auth.views
-# }}}
+
+
+logger = logging.getLogger(__name__)
 
 
 def signup_do(request):
-    # {{{
     post = {}
     post.update(dict(request.POST.items()))
     post['password2'] = post.get('password1', '')
@@ -73,7 +68,6 @@ def signup_do(request):
 
     else:
         return mysite.account.views.signup(request, signup_form=signup_form)
-    # }}}
 
 
 def signup(request, signup_form=None):
@@ -115,11 +109,8 @@ def edit_photo_do(request, mock=None):
         # "cleaning" the photo during form validation.
         valid = form.is_valid()
     except Exception, e:
-            logging.error("%s while preparing the image: %s"
-                          % (str(type(e)), str(e)))
-            # Don't pass in the form. This gives the user an empty form and a
-            # nice error message, instead of the displaying the details of the
-            # error.
+            logger.exception("%s while preparing the image: %s"
+                              % (str(type(e)), str(e)))
             return edit_photo(request, form=None, non_validation_error=True)
 
     if valid:
@@ -141,10 +132,8 @@ def catch_me(request):
 @login_required
 @view
 def settings(request):
-    # {{{
     data = {}
     return (request, 'account/settings.html', data)
-    # }}}
 
 
 @login_required
@@ -201,7 +190,7 @@ def edit_contact_info_do(request):
         p.show_email = show_email_form.cleaned_data['show_email']
         p.save()
 
-        logging.debug('Changing email of user <%s> to <%s>' % (
+        logger.debug('Changing email of user <%s> to <%s>' % (
             request.user, edit_email_form.cleaned_data['email']))
         edit_email_form.save()
 
@@ -216,7 +205,6 @@ def edit_contact_info_do(request):
 @login_required
 @view
 def change_password(request, change_password_form=None):
-    # {{{
 
     if change_password_form is None:
         change_password_form = django.contrib.auth.forms.PasswordChangeForm({})
@@ -232,13 +220,11 @@ def change_password(request, change_password_form=None):
     return (request, 'account/change_password.html',
             {'change_password_form': change_password_form,
              'account_notification': account_notification})
-    # }}}
 
 
 @login_required
 @view
 def edit_name(request, edit_name_form=None):
-    # {{{
 
     if edit_name_form is None:
         edit_name_form = mysite.account.forms.EditNameForm(
@@ -256,7 +242,6 @@ def edit_name(request, edit_name_form=None):
     return (request, 'account/edit_name.html',
             {'edit_name_form': edit_name_form,
              'account_notification': account_notification})
-    # }}}
 
 
 @login_required
@@ -277,7 +262,6 @@ def edit_name_do(request):
 @login_required
 @view
 def set_location(request, edit_location_form=None):
-    # {{{
 
     data = {}
     initial = {}
@@ -296,7 +280,8 @@ def set_location(request, edit_location_form=None):
     # Initialize edit location form
     if edit_location_form is None:
         edit_location_form = mysite.account.forms.EditLocationForm(
-            prefix='edit_location', instance=request.user.get_profile(), initial=initial)
+            prefix='edit_location', instance=request.user.get_profile(),
+            initial=initial)
 
     data['edit_location_form'] = edit_location_form
 
@@ -306,7 +291,6 @@ def set_location(request, edit_location_form=None):
         data['account_notification'] = ''
 
     return (request, 'account/set_location.html', data)
-    # }}}
 
 
 @login_required
@@ -356,7 +340,6 @@ def dont_guess_location_do(request):
 
 @login_required
 def change_password_do(request):
-    # {{{
     form = django.contrib.auth.forms.PasswordChangeForm(
         request.user, request.POST)
     if form.is_valid():
@@ -366,7 +349,6 @@ def change_password_do(request):
             reverse(change_password) + '?notification_id=success')
     else:
         return change_password(request, change_password_form=form)
-    # }}}
 
 
 @login_required
@@ -403,11 +385,10 @@ def invite_someone(request, form=None, success_message=''):
 
 
 def proxyconnect_sso(request):
-    '''This function implements the ProxyConnect single
+    """This function implements the ProxyConnect single
     sign-on API described by Vanilla Forums.
-
     More documentation: http://vanillaforums.org/page/singlesignon
-    '''
+    """
     if request.user.is_authenticated():
         return mysite.base.decorators.as_view(
             request, 'vanilla-proxy-connect-sso.txt', {}, 'proxyconnect-sso')
@@ -436,10 +417,9 @@ def invite_someone_do(request):
     else:
         return invite_someone(request, form=form)
 
+
 # The following is copied here from django_authopenid, and then
 # modified trivially in the POST handler.
-
-
 @django_authopenid.views.not_authenticated
 def register(request, template_name='authopenid/complete.html',
              redirect_field_name=django.contrib.auth.REDIRECT_FIELD_NAME,
@@ -459,8 +439,8 @@ def register(request, template_name='authopenid/complete.html',
     :attr request: request object
     :attr template_name: string, name of template to use,
     'authopenid/complete.html' by default
-    :attr redirect_field_name: string, field name used for redirect. by default
-    'next'
+    :attr redirect_field_name: string, field name used for redirect.
+    by default 'next'
     :attr register_form: form use to create a new account. By default
     `OpenidRegisterForm`
     :attr auth_form: form object used for legacy authentification.
@@ -546,8 +526,8 @@ def register(request, template_name='authopenid/complete.html',
         'email': email
     }, context_instance=django_authopenid.views._build_context(request, extra_context=extra_context))
 
-# We use this "not_authenticated" wrapper so that if you *are* logged in, you go
-# straight to the ?next= value.
+# We use this "not_authenticated" wrapper so that if you *are* logged in,
+# you go straight to the ?next= value.
 login = django_authopenid.views.not_authenticated(
     django.contrib.auth.views.login)
 

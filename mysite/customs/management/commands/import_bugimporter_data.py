@@ -14,11 +14,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.core.management.base import BaseCommand
-import mysite.customs.core_bugimporters
-import yaml
-from django.utils import simplejson
 import logging
+import yaml
+
+from django.utils import simplejson
+from django.core.management.base import BaseCommand
+
+import mysite.customs.core_bugimporters
+
+
+logger = logging.getLogger(__name__)
 
 
 def jsonlines_decoder(f):
@@ -28,8 +33,8 @@ def jsonlines_decoder(f):
         try:
             yield simplejson.loads(line)
         except Exception:
-            logging.exception("simplejson decode failed")
-            logging.error("repr(line) was: %s", repr(line))
+            logger.exception("simplejson decode failed")
+            logger.error("repr(line) was: %s", repr(line))
             continue
 
 

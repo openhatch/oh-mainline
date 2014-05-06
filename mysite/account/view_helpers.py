@@ -1,5 +1,10 @@
-from django.contrib.sessions.models import Session
+import logging
 import datetime
+
+from django.contrib.sessions.models import Session
+
+
+logger = logging.getLogger(__name__)
 
 
 def clear_user_sessions(user, session_to_omit=None):

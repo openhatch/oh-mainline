@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import logging
 
 from django.test import TestCase
 import django.core.cache
@@ -41,6 +42,9 @@ from mysite.search.models import Project, Bug, \
     ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import mysite.project.views
+
+
+logger = logging.getLogger(__name__)
 
 
 class SearchTest(TwillTests):
@@ -73,16 +77,16 @@ class SearchTest(TwillTests):
                 self.assertEqual(sorted_one[k], sorted_two[k])
             except AssertionError:
                 import sys
-                print >> sys.stderr, sorted_one
-                print >> sys.stderr, sorted_two
+                logging.exception(sorted_one)
+                logging.exception(sorted_two)
                 raise
         for k in range(len(sorted_two)):
             try:
                 self.assertEqual(sorted_one[k], sorted_two[k])
             except AssertionError:
                 import sys
-                print >> sys.stderr, sorted_one
-                print >> sys.stderr, sorted_two
+                logging.exception(sorted_one)
+                logging.exception(sorted_two)
                 raise
 
 
@@ -236,7 +240,7 @@ class SearchResults(TwillTests):
 
         for bug in bugs[:10]:
             tc.find(bug.description)
-            print "Found bug ", bug
+            logging.debug("Found bug ", bug)
 
         tc.follow(u'Next')
 
@@ -1119,7 +1123,7 @@ class QueryGrabHitCount(SearchTest):
         hit_count_cache_key = query.get_hit_count_cache_key()
         # Get the cache value.
         stored_hit_count = django.core.cache.cache.get(hit_count_cache_key)
-        print "Stored: %s" % stored_hit_count
+        logging.debug("Stored: %s" % stored_hit_count)
         # Test that it was stored correctly.
         self.assertEqual(stored_hit_count, expected_hit_count)
 
@@ -1536,7 +1540,7 @@ class CreateAnonymousAnswer(TwillTests):
             record = Answer.all_even_unowned.get(
                 text=POST_data['answer__text'])
         except Answer.DoesNotExist:
-            print "All Answers:", Answer.all_even_unowned.all()
+            logging.debug("All Answers:", Answer.all_even_unowned.all())
             raise Answer.DoesNotExist
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
@@ -1595,7 +1599,7 @@ accuracy.""",
         try:
             record = Answer.objects.get(text=POST_data['answer__text'])
         except Answer.DoesNotExist:
-            print "All Answers:", Answer.objects.all()
+            logging.exception("All Answers:", Answer.objects.all())
             raise Answer.DoesNotExist
         self.assertEqual(record.author,
                          User.objects.get(username='paulproteus'))

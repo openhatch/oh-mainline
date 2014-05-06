@@ -38,6 +38,9 @@ import mysite.account.views
 import mysite.base.depends
 
 
+logger = logging.getLogger(__name__)
+
+
 class Login(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -324,9 +327,9 @@ class EditPhoto(TwillTests):
 
     def test_image_processing_library_error(self):
         """
-        If the image processing library errors while preparing a photo, report a
-        helpful message to the user and log the error. The photo is not added
-        to the user's profile.
+        If the image processing library errors while preparing a photo, report
+        a helpful message to the user and log the error. The photo is not
+        added to the user's profile.
         """
         # Get a copy of the error log.
         string_log = StringIO.StringIO()
@@ -475,14 +478,15 @@ class LoginPageContainsUnsavedAnswer(TwillTests):
         POST_data = {
             'project__pk': p.pk,
             'question__pk': q.pk,
-            'answer__text': """Help produce official documentation, share the solution \
-             to a problem, or check, proof and test other documents for accuracy.""",
+            'answer__text': """Help produce official documentation, share \
+            the solution to a problem, or check, proof and test other \
+            documents for accuracy.""",
         }
         response = self.client.post(
             reverse(mysite.project.views.create_answer_do), POST_data,
             follow=True)
 
-        # Now, the session will know about the answer, but the answer will not be published.
+        # Session will know the answer, but the answer will not be published.
         # Visit the login page, assert that the page contains the text of the
         # answer.
 

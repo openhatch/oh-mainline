@@ -52,6 +52,9 @@ import mysite.customs.views
 from mysite.search.models import Bug, Project
 
 
+logger = logging.getLogger(__name__)
+
+
 @skipIf(
     mysite.base.depends.lxml.html is None,
     "To run these tests, please install lxml. See Advanced Installation docs.")
@@ -592,7 +595,7 @@ class BugzillaTrackerEditingViews(TwillTests):
             'max_connections': '8',
             'bug_project_name_format': 'format'})
         if form.errors:
-            logging.info(form.errors)
+            logger.info(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -614,7 +617,7 @@ class BugzillaTrackerEditingViews(TwillTests):
             'custom_parser': 'bugzilla.KDEBugzilla',
             'bug_project_name_format': 'format'})
         if form.errors:
-            logging.info(form.errors)
+            logger.info(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -653,7 +656,7 @@ class BugzillaTrackerListing(TwillTests):
             'bug_project_name_format': 'format'})
 
         if form.errors:
-            logging.info(form.errors)
+            logger.info(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -689,7 +692,7 @@ class LaunchpadTrackerEditingViews(TwillTests):
             'documentation_tag': 'doc',
             'bug_project_name_format': 'format'})
         if form.errors:
-            logging.info(form.errors)
+            logger.info(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -724,7 +727,7 @@ class GitHubTrackerEditingViews(TwillTests):
             'max_connections': '8',
             'documentation_tag': 'doc'})
         if form.errors:
-            logging.info(form.errors)
+            logger.info(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -785,7 +788,7 @@ class JiraTrackerEditingViews(TwillTests):
             'bug_project_name_format': 'KDE',
             'documentation_tag': 'doc'})
         if form.errors:
-            logging.info(form.errors)
+            logger.info(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 

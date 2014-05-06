@@ -21,6 +21,8 @@ import logging
 import mysite.profile.tasks
 import mysite.profile.management.commands.send_emails
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     help = "Run this once daily for the OpenHatch profile app."

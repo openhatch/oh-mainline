@@ -17,18 +17,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import datetime
 import dateutil
-import mysite.customs.models
-import mysite.customs.forms
 import logging
 
-from mysite.search.models import Bug
-
 import django.db.models
+
+from mysite.search.models import Bug
+import mysite.customs.models
+import mysite.customs.forms
+
+
+logger = logging.getLogger(__name__)
 
 
 def import_one_bug_item(d):
     '''Accepts one ParsedBug object, as a Python dict.
-
     Usually causes the side effect of creating a Bug project.'''
     # Store d as a copy of the input dict, to avoid making a mess.
     d = dict(d)
@@ -47,16 +49,16 @@ def import_one_bug_item(d):
     if not (('_tracker_name' in d) and
             ('_project_name' in d) and
             d.get('last_polled', None)):
-        logging.error(
+        logger.error(
             "Your data needs a _tracker_name and _project_name and " +
             "a last_polled.")
-        logging.error(repr(d))
+        logger.error(repr(d))
         return
 
     project, created = mysite.search.models.Project.objects.get_or_create(
         name=d['_project_name'])
     if created:
-        logging.error("FYI we created: %s", d['_project_name'])
+        logger.error("FYI we created: %s", d['_project_name'])
 
     tracker = mysite.customs.models.TrackerModel.get_instance_by_name(
         tracker_name=d['_tracker_name'])

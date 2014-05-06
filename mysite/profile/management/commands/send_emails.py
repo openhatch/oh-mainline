@@ -14,21 +14,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.core.management.base import BaseCommand
-from mysite.base.models import Timestamp
-from django.core.mail import EmailMultiAlternatives
-from mysite.profile.models import Person
-from django.db.models import Q
-from mysite.profile.models import PortfolioEntry
-from django.template.loader import render_to_string
-from mysite.search.models import WannaHelperNote
 import datetime
 import logging
 import HTMLParser
 import html2text
 
 from django.core.urlresolvers import reverse
+from django.core.management.base import BaseCommand
+from django.core.mail import EmailMultiAlternatives
+from django.db.models import Q
+from django.template.loader import render_to_string
+
+from mysite.search.models import WannaHelperNote
+from mysite.profile.models import Person
+from mysite.base.models import Timestamp
 import mysite.profile.views
+from mysite.profile.models import PortfolioEntry
+
+
+logger = logging.getLogger(__name__)
 
 
 def push_to_end_of_list(an_object, a_list):
@@ -71,7 +75,7 @@ class Command(BaseCommand):
         # stop here and don't send any emails.
         if ((self.this_run_covers_things_up_until - self.this_run_covers_things_since) <
                 YESTERDAY):
-            logging.warn(
+            logger.warn(
                 "Not sending emails; emails were last sent within the last 24 hours.")
             return
 
@@ -92,7 +96,7 @@ class Command(BaseCommand):
         for person in people_who_want_email:
 
             if not person.user.email:
-                logging.warn("Uh, the person has no email address: %s" %
+                logger.warn("Uh, the person has no email address: %s" %
                              person.user.username)
                 continue  # if the user has no email address, we skip the user.
 

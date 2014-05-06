@@ -17,6 +17,7 @@
 
 import datetime
 import socket
+import logging
 
 from django.core.mail import send_mail
 import django.template
@@ -34,6 +35,10 @@ import mysite.profile.views
 import mysite.project.forms
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 import mysite.project.view_helpers
+
+
+logger = logging.getLogger(__name__)
+
 
 def create_project_page_do(request):
     project_name = request.POST.get('project_name', None)
@@ -420,11 +425,9 @@ def edit_project(request, project__name):
             project = form.save()
             project.update_scaled_icons_from_self_icon()
 
-            import logging
-
             # This is a good time to make a little note pertaining to the fact
             # that someone has edited the project info.
-            logging.info(
+            logger.info(
                 "Project edit: %s just edited a project.  The project's data originally read as follows: %s.  Its data now read as follows: %s" %
                 (request.user.username, old_project.__dict__, project.__dict__))
 

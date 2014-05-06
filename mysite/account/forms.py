@@ -15,15 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+import StringIO
+
 import django.contrib.auth.forms
 from django.contrib.auth.models import User
 import django.forms
-from mysite.profile.models import Person
-import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import logging
+
 import mysite.base.depends
+from mysite.profile.models import Person
 
 RESERVED_USERNAMES = (
     'admin',
@@ -31,6 +33,8 @@ RESERVED_USERNAMES = (
     'sufjan',
     'Spam cleanup script',
 )
+
+logger = logging.getLogger(__name__)
 
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
@@ -124,9 +128,9 @@ class EditLocationForm(django.forms.ModelForm):
         try:
             mysite.base.view_helpers.cached_geocoding_in_json(address)
         except Exception:
-            logging.exception("When geocoding, caught an exception")
+            logger.exception("When geocoding, caught an exception")
             raise django.forms.ValidationError(
-                "An error occurred while geocoding. Make sure the address is a valid place. If you think this is our error, contact us.")
+                "Error while geocoding. If the address is valid and you think this is our error, contact us.")
         return address
 
 
@@ -150,8 +154,8 @@ class EditPhotoForm(django.forms.ModelForm):
             # FIXME This is fail-safe, not fail-secure, behavior.
             # If an image is too big, and the Python Imaging Library
             # is not installed, we simply do not resize it.E
-            logging.info(
-                "NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
+            logger.info(
+                "Image not resized. To resize, install PIL using OH docs.")
             return self.cleaned_data['photo']
 
         # Safe copy of data...
@@ -195,9 +199,10 @@ class SignUpIfYouWantToHelpForm(django.forms.Form):
         choices=(
                 ('forwarder',
                  'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
-            ('public_email',
-             'By email; just display my real email address'),
-        ))
+                ('public_email',
+                 'By email; just display my real email address'),
+        )
+    )
 
 
 class EmailMeForm(django.forms.ModelForm):
