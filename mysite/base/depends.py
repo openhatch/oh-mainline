@@ -88,7 +88,6 @@ def postmap_available(already_emitted_warning=[]):
             pass
         else:
             already_emitted_warning.append(True)
-            logger.warning(
-                'postmap binary not found at {0}. Look in Advanced Installation docs about postfix for more information.'.format(POSTMAP_PATH))
+            logger.warning('postmap binary not found at %s. See Advanced Installation docs about postfix.' % format(POSTMAP_PATH))
         return False
     return True

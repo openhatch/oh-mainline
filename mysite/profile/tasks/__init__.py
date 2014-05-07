@@ -76,8 +76,7 @@ class RegeneratePostfixAliasesForForwarder:
 
     def update_table(self):
         # Generate the table...
-        lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table(
-        )
+        lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
         # Save it where Postfix expects it...
         fd = open(django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
         fd.write('\n'.join(lines))

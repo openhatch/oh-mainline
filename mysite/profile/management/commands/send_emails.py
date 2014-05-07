@@ -104,7 +104,7 @@ class Command(BaseCommand):
                 person)
             if message_in_html:
                 count += 1
-                print "Emailing %s their project activity." % person.user.email
+                logger.info("Emailing %s their project activity." % person.user.email)
                 email = EmailMultiAlternatives(
                     subject="News about your OpenHatch projects",
                     body=message_in_plain_text,

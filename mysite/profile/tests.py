@@ -540,9 +540,11 @@ class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_show_email(self):
-        """This test: (a) verifies my@ema.il does not appear on paulproteus's
+        """
+        This test: (a) verifies my@ema.il does not appear on paulproteus's
         profile page then goes to his account settings and opts in to showing
-        it, and then verifies it does appear."""
+        it, and then verifies it does appear.
+        """
         self.login_with_twill()
 
         tc.go('/people/paulproteus/')
@@ -593,7 +595,9 @@ class BugsAreRecommended(TwillTests):
         self.assertEqual(len(csharp_bugs), 1)
 
     def test_recommendations_not_duplicated(self):
-        """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
+        """
+        Run two equivalent searches in parallel, and discover that they weed out duplicates.
+        """
         recommender = mysite.profile.view_helpers.RecommendBugs(
             ['Python', 'Python'], n=2)
         recommended = list(recommender.recommend())
@@ -939,7 +943,9 @@ class GimmeJsonTellsAboutImport(TwillTests):
         return datetime.datetime.utcnow() - datetime.timedelta(minutes=n)
 
     def test_import_running_false(self):
-        "When there are no dias from the past five minutes, import.running = False"
+        """
+        When there are no dias from the past five minutes, import.running = False
+        """
         # Create a DIA for paulproteus that is from ten minutes ago (but
         # curiously is still in progress)
         my_dia_but_not_recent = DataImportAttempt(
@@ -957,8 +963,10 @@ class GimmeJsonTellsAboutImport(TwillTests):
         self.assertFalse(self.gimme_json()['import']['running'])
 
     def test_for_running_import(self):
-        "When there are dias from the past five minutes, import.running = True "
-        "and progress percentage is accurate"
+        """
+        When there are dias from the past five minutes, import.running = True
+        and progress percentage is accurate
+        """
         # Create a DIA for paulproteus that is from one minutes ago (but
         # curiously is still in progress)
         my_incomplete_recent_dia = DataImportAttempt(
@@ -1199,7 +1207,7 @@ class PersonGetTagsForRecommendations(TwillTests):
 class MapTagsRemoveDuplicates(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_map_tags_remove_duplicates(self):
         pp = Person.objects.get(user__username='paulproteus')
 
         understands_not = TagType(name='understands_not')
@@ -1232,11 +1240,13 @@ class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
-    def test(self):
-        '''This test creates:
+    def test_project_get_mentors(self):
+        """
+        This test creates:
         * one person who is listed as able to mentor in Banshee
         * one person who is not
-        and asks the Banshee project to list its available mentors.'''
+        and asks the Banshee project to list its available mentors.
+        """
         Project.create_dummy(name='Banshee')
         can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
 
@@ -1256,7 +1266,7 @@ class SuggestLocation(TwillTests):
     @skipIf(
         not mysite.profile.view_helpers.geoip_city_database_available(),
         "Skipping because high-resolution GeoIP data not available.")
-    def test(self):
+    def test_suggest_location(self):
         data = {}
         data['geoip_has_suggestion'], data[
             'geoip_guess'] = mysite.profile.view_helpers.get_geoip_guess_for_ip("128.151.2.1")
@@ -1267,9 +1277,12 @@ class SuggestLocation(TwillTests):
         not mysite.profile.view_helpers.geoip_city_database_available(),
         "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
-        """We wrote this test because MaxMind gives us back a city in Iceland. That city
-        has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
-        so we verify here that we properly decode that to pure beautiful Python Unicode."""
+        """
+        We wrote this test because MaxMind gives us back a city in Iceland.
+        That city has a name not in ASCII. MaxMind's database seems to store
+        those values in Latin-1, so we verify here that we properly decode
+        that to pure beautiful Python Unicode.
+        """
         data = {}
         data['geoip_has_suggestion'], data[
             'geoip_guess'] = mysite.profile.view_helpers.get_geoip_guess_for_ip("89.160.147.41")
@@ -1291,14 +1304,15 @@ class EditLocation(TwillTests):
                 'person-barry', 'person-paulproteus']
 
     @mock.patch('mysite.base.view_helpers._geocode')
-    def test(self, mock_geocode):
-        '''
+    def test_edit_location(self, mock_geocode):
+        """
         * Goes to paulproteus's profile
         * checks that he is not in Timbuktu
         * clicks "edit or hide"
         * sets the location to Timbuktu
         * saves
-        * checks his location is Timbuktu'''
+        * checks his location is Timbuktu
+        """
         mock_geocode.return_value = {'suggested_zoom_leveel': 6,
                                      'latitude': 16.77532,
                                      'longitude': -3.008265}
@@ -1330,7 +1344,7 @@ class EditLocation(TwillTests):
 class EditBio(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_edit_bio(self):
         '''
         * Goes to paulproteus's profile
         * checks that they don't already have a bio that says "lookatme!"
@@ -1362,14 +1376,14 @@ class EditBio(TwillTests):
 class EditHomepage(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
-        '''
+    def test_edit_homepage(self):
+        """
         * Goes to paulproteus's profile
         * checks that there is no link to asheesh.org
         * clicks edit on the Info area
         * enters a link as Info
         * checks that his bio now contains "asheesh.org"
-        '''
+        """
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         # not so vain.. yet
@@ -1401,14 +1415,14 @@ class EditHomepage(TwillTests):
 class EditIrcNick(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
-        '''
+    def test_edit_irc_nick(self):
+        """
         * Goes to paulproteus's profile
         * checks that they don't already have a ircnick that says "paulproteusnick"
         * clicks edit on the Info area
         * enters a string as irc nick
         * checks that his irc nick now contains string
-        '''
+        """
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.notfind('paulproteusnick')
@@ -1430,15 +1444,15 @@ class EditIrcNick(TwillTests):
 class EditContactBlurbForwarderification(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
-        '''
+    def test_edit_contact_blurb_forwarder(self):
+        """
         a controller called put_forwarder_in_contact_blurb_if_they_want() takes a string which is what someone inputs as their contact info blurb
         it also takes said person's username or person object or something
         we're testing this:
             the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
             the Forwarder db table contains a row for our new forwarder
                 (which we created with the generate_forwarder controller)
-        '''
+        """
         # grab asheesh by the horns
         sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
         # make them a forwarder
@@ -1469,8 +1483,8 @@ class EditContactBlurbForwarderification(TwillTests):
 class EditContactBlurb(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
-        '''
+    def test_edit_contact_blurb(self):
+        """
         * Goes to paulproteus' profile
         * checks that it doesn't say "bananas"
         * clicks edit in the info area
@@ -1483,7 +1497,7 @@ class EditContactBlurb(TwillTests):
         * removes email address from user
         * enters contact blurb containing $fwd
         * makes sure that the user gets an error message
-        '''
+        """
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         # make sure our contact info isn't already on the profile page
@@ -1522,13 +1536,13 @@ class EditContactBlurb(TwillTests):
         self.assertEqual(asheesh.homepage_url, homepage_url)
 
     def test_blurb_with_irc_info(self):
-        '''
+        """
         * Goes to paulproteus' profile
         * clicks edit in the info area
         * enters irc url under the "how to contact me" section
         * submits
         * checks that his profile now has irc url
-        '''
+        """
         irc_url = 'irc://irc.freenode.net/openhatch'
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
@@ -1764,7 +1778,7 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
 
     @mock.patch(
         'mysite.profile.tasks.RegeneratePostfixAliasesForForwarder.update_table')
-    def test(self, mock_update_table):
+    def test_postfix_forwarders_gen_when_enabled(self, mock_update_table):
         task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
         task.run()
         self.assertFalse(mock_update_table.called)
@@ -1776,7 +1790,7 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
 class PostmapBinaryCalledIfExists(TwillTests):
 
     @mock.patch('os.system')
-    def test(self, mock_update_table):
+    def test_postmap_called_if_exists(self, mock_update_table):
         with mock.patch('mysite.base.depends.postmap_available') as a:
             task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
             a.return_value = True
@@ -1787,7 +1801,7 @@ class PostmapBinaryCalledIfExists(TwillTests):
 class PostmapBinaryNotCalledIfDoesNotExist(TwillTests):
 
     @mock.patch('os.system')
-    def test(self, mock_update_table):
+    def test_postmap_not_called_if_not_exist(self, mock_update_table):
         with mock.patch('mysite.base.depends.postmap_available') as a:
             task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
             a.return_value = False
@@ -1799,7 +1813,7 @@ class PostFixGeneratorList(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus']
 
-    def test(self):
+    def test_postfix_generator_list(self):
         # create two people
         #  one who has an email address list in our database
         asheesh = User.objects.get(username='paulproteus')
@@ -1830,7 +1844,7 @@ class EmailForwarderGarbageCollection(TwillTests):
     # run garbage collection
     # make sure that whatever should have happened has happened
 
-    def test(self):
+    def test_email_forwarder_garbage_collection(self):
         # args:
             # valid = True iff we want a forwarder whose expires_on is in the future
             # new_enough_for_dispay = True iff we want a forwarder whose
@@ -1898,7 +1912,7 @@ class EmailForwarderGarbageCollection(TwillTests):
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    '''
+    """
     * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
     * one of these will be expired
     * one of these will not
@@ -1906,9 +1920,9 @@ class EmailForwarderResolver(TwillTests):
         * email forwarder address that's not in the database at all
         * email forwarder that's in the db but is expired
         * email forwarder that's in the db and is not expired
-    '''
+    """
 
-    def test(self):
+    def test_email_forwarder_resolver(self):
         # this function was only being used by this test--so i moved it here.
         # it was in base/view_helpers --parker
         def get_email_address_from_forwarder_address(forwarder_address):
@@ -1959,7 +1973,7 @@ class EmailForwarderResolver(TwillTests):
 class ForwarderGetsCreated(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_forwarder_gets_created(self):
         # paulproteus has $fwd in his contact blurb
         p = Person.get_by_username('paulproteus')
         p.contact_blurb = "hi, $fwd!"
@@ -2030,7 +2044,7 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
 class PeopleMapForNonexistentProject(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_peoplemap_nonexist_project(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
@@ -2048,7 +2062,7 @@ class PeopleMapForNonexistentProject(TwillTests):
 class BugModificationTimeVersusTimestamp(TwillTests):
 
     @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache')
-    def test(self, mock_thing):
+    def test_bug_modification_time_to_timestamp(self, mock_thing):
         # The following comment is from the old Epoch class, now superseded by the
         # Timestamp class. It is here as a reference.
 
@@ -2090,7 +2104,7 @@ class BugModificationTimeVersusTimestamp(TwillTests):
 class SaveReordering(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_save_reordering(self):
         # Log in
         client = self.login_with_client()
 
@@ -2128,7 +2142,7 @@ class SaveReordering(TwillTests):
 class ArchiveProjects(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_archive_projects(self):
         # Log in
         client = self.login_with_client()
 
@@ -2155,8 +2169,10 @@ class Notifications(TwillTests):
 
     @staticmethod
     def get_email_context(recipient):
-        """ This helper method retrieves the context of the email we're
-        currently planning to send to the recipient. """
+        """
+        This helper method retrieves the context of the email we're
+        currently planning to send to the recipient.
+        """
 
         # First move the timestamp back
         Timestamp.update_timestamp_for_string(
@@ -2173,8 +2189,10 @@ class Notifications(TwillTests):
         return mail.outbox
 
     def assert_only_these_people_were_emailed(self, contributors, outbox):
-        """Assert that the ONLY email recipients are the contributors who are
-        news to each other"""
+        """
+        Assert that the ONLY email recipients are the contributors who are
+        news to each other
+        """
 
         recipient_emails = []
         for email in outbox:
