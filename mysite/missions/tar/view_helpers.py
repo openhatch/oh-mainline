@@ -37,45 +37,6 @@ int main(void)
         'Makefile': 'hello : hello.o\n'
     }
 
-    @classmethod
-    def check_tarfile(cls, tardata):
-        """
-        Validate that tardata is gzipped and contains the correct files in a wrapper directory.
-        """
-        try:
-            tfile = tarfile.open(fileobj=StringIO(tardata), mode='r:gz')
-        except tarfile.ReadError:
-            raise IncorrectTarFile, 'Archive is not a valid gzipped tarball'
-
-        # Check the filename list.
-        filenames_wanted = [cls.WRAPPER_DIR_NAME] + \
-            [os.path.join(cls.WRAPPER_DIR_NAME, filename)
-             for filename in cls.FILES.keys()]
-        for member in tfile.getmembers():
-            if '/' not in member.name:
-                if member.name in cls.FILES.keys():
-                    raise IncorrectTarFile, 'No wrapper directory is present'
-                elif member.isdir() and member.name != cls.WRAPPER_DIR_NAME:
-                    raise IncorrectTarFile, 'Wrapper directory name is incorrect: "%s"' % member.name
-            if member.name not in filenames_wanted:
-                msg = 'An unexpected entry "%s" is present' % member.name
-                if '/._' in member.name:
-                    # This is an Apple Double file.
-                    msg += '. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.'
-                raise IncorrectTarFile, msg
-            filenames_wanted.remove(member.name)
-            if member.name == cls.WRAPPER_DIR_NAME:
-                if not member.isdir():
-                    raise IncorrectTarFile, '"%s" should be a directory but is not' % member.name
-            else:
-                if not member.isfile():
-                    raise IncorrectTarFile, 'Entry "%s" is not a file' % member.name
-                if tfile.extractfile(member).read() != cls.FILES[member.name.split('/')[-1]]:
-                    raise IncorrectTarFile, 'File "%s" has incorrect contents' % member.name
-        if len(filenames_wanted) != 0:
-            raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (
-                ', '.join('"%s"' % f for f in filenames_wanted))
-
 
 class UntarMission(object):
     TARBALL_DIR_NAME = 'ghello-0.4'
