@@ -50,72 +50,60 @@
                         method='POST'>{% csrf_token %}
 
                         <div class='form-row'>
-                        <h3>You, in a nutshell</h3>
+                        <h2>You, in a nutshell</h2>
                     </div>
 
                         <div class='form-row'>
-                            <label>Bio:</label>
+                            <h3>Bio:</h3>
                             {{ form.bio }}
-                            <p class='example'>Example: I like traffic lights.
-                            On weekends, I like to make websites, destroy
-                            Twitter, and eat breakfast.</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>Web site:</label>
-                            {{ form.homepage_url.errors }}
+                            <h3>Web site:</h3>
                             {{ form.homepage_url }}
-                            <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>IRC nick:</label>
-                            {{ form.irc_nick.errors }}
+                            <h3>IRC nick:</h3>
                             {{ form.irc_nick }}
-                            <p class='example'>Example: sufjan</p>
                         </div>
 
                         <div class='form-row'>
-                            <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
+                            <h2>Tag yourself</h2>
                             <p class='why'>After you save, these tags will appear on your profile. Click them to find similar people. {# In the near future, this information will help people find you in the <a href='/people/'>People Search</a>.#} </p>
                         </div>
 
                         <div class='form-row'>
-                            <label>I understand:</label>
+                            <h3>I understand:</h3>
                             {{ form.understands }}
-                            <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>I will never understand:</label>
+                            <h3>I will never understand:</h3>
                             {{ form.understands_not }}
-                            <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>I'm currently studying:</label>
+                            <h3>I'm currently studying:</h3>
                             {{ form.studying }}
-                            <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
                         </div>
 
                         <div class='form-row'>
-                            <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Volunteering</h3>
+                            <h2>Volunteering</h2>
                             <p class='why'>These tags help us match you with interesting people and projects.</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>When projects need help, I'm willing to pitch in with:</label>
+                            <h3>When projects need help, I'm willing to pitch in with:</h3>
                             {{ form.can_pitch_in }}
-                            <p class='example'>Example: documentation, testing, c++, mac compatibility, design</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>I can mentor in:</label>
+                            <h3>I can mentor in:</h3>
                             {{ form.can_mentor }}
-                            <p class='example'>Example: python, unicode, git, GTK+</p>
                         </div>
                         <div class='form-row' id='contact_blurb'>
-                            <label>How to contact me:</label>
+                            <h3>How to contact me:</h3>
                             {% if contact_blurb_error %}
                             <!--contact_blurb_error-->
                             <ul id="error_msg" class="errorlist">
@@ -124,34 +112,25 @@
                                 </li>
                             </ul>
                             {% endif %}
-                            {{ contact_blurb_form.contact_blurb }}
-                            <p class='example'>Example: "The best way to reach me is by
-                            private message at http://identi.ca/rafpaf."</p>
                             <p class='example'>
-                                We preserve linebreaks, and turn URLs into links.
-                            </p>
-                            <p class='example'>
+                                We preserve linebreaks and turn URLs into links.
                                 We provide a Craigslist-style email forwarding
                                 service.  To use it, include the string
                                 <tt>$fwd</tt> in the text area above.
-                                
                                 For example, 
                                 &ldquo;<tt>Email me at $fwd</tt>&rdquo;
                                 will appear on your profile as "Email me at 
                                 {{ forwarder_sample|urlizetrunc:'23' }}".
+                                Keep in mind: This information will be public and
+                                crawlable by search engines. Your email forwarding
+                                address will change every few days to thwart
+                                spammers.  
                             </p>
-                            <p class='example'>
-                            Keep in mind: This information will be public and
-                            crawlable by search engines. Your email forwarding
-                            address will change every few days to thwart
-                            spammers.  
-                            </p>
-                            <p class='example'>
-                            </p>
+                             {{ contact_blurb_form.contact_blurb }}
                         </div>
 
                         <input class='save-button' type='submit' style='clear: left; float: left;' value='Save' />
-                        <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px" href="{{ user.get_profile.profile_url }} ">Cancel</a>
+                        <a style="float: left; font-size: 1.1em; margin: 1px 0 0 10px" href="{{ user.get_profile.profile_url }} ">Cancel</a>
                     </form>
                 </div>      
         {% endblock %}
