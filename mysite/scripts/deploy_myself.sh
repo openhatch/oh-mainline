@@ -34,7 +34,7 @@ function notify_web_server() {
     touch mysite/scripts/app.wsgi
 }
 
-function notify_github {} {
+function notify_github() {
     ### Update deploy_$(hostname) branch on github.com so that
     ### it is very clear which commits are deployed where.
     git push origin HEAD:deployed_$(hostname -f)
