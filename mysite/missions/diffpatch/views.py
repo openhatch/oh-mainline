@@ -183,7 +183,7 @@ def about(request, passed_data={}):
 
 
 @view
-def single_file_diff(request, passed_datappp={}):
+def single_file_diff(request, passed_data={}):
     state = DiffPatchMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Single file diff'
     data = state.as_dict_for_template_context()
