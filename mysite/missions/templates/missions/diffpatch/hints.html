@@ -1,0 +1,53 @@
+{% extends 'missions/diffpatch/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='submodule-head head'>
+    <h3>Quick reference</h3>
+  </div>
+  <div class="submodule-body body">
+    <h3>The Diff Command</h3>
+    <p><tt>diff</tt> compares two files and outputs the different lines in the two files that it finds. A quick demonstration of how to use <tt>diff</tt>:</p>
+    <code>diff -u file1.txt file2.txt &gt; output.txt</code>
+    <p>It is nice to include the -u option, which formats the output more compactly by omitting redundant context lines. This makes the output file more reader friendly. </p>
+    <h3>The Patch Command</h3>
+    <p><tt>patch</tt> applies the output file from the <tt>diff</tt> command to the original file. The input file is given like so:</p>
+    <code>patch &lt; input.patch</code>
+    <p>By default, it searches for the file with the path given in the input patch file in the current directory.</p>
+    <p>The option -p(num) removes the smallest prefix containing (num) slashes from each file path found in the input file. Suppose &frasl;usr&frasl;doc&frasl;my_file.txt is an file path in the input file.</p>
+    <p>Setting -p0 leaves the file path unchanged: &frasl;usr&frasl;doc&frasl;my_file.txt.</p>
+    <p>Setting -p1 takes off the root directory: usr&frasl;doc&frasl;my_file.txt.</p>
+    <p>Setting -p2 removes 2 slashes: doc&frasl;my_file.txt.</p>
+    <p>Now suppose you are currently in &frasl;, specifying -p0 (which does not do anything) will allow the patch to be applied correctly. However, suppose your current working directory is &frasl;other_usr and you want the patch to be applied to files in &frasl;other_usr&frasl;doc, you want to use -p2.</p>
+    <code>patch -p2 &lt; input.patch</code>
+    <p>This takes off the prefix &frasl;usr&frasl; from each file path in the input file. </p>
+    <p>If you want to specify a working directory, you can use the option -d.</p>
+    <code>patch -d &frasl;other&frasl;dir &lt; input.patch</code>
+    <h3>Other resources</h3>
+    <p>There are many more options to <tt>diff</tt> and <tt>patch</tt>. For further reading:</p>
+    <ul class="raquo_bullets">
+      <li>User manual for the command <a href="http://linux.die.net/man/1/diff"><tt>diff</tt></a>. You can also find this by typing <tt>man diff</tt> in a terminal.</li>
+      <li>User manual for the command <a href="http://linux.die.net/man/1/patch"><tt>patch</tt></a>. You can also find this by typing <tt>man patch</tt> in a terminal.</li>
+    </ul>
+    
+  </div>
+</div>
+{% endblock mission_main %}
