@@ -50,6 +50,6 @@ cd ~/milestone-a
 
 check_for_changed_files
 update_to_latest
+notify_github
 update_database
 notify_web_server
-notify_github
