@@ -31,7 +31,7 @@ kind of a big repository. (Sixty megabytes, or so.)
 How to run a local site
 =======================
 
-Read installation.rst inside getting_started directory
+Read installation.rst inside docs/getting_started directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you have the repository, open up the installation.rst file in any
