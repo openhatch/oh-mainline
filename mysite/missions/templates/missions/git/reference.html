@@ -1,0 +1,66 @@
+{% extends 'missions/git/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='submodule-head head'>
+    <h3>Quick reference</h3>
+  </div>
+  <div class="submodule-body body">
+      <h3>Tools for working with git</h3>
+      <p>If you already have git installed, you may type "git" in the terminal to bring up a list of commonly used git commands, or type "man git" for the full manual. If you don't have git installed yet, please check out this <a href="http://git-scm.com/book/en/Getting-Started-Installing-Git">tutorial</a> on how to set it up on your system.</p>
+      <p>This page is just a quick reference of the git tools that we have learned; see the bottom for other resources.</p>
+      <h3>Configuring git</h3>
+      <p>To configure your name:</p>
+      <pre>git config --global user.name 'First Last'</pre>
+      <p>To configure your email:</p>
+      <pre>git config --global user.email 'name@domain.com'</pre>
+
+      <h3>Cloning a git repository</h3>
+      <pre>git clone <em>[url]</em> <em>[folder]</em></pre>
+      <p><tt>[folder]</tt> is optional. It's for if you want to clone the respository into a specific folder in the current directory. If the folder name specified does not already exist, it will be created.</p>
+
+      <h3>Creating a patch</h3>
+      <p>To check the status of the repository:</p>
+      <pre>git status</pre>
+      <p>It's highly recommended for you to check the status of the repository before performing any git commands, so you can avoid unnecessary problems such as commit collisions.</p>
+      <p>To prepare the modified files for committing:</p>
+      <pre>git add [file]</pre>
+      <p>Note that you may add more than one file by simply concatenate more [file] at the end, seperated by a space.</p>
+      <p>To record the changes as a commit:</p>
+      <pre>git commit -m "message"</pre>
+      <p>To create a file containing the path:</p>
+      <pre>git format-patch origin/master</pre>
+
+      <h3>Rebase and merge</h3>
+      <p>To update the local copy of a repository:</p>
+      <pre>git fetch</pre>
+      <pre>git rebase origin/master</pre>
+
+      <h3>Other resources</h3>
+      <p>There are many git tools and options. While the ones we mentioned here are commonly used ones, there are many other useful ones you should know. For further reading:</p>
+      <ul class="raquo_bullets">
+      <li>The <a href="http://git-scm.com/doc">official git documentation</a> is your best if you wish to know more about git.</li>
+      <li>Git comes with a user "manual". You can read that by typing <tt>man git</tt> in a terminal, or by <a href="https://www.kernel.org/pub/software/scm/git/docs/">visiting this page</a>.</li>
+      </ul>
+
+  </div>
+</div>
+{% endblock mission_main %}
