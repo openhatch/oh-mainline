@@ -23,11 +23,12 @@ import mysite.profile.tasks
 import mysite.base.models
 import mysite.search.tasks
 
-# FIXME: Move to a search management command?
+
+logger = logging.getLogger(__name__)
 
 
 def periodically_check_if_bug_timestamp_eclipsed_the_cached_search_timestamp():
-    logging.info(
+    logger.info(
         "Checking if bug timestamp eclipsed the cached search timestamp")
     cache_time = mysite.base.models.Timestamp.get_timestamp_for_string(
         'search_cache')
@@ -37,7 +38,7 @@ def periodically_check_if_bug_timestamp_eclipsed_the_cached_search_timestamp():
         mysite.search.tasks.clear_search_cache()
         mysite.base.models.Timestamp.update_timestamp_for_string(
             'search_cache')
-    logging.info(
+    logger.info(
         "Finished dealing with bug timestamp vs. cached search timestamp.")
 
 

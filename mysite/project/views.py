@@ -16,24 +16,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-from django.core.mail import send_mail
 import socket
-from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
-import mysite.project.view_helpers
-import django.template
-import mysite.base.decorators
-import mysite.profile.views
-import mysite.project.forms
+import logging
 
+from django.core.mail import send_mail
+import django.template
 from django.http import HttpResponse, HttpResponseRedirect, \
     HttpResponsePermanentRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
-
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils import http
+
+import mysite.base.decorators
+import mysite.profile.views
+import mysite.project.forms
+from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
+import mysite.project.view_helpers
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_project_page_do(request):
@@ -83,8 +87,8 @@ def project(request, project__name=None):
         ProjectInvolvementQuestion.objects.get_or_create(
             key_string='stress', is_bug_style=True)[0],
     ]
-    context['question2answer'] = [(question, question.get_answers_for_project(p))
-                                  for question in questions]
+    context['question2answer'] = [
+        (question, question.get_answers_for_project(p)) for question in questions]
 
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
@@ -93,7 +97,10 @@ def project(request, project__name=None):
 
     contact_form_list = []
     wannahelpernotes = mysite.search.models.WannaHelperNote.objects.filter(
-        person__id__in=wanna_helpers.values_list('id', flat=True), project=p).select_related().order_by('-pk')
+        person__id__in=wanna_helpers.values_list(
+            'id',
+            flat=True),
+        project=p).select_related().order_by('-pk')
     for note in wannahelpernotes:
         # a WannaHelperNote should always exist for all Person objects in
         # people_to_show
@@ -159,16 +166,16 @@ def projects(request):
         query = query.strip()
         matching_projects = mysite.project.view_helpers.similar_project_names(
             query)
-        project_matches_query_exactly = query.lower() in [p.name.lower()
-                                                          for p in matching_projects]
+        project_matches_query_exactly = query.lower() in [
+            p.name.lower() for p in matching_projects]
         if len(matching_projects) == 1 and project_matches_query_exactly:
             return HttpResponseRedirect(matching_projects[0].get_url())
 
     if not query:
         data[
             'projects_with_bugs'] = mysite.search.view_helpers.get_projects_with_bugs()
-        data['cited_projects_lacking_bugs'] = (mysite.search.view_helpers.
-                                               get_cited_projects_lacking_bugs())
+        data['cited_projects_lacking_bugs'] = (
+            mysite.search.view_helpers. get_cited_projects_lacking_bugs())
 
     data.update({
         'query': query,
@@ -192,7 +199,11 @@ def delete_paragraph_answer_do(request):
     # grab the answer from the database.  delete it.  done.
     our_answer = Answer.objects.get(pk=answer__pk, author=request.user)
     our_answer.delete()
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
+    return HttpResponseRedirect(
+        reverse(
+            project,
+            kwargs={
+                'project__name': our_answer.project.name}))
 
 
 def create_answer_do(request):
@@ -209,7 +220,7 @@ def create_answer_do(request):
             pk=request.POST['question__pk'])
         answer.text = request.POST['answer__text']
         answer.title = request.POST.get('answer__title', None)
-    except MultiValueDictKeyError, full_error_message:
+    except MultiValueDictKeyError as full_error_message:
         return HttpResponseBadRequest("""<p>
             Sorry, an error occurred! This post handler
             (<tt>project.views.create_answer_do</tt>) expects to see all the following
@@ -218,7 +229,7 @@ def create_answer_do(request):
             </p>
             
             <p>
-            The full error message might be helpful: 
+            The full error message might be helpful:
             <xmp>%s</xmp>
             </p>
             """ % full_error_message)
@@ -233,8 +244,12 @@ def create_answer_do(request):
         suffix = ''
     else:
         suffix = '?cookies=disabled'
-        return HttpResponseRedirect(reverse(project,
-                                            kwargs={'project__name': answer.project.name}) + suffix)
+        return HttpResponseRedirect(
+            reverse(
+                project,
+                kwargs={
+                    'project__name': answer.project.name}) +
+            suffix)
 
     answer.save()
     if answer.author is None:
@@ -245,12 +260,18 @@ def create_answer_do(request):
         # If user isn't logged in, send them to the login page with next
         # parameter populated.
         url = reverse('oh_login')
-        url += "?" + http.urlencode({u'next':unicode(answer.project.get_url())})
+        url += "?" + \
+            http.urlencode({u'next': unicode(answer.project.get_url())})
         return HttpResponseRedirect(url)
     else:
         answer.author = request.user
 
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
+    return HttpResponseRedirect(
+        reverse(
+            project,
+            kwargs={
+                'project__name': answer.project.name}) +
+        suffix)
 
 
 @login_required
@@ -277,15 +298,25 @@ def suggest_question_do(request):
     question_suggestion_response = ""
     # TODO: Asheesh would really rather this be enqueued as a background job
     try:
-        send_mail('Project Page Question Suggestion: ', body,
-                  'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
+        send_mail(
+            'Project Page Question Suggestion: ',
+            body,
+            'all@openhatch.org',
+            ['all@openhatch.org'],
+            fail_silently=False)
         question_suggestion_response = "success"
     except socket.error:
         # NOTE: this will probably only happen on a local server (not on the
         # live site)
         question_suggestion_response = "failure"
     template = "project/project.html"
-    return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
+    return HttpResponseRedirect(
+        reverse(
+            mysite.project.views.project,
+            kwargs={
+                'project__name': project.name}) +
+        '?question_suggestion_response=' +
+        question_suggestion_response)
 
 
 def mark_contacted_do(request):
@@ -308,8 +339,12 @@ def mark_contacted_do(request):
                     whn.contacted_by = request.user
                     whn.contacted_on = datetime.date.today()
                     whn.save()
-    return HttpResponseRedirect(reverse(mysite.project.views.project,
-                                        kwargs={'project__name': project.name}) + '#iwh_handler')
+    return HttpResponseRedirect(
+        reverse(
+            mysite.project.views.project,
+            kwargs={
+                'project__name': project.name}) +
+        '#iwh_handler')
 
 
 def wanna_help_do(request):
@@ -342,7 +377,8 @@ def wanna_help_do(request):
         # parameter populated.
         url = reverse('oh_login')
         url += "?"
-        url += http.urlencode({u'next':unicode(project.get_url()) + '?wanna_help=true'})
+        url += http.urlencode({u'next':
+                               unicode(project.get_url()) + '?wanna_help=true'})
         if request.is_ajax():
             return HttpResponse("redirect: " + url)
         else:
@@ -373,8 +409,8 @@ def nextsteps4helpers(request):
     lucky_project = Project.objects.get(name='Ubuntu')
     context = {
         'the_lucky_project': lucky_project,
-        'helpers': lucky_project.people_who_wanna_help.exclude(pk__exact=request.user.get_profile().pk)
-    }
+        'helpers': lucky_project.people_who_wanna_help.exclude(
+            pk__exact=request.user.get_profile().pk)}
     return (request, "nextsteps4helpers.html", context)
 
 
@@ -389,12 +425,11 @@ def edit_project(request, project__name):
             project = form.save()
             project.update_scaled_icons_from_self_icon()
 
-            import logging
-
             # This is a good time to make a little note pertaining to the fact
             # that someone has edited the project info.
-            logging.info("Project edit: %s just edited a project.  The project's data originally read as follows: %s.  Its data now read as follows: %s" % (
-                request.user.username, old_project.__dict__, project.__dict__))
+            logger.info(
+                "Project edit: %s just edited a project.  The project's data originally read as follows: %s.  Its data now read as follows: %s" %
+                (request.user.username, old_project.__dict__, project.__dict__))
 
             return HttpResponseRedirect(project.get_url())
     else:
@@ -404,8 +439,9 @@ def edit_project(request, project__name):
 
     person = request.user.get_profile()
     context['i_am_a_contributor'] = (person in project.get_contributors())
-    context['i_described_this_project'] = bool(project.get_pfentries_with_descriptions(
-        person=person))
+    context['i_described_this_project'] = bool(
+        project.get_pfentries_with_descriptions(
+            person=person))
 
     pfes = project.get_pfentries_with_descriptions()
     context['pfentries_with_descriptions'] = pfes

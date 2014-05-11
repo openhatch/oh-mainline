@@ -43,8 +43,9 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
         try:
             self.user
         except AttributeError:
-            raise django.forms.ValidationError("For some reason, the programmer made a mistake, "
-                                               "and I will blame you, the user.")
+            raise django.forms.ValidationError(
+                "For some reason, the programmer made a mistake, "
+                "and I will blame you, the user.")
 
             # Check that the user owns this portfolio entry.
         # By now this is an object, not an ID.
@@ -52,8 +53,9 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
         if pf_entry.person.user == self.user:
             return pf_entry
         else:
-            raise django.forms.ValidationError("Somehow, you submitted "
-                                               "regarding a portfolio entry that you do not own.")
+            raise django.forms.ValidationError(
+                "Somehow, you submitted "
+                "regarding a portfolio entry that you do not own.")
 
 
 class EditInfoForm(django.forms.Form):

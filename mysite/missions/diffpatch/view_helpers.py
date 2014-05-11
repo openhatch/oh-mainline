@@ -35,7 +35,11 @@ class SingleFilePatch(object):
     def get_patch(cls):
         oldlines = open(cls.OLD_FILE).readlines()
         newlines = open(cls.NEW_FILE).readlines()
-        return ''.join(difflib.unified_diff(oldlines, newlines, os.path.basename(cls.OLD_FILE), os.path.basename(cls.NEW_FILE)))
+        return ''.join(
+            difflib.unified_diff(
+                oldlines, newlines, os.path.basename(
+                    cls.OLD_FILE), os.path.basename(
+                    cls.NEW_FILE)))
 
     @staticmethod
     def apply_patch(patch_obj, hunks, base_filename):
@@ -56,13 +60,13 @@ class SingleFilePatch(object):
         # If patch.fromstring() indicates that the patch affects zero files,
         # then the_patch.hunks will be a zero-length list.
         if not the_patch.hunks:
-            raise IncorrectPatch, 'The file resulting from patching does not have the correct contents. \
-        Make sure you are including the diff headers (those --- and +++ and @@ lines; You might want to look at the "Medium" hint.)'
+            raise IncorrectPatch('The file resulting from patching does not have the correct contents. \
+        Make sure you are including the diff headers (those --- and +++ and @@ lines; You might want to look at the "Medium" hint.)')
 
         # If it affects more than one file, then that would be a
         # mistake as well.
         if len(the_patch.hunks) > 1:
-            raise IncorrectPatch, 'The patch affects more than one file.'
+            raise IncorrectPatch('The patch affects more than one file.')
 
         # So now we can grab just the relevant hunks.
         hunks = the_patch.hunks[0]
@@ -71,9 +75,9 @@ class SingleFilePatch(object):
         text_when_patch_applied_in_reverse = SingleFilePatch.apply_patch(
             the_patch, hunks, cls.NEW_FILE)
         if text_when_patch_applied_in_reverse == open(cls.OLD_FILE).read():
-            raise IncorrectPatch, 'It looks like the order of files passed to diff was flipped. \
+            raise IncorrectPatch('It looks like the order of files passed to diff was flipped. \
         To generate a diff representing the changes you made to originalfile.txt \
-        to get to modifiedfile.txt, do "diff -u originalfile.txt modifiedfile.txt".'
+        to get to modifiedfile.txt, do "diff -u originalfile.txt modifiedfile.txt".')
 
         # Check that it will apply correctly to the file.
         # if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
@@ -92,10 +96,12 @@ class SingleFilePatch(object):
         # line-ending whitespace from the patch file. We detect that
         # by seeing if \n\n appears in the patch file.
         if '\n\n' in patchdata or '\r\n\r\n' in patchdata:
-            raise IncorrectPatch, 'You seem to have removed the space (" ") characters at the end of some lines. Those are essential to the patch format. If you are a Windows user, check the hints on how to copy and paste from the terminal.'
+            raise IncorrectPatch(
+                'You seem to have removed the space (" ") characters at the end of some lines. Those are essential to the patch format. If you are a Windows user, check the hints on how to copy and paste from the terminal.')
 
         # Otherwise, we give a generic error message.
-        raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
+        raise IncorrectPatch(
+            'The file resulting from patching does not have the correct contents.')
 
 
 class PatchSingleFileMission(SingleFilePatch):
@@ -147,20 +153,23 @@ class DiffRecursiveMission(object):
     @staticmethod
     def strip_filename_one_path_level(filename):
         if not '/' in filename:
-            raise IncorrectPatch, 'Attempting to strip one level of slashes from "%s" left nothing.' % filename
+            raise IncorrectPatch(
+                'Attempting to strip one level of slashes from "%s" left nothing.' %
+                filename)
         return re.sub('^[^/]*/+', '', filename)
 
     @staticmethod
     def check_for_leading_dot_slash_in_filename(filename):
         if filename.startswith("./"):
-            raise IncorrectPatch, 'The diff you submitted will not apply properly because it has filename(s) starting with "./". Make sure that when you run the diff command, you do not add unnecessary "./" path prefixes. This is important because it affects the arguments needed to run the patch command for whoever applies the patch.'
+            raise IncorrectPatch(
+                'The diff you submitted will not apply properly because it has filename(s) starting with "./". Make sure that when you run the diff command, you do not add unnecessary "./" path prefixes. This is important because it affects the arguments needed to run the patch command for whoever applies the patch.')
 
     @classmethod
     def synthesize_tarball(cls):
         tdata = StringIO()
         tfile = tarfile.open(fileobj=tdata, mode='w:gz')
         tfile.add(os.path.join(get_mission_data_path('diffpatch'),
-                  cls.ORIG_DIR), cls.ORIG_DIR)
+                               cls.ORIG_DIR), cls.ORIG_DIR)
         tfile.close()
         return tdata.getvalue()
 
@@ -208,11 +217,15 @@ class DiffRecursiveMission(object):
                 try:
                     index = the_patch.source.index(old_style_filename)
                 except ValueError:
-                    raise IncorrectPatch, 'Patch does not modify file "%s", which it should modify.' % filename
+                    raise IncorrectPatch(
+                        'Patch does not modify file "%s", which it should modify.' %
+                        filename)
 
             if (the_patch.target[index] != filename and
                     the_patch.target[index] != old_style_filename):
-                raise IncorrectPatch, 'Patch headers for file "%s" have inconsistent filenames.' % filename
+                raise IncorrectPatch(
+                    'Patch headers for file "%s" have inconsistent filenames.' %
+                    filename)
 
             hunks = the_patch.hunks[index]
             del the_patch.source[index]
@@ -226,22 +239,31 @@ class DiffRecursiveMission(object):
                 # Check for reverse patch by seeing if there is "-firstSubstitute" and "+firstOriginal" in the diff.
                 # (If they did everything perfectly and reversed the patch, there will be two lines following these conditions)
                 if patchdata.find('-' + cls.SUBSTITUTIONS[1][1]) != -1 and patchdata.find('+' + cls.SUBSTITUTIONS[1][0]) != -1:
-                    raise IncorrectPatch, 'You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.'
+                    raise IncorrectPatch(
+                        'You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.')
                 else:
-                    raise IncorrectPatch, 'The modifications to "%s" will not apply correctly to the original file.' % filename
+                    raise IncorrectPatch(
+                        'The modifications to "%s" will not apply correctly to the original file.' %
+                        filename)
 
             # Check for BOM issues.  Likely a Windows-only issue, and only when using a text editor that
             # includes UTF-8 BOM markers when saving files.
             if '\xef\xbb\xbf' in ''.join(the_patch.patch_stream(StringIO(old_contents), hunks)):
-                raise IncorrectPatch, 'It appears the text editor you used to modify "%s" leaves UTF-8 BOM characters.  Try an editor like Notepad++ or something similar.' % filename
+                raise IncorrectPatch(
+                    'It appears the text editor you used to modify "%s" leaves UTF-8 BOM characters.  Try an editor like Notepad++ or something similar.' %
+                    filename)
 
             # Check that the resulting file matches what is expected.
             if ''.join(the_patch.patch_stream(StringIO(old_contents), hunks)) != new_contents:
-                raise IncorrectPatch, 'The modifications to "%s" do not result in the correct contents. Make sure you replaced "Aubergine", too!' % filename
+                raise IncorrectPatch(
+                    'The modifications to "%s" do not result in the correct contents. Make sure you replaced "Aubergine", too!' %
+                    filename)
 
         if len(the_patch.source) != 0:
-            raise IncorrectPatch, 'The patch modifies files that it should not modify: %s' % ', '.join(
-                the_patch.source)
+            raise IncorrectPatch(
+                'The patch modifies files that it should not modify: %s' %
+                ', '.join(
+                    the_patch.source))
 
 
 class PatchRecursiveMission(object):
@@ -265,7 +287,9 @@ class PatchRecursiveMission(object):
             oldlines = open(oldname).readlines()
             newlines = open(newname).readlines()
             patchfile.writelines(
-                difflib.unified_diff(oldlines, newlines, 'a/%s/%s' %
-                                     (cls.BASE_NAME, name), 'b/%s/%s' % (cls.BASE_NAME, name)))
+                difflib.unified_diff(
+                    oldlines, newlines, 'a/%s/%s' %
+                    (cls.BASE_NAME, name), 'b/%s/%s' %
+                    (cls.BASE_NAME, name)))
 
         return patchfile.getvalue()

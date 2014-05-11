@@ -42,13 +42,16 @@ from mysite.missions.diffpatch import forms, view_helpers
 
 def patchsingle_get_original_file(request):
     return make_download(
-        open(view_helpers.PatchSingleFileMission.OLD_FILE).read(),
-        filename=os.path.basename(view_helpers.PatchSingleFileMission.OLD_FILE))
+        open(
+            view_helpers.PatchSingleFileMission.OLD_FILE).read(),
+        filename=os.path.basename(
+            view_helpers.PatchSingleFileMission.OLD_FILE))
 
 
 def patchsingle_get_patch(request):
-    return make_download(view_helpers.PatchSingleFileMission.get_patch(),
-                         filename=view_helpers.PatchSingleFileMission.PATCH_FILENAME)
+    return make_download(
+        view_helpers.PatchSingleFileMission.get_patch(),
+        filename=view_helpers.PatchSingleFileMission.PATCH_FILENAME)
 
 
 @login_required
@@ -94,14 +97,16 @@ def diffsingle_submit(request):
                 set_mission_completed(
                     request.user.get_profile(), 'diffpatch_diffsingle')
                 data['diffsingle_success'] = True
-            except view_helpers.IncorrectPatch, e:
+            except view_helpers.IncorrectPatch as e:
                 data['diffsingle_error_message'] = utf8(e)
         data['diffsingle_form'] = form
     return single_file_diff(request, data)
 
 
 def diffrecursive_get_original_tarball(request):
-    return make_download(view_helpers.DiffRecursiveMission.synthesize_tarball(), filename=view_helpers.DiffRecursiveMission.TARBALL_NAME)
+    return make_download(
+        view_helpers.DiffRecursiveMission.synthesize_tarball(),
+        filename=view_helpers.DiffRecursiveMission.TARBALL_NAME)
 
 
 @login_required
@@ -120,7 +125,7 @@ def diffrecursive_submit(request):
                 set_mission_completed(
                     request.user.get_profile(), 'diffpatch_diffrecursive')
                 data['diffrecursive_success'] = True
-            except view_helpers.IncorrectPatch, e:
+            except view_helpers.IncorrectPatch as e:
                 data['diffrecursive_error_message'] = utf8(e)
         else:
             errors = list(form['diff'].errors)
@@ -133,7 +138,10 @@ def diffrecursive_submit(request):
 
 
 def patchrecursive_get_patch(request):
-    return make_download(view_helpers.PatchRecursiveMission.get_patch(), filename=view_helpers.PatchRecursiveMission.BASE_NAME + '.patch')
+    return make_download(
+        view_helpers.PatchRecursiveMission.get_patch(),
+        filename=view_helpers.PatchRecursiveMission.BASE_NAME +
+        '.patch')
 
 
 @login_required

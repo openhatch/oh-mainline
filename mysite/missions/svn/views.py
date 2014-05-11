@@ -17,12 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import shutil
+import tempfile
+
+from django.shortcuts import render
+
 from mysite.missions.base.views import *
 from mysite.missions.svn import forms, view_helpers
 import mysite.missions.base.views
-import shutil
-import tempfile
-from django.shortcuts import render
+
 
 # POST handlers
 #
@@ -146,7 +149,7 @@ class Checkout(SvnBaseView):
 
     def get_context_data(self, *args, **kwargs):
         data = super(Checkout, self).get_context_data(*args, **kwargs)
-        if kwargs.has_key('extra_context_data'):
+        if 'extra_context_data' in kwargs:
             data.update(kwargs['extra_context_data'])
         else:
             data['svn_checkout_form'] = forms.CheckoutForm()
@@ -161,7 +164,7 @@ class Diff(SvnBaseView):
 
     def get_context_data(self, *args, **kwargs):
         data = super(Diff, self).get_context_data(*args, **kwargs)
-        if kwargs.has_key('extra_context_data'):
+        if 'extra_context_data' in kwargs:
             data.update(kwargs['extra_context_data'])
         else:
             data['svn_diff_form'] = forms.DiffForm()
@@ -177,4 +180,8 @@ class Commit(SvnBaseView):
 
 @login_required
 def commit_poll(request):
-    return HttpResponse(simplejson.dumps(view_helpers.mission_completed(request.user.get_profile(), 'svn_commit')))
+    return HttpResponse(
+        simplejson.dumps(
+            view_helpers.mission_completed(
+                request.user.get_profile(),
+                'svn_commit')))

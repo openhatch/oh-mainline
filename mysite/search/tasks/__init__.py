@@ -17,11 +17,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import mysite.search.models
-import mysite.customs.models
+
 from celery.task import Task, task
 
+import mysite.search.models
+import mysite.customs.models
 import mysite.base.view_helpers
+
+
+logger = logging.getLogger(__name__)
 
 
 class PopulateProjectIconFromOhloh(Task):
@@ -49,12 +53,13 @@ class PopulateProjectLanguageFromOhloh(Task):
                 logger.info("No Ohloh analysis found -- early %s" %
                             p.name)
                 return
+
             try:
                 data, _ = oh.analysis_id2analysis_data(analysis_id)
             except KeyError:
-                logger.info("No Ohloh analysis found for %s" %
-                            p.name)
+                logger.info("No Ohloh analysis found for %s" % p.name)
                 return
+
             if ('main_language_name' in data and
                     data['main_language_name']):
                 # re-get to minimize race condition time
@@ -73,5 +78,5 @@ class PopulateProjectLanguageFromOhloh(Task):
 
 @task
 def clear_search_cache():
-    logging.info("Clearing the search cache.")
+    logger.info("Clearing the search cache.")
     mysite.base.view_helpers.clear_static_cache('search')

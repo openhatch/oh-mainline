@@ -34,3 +34,5 @@ mysite/missions-userdata/git/*
 mysite/site.db
 mysite/local_settings.py
 .idea/
+.mylog/
+

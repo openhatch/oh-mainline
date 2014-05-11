@@ -56,7 +56,10 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
         new_GET = {}
         for key in request.GET.keys():
             new_GET[key.lower()] = request.GET[key]
-        return HttpResponseRedirect(reverse(search_index) + '?' + http.urlencode(new_GET))
+        return HttpResponseRedirect(
+            reverse(search_index) +
+            '?' +
+            http.urlencode(new_GET))
 
     if request.user.is_authenticated():
         person = request.user.get_profile()
@@ -153,8 +156,14 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
     Bug = mysite.search.models.Bug
     from django.db.models import Q, Count
-    data['popular_projects'] = list(Project.objects.filter(
-        name__in=['Miro', 'GnuCash', 'brasero', 'Evolution Exchange', 'songbird']).order_by('name').reverse())
+    data['popular_projects'] = list(
+        Project.objects.filter(
+            name__in=[
+                'Miro',
+                'GnuCash',
+                'brasero',
+                'Evolution Exchange',
+                'songbird']).order_by('name').reverse())
     data['all_projects'] = Project.objects.values('pk', 'name').filter(
         bug__looks_closed=False).annotate(Count('bug')).order_by('name')
 
@@ -165,7 +174,10 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     data['contributors2'] = Person.objects.all(
     )[random_start + 10:random_start + 15]
     data['languages'] = Project.objects.all().values_list(
-        'language', flat=True).order_by('language').exclude(language='').distinct()[:4]
+        'language',
+        flat=True).order_by('language').exclude(
+        language='').distinct()[
+            :4]
 
     if format == 'json':
         # FIXME: Why `alert`?
@@ -180,11 +192,15 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.view_helpers.get_project_count()
 
-        return mysite.base.decorators.as_view(request, 'search/search.html', data, slug=None)
+        return mysite.base.decorators.as_view(
+            request,
+            'search/search.html',
+            data,
+            slug=None)
 
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
-    """ The search results page accesses this view via jQuery's getJSON method, 
+    """ The search results page accesses this view via jQuery's getJSON method,
     and loads its results into the DOM."""
     # Purpose of this code: Serialize the list of bugs
     # Step 1: Pull the bugs out of the database, getting them back

@@ -33,7 +33,7 @@ class TarMissionTests(TestCase):
         try:
             view_helpers.TarMission.check_tarfile(
                 open(make_testdata_filename('tar', 'bad-1.tar.gz')).read())
-        except view_helpers.IncorrectTarFile, e:
+        except view_helpers.IncorrectTarFile as e:
             self.assert_('No wrapper directory is present' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -43,7 +43,7 @@ class TarMissionTests(TestCase):
         try:
             view_helpers.TarMission.check_tarfile(
                 open(make_testdata_filename('tar', 'bad-2.tar')).read())
-        except view_helpers.IncorrectTarFile, e:
+        except view_helpers.IncorrectTarFile as e:
             self.assert_('not a valid gzipped tarball' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -53,7 +53,7 @@ class TarMissionTests(TestCase):
         try:
             view_helpers.TarMission.check_tarfile(
                 open(make_testdata_filename('tar', 'bad-3.tar.gz')).read())
-        except view_helpers.IncorrectTarFile, e:
+        except view_helpers.IncorrectTarFile as e:
             self.assert_('has incorrect contents' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -63,7 +63,7 @@ class TarMissionTests(TestCase):
         try:
             view_helpers.TarMission.check_tarfile(
                 open(make_testdata_filename('tar', 'bad-4.tar.gz')).read())
-        except view_helpers.IncorrectTarFile, e:
+        except view_helpers.IncorrectTarFile as e:
             self.assert_('Wrapper directory name is incorrect' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -73,7 +73,7 @@ class TarMissionTests(TestCase):
         try:
             view_helpers.TarMission.check_tarfile(
                 open(make_testdata_filename('tar', 'bad-5.tar.gz')).read())
-        except view_helpers.IncorrectTarFile, e:
+        except view_helpers.IncorrectTarFile as e:
             self.assert_('Mac_OS_X' in e.args[0])
         else:
             self.fail('no exception raised')
@@ -101,7 +101,11 @@ class TarUploadTests(TwillTests):
 
     def test_tar_upload_good(self):
         response = self.client.post(
-            reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+            reverse(
+                views.upload), {
+                'tarfile': open(
+                    make_testdata_filename(
+                        'tar', 'good.tar.gz'))})
         self.assert_('create status: success' in response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -110,14 +114,22 @@ class TarUploadTests(TwillTests):
 
         # Make sure that nothing weird happens if it is submitted again.
         response = self.client.post(
-            reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+            reverse(
+                views.upload), {
+                'tarfile': open(
+                    make_testdata_filename(
+                        'tar', 'good.tar.gz'))})
         self.assert_('create status: success' in response.content)
         self.assertEqual(
             len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
 
     def test_tar_upload_bad(self):
         response = self.client.post(
-            reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'bad-1.tar.gz'))})
+            reverse(
+                views.upload), {
+                'tarfile': open(
+                    make_testdata_filename(
+                        'tar', 'bad-1.tar.gz'))})
         self.assert_('create status: failure' in response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -129,7 +141,9 @@ class UntarMissionTests(TestCase):
 
     def test_tarball_contains_file_we_want(self):
         tfile = tarfile.open(
-            fileobj=StringIO(view_helpers.UntarMission.synthesize_tarball()), mode='r:gz')
+            fileobj=StringIO(
+                view_helpers.UntarMission.synthesize_tarball()),
+            mode='r:gz')
 
         # Check the file we want contains the right thing.
         file_we_want = tfile.getmember(view_helpers.UntarMission.FILE_WE_WANT)
@@ -160,12 +174,14 @@ class UntarViewTests(TwillTests):
         contents_it_wants = tfile.extractfile(
             tfile.getmember(view_helpers.UntarMission.FILE_WE_WANT))
         upload_response = self.client.post(
-            reverse(views.extract_mission_upload), {'extracted_file': contents_it_wants})
+            reverse(
+                views.extract_mission_upload), {
+                'extracted_file': contents_it_wants})
         self.assert_('unpack status: success' in upload_response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertEqual(
-            len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 1)
+        self.assertEqual(len(StepCompletion.objects.filter(
+            step__name='tar_extract', person=paulproteus)), 1)
 
     def test_do_mission_incorrectly(self):
         bad_file = StringIO('This is certainly not what it wants!')
@@ -177,8 +193,8 @@ class UntarViewTests(TwillTests):
         self.assert_('unpack status: failure' in upload_response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertEqual(
-            len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)
+        self.assertEqual(len(StepCompletion.objects.filter(
+            step__name='tar_extract', person=paulproteus)), 0)
 
 
 class MissionPageStateTests(TwillTests):
@@ -222,7 +238,9 @@ class MissionPageStateTests(TwillTests):
             reverse(views.download_tarball_for_extract_mission))
         tfile = tarfile.open(
             fileobj=StringIO(download_response.content), mode='r:gz')
-        return tfile.extractfile(tfile.getmember(view_helpers.UntarMission.FILE_WE_WANT))
+        return tfile.extractfile(
+            tfile.getmember(
+                view_helpers.UntarMission.FILE_WE_WANT))
 
     def test_extract_mission_reset_redo(self):
         """
@@ -232,7 +250,9 @@ class MissionPageStateTests(TwillTests):
 
         # Complete the tar_extract mission the first time.
         upload_response = self.client.post(
-            reverse(views.extract_mission_upload), {'extracted_file': self.get_extracted_tarball()})
+            reverse(
+                views.extract_mission_upload), {
+                'extracted_file': self.get_extracted_tarball()})
         self.assert_('unpack status: success' in upload_response.content)
         self.assertEqual(len(StepCompletion.objects.filter(
             step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 1)
@@ -246,7 +266,9 @@ class MissionPageStateTests(TwillTests):
 
         # Complete the tar_extract missions a second time
         upload_response = self.client.post(
-            reverse(views.extract_mission_upload), {'extracted_file': self.get_extracted_tarball()})
+            reverse(
+                views.extract_mission_upload), {
+                'extracted_file': self.get_extracted_tarball()})
         self.assert_('unpack status: success' in upload_response.content)
         self.assertEqual(len(StepCompletion.objects.filter(
             step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 1)
@@ -259,7 +281,11 @@ class MissionPageStateTests(TwillTests):
 
         # Complete the tar mission the first time.
         response = self.client.post(
-            reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+            reverse(
+                views.upload), {
+                'tarfile': open(
+                    make_testdata_filename(
+                        'tar', 'good.tar.gz'))})
         self.assert_('create status: success' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(
             step__name='tar', person=paulproteus, is_currently_completed=True)), 1)
@@ -273,7 +299,11 @@ class MissionPageStateTests(TwillTests):
 
         # Complete the tar missions a second time.
         response = self.client.post(
-            reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+            reverse(
+                views.upload), {
+                'tarfile': open(
+                    make_testdata_filename(
+                        'tar', 'good.tar.gz'))})
         self.assert_('create status: success' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(
             step__name='tar', person=paulproteus, is_currently_completed=True)), 1)

@@ -19,6 +19,7 @@
 import os.path
 import hashlib
 from itertools import cycle, islice
+import logging
 
 import pygeoip
 
@@ -29,7 +30,6 @@ import django.core.mail
 import django.core.serializers
 from django.utils import simplejson
 
-import logging
 import mysite.search.view_helpers
 import mysite.base.models
 import mysite.search.models
@@ -41,6 +41,9 @@ import mysite.base.decorators
 # Name constants
 SUGGESTION_COUNT = 6
 DEFAULT_CACHE_TIMESPAN = 86400 * 7
+
+
+logger = logging.getLogger(__name__)
 
 
 def roundrobin(*iterables):
@@ -71,7 +74,7 @@ class RecommendBugs(object):
         return prefix + '_' + hashlib.sha1(repr(suffix_input)).hexdigest()
 
     def is_cache_empty(self):
-        return cache.get(self.get_cache_key()) == None
+        return cache.get(self.get_cache_key()) is None
 
     def recommend(self):
         ret = []
@@ -79,7 +82,7 @@ class RecommendBugs(object):
             try:
                 bug = mysite.search.models.Bug.all_bugs.get(pk=bug_id)
             except mysite.search.models.Bug.DoesNotExist:
-                logging.info("WTF, bug missing. Whatever.")
+                logger.info("Huh, bug missing. Whatever.")
                 continue
             ret.append(bug)
         return ret
@@ -134,7 +137,7 @@ def get_geoip_guess_for_ip(ip_as_string):
             geoip_database = pygeoip.GeoIP(downloaded_geolitecity_path)
 
     if geoip_database is None:  # still?
-        logging.warn("Uh, we could not find the GeoIP database.")
+        logger.warn("Uh, we could not find the GeoIP database.")
         return False, u''
 
     # First, get the country. This works on both the GeoCountry
@@ -199,7 +202,9 @@ def parse_string_query(s):
 
     # Add a key to the structure called "callable_searcher" -- upon calling
     # this, you can access its .people and .template_data values.
-    def callable_searcher(query_type=parsed['query_type'], search_string=parsed['q']):
+    def callable_searcher(
+            query_type=parsed['query_type'],
+            search_string=parsed['q']):
         return _query2results(query_type, search_string)
     parsed['callable_searcher'] = callable_searcher
     return parsed
@@ -352,8 +357,8 @@ def get_most_popular_projects():
     popular_projects = cache.get(key_name)
     if popular_projects is None:
         projects = mysite.search.models.Project.objects.all()
-        popular_projects = sorted(
-            projects, key=lambda proj: len(proj.get_contributors()) * (-1))[:SUGGESTION_COUNT]
+        popular_projects = sorted(projects, key=lambda proj: len(
+            proj.get_contributors()) * (-1))[:SUGGESTION_COUNT]
         # extract just the names from the projects
         popular_projects = [project.name for project in popular_projects]
         # cache it for a week
@@ -458,7 +463,10 @@ class TagQuery(PeopleFinder):
 
     def get_persons_by_tag_type_and_text(self, tag_type, search_string):
         tag_ids = mysite.profile.models.Tag.objects.filter(
-            tag_type=tag_type, text__iexact=search_string).values_list('id', flat=True)
+            tag_type=tag_type,
+            text__iexact=search_string).values_list(
+            'id',
+            flat=True)
         person_ids = mysite.profile.models.Link_Person_Tag.objects.filter(
             tag__id__in=tag_ids).values_list('person_id', flat=True)
         return self.get_person_instances_from_person_ids(person_ids)
@@ -540,7 +548,9 @@ class ProjectQuery(PeopleFinder):
 
     def calculate_people_for_project(self):
         person_ids = mysite.profile.models.PortfolioEntry.published_ones.filter(
-            project=self.project).values_list('person_id', flat=True)
+            project=self.project).values_list(
+            'person_id',
+            flat=True)
         self.people = self.get_person_instances_from_person_ids(person_ids)
 
     def add_wanna_help_count(self):

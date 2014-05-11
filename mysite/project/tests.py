@@ -15,27 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.base.tests import TwillTests
-import mysite.project.view_helpers
-import mysite.account.tests
-
-from mysite.search.models import Project
-from mysite.profile.models import Person, PortfolioEntry
-import mysite.project.views
-
-import mysite.profile.views
-import mysite.profile.models
-import mysite.profile.view_helpers
-
-from mysite.base.tests import better_make_twill_url
-
 import mock
 import urlparse
 import datetime
 
 from django.core.urlresolvers import reverse
-
 from twill import commands as tc
+
+from mysite.base.tests import TwillTests
+import mysite.project.view_helpers
+import mysite.account.tests
+from mysite.search.models import Project
+from mysite.profile.models import Person, PortfolioEntry
+import mysite.project.views
+import mysite.profile.models
+import mysite.profile.view_helpers
+from mysite.base.tests import better_make_twill_url
 
 
 class ProjectNameSearch(TwillTests):
@@ -64,8 +59,9 @@ class ProjectNameSearch(TwillTests):
         response = self.client.get('/projects/',
                                    {'q': 'twiSted SysTem'},
                                    follow=True)
-        self.assertEqual(response.redirect_chain,
-                         [('http://testserver/projects/Twisted%20System', 302)])
+        self.assertEqual(
+            response.redirect_chain, [
+                ('http://testserver/projects/Twisted%20System', 302)])
 
     def test_form_sends_data_to_get(self):
         # This test will fail if a query that selects one project but doesn't
@@ -141,8 +137,9 @@ class ProjectPageCreation(TwillTests):
             mysite.search.models.Project.objects.filter(name=project_name))
 
         #  and redirected to the editor.
-        self.assertEqual(response.redirect_chain,
-                         [('http://testserver/+projedit/Something%20novel', 302)])
+        self.assertEqual(
+            response.redirect_chain, [
+                ('http://testserver/+projedit/Something%20novel', 302)])
 
         # FIXME: Enqueue a job into the session to have this user take ownership
         # of this Project.
@@ -168,12 +165,16 @@ class ProjectPageCreation(TwillTests):
         self.assertEqual(1, len(mysite.search.models.Project.objects.all()))
 
         #  and redirected.
-        self.assertEqual(response.redirect_chain,
-                         [('http://testserver/projects/something%20novel', 302)])
+        self.assertEqual(
+            response.redirect_chain, [
+                ('http://testserver/projects/something%20novel', 302)])
 
-    def test_form_on_project_search_page_submits_to_project_creation_post_handler(self):
+    def test_form_on_project_search_page_submits_to_project_creation_post_handler(
+            self):
         project_search_page_url = better_make_twill_url(
-            "http://openhatch.org%s?q=newproject" % reverse(mysite.project.views.projects))
+            "http://openhatch.org%s?q=newproject" %
+            reverse(
+                mysite.project.views.projects))
         tc.go(project_search_page_url)
         # Fill form out with slightly different project name, which we
         # anticipate happening sometimes
@@ -280,8 +281,9 @@ class WannaHelpWorksAnonymously(TwillTests):
             post_to, {u'project': unicode(project_id)}, follow=True)
 
         # Make sure we are redirected to the right place
-        self.assertEqual(response.redirect_chain,
-                         [('http://testserver/account/login/?next=%2Fprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
+        self.assertEqual(
+            response.redirect_chain, [
+                ('http://testserver/account/login/?next=%2Fprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
 
         # check that the session can detect that we want to help Ubuntu out
         self.assertEqual(self.client.session['projects_we_want_to_help_out'],
@@ -292,8 +294,9 @@ class WannaHelpWorksAnonymously(TwillTests):
                          .people_who_wanna_help.all())
 
         # But when the user is logged in and *then* visits the project page
-        login_worked = self.client.login(username='paulproteus',
-                                         password="paulproteus's unbreakable password")
+        login_worked = self.client.login(
+            username='paulproteus',
+            password="paulproteus's unbreakable password")
         self.assert_(login_worked)
 
         # Visit the project page...
@@ -360,8 +363,9 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
         # destroy the session and then go back to the Referring page.
 
         # Make sure we are redirected to the right place
-        self.assertEqual(response.redirect_chain,
-                         [('http://testserver/account/login/?next=%2Fprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
+        self.assertEqual(
+            response.redirect_chain, [
+                ('http://testserver/account/login/?next=%2Fprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
 
         lucky_projects = mysite.project.view_helpers.get_wanna_help_queue_from_session(
             self.client.session)
@@ -414,7 +418,8 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
             tc.find(entry.project_description)
 
         # Uncheck one of the checkboxes and submit the form
-        name_of_checkbox_to_uncheck = "%s-use_my_description" % pfes['uncheck_me'].pk
+        name_of_checkbox_to_uncheck = "%s-use_my_description" % pfes[
+            'uncheck_me'].pk
         tc.fv("2", name_of_checkbox_to_uncheck, False)
         tc.submit()
 

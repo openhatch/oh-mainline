@@ -26,7 +26,9 @@ class PatchSingleUploadForm(django.forms.Form):
 
 class DiffSingleUploadForm(django.forms.Form):
     diff = django.forms.CharField(
-        error_messages={'required': 'No diff output was given.'}, widget=django.forms.Textarea())
+        error_messages={
+            'required': 'No diff output was given.'},
+        widget=django.forms.Textarea())
 
 
 class DiffRecursiveUploadForm(django.forms.Form):
@@ -39,4 +41,5 @@ class PatchRecursiveUploadForm(django.forms.Form):
 
     def clean_amount_of_garlic(self):
         if self.cleaned_data['amount_of_garlic'] != 3:
-            raise django.forms.ValidationError, "That is not the right number of garlic cloves."
+            raise django.forms.ValidationError(
+                "That is not the right number of garlic cloves.")

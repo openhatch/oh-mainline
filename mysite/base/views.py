@@ -19,8 +19,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import random
+import datetime
+import logging
+
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
-from mysite.base.view_helpers import render_response
 from django.utils import simplejson
 from django.template import loader, Context
 
@@ -32,11 +36,10 @@ import mysite.customs.feed
 import mysite.search.view_helpers
 import mysite.search.models
 import mysite.missions.models
+from mysite.base.view_helpers import render_response
 
-import random
-import datetime
 
-from django.contrib.auth.decorators import login_required
+logger = logging.getLogger(__name__)
 
 
 def front_page_data():
@@ -220,13 +223,13 @@ def meta_exit_code(data=None):
 
     # Exit codes and stdout for Nagios integration
     if bug2:
-        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug)
+        logging.debug("{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug))
         return 2
     elif bug1:
-        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug)
+        logging.debug("{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug))
         return 1
     else:
-        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("OK", bug1, bug2, perbug)
+        logging.debug("{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("OK", bug1, bug2, perbug))
         return 0
 
 

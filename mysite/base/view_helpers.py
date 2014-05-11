@@ -175,10 +175,6 @@ def get_object_or_none(klass, *args, **kwargs):
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.base.disk_cache
-from django.utils import simplejson
-from django.core.cache import cache
-from django.conf import settings
 import hashlib
 import re
 import traceback
@@ -188,6 +184,16 @@ import datetime
 import base64
 import os
 import random
+
+from django.utils import simplejson
+from django.core.cache import cache
+from django.conf import settings
+
+import mysite.base.disk_cache
+
+
+logger = logging.getLogger(__name__)
+
 
 notifications_dictionary = {
     "edit_password_done":
@@ -268,7 +274,7 @@ def _geocode(address=None, response_data=None):
     # address. It gets back json, which it then parses and
     # returns a string with the longitude and latitude of the address.
 
-    logging.info('Geocoding address: %s' % address)
+    logger.info('Geocoding address: %s' % address)
 
     mapsUrl = 'https://maps.googleapis.com/maps/api/geocode/json?'
 
@@ -295,12 +301,12 @@ def _geocode(address=None, response_data=None):
                     'longitude': longitude}
         return None
     except IOError:
-        logging.exception("While attempting to geocode, got an error.")
-        logging.warning(
+        logger.exception("While attempting to geocode, got an error.")
+        logger.warning(
             "If you are online and still get this message, something is wrong.")
     except Exception:
         stack = traceback.extract_stack()
-        logging.debug('An error occurred: %s' % stack)
+        logger.debug('An error occurred: %s' % stack)
         raise
 
 
