@@ -17,7 +17,7 @@ Other elements of the OpenHatch project:
 
 * The website is also powered by the "OpenHatch bugimporters," a separate Python-based codebase to download bugs from open source projects' bug trackers, based on Scrapy.
 
-  * code: https://github.com/openhatch/oh-bugimprters
+  * code: https://github.com/openhatch/oh-bugimporters
   * docs: http://oh-bugimporters.readthedocs.org/
   * main contact: http://lists.openhatch.org/mailman/listinfo/devel or #openhatch on irc.freenode.net
 
