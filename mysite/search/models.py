@@ -641,11 +641,12 @@ class WannaHelperNote(OpenHatchModel):
         return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#person_summary_%d" % self.person.pk)
 
 
-def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, **kwargs):
-    # always bump it
-    import mysite.base.models
-    mysite.base.models.Timestamp.update_timestamp_for_string(
-        'hit_count_cache_timestamp'),
+def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, raw, **kwargs):
+    if not raw:
+        # always bump it, unless we're loading a data snapshot
+        import mysite.base.models
+        mysite.base.models.Timestamp.update_timestamp_for_string(
+            'hit_count_cache_timestamp'),
 
 # Clear the hit count cache whenever Bugs are added or removed. This is
 # simply done by bumping the Timestamp used to generate the cache keys.

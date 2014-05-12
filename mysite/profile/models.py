@@ -550,8 +550,9 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
         raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
 
 
-def update_the_project_cached_contributor_count(sender, instance, **kwargs):
-    instance.project.update_cached_contributor_count_and_save()
+def update_the_project_cached_contributor_count(sender, instance, raw, **kwargs):
+    if not raw:
+        instance.project.update_cached_contributor_count_and_save()
 
 models.signals.pre_save.connect(
     reject_when_query_is_only_whitespace, sender=DataImportAttempt)
@@ -942,9 +943,10 @@ models.signals.post_save.connect(
 # change.
 
 
-def flush_map_json_cache(*args, **kwargs):
-    path = os.path.join(settings.WEB_ROOT, '+cacheable')
-    shutil.rmtree(path, ignore_errors=True)
+def flush_map_json_cache(raw, *args, **kwargs):
+    if not raw:
+        path = os.path.join(settings.WEB_ROOT, '+cacheable')
+        shutil.rmtree(path, ignore_errors=True)
 
 models.signals.post_save.connect(flush_map_json_cache, sender=PortfolioEntry)
 models.signals.post_save.connect(flush_map_json_cache, sender=Person)
