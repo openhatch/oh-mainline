@@ -27,6 +27,18 @@ body#landing {
         .screw-you-webkit;
     }
 
+    /* Add responsive design for phones and tablets,
+        so each box occupies its own row. */
+    @media (max-width: 800px) {
+      .submodule {
+        width: 100%;
+        margin-right: 0px;
+      }
+      .column.three-column {
+        width: 100%;
+      }
+    }
+
     p {
         padding: 5px 0;
     }
