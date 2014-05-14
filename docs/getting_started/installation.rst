@@ -4,7 +4,7 @@ Installation
 
 *These installation instructions are tested nightly on 
 Ubuntu 12.04 and Debian stable.  Last verified on Windows XP 11/7/2013 and on 
-Mac in spring 2013.*
+Mac OS X 10.9.2 May 11, 2014.*
 
 OpenHatch is currently designed to run on Python 2.6 or above.
 
@@ -113,8 +113,7 @@ version of the site. If you want your site to have a database filled
 with data like what is on the main OpenHatch.org site, you can import
 a data snapshot. See `maintenance.rst`_ for more info about that.)
 
-This will print out *lots* of text, when you are done you should see something like the output listed in Output Samples below, at the end of which, your tables should be ready. You're ready to run the site.
-
+This will print out *lots* of text. Once all of the text is printed, you should see something like the output listed in `Output Samples`_ below. Afterwards, your tables should be ready. You're ready to run the site.
 
 .. _maintenance.rst: ../advanced/maintenance.html
 
