@@ -152,7 +152,6 @@ class Project(OpenHatchModel):
                             help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',) * 2))
     display_name = models.CharField(max_length=200, default='',
                                     help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
-    display_name = models.CharField(max_length=200, default='')
     homepage = models.URLField(max_length=200, blank=True, default='',
                                verbose_name='Project homepage URL')
     language = models.CharField(max_length=200, blank=True, default='',
