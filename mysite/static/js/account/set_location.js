@@ -42,7 +42,6 @@ function initialize() {
                     'title': 'You',
                     'position': results[0].geometry.location
                     });
-            $('#geocode_description').css('visibility', 'visible');
             $('#success_message').css('visibility', 'visible');
         }
         else {
