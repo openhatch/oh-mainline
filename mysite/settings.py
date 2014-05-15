@@ -115,6 +115,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = [
+    'django.middleware.csrf.CsrfViewMiddleware',
     # This must live on top of Auth + Session middleware
     'mysite.base.middleware.DetectLogin',
     'django.middleware.common.CommonMiddleware',

@@ -48,7 +48,7 @@ You have to create your repository on the
 <p class="next_mission_link">
   <a href="{% url mysite.missions.git.views.diff %}">Creating a patch of your changes &raquo;</a></p>
 {% else %}
-<form method="post" action="{% url mysite.missions.git.views.checkout_submit %}">
+<form method="post" action="{% url mysite.missions.git.views.checkout_submit %}">{% csrf_token %}
   <div class="form-row">
     <a name="gitcheckout-form"></a>
     {% if git_checkout_error_message %}
