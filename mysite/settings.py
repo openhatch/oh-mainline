@@ -175,6 +175,7 @@ INSTALLED_APPS = (
     'mysite.base',
     'mysite.project',
     'mysite.missions',
+    'mysite.bugsets',
     'voting',
     'reversion',
     'debug_toolbar',
