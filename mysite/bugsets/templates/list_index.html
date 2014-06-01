@@ -8,5 +8,11 @@
   <p>
     Hello, world!
   </p>
+  <p>
+    Here are some bug sets:
+  </p>
+  {% for set in bugsets.all %}
+  <p>{{ set.name }}</p>
+  {% endfor %}
 </body>
 </html>
