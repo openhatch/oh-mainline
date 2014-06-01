@@ -402,7 +402,6 @@ class GuessLocationOnLogin(TwillTests):
         client = self.login_with_client()
         response = client.get(reverse(mysite.account.views.set_location))
         self.assertContains(response, "OpenHatch")
-        person = Person.objects.get(user__username="paulproteus")
         self.assertContains(response, "Rochester, NY, United States")
 
     mock_ip = mock.Mock()
@@ -422,7 +421,6 @@ class GuessLocationOnLogin(TwillTests):
         client = self.login_with_client()
         response = client.get(reverse(mysite.account.views.set_location))
         self.assertContains(response, "OpenHatch")
-        person = Person.objects.get(user__username="paulproteus")
         self.assertNotContains(response, "Rochester, NY, United States")
         self.assertContains(response, "The White House")
 
@@ -434,8 +432,9 @@ class GuessLocationOnLogin(TwillTests):
         response = client.post(
             reverse(mysite.account.views.confirm_location_suggestion_do))
         # asserting that we get back an http status code of 200
-        person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(response.status_code, 200)
+        # client.post modifies person, refetching to check update...
+        person = Person.objects.get(user__username="paulproteus")
         # asserting that database was updated
         self.assertTrue(person.location_confirmed)
 
@@ -447,8 +446,9 @@ class GuessLocationOnLogin(TwillTests):
         response = client.post(
             reverse(mysite.account.views.dont_guess_location_do))
         # asserting that we get back an http status code of 200
-        person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(response.status_code, 200)
+        # client.post modifies person, refetching to check update...
+        person = Person.objects.get(user__username="paulproteus")
         # asserting that database was updated
         self.assertTrue(person.dont_guess_my_location)
 
