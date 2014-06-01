@@ -238,6 +238,9 @@ urlpatterns = patterns('',
                        (r'^customs/delete_url/(?P<tracker_type>\w*)/(?P<tracker_id>\d+)/(?P<tracker_name>.+)/url/(?P<url_id>\d*)/do$',
                         'mysite.customs.views.delete_tracker_url_do'),
 
+                       # Bug set creator URLs
+                       (r'^bugsets/$', 'mysite.bugsets.views.list_index'),
+
                        # Invitation-related URLs
                        (r'^invitation/', include('invitation.urls')),
 
