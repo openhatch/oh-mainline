@@ -25,6 +25,7 @@ import mysite.bugsets.models
 from django.shortcuts import render
 # }}}
 
+
 def list_index(request):
     bugsets = mysite.bugsets.models.BugSet.objects.all()
     context = {
@@ -32,11 +33,12 @@ def list_index(request):
     }
     return render(request, 'list_index.html', context)
 
+
 def listview_index(request, pk, slug):
     bugset = mysite.bugsets.models.BugSet.objects.get(pk=pk)
     bugs = bugset.annotatedbug_set.all()
     context = {
-        'bugset' : bugset,
+        'bugset': bugset,
         'bugs': bugs,
     }
     return render(request, 'listview_index.html', context)

@@ -28,6 +28,7 @@ from mysite.base.tests import TwillTests
 from django.core.urlresolvers import reverse
 # }}}
 
+
 class BasicBugsetListTests(TwillTests):
     def test_bugset_names_load(self):
         mysite.bugsets.models.BugSet.objects.create(name="best event")
@@ -44,6 +45,7 @@ class BasicBugsetListTests(TwillTests):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertContains(response, s.get_absolute_url())
+
 
 class BasicBugsetViewTests(TwillTests):
     def test_bugset_listview_load(self):
@@ -69,7 +71,7 @@ class BasicBugsetViewTests(TwillTests):
         b.bugsets.add(s)
         url = reverse(mysite.bugsets.views.listview_index, kwargs={
             'pk': 1,
-            'slug': 'best-event', # this can be anything!
+            'slug': 'best-event',  # this can be anything!
         })
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)

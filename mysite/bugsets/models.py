@@ -28,6 +28,7 @@ from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 # }}}
 
+
 class BugSet(models.Model):
     name = models.CharField(max_length=200)
 
@@ -36,6 +37,7 @@ class BugSet(models.Model):
             'pk': self.pk,
             'slug': slugify(self.name),
         })
+
 
 class AnnotatedBug(models.Model):
     url = models.URLField(max_length=200, verbose_name='Bug URL')
