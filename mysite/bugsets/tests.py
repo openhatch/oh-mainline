@@ -37,3 +37,20 @@ class BasicBugsetListTests(TwillTests):
         self.assertEqual(200, response.status_code)
         self.assertContains(response, "best event")
         self.assertContains(response, "bestest event")
+
+    def test_bugset_view_link(self):
+        pass
+
+class BasicBugsetViewTests(TwillTests):
+    def test_bugset_listview_load(self):
+        s = mysite.bugsets.models.BugSet.objects.create(name="test event")
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(
+            url="http://openhatch.org/bugs/issue995",
+        )
+        b.bugsets.add(s)
+        url = reverse(mysite.bugsets.views.listview_index, kwargs={ 'pk': 1 })
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "test event")
+        self.assertContains(response, "http://openhatch.org/bugs/issue995")
+
