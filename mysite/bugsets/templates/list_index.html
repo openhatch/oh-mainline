@@ -31,7 +31,7 @@ Event Bug Sets
   </div>
   <div class='body'>
     {% for set in bugsets.all %}
-    <p>{{ set.name }}</p>
+    <p><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></p>
     {% endfor %}
   </div>
 </div>
