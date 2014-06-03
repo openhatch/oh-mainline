@@ -240,7 +240,7 @@ urlpatterns = patterns('',
 
                        # Bug set creator URLs
                        (r'^bugsets/$', 'mysite.bugsets.views.list_index'),
-                       (r'^bugsets/(?P<pk>\d+)(?P<slug>.*)$',
+                       (r'^bugsets/(?P<pk>\d+)-(?P<slug>.*)$',
                         'mysite.bugsets.views.listview_index'),
 
                        # Invitation-related URLs
