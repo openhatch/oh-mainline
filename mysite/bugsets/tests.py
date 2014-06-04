@@ -120,5 +120,5 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "Elana")
         self.assertContains(response, "Python")
         self.assertContains(response, "2 hours")
-        self.assertContains(response, "c")
+        self.assertContains(response, "claimed")
         self.assertContains(response, "gsoc")

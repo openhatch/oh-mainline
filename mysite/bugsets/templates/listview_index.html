@@ -39,7 +39,7 @@ Event Bugs
       <li>{{ bug.mentor }}</li>
       <li>{{ bug.language }}</li>
       <li>{{ bug.time_estimate }}</li>
-      <li>{{ bug.status }}</li>
+      <li>{{ bug.get_status_display }}</li>
       <li>{{ bug.choices}}</li>
       <li>{% for tag in bug.tags.all %}{{ tag.text }}, {% endfor %}</li>
     </ul>
