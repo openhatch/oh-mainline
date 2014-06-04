@@ -36,7 +36,7 @@ def list_index(request):
 
 def listview_index(request, pk, slug):
     bugset = mysite.bugsets.models.BugSet.objects.get(pk=pk)
-    bugs = bugset.annotatedbug_set.all()
+    bugs = bugset.bugs.all()
     context = {
         'bugset': bugset,
         'bugs': bugs,

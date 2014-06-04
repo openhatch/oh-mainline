@@ -30,8 +30,19 @@ Event Bugs
     </p>
   </div>
   <div class='body'>
-    {% for bug in bugs.all %}
-    <p>{{ bug.url }}</p>
+    {% for bug in bugs %}
+    <ul>
+      <li>{{ bug.url }}</li>
+      <li>{{ bug.title }}</li>
+      <li>{{ bug.description }}</li>
+      <li>{{ bug.assigned_to }}</li>
+      <li>{{ bug.mentor }}</li>
+      <li>{{ bug.language }}</li>
+      <li>{{ bug.time_estimate }}</li>
+      <li>{{ bug.status }}</li>
+      <li>{{ bug.choices}}</li>
+      <li>{% for tag in bug.tags.all %}{{ tag.text }}, {% endfor %}</li>
+    </ul>
     {% endfor %}
   </div>
 </div>

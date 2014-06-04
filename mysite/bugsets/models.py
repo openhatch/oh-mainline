@@ -29,16 +29,40 @@ from django.core.urlresolvers import reverse
 # }}}
 
 
+class Tag(models.Model):
+    text = models.CharField(max_length=200, primary_key=True)
+
+
+class AnnotatedBug(models.Model):
+    url = models.URLField(max_length=200, primary_key=True)
+    title = models.CharField(max_length=500, blank=True)
+    description = models.TextField(blank=True, verbose_name='Task Description')
+    assigned_to = models.CharField(max_length=200, blank=True)
+    mentor = models.CharField(max_length=200, blank=True,
+                              verbose_name='Assigned Mentor')
+    language = models.CharField(max_length=200, blank=True,
+                                verbose_name='Programming Language')
+    time_estimate = models.CharField(max_length=200, blank=True,
+                                     verbose_name='Estimated Time Commitment')
+    STATUS_CHOICES = (
+        ('u', 'unclaimed'),
+        ('c', 'claimed'),
+        ('n', 'needs-review'),
+        ('r', 'resolved'),
+    )
+    status = models.CharField(max_length=1, default='u',
+                              choices=STATUS_CHOICES)
+    tags = models.ManyToManyField(Tag)
+
+
 class BugSet(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name='Event Name')
+
+    # Many-to-many relationship with annotated bugs
+    bugs = models.ManyToManyField(AnnotatedBug)
 
     def get_absolute_url(self):
         return reverse(mysite.bugsets.views.listview_index, kwargs={
             'pk': self.pk,
             'slug': slugify(self.name),
         })
-
-
-class AnnotatedBug(models.Model):
-    url = models.URLField(max_length=200, verbose_name='Bug URL')
-    bugsets = models.ManyToManyField(BugSet)
