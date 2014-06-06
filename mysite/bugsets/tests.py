@@ -95,15 +95,21 @@ class BasicBugsetViewTests(TwillTests):
                          "UI for the bug sets")
         b.assigned_to = "Jesse"
         b.mentor = "Elana"
-        b.language = "Python"
         b.time_estimate = "2 hours"
         b.status = "c"
-        t = mysite.bugsets.models.Tag.objects.create(text="gsoc")
-        t.save()
-        b.tags.add(t)
-        b.save()
 
+        # Create and add some skills tags
+        t = mysite.bugsets.models.Skill.objects.create(text="python")
+        t.save()
+        b.skills.add(t)
+        t = mysite.bugsets.models.Skill.objects.create(text="html")
+        t.save()
+        b.skills.add(t)
+
+        # Save and associate with bugset
+        b.save()
         s.bugs.add(b)
+
         url = reverse(mysite.bugsets.views.listview_index, kwargs={
             'pk': 1,
             'slug': '',
@@ -118,7 +124,7 @@ class BasicBugsetViewTests(TwillTests):
                                        "to make a nice UI for the bug sets"))
         self.assertContains(response, "Jesse")
         self.assertContains(response, "Elana")
-        self.assertContains(response, "Python")
         self.assertContains(response, "2 hours")
         self.assertContains(response, "claimed")
-        self.assertContains(response, "gsoc")
+        self.assertContains(response, "python")
+        self.assertContains(response, "html")

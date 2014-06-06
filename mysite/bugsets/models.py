@@ -29,7 +29,7 @@ from django.core.urlresolvers import reverse
 # }}}
 
 
-class Tag(models.Model):
+class Skill(models.Model):
     text = models.CharField(max_length=200, unique=True)
 
 
@@ -40,8 +40,6 @@ class AnnotatedBug(models.Model):
     assigned_to = models.CharField(max_length=200, blank=True)
     mentor = models.CharField(max_length=200, blank=True,
                               verbose_name='Assigned Mentor')
-    language = models.CharField(max_length=200, blank=True,
-                                verbose_name='Programming Language')
     time_estimate = models.CharField(max_length=200, blank=True,
                                      verbose_name='Estimated Time Commitment')
     STATUS_CHOICES = (
@@ -52,7 +50,7 @@ class AnnotatedBug(models.Model):
     )
     status = models.CharField(max_length=1, default='u',
                               choices=STATUS_CHOICES)
-    tags = models.ManyToManyField(Tag)
+    skills = models.ManyToManyField(Skill)
 
 
 class BugSet(models.Model):

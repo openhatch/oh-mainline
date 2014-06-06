@@ -8,6 +8,13 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Adding model 'Skill'
+        db.create_table('bugsets_skill', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('text', self.gf('django.db.models.fields.CharField')(unique=True, max_length=200)),
+        ))
+        db.send_create_signal('bugsets', ['Skill'])
+
         # Adding M2M table for field bugs on 'BugSet'
         db.create_table('bugsets_bugset_bugs', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
@@ -15,9 +22,6 @@ class Migration(SchemaMigration):
             ('annotatedbug', models.ForeignKey(orm['bugsets.annotatedbug'], null=False))
         ))
         db.create_unique('bugsets_bugset_bugs', ['bugset_id', 'annotatedbug_id'])
-
-        # Deleting field 'AnnotatedBug.id'
-        db.delete_column('bugsets_annotatedbug', 'id')
 
         # Adding field 'AnnotatedBug.title'
         db.add_column('bugsets_annotatedbug', 'title', self.gf('django.db.models.fields.CharField')(default='', max_length=500, blank=True), keep_default=False)
@@ -31,9 +35,6 @@ class Migration(SchemaMigration):
         # Adding field 'AnnotatedBug.mentor'
         db.add_column('bugsets_annotatedbug', 'mentor', self.gf('django.db.models.fields.CharField')(default='', max_length=200, blank=True), keep_default=False)
 
-        # Adding field 'AnnotatedBug.language'
-        db.add_column('bugsets_annotatedbug', 'language', self.gf('django.db.models.fields.CharField')(default='', max_length=200, blank=True), keep_default=False)
-
         # Adding field 'AnnotatedBug.time_estimate'
         db.add_column('bugsets_annotatedbug', 'time_estimate', self.gf('django.db.models.fields.CharField')(default='', max_length=200, blank=True), keep_default=False)
 
@@ -43,16 +44,13 @@ class Migration(SchemaMigration):
         # Removing M2M table for field bugsets on 'AnnotatedBug'
         db.delete_table('bugsets_annotatedbug_bugsets')
 
-        # Adding M2M table for field tags on 'AnnotatedBug'
-        db.create_table('bugsets_annotatedbug_tags', (
+        # Adding M2M table for field skills on 'AnnotatedBug'
+        db.create_table('bugsets_annotatedbug_skills', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('annotatedbug', models.ForeignKey(orm['bugsets.annotatedbug'], null=False)),
-            ('tag', models.ForeignKey(orm['profile.tag'], null=False))
+            ('skill', models.ForeignKey(orm['bugsets.skill'], null=False))
         ))
-        db.create_unique('bugsets_annotatedbug_tags', ['annotatedbug_id', 'tag_id'])
-
-        # Changing field 'AnnotatedBug.url'
-        db.alter_column('bugsets_annotatedbug', 'url', self.gf('django.db.models.fields.URLField')(max_length=200, primary_key=True))
+        db.create_unique('bugsets_annotatedbug_skills', ['annotatedbug_id', 'skill_id'])
 
         # Adding unique constraint on 'AnnotatedBug', fields ['url']
         db.create_unique('bugsets_annotatedbug', ['url'])
@@ -63,11 +61,11 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'AnnotatedBug', fields ['url']
         db.delete_unique('bugsets_annotatedbug', ['url'])
 
+        # Deleting model 'Skill'
+        db.delete_table('bugsets_skill')
+
         # Removing M2M table for field bugs on 'BugSet'
         db.delete_table('bugsets_bugset_bugs')
-
-        # User chose to not deal with backwards NULL issues for 'AnnotatedBug.id'
-        raise RuntimeError("Cannot reverse this migration. 'AnnotatedBug.id' and its values cannot be restored.")
 
         # Deleting field 'AnnotatedBug.title'
         db.delete_column('bugsets_annotatedbug', 'title')
@@ -80,9 +78,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'AnnotatedBug.mentor'
         db.delete_column('bugsets_annotatedbug', 'mentor')
-
-        # Deleting field 'AnnotatedBug.language'
-        db.delete_column('bugsets_annotatedbug', 'language')
 
         # Deleting field 'AnnotatedBug.time_estimate'
         db.delete_column('bugsets_annotatedbug', 'time_estimate')
@@ -98,11 +93,8 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('bugsets_annotatedbug_bugsets', ['annotatedbug_id', 'bugset_id'])
 
-        # Removing M2M table for field tags on 'AnnotatedBug'
-        db.delete_table('bugsets_annotatedbug_tags')
-
-        # Changing field 'AnnotatedBug.url'
-        db.alter_column('bugsets_annotatedbug', 'url', self.gf('django.db.models.fields.URLField')(max_length=200))
+        # Removing M2M table for field skills on 'AnnotatedBug'
+        db.delete_table('bugsets_annotatedbug_skills')
 
 
     models = {
@@ -110,13 +102,13 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'AnnotatedBug'},
             'assigned_to': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'language': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mentor': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
+            'skills': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['bugsets.Skill']", 'symmetrical': 'False'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'u'", 'max_length': '1'}),
-            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['profile.Tag']", 'symmetrical': 'False'}),
             'time_estimate': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'primary_key': 'True'})
+            'url': ('django.db.models.fields.URLField', [], {'unique': 'True', 'max_length': '200'})
         },
         'bugsets.bugset': {
             'Meta': {'object_name': 'BugSet'},
@@ -124,16 +116,10 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
-        'profile.tag': {
-            'Meta': {'object_name': 'Tag'},
+        'bugsets.skill': {
+            'Meta': {'object_name': 'Skill'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'tag_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.TagType']"}),
-            'text': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        'profile.tagtype': {
-            'Meta': {'object_name': 'TagType'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+            'text': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'})
         }
     }
 

@@ -37,11 +37,10 @@ Event Bugs
       <li>{{ bug.description }}</li>
       <li>{{ bug.assigned_to }}</li>
       <li>{{ bug.mentor }}</li>
-      <li>{{ bug.language }}</li>
       <li>{{ bug.time_estimate }}</li>
       <li>{{ bug.get_status_display }}</li>
-      <li>{{ bug.choices}}</li>
-      <li>{% for tag in bug.tags.all %}{{ tag.text }}, {% endfor %}</li>
+      <li>{{ bug.choices }}</li>
+      <li>{% for skill in bug.skills.all %}{{ skill.text }}, {% endfor %}</li>
     </ul>
     {% endfor %}
   </div>
