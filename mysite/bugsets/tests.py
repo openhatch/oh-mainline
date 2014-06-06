@@ -91,8 +91,8 @@ class BasicBugsetViewTests(TwillTests):
 
         # Annotate the bug
         b.title = "Add bug set view screen"
-        b.description = "Use your Django and HTML/CSS skills to make a nice UI\
- for the bug sets"
+        b.description = ("Use your Django and HTML/CSS skills to make a nice "
+                         "UI for the bug sets")
         b.assigned_to = "Jesse"
         b.mentor = "Elana"
         b.language = "Python"
@@ -114,8 +114,8 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "test event")
         self.assertContains(response, "http://openhatch.org/bugs/issue995")
         self.assertContains(response, "Add bug set view screen")
-        self.assertContains(response, "Use your Django and HTML/CSS skills to\
- make a nice UI for the bug sets")
+        self.assertContains(response, ("Use your Django and HTML/CSS skills "
+                                       "to make a nice UI for the bug sets"))
         self.assertContains(response, "Jesse")
         self.assertContains(response, "Elana")
         self.assertContains(response, "Python")
