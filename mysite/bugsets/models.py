@@ -30,11 +30,11 @@ from django.core.urlresolvers import reverse
 
 
 class Tag(models.Model):
-    text = models.CharField(max_length=200, primary_key=True)
+    text = models.CharField(max_length=200, unique=True)
 
 
 class AnnotatedBug(models.Model):
-    url = models.URLField(max_length=200, primary_key=True)
+    url = models.URLField(max_length=200, unique=True)
     title = models.CharField(max_length=500, blank=True)
     description = models.TextField(blank=True, verbose_name='Task Description')
     assigned_to = models.CharField(max_length=200, blank=True)
