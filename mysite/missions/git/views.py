@@ -204,7 +204,7 @@ def rebase(request, passed_data=None):
     return (request, 'missions/git/rebase.html', data)
 
 @view
-def reference(request, passed_data={}):
+def reference(request, passed_data=None):
     state = GitMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Quick reference'
     return (request, 'missions/git/reference.html',
