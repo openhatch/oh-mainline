@@ -82,6 +82,19 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "test event")
         self.assertContains(response, "http://openhatch.org/bugs/issue995")
 
+    def test_bugset_listview_load_empty(self):
+        # Create set with no bugs
+        s = mysite.bugsets.models.BugSet.objects.create(name="test event")
+        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+            'pk': 1,
+            'slug': '',
+        })
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "test event")
+        self.assertContains(response, "No bugs!")
+
     def test_bugset_listview_load_with_annotated_bug(self):
         # Create set and a bug for it
         s = mysite.bugsets.models.BugSet.objects.create(name="test event")

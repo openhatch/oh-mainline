@@ -1,9 +1,10 @@
 {% comment %}
 # This file is part of OpenHatch.
+# Copyright (C) 2009 Karen Rustad
 # Copyright (C) 2010 Parker Phinney
 # Copyright (C) 2011 Jack Grigg
 # Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
-# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2014 Elana Hashman
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -73,10 +74,16 @@
   <div class='second-line'>
     <span class='description-container'>
       <span class='meta-data'>
-        {% for skill in bugs.skills.all %}
-          <span class='good-for-beginners'>{{ skill.text }}</span>
-          <span class='sep'>&middot;</span>
+        {% for skill in bug.skills.all %}
+          <span class='good-for-beginners'>{{ skill.text }}</span>&nbsp;
         {% endfor %}
+
+        {% if bug.skills.all %}
+          <span class='sep'>&middot;</span>
+        {% endif %}
+
+        <span class='age'>{{ bug.get_status_display }}</span>
+
       </span>
 
       <span class='sep separator_betw_tags_and_desc'>&middot;</span>

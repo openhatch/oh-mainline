@@ -22,16 +22,14 @@
   <span id='results-summary'>
 
     {% if bugs %}
-      {% ifequal bugs|length 1 %}
+      {% ifequal bugs.count 1 %}
         There's just one
       {% else %}
         Showing 
-        {{ count }}
+        {{ bugs.count }}
       {% endifequal %}
       bug{{ bugs|pluralize }}
-    {% endif %}
-        
-    {% if not bugs %}
+    {% else %}
       No bugs!
     {% endif %}
 
