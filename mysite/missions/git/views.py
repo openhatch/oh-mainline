@@ -202,3 +202,10 @@ def rebase(request, passed_data=None):
     data = state.as_dict_for_template_context()
     data['git_rebase_form'] = forms.RebaseForm()
     return (request, 'missions/git/rebase.html', data)
+
+@view
+def reference(request, passed_data=None):
+    state = GitMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Quick reference'
+    return (request, 'missions/git/reference.html',
+            state.as_dict_for_template_context())

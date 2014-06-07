@@ -206,6 +206,8 @@ urlpatterns = patterns('',
                         'mysite.missions.git.views.rebase'),
                        (r'^missions/git/rebase/submit$',
                         'mysite.missions.git.views.rebase_submit'),
+                       (r'^missions/git/reference$',
+                        'mysite.missions.git.views.reference'),
 
                        (r'^missions/windows-setup',
                         include(
