@@ -40,5 +40,6 @@ def listview_index(request, pk, slug):
     context = {
         'bugset': bugset,
         'bugs': bugs,
+        'count': bugs.count(),
     }
     return render(request, 'listview_index.html', context)

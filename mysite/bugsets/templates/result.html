@@ -1,0 +1,103 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2011 Jack Grigg
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2009 Karen Rustad
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load search %}
+{% load base_extras %}
+{% load profile_extras %}
+
+<div class='project_data'>
+  {# Project logo #}
+  <img src='/static/images/the-logo-sans-text.png'>
+
+  {# Project name #}
+  <span class='project__name'>
+    OpenHatch 
+  </span>
+
+  {# Mentoring #}
+  <div class="helpers">
+    {% if bug.assigned_to %}
+      <h5>Assigned to</h5>
+      {{ bug.assigned_to }}
+    {% endif %}
+  </div>
+
+  <div class='below_the_fold'>
+    <h5>Mentored by</h5>
+    {{ bug.mentor }}
+    <a style='font-size: .9em; display: block; margin-top: 1em;' 
+       href='{{ bug.url }}'>More about this bug</a>
+  </div>
+</div>
+
+<div class='opp_data'>
+  <div class='first-line'>
+    <div class='top_left'>
+
+      <a style='color: #000;' href='javascript:void(0);' class='title'>
+        <span class='truncated'>
+          {{ bug.title|truncatewords:'13' }}
+        </span>
+        <span class='untruncated'>
+          {{ bug.title }}
+        </span>
+      </a>
+    </div>
+    <div class='top_right'>
+      <span class='expand'><a href='javascript:void(0);'>expand</a></span>
+      <span class='sep'>&middot;</span>
+      <span class='link'>
+        <a rel='tipsy-south'
+           title='go to original bug report'
+           target='_new' href='{{ bug.url }}'>link</a>
+      </span>
+    </div>
+  </div>
+  <div class='second-line'>
+    <span class='description-container'>
+      <span class='meta-data'>
+        {% for skill in bugs.skills.all %}
+          <span class='good-for-beginners'>{{ skill.text }}</span>
+          <span class='sep'>&middot;</span>
+        {% endfor %}
+      </span>
+
+      <span class='sep separator_betw_tags_and_desc'>&middot;</span>
+      <span class='description'><p>{{ bug.description }}</p></span>
+    </span>
+  </div>
+  <div class='details'>
+    <div class='fields'>
+      <span class='field'>
+        <label>Estimated time to address: </label>
+        <span class='value'>
+          {{ bug.time_estimate }}
+        </span>
+      </span>
+      <span class='field status'>
+        <label>Status: </label>
+        <span class='value'>
+          {{ bug.get_status_display }}
+        </span>
+      </span>
+    </div>
+  </div>
+</div>
+{# vim: set filetype=htmldjango: #}
