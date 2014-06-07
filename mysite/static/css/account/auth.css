@@ -14,3 +14,4 @@ body.auth .foot input[type='submit'] { float: right; left: 0; }
 body#signup_with_password .module { margin: 0 305px; width: 350px; }
 body#signup_with_password input { float: none; display: block;width: 90% }
 .help_text { font-size: .85em;}
+p.example { clear: left; }
