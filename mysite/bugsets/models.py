@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 # Imports {{{
 import mysite.bugsets.views
+import mysite.search.models
 
 from django.db import models
 
@@ -51,6 +52,7 @@ class AnnotatedBug(models.Model):
     status = models.CharField(max_length=1, default='u',
                               choices=STATUS_CHOICES)
     skills = models.ManyToManyField(Skill)
+    project = models.ForeignKey(mysite.search.models.Project, null=True)
 
 
 class BugSet(models.Model):

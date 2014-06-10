@@ -119,6 +119,16 @@ class BasicBugsetViewTests(TwillTests):
         t.save()
         b.skills.add(t)
 
+        # Make a project
+        p = mysite.search.models.Project.objects.create(
+            name='openhatch', 
+            display_name='OpenHatch DisplayName', 
+            homepage='http://openhatch.org', 
+            language='Python',
+        )
+        p.save()
+        b.project = p
+
         # Save and associate with bugset
         b.save()
         s.bugs.add(b)
@@ -132,6 +142,7 @@ class BasicBugsetViewTests(TwillTests):
         self.assertEqual(200, response.status_code)
         self.assertContains(response, "test event")
         self.assertContains(response, "http://openhatch.org/bugs/issue995")
+        self.assertContains(response, "OpenHatch DisplayName")
         self.assertContains(response, "Add bug set view screen")
         self.assertContains(response, ("Use your Django and HTML/CSS skills "
                                        "to make a nice UI for the bug sets"))
