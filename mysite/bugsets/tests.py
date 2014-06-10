@@ -95,6 +95,25 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "test event")
         self.assertContains(response, "No bugs!")
 
+    def test_bugset_listview_load_no_project(self):
+        # Create set with no bugs
+        s = mysite.bugsets.models.BugSet.objects.create(name="test event")
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(
+            url="http://openhatch.org/bugs/issue995",
+        )
+        s.bugs.add(b)
+
+        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+            'pk': 1,
+            'slug': '',
+        })
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "test event")
+        self.assertContains(response, "http://openhatch.org/bugs/issue995")
+        self.assertContains(response, "�")  # the no project character
+
     def test_bugset_listview_load_with_annotated_bug(self):
         # Create set and a bug for it
         s = mysite.bugsets.models.BugSet.objects.create(name="test event")
@@ -119,6 +138,16 @@ class BasicBugsetViewTests(TwillTests):
         t.save()
         b.skills.add(t)
 
+        # Make a project
+        p = mysite.search.models.Project.objects.create(
+            name='openhatch', 
+            display_name='OpenHatch DisplayName', 
+            homepage='http://openhatch.org', 
+            language='Python',
+        )
+        p.save()
+        b.project = p
+
         # Save and associate with bugset
         b.save()
         s.bugs.add(b)
@@ -132,6 +161,7 @@ class BasicBugsetViewTests(TwillTests):
         self.assertEqual(200, response.status_code)
         self.assertContains(response, "test event")
         self.assertContains(response, "http://openhatch.org/bugs/issue995")
+        self.assertContains(response, "OpenHatch DisplayName")
         self.assertContains(response, "Add bug set view screen")
         self.assertContains(response, ("Use your Django and HTML/CSS skills "
                                        "to make a nice UI for the bug sets"))

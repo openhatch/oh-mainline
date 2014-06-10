@@ -24,13 +24,25 @@
 {% load profile_extras %}
 
 <div class='project_data'>
-  {# Project logo #}
-  <img src='/static/images/the-logo-sans-text.png'>
 
-  {# Project name #}
-  <span class='project__name'>
-    OpenHatch 
-  </span>
+  {% if bug.project %}
+    {# Project logo #}
+    <img src='{{ bug.project.get_url_of_search_result_icon_or_generic }}'
+        title='{{bug.project.display_name}}' />
+
+    {# Project name #}
+    <span class='project__name'>
+      {{ bug.project.display_name|break_long_words:16 }}
+    </span>
+  {% else %}
+    {# Project logo #}
+    <abbr title="This is really supposed to be a question mark">�</abbr>
+
+    {# Project name #}
+    <span class='project__name'>
+      No Project
+    </span>
+  {% endif %}
 
   {# Mentoring #}
   <div class="helpers">
@@ -49,6 +61,8 @@
 </div>
 
 <div class='opp_data'>
+
+  {# Title and description #}
   <div class='first-line'>
     <div class='top_left'>
 
@@ -71,6 +85,8 @@
       </span>
     </div>
   </div>
+
+  {# Skills tags, status #}
   <div class='second-line'>
     <span class='description-container'>
       <span class='meta-data'>
@@ -90,6 +106,8 @@
       <span class='description'><p>{{ bug.description }}</p></span>
     </span>
   </div>
+
+  {# Details section #}
   <div class='details'>
     <div class='fields'>
       <span class='field'>
