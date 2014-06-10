@@ -24,14 +24,25 @@
 {% load profile_extras %}
 
 <div class='project_data'>
-  {# Project logo #}
-  <img src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' 
-      title='{{bug.project.display_name}}' />
 
-  {# Project name #}
-  <span class='project__name'>
-    {{ bug.project.display_name|break_long_words:16 }}
-  </span>
+  {% if bug.project %}
+    {# Project logo #}
+    <img src='{{ bug.project.get_url_of_search_result_icon_or_generic }}'
+        title='{{bug.project.display_name}}' />
+
+    {# Project name #}
+    <span class='project__name'>
+      {{ bug.project.display_name|break_long_words:16 }}
+    </span>
+  {% else %}
+    {# Project logo #}
+    <abbr title="This is really supposed to be a question mark">�</abbr>
+
+    {# Project name #}
+    <span class='project__name'>
+      No Project
+    </span>
+  {% endif %}
 
   {# Mentoring #}
   <div class="helpers">
