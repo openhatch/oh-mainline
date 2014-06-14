@@ -183,6 +183,7 @@ INSTALLED_APPS = (
     'model_utils',
     'djcelery',
     'djkombu',
+    'inplaceeditform',
 )
 
 # testrunner allows us to control which testrunner to use
@@ -291,6 +292,9 @@ GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/'
 
 # This setting is used by the customs bug importers.
 TRACKER_POLL_INTERVAL = 1  # Days
+
+# Inline edit permissions
+ADAPTOR_INPLACEEDIT_EDIT = 'mysite.bugsets.perms.InlineEditPermissions'
 
 # Initialize celery
 import djcelery
