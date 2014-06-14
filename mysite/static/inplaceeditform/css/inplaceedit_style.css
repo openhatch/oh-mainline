@@ -1,0 +1,18 @@
+.inplaceedit.enable:hover,
+.inplaceedit.enable:hover img {
+    cursor: pointer; 
+}
+
+.inplaceedit.enable:hover {
+    background: #FFFFBB;
+    color: black;
+}
+
+
+.inplaceedit.enable:hover img {
+   outline: 2px solid #FFFFBB;
+}
+
+.inplaceedit.textareainplaceedit {
+    display: block;
+}
