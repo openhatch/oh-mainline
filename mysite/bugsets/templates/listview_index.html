@@ -20,6 +20,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% load inplace_edit %}
 
 {% load search %}
 {% comment %}{% load cache %}{% endcomment %}
@@ -29,6 +30,10 @@
 {% block title %}
 Event Bugs
 {% endblock title %}
+
+{% block js_in_head %}
+{% inplace_static %}
+{% endblock %}
 
 {% block body_id %}search{% endblock %}
 
