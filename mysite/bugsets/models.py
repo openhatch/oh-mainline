@@ -38,7 +38,7 @@ class AnnotatedBug(models.Model):
     url = models.URLField(max_length=200, unique=True)
     title = models.CharField(max_length=500, blank=True)
     description = models.TextField(blank=True, verbose_name='Task Description')
-    assigned_to = models.CharField(max_length=200, blank=True)
+    assigned_to = models.CharField(max_length=200, default='No one')
     mentor = models.CharField(max_length=200, blank=True,
                               verbose_name='Assigned Mentor')
     time_estimate = models.CharField(max_length=200, blank=True,
@@ -52,7 +52,8 @@ class AnnotatedBug(models.Model):
     status = models.CharField(max_length=1, default='u',
                               choices=STATUS_CHOICES)
     skills = models.ManyToManyField(Skill)
-    project = models.ForeignKey(mysite.search.models.Project, null=True)
+    project = models.ForeignKey(mysite.search.models.Project, null=True, 
+                                                              blank=True)
 
 
 class BugSet(models.Model):

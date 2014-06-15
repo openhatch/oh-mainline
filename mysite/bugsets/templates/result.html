@@ -22,6 +22,7 @@
 {% load search %}
 {% load base_extras %}
 {% load profile_extras %}
+{% load inplace_edit %}
 
 <div class='project_data'>
 
@@ -46,10 +47,8 @@
 
   {# Mentoring #}
   <div class="helpers">
-    {% if bug.assigned_to %}
-      <h5>Assigned to</h5>
-      {{ bug.assigned_to }}
-    {% endif %}
+    <h5>Assigned to</h5>
+    {% inplace_edit "bug.assigned_to" %}
   </div>
 
   <div class='below_the_fold'>
