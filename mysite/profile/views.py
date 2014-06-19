@@ -537,7 +537,6 @@ def gimme_json_for_portfolio(request):
         'portfolio_entries': portfolio_entries,
         'projects': projects,
         'summaries': summaries,
-        'messages': request.user.get_and_delete_messages(),
     })
 
     return HttpResponse(json, mimetype='application/json')

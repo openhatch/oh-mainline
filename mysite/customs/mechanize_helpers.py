@@ -25,7 +25,7 @@ import mysite.base.unicode_sanity
 import mysite.customs.models
 
 
-def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
+def mechanize_get(url, referrer=None, attempts_remaining=6):
     """Input: Some stuff regarding a web URL to request.
     Output: A browser instance that just open()'d that, plus an unsaved
     WebResponse object representing that browser's final state."""
@@ -67,11 +67,7 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
         long_message = message_schema % (url, reason, attempts_remaining)
         logging.warn(long_message)
 
-        if person:
-            short_message = message_schema % (urlparse(url).hostname,
-                                              reason, attempts_remaining)
-            person.user.message_set.create(message=short_message)
-        return mechanize_get(url, referrer, attempts_remaining - 1, person)
+        return mechanize_get(url, referrer, attempts_remaining - 1)
 
     return b
 

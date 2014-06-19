@@ -472,12 +472,6 @@ function updatePortfolio(response) {
 
     bindEventHandlers();
 
-    if (typeof response.messages != 'undefined') {
-        for (var m = 0; m < response.messages.length; m++) {
-            Notifier.displayMessage(response.messages[m]);
-        };
-    }
-
     SaveAllButton.updateDisplay();
 
     var conditions = PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue;
