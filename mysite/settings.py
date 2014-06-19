@@ -126,8 +126,6 @@ MIDDLEWARE_CLASSES = [
     'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.HandleWannaHelpQueue',
     'django.middleware.transaction.TransactionMiddleware',
-    # Django debug toolbar
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -145,6 +143,8 @@ STATIC_GENERATOR_URLS = (
     r'^/\+cacheable/',
 )
 
+STATIC_URL = '/statik/'
+
 STATIC_DOC_ROOT = 'static/'
 
 # Sessions in /tmp
@@ -159,6 +159,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'django.contrib.webdesign',
     'django.contrib.admin',
     'registration',
