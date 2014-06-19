@@ -9,7 +9,7 @@ Install Python
 
 Being a Python Web framework, Django requires Python.
 
-It works with any Python version from 2.4 to 2.7 (due to backwards
+It works with any Python version from 2.5 to 2.7 (due to backwards
 incompatibilities in Python 3.0, Django does not currently work with
 Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
 information on supported Python versions and the 3.0 transition).
@@ -24,15 +24,24 @@ probably already have it installed.
 
 .. _jython: http://jython.org/
 
+.. admonition:: Python on Windows
+
+    On Windows, you might need to adjust your ``PATH`` environment variable
+    to include paths to Python executable and additional scripts. For example,
+    if your Python is installed in ``C:\Python27\``, the following paths need
+    to be added to ``PATH``::
+
+        C:\Python27\;C:\Python27\Scripts;
+
 Install Apache and mod_wsgi
 =============================
 
 If you just want to experiment with Django, skip ahead to the next
-section; Django includes a lightweight Web server you can use for
+section; Django includes a lightweight web server you can use for
 testing, so you won't need to set up Apache until you're ready to
 deploy Django in production.
 
-If you want to use Django on a production site, use Apache with
+If you want to use Django on a production site, use `Apache`_ with
 `mod_wsgi`_. mod_wsgi can operate in one of two modes: an embedded
 mode and a daemon mode. In embedded mode, mod_wsgi is similar to
 mod_perl -- it embeds Python within Apache and loads Python code into
@@ -48,22 +57,22 @@ documentation to determine which mode is right for your setup. Make
 sure you have Apache installed, with the mod_wsgi module activated.
 Django will work with any version of Apache that supports mod_wsgi.
 
-See :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>`
+See :doc:`How to use Django with mod_wsgi </howto/deployment/wsgi/modwsgi>`
 for information on how to configure mod_wsgi once you have it
 installed.
 
-If you can't use mod_wsgi for some reason, fear not: Django supports
-many other deployment options. Another option is :doc:`FastCGI
-</howto/deployment/fastcgi>`, perfect for using Django with servers
-other than Apache. Additionally, Django follows the WSGI_ spec, which
-allows it to run on a variety of server platforms. See the
-`server-arrangements wiki page`_ for specific installation
-instructions for each platform.
+If you can't use mod_wsgi for some reason, fear not: Django supports many other
+deployment options. One is :doc:`uWSGI </howto/deployment/fastcgi>`; it works
+very well with `nginx`_. Another is :doc:`FastCGI </howto/deployment/fastcgi>`,
+perfect for using Django with servers other than Apache. Additionally, Django
+follows the WSGI spec (:pep:`3333`), which allows it to run on a variety of
+server platforms. See the `server-arrangements wiki page`_ for specific
+installation instructions for each platform.
 
 .. _Apache: http://httpd.apache.org/
+.. _nginx: http://nginx.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _WSGI: http://www.python.org/dev/peps/pep-0333/
-.. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+.. _server-arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:
 
@@ -73,7 +82,14 @@ Get your database running
 If you plan to use Django's database API functionality, you'll need to make
 sure a database server is running. Django supports many different database
 servers and is officially supported with PostgreSQL_, MySQL_, Oracle_ and
-SQLite_ (although SQLite doesn't require a separate server to be running).
+SQLite_.
+
+If you are developing a simple project or something you don't plan to deploy
+in a production environment, SQLite is generally the simplest option as it
+doesn't require running a separate server. However, SQLite has many differences
+from other databases, so if you are working on something substantial, it's
+recommended to develop with the same database as you plan on using in
+production.
 
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
@@ -92,9 +108,7 @@ support channels provided by each 3rd party project.
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
 
-* If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
-  both version 1 and 2. (When you configure Django's database layer, specify
-  either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+* If you're using PostgreSQL, you'll need the ``postgresql_psycopg2`` package.
   You might want to refer to our :ref:`PostgreSQL notes <postgresql-notes>` for
   further technical details specific to this database.
 
@@ -103,11 +117,6 @@ database bindings are installed.
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
   will also want to read the database-specific :ref:`notes for the MySQL
   backend <mysql-notes>`.
-
-* If you're using SQLite and Python 2.4, you'll need pysqlite_. Use version
-  2.0.3 or higher. Python 2.5 ships with an SQLite wrapper in the standard
-  library, so you don't need to install anything extra in that case. Please
-  read the :ref:`SQLite backend notes <sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`
@@ -175,6 +184,12 @@ This file should also be located in your ``site-packages`` directory.
     (Note that this should be run from a shell prompt, not a Python interactive
     prompt.)
 
+    Some Debian-based Linux distributions have separate ``site-packages``
+    directories for user-installed packages, such as when installing Django
+    from a downloaded tarball. The command  listed above will give you the
+    system's ``site-packages``, the user's directory can be found in
+    ``/usr/local/lib/`` instead of ``/usr/lib/``.
+
 .. _install-django-code:
 
 Install the Django code
@@ -189,33 +204,63 @@ It's easy, no matter which way you choose.
 Installing a distribution-specific package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Check the :doc:`distribution specific notes </misc/distributions>` to see if your
-platform/distribution provides official Django packages/installers.
+Check the :doc:`distribution specific notes </misc/distributions>` to see if
+your platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic installation
 of dependencies and easy upgrade paths.
 
 .. _installing-official-release:
 
-Installing an official release
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing an official release with ``pip``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    1. Download the latest release from our `download page`_.
+This is the recommended way to install Django.
 
-    2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``,
-       where ``NNN`` is the version number of the latest release).
-       If you're using Windows, you can download the command-line tool
-       bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
+1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
+   distribution already has ``pip`` installed, you might need to update it if
+   it's outdated. (If it's outdated, you'll know because installation won't
+   work.)
 
-    3. Change into the directory created in step 2 (e.g. ``cd Django-NNN``).
+2. (optional) Take a look at virtualenv_ and virtualenvwrapper_. These tools
+   provide isolated Python environments, which are more practical than
+   installing packages systemwide. They also allow installing packages
+   without administrator privileges. It's up to you to decide if you want to
+   learn and use them.
 
-    4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
-       the command ``sudo python setup.py install`` at the shell prompt.
-       If you're using Windows, start up a command shell with administrator
-       privileges and run the command ``setup.py install``.
+3. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
+   command ``sudo pip install Django`` at the shell prompt. If you're using
+   Windows, start a command shell with administrator privileges and run
+   the command ``pip install Django``. This will install Django in your Python
+   installation's ``site-packages`` directory.
 
-These commands will install Django in your Python installation's
-``site-packages`` directory.
+   If you're using a virtualenv, you don't need ``sudo`` or administrator
+   privileges, and this will install Django in the virtualenv's
+   ``site-packages`` directory.
 
+.. _pip: http://www.pip-installer.org/
+.. _virtualenv: http://www.virtualenv.org/
+.. _virtualenvwrapper: http://www.doughellmann.com/docs/virtualenvwrapper/
+.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#using-the-installer
+
+Installing an official release manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Download the latest release from our `download page`_.
+
+2. Untar the downloaded file (e.g. ``tar xzvf Django-X.Y.tar.gz``,
+   where ``X.Y`` is the version number of the latest release).
+   If you're using Windows, you can download the command-line tool
+   bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
+
+3. Change into the directory created in step 2 (e.g. ``cd Django-X.Y``).
+
+4. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
+   command ``sudo python setup.py install`` at the shell prompt. If you're
+   using Windows, start a command shell with administrator privileges and
+   run the command ``python setup.py install``. This will install Django in
+   your Python installation's ``site-packages`` directory.
+
+.. _download page: https://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
@@ -235,21 +280,41 @@ Installing the development version
     (For stable releases, any necessary changes are documented in the
     release notes.)
 
-.. _the development timeline: http://code.djangoproject.com/timeline
-.. _the list of backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+.. _the development timeline: https://code.djangoproject.com/timeline
+.. _the list of backwards-incompatible changes: https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
-1. Make sure that you have Subversion_ installed, and that you can run its
-   commands from a shell. (Enter ``svn help`` at a shell prompt to test
-   this.)
+1. Make sure that you have Subversion_, Git_, or Mercurial_ installed, and
+   that you can run its commands from a shell. (Enter ``svn help``,
+   ``git help``, or ``hg help`` at a shell prompt to test this.) Note that
+   the Subversion repository is the canonical source for the official
+   Git and Mercurial repositories and as such will always be the most up-to-date.
 
 2. Check out Django's main development branch (the 'trunk') like so:
 
    .. code-block:: bash
 
-       svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+       # Subversion
+       svn co https://code.djangoproject.com/svn/django/trunk/ django-trunk
+
+   Mirrors of the Subversion repository can be obtained like so:
+
+   .. code-block:: bash
+
+       # Git (requires version 1.6.6 or later)
+       git clone https://github.com/django/django.git
+       # or (works with all versions)
+       git clone git://github.com/django/django.git
+
+       # Mercurial
+       hg clone https://bitbucket.org/django/django
+
+   .. warning ::
+
+        These mirrors should be updated every 5 minutes but aren't guaranteed
+        to be up-to-date since they are hosted on external services.
 
 3. Next, make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is to `modify Python's search path`_. Add a ``.pth``
@@ -282,15 +347,20 @@ latest bug fixes and improvements, follow these instructions:
 
    On Windows systems, the same result can be achieved by copying the file
    ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
-   path, for example ``C:\Python24\Scripts``.
+   path, for example ``C:\Python27\Scripts``.
 
-You *don't* have to run ``python setup.py install``, because you've already
-carried out the equivalent actions in steps 3 and 4.
+.. warning::
+
+    Don't run ``sudo python setup.py install``, because you've already
+    carried out the equivalent actions in steps 3 and 4. Furthermore, this is
+    known to cause problems when updating to a more recent version of Django.
 
 When you want to update your copy of the Django source code, just run the
 command ``svn update`` from within the ``django-trunk`` directory. When you do
-this, Subversion will automatically download any changes.
+this, Subversion will automatically download any changes. The equivalent
+command for Git is ``git pull``, and for Mercurial ``hg pull --update``.
 
-.. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
+.. _Git: http://git-scm.com/
+.. _Mercurial: http://mercurial.selenic.com/
 .. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path

@@ -45,68 +45,70 @@ model field has a corresponding default form field. For example, a
 model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
 the full list of conversions:
 
-    ===============================  ========================================
-    Model field                      Form field
-    ===============================  ========================================
-    ``AutoField``                    Not represented in the form
+===============================  ========================================
+Model field                      Form field
+===============================  ========================================
+``AutoField``                    Not represented in the form
 
-    ``BigIntegerField``              ``IntegerField`` with ``min_value`` set
-                                     to -9223372036854775808 and ``max_value``
-                                     set to 9223372036854775807.
+``BigIntegerField``              ``IntegerField`` with ``min_value`` set
+                                 to -9223372036854775808 and ``max_value``
+                                 set to 9223372036854775807.
 
-    ``BooleanField``                 ``BooleanField``
+``BooleanField``                 ``BooleanField``
 
-    ``CharField``                    ``CharField`` with ``max_length`` set to
-                                     the model field's ``max_length``
+``CharField``                    ``CharField`` with ``max_length`` set to
+                                 the model field's ``max_length``
 
-    ``CommaSeparatedIntegerField``   ``CharField``
+``CommaSeparatedIntegerField``   ``CharField``
 
-    ``DateField``                    ``DateField``
+``DateField``                    ``DateField``
 
-    ``DateTimeField``                ``DateTimeField``
+``DateTimeField``                ``DateTimeField``
 
-    ``DecimalField``                 ``DecimalField``
+``DecimalField``                 ``DecimalField``
 
-    ``EmailField``                   ``EmailField``
+``EmailField``                   ``EmailField``
 
-    ``FileField``                    ``FileField``
+``FileField``                    ``FileField``
 
-    ``FilePathField``                ``CharField``
+``FilePathField``                ``FilePathField``
 
-    ``FloatField``                   ``FloatField``
+``FloatField``                   ``FloatField``
 
-    ``ForeignKey``                   ``ModelChoiceField`` (see below)
+``ForeignKey``                   ``ModelChoiceField`` (see below)
 
-    ``ImageField``                   ``ImageField``
+``ImageField``                   ``ImageField``
 
-    ``IntegerField``                 ``IntegerField``
+``IntegerField``                 ``IntegerField``
 
-    ``IPAddressField``               ``IPAddressField``
+``IPAddressField``               ``IPAddressField``
 
-    ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
-                                     below)
+``GenericIPAddressField``        ``GenericIPAddressField``
 
-    ``NullBooleanField``             ``CharField``
+``ManyToManyField``              ``ModelMultipleChoiceField`` (see
+                                 below)
 
-    ``PhoneNumberField``             ``USPhoneNumberField``
-                                     (from ``django.contrib.localflavor.us``)
+``NullBooleanField``             ``CharField``
 
-    ``PositiveIntegerField``         ``IntegerField``
+``PhoneNumberField``             ``USPhoneNumberField``
+                                 (from ``django.contrib.localflavor.us``)
 
-    ``PositiveSmallIntegerField``    ``IntegerField``
+``PositiveIntegerField``         ``IntegerField``
 
-    ``SlugField``                    ``SlugField``
+``PositiveSmallIntegerField``    ``IntegerField``
 
-    ``SmallIntegerField``            ``IntegerField``
+``SlugField``                    ``SlugField``
 
-    ``TextField``                    ``CharField`` with
-                                     ``widget=forms.Textarea``
+``SmallIntegerField``            ``IntegerField``
 
-    ``TimeField``                    ``TimeField``
+``TextField``                    ``CharField`` with
+                                 ``widget=forms.Textarea``
 
-    ``URLField``                     ``URLField`` with ``verify_exists`` set
-                                     to the model field's ``verify_exists``
-    ===============================  ========================================
+``TimeField``                    ``TimeField``
+
+``URLField``                     ``URLField`` with ``verify_exists`` set
+                                 to the model field's ``verify_exists``
+===============================  ========================================
 
 .. versionadded:: 1.2
     The ``BigIntegerField`` is new in Django 1.2.
@@ -115,31 +117,31 @@ the full list of conversions:
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
 
-    * ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
-      which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
+* ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
+  which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
 
-    * ``ManyToManyField`` is represented by
-      ``django.forms.ModelMultipleChoiceField``, which is a
-      ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
+* ``ManyToManyField`` is represented by
+  ``django.forms.ModelMultipleChoiceField``, which is a
+  ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
 
 In addition, each generated form field has attributes set as follows:
 
-    * If the model field has ``blank=True``, then ``required`` is set to
-      ``False`` on the form field. Otherwise, ``required=True``.
+* If the model field has ``blank=True``, then ``required`` is set to
+  ``False`` on the form field. Otherwise, ``required=True``.
 
-    * The form field's ``label`` is set to the ``verbose_name`` of the model
-      field, with the first character capitalized.
+* The form field's ``label`` is set to the ``verbose_name`` of the model
+  field, with the first character capitalized.
 
-    * The form field's ``help_text`` is set to the ``help_text`` of the model
-      field.
+* The form field's ``help_text`` is set to the ``help_text`` of the model
+  field.
 
-    * If the model field has ``choices`` set, then the form field's ``widget``
-      will be set to ``Select``, with choices coming from the model field's
-      ``choices``. The choices will normally include the blank choice which is
-      selected by default. If the field is required, this forces the user to
-      make a selection. The blank choice will not be included if the model
-      field has ``blank=False`` and an explicit ``default`` value (the
-      ``default`` value will be initially selected instead).
+* If the model field has ``choices`` set, then the form field's ``widget``
+  will be set to ``Select``, with choices coming from the model field's
+  ``choices``. The choices will normally include the blank choice which is
+  selected by default. If the field is required, this forces the user to
+  make a selection. The blank choice will not be included if the model
+  field has ``blank=False`` and an explicit ``default`` value (the
+  ``default`` value will be initially selected instead).
 
 Finally, note that you can override the form field used for a given model
 field. See `Overriding the default field types or widgets`_ below.
@@ -197,14 +199,14 @@ we'll discuss in a moment.)::
 The ``is_valid()`` method and ``errors``
 ----------------------------------------
 
-.. versionchanged:: 1.2
-
 The first time you call ``is_valid()`` or access the ``errors`` attribute of a
-``ModelForm`` has always triggered form validation, but as of Django 1.2, it
-will also trigger :ref:`model validation <validating-objects>`. This has the
-side-effect of cleaning the model you pass to the ``ModelForm`` constructor.
-For instance, calling ``is_valid()`` on your form will convert any date fields
-on your model to actual date objects.
+``ModelForm`` triggers :ref:`form validation <form-and-field-validation>` as
+well as :ref:`model validation <validating-objects>`. This has the side-effect
+of cleaning the model you pass to the ``ModelForm`` constructor. For instance,
+calling ``is_valid()`` on your form will convert any date fields on your model
+to actual date objects. If form validation fails, only some of the updates
+may be applied. For this reason, you'll probably want to avoid reusing the
+model instance passed to the form, especially if validation fails.
 
 
 The ``save()`` method
@@ -222,11 +224,6 @@ supplied, ``save()`` will update that instance. If it's not supplied,
 
     # Save a new Article object from the form's data.
     >>> new_article = f.save()
-
-    # Create a form to edit an existing Article.
-    >>> a = Article.objects.get(pk=1)
-    >>> f = ArticleForm(instance=a)
-    >>> f.save()
 
     # Create a form to edit an existing Article, but use
     # POST data to populate the form.
@@ -365,7 +362,7 @@ Overriding the default field types or widgets
 ---------------------------------------------
 
 .. versionadded:: 1.2
- 	The ``widgets`` attribute is new in Django 1.2.
+    The ``widgets`` attribute is new in Django 1.2.
 
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
@@ -444,6 +441,10 @@ parameter when declaring the form field::
             class Meta:
                 model = Article
 
+    You must ensure that the type of the form field can be used to set the
+    contents of the corresponding model field. When they are not compatible,
+    you will get a ``ValueError`` as no implicit conversion takes place.
+
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
@@ -519,13 +520,13 @@ the original ``ArticleForm.Meta`` to remove one field.
 
 There are a couple of things to note, however.
 
- * Normal Python name resolution rules apply. If you have multiple base
-   classes that declare a ``Meta`` inner class, only the first one will be
-   used. This means the child's ``Meta``, if it exists, otherwise the
-   ``Meta`` of the first parent, etc.
+* Normal Python name resolution rules apply. If you have multiple base
+  classes that declare a ``Meta`` inner class, only the first one will be
+  used. This means the child's ``Meta``, if it exists, otherwise the
+  ``Meta`` of the first parent, etc.
 
- * For technical reasons, a subclass cannot inherit from both a ``ModelForm``
-   and a ``Form`` simultaneously.
+* For technical reasons, a subclass cannot inherit from both a ``ModelForm``
+  and a ``Form`` simultaneously.
 
 Chances are these notes won't affect you unless you're trying to do something
 tricky with subclassing.
@@ -618,6 +619,17 @@ exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
+Providing initial values
+------------------------
+
+.. versionadded:: 1.4
+
+As with regular formsets, it's possible to :ref:`specify initial data
+<formsets-initial-data>` for forms in the formset by specifying an ``initial``
+parameter when instantiating the model formset class returned by
+``modelformset_factory``. However, with model formsets, the initial values only
+apply to extra forms, those that aren't bound to an existing object instance.
+
 .. _saving-objects-in-the-formset:
 
 Saving objects in the formset
@@ -656,6 +668,12 @@ to the database. If your formset contains a ``ManyToManyField``, you'll also
 need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
 are saved properly.
 
+.. note::
+
+    While calling ``formset.save(commit=False)`` does not save new or changed
+    objects to the database, it *does* delete objects that have been marked for
+    deletion. This behavior will be corrected in Django 1.7.
+
 .. _model-formsets-max-num:
 
 Limiting the number of editable objects
@@ -691,8 +709,8 @@ so long as the total number of forms does not exceed ``max_num``::
 
 .. versionchanged:: 1.2
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed.
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
 
 Using a model formset in a view
 -------------------------------
@@ -724,7 +742,7 @@ Overiding ``clean()`` on a ``model_formset``
 Just like with ``ModelForms``, by default the ``clean()`` method of a
 ``model_formset`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
-``unique_for_date|month|year``).  If you want to overide the ``clean()`` method
+``unique_for_date|month|year``).  If you want to override the ``clean()`` method
 on a ``model_formset`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
@@ -843,6 +861,10 @@ a particular author, you could do this::
 .. note::
     ``inlineformset_factory`` uses ``modelformset_factory`` and marks
     ``can_delete=True``.
+
+.. seealso::
+
+    :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
 
 More than one foreign key to the same model
 -------------------------------------------

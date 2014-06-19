@@ -14,12 +14,15 @@ Usage:
 import re
 import time
 import calendar
+import datetime
+
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
+from django.utils.timezone import is_aware, is_naive
 
-re_formatchars = re.compile(r'(?<!\\)([aAbBcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
+re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
 class Formatter(object):
@@ -115,9 +118,12 @@ class DateFormat(TimeFormat):
     def __init__(self, dt):
         # Accepts either a datetime or date object.
         self.data = dt
-        self.timezone = getattr(dt, 'tzinfo', None)
-        if hasattr(self.data, 'hour') and not self.timezone:
-            self.timezone = LocalTimezone(dt)
+        self.timezone = None
+        if isinstance(dt, datetime.datetime):
+            if is_naive(dt):
+                self.timezone = LocalTimezone(dt)
+            else:
+                self.timezone = dt.tzinfo
 
     def b(self):
         "Month, textual, 3 letters, lowercase; e.g. 'jan'"
@@ -137,6 +143,17 @@ class DateFormat(TimeFormat):
     def D(self):
         "Day of the week, textual, 3 letters; e.g. 'Fri'"
         return WEEKDAYS_ABBR[self.data.weekday()]
+
+    def e(self):
+        "Timezone name if available"
+        try:
+            if hasattr(self.data, 'tzinfo') and self.data.tzinfo:
+                # Have to use tzinfo.tzname and not datetime.tzname
+                # because datatime.tzname does not expect Unicode
+                return self.data.tzinfo.tzname(self.data) or ""
+        except NotImplementedError:
+            pass
+        return ""
 
     def E(self):
         "Alternative month names as required by some locales. Proprietary extension."
@@ -181,10 +198,16 @@ class DateFormat(TimeFormat):
         "Month abbreviation in Associated Press style. Proprietary extension."
         return MONTHS_AP[self.data.month]
 
+    def o(self):
+        "ISO 8601 year number matching the ISO week number (W)"
+        return self.data.isocalendar()[0]
+
     def O(self):
-        "Difference to Greenwich time in hours; e.g. '+0200'"
+        "Difference to Greenwich time in hours; e.g. '+0200', '-0430'"
         seconds = self.Z()
-        return u"%+03d%02d" % (seconds // 3600, (seconds // 60) % 60)
+        sign = '-' if seconds < 0 else '+'
+        seconds = abs(seconds)
+        return u"%s%02d%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
 
     def r(self):
         "RFC 2822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
@@ -216,7 +239,7 @@ class DateFormat(TimeFormat):
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-        if getattr(self.data, 'tzinfo', None):
+        if isinstance(self.data, datetime.datetime) and is_aware(self.data):
             return int(calendar.timegm(self.data.utctimetuple()))
         else:
             return int(time.mktime(self.data.timetuple()))
@@ -275,8 +298,10 @@ class DateFormat(TimeFormat):
         if not self.timezone:
             return 0
         offset = self.timezone.utcoffset(self.data)
-        # Only days can be negative, so negative offsets have days=-1 and
-        # seconds positive. Positive offsets have days=0
+        # `offset` is a datetime.timedelta. For negative values (to the west of
+        # UTC) only days can be negative (days=-1) and seconds are always
+        # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
+        # Positive offsets have days=0
         return offset.days * 86400 + offset.seconds
 
 def format(value, format_string):

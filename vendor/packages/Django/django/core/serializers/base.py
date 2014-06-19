@@ -5,8 +5,11 @@ Module for abstract serializer/unserializer base classes.
 from StringIO import StringIO
 
 from django.db import models
-from django.utils.encoding import smart_str, smart_unicode
-from django.utils import datetime_safe
+from django.utils.encoding import smart_unicode
+
+class SerializerDoesNotExist(KeyError):
+    """The requested serializer was not found."""
+    pass
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
@@ -38,7 +41,10 @@ class Serializer(object):
         self.start_serialization()
         for obj in queryset:
             self.start_object(obj)
-            for field in obj._meta.local_fields:
+            # Use the concrete parent class' _meta instead of the object's _meta
+            # This is to avoid local_fields problems for proxy models. Refs #17717.
+            concrete_model = obj._meta.concrete_model
+            for field in concrete_model._meta.local_fields:
                 if field.serialize:
                     if field.rel is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
@@ -46,19 +52,13 @@ class Serializer(object):
                     else:
                         if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
                             self.handle_fk_field(obj, field)
-            for field in obj._meta.many_to_many:
+            for field in concrete_model._meta.many_to_many:
                 if field.serialize:
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
         self.end_serialization()
         return self.getvalue()
-
-    def get_string_value(self, obj, field):
-        """
-        Convert a field's value to a string.
-        """
-        return smart_unicode(field.value_to_string(obj))
 
     def start_serialization(self):
         """

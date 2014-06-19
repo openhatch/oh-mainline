@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.test import TestCase
 
-from models import Article, Person
+from .models import Article, Person
 
 
 class LatestTests(TestCase):
@@ -42,6 +44,9 @@ class LatestTests(TestCase):
             Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).latest('expire_date'),
             a3,
         )
+
+        # Ensure that latest() overrides any other ordering specified on the query. Refs #11283.
+        self.assertEqual(Article.objects.order_by('id').latest(), a4)
 
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have

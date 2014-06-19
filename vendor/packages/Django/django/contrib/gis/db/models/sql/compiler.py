@@ -2,7 +2,6 @@ from itertools import izip
 from django.db.backends.util import truncate_name, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import TABLE_NAME, MULTI
-from django.db.models.sql.query import get_proxied_model
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -37,7 +36,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                 if isinstance(col, (list, tuple)):
                     alias, column = col
                     table = self.query.alias_map[alias][TABLE_NAME]
-                    if table in only_load and col not in only_load[table]:
+                    if table in only_load and column not in only_load[table]:
                         continue
                     r = self.get_field_select(field, alias, column)
                     if with_aliases:
@@ -116,7 +115,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         aliases = set()
         only_load = self.deferred_to_columns()
         # Skip all proxy to the root proxied model
-        proxied_model = get_proxied_model(opts)
+        proxied_model = opts.concrete_model
 
         if start_alias:
             seen = {None: start_alias}
@@ -171,10 +170,6 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         """
         values = []
         aliases = self.query.extra_select.keys()
-        if self.query.aggregates:
-            # If we have an aggregate annotation, must extend the aliases
-            # so their corresponding row values are included.
-            aliases.extend([None for i in xrange(len(self.query.aggregates))])
 
         # Have to set a starting row number offset that is used for
         # determining the correct starting row index -- needed for

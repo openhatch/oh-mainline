@@ -1,11 +1,16 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from django.conf.urls.defaults import patterns
+from __future__ import absolute_import
+
+from django.conf.urls import patterns
 from django.contrib import admin
 from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 
-import models, forms
+from . import models, forms, admin as base_admin
+
 
 class Admin2(admin.AdminSite):
     login_form = forms.CustomAdminAuthenticationForm
@@ -27,10 +32,19 @@ class Admin2(admin.AdminSite):
     def my_view(self, request):
         return HttpResponse("Django is a magical pony!")
 
+
+class UserLimitedAdmin(UserAdmin):
+    # used for testing password change on a user not in queryset
+    def queryset(self, request):
+        qs = super(UserLimitedAdmin, self).queryset(request)
+        return qs.filter(is_superuser=False)
+
+
 site = Admin2(name="admin2")
 
-site.register(models.Article, models.ArticleAdmin)
-site.register(models.Section, inlines=[models.ArticleInline])
-site.register(models.Thing, models.ThingAdmin)
-site.register(models.Fabric, models.FabricAdmin)
-site.register(models.ChapterXtra1, models.ChapterXtra1Admin)
+site.register(models.Article, base_admin.ArticleAdmin)
+site.register(models.Section, inlines=[base_admin.ArticleInline])
+site.register(models.Thing, base_admin.ThingAdmin)
+site.register(models.Fabric, base_admin.FabricAdmin)
+site.register(models.ChapterXtra1, base_admin.ChapterXtra1Admin)
+site.register(User, UserLimitedAdmin)

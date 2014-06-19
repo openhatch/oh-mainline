@@ -1,8 +1,10 @@
-from django.conf.urls.defaults import patterns
+from __future__ import absolute_import
 
-import views
+from django.conf.urls import patterns
+
+from . import views
 
 
 urlpatterns = patterns('',
-    (r'^get_person/(\d+)/$', views.get_person),
+    (r'^test_utils/get_person/(\d+)/$', views.get_person),
 )

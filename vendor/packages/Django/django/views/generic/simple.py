@@ -5,7 +5,7 @@ from django.utils.log import getLogger
 import warnings
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
-    PendingDeprecationWarning
+    DeprecationWarning
 )
 
 logger = getLogger('django.request')
@@ -25,7 +25,7 @@ def direct_to_template(request, template, extra_context=None, mimetype=None, **k
             dictionary[key] = value
     c = RequestContext(request, dictionary)
     t = loader.get_template(template)
-    return HttpResponse(t.render(c), mimetype=mimetype)
+    return HttpResponse(t.render(c), content_type=mimetype)
 
 def redirect_to(request, url, permanent=True, query_string=False, **kwargs):
     """
@@ -48,15 +48,19 @@ def redirect_to(request, url, permanent=True, query_string=False, **kwargs):
     from the request is appended to the URL.
 
     """
-    args = request.META["QUERY_STRING"]
-    if args and query_string and url is not None:
-        url = "%s?%s" % (url, args)
+    args = request.META.get('QUERY_STRING', '')
 
     if url is not None:
+        if kwargs:
+            url = url % kwargs
+
+        if args and query_string:
+            url = "%s?%s" % (url, args)
+
         klass = permanent and HttpResponsePermanentRedirect or HttpResponseRedirect
-        return klass(url % kwargs)
+        return klass(url)
     else:
-        logger.warning('Gone: %s' % request.path,
+        logger.warning('Gone: %s', request.path,
                     extra={
                         'status_code': 410,
                         'request': request

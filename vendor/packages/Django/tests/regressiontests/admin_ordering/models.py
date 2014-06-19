@@ -1,6 +1,7 @@
 # coding: utf-8
-from django.db import models
 from django.contrib import admin
+from django.db import models
+
 
 class Band(models.Model):
     name = models.CharField(max_length=100)
@@ -24,3 +25,11 @@ class SongInlineDefaultOrdering(admin.StackedInline):
 class SongInlineNewOrdering(admin.StackedInline):
     model = Song
     ordering = ('duration', )
+
+class DynOrderingBandAdmin(admin.ModelAdmin):
+
+    def get_ordering(self, request):
+        if request.user.is_superuser:
+            return ['rank']
+        else:
+            return ['name']

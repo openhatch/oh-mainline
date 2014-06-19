@@ -1,16 +1,23 @@
 import gc
 import sys
+import time
 
 from django.dispatch import Signal
 from django.utils import unittest
-import django.utils.copycompat as copy
+
 
 if sys.platform.startswith('java'):
     def garbage_collect():
-        """Run the garbage collector and wait a bit to let it do his work"""
-        import time
+        # Some JVM GCs will execute finalizers in a different thread, meaning
+        # we need to wait for that to complete before we go on looking for the
+        # effects of that.
         gc.collect()
         time.sleep(0.1)
+elif hasattr(sys, "pypy_version_info"):
+    def garbage_collect():
+        # Collecting weakreferences can take two collections on PyPy.
+        gc.collect()
+        gc.collect()
 else:
     def garbage_collect():
         gc.collect()
@@ -116,9 +123,3 @@ class DispatcherTests(unittest.TestCase):
         garbage_collect()
         a_signal.disconnect(receiver_3)
         self._testIsClean(a_signal)
-
-def getSuite():
-    return unittest.makeSuite(DispatcherTests,'test')
-
-if __name__ == "__main__":
-    unittest.main()

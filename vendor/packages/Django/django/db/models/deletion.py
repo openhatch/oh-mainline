@@ -1,17 +1,15 @@
+from functools import wraps
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.utils.datastructures import SortedDict
-from django.utils.functional import wraps
 
 
 class ProtectedError(IntegrityError):
     def __init__(self, msg, protected_objects):
         self.protected_objects = protected_objects
-        # TODO change this to use super() when we drop Python 2.4
-        IntegrityError.__init__(self, msg, protected_objects)
+        super(ProtectedError, self).__init__(msg, protected_objects)
 
 
 def CASCADE(collector, field, sub_objs, using):
@@ -78,6 +76,12 @@ class Collector(object):
         self.data = {}
         self.batches = {} # {model: {field: set([instances])}}
         self.field_updates = {} # {model: {(field, value): set([instances])}}
+
+        # Tracks deletion-order dependency for databases without transactions
+        # or ability to defer constraint checks. Only concrete model classes
+        # should be included, as the dependencies exist only between actual
+        # database tables; proxy models are represented here by their concrete
+        # parent.
         self.dependencies = {} # {model: set([models])}
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
@@ -103,7 +107,8 @@ class Collector(object):
         if source is not None and not nullable:
             if reverse_dependency:
                 source, model = model, source
-            self.dependencies.setdefault(source, set()).add(model)
+            self.dependencies.setdefault(
+                source._meta.concrete_model, set()).add(model._meta.concrete_model)
         return new_objs
 
     def add_batch(self, model, field, objs):
@@ -146,6 +151,7 @@ class Collector(object):
                             reverse_dependency=reverse_dependency)
         if not new_objs:
             return
+
         model = new_objs[0].__class__
 
         # Recursively collect parent models, but not their related objects.
@@ -159,7 +165,8 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_all_related_objects(include_hidden=True):
+            for related in model._meta.get_all_related_objects(
+                    include_hidden=True, include_proxy_eq=True):
                 field = related.field
                 if related.model._meta.auto_created:
                     self.add_batch(related.model, field, new_objs)
@@ -197,15 +204,17 @@ class Collector(object):
 
     def sort(self):
         sorted_models = []
+        concrete_models = set()
         models = self.data.keys()
         while len(sorted_models) < len(models):
             found = False
             for model in models:
                 if model in sorted_models:
                     continue
-                dependencies = self.dependencies.get(model)
-                if not (dependencies and dependencies.difference(sorted_models)):
+                dependencies = self.dependencies.get(model._meta.concrete_model)
+                if not (dependencies and dependencies.difference(concrete_models)):
                     sorted_models.append(model)
+                    concrete_models.add(model._meta.concrete_model)
                     found = True
             if not found:
                 return
@@ -219,7 +228,7 @@ class Collector(object):
             self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
-        # don't support transactions or cannot defer contraint checks until the
+        # don't support transactions or cannot defer constraint checks until the
         # end of a transaction.
         self.sort()
 

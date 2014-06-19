@@ -1,13 +1,13 @@
 """
 PT-specific Form helpers
 """
+import re
 
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select
+from django.forms.fields import Field, RegexField
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-import re
 
 phone_digits_re = re.compile(r'^(\d{9}|(00|\+)\d*)$')
 
@@ -17,9 +17,9 @@ class PTZipCodeField(RegexField):
         'invalid': _('Enter a zip code in the format XXXX-XXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PTZipCodeField, self).__init__(r'^(\d{4}-\d{3}|\d{7})$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self,value):
         cleaned = super(PTZipCodeField, self).clean(value)

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db import DEFAULT_DB_ALIAS, transaction, IntegrityError
+from __future__ import absolute_import
+
+from django.db import transaction, IntegrityError
 from django.test import TestCase, skipIfDBFeature
 
-from models import Employee, Business, Bar, Foo
+from .models import Employee, Business, Bar, Foo
 
 
 class CustomPKTests(TestCase):

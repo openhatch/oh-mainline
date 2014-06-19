@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.db.models.query_utils import DeferredAttribute
 from django.test import TestCase
 
-from models import Secondary, Primary, Child, BigChild
+from .models import Secondary, Primary, Child, BigChild, ChildProxy
 
 
 class DeferTests(TestCase):
@@ -28,10 +30,17 @@ class DeferTests(TestCase):
         self.assert_delayed(qs.only("name")[0], 2)
         self.assert_delayed(qs.defer("related__first")[0], 0)
 
+        # Using 'pk' with only() should result in 3 deferred fields, namely all
+        # of them except the model's primary key see #15494
+        self.assert_delayed(qs.only("pk")[0], 3)
+
         obj = qs.select_related().only("related__first")[0]
         self.assert_delayed(obj, 2)
 
         self.assertEqual(obj.related_id, s1.pk)
+
+        # You can use 'pk' with reverse foreign key lookups.
+        self.assert_delayed(s1.primary_set.all().only('pk')[0], 3)
 
         self.assert_delayed(qs.defer("name").extra(select={"a": 1})[0], 1)
         self.assert_delayed(qs.extra(select={"a": 1}).defer("name")[0], 1)
@@ -135,3 +144,17 @@ class DeferTests(TestCase):
         self.assertEqual(obj.other, "bar")
         obj.name = "bb"
         obj.save()
+
+    def test_defer_proxy(self):
+        """
+        Ensure select_related together with only on a proxy model behaves
+        as expected. See #17876.
+        """
+        related = Secondary.objects.create(first='x1', second='x2')
+        ChildProxy.objects.create(name='p1', value='xx', related=related)
+        children = ChildProxy.objects.all().select_related().only('id', 'name')
+        self.assertEqual(len(children), 1)
+        child = children[0]
+        self.assert_delayed(child, 1)
+        self.assertEqual(child.name, 'p1')
+        self.assertEqual(child.value, 'xx')

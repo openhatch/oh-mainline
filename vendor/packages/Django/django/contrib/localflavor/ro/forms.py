@@ -2,12 +2,13 @@
 """
 Romanian specific form helpers.
 """
+from __future__ import absolute_import
 
-import re
-
+from django.contrib.localflavor.ro.ro_counties import COUNTIES_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError, Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
+
 
 class ROCIFField(RegexField):
     """
@@ -19,9 +20,9 @@ class ROCIFField(RegexField):
         'invalid': _("Enter a valid CIF."),
     }
 
-    def __init__(self, *args, **kwargs):
-        super(ROCIFField, self).__init__(r'^(RO)?[0-9]{2,10}', max_length=10,
-                min_length=2, *args, **kwargs)
+    def __init__(self, max_length=10, min_length=2, *args, **kwargs):
+        super(ROCIFField, self).__init__(r'^(RO)?[0-9]{2,10}', max_length,
+                min_length, *args, **kwargs)
 
     def clean(self, value):
         """
@@ -56,9 +57,9 @@ class ROCNPField(RegexField):
         'invalid': _("Enter a valid CNP."),
     }
 
-    def __init__(self, *args, **kwargs):
-        super(ROCNPField, self).__init__(r'^[1-9][0-9]{12}', max_length=13,
-            min_length=13, *args, **kwargs)
+    def __init__(self, max_length=13, min_length=13, *args, **kwargs):
+        super(ROCNPField, self).__init__(r'^[1-9][0-9]{12}', max_length,
+            min_length, *args, **kwargs)
 
     def clean(self, value):
         """
@@ -103,7 +104,6 @@ class ROCountyField(Field):
     }
 
     def clean(self, value):
-        from ro_counties import COUNTIES_CHOICES
         super(ROCountyField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
@@ -130,7 +130,6 @@ class ROCountySelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from ro_counties import COUNTIES_CHOICES
         super(ROCountySelect, self).__init__(attrs, choices=COUNTIES_CHOICES)
 
 class ROIBANField(RegexField):
@@ -143,9 +142,9 @@ class ROIBANField(RegexField):
         'invalid': _('Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=40, min_length=24, *args, **kwargs):
         super(ROIBANField, self).__init__(r'^[0-9A-Za-z\-\s]{24,40}$',
-                max_length=40, min_length=24, *args, **kwargs)
+                max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         """
@@ -175,9 +174,9 @@ class ROPhoneNumberField(RegexField):
         'invalid': _('Phone numbers must be in XXXX-XXXXXX format.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=20, min_length=10, *args, **kwargs):
         super(ROPhoneNumberField, self).__init__(r'^[0-9\-\(\)\s]{10,20}$',
-                max_length=20, min_length=10, *args, **kwargs)
+                max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         """
@@ -200,7 +199,7 @@ class ROPostalCodeField(RegexField):
         'invalid': _('Enter a valid postal code in the format XXXXXX'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=6, min_length=6, *args, **kwargs):
         super(ROPostalCodeField, self).__init__(r'^[0-9][0-8][0-9]{4}$',
-                max_length=6, min_length=6, *args, **kwargs)
+                max_length, min_length, *args, **kwargs)
 

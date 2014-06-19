@@ -1,11 +1,14 @@
-from forms import Form
+from __future__ import absolute_import
+
 from django.core.exceptions import ValidationError
+from django.forms import Form
+from django.forms.fields import IntegerField, BooleanField
+from django.forms.util import ErrorList
+from django.forms.widgets import Media, HiddenInput
 from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from fields import IntegerField, BooleanField
-from widgets import Media, HiddenInput
-from util import ErrorList
+
 
 __all__ = ('BaseFormSet', 'all_valid')
 
@@ -15,6 +18,9 @@ INITIAL_FORM_COUNT = 'INITIAL_FORMS'
 MAX_NUM_FORM_COUNT = 'MAX_NUM_FORMS'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
+
+# default maximum number of forms in a formset, to prevent memory exhaustion
+DEFAULT_MAX_NUM = 1000
 
 class ManagementForm(Form):
     """
@@ -55,10 +61,14 @@ class BaseFormSet(StrAndUnicode):
 
     def __getitem__(self, index):
         """Returns the form at the given index, based on the rendering order"""
-        return list(self)[index]
+        return self.forms[index]
 
     def __len__(self):
         return len(self.forms)
+
+    def __nonzero__(self):
+        """All formsets have a management form which is not included in the length"""
+        return True
 
     def _management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
@@ -104,7 +114,7 @@ class BaseFormSet(StrAndUnicode):
     def _construct_forms(self):
         # instantiate all the forms and put them in self.forms
         self.forms = []
-        for i in xrange(self.total_form_count()):
+        for i in xrange(min(self.total_form_count(), self.absolute_max)):
             self.forms.append(self._construct_form(i))
 
     def _construct_form(self, i, **kwargs):
@@ -115,7 +125,7 @@ class BaseFormSet(StrAndUnicode):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial:
+        if self.initial and not 'initial' in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:
@@ -213,15 +223,14 @@ class BaseFormSet(StrAndUnicode):
                     return (1, 0) # +infinity, larger than any number
                 return (0, k[1])
             self._ordering.sort(key=compare_ordering_key)
-        # Return a list of form.cleaned_data dicts in the order spcified by
+        # Return a list of form.cleaned_data dicts in the order specified by
         # the form data.
         return [self.forms[i[0]] for i in self._ordering]
     ordered_forms = property(_get_ordered_forms)
 
-    #@classmethod
+    @classmethod
     def get_default_prefix(cls):
         return 'form'
-    get_default_prefix = classmethod(get_default_prefix)
 
     def non_form_errors(self):
         """
@@ -297,6 +306,12 @@ class BaseFormSet(StrAndUnicode):
         """
         pass
 
+    def has_changed(self):
+        """
+        Returns true if data in any form differs from initial.
+        """
+        return any(form.has_changed() for form in self)
+
     def add_fields(self, form, index):
         """A hook for adding extra fields on to each form instance."""
         if self.can_order:
@@ -313,7 +328,7 @@ class BaseFormSet(StrAndUnicode):
 
     def is_multipart(self):
         """
-        Returns True if the formset needs to be multipart-encrypted, i.e. it
+        Returns True if the formset needs to be multipart, i.e. it
         has FileInput. Otherwise, False.
         """
         return self.forms and self.forms[0].is_multipart()
@@ -348,9 +363,14 @@ class BaseFormSet(StrAndUnicode):
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):
     """Return a FormSet for the given form class."""
+    if max_num is None:
+        max_num = DEFAULT_MAX_NUM
+    # hard limit on forms instantiated, to prevent memory-exhaustion attacks
+    # limit defaults to DEFAULT_MAX_NUM, but developer can increase it via max_num
+    absolute_max = max(DEFAULT_MAX_NUM, max_num)
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
-             'max_num': max_num}
+             'max_num': max_num, 'absolute_max': absolute_max}
     return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 def all_valid(formsets):

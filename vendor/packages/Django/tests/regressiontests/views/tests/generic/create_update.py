@@ -1,12 +1,21 @@
 import datetime
+import warnings
 
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 from regressiontests.views.models import Article, UrlArticle
 
 class CreateObjectTest(TestCase):
-
     fixtures = ['testdata.json']
+    urls = 'regressiontests.views.generic_urls'
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_login_required_view(self):
         """
@@ -14,7 +23,7 @@ class CreateObjectTest(TestCase):
         login_required view gets redirected to the login page and that
         an authenticated user is let through.
         """
-        view_url = '/views/create_update/member/create/article/'
+        view_url = '/create_update/member/create/article/'
         response = self.client.get(view_url)
         self.assertRedirects(response, '/accounts/login/?next=%s' % view_url)
         # Now login and try again.
@@ -28,7 +37,7 @@ class CreateObjectTest(TestCase):
         """
         Ensures the generic view returned the page and contains a form.
         """
-        view_url = '/views/create_update/create/article/'
+        view_url = '/create_update/create/article/'
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'views/article_form.html')
@@ -39,7 +48,7 @@ class CreateObjectTest(TestCase):
         """
         POSTs a form that contains validation errors.
         """
-        view_url = '/views/create_update/create/article/'
+        view_url = '/create_update/create/article/'
         num_articles = Article.objects.count()
         response = self.client.post(view_url, {
             'title': 'My First Article',
@@ -54,7 +63,7 @@ class CreateObjectTest(TestCase):
         Creates a new article using a custom form class with a save method
         that alters the slug entered.
         """
-        view_url = '/views/create_update/create_custom/article/'
+        view_url = '/create_update/create_custom/article/'
         response = self.client.post(view_url, {
             'title': 'Test Article',
             'slug': 'this-should-get-replaced',
@@ -62,27 +71,35 @@ class CreateObjectTest(TestCase):
             'date_created': datetime.datetime(2007, 6, 25),
         })
         self.assertRedirects(response,
-            '/views/create_update/view/article/some-other-slug/',
+            '/create_update/view/article/some-other-slug/',
             target_status_code=404)
 
 class UpdateDeleteObjectTest(TestCase):
-
     fixtures = ['testdata.json']
+    urls = 'regressiontests.views.generic_urls'
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_update_object_form_display(self):
         """
         Verifies that the form was created properly and with initial values.
         """
-        response = self.client.get('/views/create_update/update/article/old_article/')
+        response = self.client.get('/create_update/update/article/old_article/')
         self.assertTemplateUsed(response, 'views/article_form.html')
-        self.assertEqual(unicode(response.context['form']['title']),
+        self.assertHTMLEqual(unicode(response.context['form']['title']),
             u'<input id="id_title" type="text" name="title" value="Old Article" maxlength="100" />')
 
     def test_update_object(self):
         """
         Verifies the updating of an Article.
         """
-        response = self.client.post('/views/create_update/update/article/old_article/', {
+        response = self.client.post('/create_update/update/article/old_article/', {
             'title': 'Another Article',
             'slug': 'another-article-slug',
             'author': 1,
@@ -95,14 +112,14 @@ class UpdateDeleteObjectTest(TestCase):
         """
         Verifies the confirm deletion page is displayed using a GET.
         """
-        response = self.client.get('/views/create_update/delete/article/old_article/')
+        response = self.client.get('/create_update/delete/article/old_article/')
         self.assertTemplateUsed(response, 'views/article_confirm_delete.html')
 
     def test_delete_object(self):
         """
         Verifies the object actually gets deleted on a POST.
         """
-        view_url = '/views/create_update/delete/article/old_article/'
+        view_url = '/create_update/delete/article/old_article/'
         response = self.client.post(view_url)
         try:
             Article.objects.get(slug='old_article')
@@ -120,14 +137,23 @@ class PostSaveRedirectTests(TestCase):
 
     fixtures = ['testdata.json']
     article_model = Article
+    urls = 'regressiontests.views.generic_urls'
 
-    create_url = '/views/create_update/create/article/'
-    update_url = '/views/create_update/update/article/old_article/'
-    delete_url = '/views/create_update/delete/article/old_article/'
+    create_url = '/create_update/create/article/'
+    update_url = '/create_update/update/article/old_article/'
+    delete_url = '/create_update/delete/article/old_article/'
 
-    create_redirect = '/views/create_update/view/article/my-first-article/'
-    update_redirect = '/views/create_update/view/article/another-article-slug/'
-    delete_redirect = '/views/create_update/'
+    create_redirect = '/create_update/view/article/my-first-article/'
+    update_redirect = '/create_update/view/article/another-article-slug/'
+    delete_redirect = '/create_update/'
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_create_article(self):
         num_articles = self.article_model.objects.count()
@@ -169,9 +195,18 @@ class NoPostSaveNoAbsoluteUrl(PostSaveRedirectTests):
     method exists on the Model that the view raises an ImproperlyConfigured
     error.
     """
+    urls = 'regressiontests.views.generic_urls'
 
-    create_url = '/views/create_update/no_redirect/create/article/'
-    update_url = '/views/create_update/no_redirect/update/article/old_article/'
+    create_url = '/create_update/no_redirect/create/article/'
+    update_url = '/create_update/no_redirect/update/article/old_article/'
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_create_article(self):
         self.assertRaises(ImproperlyConfigured,
@@ -193,15 +228,24 @@ class AbsoluteUrlNoPostSave(PostSaveRedirectTests):
     Tests that the views redirect to the Model's get_absolute_url when no
     post_save_redirect is passed.
     """
+    urls = 'regressiontests.views.generic_urls'
 
     # Article model with get_absolute_url method.
     article_model = UrlArticle
 
-    create_url = '/views/create_update/no_url/create/article/'
-    update_url = '/views/create_update/no_url/update/article/old_article/'
+    create_url = '/create_update/no_url/create/article/'
+    update_url = '/create_update/no_url/update/article/old_article/'
 
     create_redirect = '/urlarticles/my-first-article/'
     update_redirect = '/urlarticles/another-article-slug/'
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_delete_article(self):
         """

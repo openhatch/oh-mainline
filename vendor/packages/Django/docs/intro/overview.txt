@@ -176,7 +176,7 @@ decouple URLs from Python code.
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^articles/(\d{4})/$', 'news.views.year_archive'),
@@ -307,18 +307,18 @@ This is just the surface
 This has been only a quick overview of Django's functionality. Some more useful
 features:
 
-    * A :doc:`caching framework </topics/cache>` that integrates with memcached
-      or other backends.
+* A :doc:`caching framework </topics/cache>` that integrates with memcached
+  or other backends.
 
-    * A :doc:`syndication framework </ref/contrib/syndication>` that makes
-      creating RSS and Atom feeds as easy as writing a small Python class.
+* A :doc:`syndication framework </ref/contrib/syndication>` that makes
+  creating RSS and Atom feeds as easy as writing a small Python class.
 
-    * More sexy automatically-generated admin features -- this overview barely
-      scratched the surface.
+* More sexy automatically-generated admin features -- this overview barely
+  scratched the surface.
 
 The next obvious steps are for you to `download Django`_, read :doc:`the
 tutorial </intro/tutorial01>` and join `the community`_. Thanks for your
 interest!
 
-.. _download Django: http://www.djangoproject.com/download/
-.. _the community: http://www.djangoproject.com/community/
+.. _download Django: https://www.djangoproject.com/download/
+.. _the community: https://www.djangoproject.com/community/

@@ -1,11 +1,16 @@
-import cStringIO, zipfile
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+import zipfile
+
 from django.conf import settings
 from django.http import HttpResponse
 from django.template import loader
 
 def compress_kml(kml):
     "Returns compressed KMZ from the given KML string."
-    kmz = cStringIO.StringIO()
+    kmz = StringIO()
     zf = zipfile.ZipFile(kmz, 'a', zipfile.ZIP_DEFLATED)
     zf.writestr('doc.kml', kml.encode(settings.DEFAULT_CHARSET))
     zf.close()
@@ -15,7 +20,7 @@ def compress_kml(kml):
 def render_to_kml(*args, **kwargs):
     "Renders the response as KML (using the correct MIME type)."
     return HttpResponse(loader.render_to_string(*args, **kwargs),
-                        mimetype='application/vnd.google-earth.kml+xml')
+        content_type='application/vnd.google-earth.kml+xml')
 
 def render_to_kmz(*args, **kwargs):
     """
@@ -23,10 +28,9 @@ def render_to_kmz(*args, **kwargs):
     MIME type).
     """
     return HttpResponse(compress_kml(loader.render_to_string(*args, **kwargs)),
-                        mimetype='application/vnd.google-earth.kmz')
-
+        content_type='application/vnd.google-earth.kmz')
 
 def render_to_text(*args, **kwargs):
     "Renders the response using the MIME type for plain text."
     return HttpResponse(loader.render_to_string(*args, **kwargs),
-                        mimetype='text/plain')
+        content_type='text/plain')

@@ -1,114 +1,125 @@
 """
 Debug Toolbar middleware
 """
-import os
+
+from __future__ import absolute_import, unicode_literals
+
+import re
+import threading
 
 from django.conf import settings
-from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.utils.encoding import smart_unicode
-from django.conf.urls.defaults import include, patterns
+from django.utils.encoding import force_text
+from django.utils.importlib import import_module
 
-import debug_toolbar.urls
-from debug_toolbar.toolbar.loader import DebugToolbar
+from debug_toolbar.toolbar import DebugToolbar
+from debug_toolbar import settings as dt_settings
 
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
+# Handles python threading module bug - http://bugs.python.org/issue14308
+threading._DummyThread._Thread__stop = lambda x: 1
 
-def replace_insensitive(string, target, replacement):
+
+def show_toolbar(request):
     """
-    Similar to string.replace() but is case insensitive
-    Code borrowed from: http://forums.devshed.com/python-programming-11/case-insensitive-string-replace-490921.html
+    Default function to determine whether to show the toolbar on a given page.
     """
-    no_case = string.lower()
-    index = no_case.rfind(target.lower())
-    if index >= 0:
-        return string[:index] + replacement + string[index + len(target):]
-    else: # no results so return the original string
-        return string
+    if request.META.get('REMOTE_ADDR', None) not in settings.INTERNAL_IPS:
+        return False
+
+    if request.is_ajax():
+        return False
+
+    return bool(settings.DEBUG)
+
 
 class DebugToolbarMiddleware(object):
     """
     Middleware to set up Debug Toolbar on incoming request and render toolbar
     on outgoing response.
     """
-    def __init__(self):
-        self.debug_toolbars = {}
-        self.override_url = True
-
-        # Set method to use to decide to show toolbar
-        self.show_toolbar = self._show_toolbar # default
-
-        # The tag to attach the toolbar to
-        self.tag= u'</body>'
-
-        if hasattr(settings, 'DEBUG_TOOLBAR_CONFIG'):
-            show_toolbar_callback = settings.DEBUG_TOOLBAR_CONFIG.get(
-                'SHOW_TOOLBAR_CALLBACK', None)
-            if show_toolbar_callback:
-                self.show_toolbar = show_toolbar_callback
-
-            tag = settings.DEBUG_TOOLBAR_CONFIG.get('TAG', None)
-            if tag:
-                self.tag = u'</' + tag + u'>'
-
-    def _show_toolbar(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
-        if x_forwarded_for:
-            remote_addr = x_forwarded_for.split(',')[0].strip()
-        else:
-            remote_addr = request.META.get('REMOTE_ADDR', None)
-        if not remote_addr in settings.INTERNAL_IPS \
-            or (request.is_ajax() and \
-                not debug_toolbar.urls._PREFIX in request.path) \
-                    or not settings.DEBUG:
-            return False
-        return True
+    debug_toolbars = {}
 
     def process_request(self, request):
-        if self.show_toolbar(request):
-            if self.override_url:
-                original_urlconf = __import__(getattr(request, 'urlconf', settings.ROOT_URLCONF), {}, {}, ['*'])
-                debug_toolbar.urls.urlpatterns += patterns('',
-                    ('', include(original_urlconf)),
-                )
-                if hasattr(original_urlconf, 'handler404'):
-                    debug_toolbar.urls.handler404 = original_urlconf.handler404
-                if hasattr(original_urlconf, 'handler500'):
-                    debug_toolbar.urls.handler500 = original_urlconf.handler500
-                self.override_url = False
-            request.urlconf = 'debug_toolbar.urls'
+        # Decide whether the toolbar is active for this request.
+        func_path = dt_settings.CONFIG['SHOW_TOOLBAR_CALLBACK']
+        # Replace this with import_by_path in Django >= 1.6.
+        mod_path, func_name = func_path.rsplit('.', 1)
+        show_toolbar = getattr(import_module(mod_path), func_name)
+        if not show_toolbar(request):
+            return
 
-            self.debug_toolbars[request] = DebugToolbar(request)
-            for panel in self.debug_toolbars[request].panels:
-                panel.process_request(request)
+        toolbar = DebugToolbar(request)
+        self.__class__.debug_toolbars[threading.current_thread().ident] = toolbar
+
+        # Activate instrumentation ie. monkey-patch.
+        for panel in toolbar.enabled_panels:
+            panel.enable_instrumentation()
+
+        # Run process_request methods of panels like Django middleware.
+        response = None
+        for panel in toolbar.enabled_panels:
+            response = panel.process_request(request)
+            if response:
+                break
+        return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if request in self.debug_toolbars:
-            for panel in self.debug_toolbars[request].panels:
-                panel.process_view(request, view_func, view_args, view_kwargs)
+        toolbar = self.__class__.debug_toolbars.get(threading.current_thread().ident)
+        if not toolbar:
+            return
+
+        # Run process_view methods of panels like Django middleware.
+        response = None
+        for panel in toolbar.enabled_panels:
+            response = panel.process_view(request, view_func, view_args, view_kwargs)
+            if response:
+                break
+        return response
 
     def process_response(self, request, response):
-        if request not in self.debug_toolbars:
+        toolbar = self.__class__.debug_toolbars.pop(threading.current_thread().ident, None)
+        if not toolbar:
             return response
-        if self.debug_toolbars[request].config['INTERCEPT_REDIRECTS']:
-            if isinstance(response, HttpResponseRedirect):
-                redirect_to = response.get('Location', None)
-                if redirect_to:
-                    cookies = response.cookies
-                    response = render_to_response(
-                        'debug_toolbar/redirect.html',
-                        {'redirect_to': redirect_to}
-                    )
-                    response.cookies = cookies
-        if response.status_code == 200 and 'gzip' not in response.get('Content-Encoding', ''):
-            if response['Content-Type'].split(';')[0] in _HTML_TYPES:
-                for panel in self.debug_toolbars[request].panels:
-                    panel.process_response(request, response)
-                response.content = replace_insensitive(
-                    smart_unicode(response.content), 
-                    self.tag,
-                    smart_unicode(self.debug_toolbars[request].render_toolbar() + self.tag))
-                if response.get('Content-Length', None):
-                    response['Content-Length'] = len(response.content)
-        del self.debug_toolbars[request]
+
+        # Run process_response methods of panels like Django middleware.
+        for panel in reversed(toolbar.enabled_panels):
+            new_response = panel.process_response(request, response)
+            if new_response:
+                response = new_response
+
+        # Deactivate instrumentation ie. monkey-unpatch. This must run
+        # regardless of the response. Keep 'return' clauses below.
+        # (NB: Django's model for middleware doesn't guarantee anything.)
+        for panel in reversed(toolbar.enabled_panels):
+            panel.disable_instrumentation()
+
+        # Check for responses where the toolbar can't be inserted.
+        content_encoding = response.get('Content-Encoding', '')
+        content_type = response.get('Content-Type', '').split(';')[0]
+        if any((getattr(response, 'streaming', False),
+                'gzip' in content_encoding,
+                content_type not in _HTML_TYPES)):
+            return response
+
+        # Collapse the toolbar by default if SHOW_COLLAPSED is set.
+        if toolbar.config['SHOW_COLLAPSED'] and 'djdt' not in request.COOKIES:
+            response.set_cookie('djdt', 'hide', 864000)
+
+        # Insert the toolbar in the response.
+        content = force_text(response.content, encoding=settings.DEFAULT_CHARSET)
+        insert_before = dt_settings.CONFIG['INSERT_BEFORE']
+        try:                    # Python >= 2.7
+            pattern = re.escape(insert_before)
+            bits = re.split(pattern, content, flags=re.IGNORECASE)
+        except TypeError:       # Python < 2.7
+            pattern = '(.+?)(%s|$)' % re.escape(insert_before)
+            matches = re.findall(pattern, content, flags=re.DOTALL | re.IGNORECASE)
+            bits = [m[0] for m in matches if m[1] == insert_before]
+            # When the body ends with a newline, there's two trailing groups.
+            bits.append(''.join(m[0] for m in matches if m[1] == ''))
+        if len(bits) > 1:
+            bits[-2] += toolbar.render_toolbar()
+            response.content = insert_before.join(bits)
+            if response.get('Content-Length', None):
+                response['Content-Length'] = len(response.content)
         return response

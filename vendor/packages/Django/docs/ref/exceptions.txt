@@ -84,15 +84,15 @@ FieldError
     The :exc:`FieldError` exception is raised when there is a problem with a
     model field. This can happen for several reasons:
 
-        - A field in a model clashes with a field of the same name from an
-          abstract base class
-        - An infinite loop is caused by ordering
-        - A keyword cannot be parsed from the filter parameters
-        - A field cannot be determined from a keyword in the query
-          parameters
-        - A join is not permitted on the specified field
-        - A field name is invalid
-        - A query contains invalid order_by arguments
+    - A field in a model clashes with a field of the same name from an
+      abstract base class
+    - An infinite loop is caused by ordering
+    - A keyword cannot be parsed from the filter parameters
+    - A field cannot be determined from a keyword in the query
+      parameters
+    - A join is not permitted on the specified field
+    - A field name is invalid
+    - A query contains invalid order_by arguments
 
 ValidationError
 ---------------
@@ -128,10 +128,8 @@ provided in :mod:`django.db`.
 .. exception:: IntegrityError
 
 The Django wrappers for database exceptions behave exactly the same as
-the underlying database exceptions. See `PEP 249 - Python Database API
-Specification v2.0`_ for further information.
-
-.. _`PEP 249 - Python Database API Specification v2.0`: http://www.python.org/dev/peps/pep-0249/
+the underlying database exceptions. See :pep:`249`, the Python Database API
+Specification v2.0, for further information.
 
 .. currentmodule:: django.db.transaction
 
@@ -147,8 +145,6 @@ Transaction Exceptions
 Python Exceptions
 =================
 
-Django raises built-in Python exceptions when appropriate as well. See
-the Python `documentation`_ for further information on the built-in
-exceptions.
-
-.. _`documentation`: http://docs.python.org/lib/module-exceptions.html
+Django raises built-in Python exceptions when appropriate as well. See the
+Python documentation for further information on the
+built-in :mod:`exceptions`.

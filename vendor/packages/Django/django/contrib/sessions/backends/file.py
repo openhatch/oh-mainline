@@ -33,7 +33,7 @@ class SessionStore(SessionBase):
         Get the file associated with this session key.
         """
         if session_key is None:
-            session_key = self.session_key
+            session_key = self._get_or_create_session_key()
 
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
@@ -131,15 +131,13 @@ class SessionStore(SessionBase):
             pass
 
     def exists(self, session_key):
-        if os.path.exists(self._key_to_file(session_key)):
-            return True
-        return False
+        return os.path.exists(self._key_to_file(session_key))
 
     def delete(self, session_key=None):
         if session_key is None:
-            if self._session_key is None:
+            if self.session_key is None:
                 return
-            session_key = self._session_key
+            session_key = self.session_key
         try:
             os.unlink(self._key_to_file(session_key))
         except OSError:

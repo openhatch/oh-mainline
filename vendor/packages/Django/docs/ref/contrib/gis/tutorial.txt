@@ -6,8 +6,9 @@ Introduction
 ============
 
 GeoDjango is an add-on for Django that turns it into a world-class geographic
-Web framework.  GeoDjango strives to make at as simple as possible to create
-geographic Web applications, like location-based services.  Some features include:
+Web framework.  GeoDjango strives to make it as simple as possible to create
+geographic Web applications, like location-based services.  Some features
+include:
 
 * Django model fields for `OGC`_ geometries.
 * Extensions to Django's ORM for the querying and manipulation of spatial data.
@@ -16,8 +17,8 @@ geographic Web applications, like location-based services.  Some features includ
 * Editing of geometry fields inside the admin.
 
 This tutorial assumes a familiarity with Django; thus, if you're brand new to
-Django please read through the :doc:`regular tutorial </intro/tutorial01>` to introduce
-yourself with basic Django concepts.
+Django please read through the :doc:`regular tutorial </intro/tutorial01>` to
+introduce yourself with basic Django concepts.
 
 .. note::
 
@@ -52,7 +53,10 @@ Create a Spatial Database
 
 First, a spatial database needs to be created for our project.  If using
 PostgreSQL and PostGIS, then the following commands will
-create the database from a :ref:`spatial database template <spatialdb_template>`::
+create the database from a :ref:`spatial database template
+<spatialdb_template>`:
+
+.. code-block:: bash
 
     $ createdb -T template_postgis geodjango
 
@@ -60,13 +64,15 @@ create the database from a :ref:`spatial database template <spatialdb_template>`
 
     This command must be issued by a database user that has permissions to
     create a database.  Here is an example set of commands to create such
-    a user::
+    a user:
+
+    .. code-block:: bash
 
         $ sudo su - postgres
         $ createuser --createdb geo
         $ exit
 
-    Replace ``geo`` to correspond to the system login user name will be
+    Replace ``geo`` with the system login user name that will be
     connecting to the database.  For example, ``johndoe`` if that is the
     system user that will be running GeoDjango.
 
@@ -76,12 +82,17 @@ to create a :ref:`SpatiaLite database <create_spatialite_db>`.
 Create GeoDjango Project
 ------------------------
 
-Use the ``django-admin.py`` script like normal to create a ``geodjango`` project::
+Use the ``django-admin.py`` script like normal to create a ``geodjango``
+project:
+
+.. code-block:: bash
 
     $ django-admin.py startproject geodjango
 
 With the project initialized, now create a ``world`` Django application within
-the ``geodjango`` project::
+the ``geodjango`` project:
+
+.. code-block:: bash
 
     $ cd geodjango
     $ python manage.py startapp world
@@ -89,8 +100,8 @@ the ``geodjango`` project::
 Configure ``settings.py``
 -------------------------
 
-The ``geodjango`` project settings are stored in the ``settings.py`` file.  Edit
-the database connection settings appropriately::
+The ``geodjango`` project settings are stored in the ``geodjango/settings.py``
+file. Edit the database connection settings appropriately::
 
     DATABASES = {
         'default': {
@@ -99,10 +110,6 @@ the database connection settings appropriately::
              'USER': 'geo',
          }
     }
-
-.. note::
-
-    These database settings are for Django 1.2 and above.
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
 :mod:`django.contrib.admin`, :mod:`django.contrib.gis`,
@@ -113,6 +120,8 @@ and ``world`` (our newly created application)::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
         'django.contrib.admin',
         'django.contrib.gis',
         'world'
@@ -126,9 +135,11 @@ Geographic Data
 World Borders
 -------------
 
-The world borders data is available in this `zip file`__.  Create a data directory
-in the ``world`` application, download the world borders data, and unzip.
-On GNU/Linux platforms the following commands should do it::
+The world borders data is available in this `zip file`__.  Create a data
+directory in the ``world`` application, download the world borders data, and
+unzip. On GNU/Linux platforms the following commands should do it:
+
+.. code-block:: bash
 
     $ mkdir world/data
     $ cd world/data
@@ -138,7 +149,8 @@ On GNU/Linux platforms the following commands should do it::
 
 The world borders ZIP file contains a set of data files collectively known as
 an `ESRI Shapefile`__, one of the most popular geospatial data formats.  When
-unzipped the world borders data set includes files with the following extensions:
+unzipped the world borders data set includes files with the following
+extensions:
 
 * ``.shp``: Holds the vector data for the world borders geometries.
 * ``.shx``: Spatial index file for geometries stored in the ``.shp``.
@@ -154,16 +166,20 @@ Use ``ogrinfo`` to examine spatial data
 ---------------------------------------
 
 The GDAL ``ogrinfo`` utility is excellent for examining metadata about
-shapefiles (or other vector data sources)::
+shapefiles (or other vector data sources):
+
+.. code-block:: bash
 
     $ ogrinfo world/data/TM_WORLD_BORDERS-0.3.shp
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
           using driver `ESRI Shapefile' successful.
     1: TM_WORLD_BORDERS-0.3 (Polygon)
 
-Here ``ogrinfo`` is telling us that the shapefile has one layer, and that
+Here ``ogrinfo`` is telling us that the shapefile has one layer, and that such
 layer contains polygon data.  To find out more we'll specify the layer name
-and use the ``-so`` option to get only important summary information::
+and use the ``-so`` option to get only important summary information:
+
+.. code-block:: bash
 
     $ ogrinfo -so world/data/TM_WORLD_BORDERS-0.3.shp TM_WORLD_BORDERS-0.3
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -197,8 +213,8 @@ as well as detailed information for each attribute field.  For example,
 ``FIPS: String (2.0)`` indicates that there's a ``FIPS`` character field
 with a maximum length of 2; similarly, ``LON: Real (8.3)`` is a floating-point
 field that holds a maximum of 8 digits up to three decimal places.  Although
-this information may be found right on the `world borders`_ Web site, this shows
-you how to determine this information yourself when such metadata is not
+this information may be found right on the `world borders`_ Web site, this
+shows you how to determine this information yourself when such metadata is not
 provided.
 
 Geographic Models
@@ -212,7 +228,7 @@ create a GeoDjango model to represent this data::
 
     from django.contrib.gis.db import models
 
-    class WorldBorders(models.Model):
+    class WorldBorder(models.Model):
         # Regular Django fields corresponding to the attributes in the
 	# world borders shapefile.
         name = models.CharField(max_length=50)
@@ -232,10 +248,6 @@ create a GeoDjango model to represent this data::
 	mpoly = models.MultiPolygonField()
 	objects = models.GeoManager()
 
-        # So the model is pluralized correctly in the admin.
-        class Meta:
-            verbose_name_plural = "World Borders"
-
         # Returns the string representation of the model.
         def __unicode__(self):
             return self.name
@@ -247,27 +259,30 @@ Two important things to note:
    :class:`~django.contrib.gis.db.models.GeoManager`; this is *required*
    to perform spatial queries.
 
-When declaring a geometry field on your model the default spatial reference system
-is WGS84 (meaning the `SRID`__ is 4326) -- in other words, the field coordinates are in
-longitude/latitude pairs in units of degrees.  If you want the coordinate system to be
-different, then SRID of the geometry field may be customized by setting the ``srid``
-with an integer corresponding to the coordinate system of your choice.
+When declaring a geometry field on your model the default spatial reference
+system is WGS84 (meaning the `SRID`__ is 4326) -- in other words, the field
+coordinates are in longitude/latitude pairs in units of degrees.  If you want
+the coordinate system to be different, then SRID of the geometry field may be
+customized by setting the ``srid`` with an integer corresponding to the
+coordinate system of your choice.
 
 __ http://en.wikipedia.org/wiki/SRID
 
 Run ``syncdb``
 --------------
 
-After you've defined your model, it needs to be synced with the spatial database.
-First, let's look at the SQL that will generate the table for the ``WorldBorders``
-model::
+After you've defined your model, it needs to be synced with the spatial
+database. First, let's look at the SQL that will generate the table for the
+``WorldBorder`` model::
 
     $ python manage.py sqlall world
 
-This management command should produce the following output::
+This management command should produce the following output:
+
+.. code-block:: sql
 
     BEGIN;
-    CREATE TABLE "world_worldborders" (
+    CREATE TABLE "world_worldborder" (
         "id" serial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
         "area" integer NOT NULL,
@@ -282,30 +297,31 @@ This management command should produce the following output::
         "lat" double precision NOT NULL
     )
     ;
-    SELECT AddGeometryColumn('world_worldborders', 'mpoly', 4326, 'MULTIPOLYGON', 2);
-    ALTER TABLE "world_worldborders" ALTER "mpoly" SET NOT NULL;
-    CREATE INDEX "world_worldborders_mpoly_id" ON "world_worldborders" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
+    SELECT AddGeometryColumn('world_worldborder', 'mpoly', 4326, 'MULTIPOLYGON', 2);
+    ALTER TABLE "world_worldborder" ALTER "mpoly" SET NOT NULL;
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
     COMMIT;
 
 If satisfied, you may then create this table in the database by running the
 ``syncdb`` management command::
 
     $ python manage.py syncdb
-    Creating table world_worldborders
-    Installing custom SQL for world.WorldBorders model
+    Creating table world_worldborder
+    Installing custom SQL for world.WorldBorder model
 
-The ``syncdb`` command may also prompt you to create an admin user; go ahead and
-do so (not required now, may be done at any point in the future using the
+The ``syncdb`` command may also prompt you to create an admin user; go ahead
+and do so (not required now, may be done at any point in the future using the
 ``createsuperuser`` management command).
 
 Importing Spatial Data
 ======================
 
 This section will show you how to take the data from the world borders
-shapefile and import it into GeoDjango models using the :ref:`ref-layermapping`.
-There are many different different ways to import data in to a
-spatial database -- besides the tools included within GeoDjango, you
-may also use the following to populate your spatial database:
+shapefile and import it into GeoDjango models using the
+:ref:`ref-layermapping`.
+There are many different ways to import data in to a spatial database --
+besides the tools included within GeoDjango, you may also use the following to
+populate your spatial database:
 
 * `ogr2ogr`_: Command-line utility, included with GDAL, that
   supports loading a multitude of vector data formats into
@@ -326,7 +342,9 @@ shapefile.  Included within GeoDjango is an interface to GDAL's powerful OGR
 library -- in other words, you'll be able explore all the vector data sources
 that OGR supports via a Pythonic API.
 
-First, invoke the Django shell::
+First, invoke the Django shell:
+
+.. code-block:: bash
 
     $ python manage.py shell
 
@@ -335,14 +353,14 @@ tutorial, then we can determine the path using Python's built-in
 ``os`` module::
 
     >>> import os
-    >>> from geodjango import world
+    >>> import world
     >>> world_shp = os.path.abspath(os.path.join(os.path.dirname(world.__file__),
     ...                             'data/TM_WORLD_BORDERS-0.3.shp'))
 
 Now, the world borders shapefile may be opened using GeoDjango's
 :class:`~django.contrib.gis.gdal.DataSource` interface::
 
-    >>> from django.contrib.gis.gdal import *
+    >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource(world_shp)
     >>> print ds
     / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
@@ -389,7 +407,8 @@ system associated with it -- if it does, the ``srs`` attribute will return a
     '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
 Here we've noticed that the shapefile is in the popular WGS84 spatial reference
-system -- in other words, the data uses units of degrees longitude and latitude.
+system -- in other words, the data uses units of degrees longitude and
+latitude.
 
 In addition, shapefiles also support attribute fields that may contain
 additional data.  Here are the fields on the World Borders layer:
@@ -445,7 +464,7 @@ We're going to dive right in -- create a file called ``load.py`` inside the
 
     import os
     from django.contrib.gis.utils import LayerMapping
-    from models import WorldBorders
+    from models import WorldBorder
 
     world_mapping = {
         'fips' : 'FIPS',
@@ -465,7 +484,7 @@ We're going to dive right in -- create a file called ``load.py`` inside the
     world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data/TM_WORLD_BORDERS-0.3.shp'))
 
     def run(verbose=True):
-        lm = LayerMapping(WorldBorders, world_shp, world_mapping,
+        lm = LayerMapping(WorldBorder, world_shp, world_mapping,
                           transform=False, encoding='iso-8859-1')
 
         lm.save(strict=True, verbose=verbose)
@@ -473,7 +492,7 @@ We're going to dive right in -- create a file called ``load.py`` inside the
 A few notes about what's going on:
 
 * Each key in the ``world_mapping`` dictionary corresponds to a field in the
-  ``WorldBorders`` model, and the value is the name of the shapefile field
+  ``WorldBorder`` model, and the value is the name of the shapefile field
   that data will be loaded from.
 * The key ``mpoly`` for the geometry field is ``MULTIPOLYGON``, the
   geometry type we wish to import as.  Even if simple polygons are encountered
@@ -488,7 +507,9 @@ A few notes about what's going on:
   the shapefile. This ensures that string values are read and saved correctly
   from their original encoding system.
 
-Afterwards, invoke the Django shell from the ``geodjango`` project directory::
+Afterwards, invoke the Django shell from the ``geodjango`` project directory:
+
+.. code-block:: bash
 
    $ python manage.py shell
 
@@ -506,10 +527,12 @@ Try ``ogrinspect``
 Now that you've seen how to define geographic models and import data with the
 :ref:`ref-layermapping`, it's possible to further automate this process with
 use of the :djadmin:`ogrinspect` management command.  The :djadmin:`ogrinspect`
-command  introspects a GDAL-supported vector data source (e.g., a shapefile) and
-generates a model definition and ``LayerMapping`` dictionary automatically.
+command  introspects a GDAL-supported vector data source (e.g., a shapefile)
+and generates a model definition and ``LayerMapping`` dictionary automatically.
 
-The general usage of the command goes as follows::
+The general usage of the command goes as follows:
+
+.. code-block:: bash
 
     $ python manage.py ogrinspect [options] <data_source> <model_name> [options]
 
@@ -517,16 +540,20 @@ Where ``data_source`` is the path to the GDAL-supported data source and
 ``model_name`` is the name to use for the model.  Command-line options may
 be used to further define how the model is generated.
 
-For example, the following command nearly reproduces the ``WorldBorders`` model
-and mapping dictionary created above, automatically::
+For example, the following command nearly reproduces the ``WorldBorder`` model
+and mapping dictionary created above, automatically:
 
-    $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorders --srid=4326 --mapping --multi
+.. code-block:: bash
+
+    $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder \
+        --srid=4326 --mapping --multi
 
 A few notes about the command-line options given above:
 
 * The ``--srid=4326`` option sets the SRID for the geographic field.
 * The ``--mapping`` option tells ``ogrinspect`` to also generate a
-  mapping dictionary for use with :class:`~django.contrib.gis.utils.LayerMapping`.
+  mapping dictionary for use with
+  :class:`~django.contrib.gis.utils.LayerMapping`.
 * The ``--multi`` option is specified so that the geographic field is a
   :class:`~django.contrib.gis.db.models.MultiPolygonField` instead of just a
   :class:`~django.contrib.gis.db.models.PolygonField`.
@@ -537,7 +564,7 @@ directly into the ``models.py`` of a GeoDjango application::
     # This is an auto-generated Django model module created by ogrinspect.
     from django.contrib.gis.db import models
 
-    class WorldBorders(models.Model):
+    class WorldBorder(models.Model):
         fips = models.CharField(max_length=2)
         iso2 = models.CharField(max_length=2)
         iso3 = models.CharField(max_length=3)
@@ -552,7 +579,7 @@ directly into the ``models.py`` of a GeoDjango application::
         geom = models.MultiPolygonField(srid=4326)
         objects = models.GeoManager()
 
-    # Auto-generated `LayerMapping` dictionary for WorldBorders model
+    # Auto-generated `LayerMapping` dictionary for WorldBorder model
     worldborders_mapping = {
         'fips' : 'FIPS',
         'iso2' : 'ISO2',
@@ -575,7 +602,9 @@ Spatial Lookups
 ---------------
 GeoDjango extends the Django ORM and allows the use of spatial lookups.
 Let's do an example where we find the ``WorldBorder`` model that contains
-a point.  First, fire up the management shell::
+a point.  First, fire up the management shell:
+
+.. code-block:: bash
 
     $ python manage.py shell
 
@@ -586,25 +615,25 @@ Now, define a point of interest [#]_::
 The ``pnt_wkt`` string represents the point at -95.3385 degrees longitude,
 and 29.7245 degrees latitude.  The geometry is in a format known as
 Well Known Text (WKT), an open standard issued by the Open Geospatial
-Consortium (OGC). [#]_  Import the ``WorldBorders`` model, and perform
+Consortium (OGC). [#]_  Import the ``WorldBorder`` model, and perform
 a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
 
-    >>> from world.models import WorldBorders
-    >>> qs = WorldBorders.objects.filter(mpoly__contains=pnt_wkt)
+    >>> from world.models import WorldBorder
+    >>> qs = WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
     >>> qs
-    [<WorldBorders: United States>]
+    [<WorldBorder: United States>]
 
 Here we retrieved a ``GeoQuerySet`` that has only one model: the one
 for the United States (which is what we would expect).  Similarly,
-a :ref:`GEOS geometry object <ref-geos>` may also be used -- here the ``intersects``
-spatial lookup is combined with the ``get`` method to retrieve
-only the ``WorldBorders`` instance for San Marino instead of a queryset::
+a :ref:`GEOS geometry object <ref-geos>` may also be used -- here the
+``intersects`` spatial lookup is combined with the ``get`` method to retrieve
+only the ``WorldBorder`` instance for San Marino instead of a queryset::
 
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(12.4604, 43.9420)
-    >>> sm = WorldBorders.objects.get(mpoly__intersects=pnt)
+    >>> sm = WorldBorder.objects.get(mpoly__intersects=pnt)
     >>> sm
-    <WorldBorders: San Marino>
+    <WorldBorder: San Marino>
 
 The ``contains`` and ``intersects`` lookups are just a subset of what's
 available -- the :ref:`ref-gis-db-api` documentation has more.
@@ -617,10 +646,10 @@ example, the coordinate will be expressed in terms of `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
 **meters** and not degrees::
 
-    >>> from django.contrib.gis.geos import *
+    >>> from django.contrib.gis.geos import Point, GEOSGeometry
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
-Note that ``pnt`` may also constructed with EWKT, an "extended" form of
+Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
 WKT that includes the SRID::
 
     >>> pnt = GEOSGeometry('SRID=32140;POINT(954158.1 4215137.1)')
@@ -629,27 +658,27 @@ When using GeoDjango's ORM, it will automatically wrap geometry values
 in transformation SQL, allowing the developer to work at a higher level
 of abstraction::
 
-    >>> qs = WorldBorders.objects.filter(mpoly__intersects=pnt)
+    >>> qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
     >>> print qs.query # Generating the SQL
-    SELECT "world_worldborders"."id", "world_worldborders"."name", "world_worldborders"."area",
-    "world_worldborders"."pop2005", "world_worldborders"."fips", "world_worldborders"."iso2",
-    "world_worldborders"."iso3", "world_worldborders"."un", "world_worldborders"."region",
-    "world_worldborders"."subregion", "world_worldborders"."lon", "world_worldborders"."lat",
-    "world_worldborders"."mpoly" FROM "world_worldborders"
-    WHERE ST_Intersects("world_worldborders"."mpoly", ST_Transform(%s, 4326))
+    SELECT "world_worldborder"."id", "world_worldborder"."name", "world_worldborder"."area",
+    "world_worldborder"."pop2005", "world_worldborder"."fips", "world_worldborder"."iso2",
+    "world_worldborder"."iso3", "world_worldborder"."un", "world_worldborder"."region",
+    "world_worldborder"."subregion", "world_worldborder"."lon", "world_worldborder"."lat",
+    "world_worldborder"."mpoly" FROM "world_worldborder"
+    WHERE ST_Intersects("world_worldborder"."mpoly", ST_Transform(%s, 4326))
     >>> qs # printing evaluates the queryset
-    [<WorldBorders: United States>]
+    [<WorldBorder: United States>]
 
 __ http://spatialreference.org/ref/epsg/32140/
 
 Lazy Geometries
 ---------------
 Geometries come to GeoDjango in a standardized textual representation.  Upon
-access of the geometry field, GeoDjango creates a `GEOS geometry object <ref-geos>`,
-exposing powerful functionality, such as serialization properties for
-popular geospatial formats::
+access of the geometry field, GeoDjango creates a `GEOS geometry object
+<ref-geos>`, exposing powerful functionality, such as serialization properties
+for popular geospatial formats::
 
-    >>> sm = WorldBorders.objects.get(name='San Marino')
+    >>> sm = WorldBorder.objects.get(name='San Marino')
     >>> sm.mpoly
     <MultiPolygon object at 0x24c6798>
     >>> sm.mpoly.wkt # WKT
@@ -694,35 +723,37 @@ Let's dive in again -- create a file called ``admin.py`` inside the
 ``world`` application, and insert the following::
 
     from django.contrib.gis import admin
-    from models import WorldBorders
+    from models import WorldBorder
 
-    admin.site.register(WorldBorders, admin.GeoModelAdmin)
+    admin.site.register(WorldBorder, admin.GeoModelAdmin)
 
-Next, edit your ``urls.py`` in the ``geodjango`` project folder to look
+Next, edit your ``urls.py`` in the ``geodjango`` application folder to look
 as follows::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.contrib.gis import admin
 
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', include(admin.site.urls)),
     )
 
-Start up the Django development server::
+Start up the Django development server:
+
+.. code-block:: bash
 
     $ python manage.py runserver
 
 Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running ``syncdb``.  Browse to any of the ``WorldBorders``
+user created after running ``syncdb``.  Browse to any of the ``WorldBorder``
 entries -- the borders may be edited by clicking on a polygon and dragging
 the vertexes to the desired position.
 
 .. _OpenLayers: http://openlayers.org/
 .. _Open Street Map: http://openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
-.. _Metacarta: http://metacarta.com
+.. _OSGeo: http://www.osgeo.org
 
 .. _osmgeoadmin-intro:
 
@@ -733,25 +764,24 @@ With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
 a `Open Street Map`_ layer in the admin.
 This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
-(which uses the `Vector Map Level 0`_ WMS data set hosted at `Metacarta`_).
+(which uses the `Vector Map Level 0`_ WMS data set hosted at `OSGeo`_).
 
 First, there are some important requirements and limitations:
 
 * :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that the
   :ref:`spherical mercator projection be added <addgoogleprojection>`
-  to the to be added to the ``spatial_ref_sys`` table (PostGIS 1.3 and
-  below, only).
+  to the ``spatial_ref_sys`` table (PostGIS 1.3 and below, only).
 * The PROJ.4 datum shifting files must be installed (see the
   :ref:`PROJ.4 installation instructions <proj4>` for more details).
 
 If you meet these requirements, then just substitute in the ``OSMGeoAdmin``
 option class in your ``admin.py`` file::
 
-    admin.site.register(WorldBorders, admin.OSMGeoAdmin)
+    admin.site.register(WorldBorder, admin.OSMGeoAdmin)
 
 .. rubric:: Footnotes
 
 .. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org <http://thematicmapping.org>`_ for providing and maintaining this data set.
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and Christopher Schmidt.
-.. [#] Here the point is for the `University of Houston Law Center <http://www.law.uh.edu/>`_ .
-.. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049.
+.. [#] Here the point is for the `University of Houston Law Center <http://www.law.uh.edu/>`_.
+.. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.

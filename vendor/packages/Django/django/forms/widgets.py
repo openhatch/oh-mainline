@@ -1,14 +1,16 @@
 """
 HTML Widget classes
 """
+
+from __future__ import absolute_import
+
+import copy
 import datetime
 from itertools import chain
-import time
 from urlparse import urljoin
-from util import flatatt
 
-import django.utils.copycompat as copy
 from django.conf import settings
+from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext, ugettext_lazy
@@ -135,10 +137,26 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
         return new_class
 
+class SubWidget(StrAndUnicode):
+    """
+    Some widgets are made of multiple HTML elements -- namely, RadioSelect.
+    This is a class that represents the "inner" HTML element of a widget.
+    """
+    def __init__(self, parent_widget, name, value, attrs, choices):
+        self.parent_widget = parent_widget
+        self.name, self.value = name, value
+        self.attrs, self.choices = attrs, choices
+
+    def __unicode__(self):
+        args = [self.name, self.value, self.attrs]
+        if self.choices:
+            args.append(self.choices)
+        return self.parent_widget.render(*args)
+
 class Widget(object):
     __metaclass__ = MediaDefiningClass
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
-    needs_multipart_form = False # Determines does this widget need multipart-encrypted form
+    needs_multipart_form = False # Determines does this widget need multipart form
     is_localized = False
     is_required = False
 
@@ -153,6 +171,15 @@ class Widget(object):
         obj.attrs = self.attrs.copy()
         memo[id(self)] = obj
         return obj
+
+    def subwidgets(self, name, value, attrs=None, choices=()):
+        """
+        Yields all "subwidgets" of this widget. Used only by RadioSelect to
+        allow template access to individual <input type="radio"> buttons.
+
+        Arguments are the same as for render().
+        """
+        yield SubWidget(self, name, value, attrs, choices)
 
     def render(self, name, value, attrs=None):
         """
@@ -207,7 +234,6 @@ class Widget(object):
         tags.
         """
         return id_
-    id_for_label = classmethod(id_for_label)
 
 class Input(Widget):
     """
@@ -371,7 +397,6 @@ class Textarea(Widget):
 
 class DateInput(Input):
     input_type = 'text'
-    format = '%Y-%m-%d'     # '2006-10-25'
 
     def __init__(self, attrs=None, format=None):
         super(DateInput, self).__init__(attrs)
@@ -396,14 +421,13 @@ class DateInput(Input):
         # necessarily the format used for this widget. Attempt to convert it.
         try:
             input_format = formats.get_format('DATE_INPUT_FORMATS')[0]
-            initial = datetime.date(*time.strptime(initial, input_format)[:3])
+            initial = datetime.datetime.strptime(initial, input_format).date()
         except (TypeError, ValueError):
             pass
         return super(DateInput, self)._has_changed(self._format_value(initial), data)
 
 class DateTimeInput(Input):
     input_type = 'text'
-    format = '%Y-%m-%d %H:%M:%S'     # '2006-10-25 14:30:59'
 
     def __init__(self, attrs=None, format=None):
         super(DateTimeInput, self).__init__(attrs)
@@ -428,14 +452,13 @@ class DateTimeInput(Input):
         # necessarily the format used for this widget. Attempt to convert it.
         try:
             input_format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
-            initial = datetime.datetime(*time.strptime(initial, input_format)[:6])
+            initial = datetime.datetime.strptime(initial, input_format)
         except (TypeError, ValueError):
             pass
         return super(DateTimeInput, self)._has_changed(self._format_value(initial), data)
 
 class TimeInput(Input):
     input_type = 'text'
-    format = '%H:%M:%S'     # '14:30:59'
 
     def __init__(self, attrs=None, format=None):
         super(TimeInput, self).__init__(attrs)
@@ -459,17 +482,23 @@ class TimeInput(Input):
         # necessarily the format used for this  widget. Attempt to convert it.
         try:
             input_format = formats.get_format('TIME_INPUT_FORMATS')[0]
-            initial = datetime.time(*time.strptime(initial, input_format)[3:6])
+            initial = datetime.datetime.strptime(initial, input_format).time()
         except (TypeError, ValueError):
             pass
         return super(TimeInput, self)._has_changed(self._format_value(initial), data)
 
+
+# Defined at module level so that CheckboxInput is picklable (#17976)
+def boolean_check(v):
+    return not (v is False or v is None or v == '')
+
+
 class CheckboxInput(Widget):
-    def __init__(self, attrs=None, check_test=bool):
+    def __init__(self, attrs=None, check_test=None):
         super(CheckboxInput, self).__init__(attrs)
         # check_test is a callable that takes a value and returns True
         # if the checkbox should be checked for that value.
-        self.check_test = check_test
+        self.check_test = boolean_check if check_test is None else check_test
 
     def render(self, name, value, attrs=None):
         final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
@@ -479,7 +508,7 @@ class CheckboxInput(Widget):
             result = False
         if result:
             final_attrs['checked'] = 'checked'
-        if value not in ('', True, False, None):
+        if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(value)
         return mark_safe(u'<input%s />' % flatatt(final_attrs))
@@ -502,6 +531,8 @@ class CheckboxInput(Widget):
         return bool(initial) != bool(data)
 
 class Select(Widget):
+    allow_multiple_selected = False
+
     def __init__(self, attrs=None, choices=()):
         super(Select, self).__init__(attrs)
         # choices can be any iterable, but we may need to render this widget
@@ -521,14 +552,20 @@ class Select(Widget):
 
     def render_option(self, selected_choices, option_value, option_label):
         option_value = force_unicode(option_value)
-        selected_html = (option_value in selected_choices) and u' selected="selected"' or ''
+        if option_value in selected_choices:
+            selected_html = u' selected="selected"'
+            if not self.allow_multiple_selected:
+                # Only allow for a single selection.
+                selected_choices.remove(option_value)
+        else:
+            selected_html = ''
         return u'<option value="%s"%s>%s</option>' % (
             escape(option_value), selected_html,
             conditional_escape(force_unicode(option_label)))
 
     def render_options(self, choices, selected_choices):
         # Normalize to strings.
-        selected_choices = set([force_unicode(v) for v in selected_choices])
+        selected_choices = set(force_unicode(v) for v in selected_choices)
         output = []
         for option_value, option_label in chain(self.choices, choices):
             if isinstance(option_label, (list, tuple)):
@@ -545,7 +582,9 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = ((u'1', ugettext('Unknown')), (u'2', ugettext('Yes')), (u'3', ugettext('No')))
+        choices = ((u'1', ugettext_lazy('Unknown')),
+                   (u'2', ugettext_lazy('Yes')),
+                   (u'3', ugettext_lazy('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
@@ -574,6 +613,8 @@ class NullBooleanSelect(Select):
         return initial != data
 
 class SelectMultiple(Select):
+    allow_multiple_selected = True
+
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
@@ -600,7 +641,7 @@ class SelectMultiple(Select):
         data_set = set([force_unicode(value) for value in data])
         return data_set != initial_set
 
-class RadioInput(StrAndUnicode):
+class RadioInput(SubWidget):
     """
     An object used by RadioFieldRenderer that represents a single
     <input type='radio'>.
@@ -614,6 +655,12 @@ class RadioInput(StrAndUnicode):
         self.index = index
 
     def __unicode__(self):
+        return self.render()
+
+    def render(self, name=None, value=None, attrs=None, choices=()):
+        name = name or self.name
+        value = value or self.value
+        attrs = attrs or self.attrs
         if 'id' in self.attrs:
             label_for = ' for="%s_%s"' % (self.attrs['id'], self.index)
         else:
@@ -667,6 +714,10 @@ class RadioSelect(Select):
             self.renderer = renderer
         super(RadioSelect, self).__init__(*args, **kwargs)
 
+    def subwidgets(self, name, value, attrs=None, choices=()):
+        for widget in self.get_renderer(name, value, attrs, choices):
+            yield widget
+
     def get_renderer(self, name, value, attrs=None, choices=()):
         """Returns an instance of the renderer."""
         if value is None: value = ''
@@ -686,7 +737,6 @@ class RadioSelect(Select):
         if id_:
             id_ += '_0'
         return id_
-    id_for_label = classmethod(id_for_label)
 
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
@@ -718,7 +768,6 @@ class CheckboxSelectMultiple(SelectMultiple):
         if id_:
             id_ += '_0'
         return id_
-    id_for_label = classmethod(id_for_label)
 
 class MultiWidget(Widget):
     """
@@ -777,7 +826,6 @@ class MultiWidget(Widget):
         if id_:
             id_ += '_0'
         return id_
-    id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
@@ -828,8 +876,6 @@ class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.
     """
-    date_format = DateInput.format
-    time_format = TimeInput.format
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
         widgets = (DateInput(attrs=attrs, format=date_format),
@@ -838,6 +884,7 @@ class SplitDateTimeWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
+            value = to_current_timezone(value)
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
 

@@ -5,8 +5,7 @@ import sys
 import socket
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler, run, WSGIServerException
+from django.core.servers.basehttp import AdminMediaHandler, run, WSGIServerException, get_internal_wsgi_application
 from django.utils import autoreload
 
 naiveip_re = re.compile(r"""^(?:
@@ -17,10 +16,13 @@ naiveip_re = re.compile(r"""^(?:
 ):)?(?P<port>\d+)$""", re.X)
 DEFAULT_PORT = "8000"
 
+
 class BaseRunserverCommand(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
             help='Tells Django to use a IPv6 address.'),
+        make_option('--nothreading', action='store_false', dest='use_threading', default=True,
+            help='Tells Django to NOT use threading.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
     )
@@ -34,7 +36,7 @@ class BaseRunserverCommand(BaseCommand):
         """
         Returns the default WSGI handler for the runner.
         """
-        return WSGIHandler()
+        return get_internal_wsgi_application()
 
     def handle(self, addrport='', *args, **options):
         self.use_ipv6 = options.get('use_ipv6')
@@ -70,7 +72,7 @@ class BaseRunserverCommand(BaseCommand):
         """
         Runs the server, using the autoreloader if needed
         """
-        use_reloader = options.get('use_reloader', True)
+        use_reloader = options.get('use_reloader')
 
         if use_reloader:
             autoreload.main(self.inner_run, args, options)
@@ -81,6 +83,7 @@ class BaseRunserverCommand(BaseCommand):
         from django.conf import settings
         from django.utils import translation
 
+        threading = options.get('use_threading')
         shutdown_message = options.get('shutdown_message', '')
         quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
 
@@ -104,7 +107,8 @@ class BaseRunserverCommand(BaseCommand):
 
         try:
             handler = self.get_handler(*args, **options)
-            run(self.addr, int(self.port), handler, ipv6=self.use_ipv6)
+            run(self.addr, int(self.port), handler,
+                ipv6=self.use_ipv6, threading=threading)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
@@ -135,4 +139,4 @@ class Command(BaseRunserverCommand):
         Serves admin media like old-school (deprecation pending).
         """
         handler = super(Command, self).get_handler(*args, **options)
-        return AdminMediaHandler(handler, options.get('admin_media_path', ''))
+        return AdminMediaHandler(handler, options.get('admin_media_path'))

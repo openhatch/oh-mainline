@@ -1,11 +1,11 @@
 import urllib
-from urlparse import urlparse, urlunparse, urlsplit
 import sys
 import os
 import re
 import mimetypes
 import warnings
 from copy import copy
+from urlparse import urlparse, urlsplit
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -24,7 +24,7 @@ from django.utils.encoding import smart_str
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
-from django.db import transaction, close_connection
+from django.db import close_connection
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
@@ -182,10 +182,13 @@ class RequestFactory(object):
         """
         The base environment for a request.
         """
+        # This is a minimal valid WSGI environ dictionary, plus:
+        # - HTTP_COOKIE: for cookie support,
+        # - REMOTE_ADDR: often useful, see #8551.
+        # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         environ = {
             'HTTP_COOKIE':       self.cookies.output(header='', sep='; '),
             'PATH_INFO':         '/',
-            'QUERY_STRING':      '',
             'REMOTE_ADDR':       '127.0.0.1',
             'REQUEST_METHOD':    'GET',
             'SCRIPT_NAME':       '',
@@ -194,6 +197,7 @@ class RequestFactory(object):
             'SERVER_PROTOCOL':   'HTTP/1.1',
             'wsgi.version':      (1,0),
             'wsgi.url_scheme':   'http',
+            'wsgi.input':        FakePayload(''),
             'wsgi.errors':       self.errors,
             'wsgi.multiprocess': True,
             'wsgi.multithread':  False,
@@ -235,7 +239,6 @@ class RequestFactory(object):
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'GET',
-            'wsgi.input':      FakePayload('')
         }
         r.update(extra)
         return self.request(**r)
@@ -267,7 +270,6 @@ class RequestFactory(object):
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'HEAD',
-            'wsgi.input':      FakePayload('')
         }
         r.update(extra)
         return self.request(**r)
@@ -280,7 +282,6 @@ class RequestFactory(object):
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'OPTIONS',
-            'wsgi.input':      FakePayload('')
         }
         r.update(extra)
         return self.request(**r)
@@ -311,7 +312,6 @@ class RequestFactory(object):
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'DELETE',
-            'wsgi.input':      FakePayload('')
         }
         r.update(extra)
         return self.request(**r)
@@ -415,7 +415,7 @@ class Client(RequestFactory):
             # Provide a backwards-compatible (but pending deprecation) response.template
             def _get_template(self):
                 warnings.warn("response.template is deprecated; use response.templates instead (which is always a list)",
-                              PendingDeprecationWarning, stacklevel=2)
+                              DeprecationWarning, stacklevel=2)
                 if not self.templates:
                     return None
                 elif len(self.templates) == 1:
@@ -546,19 +546,18 @@ class Client(RequestFactory):
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):
             url = response['Location']
-            scheme, netloc, path, query, fragment = urlsplit(url)
-
             redirect_chain = response.redirect_chain
             redirect_chain.append((url, response.status_code))
 
-            if scheme:
-                extra['wsgi.url_scheme'] = scheme
+            url = urlsplit(url)
+            if url.scheme:
+                extra['wsgi.url_scheme'] = url.scheme
+            if url.hostname:
+                extra['SERVER_NAME'] = url.hostname
+            if url.port:
+                extra['SERVER_PORT'] = str(url.port)
 
-            # The test client doesn't handle external links,
-            # but since the situation is simulated in test_client,
-            # we fake things here by ignoring the netloc portion of the
-            # redirected URL.
-            response = self.get(path, QueryDict(query), follow=False, **extra)
+            response = self.get(url.path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
             # Prevent loops

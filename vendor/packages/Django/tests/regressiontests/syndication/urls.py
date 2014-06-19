@@ -1,24 +1,19 @@
-from django.conf.urls.defaults import *
+from __future__ import absolute_import
 
-import feeds
+from django.conf.urls import patterns
 
-feed_dict = {
-    'complex': feeds.DeprecatedComplexFeed,
-    'rss': feeds.DeprecatedRssFeed,
-}
+from . import feeds
+
 
 urlpatterns = patterns('django.contrib.syndication.views',
-    (r'^complex/(?P<foo>.*)/$', feeds.ComplexFeed()),
-    (r'^rss2/$', feeds.TestRss2Feed()),
-    (r'^rss091/$', feeds.TestRss091Feed()),
-    (r'^atom/$', feeds.TestAtomFeed()),
-    (r'^custom/$', feeds.TestCustomFeed()),
-    (r'^naive-dates/$', feeds.NaiveDatesFeed()),
-    (r'^aware-dates/$', feeds.TZAwareDatesFeed()),
-    (r'^feedurl/$', feeds.TestFeedUrlFeed()),
-    (r'^articles/$', feeds.ArticlesFeed()),
-    (r'^template/$', feeds.TemplateFeed()),
-
-    (r'^depr-feeds/(?P<url>.*)/$', 'feed', {'feed_dict': feed_dict}),
-    (r'^depr-feeds-empty/(?P<url>.*)/$', 'feed', {'feed_dict': None}),
+    (r'^syndication/complex/(?P<foo>.*)/$', feeds.ComplexFeed()),
+    (r'^syndication/rss2/$', feeds.TestRss2Feed()),
+    (r'^syndication/rss091/$', feeds.TestRss091Feed()),
+    (r'^syndication/atom/$', feeds.TestAtomFeed()),
+    (r'^syndication/custom/$', feeds.TestCustomFeed()),
+    (r'^syndication/naive-dates/$', feeds.NaiveDatesFeed()),
+    (r'^syndication/aware-dates/$', feeds.TZAwareDatesFeed()),
+    (r'^syndication/feedurl/$', feeds.TestFeedUrlFeed()),
+    (r'^syndication/articles/$', feeds.ArticlesFeed()),
+    (r'^syndication/template/$', feeds.TemplateFeed()),
 )

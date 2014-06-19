@@ -1,5 +1,7 @@
 "Thread-safe in-memory cache backend."
 
+from __future__ import with_statement
+
 import time
 try:
     import cPickle as pickle
@@ -26,44 +28,37 @@ class LocMemCache(BaseCache):
     def add(self, key, value, timeout=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        self._lock.writer_enters()
-        try:
+        with self._lock.writer():
             exp = self._expire_info.get(key)
             if exp is None or exp <= time.time():
                 try:
-                    self._set(key, pickle.dumps(value), timeout)
+                    pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+                    self._set(key, pickled, timeout)
                     return True
                 except pickle.PickleError:
                     pass
             return False
-        finally:
-            self._lock.writer_leaves()
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        self._lock.reader_enters()
-        try:
+        with self._lock.reader():
             exp = self._expire_info.get(key)
             if exp is None:
                 return default
             elif exp > time.time():
                 try:
-                    return pickle.loads(self._cache[key])
+                    pickled = self._cache[key]
+                    return pickle.loads(pickled)
                 except pickle.PickleError:
                     return default
-        finally:
-            self._lock.reader_leaves()
-        self._lock.writer_enters()
-        try:
+        with self._lock.writer():
             try:
                 del self._cache[key]
                 del self._expire_info[key]
             except KeyError:
                 pass
             return default
-        finally:
-            self._lock.writer_leaves()
 
     def _set(self, key, value, timeout=None):
         if len(self._cache) >= self._max_entries:
@@ -76,39 +71,44 @@ class LocMemCache(BaseCache):
     def set(self, key, value, timeout=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        self._lock.writer_enters()
-        # Python 2.4 doesn't allow combined try-except-finally blocks.
-        try:
+        with self._lock.writer():
             try:
-                self._set(key, pickle.dumps(value), timeout)
+                pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+                self._set(key, pickled, timeout)
             except pickle.PickleError:
                 pass
-        finally:
-            self._lock.writer_leaves()
+
+    def incr(self, key, delta=1, version=None):
+        value = self.get(key, version=version)
+        if value is None:
+            raise ValueError("Key '%s' not found" % key)
+        new_value = value + delta
+        key = self.make_key(key, version=version)
+        with self._lock.writer():
+            try:
+                pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
+                self._cache[key] = pickled
+            except pickle.PickleError:
+                pass
+        return new_value
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        self._lock.reader_enters()
-        try:
+        with self._lock.reader():
             exp = self._expire_info.get(key)
             if exp is None:
                 return False
             elif exp > time.time():
                 return True
-        finally:
-            self._lock.reader_leaves()
 
-        self._lock.writer_enters()
-        try:
+        with self._lock.writer():
             try:
                 del self._cache[key]
                 del self._expire_info[key]
             except KeyError:
                 pass
             return False
-        finally:
-            self._lock.writer_leaves()
 
     def _cull(self):
         if self._cull_frequency == 0:
@@ -131,11 +131,8 @@ class LocMemCache(BaseCache):
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        self._lock.writer_enters()
-        try:
+        with self._lock.writer():
             self._delete(key)
-        finally:
-            self._lock.writer_leaves()
 
     def clear(self):
         self._cache.clear()

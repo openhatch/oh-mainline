@@ -4,7 +4,6 @@ import time
 from threading import local
 
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
-from django.utils import importlib
 
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
@@ -47,7 +46,7 @@ class BaseMemcachedCache(BaseCache):
             #
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
-        return timeout
+        return int(timeout)
 
     def add(self, key, value, timeout=0, version=None):
         key = self.make_key(key, version=version)
@@ -126,24 +125,19 @@ class BaseMemcachedCache(BaseCache):
     def clear(self):
         self._cache.flush_all()
 
-# For backwards compatibility -- the default cache class tries a
-# cascading lookup of cmemcache, then memcache.
 class CacheClass(BaseMemcachedCache):
     def __init__(self, server, params):
+        import warnings
+        warnings.warn(
+            "memcached.CacheClass has been split into memcached.MemcachedCache and memcached.PyLibMCCache. Please update your cache backend setting.",
+            PendingDeprecationWarning
+        )
         try:
-            import cmemcache as memcache
-            import warnings
-            warnings.warn(
-                "Support for the 'cmemcache' library has been deprecated. Please use python-memcached or pyblimc instead.",
-                DeprecationWarning
-            )
-        except ImportError:
-            try:
-                import memcache
-            except:
-                raise InvalidCacheBackendError(
-                    "Memcached cache backend requires either the 'memcache' or 'cmemcache' library"
-                    )
+            import memcache
+        except:
+            raise InvalidCacheBackendError(
+                "Memcached cache backend requires either the 'memcache' or 'cmemcache' library"
+                )
         super(CacheClass, self).__init__(server, params,
                                          library=memcache,
                                          value_not_found_exception=ValueError)

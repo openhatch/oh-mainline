@@ -1,7 +1,6 @@
 from copy import copy
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
-from django.http import HttpRequest
 
 # Cache of actual callables.
 _standard_context_processors = None
@@ -84,10 +83,12 @@ class BaseContext(object):
 
 class Context(BaseContext):
     "A stack container for variable context"
-    def __init__(self, dict_=None, autoescape=True, current_app=None, use_l10n=None):
+    def __init__(self, dict_=None, autoescape=True, current_app=None,
+            use_l10n=None, use_tz=None):
         self.autoescape = autoescape
-        self.use_l10n = use_l10n
         self.current_app = current_app
+        self.use_l10n = use_l10n
+        self.use_tz = use_tz
         self.render_context = RenderContext()
         super(Context, self).__init__(dict_)
 
@@ -163,8 +164,10 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict=None, processors=None, current_app=None, use_l10n=None):
-        Context.__init__(self, dict, current_app=current_app, use_l10n=use_l10n)
+    def __init__(self, request, dict_=None, processors=None, current_app=None,
+            use_l10n=None, use_tz=None):
+        Context.__init__(self, dict_, current_app=current_app,
+                use_l10n=use_l10n, use_tz=use_tz)
         if processors is None:
             processors = ()
         else:

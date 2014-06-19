@@ -1,25 +1,31 @@
+from __future__ import absolute_import
+
 import datetime
 from decimal import Decimal
 
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models.fields import (
+    AutoField, BigIntegerField, BooleanField, CharField,
+    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
+    EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
+    GenericIPAddressField, NullBooleanField, PositiveIntegerField,
+    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField)
 from django.db import models
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields.files import FileField, ImageField, FieldFile
 from django.utils import unittest
 
-from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel, Document
+from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
+    NullBooleanModel, BooleanModel, Document, RenamedField, VerboseNameField)
 
 # If PIL available, do these tests.
 if Image:
-    from imagefield import \
-            ImageFieldTests, \
-            ImageFieldTwoDimensionsTests, \
-            ImageFieldNoDimensionsTests, \
-            ImageFieldOneDimensionTests, \
-            ImageFieldDimensionsFirstTests, \
-            ImageFieldUsingFileTests, \
-            TwoImageFieldTests
+    from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
+        TwoImageFieldTests, ImageFieldNoDimensionsTests,
+        ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
+        ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):
@@ -47,6 +53,32 @@ class BasicFieldTests(test.TestCase):
             nullboolean.full_clean()
         except ValidationError, e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
+
+    def test_field_repr(self):
+        """
+        Regression test for #5931: __repr__ of a field also displays its name
+        """
+        f = Foo._meta.get_field('a')
+        self.assertEqual(repr(f), '<django.db.models.fields.CharField: a>')
+        f = models.fields.CharField()
+        self.assertEqual(repr(f), '<django.db.models.fields.CharField>')
+
+    def test_field_name(self):
+        """
+        Regression test for #14695: explicitly defined field name overwritten
+        by model's attribute name.
+        """
+        instance = RenamedField()
+        self.assertTrue(hasattr(instance, 'get_fieldname_display'))
+        self.assertFalse(hasattr(instance, 'get_modelname_display'))
+
+    def test_field_verbose_name(self):
+        m = VerboseNameField
+        for i in range(1, 23):
+            self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
+                    'verbose field%d' % i)
+
+        self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
@@ -348,3 +380,88 @@ class FileFieldTests(unittest.TestCase):
         field = d._meta.get_field('myfile')
         field.save_form_data(d, 'else.txt')
         self.assertEqual(d.myfile, 'else.txt')
+
+
+class PrepValueTest(test.TestCase):
+    def test_AutoField(self):
+        self.assertIsInstance(AutoField(primary_key=True).get_prep_value(1), int)
+
+    def test_BigIntegerField(self):
+        self.assertIsInstance(BigIntegerField().get_prep_value(long(9999999999999999999)), long)
+
+    def test_BooleanField(self):
+        self.assertIsInstance(BooleanField().get_prep_value(True), bool)
+
+    def test_CharField(self):
+        self.assertIsInstance(CharField().get_prep_value(''), str)
+        self.assertIsInstance(CharField().get_prep_value(0), unicode)
+
+    def test_CommaSeparatedIntegerField(self):
+        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value('1,2'), str)
+        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value(0), unicode)
+
+    def test_DateField(self):
+        self.assertIsInstance(DateField().get_prep_value(datetime.date.today()), datetime.date)
+
+    def test_DateTimeField(self):
+        self.assertIsInstance(DateTimeField().get_prep_value(datetime.datetime.now()), datetime.datetime)
+
+    def test_DecimalField(self):
+        self.assertIsInstance(DecimalField().get_prep_value(Decimal('1.2')), Decimal)
+
+    def test_EmailField(self):
+        self.assertIsInstance(EmailField().get_prep_value('mailbox@domain.com'), str)
+
+    def test_FileField(self):
+        self.assertIsInstance(FileField().get_prep_value('filename.ext'), unicode)
+        self.assertIsInstance(FileField().get_prep_value(0), unicode)
+
+    def test_FilePathField(self):
+        self.assertIsInstance(FilePathField().get_prep_value('tests.py'), unicode)
+        self.assertIsInstance(FilePathField().get_prep_value(0), unicode)
+
+    def test_FloatField(self):
+        self.assertIsInstance(FloatField().get_prep_value(1.2), float)
+
+    def test_ImageField(self):
+        self.assertIsInstance(ImageField().get_prep_value('filename.ext'), unicode)
+
+    def test_IntegerField(self):
+        self.assertIsInstance(IntegerField().get_prep_value(1), int)
+
+    def test_IPAddressField(self):
+        self.assertIsInstance(IPAddressField().get_prep_value('127.0.0.1'), unicode)
+        self.assertIsInstance(IPAddressField().get_prep_value(0), unicode)
+
+    def test_GenericIPAddressField(self):
+        self.assertIsInstance(GenericIPAddressField().get_prep_value('127.0.0.1'), unicode)
+        self.assertIsInstance(GenericIPAddressField().get_prep_value(0), unicode)
+
+    def test_NullBooleanField(self):
+        self.assertIsInstance(NullBooleanField().get_prep_value(True), bool)
+
+    def test_PositiveIntegerField(self):
+        self.assertIsInstance(PositiveIntegerField().get_prep_value(1), int)
+
+    def test_PositiveSmallIntegerField(self):
+        self.assertIsInstance(PositiveSmallIntegerField().get_prep_value(1), int)
+
+    def test_SlugField(self):
+        self.assertIsInstance(SlugField().get_prep_value('slug'), str)
+        self.assertIsInstance(SlugField().get_prep_value(0), unicode)
+
+    def test_SmallIntegerField(self):
+        self.assertIsInstance(SmallIntegerField().get_prep_value(1), int)
+
+    def test_TextField(self):
+        self.assertIsInstance(TextField().get_prep_value('Abc'), str)
+        self.assertIsInstance(TextField().get_prep_value(0), unicode)
+
+    def test_TimeField(self):
+        self.assertIsInstance(
+            TimeField().get_prep_value(datetime.datetime.now().time()),
+            datetime.time)
+
+    def test_URLField(self):
+        self.assertIsInstance(URLField().get_prep_value('http://domain.com'), str)
+

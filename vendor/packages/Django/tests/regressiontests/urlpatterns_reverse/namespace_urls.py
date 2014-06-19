@@ -1,5 +1,9 @@
-from django.conf.urls.defaults import *
-from views import view_class_instance
+from __future__ import absolute_import
+
+from django.conf.urls import patterns, url, include
+
+from .views import view_class_instance
+
 
 class URLObject(object):
     def __init__(self, app_name, namespace):
@@ -10,6 +14,7 @@ class URLObject(object):
         return patterns('',
             url(r'^inner/$', 'empty_view', name='urlobject-view'),
             url(r'^inner/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='urlobject-view'),
+            url(r'^inner/\+\\\$\*/$', 'empty_view', name='urlobject-special-view'),
         ), self.app_name, self.namespace
     urls = property(urls)
 
@@ -24,6 +29,8 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     url(r'^normal/$', 'empty_view', name='normal-view'),
     url(r'^normal/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='normal-view'),
 
+    url(r'^\+\\\$\*/$', 'empty_view', name='special-view'),
+
     url(r'^mixed_args/(\d+)/(?P<arg2>\d+)/$', 'empty_view', name='mixed-args'),
     url(r'^no_kwargs/(\d+)/(\d+)/$', 'empty_view', name='no-kwargs'),
 
@@ -37,11 +44,15 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     (r'^default/', include(default_testobj.urls)),
 
     (r'^other1/', include(otherobj1.urls)),
-    (r'^other2/', include(otherobj2.urls)),
+    (r'^other[246]/', include(otherobj2.urls)),
 
-    (r'^ns-included1/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
+    (r'^ns-included[135]/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
     (r'^ns-included2/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
     (r'^included/', include('regressiontests.urlpatterns_reverse.included_namespace_urls')),
+    (r'^inc(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_urls', namespace='inc-ns5')),
 
+    (r'^ns-outer/(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
+
+    (r'^\+\\\$\*/', include('regressiontests.urlpatterns_reverse.namespace_urls', namespace='special')),
 )

@@ -2,34 +2,34 @@
 Field classes.
 """
 
+from __future__ import absolute_import
+
+import copy
 import datetime
 import os
 import re
-import time
 import urlparse
-import warnings
 from decimal import Decimal, DecimalException
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
-from django.core.exceptions import ValidationError
 from django.core import validators
-import django.utils.copycompat as copy
+from django.core.exceptions import ValidationError
+from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
+from django.forms.widgets import (TextInput, PasswordInput, HiddenInput,
+    MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
+    NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
+    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 from django.utils import formats
+from django.utils.encoding import smart_unicode, smart_str, force_unicode
+from django.utils.ipv6 import clean_ipv6_address
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode, smart_str
-from django.utils.functional import lazy
 
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES
 
-from util import ErrorList
-from widgets import (TextInput, PasswordInput, HiddenInput,
-    MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
-    NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
-    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
@@ -37,20 +37,10 @@ __all__ = (
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
-    'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
-    'TypedChoiceField', 'TypedMultipleChoiceField'
+    'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
 )
 
-def en_format(name):
-    """
-    Helper function to stay backward compatible.
-    """
-    from django.conf.locale.en import formats
-    warnings.warn(
-        "`django.forms.fields.DEFAULT_%s` is deprecated; use `django.utils.formats.get_format('%s')` instead." % (name, name),
-        DeprecationWarning
-    )
-    return getattr(formats, name)
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
@@ -188,6 +178,7 @@ class Field(object):
         result = copy.copy(self)
         memo[id(self)] = result
         result.widget = copy.deepcopy(self.widget, memo)
+        result.validators = self.validators[:]
         return result
 
 class CharField(Field):
@@ -206,9 +197,11 @@ class CharField(Field):
         return smart_unicode(value)
 
     def widget_attrs(self, widget):
+        attrs = super(CharField, self).widget_attrs(widget)
         if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
             # The HTML attribute is maxlength, not max_length.
-            return {'maxlength': str(self.max_length)}
+            attrs.update({'maxlength': str(self.max_length)})
+        return attrs
 
 class IntegerField(Field):
     default_error_messages = {
@@ -330,15 +323,47 @@ class DecimalField(Field):
             raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
-class DateField(Field):
+class BaseTemporalField(Field):
+
+    def __init__(self, input_formats=None, *args, **kwargs):
+        super(BaseTemporalField, self).__init__(*args, **kwargs)
+        if input_formats is not None:
+            self.input_formats = input_formats
+
+    def to_python(self, value):
+        # Try to coerce the value to unicode.
+        unicode_value = force_unicode(value, strings_only=True)
+        if isinstance(unicode_value, unicode):
+            value = unicode_value.strip()
+        # If unicode, try to strptime against each input format.
+        if isinstance(value, unicode):
+            for format in self.input_formats:
+                try:
+                    return self.strptime(value, format)
+                except ValueError:
+                    if format.endswith('.%f'):
+                        # Compatibility with datetime in pythons < 2.6.
+                        # See: http://docs.python.org/library/datetime.html#strftime-and-strptime-behavior
+                        if value.count('.') != format.count('.'):
+                            continue
+                        try:
+                            datetime_str, usecs_str = value.rsplit('.', 1)
+                            usecs = int(usecs_str[:6].ljust(6, '0'))
+                            dt = datetime.datetime.strptime(datetime_str, format[:-3])
+                            return dt.replace(microsecond=usecs)
+                        except ValueError:
+                            continue
+        raise ValidationError(self.error_messages['invalid'])
+
+    def strptime(self, value, format):
+        raise NotImplementedError('Subclasses must define this method.')
+
+class DateField(BaseTemporalField):
     widget = DateInput
+    input_formats = formats.get_format_lazy('DATE_INPUT_FORMATS')
     default_error_messages = {
         'invalid': _(u'Enter a valid date.'),
     }
-
-    def __init__(self, input_formats=None, *args, **kwargs):
-        super(DateField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats
 
     def to_python(self, value):
         """
@@ -351,22 +376,17 @@ class DateField(Field):
             return value.date()
         if isinstance(value, datetime.date):
             return value
-        for format in self.input_formats or formats.get_format('DATE_INPUT_FORMATS'):
-            try:
-                return datetime.date(*time.strptime(value, format)[:3])
-            except ValueError:
-                continue
-        raise ValidationError(self.error_messages['invalid'])
+        return super(DateField, self).to_python(value)
 
-class TimeField(Field):
+    def strptime(self, value, format):
+        return datetime.datetime.strptime(value, format).date()
+
+class TimeField(BaseTemporalField):
     widget = TimeInput
+    input_formats = formats.get_format_lazy('TIME_INPUT_FORMATS')
     default_error_messages = {
         'invalid': _(u'Enter a valid time.')
     }
-
-    def __init__(self, input_formats=None, *args, **kwargs):
-        super(TimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats
 
     def to_python(self, value):
         """
@@ -377,22 +397,22 @@ class TimeField(Field):
             return None
         if isinstance(value, datetime.time):
             return value
-        for format in self.input_formats or formats.get_format('TIME_INPUT_FORMATS'):
-            try:
-                return datetime.time(*time.strptime(value, format)[3:6])
-            except ValueError:
-                continue
-        raise ValidationError(self.error_messages['invalid'])
+        return super(TimeField, self).to_python(value)
 
-class DateTimeField(Field):
+    def strptime(self, value, format):
+        return datetime.datetime.strptime(value, format).time()
+
+class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
+    input_formats = formats.get_format_lazy('DATETIME_INPUT_FORMATS')
     default_error_messages = {
         'invalid': _(u'Enter a valid date/time.'),
     }
 
-    def __init__(self, input_formats=None, *args, **kwargs):
-        super(DateTimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats
+    def prepare_value(self, value):
+        if isinstance(value, datetime.datetime):
+            value = to_current_timezone(value)
+        return value
 
     def to_python(self, value):
         """
@@ -402,9 +422,10 @@ class DateTimeField(Field):
         if value in validators.EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
-            return value
+            return from_current_timezone(value)
         if isinstance(value, datetime.date):
-            return datetime.datetime(value.year, value.month, value.day)
+            result = datetime.datetime(value.year, value.month, value.day)
+            return from_current_timezone(result)
         if isinstance(value, list):
             # Input comes from a SplitDateTimeWidget, for example. So, it's two
             # components: date and time.
@@ -413,12 +434,11 @@ class DateTimeField(Field):
             if value[0] in validators.EMPTY_VALUES and value[1] in validators.EMPTY_VALUES:
                 return None
             value = '%s %s' % tuple(value)
-        for format in self.input_formats or formats.get_format('DATETIME_INPUT_FORMATS'):
-            try:
-                return datetime.datetime(*time.strptime(value, format)[:6])
-            except ValueError:
-                continue
-        raise ValidationError(self.error_messages['invalid'])
+        result = super(DateTimeField, self).to_python(value)
+        return from_current_timezone(result)
+
+    def strptime(self, value, format):
+        return datetime.datetime.strptime(value, format)
 
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
@@ -433,10 +453,21 @@ class RegexField(CharField):
             error_messages['invalid'] = error_message
             kwargs['error_messages'] = error_messages
         super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
+        self._set_regex(regex)
+
+    def _get_regex(self):
+        return self._regex
+
+    def _set_regex(self, regex):
         if isinstance(regex, basestring):
             regex = re.compile(regex)
-        self.regex = regex
-        self.validators.append(validators.RegexValidator(regex=regex))
+        self._regex = regex
+        if hasattr(self, '_regex_validator') and self._regex_validator in self.validators:
+            self.validators.remove(self._regex_validator)
+        self._regex_validator = validators.RegexValidator(regex=regex)
+        self.validators.append(self._regex_validator)
+
+    regex = property(_get_regex, _set_regex)
 
 class EmailField(CharField):
     default_error_messages = {
@@ -460,6 +491,7 @@ class FileField(Field):
 
     def __init__(self, *args, **kwargs):
         self.max_length = kwargs.pop('max_length', None)
+        self.allow_empty_file = kwargs.pop('allow_empty_file', False)
         super(FileField, self).__init__(*args, **kwargs)
 
     def to_python(self, data):
@@ -478,7 +510,7 @@ class FileField(Field):
             raise ValidationError(self.error_messages['max_length'] % error_values)
         if not file_name:
             raise ValidationError(self.error_messages['invalid'])
-        if not file_size:
+        if not self.allow_empty_file and not file_size:
             raise ValidationError(self.error_messages['empty'])
 
         return data
@@ -566,8 +598,22 @@ class URLField(CharField):
         self.validators.append(validators.URLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
 
     def to_python(self, value):
+
+        def split_url(url):
+            """
+            Returns a list of url parts via ``urlparse.urlsplit`` (or raises a
+            ``ValidationError`` exception for certain).
+            """
+            try:
+                return list(urlparse.urlsplit(url))
+            except ValueError:
+                # urlparse.urlsplit can raise a ValueError with some
+                # misformatted URLs.
+                raise ValidationError(self.error_messages['invalid'])
+
+        value = super(URLField, self).to_python(value)
         if value:
-            url_fields = list(urlparse.urlsplit(value))
+            url_fields = split_url(value)
             if not url_fields[0]:
                 # If no URL scheme given, assume http://
                 url_fields[0] = 'http'
@@ -578,13 +624,12 @@ class URLField(CharField):
                 url_fields[2] = ''
                 # Rebuild the url_fields list, since the domain segment may now
                 # contain the path too.
-                value = urlparse.urlunsplit(url_fields)
-                url_fields = list(urlparse.urlsplit(value))
+                url_fields = split_url(urlparse.urlunsplit(url_fields))
             if not url_fields[2]:
                 # the path portion may need to be added before query params
                 url_fields[2] = '/'
             value = urlparse.urlunsplit(url_fields)
-        return super(URLField, self).to_python(value)
+        return value
 
 class BooleanField(Field):
     widget = CheckboxInput
@@ -595,7 +640,7 @@ class BooleanField(Field):
         # will submit for False. Also check for '0', since this is what
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
         # we don't need to handle that explicitly.
-        if value in ('False', '0'):
+        if isinstance(value, basestring) and value.lower() in ('false', '0'):
             value = False
         else:
             value = bool(value)
@@ -639,6 +684,11 @@ class ChoiceField(Field):
         super(ChoiceField, self).__init__(required=required, widget=widget, label=label,
                                         initial=initial, help_text=help_text, *args, **kwargs)
         self.choices = choices
+
+    def __deepcopy__(self, memo):
+        result = super(ChoiceField, self).__deepcopy__(memo)
+        result._choices = copy.deepcopy(self._choices, memo)
+        return result
 
     def _get_choices(self):
         return self._choices
@@ -848,6 +898,7 @@ class MultiValueField(Field):
 
         out = self.compress(clean_data)
         self.validate(out)
+        self.run_validators(out)
         return out
 
     def compress(self, data_list):
@@ -926,7 +977,8 @@ class SplitDateTimeField(MultiValueField):
                 raise ValidationError(self.error_messages['invalid_date'])
             if data_list[1] in validators.EMPTY_VALUES:
                 raise ValidationError(self.error_messages['invalid_time'])
-            return datetime.datetime.combine(*data_list)
+            result = datetime.datetime.combine(*data_list)
+            return from_current_timezone(result)
         return None
 
 
@@ -935,6 +987,25 @@ class IPAddressField(CharField):
         'invalid': _(u'Enter a valid IPv4 address.'),
     }
     default_validators = [validators.validate_ipv4_address]
+
+
+class GenericIPAddressField(CharField):
+    default_error_messages = {}
+
+    def __init__(self, protocol='both', unpack_ipv4=False, *args, **kwargs):
+        self.unpack_ipv4 = unpack_ipv4
+        self.default_validators, invalid_error_message = \
+            validators.ip_address_validators(protocol, unpack_ipv4)
+        self.default_error_messages['invalid'] = invalid_error_message
+        super(GenericIPAddressField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if value in validators.EMPTY_VALUES:
+            return u''
+        if value and ':' in value:
+                return clean_ipv6_address(value,
+                    self.unpack_ipv4, self.error_messages['invalid'])
+        return value
 
 
 class SlugField(CharField):

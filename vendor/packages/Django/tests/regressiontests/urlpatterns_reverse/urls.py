@@ -1,8 +1,13 @@
-from django.conf.urls.defaults import *
-from views import empty_view, absolute_kwargs_view
+from __future__ import absolute_import
+
+from django.conf.urls import patterns, url, include
+
+from .views import empty_view, empty_view_partial, empty_view_wrapped, absolute_kwargs_view
+
 
 other_patterns = patterns('',
     url(r'non_path_include/$', empty_view, name='non_path_include'),
+    url(r'nested_path/$', 'regressiontests.urlpatterns_reverse.views.nested_view'),
 )
 
 urlpatterns = patterns('',
@@ -18,8 +23,9 @@ urlpatterns = patterns('',
     url(r'^people/(?P<name>\w+)/$', empty_view, name="people"),
     url(r'^people/(?:name/)', empty_view, name="people2"),
     url(r'^people/(?:name/(\w+)/)?', empty_view, name="people2a"),
+    url(r'^people/(?P<name>\w+)-(?P=name)/$', empty_view, name="people_backref"),
     url(r'^optional/(?P<name>.*)/(?:.+/)?', empty_view, name="optional"),
-    url(r'^hardcoded/$', 'hardcoded/', empty_view, name="hardcoded"),
+    url(r'^hardcoded/$', empty_view, name="hardcoded"),
     url(r'^hardcoded/doc\.pdf$', empty_view, name="hardcoded2"),
     url(r'^people/(?P<state>\w\w)/(?P<name>\w+)/$', empty_view, name="people3"),
     url(r'^people/(?P<state>\w\w)/(?P<name>\d)/$', empty_view, name="people4"),
@@ -50,14 +56,19 @@ urlpatterns = patterns('',
     # This is non-reversible, but we shouldn't blow up when parsing it.
     url(r'^(?:foo|bar)(\w+)/$', empty_view, name="disjunction"),
 
+    # Partials should be fine.
+    url(r'^partial/', empty_view_partial, name="partial"),
+    url(r'^partial_wrapped/', empty_view_wrapped, name="partial_wrapped"),
+
     # Regression views for #9038. See tests for more details
     url(r'arg_view/$', 'kwargs_view'),
     url(r'arg_view/(?P<arg1>\d+)/$', 'kwargs_view'),
     url(r'absolute_arg_view/(?P<arg1>\d+)/$', absolute_kwargs_view),
     url(r'absolute_arg_view/$', absolute_kwargs_view),
-    
+
+    # Tests for #13154. Mixed syntax to test both ways of defining URLs.
+    url(r'defaults_view1/(?P<arg1>\d+)/', 'defaults_view', {'arg2': 1}, name='defaults'),
+    (r'defaults_view2/(?P<arg1>\d+)/', 'defaults_view', {'arg2': 2}, 'defaults'),
+
     url('^includes/', include(other_patterns)),
-
 )
-
-

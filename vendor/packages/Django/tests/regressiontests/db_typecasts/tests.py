@@ -1,7 +1,10 @@
 # Unit tests for typecast functions in django.db.backends.util
 
+import datetime
+
 from django.db.backends import util as typecasts
-import datetime, unittest
+from django.utils import unittest
+
 
 TEST_CASES = {
     'typecast_date': (
@@ -42,21 +45,11 @@ TEST_CASES = {
         ('2010-10-12 15:29:22.0632021', datetime.datetime(2010, 10, 12, 15, 29, 22, 63202)),
         ('2010-10-12 15:29:22.0632029', datetime.datetime(2010, 10, 12, 15, 29, 22, 63202)),
     ),
-    'typecast_boolean': (
-        (None, None),
-        ('', False),
-        ('t', True),
-        ('f', False),
-        ('x', False),
-    ),
 }
 
 class DBTypeCasts(unittest.TestCase):
     def test_typeCasts(self):
-        for k, v in TEST_CASES.items():
+        for k, v in TEST_CASES.iteritems():
             for inpt, expected in v:
                 got = getattr(typecasts, k)(inpt)
-                assert got == expected, "In %s: %r doesn't match %r. Got %r instead." % (k, inpt, expected, got)
-
-if __name__ == '__main__':
-    unittest.main()
+                self.assertEqual(got, expected, "In %s: %r doesn't match %r. Got %r instead." % (k, inpt, expected, got))

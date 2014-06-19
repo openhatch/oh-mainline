@@ -53,6 +53,7 @@ packages/sessionprofile
 packages/six
 packages/south
 packages/sphinx
+packages/sqlparse
 packages/staticgenerator
 packages/twill
 packages/twisted

@@ -1,9 +1,8 @@
-import datetime
-from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError, transaction, router
 from django.utils.encoding import force_unicode
+from django.utils import timezone
 
 
 class SessionStore(SessionBase):
@@ -17,7 +16,7 @@ class SessionStore(SessionBase):
         try:
             s = Session.objects.get(
                 session_key = self.session_key,
-                expire_date__gt=datetime.datetime.now()
+                expire_date__gt=timezone.now()
             )
             return self.decode(force_unicode(s.session_data))
         except (Session.DoesNotExist, SuspiciousOperation):
@@ -25,15 +24,11 @@ class SessionStore(SessionBase):
             return {}
 
     def exists(self, session_key):
-        try:
-            Session.objects.get(session_key=session_key)
-        except Session.DoesNotExist:
-            return False
-        return True
+        return Session.objects.filter(session_key=session_key).exists()
 
     def create(self):
         while True:
-            self.session_key = self._get_new_session_key()
+            self._session_key = self._get_new_session_key()
             try:
                 # Save immediately to ensure we have a unique entry in the
                 # database.
@@ -53,9 +48,9 @@ class SessionStore(SessionBase):
         entry).
         """
         obj = Session(
-            session_key = self.session_key,
-            session_data = self.encode(self._get_session(no_load=must_create)),
-            expire_date = self.get_expiry_date()
+            session_key=self._get_or_create_session_key(),
+            session_data=self.encode(self._get_session(no_load=must_create)),
+            expire_date=self.get_expiry_date()
         )
         using = router.db_for_write(Session, instance=obj)
         sid = transaction.savepoint(using=using)
@@ -69,9 +64,9 @@ class SessionStore(SessionBase):
 
     def delete(self, session_key=None):
         if session_key is None:
-            if self._session_key is None:
+            if self.session_key is None:
                 return
-            session_key = self._session_key
+            session_key = self.session_key
         try:
             Session.objects.get(session_key=session_key).delete()
         except Session.DoesNotExist:

@@ -6,6 +6,7 @@ import threading
 
 from django.db import models
 
+
 class DumbCategory(models.Model):
     pass
 
@@ -208,6 +209,9 @@ class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
 
+    def __unicode__(self):
+        return self.name
+
 class TvChef(Celebrity):
     pass
 
@@ -317,3 +321,28 @@ class ObjectC(models.Model):
 
     def __unicode__(self):
        return self.name
+
+class SimpleCategory(models.Model):
+    name = models.CharField(max_length=15)
+
+    def __unicode__(self):
+        return self.name
+
+class SpecialCategory(SimpleCategory):
+    special_name = models.CharField(max_length=15)
+
+    def __unicode__(self):
+        return self.name + " " + self.special_name
+
+class CategoryItem(models.Model):
+    category = models.ForeignKey(SimpleCategory)
+
+    def __unicode__(self):
+        return "category item: " + str(self.category)
+
+class OneToOneCategory(models.Model):
+    new_name = models.CharField(max_length=15)
+    category = models.OneToOneField(SimpleCategory)
+
+    def __unicode__(self):
+        return "one2one " + self.new_name

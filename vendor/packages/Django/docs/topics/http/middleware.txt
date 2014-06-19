@@ -97,6 +97,21 @@ calling ANY other request, view or exception middleware, or the appropriate
 view; it'll return that :class:`~django.http.HttpResponse`. Response
 middleware is always called on every response.
 
+.. note::
+
+    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` or
+    :attr:`request.REQUEST <django.http.HttpRequest.REQUEST>` inside middleware
+    from ``process_request`` or ``process_view`` will prevent any view running
+    after the middleware from being able to :ref:`modify the upload handlers
+    for the request <modifying_upload_handlers_on_the_fly>`, and should
+    normally be avoided.
+
+    The :class:`~django.middleware.csrf.CsrfViewMiddleware` class can be
+    considered an exception, as it provides the
+    :func:`~django.views.decorators.csrf.csrf_exempt` and
+    :func:`~django.views.decorators.csrf.csrf_protect` decorators which allow
+    views to explicitly control at what point the CSRF validation should occur.
+
 .. _template-response-middleware:
 
 ``process_template_response``
@@ -106,22 +121,20 @@ middleware is always called on every response.
 
 .. method:: process_template_response(self, request, response)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is the
-:class:`~django.template.response.SimpleTemplateResponse` subclass (e.g.
-:class:`~django.template.response.TemplateResponse`) object returned by a
-Django view.
+``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is a
+subclass of :class:`~django.template.response.SimpleTemplateResponse` (e.g.
+:class:`~django.template.response.TemplateResponse`) or any response object
+that implements a ``render`` method.
 
-``process_template_response()`` must return an
-:class:`~django.template.response.SimpleTemplateResponse` (or its subclass)
-object. It could alter the given ``response`` by changing
-``response.template_name`` and ``response.context_data``, or it could
-create and return a brand-new
-:class:`~django.template.response.SimpleTemplateResponse` (or its subclass)
-instance.
+``process_template_response()`` must return a response object that implements a
+``render`` method. It could alter the given ``response`` by changing
+``response.template_name`` and ``response.context_data``, or it could create
+and return a brand-new
+:class:`~django.template.response.SimpleTemplateResponse` or equivalent.
 
 ``process_template_response()`` will only be called if the response
 instance has a ``render()`` method, indicating that it is a
-:class:`~django.template.response.TemplateResponse`.
+:class:`~django.template.response.TemplateResponse` or equivalent.
 
 You don't need to explicitly render responses -- responses will be
 automatically rendered once all template response middleware has been
@@ -182,11 +195,12 @@ essentially placeholders for the ``process_*`` methods. If you do need some
 global state you may use ``__init__`` to set up. However, keep in mind a couple
 of caveats:
 
-    * Django initializes your middleware without any arguments, so you can't
-      define ``__init__`` as requiring any arguments.
+* Django initializes your middleware without any arguments, so you can't
+  define ``__init__`` as requiring any arguments.
 
-    * Unlike the ``process_*`` methods which get called once per request,
-      ``__init__`` gets called only *once*, when the Web server starts up.
+* Unlike the ``process_*`` methods which get called once per request,
+  ``__init__`` gets called only *once*, when the Web server responds to the
+  first request.
 
 Marking middleware as unused
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -199,15 +213,15 @@ piece of middleware from the middleware process.
 Guidelines
 ----------
 
-    * Middleware classes don't have to subclass anything.
+* Middleware classes don't have to subclass anything.
 
-    * The middleware class can live anywhere on your Python path. All Django
-      cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
-      the path to it.
+* The middleware class can live anywhere on your Python path. All Django
+  cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
+  the path to it.
 
-    * Feel free to look at :doc:`Django's available middleware
-      </ref/middleware>` for examples.
+* Feel free to look at :doc:`Django's available middleware
+  </ref/middleware>` for examples.
 
-    * If you write a middleware component that you think would be useful to
-      other people, contribute to the community! :doc:`Let us know
-      </internals/contributing>`, and we'll consider adding it to Django.
+* If you write a middleware component that you think would be useful to
+  other people, contribute to the community! :doc:`Let us know
+  </internals/contributing/index>`, and we'll consider adding it to Django.

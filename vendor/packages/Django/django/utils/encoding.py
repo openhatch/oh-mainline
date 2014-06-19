@@ -81,7 +81,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
                     # without raising a further exception. We do an
                     # approximation to what the Exception's standard str()
                     # output should be.
-                    s = ' '.join([force_unicode(arg, encoding, strings_only,
+                    s = u' '.join([force_unicode(arg, encoding, strings_only,
                             errors) for arg in s])
         elif not isinstance(s, unicode):
             # Note: We use .decode() here, instead of unicode(s, encoding,
@@ -97,7 +97,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = ' '.join([force_unicode(arg, encoding, strings_only,
+            s = u' '.join([force_unicode(arg, encoding, strings_only,
                     errors) for arg in s])
     return s
 
@@ -183,3 +183,15 @@ try:
     codecs.lookup(DEFAULT_LOCALE_ENCODING)
 except:
     DEFAULT_LOCALE_ENCODING = 'ascii'
+
+# Forwards compatibility with Django 1.5
+
+def python_2_unicode_compatible(klass):
+    # Always use the Python 2 branch of the decorator here in Django 1.4
+    klass.__unicode__ = klass.__str__
+    klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+    return klass
+
+smart_text = smart_unicode
+force_text = force_unicode
+smart_bytes = smart_str

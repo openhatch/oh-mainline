@@ -12,7 +12,9 @@ from django.db.backends import *
 from django.db.backends.creation import BaseDatabaseCreation
 
 def complain(*args, **kwargs):
-    raise ImproperlyConfigured("You haven't set the database ENGINE setting yet.")
+    raise ImproperlyConfigured("settings.DATABASES is improperly configured. "
+                               "Please supply the ENGINE value. Check "
+                               "settings documentation for more details.")
 
 def ignore(*args, **kwargs):
     pass
@@ -34,6 +36,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_description = complain
     get_relations = complain
     get_indexes = complain
+    get_key_columns = complain
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {}
@@ -59,7 +62,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.features = BaseDatabaseFeatures(self)
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = BaseDatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)

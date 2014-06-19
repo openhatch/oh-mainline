@@ -1,5 +1,9 @@
-from django.conf.urls.defaults import *
-from views import empty_view
+from __future__ import absolute_import
+
+from django.conf.urls import patterns, url, include
+
+from .views import empty_view
+
 
 urlpatterns = patterns('',
     url(r'^$', empty_view, name="named-url3"),

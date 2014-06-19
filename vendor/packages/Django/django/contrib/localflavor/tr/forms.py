@@ -2,12 +2,17 @@
 TR-specific Form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.tr.tr_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select, CharField
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-import re
+
 
 phone_digits_re = re.compile(r'^(\+90|0)? ?(([1-9]\d{2})|\([1-9]\d{2}\)) ?([2-9]\d{2} ?\d{2} ?\d{2})$')
 
@@ -16,9 +21,9 @@ class TRPostalCodeField(RegexField):
         'invalid': _(u'Enter a postal code in the format XXXXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=5, min_length=5, *args, **kwargs):
         super(TRPostalCodeField, self).__init__(r'^\d{5}$',
-            max_length=5, min_length=5, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         value = super(TRPostalCodeField, self).clean(value)
@@ -87,5 +92,4 @@ class TRProvinceSelect(Select):
     A Select widget that uses a list of provinces in Turkey as its choices.
     """
     def __init__(self, attrs=None):
-        from tr_provinces import PROVINCE_CHOICES
         super(TRProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)

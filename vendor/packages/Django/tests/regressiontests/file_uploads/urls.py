@@ -1,5 +1,9 @@
-from django.conf.urls.defaults import *
-import views
+from __future__ import absolute_import
+
+from django.conf.urls import patterns
+
+from . import views
+
 
 urlpatterns = patterns('',
     (r'^upload/$',          views.file_upload_view),
@@ -11,4 +15,5 @@ urlpatterns = patterns('',
     (r'^quota/broken/$',    views.file_upload_quota_broken),
     (r'^getlist_count/$',   views.file_upload_getlist_count),
     (r'^upload_errors/$',   views.file_upload_errors),
+    (r'^filename_case/$',   views.file_upload_filename_case_view),
 )

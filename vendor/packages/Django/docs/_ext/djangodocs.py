@@ -16,7 +16,7 @@ except ImportError:
         except ImportError:
             json = None
 
-from sphinx import addnodes, roles
+from sphinx import addnodes, roles, __version__ as sphinx_ver
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
@@ -62,7 +62,6 @@ def setup(app):
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
-    app.add_transform(SuppressBlockquotes)
     app.add_builder(DjangoStandaloneHTMLBuilder)
 
 
@@ -82,7 +81,7 @@ class VersionDirective(Directive):
         ret.append(node)
         if not is_nextversion:
             if len(self.arguments) == 1:
-                linktext = 'Please, see the release notes </releases/%s>' % (arg0)
+                linktext = 'Please see the release notes </releases/%s>' % (arg0)
                 xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state)
                 node.extend(xrefs[0])
             node['version'] = arg0
@@ -99,27 +98,6 @@ class VersionDirective(Directive):
         return ret
 
 
-class SuppressBlockquotes(transforms.Transform):
-    """
-    Remove the default blockquotes that encase indented list, tables, etc.
-    """
-    default_priority = 300
-
-    suppress_blockquote_child_nodes = (
-        nodes.bullet_list,
-        nodes.enumerated_list,
-        nodes.definition_list,
-        nodes.literal_block,
-        nodes.doctest_block,
-        nodes.line_block,
-        nodes.table
-    )
-
-    def apply(self):
-        for node in self.document.traverse(nodes.block_quote):
-            if len(node.children) == 1 and isinstance(node.children[0], self.suppress_blockquote_child_nodes):
-                node.replace_self(node.children[0])
-
 class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     """
     Django-specific reST to HTML tweaks.
@@ -127,26 +105,37 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
+        self.context.append(self.compact_p)
+        self.compact_p = True
+        self._table_row_index = 0 # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
 
-    # <big>? Really?
+    def depart_table(self, node):
+        self.compact_p = self.context.pop()
+        self.body.append('</table>\n')
+
     def visit_desc_parameterlist(self, node):
-        self.body.append('(')
+        self.body.append('(')  # by default sphinx puts <big> around the "("
         self.first_param = 1
+        self.optional_param_level = 0
+        self.param_separator = node.child_text_separator
+        self.required_params_left = sum([isinstance(c, addnodes.desc_parameter)
+                                         for c in node.children])
 
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
 
-    #
-    # Don't apply smartypants to literal blocks
-    #
-    def visit_literal_block(self, node):
-        self.no_smarty += 1
-        SmartyPantsHTMLTranslator.visit_literal_block(self, node)
+    if sphinx_ver < '1.0.8':
+        #
+        # Don't apply smartypants to literal blocks
+        #
+        def visit_literal_block(self, node):
+            self.no_smarty += 1
+            SmartyPantsHTMLTranslator.visit_literal_block(self, node)
 
-    def depart_literal_block(self, node):
-        SmartyPantsHTMLTranslator.depart_literal_block(self, node)
-        self.no_smarty -= 1
+        def depart_literal_block(self, node):
+            SmartyPantsHTMLTranslator.depart_literal_block(self, node)
+            self.no_smarty -= 1
 
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a

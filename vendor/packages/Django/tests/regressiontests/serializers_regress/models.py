@@ -52,6 +52,9 @@ class BigIntegerData(models.Model):
 class IPAddressData(models.Model):
     data = models.IPAddressField(null=True)
 
+class GenericIPAddressData(models.Model):
+    data = models.GenericIPAddressField(null=True)
+
 class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
 
@@ -108,6 +111,18 @@ class Anchor(models.Model):
     class Meta:
         ordering = ('id',)
 
+class NaturalKeyAnchorManager(models.Manager):
+    def get_by_natural_key(self, data):
+        return self.get(data=data)
+
+class NaturalKeyAnchor(models.Model):
+    objects = NaturalKeyAnchorManager()
+
+    data = models.CharField(max_length=100, unique=True)
+
+    def natural_key(self):
+        return (self.data,)
+
 class UniqueAnchor(models.Model):
     """This is a model that can be used as
     something for other models to point at"""
@@ -116,6 +131,9 @@ class UniqueAnchor(models.Model):
 
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, null=True)
+
+class FKDataNaturalKey(models.Model):
+    data = models.ForeignKey(NaturalKeyAnchor, null=True)
 
 class M2MData(models.Model):
     data = models.ManyToManyField(Anchor, null=True)
@@ -187,6 +205,9 @@ class IntegerPKData(models.Model):
 class IPAddressPKData(models.Model):
     data = models.IPAddressField(primary_key=True)
 
+class GenericIPAddressPKData(models.Model):
+    data = models.GenericIPAddressField(primary_key=True)
+
 # This is just a Boolean field with null=True, and we can't test a PK value of NULL.
 # class NullBooleanPKData(models.Model):
 #     data = models.NullBooleanField(primary_key=True)
@@ -253,8 +274,17 @@ class ExplicitInheritBaseModel(BaseModel):
     parent = models.OneToOneField(BaseModel)
     child_data = models.IntegerField()
 
+class ProxyBaseModel(BaseModel):
+    class Meta:
+        proxy = True
+
+class ProxyProxyBaseModel(ProxyBaseModel):
+    class Meta:
+        proxy = True
+
 class LengthModel(models.Model):
     data = models.IntegerField()
 
     def __len__(self):
         return self.data
+

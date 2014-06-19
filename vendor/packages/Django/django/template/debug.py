@@ -1,9 +1,10 @@
-from django.conf import settings
 from django.template.base import Lexer, Parser, tag_re, NodeList, VariableNode, TemplateSyntaxError
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.safestring import SafeData, EscapeData
 from django.utils.formats import localize
+from django.utils.timezone import localtime
+
 
 class DebugLexer(Lexer):
     def __init__(self, template_string, origin):
@@ -43,9 +44,9 @@ class DebugParser(Parser):
     def error(self, token, msg):
         return self.source_error(token.source, msg)
 
-    def source_error(self, source,msg):
+    def source_error(self, source, msg):
         e = TemplateSyntaxError(msg)
-        e.source = source
+        e.django_template_source = source
         return e
 
     def create_nodelist(self):
@@ -64,38 +65,32 @@ class DebugParser(Parser):
         raise self.source_error(source, msg)
 
     def compile_function_error(self, token, e):
-        if not hasattr(e, 'source'):
-            e.source = token.source
+        if not hasattr(e, 'django_template_source'):
+            e.django_template_source = token.source
 
 class DebugNodeList(NodeList):
     def render_node(self, node, context):
         try:
-            result = node.render(context)
-        except TemplateSyntaxError, e:
-            if not hasattr(e, 'source'):
-                e.source = node.source
-            raise
+            return node.render(context)
         except Exception, e:
-            from sys import exc_info
-            wrapped = TemplateSyntaxError(u'Caught %s while rendering: %s' %
-                (e.__class__.__name__, force_unicode(e, errors='replace')))
-            wrapped.source = node.source
-            wrapped.exc_info = exc_info()
-            raise wrapped, None, wrapped.exc_info[2]
-        return result
+            if not hasattr(e, 'django_template_source'):
+                e.django_template_source = node.source
+            raise
+
 
 class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
             output = self.filter_expression.resolve(context)
+            output = localtime(output, use_tz=context.use_tz)
             output = localize(output, use_l10n=context.use_l10n)
             output = force_unicode(output)
-        except TemplateSyntaxError, e:
-            if not hasattr(e, 'source'):
-                e.source = self.source
-            raise
         except UnicodeDecodeError:
             return ''
+        except Exception, e:
+            if not hasattr(e, 'django_template_source'):
+                e.django_template_source = self.source
+            raise
         if (context.autoescape and not isinstance(output, SafeData)) or isinstance(output, EscapeData):
             return escape(output)
         else:

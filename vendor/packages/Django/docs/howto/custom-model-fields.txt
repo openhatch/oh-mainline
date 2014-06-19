@@ -133,14 +133,14 @@ example). If this sounds a bit tricky, don't worry -- it will become clearer in
 the examples below. Just remember that you will often end up creating two
 classes when you want a custom field:
 
-    * The first class is the Python object that your users will manipulate.
-      They will assign it to the model attribute, they will read from it for
-      displaying purposes, things like that. This is the ``Hand`` class in our
-      example.
+* The first class is the Python object that your users will manipulate.
+  They will assign it to the model attribute, they will read from it for
+  displaying purposes, things like that. This is the ``Hand`` class in our
+  example.
 
-    * The second class is the ``Field`` subclass. This is the class that knows
-      how to convert your first class back and forth between its permanent
-      storage form and the Python form.
+* The second class is the ``Field`` subclass. This is the class that knows
+  how to convert your first class back and forth between its permanent
+  storage form and the Python form.
 
 Writing a field subclass
 ========================
@@ -177,53 +177,54 @@ below), but we ensure it has a fixed length, since it only needs to hold 52
 card values plus their suits; 104 characters in total.
 
 .. note::
+
     Many of Django's model fields accept options that they don't do anything
     with. For example, you can pass both
     :attr:`~django.db.models.Field.editable` and
-    :attr:`~django.db.models.Field.auto_now` to a
+    :attr:`~django.db.models.DateField.auto_now` to a
     :class:`django.db.models.DateField` and it will simply ignore the
     :attr:`~django.db.models.Field.editable` parameter
-    (:attr:`~django.db.models.Field.auto_now` being set implies
+    (:attr:`~django.db.models.DateField.auto_now` being set implies
     ``editable=False``). No error is raised in this case.
 
     This behavior simplifies the field classes, because they don't need to
     check for options that aren't necessary. They just pass all the options to
     the parent class and then don't use them later on. It's up to you whether
-    you want your fields to be more strict about the options they select, or
-    to use the simpler, more permissive behavior of the current fields.
+    you want your fields to be more strict about the options they select, or to
+    use the simpler, more permissive behavior of the current fields.
 
 .. method:: Field.__init__
 
 The :meth:`~django.db.models.Field.__init__` method takes the following
 parameters:
 
-    * :attr:`~django.db.models.Field.verbose_name`
-    * :attr:`~django.db.models.Field.name`
-    * :attr:`~django.db.models.Field.primary_key`
-    * :attr:`~django.db.models.Field.max_length`
-    * :attr:`~django.db.models.Field.unique`
-    * :attr:`~django.db.models.Field.blank`
-    * :attr:`~django.db.models.Field.null`
-    * :attr:`~django.db.models.Field.db_index`
-    * :attr:`~django.db.models.Field.rel`: Used for related fields (like
-      :class:`ForeignKey`). For advanced use only.
-    * :attr:`~django.db.models.Field.default`
-    * :attr:`~django.db.models.Field.editable`
-    * :attr:`~django.db.models.Field.serialize`: If ``False``, the field will
-      not be serialized when the model is passed to Django's :doc:`serializers
-      </topics/serialization>`. Defaults to ``True``.
-    * :attr:`~django.db.models.Field.unique_for_date`
-    * :attr:`~django.db.models.Field.unique_for_month`
-    * :attr:`~django.db.models.Field.unique_for_year`
-    * :attr:`~django.db.models.Field.choices`
-    * :attr:`~django.db.models.Field.help_text`
-    * :attr:`~django.db.models.Field.db_column`
-    * :attr:`~django.db.models.Field.db_tablespace`: Currently only used with
-      the Oracle backend and only for index creation. You can usually ignore
-      this option.
-    * :attr:`~django.db.models.Field.auto_created`: True if the field was
-      automatically created, as for the `OneToOneField` used by model
-      inheritance. For advanced use only.
+* :attr:`~django.db.models.Field.verbose_name`
+* :attr:`~django.db.models.Field.name`
+* :attr:`~django.db.models.Field.primary_key`
+* :attr:`~django.db.models.Field.max_length`
+* :attr:`~django.db.models.Field.unique`
+* :attr:`~django.db.models.Field.blank`
+* :attr:`~django.db.models.Field.null`
+* :attr:`~django.db.models.Field.db_index`
+* :attr:`~django.db.models.Field.rel`: Used for related fields (like
+  :class:`ForeignKey`). For advanced use only.
+* :attr:`~django.db.models.Field.default`
+* :attr:`~django.db.models.Field.editable`
+* :attr:`~django.db.models.Field.serialize`: If ``False``, the field will
+  not be serialized when the model is passed to Django's :doc:`serializers
+  </topics/serialization>`. Defaults to ``True``.
+* :attr:`~django.db.models.Field.unique_for_date`
+* :attr:`~django.db.models.Field.unique_for_month`
+* :attr:`~django.db.models.Field.unique_for_year`
+* :attr:`~django.db.models.Field.choices`
+* :attr:`~django.db.models.Field.help_text`
+* :attr:`~django.db.models.Field.db_column`
+* :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
+  backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
+  ignore this option.
+* :attr:`~django.db.models.Field.auto_created`: True if the field was
+  automatically created, as for the `OneToOneField` used by model
+  inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation
@@ -333,7 +334,6 @@ Once you have ``MytypeField``, you can use it in any model, just like any other
 
     class Person(models.Model):
         name = models.CharField(max_length=80)
-        gender = models.CharField(max_length=1)
         something_else = MytypeField()
 
 If you aim to build a database-agnostic application, you should account for
@@ -414,11 +414,11 @@ that are more complex than strings, dates, integers or floats, then you'll need
 to override this method. As a general rule, the method should deal gracefully
 with any of the following arguments:
 
-    * An instance of the correct type (e.g., ``Hand`` in our ongoing example).
+* An instance of the correct type (e.g., ``Hand`` in our ongoing example).
 
-    * A string (e.g., from a deserializer).
+* A string (e.g., from a deserializer).
 
-    * Whatever the database returns for the column type you're using.
+* Whatever the database returns for the column type you're using.
 
 In our ``HandField`` class, we're storing the data as a VARCHAR field in the
 database, so we need to be able to process strings and ``Hand`` instances in
@@ -447,6 +447,13 @@ called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise :meth:`.to_python` won't be called
 automatically.
 
+.. warning::
+
+    If your custom field allows ``null=True``, any field method that takes
+    ``value`` as an argument, like :meth:`~Field.to_python` and
+    :meth:`~Field.get_prep_value`, should handle the case when ``value`` is
+    ``None``.
+
 Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -474,6 +481,16 @@ For example::
         def get_prep_value(self, value):
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
+
+.. warning::
+
+    If your custom field uses the ``CHAR``, ``VARCHAR`` or ``TEXT``
+    types for MySQL, you must make sure that :meth:`.get_prep_value`
+    always returns a string type. MySQL performs flexible and unexpected
+    matching when a query is performed on these types and the provided
+    value is an integer, which can cause queries to include unexpected
+    objects in their results. This problem cannot occur if you always
+    return a string type from :meth:`.get_prep_value`.
 
 Converting query values to database values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -524,8 +541,8 @@ for the first time, the ``add`` parameter will be ``True``, otherwise it will be
 You only need to override this method if you want to preprocess the value
 somehow, just before saving. For example, Django's
 :class:`~django.db.models.DateTimeField` uses this method to set the attribute
-correctly in the case of :attr:`~django.db.models.Field.auto_now` or
-:attr:`~django.db.models.Field.auto_now_add`.
+correctly in the case of :attr:`~django.db.models.DateField.auto_now` or
+:attr:`~django.db.models.DateField.auto_now_add`.
 
 If you do override this method, you must return the value of the attribute at
 the end. You should also update the model's attribute if you make any changes
@@ -684,7 +701,7 @@ data storage anyway, we can reuse some existing conversion code::
 
         def value_to_string(self, obj):
             value = self._get_val_from_obj(obj)
-            return self.get_db_prep_value(value)
+            return self.get_prep_value(value)
 
 Some general advice
 --------------------
@@ -694,19 +711,19 @@ complex conversions between your Python types and your database and
 serialization formats. Here are a couple of tips to make things go more
 smoothly:
 
-    1. Look at the existing Django fields (in
-       :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
-       a field that's similar to what you want and extend it a little bit,
-       instead of creating an entirely new field from scratch.
+1. Look at the existing Django fields (in
+   :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
+   a field that's similar to what you want and extend it a little bit,
+   instead of creating an entirely new field from scratch.
 
-    2. Put a :meth:`__str__` or :meth:`__unicode__` method on the class you're
-       wrapping up as a field. There are a lot of places where the default
-       behavior of the field code is to call
-       :func:`~django.utils.encoding.force_unicode` on the value. (In our
-       examples in this document, ``value`` would be a ``Hand`` instance, not a
-       ``HandField``). So if your :meth:`__unicode__` method automatically
-       converts to the string form of your Python object, you can save yourself
-       a lot of work.
+2. Put a :meth:`__str__` or :meth:`__unicode__` method on the class you're
+   wrapping up as a field. There are a lot of places where the default
+   behavior of the field code is to call
+   :func:`~django.utils.encoding.force_unicode` on the value. (In our
+   examples in this document, ``value`` would be a ``Hand`` instance, not a
+   ``HandField``). So if your :meth:`__unicode__` method automatically
+   converts to the string form of your Python object, you can save yourself
+   a lot of work.
 
 
 Writing a ``FileField`` subclass
@@ -734,14 +751,14 @@ A few suggestions
 In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
 
-    1. The source for Django's own ``ImageField`` (in
-       ``django/db/models/fields/files.py``) is a great example of how to
-       subclass ``FileField`` to support a particular type of file, as it
-       incorporates all of the techniques described above.
+1. The source for Django's own ``ImageField`` (in
+   ``django/db/models/fields/files.py``) is a great example of how to
+   subclass ``FileField`` to support a particular type of file, as it
+   incorporates all of the techniques described above.
 
-    2. Cache file attributes wherever possible. Since files may be stored in
-       remote storage systems, retrieving them may cost extra time, or even
-       money, that isn't always necessary. Once a file is retrieved to obtain
-       some data about its content, cache as much of that data as possible to
-       reduce the number of times the file must be retrieved on subsequent
-       calls for that information.
+2. Cache file attributes wherever possible. Since files may be stored in
+   remote storage systems, retrieving them may cost extra time, or even
+   money, that isn't always necessary. Once a file is retrieved to obtain
+   some data about its content, cache as much of that data as possible to
+   reduce the number of times the file must be retrieved on subsequent
+   calls for that information.

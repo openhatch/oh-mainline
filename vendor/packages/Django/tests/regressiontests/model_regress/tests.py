@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 from operator import attrgetter
 
@@ -5,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import tzinfo
 
-from models import (Worker, Article, Party, Event, Department,
+from .models import (Worker, Article, Party, Event, Department,
     BrokenUnicodeMethod, NonAutoPK)
 
 
@@ -48,8 +50,7 @@ class ModelTests(TestCase):
             article_text = "ABCDE" * 1000
         )
         a = Article.objects.get(pk=a.pk)
-        self.assertEqual
-        (len(a.article_text), 5000)
+        self.assertEqual(len(a.article_text), 5000)
 
     def test_date_lookup(self):
         # Regression test for #659
@@ -163,8 +164,23 @@ class ModelTests(TestCase):
             1
         )
 
+
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
         one = NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
         self.assertRaises(ValidationError, again.validate_unique)
+
+
+class EvaluateMethodTest(TestCase):
+    """
+    Regression test for #13640: cannot filter by objects with 'evaluate' attr
+    """
+
+    def test_model_with_evaluate_method(self):
+        """
+        Ensures that you can filter by objects that have an 'evaluate' attr
+        """
+        dept = Department.objects.create(pk=1, name='abc')
+        dept.evaluate = 'abc'
+        Worker.objects.filter(department=dept)

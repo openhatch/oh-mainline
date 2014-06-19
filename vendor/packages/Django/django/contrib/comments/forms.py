@@ -1,16 +1,14 @@
 import time
-import datetime
-
 from django import forms
 from django.forms.util import ErrorDict
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from models import Comment
+from django.contrib.comments.models import Comment
 from django.utils.crypto import salted_hmac, constant_time_compare
 from django.utils.encoding import force_unicode
-from django.utils.hashcompat import sha_constructor
 from django.utils.text import get_text_list
-from django.utils.translation import ungettext, ugettext_lazy as _
+from django.utils import timezone
+from django.utils.translation import ungettext, ugettext, ugettext_lazy as _
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
 
@@ -48,12 +46,7 @@ class CommentSecurityForm(forms.Form):
         expected_hash = self.generate_security_hash(**security_hash_dict)
         actual_hash = self.cleaned_data["security_hash"]
         if not constant_time_compare(expected_hash, actual_hash):
-            # Fallback to Django 1.2 method for compatibility
-            # PendingDeprecationWarning <- here to remind us to remove this
-            # fallback in Django 1.5
-            expected_hash_old = self._generate_security_hash_old(**security_hash_dict)
-            if not constant_time_compare(expected_hash_old, actual_hash):
-                raise forms.ValidationError("Security hash check failed.")
+            raise forms.ValidationError("Security hash check failed.")
         return actual_hash
 
     def clean_timestamp(self):
@@ -95,12 +88,6 @@ class CommentSecurityForm(forms.Form):
         key_salt = "django.contrib.forms.CommentSecurityForm"
         value = "-".join(info)
         return salted_hmac(key_salt, value).hexdigest()
-
-    def _generate_security_hash_old(self, content_type, object_pk, timestamp):
-        """Generate a (SHA1) security hash from the provided info."""
-        # Django 1.2 compatibility
-        info = (content_type, object_pk, timestamp, settings.SECRET_KEY)
-        return sha_constructor("".join(info)).hexdigest()
 
 class CommentDetailsForm(CommentSecurityForm):
     """
@@ -151,7 +138,7 @@ class CommentDetailsForm(CommentSecurityForm):
             user_email   = self.cleaned_data["email"],
             user_url     = self.cleaned_data["url"],
             comment      = self.cleaned_data["comment"],
-            submit_date  = datetime.datetime.now(),
+            submit_date  = timezone.now(),
             site_id      = settings.SITE_ID,
             is_public    = True,
             is_removed   = False,
@@ -186,11 +173,12 @@ class CommentDetailsForm(CommentSecurityForm):
         if settings.COMMENTS_ALLOW_PROFANITIES == False:
             bad_words = [w for w in settings.PROFANITIES_LIST if w in comment.lower()]
             if bad_words:
-                plural = len(bad_words) > 1
                 raise forms.ValidationError(ungettext(
                     "Watch your mouth! The word %s is not allowed here.",
-                    "Watch your mouth! The words %s are not allowed here.", plural) % \
-                    get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in bad_words], 'and'))
+                    "Watch your mouth! The words %s are not allowed here.",
+                    len(bad_words)) % get_text_list(
+                        ['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1])
+                         for i in bad_words], ugettext('and')))
         return comment
 
 class CommentForm(CommentDetailsForm):

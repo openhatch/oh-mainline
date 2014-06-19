@@ -3,13 +3,13 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
-from django.db import connections
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
-from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
+from django.utils.functional import Promise
+from django.utils.encoding import force_unicode
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
@@ -40,7 +40,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
-                    pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
+                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
 
 class UpdateQuery(Query):
@@ -69,14 +69,13 @@ class UpdateQuery(Query):
         return super(UpdateQuery, self).clone(klass,
                 related_updates=self.related_updates.copy(), **kwargs)
 
-
     def update_batch(self, pk_list, values, using):
         pk_field = self.model._meta.pk
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
-                    pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
+                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
             self.get_compiler(using).execute_sql(None)
 
@@ -103,6 +102,10 @@ class UpdateQuery(Query):
         Used by add_update_values() as well as the "fast" update path when
         saving models.
         """
+        # Check that no Promise object passes to the query. Refs #10498.
+        values_seq = [(value[0], value[1], force_unicode(value[2]))
+                      if isinstance(value[2], Promise) else value
+                      for value in values_seq]
         self.values.extend(values_seq)
 
     def add_related_update(self, model, field, value):
@@ -138,20 +141,19 @@ class InsertQuery(Query):
 
     def __init__(self, *args, **kwargs):
         super(InsertQuery, self).__init__(*args, **kwargs)
-        self.columns = []
-        self.values = []
-        self.params = ()
+        self.fields = []
+        self.objs = []
 
     def clone(self, klass=None, **kwargs):
         extras = {
-            'columns': self.columns[:],
-            'values': self.values[:],
-            'params': self.params
+            'fields': self.fields[:],
+            'objs': self.objs[:],
+            'raw': self.raw,
         }
         extras.update(kwargs)
         return super(InsertQuery, self).clone(klass, **extras)
 
-    def insert_values(self, insert_values, raw_values=False):
+    def insert_values(self, fields, objs, raw=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
         dictionary gives the model field names and their target values.
@@ -161,16 +163,15 @@ class InsertQuery(Query):
         parameters. This provides a way to insert NULL and DEFAULT keywords
         into the query, for example.
         """
-        placeholders, values = [], []
-        for field, val in insert_values:
-            placeholders.append((field, val))
-            self.columns.append(field.column)
-            values.append(val)
-        if raw_values:
-            self.values.extend([(None, v) for v in values])
-        else:
-            self.params += tuple(values)
-            self.values.extend(placeholders)
+        self.fields = fields
+        # Check that no Promise object reaches the DB. Refs #10498.
+        for field in fields:
+            for obj in objs:
+                value = getattr(obj, field.attname)
+                if isinstance(value, Promise):
+                    setattr(obj, field.attname, force_unicode(value))
+        self.objs = objs
+        self.raw = raw
 
 class DateQuery(Query):
     """

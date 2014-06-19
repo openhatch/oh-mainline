@@ -1,6 +1,9 @@
-from django.db import DatabaseError
+from __future__ import absolute_import
+
 from django.utils import unittest
-from regressiontests.max_lengths.models import PersonWithDefaultMaxLengths, PersonWithCustomMaxLengths
+
+from .models import PersonWithDefaultMaxLengths, PersonWithCustomMaxLengths
+
 
 class MaxLengthArgumentsTests(unittest.TestCase):
 

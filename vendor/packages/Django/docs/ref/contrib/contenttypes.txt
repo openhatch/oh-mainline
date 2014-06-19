@@ -45,14 +45,14 @@ but if you've removed it or if you manually set up your
 It's generally a good idea to have the contenttypes framework
 installed; several of Django's other bundled applications require it:
 
-    * The admin application uses it to log the history of each object
-      added or changed through the admin interface.
+* The admin application uses it to log the history of each object
+  added or changed through the admin interface.
 
-    * Django's :mod:`authentication framework <django.contrib.auth>` uses it
-      to tie user permissions to specific models.
+* Django's :mod:`authentication framework <django.contrib.auth>` uses it
+  to tie user permissions to specific models.
 
-    * Django's comments system (:mod:`django.contrib.comments`) uses it to
-      "attach" comments to any installed model.
+* Django's comments system (:mod:`django.contrib.comments`) uses it to
+  "attach" comments to any installed model.
 
 .. currentmodule:: django.contrib.contenttypes.models
 
@@ -92,15 +92,15 @@ your database. Along with it a new instance of
 :class:`~django.contrib.contenttypes.models.ContentType` will be
 created with the following values:
 
-    * :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
-      will be set to ``'sites'`` (the last part of the Python
-      path "django.contrib.sites").
+* :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
+  will be set to ``'sites'`` (the last part of the Python
+  path "django.contrib.sites").
 
-    * :attr:`~django.contrib.contenttypes.models.ContentType.model`
-      will be set to ``'site'``.
+* :attr:`~django.contrib.contenttypes.models.ContentType.model`
+  will be set to ``'site'``.
 
-    * :attr:`~django.contrib.contenttypes.models.ContentType.name`
-      will be set to ``'site'``.
+* :attr:`~django.contrib.contenttypes.models.ContentType.name`
+  will be set to ``'site'``.
 
 .. _the verbose_name attribute: ../model-api/#verbose_name
 
@@ -116,7 +116,8 @@ model it represents, or to retrieve objects from that model:
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
-    represents, and does :meth:`a get() lookup <django.db.models.QuerySet.get>`
+    represents, and does
+    :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
     on that model, returning the corresponding object.
 
 .. method:: ContentType.model_class()
@@ -147,17 +148,17 @@ Together,
 and :meth:`~django.contrib.contenttypes.models.ContentType.model_class` enable
 two extremely important use cases:
 
-    1. Using these methods, you can write high-level generic code that
-       performs queries on any installed model -- instead of importing and
-       using a single specific model class, you can pass an ``app_label`` and
-       ``model`` into a
-       :class:`~django.contrib.contenttypes.models.ContentType` lookup at
-       runtime, and then work with the model class or retrieve objects from it.
+1. Using these methods, you can write high-level generic code that
+   performs queries on any installed model -- instead of importing and
+   using a single specific model class, you can pass an ``app_label`` and
+   ``model`` into a
+   :class:`~django.contrib.contenttypes.models.ContentType` lookup at
+   runtime, and then work with the model class or retrieve objects from it.
 
-    2. You can relate another model to
-       :class:`~django.contrib.contenttypes.models.ContentType` as a way of
-       tying instances of it to particular model classes, and use these methods
-       to get access to those model classes.
+2. You can relate another model to
+   :class:`~django.contrib.contenttypes.models.ContentType` as a way of
+   tying instances of it to particular model classes, and use these methods
+   to get access to those model classes.
 
 Several of Django's bundled applications make use of the latter technique.
 For example,
@@ -186,11 +187,26 @@ The ``ContentTypeManager``
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
 
+    .. method:: get_for_id(id)
+
+        Lookup a :class:`~django.contrib.contenttypes.models.ContentType` by ID.
+        Since this method uses the same shared cache as
+        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`,
+        it's preferred to use this method over the usual
+        ``ContentType.objects.get(pk=id)``
+
     .. method:: get_for_model(model)
 
         Takes either a model class or an instance of a model, and returns the
         :class:`~django.contrib.contenttypes.models.ContentType` instance
         representing that model.
+
+    .. method:: get_for_models(*models)
+
+        Takes a variadic number of model classes, and returns a dictionary
+        mapping the model classes to the
+        :class:`~django.contrib.contenttypes.models.ContentType` instances
+        representing them.
 
     .. method:: get_by_natural_key(app_label, model)
 
@@ -255,21 +271,21 @@ model:
     There are three parts to setting up a
     :class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
 
-        1. Give your model a :class:`~django.db.models.ForeignKey`
-           to :class:`~django.contrib.contenttypes.models.ContentType`.
+    1. Give your model a :class:`~django.db.models.ForeignKey`
+       to :class:`~django.contrib.contenttypes.models.ContentType`.
 
-        2. Give your model a field that can store primary key values from the
-           models you'll be relating to. For most models, this means a
-           :class:`~django.db.models.PositiveIntegerField`. The usual name
-           for this field is "object_id".
+    2. Give your model a field that can store primary key values from the
+       models you'll be relating to. For most models, this means a
+       :class:`~django.db.models.PositiveIntegerField`. The usual name
+       for this field is "object_id".
 
-        3. Give your model a
-           :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
-           pass it the names of the two fields described above. If these fields
-           are named "content_type" and "object_id", you can omit this -- those
-           are the default field names
-           :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
-           look for.
+    3. Give your model a
+       :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
+       pass it the names of the two fields described above. If these fields
+       are named "content_type" and "object_id", you can omit this -- those
+       are the default field names
+       :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
+       look for.
 
 .. admonition:: Primary key type compatibility
 
@@ -318,8 +334,8 @@ creating a ``TaggedItem``::
 
 Due to the way :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
-and ``exclude()``, for example) via the database API. Because a 
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` isn't a 
+and ``exclude()``, for example) via the database API. Because a
+:class:`~django.contrib.contenttypes.generic.GenericForeignKey` isn't a
 normal field objects, these examples will *not* work::
 
     # This will fail
@@ -342,7 +358,7 @@ a "reverse" generic relationship to enable an additional API. For example::
 ``Bookmark`` instances will each have a ``tags`` attribute, which can
 be used to retrieve their associated ``TaggedItems``::
 
-    >>> b = Bookmark(url='http://www.djangoproject.com/')
+    >>> b = Bookmark(url='https://www.djangoproject.com/')
     >>> b.save()
     >>> t1 = TaggedItem(content_object=b, tag='django')
     >>> t1.save()
@@ -369,7 +385,7 @@ referred to above used fields named ``content_type_fk`` and
 Of course, if you don't add the reverse relationship, you can do the
 same types of lookups manually::
 
-    >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/')
+    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
     >>> bookmark_type = ContentType.objects.get_for_model(b)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)
@@ -416,9 +432,9 @@ might be tempted to try something like::
 
 This will not work correctly, however. The generic relation adds extra filters
 to the queryset to ensure the correct content type, but the
-:meth:`~django.db.models.QuerySet.aggregate` method doesn't take them into
-account. For now, if you need aggregates on generic relations, you'll need
-to calculate them without using the aggregation API.
+:meth:`~django.db.models.query.QuerySet.aggregate` method doesn't take them
+into account. For now, if you need aggregates on generic relations, you'll
+need to calculate them without using the aggregation API.
 
 Generic relations in forms and admin
 ------------------------------------

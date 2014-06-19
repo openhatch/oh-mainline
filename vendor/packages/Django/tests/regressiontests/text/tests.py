@@ -1,10 +1,13 @@
 # coding: utf-8
-from django.test import TestCase
+from __future__ import with_statement
 
-from django.utils.text import *
-from django.utils.http import urlquote, urlquote_plus, cookie_date, http_date
+from django.test import TestCase
 from django.utils.encoding import iri_to_uri
-from django.utils.translation import activate, deactivate
+from django.utils.http import (cookie_date, http_date,
+    urlquote, urlquote_plus, urlunquote, urlunquote_plus)
+from django.utils.text import get_text_list, smart_split
+from django.utils.translation import override
+
 
 class TextTests(TestCase):
     """
@@ -17,9 +20,8 @@ class TextTests(TestCase):
         self.assertEqual(get_text_list(['a', 'b'], 'and'), u'a and b')
         self.assertEqual(get_text_list(['a']), u'a')
         self.assertEqual(get_text_list([]), u'')
-        activate('ar')
-        self.assertEqual(get_text_list(['a', 'b', 'c']), u"a، b أو c")
-        deactivate()
+        with override('ar'):
+            self.assertEqual(get_text_list(['a', 'b', 'c']), u"a، b أو c")
 
     def test_smart_split(self):
 
@@ -59,15 +61,26 @@ class TextTests(TestCase):
             [u"cut:','|cut:' '"])
 
     def test_urlquote(self):
-
         self.assertEqual(urlquote(u'Paris & Orl\xe9ans'),
             u'Paris%20%26%20Orl%C3%A9ans')
         self.assertEqual(urlquote(u'Paris & Orl\xe9ans', safe="&"),
             u'Paris%20&%20Orl%C3%A9ans')
+        self.assertEqual(
+            urlunquote(u'Paris%20%26%20Orl%C3%A9ans'),
+            u'Paris & Orl\xe9ans')
+        self.assertEqual(
+            urlunquote(u'Paris%20&%20Orl%C3%A9ans'),
+            u'Paris & Orl\xe9ans')
         self.assertEqual(urlquote_plus(u'Paris & Orl\xe9ans'),
             u'Paris+%26+Orl%C3%A9ans')
         self.assertEqual(urlquote_plus(u'Paris & Orl\xe9ans', safe="&"),
             u'Paris+&+Orl%C3%A9ans')
+        self.assertEqual(
+            urlunquote_plus(u'Paris+%26+Orl%C3%A9ans'),
+            u'Paris & Orl\xe9ans')
+        self.assertEqual(
+            urlunquote_plus(u'Paris+&+Orl%C3%A9ans'),
+            u'Paris & Orl\xe9ans')
 
     def test_cookie_date(self):
         t = 1167616461.0

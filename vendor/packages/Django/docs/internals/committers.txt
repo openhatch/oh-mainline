@@ -58,6 +58,8 @@ Current developers
 
 Currently, Django is led by a team of volunteers from around the globe.
 
+.. _django-bdfls:
+
 BDFLs
 -----
 
@@ -75,15 +77,13 @@ record of being helpful on the mailing lists, and a proven desire to dedicate
 serious time to Django. In return, they've been granted the coveted commit bit,
 and have free rein to hack on all parts of Django.
 
-`Malcolm Tredinnick`_
+Malcolm Tredinnick
     Malcolm originally wanted to be a mathematician, somehow ended up a software
     developer. He's contributed to many Open Source projects, has served on the
     board of the GNOME foundation, and will kick your ass at chess.
 
     When he's not busy being an International Man of Mystery, Malcolm lives in
     Sydney, Australia.
-
-.. _malcolm tredinnick: http://www.pointy-stick.com/
 
 `Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
@@ -144,14 +144,14 @@ Joseph Kocherhans
 
     Brian lives in Denver, Colorado, USA.
 
-.. _brian rosner: http://oebfare.com/
+.. _brian rosner: http://brosner.com/
 .. _eldarion: http://eldarion.com/
 .. _django dose: http://djangodose.com/
 
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web
     applications for `The University of Texas`_ (UT).  Since, he has made
-    contributions to the e-mail and forms systems, as well as many other
+    contributions to the email and forms systems, as well as many other
     improvements and code cleanups throughout the code base.
 
     Gary is currently a developer and software engineering graduate student at
@@ -160,7 +160,7 @@ Joseph Kocherhans
 
     Gary lives in Austin, Texas, USA.
 
-.. _Gary Wilson: http://gdub.wordpress.com/
+.. _Gary Wilson: http://thegarywilson.com/
 .. _The University of Texas: http://www.utexas.edu/
 
 Justin Bronn
@@ -236,13 +236,12 @@ Karen Tracey
 `Carl Meyer`_
     Carl has been working with Django since 2007 (long enough to remember
     queryset-refactor, but not magic-removal), and works as a freelance
-    developer with OddBird_ and Eldarion_. He became a Django contributor by
-    accident, because fixing bugs is more interesting than working around
-    them.
+    developer with OddBird_.  He became a Django contributor by accident,
+    because fixing bugs is more interesting than working around them.
 
-    Carl lives in Elkhart, IN, USA.
+    Carl lives in Rapid City, SD, USA.
 
-.. _Carl Meyer: http://www.oddbird.net/about/#hcard-carl
+.. _Carl Meyer: http://www.oddbird.net/
 .. _OddBird: http://www.oddbird.net/
 
 Ramiro Morales
@@ -298,22 +297,79 @@ Honza Král
 .. _Pixane: http://pixane.com
 .. _Skills: http://skillsapp.com
 
+`Paul McMillan`_
+    Paul found Django in 2008 while looking for a more
+    structured approach to web programming. He stuck around after
+    figuring out that the developers of Django had already invented
+    many of the wheels he needed. His passion for breaking (and then
+    fixing) things led to his current role working to maintain and
+    improve the security of Django.
+
+    Paul works in Berkeley, California as a `web developer`_ and `security
+    consultant`_.
+
+.. _Paul McMillan: http://subversivecode.com
+.. _web developer: http://zerocoordinate.com
+.. _security consultant: http://subversivecode.com/about
+
+`Julien Phalip`_
+    Julien has a background in software engineering and human-computer
+    interaction. As a Web developer, he enjoys tinkering with the backend as
+    much as designing and coding user interfaces. Julien discovered Django in
+    2007 while doing his PhD in Computing Sciences. Since then he has
+    contributed patches to various components of the framework, in particular
+    the admin. Julien was a co-founder of the `Interaction Consortium`_. He
+    now works at Odopod_, a digital agency based in San Francisco, CA, USA.
+
+.. _Julien Phalip: http://julienphalip.com
+.. _Interaction Consortium: http://interaction.net.au
+.. _Odopod: http://odopod.com
+
+`Aymeric Augustin`_
+    Aymeric is an engineer with a background in mathematics and computer
+    science. He chose Django because he believes that software should be simple,
+    explicit and tested. His perfectionist tendencies quickly led him to triage
+    tickets and contribute patches.
+
+    Aymeric has a pragmatic approach to software engineering, can't live without
+    a continuous integration server, and likes proving that Django is a good
+    choice for enterprise software.
+
+    He works in a `management consulting company`_ in Paris, France.
+
+.. _Aymeric Augustin: http://myks.org/
+.. _management consulting company: http://www.polyconseil.fr/
+
+`Claude Paroz`_
+    Claude is a former teacher who fell in love with free software at the
+    beginning of the 21st century. He's now working as freelancer in Web
+    development in his native Switzerland. He has found in Django a perfect
+    match for his needs of a stable, clean, documented and well-maintained Web
+    framework.
+
+    He's also helping the GNOME Translation Project as maintainer of the
+    Django-based `l10n.gnome.org`_.
+
+.. _Claude Paroz: http://www.2xlibre.net
+.. _l10n.gnome.org: http://l10n.gnome.org
+
 Specialists
 -----------
 
 `James Bennett`_
-    James is Django's release manager; he also contributes to the documentation.
+    James is Django's release manager, and also contributes to the
+    documentation and provide the occasional bugfix.
 
     James came to Web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
-    better pay. He lives in Lawrence, Kansas, where he works for the
-    Journal-World developing Ellington. He `keeps a blog`_, has
-    written a `book on Django`_, and enjoys fine port and talking to
-    his car.
+    better pay. He lives in Lawrence, Kansas and previously worked at
+    World Online; currently, he's part of the Web development team at
+    Mozilla.
+
+    He `keeps a blog`_, and enjoys fine port and talking to his car.
 
 .. _james bennett: http://b-list.org/
 .. _keeps a blog: `james bennett`_
-.. _book on Django: http://www.amazon.com/dp/1590599969/?tag=djangoproject-20
 
 Ian Kelly
     Ian is responsible for Django's support for Oracle.

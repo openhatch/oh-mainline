@@ -1,5 +1,6 @@
 import os
 import sys
+import imp
 from zipimport import zipimporter
 
 from django.utils import unittest
@@ -8,9 +9,17 @@ from django.utils.module_loading import module_has_submodule
 
 
 class DefaultLoader(unittest.TestCase):
+    def setUp(self):
+        sys.meta_path.insert(0, ProxyFinder())
+
+    def tearDown(self):
+        sys.meta_path.pop(0)
+
     def test_loader(self):
         "Normal module existence can be tested"
         test_module = import_module('regressiontests.utils.test_module')
+        test_no_submodule = import_module(
+            'regressiontests.utils.test_no_submodule')
 
         # An importable child
         self.assertTrue(module_has_submodule(test_module, 'good_module'))
@@ -25,9 +34,18 @@ class DefaultLoader(unittest.TestCase):
         self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.no_such_module')
 
+        # A child that doesn't exist, but is the name of a package on the path
+        self.assertFalse(module_has_submodule(test_module, 'django'))
+        self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.django')
+
         # Don't be confused by caching of import misses
         import types  # causes attempted import of regressiontests.utils.types
         self.assertFalse(module_has_submodule(sys.modules['regressiontests.utils'], 'types'))
+
+        # A module which doesn't have a __path__ (so no submodules)
+        self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
+        self.assertRaises(ImportError, import_module,
+            'regressiontests.utils.test_no_submodule.anything')
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
@@ -83,6 +101,25 @@ class EggLoader(unittest.TestCase):
         # A child that doesn't exist
         self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
+
+class ProxyFinder(object):
+    def __init__(self):
+        self._cache = {}
+
+    def find_module(self, fullname, path=None):
+        tail = fullname.rsplit('.', 1)[-1]
+        try:
+            self._cache[fullname] = imp.find_module(tail, path)
+        except ImportError:
+            return None
+        else:
+            return self  # this is a loader as well
+
+    def load_module(self, fullname):
+        if fullname in sys.modules:
+            return sys.modules[fullname]
+        fd, fn, info = self._cache[fullname]
+        return imp.load_module(fullname, fd, fn, info)
 
 class TestFinder(object):
     def __init__(self, *args, **kwargs):

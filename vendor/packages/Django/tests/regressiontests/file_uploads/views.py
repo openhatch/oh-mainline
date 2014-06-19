@@ -1,11 +1,16 @@
+from __future__ import absolute_import
+
+import hashlib
 import os
+
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import simplejson
-from models import FileModel, UPLOAD_TO
-from uploadhandler import QuotaUploadHandler, ErroringUploadHandler
-from django.utils.hashcompat import sha_constructor
-from tests import UNICODE_FILENAME
+
+from .models import FileModel, UPLOAD_TO
+from .tests import UNICODE_FILENAME
+from .uploadhandler import QuotaUploadHandler, ErroringUploadHandler
+
 
 def file_upload_view(request):
     """
@@ -37,9 +42,9 @@ def file_upload_view_verify(request):
             continue
         submitted_hash = form_data[key + '_hash']
         if isinstance(value, UploadedFile):
-            new_hash = sha_constructor(value.read()).hexdigest()
+            new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
-            new_hash = sha_constructor(value).hexdigest()
+            new_hash = hashlib.sha1(value).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 
@@ -120,3 +125,12 @@ def file_upload_getlist_count(request):
 def file_upload_errors(request):
     request.upload_handlers.insert(0, ErroringUploadHandler())
     return file_upload_echo(request)
+
+def file_upload_filename_case_view(request):
+    """
+    Check adding the file to the database will preserve the filename case.
+    """
+    file = request.FILES['file_field']
+    obj = FileModel()
+    obj.testfile.save(file.name, file)
+    return HttpResponse('%d' % obj.pk)

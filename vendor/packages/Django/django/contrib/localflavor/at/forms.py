@@ -16,14 +16,14 @@ class ATZipCodeField(RegexField):
     """
     A form field that validates its input is an Austrian postcode.
 
-    Accepts 4 digits.
+    Accepts 4 digits (first digit must be greater than 0).
     """
     default_error_messages = {
         'invalid': _('Enter a zip code in the format XXXX.'),
     }
-    def __init__(self, *args, **kwargs):
-        super(ATZipCodeField, self).__init__(r'^\d{4}$',
-                max_length=None, min_length=None, *args, **kwargs)
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        super(ATZipCodeField, self).__init__(r'^[1-9]{1}\d{3}$',
+                max_length, min_length, *args, **kwargs)
 
 class ATStateSelect(Select):
     """

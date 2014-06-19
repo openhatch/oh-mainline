@@ -1,7 +1,16 @@
 #!/usr/bin/env python
-import os, subprocess, sys
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import warnings
 
-import django.contrib as contrib
+from django import contrib
+
+# databrowse is deprecated, but we still want to run its tests
+warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
+                        PendingDeprecationWarning, 'django.contrib.databrowse')
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -9,9 +18,12 @@ REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
+RUNTESTS_DIR = os.path.dirname(__file__)
 CONTRIB_DIR = os.path.dirname(contrib.__file__)
-MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
-REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
+MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
+REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
+TEMP_DIR = tempfile.mkdtemp(prefix='django_')
+os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 REGRESSION_SUBDIRS_TO_SKIP = ['locale']
 
@@ -26,7 +38,12 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.comments',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.databrowse',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'regressiontests.staticfiles_tests',
+    'regressiontests.staticfiles_tests.apps.test',
+    'regressiontests.staticfiles_tests.apps.no_label',
 ]
 
 def geodjango(settings):
@@ -37,7 +54,10 @@ def geodjango(settings):
 
 def get_test_modules():
     modules = []
-    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
+    for loc, dirpath in (
+        (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR),
+        (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR),
+        (CONTRIB_DIR_NAME, CONTRIB_DIR)):
         for f in os.listdir(dirpath):
             if (f.startswith('__init__') or
                 f.startswith('.') or
@@ -57,12 +77,16 @@ def setup(verbosity, test_labels):
         'LOGIN_URL': settings.LOGIN_URL,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
+        'STATIC_URL': settings.STATIC_URL,
+        'STATIC_ROOT': settings.STATIC_ROOT,
     }
 
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
-    settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
+    settings.STATIC_URL = '/static/'
+    settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
+    settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
     settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
     settings.LOGIN_URL = '/accounts/login/'
@@ -93,6 +117,7 @@ def setup(verbosity, test_labels):
     if geodjango(settings):
         from django.contrib.gis.tests import geo_apps
         test_modules.extend(geo_apps(runtests=True))
+        settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
     for module_dir, module_name in test_modules:
         module_label = '.'.join([module_dir, module_name])
@@ -111,6 +136,11 @@ def setup(verbosity, test_labels):
 
 def teardown(state):
     from django.conf import settings
+    # Removing the temporary TEMP_DIR. Ensure we pass in unicode
+    # so that it will successfully remove temp trees containing
+    # non-ASCII filenames on Windows. (We're assuming the temp dir
+    # name itself does not contain non-ASCII characters.)
+    shutil.rmtree(unicode(TEMP_DIR))
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
@@ -122,7 +152,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 
     # If GeoDjango is used, add it's tests that aren't a part of
     # an application (e.g., GEOS, GDAL, Distance objects).
-    if geodjango(settings):
+    if geodjango(settings) and (not test_labels or 'gis' in test_labels):
         from django.contrib.gis.tests import geodjango_suite
         extra_tests.append(geodjango_suite(apps=False))
 
@@ -132,19 +162,9 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         settings.TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
     TestRunner = get_runner(settings)
 
-    if hasattr(TestRunner, 'func_name'):
-        # Pre 1.2 test runners were just functions,
-        # and did not support the 'failfast' option.
-        import warnings
-        warnings.warn(
-            'Function-based test runners are deprecated. Test runners should be classes with a run_tests() method.',
-            DeprecationWarning
-        )
-        failures = TestRunner(test_labels, verbosity=verbosity, interactive=interactive,
-            extra_tests=extra_tests)
-    else:
-        test_runner = TestRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
-        failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
+    test_runner = TestRunner(verbosity=verbosity, interactive=interactive,
+        failfast=failfast)
+    failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
 
     teardown(state)
     return failures
@@ -168,7 +188,8 @@ def bisect_tests(bisection_label, options, test_labels):
         except ValueError:
             pass
 
-    subprocess_args = [sys.executable, __file__, '--settings=%s' % options.settings]
+    subprocess_args = [
+        sys.executable, __file__, '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -228,7 +249,8 @@ def paired_tests(paired_test, options, test_labels):
         except ValueError:
             pass
 
-    subprocess_args = [sys.executable, __file__, '--settings=%s' % options.settings]
+    subprocess_args = [
+        sys.executable, __file__, '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -237,7 +259,8 @@ def paired_tests(paired_test, options, test_labels):
         subprocess_args.append('--noinput')
 
     for i, label in enumerate(test_labels):
-        print '***** %d of %d: Check test pairing with %s' % (i+1, len(test_labels), label)
+        print '***** %d of %d: Check test pairing with %s' % (
+            i+1, len(test_labels), label)
         failures = subprocess.call(subprocess_args + [label, paired_test])
         if failures:
             print '***** Found problem pair with',label
@@ -250,19 +273,36 @@ if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [module module module ...]"
     parser = OptionParser(usage=usage)
-    parser.add_option('-v','--verbosity', action='store', dest='verbosity', default='1',
+    parser.add_option(
+        '-v','--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2', '3'],
-        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
-    parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all '
+             'output')
+    parser.add_option(
+        '--noinput', action='store_false', dest='interactive', default=True,
         help='Tells Django to NOT prompt the user for input of any kind.')
-    parser.add_option('--failfast', action='store_true', dest='failfast', default=False,
-        help='Tells Django to stop running the test suite after first failed test.')
-    parser.add_option('--settings',
-        help='Python path to settings module, e.g. "myproject.settings". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
-    parser.add_option('--bisect', action='store', dest='bisect', default=None,
-        help="Bisect the test suite to discover a test that causes a test failure when combined with the named test.")
-    parser.add_option('--pair', action='store', dest='pair', default=None,
-        help="Run the test suite in pairs with the named test to find problem pairs.")
+    parser.add_option(
+        '--failfast', action='store_true', dest='failfast', default=False,
+        help='Tells Django to stop running the test suite after first failed '
+             'test.')
+    parser.add_option(
+        '--settings',
+        help='Python path to settings module, e.g. "myproject.settings". If '
+             'this isn\'t provided, the DJANGO_SETTINGS_MODULE environment '
+             'variable will be used.')
+    parser.add_option(
+        '--bisect', action='store', dest='bisect', default=None,
+        help='Bisect the test suite to discover a test that causes a test '
+             'failure when combined with the named test.')
+    parser.add_option(
+        '--pair', action='store', dest='pair', default=None,
+        help='Run the test suite in pairs with the named test to find problem '
+             'pairs.')
+    parser.add_option(
+        '--liveserver', action='store', dest='liveserver', default=None,
+        help='Overrides the default address where the live server (used with '
+             'LiveServerTestCase) is expected to run from. The default value '
+             'is localhost:8081.'),
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -272,11 +312,15 @@ if __name__ == "__main__":
     else:
         options.settings = os.environ['DJANGO_SETTINGS_MODULE']
 
+    if options.liveserver is not None:
+        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
+
     if options.bisect:
         bisect_tests(options.bisect, options, args)
     elif options.pair:
         paired_tests(options.pair, options, args)
     else:
-        failures = django_tests(int(options.verbosity), options.interactive, options.failfast, args)
+        failures = django_tests(int(options.verbosity), options.interactive,
+                                options.failfast, args)
         if failures:
             sys.exit(bool(failures))

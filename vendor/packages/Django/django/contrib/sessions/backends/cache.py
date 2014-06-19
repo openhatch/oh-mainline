@@ -3,6 +3,7 @@ from django.core.cache import cache
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 
+
 class SessionStore(SessionBase):
     """
     A cache-based session store.
@@ -11,8 +12,17 @@ class SessionStore(SessionBase):
         self._cache = cache
         super(SessionStore, self).__init__(session_key)
 
+    @property
+    def cache_key(self):
+        return KEY_PREFIX + self._get_or_create_session_key()
+
     def load(self):
-        session_data = self._cache.get(KEY_PREFIX + self.session_key)
+        try:
+            session_data = self._cache.get(self.cache_key, None)
+        except Exception:
+            # Some backends (e.g. memcache) raise an exception on invalid
+            # cache keys. If this happens, reset the session. See #17810.
+            session_data = None
         if session_data is not None:
             return session_data
         self.create()
@@ -25,7 +35,7 @@ class SessionStore(SessionBase):
         # and then raise an exception. That's the risk you shoulder if using
         # cache backing.
         for i in xrange(10000):
-            self.session_key = self._get_new_session_key()
+            self._session_key = self._get_new_session_key()
             try:
                 self.save(must_create=True)
             except CreateError:
@@ -39,20 +49,18 @@ class SessionStore(SessionBase):
             func = self._cache.add
         else:
             func = self._cache.set
-        result = func(KEY_PREFIX + self.session_key, self._get_session(no_load=must_create),
-                self.get_expiry_age())
+        result = func(self.cache_key,
+                      self._get_session(no_load=must_create),
+                      self.get_expiry_age())
         if must_create and not result:
             raise CreateError
 
     def exists(self, session_key):
-        if self._cache.has_key(KEY_PREFIX + session_key):
-            return True
-        return False
+        return (KEY_PREFIX + session_key) in self._cache
 
     def delete(self, session_key=None):
         if session_key is None:
-            if self._session_key is None:
+            if self.session_key is None:
                 return
-            session_key = self._session_key
+            session_key = self.session_key
         self._cache.delete(KEY_PREFIX + session_key)
-

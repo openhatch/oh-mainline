@@ -23,26 +23,31 @@ CSRF Protection
 ---------------
 
 There have been large changes to the way that CSRF protection works, detailed in
-:doc:`the CSRF documentaton </ref/contrib/csrf>`.  The following are the major
+:doc:`the CSRF documentation </ref/contrib/csrf>`.  The following are the major
 changes that developers must be aware of:
 
- * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
-   **will be removed completely in Django 1.4**, in favor of a template tag that
-   should be inserted into forms.
+* ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
+  **will be removed completely in Django 1.4**, in favor of a template tag that
+  should be inserted into forms.
 
- * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
-   requires the use of the ``csrf_token`` template tag in the template, so if you
-   have used custom templates for contrib views, you MUST READ THE :ref:`UPGRADE
-   INSTRUCTIONS <ref-csrf-upgrading-notes>` to fix those templates.
+* All contrib apps use a ``csrf_protect`` decorator to protect the view. This
+  requires the use of the ``csrf_token`` template tag in the template, so if you
+  have used custom templates for contrib views, you MUST READ THE UPGRADE
+  INSTRUCTIONS to fix those templates.
 
- * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
-   default. This turns on CSRF protection by default, so that views that accept
-   POST requests need to be written to work with the middleware. Instructions
-   on how to do this are found in the CSRF docs.
+  .. admonition:: Documentation removed
 
- * CSRF-related code has moved from ``contrib`` to ``core`` (with
-   backwards compatible imports in the old locations, which are
-   deprecated).
+     The upgrade notes have been removed in current Django docs. Please refer
+     to the docs for Django 1.3 or older to find these instructions.
+
+* ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+  default. This turns on CSRF protection by default, so that views that accept
+  POST requests need to be written to work with the middleware. Instructions
+  on how to do this are found in the CSRF docs.
+
+* CSRF-related code has moved from ``contrib`` to ``core`` (with
+  backwards compatible imports in the old locations, which are
+  deprecated).
 
 :ttag:`if` tag changes
 ----------------------
@@ -65,18 +70,18 @@ If you used ``LazyObject`` in your own code, and implemented the
 ``get_all_members()`` method for wrapped objects, you need to make the following
 changes:
 
- * If your class does not have special requirements for introspection (i.e. you
-   have not implemented ``__getattr__()`` or other methods that allow for
-   attributes not discoverable by normal mechanisms), you can simply remove the
-   ``get_all_members()`` method.  The default implementation on ``LazyObject``
-   will do the right thing.
+* If your class does not have special requirements for introspection (i.e. you
+  have not implemented ``__getattr__()`` or other methods that allow for
+  attributes not discoverable by normal mechanisms), you can simply remove the
+  ``get_all_members()`` method.  The default implementation on ``LazyObject``
+  will do the right thing.
 
- * If you have more complex requirements for introspection, first rename the
-   ``get_all_members()`` method to ``__dir__()``.  This is the standard method,
-   from Python 2.6 onwards, for supporting introspection.  If you are require
-   support for Python < 2.6, add the following code to the class::
+* If you have more complex requirements for introspection, first rename the
+  ``get_all_members()`` method to ``__dir__()``.  This is the standard method,
+  from Python 2.6 onwards, for supporting introspection.  If you are require
+  support for Python < 2.6, add the following code to the class::
 
-       __members__ = property(lambda self: self.__dir__())
+      __members__ = property(lambda self: self.__dir__())
 
 ``__dict__`` on Model instances
 -------------------------------
@@ -195,14 +200,19 @@ template tag method (see above), and will be removed completely in Django
 ``CsrfResponseMiddleware`` and ``CsrfViewMiddleware`` has likewise been
 deprecated.
 
-Also, the CSRF module has moved from contrib to core, and the old imports are
-deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>`.
+Also, the CSRF module has moved from contrib to core, and the old
+imports are deprecated, as described in the upgrading notes.
+
+.. admonition:: Documentation removed
+
+   The upgrade notes have been removed in current Django docs. Please refer
+   to the docs for Django 1.3 or older to find these instructions.
 
 ``SMTPConnection``
 ------------------
 
 The ``SMTPConnection`` class has been deprecated in favor of a generic
-E-mail backend API. Old code that explicitly instantiated an instance
+Email backend API. Old code that explicitly instantiated an instance
 of an SMTPConnection::
 
     from django.core.mail import SMTPConnection
@@ -211,7 +221,7 @@ of an SMTPConnection::
     connection.send_messages(messages)
 
 should now call :meth:`~django.core.mail.get_connection()` to
-instantiate a generic e-mail connection::
+instantiate a generic email connection::
 
     from django.core.mail import get_connection
     connection = get_connection()
@@ -220,7 +230,7 @@ instantiate a generic e-mail connection::
 
 Depending on the value of the :setting:`EMAIL_BACKEND` setting, this
 may not return an SMTP connection. If you explicitly require an SMTP
-connection with which to send e-mail, you can explicitly request an
+connection with which to send email, you can explicitly request an
 SMTP connection::
 
     from django.core.mail import get_connection
@@ -272,20 +282,20 @@ The sample settings given previously would now be stored using::
 
 This affects the following settings:
 
-    =========================================  ==========================
-     Old setting                                New Setting
-    =========================================  ==========================
-    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-    :setting:`DATABASE_HOST`                   :setting:`HOST`
-    :setting:`DATABASE_NAME`                   :setting:`NAME`
-    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-    :setting:`DATABASE_PORT`                   :setting:`PORT`
-    :setting:`DATABASE_USER`                   :setting:`USER`
-    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
-    =========================================  ==========================
+=========================================  ==========================
+ Old setting                                New Setting
+=========================================  ==========================
+:setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+:setting:`DATABASE_HOST`                   :setting:`HOST`
+:setting:`DATABASE_NAME`                   :setting:`NAME`
+:setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+:setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+:setting:`DATABASE_PORT`                   :setting:`PORT`
+:setting:`DATABASE_USER`                   :setting:`USER`
+:setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+:setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+:setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+=========================================  ==========================
 
 These changes are also required if you have manually created a database
 connection using ``DatabaseWrapper()`` from your database backend of choice.
@@ -357,9 +367,9 @@ or, when directly formatting a date value::
 
 The same applies to the globals found in ``django.forms.fields``:
 
-  * ``DEFAULT_DATE_INPUT_FORMATS``
-  * ``DEFAULT_TIME_INPUT_FORMATS``
-  * ``DEFAULT_DATETIME_INPUT_FORMATS``
+* ``DEFAULT_DATE_INPUT_FORMATS``
+* ``DEFAULT_TIME_INPUT_FORMATS``
+* ``DEFAULT_DATETIME_INPUT_FORMATS``
 
 Use ``django.utils.formats.get_format()`` to get the appropriate formats.
 
@@ -385,23 +395,23 @@ malicious site in their browser. A related type of attack, 'login
 CSRF', where an attacking site tricks a user's browser into logging
 into a site with someone else's credentials, is also covered.
 
-E-mail Backends
----------------
+Email Backends
+--------------
 
-You can now :ref:`configure the way that Django sends e-mail
-<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
-can now choose a configurable e-mail backend to send messages. If your
+You can now :ref:`configure the way that Django sends email
+<topic-email-backends>`. Instead of using SMTP to send all email, you
+can now choose a configurable email backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
-sending mail, you can now construct an e-mail backend that will allow
+sending mail, you can now construct an email backend that will allow
 Django's standard :doc:`mail sending methods</topics/email>` to use
 those facilities.
 
 This also makes it easier to debug mail sending - Django ships with
-backend implementations that allow you to send e-mail to a
+backend implementations that allow you to send email to a
 :ref:`file<topic-email-file-backend>`, to the
 :ref:`console<topic-email-console-backend>`, or to
 :ref:`memory<topic-email-memory-backend>` - you can even configure all
-e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
+email to be :ref:`thrown away<topic-email-dummy-backend>`.
 
 Messages Framework
 ------------------
@@ -549,7 +559,7 @@ Django team by trying out the alpha codebase in a safe test environment and
 reporting any bugs or issues you encounter. The Django ticket tracker is the
 central place to search for open issues:
 
-    * http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
@@ -557,7 +567,7 @@ running into.
 Additionally, discussion of Django development, including progress toward the
 1.2 release, takes place daily on the django-developers mailing list:
 
-    * http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 ... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
 interested in helping out with Django's development, feel free to join the
@@ -566,7 +576,7 @@ discussions there.
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :doc:`How to contribute to Django </internals/contributing>`
+* :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

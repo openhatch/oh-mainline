@@ -49,6 +49,12 @@ they were created. The default formset iterator also renders the forms
 in this order, but you can change this order by providing an alternate
 implementation for the :meth:`__iter__()` method.
 
+Formsets can also be indexed into, which returns the corresponding form. If you
+override ``__iter__``, you will need to also override ``__getitem__`` to have
+matching behavior.
+
+.. _formsets-initial-data:
+
 Using initial data with a formset
 ---------------------------------
 
@@ -61,7 +67,7 @@ example::
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(initial=[
     ...     {'title': u'Django is now open source',
-    ...      'pub_date': datetime.date.today()},
+    ...      'pub_date': datetime.date.today(),}
     ... ])
 
     >>> for form in formset:
@@ -102,8 +108,10 @@ If the value of ``max_num`` is greater than the number of existing
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``.
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed. Please note that the default value of ``max_num`` was changed
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
+
+Please note that the default value of ``max_num`` was changed
 from ``0`` to ``None`` in version 1.2 to allow ``0`` as a valid value.
 
 Formset validation
@@ -145,6 +153,20 @@ provide an invalid article::
 As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
+
+We can also check if form data differs from the initial data (i.e. the form was
+sent without any data)::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ...     'form-0-title': u'',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.has_changed()
+    False
 
 .. _understanding-the-managementform:
 
@@ -255,7 +277,7 @@ getting to that data.
 
 Default: ``False``
 
-Lets create a formset with the ability to order::
+Lets you create a formset with the ability to order::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(initial=[
@@ -276,7 +298,7 @@ Lets create a formset with the ability to order::
 
 This adds an additional field to each form. This new field is named ``ORDER``
 and is an ``forms.IntegerField``. For the forms that came from the initial
-data it automatically assigned them a numeric value. Lets look at what will
+data it automatically assigned them a numeric value. Let's look at what will
 happen when the user changes these values::
 
     >>> data = {
@@ -311,7 +333,7 @@ happen when the user changes these values::
 
 Default: ``False``
 
-Lets create a formset with the ability to delete::
+Lets you create a formset with the ability to delete::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(initial=[
@@ -423,6 +445,33 @@ with the management form:
     </form>
 
 The above ends up calling the ``as_table`` method on the formset class.
+
+.. _manually-rendered-can-delete-and-can-order:
+
+Manually rendered ``can_delete`` and ``can_order``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you manually render fields in the template, you can render
+``can_delete`` parameter with ``{{ form.DELETE }}``:
+
+.. code-block:: html+django
+
+    <form method="post" action="">
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form.id }}
+            <ul>
+                <li>{{ form.title }}</li>
+                {% if formset.can_delete %}
+                    <li>{{ form.DELETE }}</li>
+                {% endif %}
+            </ul>
+        {% endfor %}
+    </form>
+
+
+Similarly, if the formset has the ability to order (``can_order=True``), it is possible to render it
+with ``{{ form.ORDER }}``.
 
 Using more than one formset in a view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

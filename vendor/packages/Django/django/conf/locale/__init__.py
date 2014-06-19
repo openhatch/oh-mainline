@@ -77,6 +77,12 @@ LANG_INFO = {
         'name': 'British English',
         'name_local': u'British English',
     },
+    'eo': {
+        'bidi': False,
+        'code': 'eo',
+        'name': 'Esperanto',
+        'name_local': u'Esperanto',
+    },
     'es': {
         'bidi': False,
         'code': 'es',
@@ -203,6 +209,12 @@ LANG_INFO = {
         'name': 'Georgian',
         'name_local': u'\u10e5\u10d0\u10e0\u10d7\u10e3\u10da\u10d8',
     },
+    'kk': {
+        'bidi': False,
+        'code': 'kk',
+        'name': 'Kazakh',
+        'name_local': u'\u049a\u0430\u0437\u0430\u049b',
+    },
     'km': {
         'bidi': False,
         'code': 'km',
@@ -256,6 +268,12 @@ LANG_INFO = {
         'code': 'nb',
         'name': 'Norwegian Bokmal',
         'name_local': u'Norsk (bokm\xe5l)',
+    },
+    'ne': {
+        'bidi': False,
+        'code': 'ne',
+        'name': 'Nepali',
+        'name_local': u'\u0928\u0947\u092a\u093e\u0932\u0940',
     },
     'nl': {
         'bidi': False,
@@ -347,6 +365,12 @@ LANG_INFO = {
         'name': 'Swedish',
         'name_local': u'Svenska',
     },
+    'sw': {
+        'bidi': False,
+        'code': 'sw',
+        'name': 'Swahili',
+        'name_local': u'Kiswahili',
+    },
     'ta': {
         'bidi': False,
         'code': 'ta',
@@ -370,6 +394,12 @@ LANG_INFO = {
         'code': 'tr',
         'name': 'Turkish',
         'name_local': u'T\xfcrk\xe7e',
+    },
+    'tt': {
+        'bidi': False,
+        'code': 'tt',
+        'name': 'Tatar',
+        'name_local': u'\u0422\u0430\u0442\u0430\u0440\u0447\u0430',
     },
     'uk': {
         'bidi': False,

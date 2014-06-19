@@ -1,5 +1,9 @@
+from __future__ import absolute_import, with_statement
+
 from django.test import TestCase
-from models import Article, Publication
+
+from .models import Article, Publication
+
 
 class ManyToManyTests(TestCase):
 
@@ -48,7 +52,8 @@ class ManyToManyTests(TestCase):
             ])
 
         # Adding an object of the wrong type raises TypeError
-        self.assertRaises(TypeError, a6.publications.add, a5)
+        with self.assertRaisesRegexp(TypeError, "'Publication' instance expected, got <Article.*"):
+            a6.publications.add(a5)
         # Add a Publication directly via publications.add by using keyword arguments.
         p4 = a6.publications.create(title='Highlights for Adults')
         self.assertQuerysetEqual(a6.publications.all(),

@@ -36,41 +36,49 @@ Supported countries
 
 Countries currently supported by :mod:`~django.contrib.localflavor` are:
 
-    * Argentina_
-    * Australia_
-    * Austria_
-    * Belgium_
-    * Brazil_
-    * Canada_
-    * Chile_
-    * Czech_
-    * Finland_
-    * France_
-    * Germany_
-    * Iceland_
-    * India_
-    * Indonesia_
-    * Ireland_
-    * Israel_
-    * Italy_
-    * Japan_
-    * Kuwait_
-    * Mexico_
-    * `The Netherlands`_
-    * Norway_
-    * Peru_
-    * Poland_
-    * Portugal_
-    * Romania_
-    * Slovakia_
-    * `South Africa`_
-    * Spain_
-    * Sweden_
-    * Switzerland_
-    * Turkey_
-    * `United Kingdom`_
-    * `United States of America`_
-    * Uruguay_
+* Argentina_
+* Australia_
+* Austria_
+* Belgium_
+* Brazil_
+* Canada_
+* Chile_
+* China_
+* Colombia_
+* Croatia_
+* Czech_
+* Ecuador_
+* Finland_
+* France_
+* Germany_
+* Iceland_
+* India_
+* Indonesia_
+* Ireland_
+* Israel_
+* Italy_
+* Japan_
+* Kuwait_
+* Macedonia_
+* Mexico_
+* `The Netherlands`_
+* Norway_
+* Peru_
+* Poland_
+* Portugal_
+* Paraguay_
+* Romania_
+* Russia_
+* Slovakia_
+* Slovenia_
+* `South Africa`_
+* Spain_
+* Sweden_
+* Switzerland_
+* Turkey_
+* `United Kingdom`_
+* `United States of America`_
+* Uruguay_
 
 The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
 containing useful code that is not specific to one particular country or culture.
@@ -84,7 +92,7 @@ Here's an example of how to use them::
     class MyForm(forms.Form):
         my_date_field = generic.forms.DateField()
 
-.. _ISO 3166 country codes: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
+.. _ISO 3166 country codes: http://www.iso.org/iso/country_codes.htm
 .. _Argentina: `Argentina (ar)`_
 .. _Australia: `Australia (au)`_
 .. _Austria: `Austria (at)`_
@@ -92,7 +100,11 @@ Here's an example of how to use them::
 .. _Brazil: `Brazil (br)`_
 .. _Canada: `Canada (ca)`_
 .. _Chile: `Chile (cl)`_
+.. _China: `China (cn)`_
+.. _Colombia: `Colombia (co)`_
+.. _Croatia: `Croatia (hr)`_
 .. _Czech: `Czech (cz)`_
+.. _Ecuador: `Ecuador (ec)`_
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
 .. _Germany: `Germany (de)`_
@@ -105,19 +117,23 @@ Here's an example of how to use them::
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
 .. _Kuwait: `Kuwait (kw)`_
+.. _Macedonia: `Macedonia (mk)`_
 .. _Mexico: `Mexico (mx)`_
 .. _Norway: `Norway (no)`_
+.. _Paraguay: `Paraguay (py)`_
 .. _Peru: `Peru (pe)`_
 .. _Poland: `Poland (pl)`_
 .. _Portugal: `Portugal (pt)`_
 .. _Romania: `Romania (ro)`_
+.. _Russia: `Russia (ru)`_
 .. _Slovakia: `Slovakia (sk)`_
+.. _Slovenia: `Slovenia (si)`_
 .. _South Africa: `South Africa (za)`_
 .. _Spain: `Spain (es)`_
 .. _Sweden: `Sweden (se)`_
 .. _Switzerland: `Switzerland (ch)`_
 .. _Turkey: `Turkey (tr)`_
-.. _United Kingdom: `United Kingdom (uk)`_
+.. _United Kingdom: `United Kingdom (gb)`_
 .. _United States of America: `United States of America (us)`_
 .. _Uruguay: `Uruguay (uy)`_
 
@@ -130,7 +146,7 @@ Django's general catalog in ``django/conf/locale``. If you want localflavor's
 texts to be translated, like form fields error messages, you must include
 :mod:`django.contrib.localflavor` in the :setting:`INSTALLED_APPS` setting, so
 the internationalization system can find the catalog, as explained in
-:ref:`using-translations-in-your-own-projects`.
+:ref:`how-django-discovers-translations`.
 
 Adding flavors
 ==============
@@ -140,7 +156,7 @@ any code you'd like to contribute. One thing we ask is that you please use
 Unicode objects (``u'mystring'``) for strings, rather than setting the encoding
 in the file. See any of the existing flavors for examples.
 
-.. _create a ticket: http://code.djangoproject.com/simpleticket
+.. _create a ticket: https://code.djangoproject.com/newticket
 
 Localflavor and backwards compatibility
 =======================================
@@ -199,6 +215,8 @@ Argentina (``ar``)
 Australia (``au``)
 =============================================
 
+.. versionadded:: 1.4
+
 .. class:: au.forms.AUPostCodeField
 
     A form field that validates input as an Australian postcode.
@@ -213,12 +231,28 @@ Australia (``au``)
     A ``Select`` widget that uses a list of Australian states/territories as its
     choices.
 
+.. class:: au.models.AUPhoneNumberField
+
+    A model field that checks that the value is a valid Australian phone
+    number (ten digits).
+
+.. class:: au.models.AUStateField
+
+    A model field that forms represent as a ``forms.AUStateField`` field and
+    stores the three-letter Australian state abbreviation in the database.
+
+.. class:: au.models.AUPostCodeField
+
+    A model field that forms represent as a ``forms.AUPostCodeField`` field
+    and stores the four-digit Australian postcode in the database.
+
 Austria (``at``)
 ================
 
 .. class:: at.forms.ATZipCodeField
 
-    A form field that validates its input as an Austrian zip code.
+    A form field that validates its input as an Austrian zip code, with the
+    format XXXX (first digit must be greater than 0).
 
 .. class:: at.forms.ATStateSelect
 
@@ -333,6 +367,113 @@ Chile (``cl``)
     A ``Select`` widget that uses a list of Chilean regions (Regiones) as its
     choices.
 
+China (``cn``)
+==============
+
+.. versionadded:: 1.4
+
+.. class:: cn.forms.CNProvinceSelect
+
+    A ``Select`` widget that uses a list of Chinese regions as its choices.
+
+.. class:: cn.forms.CNPostCodeField
+
+    A form field that validates input as a Chinese post code.
+    Valid formats are XXXXXX where X is digit.
+
+.. class:: cn.forms.CNIDCardField
+
+    A form field that validates input as a Chinese Identification Card Number.
+    Both 1st and 2nd generation ID Card Number are validated.
+
+.. class:: cn.forms.CNPhoneNumberField
+
+    A form field that validates input as a Chinese phone number.
+    Valid formats are 0XX-XXXXXXXX, composed of 3 or 4 digits of region code
+    and 7 or 8 digits of phone number.
+
+.. class:: cn.forms.CNCellNumberField
+
+    A form field that validates input as a Chinese mobile phone number.
+    Valid formats are like 1XXXXXXXXXX, where X is digit.
+    The second digit could only be 3, 5 and 8.
+
+Colombia (``co``)
+=================
+
+.. versionadded:: 1.4
+
+.. class:: co.forms.CoDepartmentSelect
+
+    A ``Select`` widget that uses a list of Colombian departments
+    as its choices.
+
+Croatia (``hr``)
+================
+
+.. versionadded:: 1.4
+
+.. class:: hr.forms.HRCountySelect
+
+    A ``Select`` widget that uses a list of counties of Croatia as its choices.
+
+.. class:: hr.forms.HRPhoneNumberPrefixSelect
+
+    A ``Select`` widget that uses a list of phone number prefixes of Croatia as
+    its choices.
+
+.. class:: hr.forms.HRLicensePlatePrefixSelect
+
+    A ``Select`` widget that uses a list of vehicle license plate prefixes of
+    Croatia as its choices.
+
+.. class:: hr.forms.HRPhoneNumberField
+
+    A form field that validates input as a phone number of Croatia.
+    A valid format is a country code or a leading zero, area code prefix, 6 or 7
+    digit number; e.g. +385XXXXXXXX or 0XXXXXXXX
+    Validates fixed, mobile and FGSM numbers. Normalizes to a full number with
+    country code (+385 prefix).
+
+.. class:: hr.forms.HRLicensePlateField
+
+    A form field that validates input as a vehicle license plate of Croatia.
+    Normalizes to the specific format XX YYYY-XX where X is a letter and Y a
+    digit. There can be three or four digits.
+    Suffix is constructed from the shared letters of the Croatian and English
+    alphabets.
+    It is used for standardized license plates only. Special cases like license
+    plates for oldtimers, temporary license plates, government institution
+    license plates and customized license plates are not covered by this field.
+
+.. class:: hr.forms.HRPostalCodeField
+
+    A form field that validates input as a postal code of Croatia.
+    It consists of exactly five digits ranging from 10000 to 59999 inclusive.
+
+.. class:: hr.forms.HROIBField
+
+    A form field that validates input as a Personal Identification Number (OIB)
+    of Croatia.
+    It consists of exactly eleven digits.
+
+.. class:: hr.forms.HRJMBGField
+
+    A form field that validates input as a Unique Master Citizen Number (JMBG).
+    The number is still in use in Croatia, but it is being replaced by OIB.
+    This field works for other ex-Yugoslavia countries as well where the JMBG is
+    still in use.
+    The area segment of the JMBG is not validated because the citizens might
+    have emigrated to another ex-Yugoslavia country.
+    The number consists of exactly thirteen digits.
+
+.. class:: hr.forms.HRJMBAGField
+
+    A form field that validates input as a Unique Master Academic Citizen Number
+    (JMBAG) of Croatia.
+    This number is used by college students and professors in Croatia.
+    The number consists of exactly nineteen digits.
+
 Czech (``cz``)
 ==============
 
@@ -353,6 +494,16 @@ Czech (``cz``)
 .. class:: cz.forms.CZRegionSelect
 
     A ``Select`` widget that uses a list of Czech regions as its choices.
+
+Ecuador (``ec``)
+================
+
+.. versionadded:: 1.4
+
+.. class:: ec.forms.EcProvinceSelect
+
+    A ``Select`` widget that uses a list of Ecuatorian provinces as
+    its choices.
 
 Finland (``fi``)
 ================
@@ -451,21 +602,33 @@ Iceland (``is_``)
 India (``in_``)
 ===============
 
-.. class:: in.forms.INStateField
+.. class:: in_.forms.INStateField
 
     A form field that validates input as an Indian state/territory name or
     abbreviation. Input is normalized to the standard two-letter vehicle
     registration abbreviation for the given state or territory.
 
-.. class:: in.forms.INZipCodeField
+.. class:: in_.forms.INZipCodeField
 
     A form field that validates input as an Indian zip code, with the
     format XXXXXXX.
 
-.. class:: in.forms.INStateSelect
+.. class:: in_.forms.INStateSelect
 
     A ``Select`` widget that uses a list of Indian states/territories as its
     choices.
+
+.. versionadded:: 1.4
+
+.. class:: in_.forms.INPhoneNumberField
+
+    A form field that validates that the data is a valid Indian phone number,
+    including the STD code. It's normalised to 0XXX-XXXXXXX or 0XXX XXXXXXX
+    format. The first string is the STD code which is a '0' followed by 2-4
+    digits. The second string is 8 digits if the STD code is 3 digits, 7
+    digits if the STD code is 4 digits and 6 digits if the STD code is 5
+    digits. The second string will start with numbers between 1 and 6. The
+    separator is either a space or a hyphen.
 
 Ireland (``ie``)
 ================
@@ -532,8 +695,6 @@ Israel (``il``)
 .. _Israeli identification number: http://he.wikipedia.org/wiki/%D7%9E%D7%A1%D7%A4%D7%A8_%D7%96%D7%94%D7%95%D7%AA_(%D7%99%D7%A9%D7%A8%D7%90%D7%9C)
 .. _Luhn algorithm: http://en.wikipedia.org/wiki/Luhn_algorithm
 
-
-
 Italy (``it``)
 ==============
 
@@ -542,7 +703,7 @@ Italy (``it``)
     A form field that validates input as an Italian social security number
     (`codice fiscale`_).
 
-.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+.. _codice fiscale: http://www.agenziaentrate.gov.it/wps/content/Nsilib/Nsi/Home/CosaDeviFare/Richiedere/Codice+fiscale+e+tessera+sanitaria/Richiesta+TS_CF/SchedaI/Informazioni+codificazione+pf/
 
 .. class:: it.forms.ITVatNumberField
 
@@ -585,12 +746,132 @@ Kuwait (``kw``)
     * The birthdate of the person is a valid date.
     * The calculated checksum equals to the last digit of the Civil ID.
 
+Macedonia (``mk``)
+===================
+
+.. versionadded:: 1.4
+
+.. class:: mk.forms.MKIdentityCardNumberField
+
+    A form field that validates input as a Macedonian identity card number.
+    Both old and new identity card numbers are supported.
+
+
+.. class:: mk.forms.MKMunicipalitySelect
+
+    A form ``Select`` widget that uses a list of Macedonian municipalities as
+    choices.
+
+
+.. class:: mk.forms.UMCNField
+
+    A form field that validates input as a unique master citizen
+    number.
+
+    The format of the unique master citizen number is not unique
+    to Macedonia. For more information see:
+    https://secure.wikimedia.org/wikipedia/en/wiki/Unique_Master_Citizen_Number
+
+    A value will pass validation if it complies to the following rules:
+
+    * Consists of exactly 13 digits
+    * The first 7 digits represent a valid past date in the format DDMMYYY
+    * The last digit of the UMCN passes a checksum test
+
+
+.. class:: mk.models.MKIdentityCardNumberField
+
+   A model field that forms represent as a
+   ``forms.MKIdentityCardNumberField`` field.
+
+
+.. class:: mk.models.MKMunicipalityField
+
+   A model field that forms represent as a
+   ``forms.MKMunicipalitySelect`` and stores the 2 character code of the
+   municipality in the database.
+
+
+.. class:: mk.models.UMCNField
+
+   A model field that forms represent as a ``forms.UMCNField`` field.
+
+
 Mexico (``mx``)
 ===============
+
+.. class:: mx.forms.MXZipCodeField
+
+    .. versionadded:: 1.4
+
+    A form field that accepts a Mexican Zip Code.
+
+    More info about this: List of postal codes in Mexico (zipcodes_)
+
+.. _zipcodes: http://en.wikipedia.org/wiki/List_of_postal_codes_in_Mexico
+
+.. class:: mx.forms.MXRFCField
+
+    .. versionadded:: 1.4
+
+    A form field that validates a Mexican *Registro Federal de Contribuyentes* for
+    either **Persona física** or **Persona moral**. This field accepts RFC strings
+    whether or not it contains a *homoclave*.
+
+    More info about this: Registro Federal de Contribuyentes (rfc_)
+
+.. _rfc: http://es.wikipedia.org/wiki/Registro_Federal_de_Contribuyentes_(M%C3%A9xico)
+
+.. class:: mx.forms.MXCURPField
+
+   .. versionadded:: 1.4
+
+   A field that validates a Mexican *Clave Única de Registro de Población*.
+
+   More info about this: Clave Unica de Registro de Poblacion (curp_)
+
+.. _curp: http://www.condusef.gob.mx/index.php/clave-unica-de-registro-de-poblacion-curp
 
 .. class:: mx.forms.MXStateSelect
 
     A ``Select`` widget that uses a list of Mexican states as its choices.
+
+.. class:: mx.models.MXStateField
+
+    .. versionadded:: 1.4
+
+    A model field that stores the three-letter Mexican state abbreviation in the
+    database.
+
+.. class:: mx.models.MXZipCodeField
+
+    .. versionadded:: 1.4
+
+    A model field that forms represent as a ``forms.MXZipCodeField`` field and
+    stores the five-digit Mexican zip code.
+
+.. class:: mx.models.MXRFCField
+
+    .. versionadded:: 1.4
+
+    A model field that forms represent as a ``forms.MXRFCField`` field and
+    stores the value of a valid Mexican RFC.
+
+.. class:: mx.models.MXCURPField
+
+    .. versionadded:: 1.4
+
+    A model field that forms represent as a ``forms.MXCURPField`` field and
+    stores the value of a valid Mexican CURP.
+
+Additionally, a choice tuple is provided in ``django.contrib.localflavor.mx.mx_states``,
+allowing customized model and form fields, and form presentations, for subsets of
+Mexican states abbreviations:
+
+.. data:: mx.mx_states.STATE_CHOICES
+
+    A tuple of choices of the states abbreviations for all 31 Mexican states,
+    plus the `Distrito Federal`.
 
 Norway (``no``)
 ===============
@@ -611,6 +892,19 @@ Norway (``no``)
 
     A ``Select`` widget that uses a list of Norwegian municipalities (fylker) as
     its choices.
+
+Paraguay (``py``)
+=================
+
+.. versionadded:: 1.4
+
+.. class:: py.forms.PyDepartmentSelect
+
+    A ``Select`` widget with a list of Paraguayan departments as choices.
+
+.. class:: py.forms.PyNumberedDepartmentSelect
+
+    A ``Select`` widget with a roman numbered list of Paraguayan departments as choices.
 
 Peru (``pe``)
 =============
@@ -639,6 +933,17 @@ Poland (``pl``)
 
 .. _PESEL: http://en.wikipedia.org/wiki/PESEL
 
+.. versionadded:: 1.4
+
+.. class:: pl.forms.PLNationalIDCardNumberField
+
+    A form field that validates input as a Polish National ID Card number. The
+    valid format is AAAXXXXXX, where A is letter (A-Z), X is digit and left-most
+    digit is checksum digit. More information about checksum calculation algorithm
+    see `Polish identity card`_.
+
+.. _`Polish identity card`: http://en.wikipedia.org/wiki/Polish_identity_card
+
 .. class:: pl.forms.PLREGONField
 
     A form field that validates input as a Polish National Official Business
@@ -655,8 +960,8 @@ Poland (``pl``)
 
 .. class:: pl.forms.PLNIPField
 
-    A form field that validates input as a Polish Tax Number (NIP). Valid
-    formats are XXX-XXX-XX-XX or XX-XX-XXX-XXX. The checksum algorithm used
+    A form field that validates input as a Polish Tax Number (NIP). Valid formats
+    are XXX-XXX-XX-XX, XXX-XX-XX-XXX or XXXXXXXXXX. The checksum algorithm used
     for NIPs is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
 
 .. class:: pl.forms.PLCountySelect
@@ -721,6 +1026,34 @@ Romania (``ro``)
 
     A form field that validates Romanian postal codes.
 
+Russia (``ru``)
+===============
+
+.. versionadded:: 1.4
+
+.. class:: ru.forms.RUPostalCodeField
+
+    Russian Postal code field. The valid format is XXXXXX, where X is any
+    digit and the first digit is not zero.
+
+.. class:: ru.forms.RUCountySelect
+
+    A ``Select`` widget that uses a list of Russian Counties as its choices.
+
+.. class:: ru.forms.RURegionSelect
+
+    A ``Select`` widget that uses a list of Russian Regions as its choices.
+
+.. class:: ru.forms.RUPassportNumberField
+
+    Russian internal passport number. The valid format is XXXX XXXXXX, where X
+    is any digit.
+
+.. class:: ru.forms.RUAlienPassportNumberField
+
+    Russian alien's passport number. The valid format is XX XXXXXXX, where X
+    is any digit.
+
 Slovakia (``sk``)
 =================
 
@@ -736,6 +1069,35 @@ Slovakia (``sk``)
 .. class:: sk.forms.SKRegionSelect
 
     A ``Select`` widget that uses a list of Slovak regions as its choices.
+
+Slovenia (``si``)
+=================
+
+.. class:: si.forms.SIEMSOField
+
+    A form field that validates input as Slovenian personal identification
+    number and stores gender and birthday to self.info dictionary.
+
+.. class:: si.forms.SITaxNumberField
+
+    A form field that validates input as a Slovenian tax number. Valid input
+    is SIXXXXXXXX or XXXXXXXX.
+
+.. class:: si.forms.SIPhoneNumberField
+
+    A form field that validates input as a Slovenian phone number. Phone
+    number must contain at least local area code with optional country code.
+
+.. class:: si.forms.SIPostalCodeField
+
+    A form field that provides a choice field of major Slovenian postal
+    codes.
+
+.. class:: si.forms.SIPostalCodeSelect
+
+    A ``Select`` widget that uses a list of major Slovenian postal codes as
+    its choices.
+
 
 South Africa (``za``)
 =====================
@@ -895,20 +1257,20 @@ Turkey (``tr``)
 
     A ``select`` widget that uses a list of Turkish provinces as its choices.
 
-United Kingdom (``uk``)
+United Kingdom (``gb``)
 =======================
 
-.. class:: uk.forms.UKPostcodeField
+.. class:: gb.forms.GBPostcodeField
 
     A form field that validates input as a UK postcode. The regular
     expression used is sourced from the schema for British Standard BS7666
     address types at http://www.cabinetoffice.gov.uk/media/291293/bs7666-v2-0.xml.
 
-.. class:: uk.forms.UKCountySelect
+.. class:: gb.forms.GBCountySelect
 
     A ``Select`` widget that uses a list of UK counties/regions as its choices.
 
-.. class:: uk.forms.UKNationSelect
+.. class:: gb.forms.GBNationSelect
 
     A ``Select`` widget that uses a list of UK nations as its choices.
 
@@ -924,13 +1286,13 @@ United States of America (``us``)
     A form field that validates input as a U.S. Social Security Number (SSN).
     A valid SSN must obey the following rules:
 
-        * Format of XXX-XX-XXXX
-        * No group of digits consisting entirely of zeroes
-        * Leading group of digits cannot be 666
-        * Number not in promotional block 987-65-4320 through 987-65-4329
-        * Number not one known to be invalid due to widespread promotional
-          use or distribution (e.g., the Woolworth's number or the 1962
-          promotional number)
+    * Format of XXX-XX-XXXX
+    * No group of digits consisting entirely of zeroes
+    * Leading group of digits cannot be 666
+    * Number not in promotional block 987-65-4320 through 987-65-4329
+    * Number not one known to be invalid due to widespread promotional
+      use or distribution (e.g., the Woolworth's number or the 1962
+      promotional number)
 
 .. class:: us.forms.USStateField
 
@@ -1032,5 +1394,5 @@ Uruguay (``uy``)
 
 .. class:: uy.forms.UYDepartamentSelect
 
-    A ``Select`` widget that uses a list of  Uruguayan departaments as its
+    A ``Select`` widget that uses a list of  Uruguayan departments as its
     choices.

@@ -1,7 +1,10 @@
-from django.contrib.syndication import feeds, views
+from __future__ import absolute_import
+
+from django.contrib.syndication import views
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import feedgenerator, tzinfo
-from models import Article, Entry
+
+from .models import Article, Entry
 
 
 class ComplexFeed(views.Feed):
@@ -121,22 +124,3 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
 
 class TestCustomFeed(TestAtomFeed):
     feed_type = MyCustomAtom1Feed
-
-
-class DeprecatedComplexFeed(feeds.Feed):
-    def get_object(self, bits):
-        if len(bits) != 1:
-            raise ObjectDoesNotExist
-        return None
-
-
-class DeprecatedRssFeed(feeds.Feed):
-    link = "/blog/"
-    title = 'My blog'
-
-    def items(self):
-        return Entry.objects.all()
-
-    def item_link(self, item):
-        return "/blog/%s/" % item.pk
-

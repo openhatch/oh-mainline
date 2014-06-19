@@ -2,9 +2,8 @@
 Regression tests for defer() / only() behavior.
 """
 
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.db import connection, models
+from django.db import models
+
 
 class Item(models.Model):
     name = models.CharField(max_length=15)
@@ -34,3 +33,17 @@ class Leaf(models.Model):
 class ResolveThis(models.Model):
     num = models.FloatField()
     name = models.CharField(max_length=16)
+
+class Proxy(Item):
+    class Meta:
+        proxy = True
+
+class SimpleItem(models.Model):
+    name = models.CharField(max_length=15)
+    value = models.IntegerField()
+
+    def __unicode__(self):
+        return self.name
+
+class Feature(models.Model):
+    item = models.ForeignKey(SimpleItem)

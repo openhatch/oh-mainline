@@ -10,21 +10,14 @@ model maps to a single database table.
 
 The basics:
 
-    * Each model is a Python class that subclasses
-      :class:`django.db.models.Model`.
+* Each model is a Python class that subclasses
+  :class:`django.db.models.Model`.
 
-    * Each attribute of the model represents a database field.
+* Each attribute of the model represents a database field.
 
-    * With all of this, Django gives you an automatically-generated
-      database-access API; see :doc:`/topics/db/queries`.
+* With all of this, Django gives you an automatically-generated
+  database-access API; see :doc:`/topics/db/queries`.
 
-.. seealso::
-
-    A companion to this document is the `official repository of model
-    examples`_. (In the Django source distribution, these examples are in the
-    ``tests/modeltests`` directory.)
-
-    .. _official repository of model examples: http://code.djangoproject.com/browser/django/trunk/tests/modeltests
 
 Quick example
 =============
@@ -53,16 +46,16 @@ The above ``Person`` model would create a database table like this:
 
 Some technical notes:
 
-    * The name of the table, ``myapp_person``, is automatically derived from
-      some model metadata but can be overridden. See :ref:`table-names` for more
-      details..
+* The name of the table, ``myapp_person``, is automatically derived from
+  some model metadata but can be overridden. See :ref:`table-names` for more
+  details..
 
-    * An ``id`` field is added automatically, but this behavior can be
-      overridden. See :ref:`automatic-primary-key-fields`.
+* An ``id`` field is added automatically, but this behavior can be
+  overridden. See :ref:`automatic-primary-key-fields`.
 
-    * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
-      syntax, but it's worth noting Django uses SQL tailored to the database
-      backend specified in your :doc:`settings file </topics/settings>`.
+* The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
+  syntax, but it's worth noting Django uses SQL tailored to the database
+  backend specified in your :doc:`settings file </topics/settings>`.
 
 Using models
 ============
@@ -73,13 +66,13 @@ those models. Do this by editing your settings file and changing the
 your ``models.py``.
 
 For example, if the models for your application live in the module
-``mysite.myapp.models`` (the package structure that is created for an
+``myapp.models`` (the package structure that is created for an
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = (
         #...
-        'mysite.myapp',
+        'myapp',
         #...
     )
 
@@ -91,7 +84,9 @@ Fields
 
 The most important part of a model -- and the only required part of a model --
 is the list of database fields it defines. Fields are specified by class
-attributes.
+attributes. Be careful not to choose field names that conflict with the
+:doc:`models API </ref/models/instances>` like ``clean``, ``save``, or
+``delete``.
 
 Example::
 
@@ -113,13 +108,13 @@ Each field in your model should be an instance of the appropriate
 :class:`~django.db.models.Field` class. Django uses the field class types to
 determine a few things:
 
-    * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
+* The database column type (e.g. ``INTEGER``, ``VARCHAR``).
 
-    * The :doc:`widget </ref/forms/widgets>` to use in Django's admin interface,
-      if you care to use it (e.g. ``<input type="text">``, ``<select>``).
+* The default :doc:`widget </ref/forms/widgets>` to use when rendering a form
+  field (e.g. ``<input type="text">``, ``<select>``).
 
-    * The minimal validation requirements, used in Django's admin and in
-      automatically-generated forms.
+* The minimal validation requirements, used in Django's admin and in
+  automatically-generated forms.
 
 Django ships with dozens of built-in field types; you can find the complete list
 in the :ref:`model field reference <model-field-types>`. You can easily write
@@ -140,83 +135,83 @@ optional. They're fully explained in the :ref:`reference
 <common-model-field-options>`, but here's a quick summary of the most often-used
 ones:
 
-    :attr:`~Field.null`
-        If ``True``, Django will store empty values as ``NULL`` in the database.
-        Default is ``False``.
+:attr:`~Field.null`
+    If ``True``, Django will store empty values as ``NULL`` in the database.
+    Default is ``False``.
 
-    :attr:`~Field.blank`
-        If ``True``, the field is allowed to be blank. Default is ``False``.
+:attr:`~Field.blank`
+    If ``True``, the field is allowed to be blank. Default is ``False``.
 
-        Note that this is different than :attr:`~Field.null`.
-        :attr:`~Field.null` is purely database-related, whereas
-        :attr:`~Field.blank` is validation-related. If a field has
-        :attr:`blank=True <Field.blank>`, validation on Django's admin site will
-        allow entry of an empty value. If a field has :attr:`blank=False
-        <Field.blank>`, the field will be required.
+    Note that this is different than :attr:`~Field.null`.
+    :attr:`~Field.null` is purely database-related, whereas
+    :attr:`~Field.blank` is validation-related. If a field has
+    :attr:`blank=True <Field.blank>`, form validation will
+    allow entry of an empty value. If a field has :attr:`blank=False
+    <Field.blank>`, the field will be required.
 
-    :attr:`~Field.choices`
-        An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
-        this field. If this is given, Django's admin will use a select box
-        instead of the standard text field and will limit choices to the choices
-        given.
+:attr:`~Field.choices`
+    An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
+    this field. If this is given, the default form widget will be a select box
+    instead of the standard text field and will limit choices to the choices
+    given.
 
-        A choices list looks like this::
+    A choices list looks like this::
 
-            YEAR_IN_SCHOOL_CHOICES = (
-                (u'FR', u'Freshman'),
-                (u'SO', u'Sophomore'),
-                (u'JR', u'Junior'),
-                (u'SR', u'Senior'),
-                (u'GR', u'Graduate'),
+        YEAR_IN_SCHOOL_CHOICES = (
+            (u'FR', u'Freshman'),
+            (u'SO', u'Sophomore'),
+            (u'JR', u'Junior'),
+            (u'SR', u'Senior'),
+            (u'GR', u'Graduate'),
+        )
+
+    The first element in each tuple is the value that will be stored in the
+    database, the second element will be displayed by the default form widget
+    or in a ModelChoiceField. Given an instance of a model object, the
+    display value for a choices field can be accessed using the
+    ``get_FOO_display`` method. For example::
+
+        from django.db import models
+
+        class Person(models.Model):
+            SHIRT_SIZES = (
+                (u'S', u'Small'),
+                (u'M', u'Medium'),
+                (u'L', u'Large'),
             )
+            name = models.CharField(max_length=60)
+            shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
 
-        The first element in each tuple is the value that will be stored in the
-        database, the second element will be displayed by the admin interface,
-        or in a ModelChoiceField. Given an instance of a model object, the
-        display value for a choices field can be accessed using the
-        ``get_FOO_display`` method. For example::
+    ::
 
-            from django.db import models
+        >>> p = Person(name="Fred Flintstone", shirt_size="L")
+        >>> p.save()
+        >>> p.shirt_size
+        u'L'
+        >>> p.get_shirt_size_display()
+        u'Large'
 
-            class Person(models.Model):
-                GENDER_CHOICES = (
-                    (u'M', u'Male'),
-                    (u'F', u'Female'),
-                )
-                name = models.CharField(max_length=60)
-                gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
+:attr:`~Field.default`
+    The default value for the field. This can be a value or a callable
+    object. If callable it will be called every time a new object is
+    created.
 
-        ::
+:attr:`~Field.help_text`
+    Extra "help" text to be displayed with the form widget. It's useful for
+    documentation even if your field isn't used on a form.
 
-            >>> p = Person(name="Fred Flintstone", gender="M")
-            >>> p.save()
-            >>> p.gender
-            u'M'
-            >>> p.get_gender_display()
-            u'Male'
+:attr:`~Field.primary_key`
+    If ``True``, this field is the primary key for the model.
 
-    :attr:`~Field.default`
-        The default value for the field. This can be a value or a callable
-        object. If callable it will be called every time a new object is
-        created.
+    If you don't specify :attr:`primary_key=True <Field.primary_key>` for
+    any fields in your model, Django will automatically add an
+    :class:`IntegerField` to hold the primary key, so you don't need to set
+    :attr:`primary_key=True <Field.primary_key>` on any of your fields
+    unless you want to override the default primary-key behavior. For more,
+    see :ref:`automatic-primary-key-fields`.
 
-    :attr:`~Field.help_text`
-        Extra "help" text to be displayed under the field on the object's admin
-        form. It's useful for documentation even if your object doesn't have an
-        admin form.
-
-    :attr:`~Field.primary_key`
-        If ``True``, this field is the primary key for the model.
-
-        If you don't specify :attr:`primary_key=True <Field.primary_key>` for
-        any fields in your model, Django will automatically add an
-        :class:`IntegerField` to hold the primary key, so you don't need to set
-        :attr:`primary_key=True <Field.primary_key>` on any of your fields
-        unless you want to override the default primary-key behavior. For more,
-        see :ref:`automatic-primary-key-fields`.
-
-    :attr:`~Field.unique`
-        If ``True``, this field must be unique throughout the table.
+:attr:`~Field.unique`
+    If ``True``, this field must be unique throughout the table.
 
 Again, these are just short descriptions of the most common field options. Full
 details can be found in the :ref:`common model field option reference
@@ -326,9 +321,8 @@ whatever you want. For example::
     For details on accessing backwards-related objects, see the
     :ref:`Following relationships backward example <backwards-related-objects>`.
 
-    For sample code, see the `Many-to-one relationship model tests`_.
-
-    .. _Many-to-one relationship model tests: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_one
+    For sample code, see the :doc:`Many-to-one relationship model example
+    </topics/db/examples/many_to_one>`.
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -362,28 +356,26 @@ It's suggested, but not required, that the name of a
 :class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
 be a plural describing the set of related model objects.
 
-It doesn't matter which model gets the
-:class:`~django.db.models.ManyToManyField`, but you only need it in one of the
-models -- not in both.
+It doesn't matter which model has the
+:class:`~django.db.models.ManyToManyField`, but you should only put it in one
+of the models -- not both.
 
-Generally, :class:`~django.db.models.ManyToManyField` instances should go in the
-object that's going to be edited in the admin interface, if you're using
-Django's admin. In the above example, ``toppings`` is in ``Pizza`` (rather than
-``Topping`` having a ``pizzas`` :class:`~django.db.models.ManyToManyField` )
-because it's more natural to think about a pizza having toppings than a
-topping being on multiple pizzas. The way it's set up above, the ``Pizza`` admin
-form would let users select the toppings.
+Generally, :class:`~django.db.models.ManyToManyField` instances should go in
+the object that's going to be edited on a form. In the above example,
+``toppings`` is in ``Pizza`` (rather than ``Topping`` having a ``pizzas``
+:class:`~django.db.models.ManyToManyField` ) because it's more natural to think
+about a pizza having toppings than a topping being on multiple pizzas. The way
+it's set up above, the ``Pizza`` form would let users select the toppings.
 
 .. seealso::
 
-    See the `Many-to-many relationship model example`_ for a full example.
+    See the :doc:`Many-to-many relationship model example
+    </topics/db/examples/many_to_many>` for a full example.
 
-.. _Many-to-many relationship model example: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_many/models.py
-
-:class:`~django.db.models.ManyToManyField` fields also accept a number of extra
-arguments which are explained in :ref:`the model field reference
-<manytomany-arguments>`. These options help define how the relationship should
-work; all are optional.
+:class:`~django.db.models.ManyToManyField` fields also accept a number of
+extra arguments which are explained in :ref:`the model field reference
+<manytomany-arguments>`. These options help define how the relationship
+should work; all are optional.
 
 .. _intermediary-manytomany:
 
@@ -434,24 +426,24 @@ explicit declaration defines how the two models are related.
 
 There are a few restrictions on the intermediate model:
 
-    * Your intermediate model must contain one - and *only* one - foreign key
-      to the target model (this would be ``Person`` in our example). If you
-      have more than one foreign key, a validation error will be raised.
+* Your intermediate model must contain one - and *only* one - foreign key
+  to the target model (this would be ``Person`` in our example). If you
+  have more than one foreign key, a validation error will be raised.
 
-    * Your intermediate model must contain one - and *only* one - foreign key
-      to the source model (this would be ``Group`` in our example). If you
-      have more than one foreign key, a validation error will be raised.
+* Your intermediate model must contain one - and *only* one - foreign key
+  to the source model (this would be ``Group`` in our example). If you
+  have more than one foreign key, a validation error will be raised.
 
-    * The only exception to this is a model which has a many-to-many
-      relationship to itself, through an intermediary model. In this
-      case, two foreign keys to the same model are permitted, but they
-      will be treated as the two (different) sides of the many-to-many
-      relation.
+* The only exception to this is a model which has a many-to-many
+  relationship to itself, through an intermediary model. In this
+  case, two foreign keys to the same model are permitted, but they
+  will be treated as the two (different) sides of the many-to-many
+  relation.
 
-    * When defining a many-to-many relationship from a model to
-      itself, using an intermediary model, you *must* use
-      :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
-      :ref:`the model field reference <manytomany-arguments>`).
+* When defining a many-to-many relationship from a model to
+  itself, using an intermediary model, you *must* use
+  :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
+  :ref:`the model field reference <manytomany-arguments>`).
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
@@ -518,6 +510,25 @@ As you are using an intermediate model, you can also query on its attributes::
     ...     membership__date_joined__gt=date(1961,1,1))
     [<Person: Ringo Starr]
 
+If you need to access a membership's information you may do so by directly
+querying the ``Membership`` model::
+
+    >>> ringos_membership = Membership.objects.get(group=beatles, person=ringo)
+    >>> ringos_membership.date_joined
+    datetime.date(1962, 8, 16)
+    >>> ringos_membership.invite_reason
+    u'Needed a new drummer.'
+
+Another way to access the same information is by querying the
+:ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
+``Person`` object::
+
+    >>> ringos_membership = ringo.membership_set.get(group=beatles)
+    >>> ringos_membership.date_joined
+    datetime.date(1962, 8, 16)
+    >>> ringos_membership.invite_reason
+    u'Needed a new drummer.'
+
 
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -550,9 +561,8 @@ can be made; see :ref:`the model field reference <ref-onetoone>` for details.
 
 .. seealso::
 
-    See the `One-to-one relationship model example`_ for a full example.
-
-.. _One-to-one relationship model example: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/one_to_one/models.py
+    See the :doc:`One-to-one relationship model example
+    </topics/db/examples/one_to_one>` for a full example.
 
 :class:`~django.db.models.OneToOneField` fields also accept one optional argument
 described in the :ref:`model field reference <ref-onetoone>`.
@@ -581,17 +591,17 @@ Field name restrictions
 
 Django places only two restrictions on model field names:
 
-    1. A field name cannot be a Python reserved word, because that would result
-       in a Python syntax error. For example::
+1. A field name cannot be a Python reserved word, because that would result
+   in a Python syntax error. For example::
 
-           class Example(models.Model):
-               pass = models.IntegerField() # 'pass' is a reserved word!
+       class Example(models.Model):
+           pass = models.IntegerField() # 'pass' is a reserved word!
 
-    2. A field name cannot contain more than one underscore in a row, due to
-       the way Django's query lookup syntax works. For example::
+2. A field name cannot contain more than one underscore in a row, due to
+   the way Django's query lookup syntax works. For example::
 
-           class Example(models.Model):
-               foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
+       class Example(models.Model):
+           foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
 
 These limitations can be worked around, though, because your field name doesn't
 necessarily have to match your database column name. See the
@@ -675,33 +685,30 @@ For example, this model has a few custom methods::
             return '%s %s' % (self.first_name, self.last_name)
         full_name = property(_get_full_name)
 
-The last method in this example is a :term:`property`. `Read more about
-properties`_.
-
-.. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
+The last method in this example is a :term:`property`.
 
 The :doc:`model instance reference </ref/models/instances>` has a complete list
 of :ref:`methods automatically given to each model <model-instance-methods>`.
 You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
-    :meth:`~Model.__unicode__`
-        A Python "magic method" that returns a unicode "representation" of any
-        object. This is what Python and Django will use whenever a model
-        instance needs to be coerced and displayed as a plain string. Most
-        notably, this happens when you display an object in an interactive
-        console or in the admin.
+:meth:`~Model.__unicode__`
+    A Python "magic method" that returns a unicode "representation" of any
+    object. This is what Python and Django will use whenever a model
+    instance needs to be coerced and displayed as a plain string. Most
+    notably, this happens when you display an object in an interactive
+    console or in the admin.
 
-        You'll always want to define this method; the default isn't very helpful
-        at all.
+    You'll always want to define this method; the default isn't very helpful
+    at all.
 
-    :meth:`~Model.get_absolute_url`
-        This tells Django how to calculate the URL for an object. Django uses
-        this in its admin interface, and any time it needs to figure out a URL
-        for an object.
+:meth:`~Model.get_absolute_url`
+    This tells Django how to calculate the URL for an object. Django uses
+    this in its admin interface, and any time it needs to figure out a URL
+    for an object.
 
-        Any object that has a URL that uniquely identifies it should define this
-        method.
+    Any object that has a URL that uniquely identifies it should define this
+    method.
 
 .. _overriding-model-methods:
 
@@ -754,13 +761,20 @@ built-in model methods, adding new arguments. If you use ``*args,
 **kwargs`` in your method definitions, you are guaranteed that your
 code will automatically support those arguments when they are added.
 
-.. admonition:: Overriding Delete
+.. admonition:: Overridden model methods are not called on bulk operations
 
     Note that the :meth:`~Model.delete()` method for an object is not
     necessarily called when :ref:`deleting objects in bulk using a
     QuerySet<topics-db-queries-delete>`. To ensure customized delete logic
     gets executed, you can use :data:`~django.db.models.signals.pre_delete`
     and/or :data:`~django.db.models.signals.post_delete` signals.
+
+    Unfortunately, there isn't a workaround when
+    :meth:`creating<django.db.models.query.QuerySet.bulk_create>` or
+    :meth:`updating<django.db.models.query.QuerySet.update>` objects in bulk,
+    since none of :meth:`~Model.save()`,
+    :data:`~django.db.models.signals.pre_save`, and
+    :data:`~django.db.models.signals.post_save` are called.
 
 Executing custom SQL
 --------------------
@@ -783,16 +797,16 @@ models.
 
 There are three styles of inheritance that are possible in Django.
 
- 1. Often, you will just want to use the parent class to hold information that
-    you don't want to have to type out for each child model. This class isn't
-    going to ever be used in isolation, so :ref:`abstract-base-classes` are
-    what you're after.
- 2. If you're subclassing an existing model (perhaps something from another
-    application entirely) and want each model to have its own database table,
-    :ref:`multi-table-inheritance` is the way to go.
- 3. Finally, if you only want to modify the Python-level behavior of a model,
-    without changing the models fields in any way, you can use
-    :ref:`proxy-models`.
+1. Often, you will just want to use the parent class to hold information that
+   you don't want to have to type out for each child model. This class isn't
+   going to ever be used in isolation, so :ref:`abstract-base-classes` are
+   what you're after.
+2. If you're subclassing an existing model (perhaps something from another
+   application entirely) and want each model to have its own database table,
+   :ref:`multi-table-inheritance` is the way to go.
+3. Finally, if you only want to modify the Python-level behavior of a model,
+   without changing the models fields in any way, you can use
+   :ref:`proxy-models`.
 
 .. _abstract-base-classes:
 
@@ -906,7 +920,7 @@ Along with another app ``rare/models.py``::
     class ChildB(Base):
         pass
 
-The reverse name of the ``commmon.ChildA.m2m`` field will be
+The reverse name of the ``common.ChildA.m2m`` field will be
 ``common_childa_related``, whilst the reverse name of the
 ``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
@@ -1180,14 +1194,14 @@ were needed in any case, so the current separation arose.
 
 So, the general rules are:
 
-    1. If you are mirroring an existing model or database table and don't want
-       all the original database table columns, use ``Meta.managed=False``.
-       That option is normally useful for modeling database views and tables
-       not under the control of Django.
-    2. If you are wanting to change the Python-only behavior of a model, but
-       keep all the same fields as in the original, use ``Meta.proxy=True``.
-       This sets things up so that the proxy model is an exact copy of the
-       storage structure of the original model when data is saved.
+1. If you are mirroring an existing model or database table and don't want
+   all the original database table columns, use ``Meta.managed=False``.
+   That option is normally useful for modeling database views and tables
+   not under the control of Django.
+2. If you are wanting to change the Python-only behavior of a model, but
+   keep all the same fields as in the original, use ``Meta.proxy=True``.
+   This sets things up so that the proxy model is an exact copy of the
+   storage structure of the original model when data is saved.
 
 Multiple inheritance
 --------------------

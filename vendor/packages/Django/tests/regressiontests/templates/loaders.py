@@ -14,13 +14,10 @@ import pkg_resources
 import imp
 import StringIO
 import os.path
-import warnings
 
 from django.template import TemplateDoesNotExist, Context
-from django.template.loaders.eggs import load_template_source as lts_egg
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 
 
@@ -56,33 +53,6 @@ def create_egg(name, resources):
     egg.__loader__ = MockLoader()
     egg._resources = resources
     sys.modules[name] = egg
-
-class DeprecatedEggLoaderTest(unittest.TestCase):
-    "Test the deprecated load_template_source interface to the egg loader"
-    def setUp(self):
-        pkg_resources._provider_factories[MockLoader] = MockProvider
-
-        self.empty_egg = create_egg("egg_empty", {})
-        self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO.StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO.StringIO("x"),
-        })
-        self._old_installed_apps = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS = []
-        self._warnings_state = get_warnings_state()
-        warnings.filterwarnings("ignore", category=DeprecationWarning,
-                                module='django.template.loaders.eggs')
-
-    def tearDown(self):
-        settings.INSTALLED_APPS = self._old_installed_apps
-        restore_warnings_state(self._warnings_state)
-
-    def test_existing(self):
-        "A template can be loaded from an egg"
-        settings.INSTALLED_APPS = ['egg_1']
-        contents, template_name = lts_egg("y.html")
-        self.assertEqual(contents, "y")
-        self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
 
 class EggLoaderTest(unittest.TestCase):
@@ -173,5 +143,13 @@ class RenderToStringTest(unittest.TestCase):
         self.assertEqual(output, 'obj:after')
         self.assertEqual(context['obj'], 'before')
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_empty_list(self):
+        self.assertRaisesRegexp(TemplateDoesNotExist,
+                                'No template names provided$',
+                                loader.render_to_string, [])
+
+
+    def test_select_templates_from_empty_list(self):
+        self.assertRaisesRegexp(TemplateDoesNotExist,
+                                'No template names provided$',
+                                loader.select_template, [])

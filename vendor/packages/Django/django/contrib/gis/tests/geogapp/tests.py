@@ -1,11 +1,16 @@
 """
 Tests for geography support in PostGIS 1.5+
 """
+from __future__ import absolute_import
+
 import os
+
 from django.contrib.gis import gdal
 from django.contrib.gis.measure import D
 from django.test import TestCase
-from models import City, County, Zipcode
+
+from .models import City, County, Zipcode
+
 
 class GeographyTest(TestCase):
 
@@ -79,7 +84,6 @@ class GeographyTest(TestCase):
 
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
-        from django.contrib.gis.measure import A
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
         ref_area = 5439084.70637573
         tol = 5

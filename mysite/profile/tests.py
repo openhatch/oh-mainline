@@ -571,36 +571,6 @@ mock_launchpad_debian_response.return_value = {
 }
 
 
-class BugsAreRecommended(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus',
-                'bugs-for-two-projects.json']
-
-    def test_recommendations_found(self):
-        # Recommendations defined like this:
-        # the first N bugs matching the various "recommended searches" (N=5?)
-
-        # It's round-robin across the searches.
-        # So if we create two Python bugs and one C# bug, and we set N to 2,
-        # and paulproteus ought to get hits from Python and C#, we should see
-        # only one Python bug.
-        recommender = mysite.profile.view_helpers.RecommendBugs(
-            ['Python', 'C#'], n=2)
-        recommended = list(recommender.recommend())
-        python_bugs = [
-            bug for bug in recommended if bug.project.language == 'Python']
-        self.assertEqual(len(python_bugs), 1)
-        csharp_bugs = [
-            bug for bug in recommended if bug.project.language == 'C#']
-        self.assertEqual(len(csharp_bugs), 1)
-
-    def test_recommendations_not_duplicated(self):
-        """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
-        recommender = mysite.profile.view_helpers.RecommendBugs(
-            ['Python', 'Python'], n=2)
-        recommended = list(recommender.recommend())
-        self.assertNotEqual(recommended[0], recommended[1])
-
-
 class PersonInfoLinksToSearch(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -1062,26 +1032,6 @@ class OtherContributors(TwillTests):
             project.get_n_other_contributors_than(5, barry),
             [paulproteus]
         )
-
-
-class UserGetsHisQueuedMessages(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def gimme_json(self):
-        url = reverse(mysite.profile.views.gimme_json_for_portfolio)
-        response = self.login_with_client().get(url)
-        return simplejson.loads(response.content)
-
-    def test_user_gets_his_queued_messages(self):
-        paulproteus = Person.objects.get(user__username='paulproteus')
-        # Verify the first time, the gimme_json has no messages
-        self.assertEqual(self.gimme_json()['messages'], [])
-
-        # Queue a message for paulproteus
-        paulproteus.user.message_set.create(message="MSG'd!")
-
-        # Verify that the gimme_json now has that message
-        self.assertEqual(self.gimme_json()['messages'], ["MSG'd!"])
 
 
 class IgnoreNewDuplicateCitations(TwillTests):
@@ -1990,48 +1940,6 @@ class PeopleMapForNonexistentProject(TwillTests):
              u'user': User.objects.get(username='paulproteus')})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
-
-
-class BugModificationTimeVersusTimestamp(TwillTests):
-
-    @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache')
-    def test(self, mock_thing):
-        # The following comment is from the old Epoch class, now superseded by the
-        # Timestamp class. It is here as a reference.
-
-        # This class has a modified_date column, thanks to OpenHatchModel.
-        # Instances of this class are effectively mappings of strings to
-        # modified_dates.
-        #
-        # We can use this table to answer the question, Which cache key should I
-        # use for such-and-such a thing? For example, which cache key should I use
-        # when retrieving a list of recommended bugs for Python lovers?  If there's
-        # a row in this table like this:
-        #
-        #   class_name    modified_date
-        #   'Bug'         (a representation of yesterday's date)
-        #
-        # then we know to cache the output of Bug-related functions using a key like
-        # recommended_bugs_for_python_lovers_as_of_2010_06_04
-        #
-        # When the Epoch table changes, then we use a new cache key to store and
-        # retrieve cached data. The old cache key and its value is ignored forever
-        # (and will eventually be flushed out of memcached).
-
-        timestamp_at_start = mysite.base.models.Timestamp.get_timestamp_for_string(
-            str(mysite.search.models.Bug))
-        # This is a new bug, so we might want to invalidate the cache for
-        # recommended-bug lists, or people won't see this bug in their list of
-        # "Recommended bugs"
-        mysite.search.models.Bug.create_dummy_with_project()
-        # Let's the invalidate the cache
-        mysite.profile.tasks.sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache(
-        )
-        # Make sure that the cache timestamp has been updated
-        new_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-            str(mysite.search.models.Bug))
-        self.assert_(new_timestamp > timestamp_at_start)
-        self.assert_(mock_thing.called)
 
 
 class SaveReordering(TwillTests):

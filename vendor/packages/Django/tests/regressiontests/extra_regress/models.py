@@ -1,9 +1,9 @@
+import copy
 import datetime
-
-import django.utils.copycompat as copy
 
 from django.contrib.auth.models import User
 from django.db import models
+
 
 class RevisionableModel(models.Model):
     base = models.ForeignKey('self', null=True)

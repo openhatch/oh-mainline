@@ -1,20 +1,30 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import datetime
-import time
+
 from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
+from django.test import TestCase
 from django.utils import translation
-from django.utils import unittest
-from django.utils.encoding import force_unicode
-from django.utils.encoding import smart_unicode
-from error_messages import AssertFormErrorsMixin
+from django.utils.encoding import force_unicode, smart_unicode
+
+from .error_messages import AssertFormErrorsMixin
+
 
 class GetDate(Form):
     mydate = DateField(widget=SelectDateWidget)
 
-class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
+class GetNotRequiredDate(Form):
+    mydate = DateField(widget=SelectDateWidget, required=False)
+
+class GetDateShowHiddenInitial(Form):
+    mydate = DateField(widget=SelectDateWidget, show_hidden_initial=True)
+
+class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
     ###############
     # Extra stuff #
     ###############
@@ -22,7 +32,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
     # The forms library comes with some extra, higher-level Field and Widget
     def test_selectdate(self):
         w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
-        self.assertEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
 <option value="2">February</option>
@@ -37,6 +47,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="11">November</option>
 <option value="12">December</option>
 </select>
+
 <select name="mydate_day" id="id_mydate_day">
 <option value="0">---</option>
 <option value="1">1</option>
@@ -71,6 +82,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="30">30</option>
 <option value="31">31</option>
 </select>
+
 <select name="mydate_year" id="id_mydate_year">
 <option value="0">---</option>
 <option value="2007">2007</option>
@@ -84,9 +96,9 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="2015">2015</option>
 <option value="2016">2016</option>
 </select>""")
-        self.assertEqual(w.render('mydate', None), w.render('mydate', ''))
+        self.assertHTMLEqual(w.render('mydate', None), w.render('mydate', ''))
 
-        self.assertEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
 <option value="1">January</option>
 <option value="2">February</option>
 <option value="3">March</option>
@@ -147,10 +159,10 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 </select>""")
 
         # Accepts a datetime or a string:
-        self.assertEqual(w.render('mydate', datetime.date(2010, 4, 15)), w.render('mydate', '2010-04-15'))
+        self.assertHTMLEqual(w.render('mydate', datetime.date(2010, 4, 15)), w.render('mydate', '2010-04-15'))
 
         # Invalid dates still render the failed date:
-        self.assertEqual(w.render('mydate', '2010-02-31'), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', '2010-02-31'), """<select name="mydate_month" id="id_mydate_month">
 <option value="1">January</option>
 <option value="2" selected="selected">February</option>
 <option value="3">March</option>
@@ -212,7 +224,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 
         # Using a SelectDateWidget in a form:
         w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'), required=False)
-        self.assertEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
 <option value="2">February</option>
@@ -274,7 +286,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="2015">2015</option>
 <option value="2016">2016</option>
 </select>""")
-        self.assertEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
 <option value="2">February</option>
@@ -345,7 +357,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         # we must be prepared to accept the input from the "as_hidden"
         # rendering as well.
 
-        self.assertEqual(a['mydate'].as_hidden(), '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />')
+        self.assertHTMLEqual(a['mydate'].as_hidden(), '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />')
 
         b = GetDate({'mydate':'2008-4-1'})
         self.assertTrue(b.is_valid())
@@ -379,14 +391,14 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
             def decompress(self, value):
                 if value:
                     data = value.split(',')
-                    return [data[0], data[1], datetime.datetime(*time.strptime(data[2], "%Y-%m-%d %H:%M:%S")[0:6])]
+                    return [data[0], data[1], datetime.datetime.strptime(data[2], "%Y-%m-%d %H:%M:%S")]
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
                 return u'\n'.join(rendered_widgets)
 
         w = ComplexMultiWidget()
-        self.assertEqual(w.render('name', 'some text,JP,2007-04-25 06:24:00'), """<input type="text" name="name_0" value="some text" />
+        self.assertHTMLEqual(w.render('name', 'some text,JP,2007-04-25 06:24:00'), """<input type="text" name="name_0" value="some text" />
 <select multiple="multiple" name="name_1">
 <option value="J" selected="selected">John</option>
 <option value="P" selected="selected">Paul</option>
@@ -420,7 +432,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
             field1 = ComplexField(widget=w)
 
         f = ComplexFieldForm()
-        self.assertEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J">John</option>
 <option value="P">Paul</option>
@@ -430,7 +442,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <input type="text" name="field1_2_0" id="id_field1_2_0" /><input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>""")
 
         f = ComplexFieldForm({'field1_0':'some text','field1_1':['J','P'], 'field1_2_0':'2007-04-25', 'field1_2_1':'06:24:00'})
-        self.assertEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J" selected="selected">John</option>
 <option value="P" selected="selected">Paul</option>
@@ -459,6 +471,86 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
         self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
         self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+
+    def test_generic_ipaddress_invalid_arguments(self):
+        self.assertRaises(ValueError, GenericIPAddressField, protocol="hamster")
+        self.assertRaises(ValueError, GenericIPAddressField, protocol="ipv4", unpack_ipv4=True)
+
+    def test_generic_ipaddress_as_generic(self):
+        # The edge cases of the IPv6 validation code are not deeply tested
+        # here, they are covered in the tests for django.utils.ipv6
+        f = GenericIPAddressField()
+        self.assertFormErrors([u'This field is required.'], f.clean, '')
+        self.assertFormErrors([u'This field is required.'], f.clean, None)
+        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), u'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), u'2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
+
+    def test_generic_ipaddress_as_ipv4_only(self):
+        f = GenericIPAddressField(protocol="IPv4")
+        self.assertFormErrors([u'This field is required.'], f.clean, '')
+        self.assertFormErrors([u'This field is required.'], f.clean, None)
+        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
+        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'foo')
+        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '256.125.1.5')
+        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'fe80::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '2a02::223:6cff:fe8a:2e8a')
+
+    def test_generic_ipaddress_as_ipv6_only(self):
+        f = GenericIPAddressField(protocol="IPv6")
+        self.assertFormErrors([u'This field is required.'], f.clean, '')
+        self.assertFormErrors([u'This field is required.'], f.clean, None)
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '127.0.0.1')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, 'foo')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), u'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), u'2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors([u'Enter a valid IPv6 address.'], f.clean, '1:2')
+
+    def test_generic_ipaddress_as_generic_not_required(self):
+        f = GenericIPAddressField(required=False)
+        self.assertEqual(f.clean(''), u'')
+        self.assertEqual(f.clean(None), u'')
+        self.assertEqual(f.clean('127.0.0.1'), u'127.0.0.1')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '127.0.0.')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1.2.3.4.5')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '256.125.1.5')
+        self.assertEqual(f.clean('fe80::223:6cff:fe8a:2e8a'), u'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean('2a02::223:6cff:fe8a:2e8a'), u'2a02::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '12345:2:3:4')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3::4')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1::2:3:4:5:6:7:8')
+        self.assertFormErrors([u'Enter a valid IPv4 or IPv6 address.'], f.clean, '1:2')
+
+    def test_generic_ipaddress_normalization(self):
+        # Test the normalising code
+        f = GenericIPAddressField()
+        self.assertEqual(f.clean('::ffff:0a0a:0a0a'), u'::ffff:10.10.10.10')
+        self.assertEqual(f.clean('::ffff:10.10.10.10'), u'::ffff:10.10.10.10')
+        self.assertEqual(f.clean('2001:000:a:0000:0:fe:fe:beef'), u'2001:0:a::fe:fe:beef')
+        self.assertEqual(f.clean('2001::a:0000:0:fe:fe:beef'), u'2001:0:a::fe:fe:beef')
+
+        f = GenericIPAddressField(unpack_ipv4=True)
+        self.assertEqual(f.clean('::ffff:0a0a:0a0a'), u'10.10.10.10')
 
     def test_smart_unicode(self):
         class Test:
@@ -509,7 +601,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 
         data = dict(email='invalid')
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
-        self.assertEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
+        self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
 <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
 <p>Email: <input type="text" name="email" value="invalid" /></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
@@ -530,8 +622,17 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         self.assertTrue(FormWithFile().is_multipart())
         self.assertTrue(FormWithImage().is_multipart())
 
+    def test_field_not_required(self):
+        b = GetNotRequiredDate({
+            'mydate_year': '',
+            'mydate_month': '',
+            'mydate_day': ''
+        })
+        self.assertFalse(b.has_changed())
 
-class FormsExtraL10NTestCase(unittest.TestCase):
+
+
+class FormsExtraL10NTestCase(TestCase):
     def setUp(self):
         super(FormsExtraL10NTestCase, self).setUp()
         self.old_use_l10n = getattr(settings, 'USE_L10N', False)
@@ -547,7 +648,7 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'), required=False)
         self.assertEqual(w.value_from_datadict({'date_year': '2010', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-2010')
 
-        self.assertEqual(w.render('date', '13-08-2010'), """<select name="date_day" id="id_date_day">
+        self.assertHTMLEqual(w.render('date', '13-08-2010'), """<select name="date_day" id="id_date_day">
 <option value="0">---</option>
 <option value="1">1</option>
 <option value="2">2</option>
@@ -613,6 +714,60 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         # Years before 1900 work
         w = SelectDateWidget(years=('1899',))
         self.assertEqual(w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-1899')
+
+    def test_l10n_date_changed(self):
+        """
+        Ensure that SelectDateWidget._has_changed() works correctly with a
+        localized date format.
+        Refs #17165.
+        """
+        # With Field.show_hidden_initial=False -----------------------
+        b = GetDate({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '1',
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+        b = GetDate({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '2',
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertTrue(b.has_changed())
+
+        # With Field.show_hidden_initial=True ------------------------
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '1',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertTrue(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 22)})
+        self.assertTrue(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 22))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
 
     def test_l10n_invalid_date_in(self):
         # Invalid dates shouldn't be allowed

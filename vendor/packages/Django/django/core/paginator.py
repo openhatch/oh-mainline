@@ -12,8 +12,8 @@ class EmptyPage(InvalidPage):
 class Paginator(object):
     def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
         self.object_list = object_list
-        self.per_page = per_page
-        self.orphans = orphans
+        self.per_page = int(per_page)
+        self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
         self._num_pages = self._count = None
 
@@ -21,7 +21,7 @@ class Paginator(object):
         "Validates the given 1-based page number."
         try:
             number = int(number)
-        except ValueError:
+        except (TypeError, ValueError):
             raise PageNotAnInteger('That page number is not an integer')
         if number < 1:
             raise EmptyPage('That page number is less than 1')
@@ -83,6 +83,44 @@ class Page(object):
 
     def __repr__(self):
         return '<Page %s of %s>' % (self.number, self.paginator.num_pages)
+
+    def __len__(self):
+        return len(self.object_list)
+
+    def __getitem__(self, index):
+        # The object_list is converted to a list so that if it was a QuerySet
+        # it won't be a database hit per __getitem__.
+        return list(self.object_list)[index]
+
+    # The following four methods are only necessary for Python <2.6
+    # compatibility (this class could just extend 2.6's collections.Sequence).
+
+    def __iter__(self):
+        i = 0
+        try:
+            while True:
+                v = self[i]
+                yield v
+                i += 1
+        except IndexError:
+            return
+
+    def __contains__(self, value):
+        for v in self:
+            if v == value:
+                return True
+        return False
+
+    def index(self, value):
+        for i, v in enumerate(self):
+            if v == value:
+                return i
+        raise ValueError
+
+    def count(self, value):
+        return sum([1 for v in self if v == value])
+
+    # End of compatibility methods.
 
     def has_next(self):
         return self.number < self.paginator.num_pages

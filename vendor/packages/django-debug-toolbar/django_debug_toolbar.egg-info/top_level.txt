@@ -1,2 +1,2 @@
+tests
 debug_toolbar
-example

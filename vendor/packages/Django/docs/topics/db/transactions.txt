@@ -54,6 +54,13 @@ The various cache middlewares are an exception:
 Even when using database caching, Django's cache backend uses its own
 database cursor (which is mapped to its own database connection internally).
 
+.. note::
+
+    The ``TransactionMiddleware`` only affects the database aliased
+    as "default" within your :setting:`DATABASES` setting.  If you are using
+    multiple databases and want transaction control over databases other than
+    "default", you will need to write your own transaction middleware.
+
 .. _transaction-management-functions:
 
 Controlling transaction management in views
@@ -69,35 +76,33 @@ per-function or per-code-block basis.
 
 These functions, described in detail below, can be used in two different ways:
 
-    * As a decorator_ on a particular function. For example::
+* As a decorator_ on a particular function. For example::
 
-            from django.db import transaction
+    from django.db import transaction
 
-            @transaction.commit_on_success
-            def viewfunc(request):
-                # ...
-                # this code executes inside a transaction
-                # ...
+    @transaction.commit_on_success
+    def viewfunc(request):
+        # ...
+        # this code executes inside a transaction
+        # ...
 
-      This technique works with all supported version of Python (that is, with
-      Python 2.4 and greater).
+* As a `context manager`_ around a particular block of code::
 
-    * As a `context manager`_ around a particular block of code::
+    from django.db import transaction
 
-            from django.db import transaction
+    def viewfunc(request):
+        # ...
+        # this code executes using default transaction management
+        # ...
 
-            def viewfunc(request):
-                # ...
-                # this code executes using default transaction management
-                # ...
+        with transaction.commit_on_success():
+            # ...
+            # this code executes inside a transaction
+            # ...
 
-                with transaction.commit_on_success():
-                    # ...
-                    # this code executes inside a transaction
-                    # ...
-
-      The ``with`` statement is new in Python 2.5, and so this syntax can only
-      be used with Python 2.5 and above.
+Both techniques work with all supported version of Python. However, in Python
+2.5, you must add ``from __future__ import with_statement`` at the beginning
+of your module if you are using the ``with`` statement.
 
 .. _decorator: http://docs.python.org/glossary.html#term-decorator
 .. _context manager: http://docs.python.org/glossary.html#term-context-manager
@@ -227,11 +232,14 @@ transaction middleware, and only modify selected functions as needed.
 Savepoints
 ==========
 
-A savepoint is a marker within a transaction that enables you to roll back
-part of a transaction, rather than the full transaction. Savepoints are
-available to the PostgreSQL 8 and Oracle backends. Other backends will
-provide the savepoint functions, but they are empty operations - they won't
-actually do anything.
+A savepoint is a marker within a transaction that enables you to roll back part
+of a transaction, rather than the full transaction. Savepoints are available
+with the PostgreSQL 8, Oracle and MySQL (version 5.0.3 and newer, when using
+the InnoDB storage engine) backends. Other backends provide the savepoint
+functions, but they're empty operations -- they don't actually do anything.
+
+.. versionchanged:: 1.4
+   Savepoint support for the MySQL backend was added in Django 1.4.
 
 Savepoints aren't especially useful if you are using the default
 ``autocommit`` behavior of Django. However, if you are using

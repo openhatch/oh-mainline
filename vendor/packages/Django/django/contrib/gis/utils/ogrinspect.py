@@ -189,7 +189,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
             yield '    %s = models.DateField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTDateTime:
             yield '    %s = models.DateTimeField(%s)' % (mfield, kwargs_str[2:])
-        elif field_type is OFTDate:
+        elif field_type is OFTTime:
             yield '    %s = models.TimeField(%s)' % (mfield, kwargs_str[2:])
         else:
             raise TypeError('Unknown field type %s in %s' % (field_type, mfield))

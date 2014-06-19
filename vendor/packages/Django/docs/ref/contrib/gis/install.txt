@@ -4,11 +4,13 @@
 GeoDjango Installation
 ======================
 
+.. highlight:: console
+
 Overview
 ========
 In general, GeoDjango installation requires:
 
-1. :ref:`python24` and :ref:`django`
+1. :ref:`Python and Django <django>`
 2. :ref:`spatial_database`
 3. :ref:`geospatial_libs`
 
@@ -32,29 +34,19 @@ instructions are available for:
 Requirements
 ============
 
-.. _python24:
-
-Python 2.4+
------------
-
-Python 2.4 is the minimum version supported by Django, however Python 2.5+ is
-recommended because the `ctypes`__ module comes included; otherwise, 2.4 users
-will need to `download and install ctypes`__.
-
-__ http://docs.python.org/lib/module-ctypes.html
-__ http://sourceforge.net/projects/ctypes/files/
-
 .. _django:
 
-Django
-------
+Python and Django
+-----------------
 
 Because GeoDjango is included with Django, please refer to Django's
-:doc:`installation instructions </intro/install>` for details on how to install.
+:ref:`installation instructions <installing-official-release>` for details on
+how to install.
+
 
 .. _spatial_database:
 
-Spatial Database
+Spatial database
 ----------------
 PostgreSQL (with PostGIS), MySQL, Oracle, and SQLite (with SpatiaLite) are
 the spatial databases currently supported.
@@ -79,7 +71,7 @@ SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires
 
 .. _geospatial_libs:
 
-Geospatial Libraries
+Geospatial libraries
 --------------------
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
@@ -87,12 +79,12 @@ geospatial libraries:
 ========================  ====================================  ================================  ==========================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ==========================
-:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.2, 3.1, 3.0
+:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.3, 3.2, 3.1, 3.0
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.7, 4.6, 4.5, 4.4
 :ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.8, 1.7, 1.6, 1.5, 1.4
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             1.5, 1.4, 1.3
-`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 2.4, 2.3
+`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 3.0, 2.4, 2.3
 ========================  ====================================  ================================  ==========================
 
 .. admonition::  Install GDAL
@@ -110,11 +102,11 @@ Program                   Description                           Required        
 
 .. _PROJ.4: http://trac.osgeo.org/proj/
 __ http://postgis.refractions.net/
-__ http://www.gaia-gis.it/spatialite/index.html
+__ http://www.gaia-gis.it/gaia-sins/
 
 .. _build_from_source:
 
-Building from Source
+Building from source
 ====================
 
 When installing from source on UNIX and GNU/Linux systems, please follow
@@ -124,7 +116,7 @@ is required.
 
 .. note::
 
-   On Linux platforms, it may be necessarry to run the ``ldconfig``
+   On Linux platforms, it may be necessary to run the ``ldconfig``
    command after installing each library.  For example::
 
        $ sudo make install
@@ -136,7 +128,7 @@ is required.
     to compile software from source.  This is typically included on your
     OS X installation DVDs.
 
-.. _Apple Developer Tools: http://developer.apple.com/tools/xcode/
+.. _Apple Developer Tools: https://developer.apple.com/technologies/tools/
 
 .. _geosbuild:
 
@@ -151,13 +143,13 @@ directly from Python using ctypes.
 First, download GEOS 3.2 from the refractions Web site and untar the source
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.2.2.tar.bz2
-    $ tar xjf geos-3.2.2.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.3.0.tar.bz2
+    $ tar xjf geos-3.3.0.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
 script, compile, and install::
 
-    $ cd geos-3.2.2
+    $ cd geos-3.3.0
     $ ./configure
     $ make
     $ sudo make install
@@ -166,10 +158,12 @@ script, compile, and install::
 Troubleshooting
 ^^^^^^^^^^^^^^^
 
-Can't find GEOS Library
+Can't find GEOS library
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When GeoDjango can't find GEOS, this error is raised::
+When GeoDjango can't find GEOS, this error is raised:
+
+.. code-block:: text
 
     ImportError: Could not find the GEOS library (tried "geos_c"). Try setting GEOS_LIBRARY_PATH in your settings.
 
@@ -186,7 +180,9 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to the
-GEOS C library.  For example::
+GEOS C library.  For example:
+
+.. code-block:: python
 
     GEOS_LIBRARY_PATH = '/home/bob/local/lib/libgeos_c.so'
 
@@ -194,6 +190,8 @@ GEOS C library.  For example::
 
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
+
+See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-logfile>`.
 
 .. _proj4:
 
@@ -237,7 +235,7 @@ installed prior to building PostGIS.
     The `psycopg2`_ module is required for use as the database adaptor
     when using GeoDjango with PostGIS.
 
-.. _psycopg2: http://initd.org/projects/psycopg2
+.. _psycopg2: http://initd.org/psycopg/
 
 First download the source archive, and extract::
 
@@ -274,9 +272,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.8.0.tar.gz
-    $ tar xzf gdal-1.8.0.tar.gz
-    $ cd gdal-1.8.0
+    $ wget http://download.osgeo.org/gdal/gdal-1.8.1.tar.gz
+    $ tar xzf gdal-1.8.1.tar.gz
+    $ cd gdal-1.8.1
 
 Configure, make and install::
 
@@ -303,11 +301,13 @@ __ http://trac.osgeo.org/gdal/wiki/GdalOgrInPython
 Troubleshooting
 ^^^^^^^^^^^^^^^
 
-Can't find GDAL Library
+Can't find GDAL library
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When GeoDjango can't find the GDAL library, the ``HAS_GDAL`` flag
-will be false::
+will be false:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis import gdal
     >>> gdal.HAS_GDAL
@@ -324,7 +324,9 @@ The solution is to properly configure your :ref:`libsettings` *or* set
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to
-the GDAL library.  For example::
+the GDAL library.  For example:
+
+.. code-block:: python
 
     GDAL_LIBRARY_PATH = '/home/sue/local/lib/libgdal.so'
 
@@ -335,7 +337,9 @@ Can't find GDAL data files (``GDAL_DATA``)
 
 When installed from source, GDAL versions 1.5.1 and below have an autoconf bug
 that places data in the wrong location. [#]_   This can lead to error messages
-like this::
+like this:
+
+.. code-block:: text
 
     ERROR 4: Unable to open EPSG support file gcs.csv.
     ...
@@ -349,7 +353,9 @@ GDAL data files before invoking Python  (typically ``/usr/local/share``; use
     $ python manage.py shell
 
 If using Apache, you may need to add this environment variable to your configuration
-file::
+file:
+
+.. code-block:: apache
 
     SetEnv GDAL_DATA /usr/local/share
 
@@ -372,7 +378,7 @@ SpatiaLite.
 After installation is complete, don't forget to read the post-installation
 docs on :ref:`create_spatialite_db`.
 
-__ http://www.gaia-gis.it/spatialite/index.html
+__ http://www.gaia-gis.it/gaia-sins/
 
 .. _sqlite:
 
@@ -408,7 +414,7 @@ __ http://www.sqlite.org/download.html
 
 .. _spatialitebuild :
 
-SpatiaLite Library (``libspatialite``) and Tools (``spatialite``)
+SpatiaLite library (``libspatialite``) and tools (``spatialite``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 After SQLite has been built with the R*Tree module enabled, get the latest
@@ -453,7 +459,7 @@ Finally, do the same for the SpatiaLite tools::
 
         $ ./configure --target=macosx
 
-__ http://www.gaia-gis.it/spatialite/sources.html
+__ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
 .. _pysqlite2:
 
@@ -469,7 +475,9 @@ Thus, download pysqlite2 2.6, and untar::
     $ cd pysqlite-2.6.0
 
 Next, use a text editor (e.g., ``emacs`` or ``vi``) to edit the ``setup.cfg`` file
-to look like the following::
+to look like the following:
+
+.. code-block:: ini
 
     [build_ext]
     #define=
@@ -491,12 +499,12 @@ to build and install::
 
     $ sudo python setup.py install
 
-Post-Installation
+Post-installation
 =================
 
 .. _spatialdb_template:
 
-Creating a Spatial Database Template for PostGIS
+Creating a spatial database template for PostGIS
 ------------------------------------------------
 
 Creating a spatial database with PostGIS is different than normal because
@@ -545,7 +553,7 @@ These commands may be placed in a shell script for later use; for convenience
 the following scripts are available:
 
 ===============  =============================================
-PostGIS Version  Bash Shell Script
+PostGIS version  Bash shell script
 ===============  =============================================
 1.3              :download:`create_template_postgis-1.3.sh`
 1.4              :download:`create_template_postgis-1.4.sh`
@@ -568,39 +576,41 @@ Afterwards, you may create a spatial database by simply specifying
 
 .. _create_spatialite_db:
 
-Creating a Spatial Database for SpatiaLite
--------------------------------------------
+Creating a spatial database for SpatiaLite
+------------------------------------------
 
-After the SpatiaLite library and tools have been installed, it is now possible
-to create a spatial database for use with GeoDjango.
+After you've installed SpatiaLite, you'll need to create a number of spatial
+metadata tables in your database in order to perform spatial queries.
 
-For this, a number of spatial metadata tables must be created in the database
-before any spatial query is performed against it.  You need to download a
-database initialization file and execute the SQL queries it contains against
-your database.
+If you're using SpatiaLite 3.0 or newer, use the ``spatialite`` utility to
+call the ``InitSpatiaMetaData()`` function, like this::
 
-First, get it from the appropiate SpatiaLite Resources page (i.e.
+   $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
+   the SPATIAL_REF_SYS table already contains some row(s)
+    InitSpatiaMetaData ()error:"table spatial_ref_sys already exists"
+   0
+
+You can safely ignore the error messages shown. When you've done this, you can
+skip the rest of this section.
+
+If you're using a version of SpatiaLite older than 3.0, you'll need to download
+a database-initialization file and execute its SQL queries in your database.
+
+First, get it from the appropriate SpatiaLite Resources page (
 http://www.gaia-gis.it/spatialite-2.3.1/resources.html for 2.3 or
 http://www.gaia-gis.it/spatialite-2.4.0/ for 2.4)::
 
    $ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
    $ gunzip init_spatialite-2.3.sql.gz
 
-(Or, if you are using SpatiaLite 2.4 then do::
-
-   $ wget http://www.gaia-gis.it/spatialite-2.4.0/init_spatialite-2.4.sql.gz
-   $ gunzip init_spatialite-2.4.sql.gz
-
-)
-
-Now, the ``spatialite`` command can be used to initialize a spatial database::
+Then, use the ``spatialite`` command to initialize a spatial database::
 
    $ spatialite geodjango.db < init_spatialite-2.X.sql
 
 .. note::
 
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
-    you want to use.  Use the same in the :setting:`DATABASE_NAME`
+    you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
@@ -613,21 +623,23 @@ features such as the geographic admin or KML sitemaps will not function properly
 
 .. _addgoogleprojection:
 
-Add Google Projection to ``spatial_ref_sys`` table
+Add Google projection to ``spatial_ref_sys`` table
 --------------------------------------------------
 
 .. versionchanged:: 1.2
 
 .. note::
 
-    If running PostGIS 1.4 and above, the entry is already included in the
-    default ``spatial_ref_sys`` table.  You can skip this step.
+    If you're running PostGIS 1.4 or above, you can skip this step. The entry
+    is already included in the default ``spatial_ref_sys`` table.
 
 In order to conduct database transformations to the so-called "Google"
 projection (a spherical mercator projection used by Google Maps),
 an entry must be added to your spatial database's ``spatial_ref_sys`` table.
 Invoke the Django shell from your project and execute the
-``add_srs_entry`` function::
+``add_srs_entry`` function:
+
+.. code-block:: pycon
 
     $ python manage shell
     >>> from django.contrib.gis.utils import add_srs_entry
@@ -647,22 +659,20 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Join the ``#geodjango`` IRC channel on FreeNode (may be accessed on the
-  Web via `Mibbit`__).  Please be patient and polite -- while you may not
-  get an immediate response, someone will attempt to answer your question
-  as soon as they see it.
+* Join the ``#geodjango`` IRC channel on FreeNode. Please be patient and polite
+  -- while you may not get an immediate response, someone will attempt to answer
+  your question as soon as they see it.
 * Ask your question on the `GeoDjango`__ mailing list.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ http://www.mibbit.com/?server=irc.freenode.net&channel=%23geodjango
 __ http://groups.google.com/group/geodjango
-__ http://code.djangoproject.com/simpleticket
+__ https://code.djangoproject.com/newticket
 
 .. _libsettings:
 
-Library Environment Settings
+Library environment settings
 ----------------------------
 
 By far, the most common problem when installing GeoDjango is that the
@@ -685,7 +695,7 @@ could place the following in their bash profile::
 
     export LD_LIBRARY_PATH=/usr/local/lib
 
-Setting System Library Path
+Setting system library path
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which may include
@@ -724,7 +734,7 @@ Similarly, on Red Hat and CentOS systems::
 
     $ sudo yum install binutils
 
-Platform Specific Instructions
+Platform-specific instructions
 ==============================
 
 .. _macosx:
@@ -733,8 +743,9 @@ Mac OS X
 --------
 
 Because of the variety of packaging systems available for OS X, users have
-several different options for installing GeoDjango.  These options are:
+several different options for installing GeoDjango. These options are:
 
+* :ref:`homebrew`
 * :ref:`kyngchaos`
 * :ref:`fink`
 * :ref:`macports`
@@ -771,9 +782,28 @@ __ http://python.org/ftp/python/2.6.2/python-2.6.2-macosx2009-04-16.dmg
 
         export PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
 
+.. _homebrew:
+
+Homebrew
+^^^^^^^^
+
+`Homebrew`__ provides "recipes" for building binaries and packages from source.
+It provides recipes for the GeoDjango prerequisites on Macintosh computers
+running OS X. Because Homebrew still builds the software from source, the
+`Apple Developer Tools`_ are required.
+
+Summary::
+
+    $ brew install postgresql
+    $ brew install postgis
+    $ brew install gdal
+    $ brew install libgeoip
+
+__ http://mxcl.github.com/homebrew/
+
 .. _kyngchaos:
 
-KyngChaos Packages
+KyngChaos packages
 ^^^^^^^^^^^^^^^^^^
 
 William Kyngesburye provides a number of `geospatial library binary packages`__
@@ -816,7 +846,9 @@ __ http://www.kyngchaos.com/software/postgres
 
     Use of these binaries requires Django 1.0.3 and above.  If you are
     using a previous version of Django (like 1.0.2), then you will have
-    to add the following in your settings::
+    to add the following in your settings:
+
+    .. code-block:: python
 
         GEOS_LIBRARY_PATH='/Library/Frameworks/GEOS.framework/GEOS'
         GDAL_LIBRARY_PATH='/Library/Frameworks/GDAL.framework/GDAL'
@@ -829,13 +861,12 @@ psycopg2
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
 
-    $ sudo python easy_install psycopg2
+    $ sudo pip install psycopg2
 
 .. note::
 
-   To use ``easy_install`` you'll need to install Python's `setuptools`_.
-
-.. _setuptools: http://pypi.python.org/pypi/setuptools
+    If you don't have ``pip``, follow the the :ref:`installation instructions
+    <installing-official-release>` to install it.
 
 .. _pysqlite2_kyngchaos:
 
@@ -843,7 +874,9 @@ pysqlite2
 ~~~~~~~~~
 
 Follow the :ref:`pysqlite2` source install instructions, however,
-when editing the ``setup.cfg`` use the following instead::
+when editing the ``setup.cfg`` use the following instead:
+
+.. code-block:: ini
 
     [build_ext]
     #define=
@@ -868,11 +901,13 @@ location available in your ``PATH``.  For example::
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
 
 Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
-add the following to your ``settings.py``::
+add the following to your ``settings.py``:
+
+.. code-block:: python
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
-__ http://www.gaia-gis.it/spatialite/binaries.html
+__ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
 
 .. _fink:
 
@@ -905,7 +940,7 @@ Summary::
     $ sudo port install geos
     $ sudo port install proj
     $ sudo port install postgis
-    $ sudo port install gdal
+    $ sudo port install gdal +geos
     $ sudo port install libgeoip
 
 .. note::
@@ -929,44 +964,51 @@ Ubuntu & Debian GNU/Linux
 
 .. note::
 
-    The PostGIS SQL files are not placed the PostgreSQL share directory in the
-    Debian and Ubuntu packages, and are located instead special directory
-    depending on the release.  Thus, when :ref:`spatialdb_template` use the
-    :download:`create_template_postgis-debian.sh` script instead
+    The PostGIS SQL files are not placed in the PostgreSQL share directory in
+    the Debian and Ubuntu packages. Instead, they're located in a special
+    directory depending on the release. In this case, use the
+    :download:`create_template_postgis-debian.sh` script
 
 .. _ubuntu:
 
 Ubuntu
 ^^^^^^
 
+11.10
+~~~~~
+
+In Ubuntu 11.10, PostgreSQL was upgraded to 9.1. The installation commands are:
+
+.. code-block:: bash
+
+    $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-9.1-postgis \
+         postgresql-server-dev-9.1 python-psycopg2
+
 .. _ubuntu10:
 
-10.04 and 10.10
-~~~~~~~~~~~~~~~
+10.04 through 11.04
+~~~~~~~~~~~~~~~~~~~
 
-In Ubuntu 10 PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
+In Ubuntu 10.04, PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
 Ubuntu 10.04 uses PostGIS 1.4, while Ubuntu 10.10 uses PostGIS 1.5 (with
-geography support).  The installation commands are::
+geography support).  The installation commands are:
 
-    $ sudo apt-get install binutils gdal-bin postgresql-8.4-postgis \
-         postgresql-server-dev-8.4 python-psycopg2 python-setuptools
-    $ sudo easy_install Django
+.. code-block:: bash
+
+    $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-8.4-postgis \
+         postgresql-server-dev-8.4 python-psycopg2
 
 .. _ibex:
 
 8.10
 ~~~~
 
-Use the synaptic package manager to install the following packages::
+Use the synaptic package manager to install the following packages:
+
+.. code-block:: bash
 
     $ sudo apt-get install binutils gdal-bin postgresql-8.3-postgis \
-        postgresql-server-dev-8.3 python-psycopg2 python-setuptools
-
-Afterwards, you may install Django with Python's ``easy_install`` script (the
-Ubuntu package ``python-django`` uses an older version missing several
-important bug fixes for GeoDjango)::
-
-    $ sudo easy_install Django
+        postgresql-server-dev-8.3 python-psycopg2
 
 That's it!  For the curious, the required binary prerequisites packages are:
 
@@ -978,7 +1020,6 @@ That's it!  For the curious, the required binary prerequisites packages are:
 * ``libgdal1-1.5.0``: for GDAL 1.5.0 library
 * ``proj``: for PROJ 4.6.0 -- but no datum shifting files, see note below
 * ``python-psycopg2``
-* ``python-setuptools``: for ``easy_install``
 
 Optional packages to consider:
 
@@ -993,7 +1034,9 @@ Optional packages to consider:
     geographic admin because the ``null`` datum grid is not available for
     transforming geometries to the spherical mercator projection. A solution
     is to download the datum-shifting files, create the grid file, and
-    install it yourself::
+    install it yourself:
+
+    .. code-block:: bash
 
         $ wget http://download.osgeo.org/proj/proj-datumgrid-1.4.tar.gz
         $ mkdir nad
@@ -1027,15 +1070,19 @@ Debian
 
 4.0 (Etch)
 ^^^^^^^^^^
+
 The situation here is the same as that of Ubuntu :ref:`heron` -- in other words,
 some packages must be built from source to work properly with GeoDjango.
 
-Binary Packages
+Binary packages
 ~~~~~~~~~~~~~~~
 The following command will install acceptable binary packages, as well as
-the development tools necessary to build the rest of the requirements::
+the development tools necessary to build the rest of the requirements:
 
-    $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
+.. code-block:: bash
+
+    $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 \
+        postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
 
 Required package information:
 
@@ -1045,15 +1092,13 @@ Required package information:
 * ``flex``: required to build PostGIS
 * ``postgresql-8.1``
 * ``postgresql-server-dev-8.1``: for ``pg_config``
-* ``python-ctypes``: Python 2.4 needs to have ctypes installed separately
 * ``python-psycopg2``
-* ``python-setuptools``: for ``easy_install``
 
 Optional packages:
 
 * ``libgeoip``: for :ref:`GeoIP <ref-geoip>` support
 
-Source Packages
+Source packages
 ~~~~~~~~~~~~~~~
 You will still have to install :ref:`geosbuild`, :ref:`proj4`,
 :ref:`postgis`, and :ref:`gdalbuild` from source.  Please follow the
@@ -1065,9 +1110,13 @@ directions carefully.
 ^^^^^^^^^^^
 
 This version is comparable to Ubuntu :ref:`ibex`, so the command
-is very similar::
+is very similar:
 
-    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3 postgresql-8.3-postgis postgresql-server-dev-8.3 python-psycopg2 python-setuptools
+.. code-block:: bash
+
+    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3 \
+        postgresql-8.3-postgis postgresql-server-dev-8.3 \
+        python-psycopg2 python-setuptools
 
 This assumes that you are using PostgreSQL version 8.3. Else, replace ``8.3``
 in the above command with the appropriate PostgreSQL version.
@@ -1080,11 +1129,13 @@ in the above command with the appropriate PostgreSQL version.
 
 .. _post_install:
 
-Post-installation Notes
+Post-installation notes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If the PostgreSQL database cluster was not initiated after installing, then it
-can be created (and started) with the following command::
+can be created (and started) with the following command:
+
+.. code-block:: bash
 
     $ sudo pg_createcluster --start 8.3 main
 
@@ -1094,11 +1145,15 @@ the starting and stopping of PostgreSQL.
 In addition, the SQL files for PostGIS are placed in a different location on
 Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 
-* Create a symbolic link to these files::
+* Create a symbolic link to these files:
 
-    $ sudo ln -s /usr/share/postgresql-8.3-postgis/{lwpostgis,spatial_ref_sys}.sql /usr/share/postgresql/8.3
+  .. code-block:: bash
 
-  If not running PostgreSQL 8.3, then  replace ``8.3`` in the command above with the correct version.
+    $ sudo ln -s /usr/share/postgresql-8.3-postgis/{lwpostgis,spatial_ref_sys}.sql \
+        /usr/share/postgresql/8.3
+
+  If not running PostgreSQL 8.3, then  replace ``8.3`` in the command above with
+  the correct version.
 
 * Or use the :download:`create_template_postgis-debian.sh` to create the spatial database.
 
@@ -1209,13 +1264,15 @@ installer.
 
 .. _OSGeo4W installer: http://trac.osgeo.org/osgeo4w/
 
-Modify Windows Environment
+Modify Windows environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In order to use GeoDjango, you will need to add your Python and OSGeo4W
 directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
 and ``PROJ_LIB`` environment variables.  The following set of commands,
-executable with ``cmd.exe``, will set this up::
+executable with ``cmd.exe``, will set this up:
+
+.. code-block:: bat
 
      set OSGEO4W_ROOT=C:\OSGeo4W
      set PYTHON_ROOT=C:\Python27
@@ -1226,7 +1283,7 @@ executable with ``cmd.exe``, will set this up::
      reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
      reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
 
-For your convenience, these commands are available in the execuatble batch
+For your convenience, these commands are available in the executable batch
 script, :download:`geodjango_setup.bat`.
 
 .. note::
@@ -1242,8 +1299,8 @@ script, :download:`geodjango_setup.bat`.
     then you will need to modify the ``OSGEO4W_ROOT`` and/or ``PYTHON_ROOT``
     variables accordingly.
 
-Install Django and Setup Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Install Django and set up database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Finally, :ref:`install Django <installing-official-release>` on your system.
 You do not need to create a spatial database template, as one named
@@ -1259,13 +1316,17 @@ may be executed from the SQL Shell as the ``postgres`` user::
     postgres# CREATE DATABASE geodjango OWNER geodjango TEMPLATE template_postgis ENCODING 'utf8';
 
 .. rubric:: Footnotes
-.. [#] The datum shifting files are needed for converting data to and from certain projections.
-       For example, the PROJ.4 string for the `Google projection (900913) <http://spatialreference.org/ref/epsg/900913/proj4>`_
-       requires the ``null`` grid file only included in the extra datum shifting files.
-       It is easier to install the shifting files now, then to have debug a problem caused by their absence later.
-.. [#] Specifically, GeoDjango provides support for the `OGR <http://gdal.org/ogr>`_ library, a component of GDAL.
+.. [#] The datum shifting files are needed for converting data to and from
+       certain projections.
+       For example, the PROJ.4 string for the `Google projection (900913 or 3857)
+       <http://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
+       ``null`` grid file only included in the extra datum shifting files.
+       It is easier to install the shifting files now, then to have debug a
+       problem caused by their absence later.
+.. [#] Specifically, GeoDjango provides support for the `OGR
+       <http://gdal.org/ogr>`_ library, a component of GDAL.
 .. [#] See `GDAL ticket #2382 <http://trac.osgeo.org/gdal/ticket/2382>`_.
-.. [#] GeoDjango uses the `find_library <http://docs.python.org/library/ctypes.html#finding-shared-libraries>`_
-       routine from ``ctypes.util`` to locate shared libraries.
+.. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
+       :mod:`ctypes.util` to locate shared libraries.
 .. [#] The ``psycopg2`` Windows installers are packaged and maintained by
        `Jason Erickson <http://www.stickpeople.com/projects/python/win-psycopg/>`_.
