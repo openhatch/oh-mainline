@@ -110,8 +110,8 @@ urlpatterns = patterns('',
                                              allow_xmlhttprequest=True)),
 
                        # Feed URL pattern
-                       url(r'^\+feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-                           {'feed_dict': feeds}, name='oh_feed_url'),
+                       url(r'^\+feeds/recbugs/$', RecommendedBugsFeed()),
+                       url(r'^\+feeds/activity/$', RecentActivityFeed()),
 
                        # Mission-related URLs
                        (r'^missions/$',
