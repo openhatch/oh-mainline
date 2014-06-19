@@ -123,40 +123,6 @@ class FetchPersonDataFromOhloh:
             raise ValueError, {'code': code, 'url': url}
 
 
-def fill_recommended_bugs_cache():
-    logging.info("Filling recommended bugs cache for all people.")
-    for person in mysite.profile.models.Person.objects.all():
-        fill_one_person_recommend_bugs_cache(person_id=person.id)
-    logging.info("Finished filling recommended bugs cache for all people.")
-
-
-def fill_one_person_recommend_bugs_cache(person_id):
-    p = mysite.profile.models.Person.objects.get(id=person_id)
-    logging.info("Recommending bugs for %s" % p)
-    suggested_searches = p.get_recommended_search_terms()  # expensive?
-    # cache fill prep...
-    recommender = mysite.profile.view_helpers.RecommendBugs(
-        suggested_searches, n=5)
-    recommender.recommend()  # cache fill do it.
-
-
-def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
-    logging.info("Syncing bug timestamp...")
-    # Find the highest bug object modified date
-    from django.db.models import Max
-    highest_bug_mtime = mysite.search.models.Bug.all_bugs.all().aggregate(
-        Max('modified_date')).values()[0]
-    timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-        str(mysite.search.models.Bug))
-    # if the timestamp is lower, then set the timestamp to that value
-    if highest_bug_mtime.timetuple() > timestamp.timetuple():
-        mysite.base.models.Timestamp.update_timestamp_for_string(
-            str(mysite.search.models.Bug))
-        logging.info("Whee! Bumped the timestamp. Guess I'll fill the cache.")
-        fill_recommended_bugs_cache()
-    logging.info("Done syncing bug timestamp.")
-
-
 def clear_people_page_cache(*args, **kwargs):
     shutil.rmtree(os.path.join(django.conf.settings.WEB_ROOT,
                                'people'),

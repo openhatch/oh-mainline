@@ -56,63 +56,6 @@ def roundrobin(*iterables):
             pending -= 1
             nexts = cycle(islice(nexts, pending))
 
-
-class RecommendBugs(object):
-
-    def __init__(self, terms, n):
-        self.terms = terms
-        self.n = n
-
-    def get_cache_key(self):
-        prefix = 'bug_recommendation_cache_'
-        bug_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-            str(mysite.search.models.Bug))
-        suffix_input = [self.terms, self.n, bug_timestamp]
-        return prefix + '_' + hashlib.sha1(repr(suffix_input)).hexdigest()
-
-    def is_cache_empty(self):
-        return cache.get(self.get_cache_key()) == None
-
-    def recommend(self):
-        ret = []
-        for bug_id in self._recommend_as_list():
-            try:
-                bug = mysite.search.models.Bug.all_bugs.get(pk=bug_id)
-            except mysite.search.models.Bug.DoesNotExist:
-                logging.info("WTF, bug missing. Whatever.")
-                continue
-            ret.append(bug)
-        return ret
-
-    @mysite.base.decorators.cache_method('get_cache_key')
-    def _recommend_as_list(self):
-        return list(self._recommend_as_generator())
-
-    def _recommend_as_generator(self):
-        '''Input: A list of terms, like ['Python', 'C#'], designed for use in the search engine.
-
-        I am a generator that yields Bug objects.
-        I yield up to n Bugs in a round-robin fashion.
-        I don't yield a Bug more than once.'''
-
-        distinct_ids = set()
-
-        lists_of_bugs = [
-            mysite.search.view_helpers.order_bugs(
-                mysite.search.view_helpers.Query(terms=[t]).get_bugs_unordered())
-            for t in self.terms]
-        number_emitted = 0
-
-        for bug in roundrobin(*lists_of_bugs):
-            if number_emitted >= self.n:
-                raise StopIteration
-            if bug.id in distinct_ids:
-                continue
-            # otherwise...
-            number_emitted += 1
-            distinct_ids.add(bug.id)
-            yield bug.id
-
 geoip_database = None
 
 

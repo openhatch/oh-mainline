@@ -44,12 +44,8 @@ import mysite.profile.api
 import mysite.missions.svn.views
 import mysite.missions.setup.views
 
-from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
+from mysite.base.feeds import RecentActivityFeed
 
-feeds = {
-    'recbugs': RecommendedBugsFeed,
-    'activity': RecentActivityFeed,
-}
 
 urlpatterns = patterns('',
                        # Okay, sometimes people link /, or /) because of bad linkification
@@ -110,7 +106,6 @@ urlpatterns = patterns('',
                                              allow_xmlhttprequest=True)),
 
                        # Feed URL pattern
-                       url(r'^\+feeds/recbugs/$', RecommendedBugsFeed()),
                        url(r'^\+feeds/activity/$', RecentActivityFeed()),
 
                        # Mission-related URLs
@@ -422,9 +417,6 @@ urlpatterns = patterns('',
 
                        (r'^profile/views/delete_portfolio_entry_do$',
                         'mysite.profile.views.delete_portfolio_entry_do'),
-
-                       (r'^\+profile/bug_recommendation_list_as_template_fragment$',
-                        'mysite.profile.views.bug_recommendation_list_as_template_fragment'),
 
                        (r'^people/portfolio/import/$',
                         'mysite.profile.views.importer'),

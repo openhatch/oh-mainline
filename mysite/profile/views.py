@@ -907,28 +907,6 @@ def unsubscribe_do(request):
     person.save()
     return HttpResponseRedirect(reverse(unsubscribe, kwargs={'token_string': token_string}))
 
-
-@login_required
-def bug_recommendation_list_as_template_fragment(request):
-    suggested_searches = request.user.get_profile(
-    ).get_recommended_search_terms()
-    recommender = mysite.profile.view_helpers.RecommendBugs(
-        suggested_searches, n=5)
-    recommended_bugs = list(recommender.recommend())
-
-    response_data = {}
-
-    if recommended_bugs:
-        response_data['result'] = 'OK'
-        template_path = 'base/recommended_bugs_content.html'
-        context = RequestContext(
-            request, {'recommended_bugs': recommended_bugs})
-        response_data['html'] = render_to_string(template_path, context)
-    else:
-        response_data['result'] = 'NO_BUGS'
-
-    return HttpResponse(simplejson.dumps(response_data), mimetype='application/json')
-
 # API-y views go below here
 
 # vim: ai ts=3 sts=4 et sw=4 nu

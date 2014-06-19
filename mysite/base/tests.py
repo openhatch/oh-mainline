@@ -307,21 +307,6 @@ class CacheMethod(TwillTests):
             'doodles', '{"value": "1"}', 86400 * 10)
 
 
-class RecommendBugs(TwillTests):
-
-    @mock.patch('mysite.profile.view_helpers.RecommendBugs')
-    def test_no_synchronous_processing_on_empty(self, RecommendBugsMock):
-        RecommendBugsMock.is_cache_empty.return_value = True
-
-        self.client.login(username='testclient', password='password')
-        response = self.client.get('/')
-
-        # Login was required
-        self.assertEqual(response.status_code, 200)
-        # No synchronous call to costly recommend() method
-        self.assertFalse(RecommendBugsMock.recommend.called)
-
-
 class EnhanceNextWithNewUserMetadata(TwillTests):
 
     def test_easy(self):
