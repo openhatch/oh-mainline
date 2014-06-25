@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Api &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Resource Fields" href="fields.html" />
+    <link rel="prev" title="Bundles" href="bundles.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fields.html" title="Resource Fields"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bundles.html" title="Bundles"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api">
+<span id="ref-api"></span><h1>Api<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>In terms of a REST-style architecture, the &#8220;api&#8221; is a collection of resources.
+In Tastypie, the <tt class="docutils literal"><span class="pre">Api</span></tt> gathers together the <tt class="docutils literal"><span class="pre">Resources</span></tt> &amp; provides a nice
+way to use them as a set. It handles many of the URLconf details for you,
+provides a helpful &#8220;top-level&#8221; view to show what endpoints are available &amp;
+some extra URL resolution juice.</p>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>A sample api definition might look something like (usually located in a
+URLconf):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">from</span> <span class="nn">myapp.api.resources</span> <span class="kn">import</span> <span class="n">UserResource</span><span class="p">,</span> <span class="n">EntryResource</span>
+
+<span class="n">v1_api</span> <span class="o">=</span> <span class="n">Api</span><span class="p">(</span><span class="n">api_name</span><span class="o">=</span><span class="s">&#39;v1&#39;</span><span class="p">)</span>
+<span class="n">v1_api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">UserResource</span><span class="p">())</span>
+<span class="n">v1_api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">EntryResource</span><span class="p">())</span>
+
+<span class="c"># Standard bits...</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^api/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">v1_api</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="api-methods">
+<h2><tt class="docutils literal"><span class="pre">Api</span></tt> Methods<a class="headerlink" href="#api-methods" title="Permalink to this headline">¶</a></h2>
+<p>Implements a registry to tie together the various resources that make up
+an API.</p>
+<p>Especially useful for navigation, HATEOAS and for providing multiple
+versions of your API.</p>
+<p>Optionally supplying <tt class="docutils literal"><span class="pre">api_name</span></tt> allows you to name the API. Generally,
+this is done with version numbers (i.e. <tt class="docutils literal"><span class="pre">v1</span></tt>, <tt class="docutils literal"><span class="pre">v2</span></tt>, etc.) but can
+be named any string.</p>
+<div class="section" id="register">
+<h3><tt class="docutils literal"><span class="pre">register</span></tt><a class="headerlink" href="#register" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Api.register(self, resource, canonical=True):</tt></dt>
+<dd></dd></dl>
+
+<p>Registers an instance of a <tt class="docutils literal"><span class="pre">Resource</span></tt> subclass with the API.</p>
+<p>Optionally accept a <tt class="docutils literal"><span class="pre">canonical</span></tt> argument, which indicates that the
+resource being registered is the canonical variant. Defaults to
+<tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+</div>
+<div class="section" id="unregister">
+<h3><tt class="docutils literal"><span class="pre">unregister</span></tt><a class="headerlink" href="#unregister" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Api.unregister(self, resource_name):</tt></dt>
+<dd></dd></dl>
+
+<p>If present, unregisters a resource from the API.</p>
+</div>
+<div class="section" id="canonical-resource-for">
+<h3><tt class="docutils literal"><span class="pre">canonical_resource_for</span></tt><a class="headerlink" href="#canonical-resource-for" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Api.canonical_resource_for(self, resource_name):</tt></dt>
+<dd></dd></dl>
+
+<p>Returns the canonical resource for a given <tt class="docutils literal"><span class="pre">resource_name</span></tt>.</p>
+<div class="section" id="override-urls">
+<h4><tt class="docutils literal"><span class="pre">override_urls</span></tt><a class="headerlink" href="#override-urls" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt>
+<tt class="descname">Api.override_urls(self):</tt></dt>
+<dd></dd></dl>
+
+<p>Deprecated. Will be removed by v1.0.0. Please use <tt class="docutils literal"><span class="pre">Api.prepend_urls</span></tt> instead.</p>
+</div>
+<div class="section" id="prepend-urls">
+<h4><tt class="docutils literal"><span class="pre">prepend_urls</span></tt><a class="headerlink" href="#prepend-urls" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt>
+<tt class="descname">Api.prepend_urls(self):</tt></dt>
+<dd></dd></dl>
+
+<p>A hook for adding your own URLs or matching before the default URLs. Useful for
+adding custom endpoints or overriding the built-in ones.</p>
+<p>Should return a list of individual URLconf lines (<strong>NOT</strong> wrapped in
+<tt class="docutils literal"><span class="pre">patterns</span></tt>).</p>
+</div>
+</div>
+<div class="section" id="urls">
+<h3><tt class="docutils literal"><span class="pre">urls</span></tt><a class="headerlink" href="#urls" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Api.urls(self):</tt></dt>
+<dd></dd></dl>
+
+<p><em>Property</em></p>
+<p>Provides URLconf details for the <tt class="docutils literal"><span class="pre">Api</span></tt> and all registered
+<tt class="docutils literal"><span class="pre">Resources</span></tt> beneath it.</p>
+</div>
+<div class="section" id="top-level">
+<h3><tt class="docutils literal"><span class="pre">top_level</span></tt><a class="headerlink" href="#top-level" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Api.top_level(self, request, api_name=None):</tt></dt>
+<dd></dd></dl>
+
+<p>A view that returns a serialized list of all resources registers
+to the <tt class="docutils literal"><span class="pre">Api</span></tt>. Useful for discovery.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Api</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#api-methods"><tt class="docutils literal"><span class="pre">Api</span></tt> Methods</a><ul>
+<li><a class="reference internal" href="#register"><tt class="docutils literal"><span class="pre">register</span></tt></a></li>
+<li><a class="reference internal" href="#unregister"><tt class="docutils literal"><span class="pre">unregister</span></tt></a></li>
+<li><a class="reference internal" href="#canonical-resource-for"><tt class="docutils literal"><span class="pre">canonical_resource_for</span></tt></a><ul>
+<li><a class="reference internal" href="#override-urls"><tt class="docutils literal"><span class="pre">override_urls</span></tt></a></li>
+<li><a class="reference internal" href="#prepend-urls"><tt class="docutils literal"><span class="pre">prepend_urls</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#urls"><tt class="docutils literal"><span class="pre">urls</span></tt></a></li>
+<li><a class="reference internal" href="#top-level"><tt class="docutils literal"><span class="pre">top_level</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bundles.html"
+                        title="previous chapter">Bundles</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fields.html"
+                        title="next chapter">Resource Fields</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fields.html" title="Resource Fields"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bundles.html" title="Bundles"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
