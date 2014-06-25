@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Interacting With The API &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Tastypie Settings" href="settings.html" />
+    <link rel="prev" title="Getting Started with Tastypie" href="tutorial.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Tastypie Settings"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Getting Started with Tastypie"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="interacting-with-the-api">
+<span id="ref-interacting"></span><h1>Interacting With The API<a class="headerlink" href="#interacting-with-the-api" title="Permalink to this headline">¶</a></h1>
+<p>Now that you&#8217;ve got a shiny new REST-style API in place, let&#8217;s demonstrate how
+to interact with it. We&#8217;ll assume that you have <a class="reference external" href="http://curl.haxx.se/">cURL</a> installed on your system
+(generally available on most modern Mac &amp; Linux machines), but any tool that
+allows you to control headers &amp; bodies on requests will do.</p>
+<p>We&#8217;ll assume that we&#8217;re interacting with the following Tastypie code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># myapp/api/resources.py</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.authorization</span> <span class="kn">import</span> <span class="n">Authorization</span>
+<span class="kn">from</span> <span class="nn">tastypie</span> <span class="kn">import</span> <span class="n">fields</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span><span class="p">,</span> <span class="n">ALL</span><span class="p">,</span> <span class="n">ALL_WITH_RELATIONS</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_active&#39;</span><span class="p">,</span> <span class="s">&#39;is_staff&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="n">filtering</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="n">ALL</span><span class="p">,</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">EntryResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">UserResource</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;entry&#39;</span>
+        <span class="n">authorization</span> <span class="o">=</span> <span class="n">Authorization</span><span class="p">()</span>
+        <span class="n">filtering</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="n">ALL_WITH_RELATIONS</span><span class="p">,</span>
+            <span class="s">&#39;pub_date&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;exact&#39;</span><span class="p">,</span> <span class="s">&#39;lt&#39;</span><span class="p">,</span> <span class="s">&#39;lte&#39;</span><span class="p">,</span> <span class="s">&#39;gte&#39;</span><span class="p">,</span> <span class="s">&#39;gt&#39;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+
+<span class="c"># urls.py</span>
+<span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tastypie.api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">from</span> <span class="nn">myapp.api.resources</span> <span class="kn">import</span> <span class="n">EntryResource</span><span class="p">,</span> <span class="n">UserResource</span>
+
+<span class="n">v1_api</span> <span class="o">=</span> <span class="n">Api</span><span class="p">(</span><span class="n">api_name</span><span class="o">=</span><span class="s">&#39;v1&#39;</span><span class="p">)</span>
+<span class="n">v1_api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">UserResource</span><span class="p">())</span>
+<span class="n">v1_api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">EntryResource</span><span class="p">())</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># The normal jazz here...</span>
+    <span class="p">(</span><span class="s">r&#39;^blog/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;myapp.urls&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s">r&#39;^api/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">v1_api</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Let&#8217;s fire up a shell &amp; start exploring the API!</p>
+<div class="section" id="front-matter">
+<h2>Front Matter<a class="headerlink" href="#front-matter" title="Permalink to this headline">¶</a></h2>
+<p>Tastypie tries to treat all clients &amp; all serialization types as equally as
+possible. It also tries to be a good &#8216;Net citizen &amp; respects the HTTP method
+used as well as the <tt class="docutils literal"><span class="pre">Accepts</span></tt> headers sent. Between these two, you control
+all interactions with Tastypie through relatively few endpoints.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Should you try these URLs in your browser, be warned you <strong>WILL</strong> need to
+append <tt class="docutils literal"><span class="pre">?format=json</span></tt> (or <tt class="docutils literal"><span class="pre">xml</span></tt> or <tt class="docutils literal"><span class="pre">yaml</span></tt>) to the URL. Your browser
+requests <tt class="docutils literal"><span class="pre">application/xml</span></tt> before <tt class="docutils literal"><span class="pre">application/json</span></tt>, so you&#8217;ll always
+get back XML if you don&#8217;t specify it.</p>
+<p class="last">That&#8217;s also why it&#8217;s recommended that you explore via curl, because you
+avoid your browser&#8217;s opinionated requests &amp; get something closer to what
+any programmatic clients will get.</p>
+</div>
+</div>
+<div class="section" id="fetching-data">
+<h2>Fetching Data<a class="headerlink" href="#fetching-data" title="Permalink to this headline">¶</a></h2>
+<p>Since reading data out of an API is a very common activity (and the easiest
+type of request to make), we&#8217;ll start there. Tastypie tries to expose various
+parts of the API &amp; interlink things within the API (HATEOAS).</p>
+<div class="section" id="api-wide">
+<h3>Api-Wide<a class="headerlink" href="#api-wide" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ll start at the highest level:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/</pre>
+</div>
+<p>You&#8217;ll get back something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;entry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;list_endpoint&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;schema&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/schema/&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;list_endpoint&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;schema&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/schema/&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This lists out all the different <tt class="docutils literal"><span class="pre">Resource</span></tt> classes you registered in your
+URLconf with the API. Each one is listed by the <tt class="docutils literal"><span class="pre">resource_name</span></tt> you gave it
+and provides the <tt class="docutils literal"><span class="pre">list_endpoint</span></tt> &amp; the <tt class="docutils literal"><span class="pre">schema</span></tt> for the resource.</p>
+<p>Note that these links try to direct you to other parts of the API, to make
+exploration/discovery easier. We&#8217;ll use these URLs in the next several
+sections.</p>
+<p>To demonstrate another format, you could run the following to get the XML
+variant of the same information:</p>
+<div class="highlight-python"><pre>curl -H "Accept: application/xml" http://localhost:8000/api/v1/</pre>
+</div>
+<p>To which you&#8217;d receive:</p>
+<div class="highlight-python"><pre>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;response&gt;
+  &lt;entry type="hash"&gt;
+    &lt;list_endpoint&gt;/api/v1/entry/&lt;/list_endpoint&gt;
+    &lt;schema&gt;/api/v1/entry/schema/&lt;/schema&gt;
+  &lt;/entry&gt;
+  &lt;user type="hash"&gt;
+    &lt;list_endpoint&gt;/api/v1/user/&lt;/list_endpoint&gt;
+    &lt;schema&gt;/api/v1/user/schema/&lt;/schema&gt;
+  &lt;/user&gt;
+&lt;/response&gt;</pre>
+</div>
+<p>We&#8217;ll stick to JSON for the rest of this document, but using XML should be OK
+to do at any time.</p>
+</div>
+<div class="section" id="inspecting-the-resource-s-schema">
+<span id="schema-inspection"></span><h3>Inspecting The Resource&#8217;s Schema<a class="headerlink" href="#inspecting-the-resource-s-schema" title="Permalink to this headline">¶</a></h3>
+<p>Since the api-wide view gave us a <tt class="docutils literal"><span class="pre">schema</span></tt> URL, let&#8217;s inspect that next.
+We&#8217;ll use the <tt class="docutils literal"><span class="pre">entry</span></tt> resource. Again, a simple GET request by curl:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/entry/schema/</pre>
+</div>
+<p>This time, we get back a lot more data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;default_format&quot;</span><span class="p">:</span> <span class="s">&quot;application/json&quot;</span><span class="p">,</span>
+    <span class="s">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;Unicode string data. Ex: </span><span class="se">\&quot;</span><span class="s">Hello World</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;string&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;Unicode string data. Ex: </span><span class="se">\&quot;</span><span class="s">Hello World</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;string&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;A date &amp; time as a string. Ex: </span><span class="se">\&quot;</span><span class="s">2010-11-10T03:07:43</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;datetime&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;Unicode string data. Ex: </span><span class="se">\&quot;</span><span class="s">Hello World</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;string&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;Unicode string data. Ex: </span><span class="se">\&quot;</span><span class="s">Hello World</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;string&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;Unicode string data. Ex: </span><span class="se">\&quot;</span><span class="s">Hello World</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;string&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;help_text&quot;</span><span class="p">:</span> <span class="s">&quot;A single related resource. Can be either a URI or set of nested resource data.&quot;</span><span class="p">,</span>
+            <span class="s">&quot;nullable&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;readonly&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;related&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s">&quot;filtering&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;exact&quot;</span><span class="p">,</span> <span class="s">&quot;lt&quot;</span><span class="p">,</span> <span class="s">&quot;lte&quot;</span><span class="p">,</span> <span class="s">&quot;gte&quot;</span><span class="p">,</span> <span class="s">&quot;gt&quot;</span><span class="p">],</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This lists out the <tt class="docutils literal"><span class="pre">default_format</span></tt> this resource responds with, the
+<tt class="docutils literal"><span class="pre">fields</span></tt> on the resource &amp; the <tt class="docutils literal"><span class="pre">filtering</span></tt> options available. This
+information can be used to prepare the other aspects of the code for the
+data it can obtain &amp; ways to filter the resources.</p>
+</div>
+<div class="section" id="getting-a-collection-of-resources">
+<h3>Getting A Collection Of Resources<a class="headerlink" href="#getting-a-collection-of-resources" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s get down to fetching live data. From the api-wide view, we&#8217;ll hit
+the <tt class="docutils literal"><span class="pre">list_endpoint</span></tt> for <tt class="docutils literal"><span class="pre">entry</span></tt>:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>We get back data that looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s">&quot;next&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s">&quot;previous&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s">&quot;total_count&quot;</span><span class="p">:</span> <span class="mi">3</span>
+    <span class="p">},</span>
+    <span class="s">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;Welcome to my blog!&quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:46:38&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/1/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;first-post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;First Post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;Well, it&#39;s been awhile and I still haven&#39;t updated. &quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;2&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-21T00:46:58&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/2/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;second-post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;Second Post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;I&#39;m really excited to get started with this new blog. It&#39;s gonna be great!&quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;3&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:47:30&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/3/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;my-blog&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;My Blog&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/2/&quot;</span>
+    <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Some things to note:</p>
+<blockquote>
+<div><ul class="simple">
+<li>By default, you get a paginated set of objects (20 per page is the default).</li>
+<li>In the <tt class="docutils literal"><span class="pre">meta</span></tt>, you get a <tt class="docutils literal"><span class="pre">previous</span></tt> &amp; <tt class="docutils literal"><span class="pre">next</span></tt>. If available, these are
+URIs to the previous &amp; next pages.</li>
+<li>You get a list of resources/objects under the <tt class="docutils literal"><span class="pre">objects</span></tt> key.</li>
+<li>Each resources/object has a <tt class="docutils literal"><span class="pre">resource_uri</span></tt> field that points to the
+detail view for that object.</li>
+<li>The foreign key to <tt class="docutils literal"><span class="pre">User</span></tt> is represented as a URI by default. If you&#8217;re
+looking for the full <tt class="docutils literal"><span class="pre">UserResource</span></tt> to be embedded in this view, you&#8217;ll
+need to add <tt class="docutils literal"><span class="pre">full=True</span></tt> to the <tt class="docutils literal"><span class="pre">fields.ToOneField</span></tt>.</li>
+</ul>
+</div></blockquote>
+<p>If you want to skip paginating, simply run:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/entry/?limit=0</pre>
+</div>
+<p>Be warned this will return all objects, so it may be a CPU/IO-heavy operation
+on large datasets.</p>
+<p>Let&#8217;s try filtering on the resource. Since we know we can filter on the
+<tt class="docutils literal"><span class="pre">user</span></tt>, we&#8217;ll fetch all posts by the <tt class="docutils literal"><span class="pre">daniel</span></tt> user with:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/entry/?user__username=daniel</pre>
+</div>
+<p>We get back what we asked for:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s">&quot;next&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s">&quot;previous&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s">&quot;total_count&quot;</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="p">},</span>
+    <span class="s">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;Welcome to my blog!&quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:46:38&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/1/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;first-post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;First Post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;Well, it&#39;s been awhile and I still haven&#39;t updated. &quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;2&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-21T00:46:58&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/2/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;second-post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;Second Post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span>
+    <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Where there were three posts before, now there are only two.</p>
+</div>
+<div class="section" id="getting-a-detail-resource">
+<h3>Getting A Detail Resource<a class="headerlink" href="#getting-a-detail-resource" title="Permalink to this headline">¶</a></h3>
+<p>Since each resource/object in the list view had a <tt class="docutils literal"><span class="pre">resource_uri</span></tt>, let&#8217;s
+explore what&#8217;s there:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/entry/1/</pre>
+</div>
+<p>We get back a similar set of data that we received from the list view:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;Welcome to my blog!&quot;</span><span class="p">,</span>
+    <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+    <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:46:38&quot;</span><span class="p">,</span>
+    <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/1/&quot;</span><span class="p">,</span>
+    <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;first-post&quot;</span><span class="p">,</span>
+    <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;First Post&quot;</span><span class="p">,</span>
+    <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Where this proves useful (for example) is present in the data we got back. We
+know the URI of the <tt class="docutils literal"><span class="pre">User</span></tt> associated with this blog entry. Let&#8217;s run:</p>
+<div class="highlight-python"><pre>curl http://localhost:8000/api/v1/user/1/</pre>
+</div>
+<p>Without ever seeing any aspect of the <tt class="docutils literal"><span class="pre">UserResource</span></tt> &amp; just following the URI
+given, we get back:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;date_joined&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:42:14.990617&quot;</span><span class="p">,</span>
+    <span class="s">&quot;first_name&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+    <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+    <span class="s">&quot;last_login&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:44:57.510066&quot;</span><span class="p">,</span>
+    <span class="s">&quot;last_name&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+    <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span><span class="p">,</span>
+    <span class="s">&quot;username&quot;</span><span class="p">:</span> <span class="s">&quot;daniel&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can do a similar fetch using the following Javascript/jQuery (though be
+wary of same-domain policy):</p>
+<div class="highlight-python"><pre>$.ajax({
+  url: 'http://localhost:8000/api/v1/user/1/',
+  type: 'GET',
+  accepts: 'application/json',
+  dataType: 'json'
+})</pre>
+</div>
+</div>
+<div class="section" id="selecting-a-subset-of-resources">
+<h3>Selecting A Subset Of Resources<a class="headerlink" href="#selecting-a-subset-of-resources" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes you may want back more than one record, but not an entire list view
+nor do you want to do multiple requests. Tastypie includes a &#8220;set&#8221; view, which
+lets you cherry-pick the objects you want. For example, if we just want the
+first &amp; third <tt class="docutils literal"><span class="pre">Entry</span></tt> resources, we&#8217;d run:</p>
+<div class="highlight-python"><pre>curl "http://localhost:8000/api/v1/entry/set/1;3/"</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Quotes are needed in this case because of the semicolon delimiter between
+primary keys. Without the quotes, bash tries to split it into two statements.
+No extraordinary quoting will be necessary in your application (unless your
+API client is written in bash :D).</p>
+</div>
+<p>And we get back just those two objects:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;Welcome to my blog!&quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:46:38&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/1/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;first-post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;First Post&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/1/&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s">&quot;body&quot;</span><span class="p">:</span> <span class="s">&quot;I&#39;m really excited to get started with this new blog. It&#39;s gonna be great!&quot;</span><span class="p">,</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;3&quot;</span><span class="p">,</span>
+        <span class="s">&quot;pub_date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-05-20T00:47:30&quot;</span><span class="p">,</span>
+        <span class="s">&quot;resource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/entry/3/&quot;</span><span class="p">,</span>
+        <span class="s">&quot;slug&quot;</span><span class="p">:</span> <span class="s">&quot;my-blog&quot;</span><span class="p">,</span>
+        <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;My Blog&quot;</span><span class="p">,</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="s">&quot;/api/v1/user/2/&quot;</span>
+    <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that, like the list view, you get back a list of <tt class="docutils literal"><span class="pre">objects</span></tt>. Unlike the
+list view, there is <strong>NO</strong> pagination applied to these objects. You asked for
+them, you&#8217;re going to get them all.</p>
+</div>
+</div>
+<div class="section" id="sending-data">
+<h2>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h2>
+<p>Tastypie also gives you full write capabilities in the API. Since the
+<tt class="docutils literal"><span class="pre">EntryResource</span></tt> has the no-limits <tt class="docutils literal"><span class="pre">Authentication</span></tt> &amp; <tt class="docutils literal"><span class="pre">Authorization</span></tt> on
+it, we can freely write data.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Note that this is a huge security hole as well. Don&#8217;t put unauthorized
+write-enabled resources on the Internet, because someone will trash your
+data.</p>
+<p class="last">This is why <tt class="docutils literal"><span class="pre">ReadOnlyAuthorization</span></tt> is the default in Tastypie &amp; why you
+must override to provide more access.</p>
+</div>
+<p>The good news is that there are no new URLs to learn. The &#8220;list&#8221; &amp; &#8220;detail&#8221;
+URLs we&#8217;ve been using to fetch data <em>ALSO</em> support the
+<tt class="docutils literal"><span class="pre">POST</span></tt>/<tt class="docutils literal"><span class="pre">PUT</span></tt>/<tt class="docutils literal"><span class="pre">DELETE</span></tt> HTTP methods.</p>
+<div class="section" id="creating-a-new-resource-post">
+<h3>Creating A New Resource (POST)<a class="headerlink" href="#creating-a-new-resource-post" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s add a new entry. To create new data, we&#8217;ll switch from <tt class="docutils literal"><span class="pre">GET</span></tt> requests
+to the familiar <tt class="docutils literal"><span class="pre">POST</span></tt> request.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Tastypie encourages &#8220;round-trippable&#8221; data, which means the data you
+can GET should be able to be POST/PUT&#8217;d back to recreate the same
+object.</p>
+<p class="last">If you&#8217;re ever in question about what you should send, do a GET on
+another object &amp; see what Tastypie thinks it should look like.</p>
+</div>
+<p>To create new resources/objects, you will <tt class="docutils literal"><span class="pre">POST</span></tt> to the list endpoint of
+a resource. Trying to <tt class="docutils literal"><span class="pre">POST</span></tt> to a detail endpoint has a different meaning in
+the REST mindset (meaning to add a resource as a child of a resource of the
+same type).</p>
+<p>As with all Tastypie requests, the headers we request are important. Since
+we&#8217;ve been using primarily JSON throughout, let&#8217;s send a new entry in JSON
+format:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"body": "This will prbbly be my lst post.", "pub_date": "2011-05-22T00:46:38", "slug": "another-post", "title": "Another Post", "user": "/api/v1/user/1/"}' http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">Content-Type</span></tt> header here informs Tastypie that we&#8217;re sending it JSON.
+We send the data as a JSON-serialized body (<strong>NOT</strong> as form-data in the form of
+URL parameters). What we get back is the following response:</p>
+<div class="highlight-python"><pre>HTTP/1.0 201 CREATED
+Date: Fri, 20 May 2011 06:48:36 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Type: text/html; charset=utf-8
+Location: http://localhost:8000/api/v1/entry/4/</pre>
+</div>
+<p>You&#8217;ll also note that we get a correct HTTP status code back (201) &amp; a
+<tt class="docutils literal"><span class="pre">Location</span></tt> header, which gives us the URI to our newly created resource.</p>
+<p>Passing <tt class="docutils literal"><span class="pre">--dump-header</span> <span class="pre">-</span></tt> is important, because it gives you all the headers
+as well as the status code. When things go wrong, this will be useful
+information to help with debugging. For instance, if we send a request without
+a <tt class="docutils literal"><span class="pre">user</span></tt>:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"body": "This will prbbly be my lst post.", "pub_date": "2011-05-22T00:46:38", "slug": "another-post", "title": "Another Post"}' http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>We get back:</p>
+<div class="highlight-python"><pre>HTTP/1.0 400 BAD REQUEST
+Date: Fri, 20 May 2011 06:53:02 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Type: text/html; charset=utf-8
+
+The 'user' field has no data and doesn't allow a default or null value.</pre>
+</div>
+<p>You can do a similar POST using the following Javascript/jQuery (though be
+wary of same-domain policy):</p>
+<div class="highlight-python"><pre># This may require the ``json2.js`` library for older browsers.
+var data = JSON.stringify({
+    "body": "This will prbbly be my lst post.",
+    "pub_date": "2011-05-22T00:46:38",
+    "slug": "another-post",
+    "title": "Another Post"
+});
+
+$.ajax({
+  url: 'http://localhost:8000/api/v1/entry/',
+  type: 'POST',
+  contentType: 'application/json',
+  data: data,
+  dataType: 'json',
+  processData: false
+})</pre>
+</div>
+</div>
+<div class="section" id="updating-an-existing-resource-put">
+<h3>Updating An Existing Resource (PUT)<a class="headerlink" href="#updating-an-existing-resource-put" title="Permalink to this headline">¶</a></h3>
+<p>You might have noticed that we made some typos when we submitted the POST
+request. We can fix this using a <tt class="docutils literal"><span class="pre">PUT</span></tt> request to the detail endpoint (modify
+this instance of a resource).:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X PUT --data '{"body": "This will probably be my last post.", "pub_date": "2011-05-22T00:46:38", "slug": "another-post", "title": "Another Post", "user": "/api/v1/user/1/"}' http://localhost:8000/api/v1/entry/4/</pre>
+</div>
+<p>After fixing up the <tt class="docutils literal"><span class="pre">body</span></tt>, we get back:</p>
+<div class="highlight-python"><pre>HTTP/1.0 204 NO CONTENT
+Date: Fri, 20 May 2011 07:13:21 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+<p>We get a 204 status code, meaning our update was successful. We don&#8217;t get
+a <tt class="docutils literal"><span class="pre">Location</span></tt> header back because we did the <tt class="docutils literal"><span class="pre">PUT</span></tt> on a detail URL, which
+presumably did not change.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A <tt class="docutils literal"><span class="pre">PUT</span></tt> request requires that the entire resource representation be enclosed. Missing fields may cause errors, or be filled in by default values.</p>
+</div>
+</div>
+<div class="section" id="partially-updating-an-existing-resource-patch">
+<h3>Partially Updating An Existing Resource (PATCH)<a class="headerlink" href="#partially-updating-an-existing-resource-patch" title="Permalink to this headline">¶</a></h3>
+<p>In some cases, you may not want to send the entire resource when updating. To update just a subset of the fields, we can send a <tt class="docutils literal"><span class="pre">PATCH</span></tt> request to the detail endpoint.:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X PATCH --data '{"body": "This actually is my last post."}' http://localhost:8000/api/v1/entry/4/</pre>
+</div>
+<p>To which we should get back:</p>
+<div class="highlight-python"><pre>HTTP/1.0 202 ACCEPTED
+Date: Fri, 20 May 2011 07:13:21 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+</div>
+<div class="section" id="updating-a-whole-collection-of-resources-put">
+<h3>Updating A Whole Collection Of Resources (PUT)<a class="headerlink" href="#updating-a-whole-collection-of-resources-put" title="Permalink to this headline">¶</a></h3>
+<p>You can also, in rare circumstances, update an entire collection of objects.
+By sending a <tt class="docutils literal"><span class="pre">PUT</span></tt> request to the list view of a resource, you can replace
+the entire collection.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This deletes all of the objects first, then creates the objects afresh. This
+is done because determining which objects are the same is actually difficult
+to get correct in the general case for all people.</p>
+</div>
+<p>Send a request like:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X PUT --data '{"objects": [{"body": "Welcome to my blog!","id": "1","pub_date": "2011-05-20T00:46:38","resource_uri": "/api/v1/entry/1/","slug": "first-post","title": "First Post","user": "/api/v1/user/1/"},{"body": "I'm really excited to get started with this new blog. It's gonna be great!","id": "3","pub_date": "2011-05-20T00:47:30","resource_uri": "/api/v1/entry/3/","slug": "my-blog","title": "My Blog","user": "/api/v1/user/2/"}]}' http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>And you&#8217;ll get back a response like:</p>
+<div class="highlight-python"><pre>HTTP/1.0 204 NO CONTENT
+Date: Fri, 20 May 2011 07:13:21 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+</div>
+</div>
+<div class="section" id="deleting-data">
+<h2>Deleting Data<a class="headerlink" href="#deleting-data" title="Permalink to this headline">¶</a></h2>
+<p>No CRUD setup would be complete without the ability to delete resources/objects.
+Deleting also requires significantly less complicated requests than
+<tt class="docutils literal"><span class="pre">POST</span></tt>/<tt class="docutils literal"><span class="pre">PUT</span></tt>.</p>
+<div class="section" id="deleting-a-single-resource">
+<h3>Deleting A Single Resource<a class="headerlink" href="#deleting-a-single-resource" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ve decided that we don&#8217;t like the entry we added &amp; edited earlier. Let&#8217;s
+delete it (but leave the other objects alone):</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X DELETE  http://localhost:8000/api/v1/entry/4/</pre>
+</div>
+<p>Once again, we get back the &#8220;Accepted&#8221; response of a 204:</p>
+<div class="highlight-python"><pre>HTTP/1.0 204 NO CONTENT
+Date: Fri, 20 May 2011 07:28:01 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+<p>If we request that resource, we get a 410 to show it&#8217;s no longer there:</p>
+<div class="highlight-python"><pre>curl --dump-header - http://localhost:8000/api/v1/entry/4/
+
+HTTP/1.0 410 GONE
+Date: Fri, 20 May 2011 07:29:02 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+<p>Additionally, if we try to run the <tt class="docutils literal"><span class="pre">DELETE</span></tt> again (using the same original
+command), we get the &#8220;Gone&#8221; response again:</p>
+<div class="highlight-python"><pre>HTTP/1.0 410 GONE
+Date: Fri, 20 May 2011 07:30:00 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+</div>
+<div class="section" id="deleting-a-whole-collection-of-resources">
+<h3>Deleting A Whole Collection Of Resources<a class="headerlink" href="#deleting-a-whole-collection-of-resources" title="Permalink to this headline">¶</a></h3>
+<p>Finally, it&#8217;s possible to remove an entire collection of resources. This is
+as destructive as it sounds. Once again, we use the <tt class="docutils literal"><span class="pre">DELETE</span></tt> method, this
+time on the entire list endpoint:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X DELETE  http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>As a response, we get:</p>
+<div class="highlight-python"><pre>HTTP/1.0 204 NO CONTENT
+Date: Fri, 20 May 2011 07:32:51 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+<p>Hitting the list view:</p>
+<div class="highlight-python"><pre>curl --dump-header - http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>Gives us a 200 but no objects:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s">&quot;next&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s">&quot;previous&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s">&quot;total_count&quot;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">},</span>
+    <span class="s">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="bulk-operations">
+<h2>Bulk Operations<a class="headerlink" href="#bulk-operations" title="Permalink to this headline">¶</a></h2>
+<p>As an optimization, it is possible to do many creations, updates, and deletions to a collection in a single request by sending a <tt class="docutils literal"><span class="pre">PATCH</span></tt> to the list endpoint.:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X PATCH --data '{"objects": [{"body": "Surprise! Another post!.", "pub_date": "2012-02-16T00:46:38", "slug": "yet-another-post", "title": "Yet Another Post"}], "deleted_objects": ["http://localhost:8000/api/v1/entry/4/"]}'  http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>We should get back:</p>
+<div class="highlight-python"><pre>HTTP/1.0 202 ACCEPTED
+Date: Fri, 16 Feb 2012 00:46:38 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+<p>The Accepted response means the server has accepted the request, but gives no details on the result. In order to see any created resources, we would need to do a get <tt class="docutils literal"><span class="pre">GET</span></tt> on the list endpoint.</p>
+<p>For detailed information on the format of a bulk request, see <a class="reference internal" href="resources.html#patch-list"><em>patch_list</em></a>.</p>
+</div>
+<div class="section" id="you-did-it">
+<h2>You Did It!<a class="headerlink" href="#you-did-it" title="Permalink to this headline">¶</a></h2>
+<p>That&#8217;s a whirlwind tour of interacting with a Tastypie API. There&#8217;s additional
+functionality present, such as:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">POST</span></tt>/<tt class="docutils literal"><span class="pre">PUT</span></tt> the other supported content-types</li>
+<li>More filtering/<tt class="docutils literal"><span class="pre">order_by</span></tt>/<tt class="docutils literal"><span class="pre">limit</span></tt>/<tt class="docutils literal"><span class="pre">offset</span></tt> tricks</li>
+<li>Using overridden URLconfs to support complex or non-PK lookups</li>
+<li>Authentication</li>
+</ul>
+<p>But this grounds you in the basics &amp; hopefully clarifies usage/debugging better.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Interacting With The API</a><ul>
+<li><a class="reference internal" href="#front-matter">Front Matter</a></li>
+<li><a class="reference internal" href="#fetching-data">Fetching Data</a><ul>
+<li><a class="reference internal" href="#api-wide">Api-Wide</a></li>
+<li><a class="reference internal" href="#inspecting-the-resource-s-schema">Inspecting The Resource&#8217;s Schema</a></li>
+<li><a class="reference internal" href="#getting-a-collection-of-resources">Getting A Collection Of Resources</a></li>
+<li><a class="reference internal" href="#getting-a-detail-resource">Getting A Detail Resource</a></li>
+<li><a class="reference internal" href="#selecting-a-subset-of-resources">Selecting A Subset Of Resources</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sending-data">Sending Data</a><ul>
+<li><a class="reference internal" href="#creating-a-new-resource-post">Creating A New Resource (POST)</a></li>
+<li><a class="reference internal" href="#updating-an-existing-resource-put">Updating An Existing Resource (PUT)</a></li>
+<li><a class="reference internal" href="#partially-updating-an-existing-resource-patch">Partially Updating An Existing Resource (PATCH)</a></li>
+<li><a class="reference internal" href="#updating-a-whole-collection-of-resources-put">Updating A Whole Collection Of Resources (PUT)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deleting-data">Deleting Data</a><ul>
+<li><a class="reference internal" href="#deleting-a-single-resource">Deleting A Single Resource</a></li>
+<li><a class="reference internal" href="#deleting-a-whole-collection-of-resources">Deleting A Whole Collection Of Resources</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bulk-operations">Bulk Operations</a></li>
+<li><a class="reference internal" href="#you-did-it">You Did It!</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="previous chapter">Getting Started with Tastypie</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="settings.html"
+                        title="next chapter">Tastypie Settings</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/interacting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Tastypie Settings"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Getting Started with Tastypie"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

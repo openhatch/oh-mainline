@@ -1,0 +1,548 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Serialization &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Throttling" href="throttling.html" />
+    <link rel="prev" title="Authorization" href="authorization.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="throttling.html" title="Throttling"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="authorization.html" title="Authorization"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="serialization">
+<span id="ref-serialization"></span><h1>Serialization<a class="headerlink" href="#serialization" title="Permalink to this headline">¶</a></h1>
+<p>Serialization can be one of the most contentious areas of an API. Everyone
+has their own requirements, their own preferred output format &amp; the desire to
+have control over what is returned.</p>
+<p>As a result, Tastypie ships with a serializer that tries to meet the basic
+needs of most use cases, and the flexibility to go outside of that when you
+need to.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Using this class is simple. It is the default option on all <tt class="docutils literal"><span class="pre">Resource</span></tt>
+classes unless otherwise specified. The following code is identical to the
+defaults but demonstrate how you could use your own serializer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">tastypie.serializers</span> <span class="kn">import</span> <span class="n">Serializer</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="c"># Add it here.</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">Serializer</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="configuring-allowed-formats">
+<h3>Configuring Allowed Formats<a class="headerlink" href="#configuring-allowed-formats" title="Permalink to this headline">¶</a></h3>
+<p>The default <tt class="docutils literal"><span class="pre">Serializer</span></tt> supports the following formats:</p>
+<ul class="simple">
+<li>json</li>
+<li>jsonp (Disabled by default)</li>
+<li>xml</li>
+<li>yaml</li>
+<li>html</li>
+<li>plist (see <a class="reference external" href="http://explorapp.com/biplist/">http://explorapp.com/biplist/</a>)</li>
+</ul>
+<p>Not everyone wants to install or support all the serialization options. If you
+would list to customize the list of supported formats for your entire site
+the <a class="reference internal" href="settings.html#settings-tastypie-default-formats"><em>TASTYPIE_DEFAULT_FORMATS setting</em></a>
+allows you to set the default format list site-wide.</p>
+<p>If you wish to change the format list for a specific resource, you can pass the
+list of supported formats using the <tt class="docutils literal"><span class="pre">formats=</span></tt> kwarg. For example, to provide
+only JSON &amp; binary plist serialization:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">tastypie.serializers</span> <span class="kn">import</span> <span class="n">Serializer</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">Serializer</span><span class="p">(</span><span class="n">formats</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;plist&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Enabling the built-in (but disabled by default) JSONP support looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">tastypie.serializers</span> <span class="kn">import</span> <span class="n">Serializer</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">Serializer</span><span class="p">(</span><span class="n">formats</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;jsonp&#39;</span><span class="p">,</span> <span class="s">&#39;xml&#39;</span><span class="p">,</span> <span class="s">&#39;yaml&#39;</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">,</span> <span class="s">&#39;plist&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="serialization-security">
+<h2>Serialization Security<a class="headerlink" href="#serialization-security" title="Permalink to this headline">¶</a></h2>
+<p>Deserialization of input from unknown or untrusted sources is an intrinsically
+risky endeavor and vulnerabilities are regularly found in popular format
+libraries. Tastypie adopts and recommends the following approach:</p>
+<ul>
+<li><p class="first">Support the minimum required set of formats in your application.
+If you do not require a format, it&#8217;s much safer to disable it
+completely. See <a class="reference internal" href="settings.html#settings-tastypie-default-formats"><em>TASTYPIE_DEFAULT_FORMATS setting</em></a>.</p>
+</li>
+<li><p class="first">Some parsers offer additional safety check for use with untrusted content.
+The standard Tastypie Serializer attempts to be secure by default using
+features like PyYAML&#8217;s
+<a class="reference external" href="http://pyyaml.org/wiki/PyYAMLDocumentation#LoadingYAML">safe_load</a> function
+and the <a class="reference external" href="https://pypi.python.org/pypi/defusedxml">defusedxml</a> security wrapper for popular Python XML libraries.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Tastypie&#8217;s precautions only apply to the default <tt class="xref py py-class docutils literal"><span class="pre">Serializer</span></tt>. If
+you have written your own serializer subclass we strongly recommend that
+you review your code to ensure that it uses the same precautions.</p>
+<p class="last">If backwards compatibility forces you to load files which require risky
+features we strongly recommend enabling those features only for the
+necessary resources and making your authorization checks as strict as
+possible. The <a class="reference internal" href="authentication.html"><em>Authentication</em></a> and <a class="reference internal" href="authorization.html"><em>Authorization</em></a> checks happen
+before deserialization so, for example, a resource which only allowed
+POST or PUT requests to be made by administrators is far less exposed than
+a general API open to the unauthenticated internet.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="implementing-your-own-serializer">
+<h2>Implementing Your Own Serializer<a class="headerlink" href="#implementing-your-own-serializer" title="Permalink to this headline">¶</a></h2>
+<p>There are several different use cases here. We&#8217;ll cover simple examples of
+wanting a tweaked format &amp; adding a different format.</p>
+<p>To tweak a format, simply override it&#8217;s <tt class="docutils literal"><span class="pre">to_&lt;format&gt;</span></tt> &amp; <tt class="docutils literal"><span class="pre">from_&lt;format&gt;</span></tt>
+methods. So adding the server time to all output might look like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">simplejson</span>
+<span class="kn">from</span> <span class="nn">django.core.serializers</span> <span class="kn">import</span> <span class="n">json</span>
+<span class="kn">from</span> <span class="nn">tastypie.serializers</span> <span class="kn">import</span> <span class="n">Serializer</span>
+
+<span class="k">class</span> <span class="nc">CustomJSONSerializer</span><span class="p">(</span><span class="n">Serializer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_simple</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+
+        <span class="c"># Add in the current time.</span>
+        <span class="n">data</span><span class="p">[</span><span class="s">&#39;requested_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">DjangoJSONEncoder</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;requested_time&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="c"># Log the request here...</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>In the case of adding a different format, let&#8217;s say you want to add a CSV
+output option to the existing set. Your <tt class="docutils literal"><span class="pre">Serializer</span></tt> subclass might look
+like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">StringIO</span>
+<span class="kn">from</span> <span class="nn">tastypie.serializers</span> <span class="kn">import</span> <span class="n">Serializer</span>
+
+
+<span class="k">class</span> <span class="nc">CSVSerializer</span><span class="p">(</span><span class="n">Serializer</span><span class="p">):</span>
+    <span class="n">formats</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;jsonp&#39;</span><span class="p">,</span> <span class="s">&#39;xml&#39;</span><span class="p">,</span> <span class="s">&#39;yaml&#39;</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">,</span> <span class="s">&#39;plist&#39;</span><span class="p">,</span> <span class="s">&#39;csv&#39;</span><span class="p">]</span>
+    <span class="n">content_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;json&#39;</span><span class="p">:</span> <span class="s">&#39;application/json&#39;</span><span class="p">,</span>
+        <span class="s">&#39;jsonp&#39;</span><span class="p">:</span> <span class="s">&#39;text/javascript&#39;</span><span class="p">,</span>
+        <span class="s">&#39;xml&#39;</span><span class="p">:</span> <span class="s">&#39;application/xml&#39;</span><span class="p">,</span>
+        <span class="s">&#39;yaml&#39;</span><span class="p">:</span> <span class="s">&#39;text/yaml&#39;</span><span class="p">,</span>
+        <span class="s">&#39;html&#39;</span><span class="p">:</span> <span class="s">&#39;text/html&#39;</span><span class="p">,</span>
+        <span class="s">&#39;plist&#39;</span><span class="p">:</span> <span class="s">&#39;application/x-plist&#39;</span><span class="p">,</span>
+        <span class="s">&#39;csv&#39;</span><span class="p">:</span> <span class="s">&#39;text/csv&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_simple</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="c"># Untested, so this might not work exactly right.</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">extrasaction</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">raw_data</span>
+
+    <span class="k">def</span> <span class="nf">from_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># Untested, so this might not work exactly right.</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">raw_data</span><span class="p">):</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="serializer-methods">
+<h2><tt class="docutils literal"><span class="pre">Serializer</span></tt> Methods<a class="headerlink" href="#serializer-methods" title="Permalink to this headline">¶</a></h2>
+<p>A swappable class for serialization.</p>
+<p>This handles most types of data as well as the following output formats:</p>
+<div class="highlight-python"><pre>* json
+* jsonp
+* xml
+* yaml
+* html
+* plist</pre>
+</div>
+<p>It was designed to make changing behavior easy, either by overridding the
+various format methods (i.e. <tt class="docutils literal"><span class="pre">to_json</span></tt>), by changing the
+<tt class="docutils literal"><span class="pre">formats/content_types</span></tt> options or by altering the other hook methods.</p>
+<div class="section" id="get-mime-for-format">
+<h3><tt class="docutils literal"><span class="pre">get_mime_for_format</span></tt><a class="headerlink" href="#get-mime-for-format" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.get_mime_for_format(self, format):</tt></dt>
+<dd></dd></dl>
+
+<p>Given a format, attempts to determine the correct MIME type.</p>
+<p>If not available on the current <tt class="docutils literal"><span class="pre">Serializer</span></tt>, returns
+<tt class="docutils literal"><span class="pre">application/json</span></tt> by default.</p>
+</div>
+<div class="section" id="format-datetime">
+<h3><tt class="docutils literal"><span class="pre">format_datetime</span></tt><a class="headerlink" href="#format-datetime" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.format_datetime(data):</tt></dt>
+<dd></dd></dl>
+
+<p>A hook to control how datetimes are formatted.</p>
+<p>Can be overridden at the <tt class="docutils literal"><span class="pre">Serializer</span></tt> level (<tt class="docutils literal"><span class="pre">datetime_formatting</span></tt>)
+or globally (via <tt class="docutils literal"><span class="pre">settings.TASTYPIE_DATETIME_FORMATTING</span></tt>).</p>
+<p>Default is <tt class="docutils literal"><span class="pre">iso-8601</span></tt>, which looks like &#8220;2010-12-16T03:02:14&#8221;.</p>
+</div>
+<div class="section" id="format-date">
+<h3><tt class="docutils literal"><span class="pre">format_date</span></tt><a class="headerlink" href="#format-date" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.format_date(data):</tt></dt>
+<dd></dd></dl>
+
+<p>A hook to control how dates are formatted.</p>
+<p>Can be overridden at the <tt class="docutils literal"><span class="pre">Serializer</span></tt> level (<tt class="docutils literal"><span class="pre">datetime_formatting</span></tt>)
+or globally (via <tt class="docutils literal"><span class="pre">settings.TASTYPIE_DATETIME_FORMATTING</span></tt>).</p>
+<p>Default is <tt class="docutils literal"><span class="pre">iso-8601</span></tt>, which looks like &#8220;2010-12-16&#8221;.</p>
+</div>
+<div class="section" id="format-time">
+<h3><tt class="docutils literal"><span class="pre">format_time</span></tt><a class="headerlink" href="#format-time" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.format_time(data):</tt></dt>
+<dd></dd></dl>
+
+<p>A hook to control how times are formatted.</p>
+<p>Can be overridden at the <tt class="docutils literal"><span class="pre">Serializer</span></tt> level (<tt class="docutils literal"><span class="pre">datetime_formatting</span></tt>)
+or globally (via <tt class="docutils literal"><span class="pre">settings.TASTYPIE_DATETIME_FORMATTING</span></tt>).</p>
+<p>Default is <tt class="docutils literal"><span class="pre">iso-8601</span></tt>, which looks like &#8220;03:02:14&#8221;.</p>
+</div>
+<div class="section" id="serialize">
+<h3><tt class="docutils literal"><span class="pre">serialize</span></tt><a class="headerlink" href="#serialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.serialize(self, bundle, format='application/json', options={}):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some data and a format, calls the correct method to serialize
+the data and returns the result.</p>
+</div>
+<div class="section" id="deserialize">
+<h3><tt class="docutils literal"><span class="pre">deserialize</span></tt><a class="headerlink" href="#deserialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.deserialize(self, content, format='application/json'):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some data and a format, calls the correct method to deserialize
+the data and returns the result.</p>
+</div>
+<div class="section" id="to-simple">
+<h3><tt class="docutils literal"><span class="pre">to_simple</span></tt><a class="headerlink" href="#to-simple" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_simple(self, data, options):</tt></dt>
+<dd></dd></dl>
+
+<p>For a piece of data, attempts to recognize it and provide a simplified
+form of something complex.</p>
+<p>This brings complex Python data structures down to native types of the
+serialization format(s).</p>
+</div>
+<div class="section" id="to-etree">
+<h3><tt class="docutils literal"><span class="pre">to_etree</span></tt><a class="headerlink" href="#to-etree" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_etree(self, data, options=None, name=None, depth=0):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some data, converts that data to an <tt class="docutils literal"><span class="pre">etree.Element</span></tt> suitable
+for use in the XML output.</p>
+</div>
+<div class="section" id="from-etree">
+<h3><tt class="docutils literal"><span class="pre">from_etree</span></tt><a class="headerlink" href="#from-etree" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.from_etree(self, data):</tt></dt>
+<dd></dd></dl>
+
+<p>Not the smartest deserializer on the planet. At the request level,
+it first tries to output the deserialized subelement called &#8220;object&#8221;
+or &#8220;objects&#8221; and falls back to deserializing based on hinted types in
+the XML element attribute &#8220;type&#8221;.</p>
+</div>
+<div class="section" id="to-json">
+<h3><tt class="docutils literal"><span class="pre">to_json</span></tt><a class="headerlink" href="#to-json" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_json(self, data, options=None):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some Python data, produces JSON output.</p>
+</div>
+<div class="section" id="from-json">
+<h3><tt class="docutils literal"><span class="pre">from_json</span></tt><a class="headerlink" href="#from-json" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.from_json(self, content):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some JSON data, returns a Python dictionary of the decoded data.</p>
+</div>
+<div class="section" id="to-jsonp">
+<h3><tt class="docutils literal"><span class="pre">to_jsonp</span></tt><a class="headerlink" href="#to-jsonp" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_jsonp(self, data, options=None):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some Python data, produces JSON output wrapped in the provided
+callback.</p>
+</div>
+<div class="section" id="to-xml">
+<h3><tt class="docutils literal"><span class="pre">to_xml</span></tt><a class="headerlink" href="#to-xml" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_xml(self, data, options=None):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some Python data, produces XML output.</p>
+</div>
+<div class="section" id="from-xml">
+<h3><tt class="docutils literal"><span class="pre">from_xml</span></tt><a class="headerlink" href="#from-xml" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.from_xml(self, content):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some XML data, returns a Python dictionary of the decoded data.</p>
+</div>
+<div class="section" id="to-yaml">
+<h3><tt class="docutils literal"><span class="pre">to_yaml</span></tt><a class="headerlink" href="#to-yaml" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_yaml(self, data, options=None):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some Python data, produces YAML output.</p>
+</div>
+<div class="section" id="from-yaml">
+<h3><tt class="docutils literal"><span class="pre">from_yaml</span></tt><a class="headerlink" href="#from-yaml" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.from_yaml(self, content):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some YAML data, returns a Python dictionary of the decoded data.</p>
+</div>
+<div class="section" id="to-plist">
+<h3><tt class="docutils literal"><span class="pre">to_plist</span></tt><a class="headerlink" href="#to-plist" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_plist(self, data, options=None):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some Python data, produces binary plist output.</p>
+</div>
+<div class="section" id="from-plist">
+<h3><tt class="docutils literal"><span class="pre">from_plist</span></tt><a class="headerlink" href="#from-plist" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.from_plist(self, content):</tt></dt>
+<dd></dd></dl>
+
+<p>Given some binary plist data, returns a Python dictionary of the decoded data.</p>
+</div>
+<div class="section" id="to-html">
+<h3><tt class="docutils literal"><span class="pre">to_html</span></tt><a class="headerlink" href="#to-html" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.to_html(self, data, options=None):</tt></dt>
+<dd></dd></dl>
+
+<p>Reserved for future usage.</p>
+<p>The desire is to provide HTML output of a resource, making an API
+available to a browser. This is on the TODO list but not currently
+implemented.</p>
+</div>
+<div class="section" id="from-html">
+<h3><tt class="docutils literal"><span class="pre">from_html</span></tt><a class="headerlink" href="#from-html" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt>
+<tt class="descname">Serializer.from_html(self, content):</tt></dt>
+<dd></dd></dl>
+
+<p>Reserved for future usage.</p>
+<p>The desire is to handle form-based (maybe Javascript?) input, making an
+API available to a browser. This is on the TODO list but not currently
+implemented.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Serialization</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#configuring-allowed-formats">Configuring Allowed Formats</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#serialization-security">Serialization Security</a></li>
+<li><a class="reference internal" href="#implementing-your-own-serializer">Implementing Your Own Serializer</a></li>
+<li><a class="reference internal" href="#serializer-methods"><tt class="docutils literal"><span class="pre">Serializer</span></tt> Methods</a><ul>
+<li><a class="reference internal" href="#get-mime-for-format"><tt class="docutils literal"><span class="pre">get_mime_for_format</span></tt></a></li>
+<li><a class="reference internal" href="#format-datetime"><tt class="docutils literal"><span class="pre">format_datetime</span></tt></a></li>
+<li><a class="reference internal" href="#format-date"><tt class="docutils literal"><span class="pre">format_date</span></tt></a></li>
+<li><a class="reference internal" href="#format-time"><tt class="docutils literal"><span class="pre">format_time</span></tt></a></li>
+<li><a class="reference internal" href="#serialize"><tt class="docutils literal"><span class="pre">serialize</span></tt></a></li>
+<li><a class="reference internal" href="#deserialize"><tt class="docutils literal"><span class="pre">deserialize</span></tt></a></li>
+<li><a class="reference internal" href="#to-simple"><tt class="docutils literal"><span class="pre">to_simple</span></tt></a></li>
+<li><a class="reference internal" href="#to-etree"><tt class="docutils literal"><span class="pre">to_etree</span></tt></a></li>
+<li><a class="reference internal" href="#from-etree"><tt class="docutils literal"><span class="pre">from_etree</span></tt></a></li>
+<li><a class="reference internal" href="#to-json"><tt class="docutils literal"><span class="pre">to_json</span></tt></a></li>
+<li><a class="reference internal" href="#from-json"><tt class="docutils literal"><span class="pre">from_json</span></tt></a></li>
+<li><a class="reference internal" href="#to-jsonp"><tt class="docutils literal"><span class="pre">to_jsonp</span></tt></a></li>
+<li><a class="reference internal" href="#to-xml"><tt class="docutils literal"><span class="pre">to_xml</span></tt></a></li>
+<li><a class="reference internal" href="#from-xml"><tt class="docutils literal"><span class="pre">from_xml</span></tt></a></li>
+<li><a class="reference internal" href="#to-yaml"><tt class="docutils literal"><span class="pre">to_yaml</span></tt></a></li>
+<li><a class="reference internal" href="#from-yaml"><tt class="docutils literal"><span class="pre">from_yaml</span></tt></a></li>
+<li><a class="reference internal" href="#to-plist"><tt class="docutils literal"><span class="pre">to_plist</span></tt></a></li>
+<li><a class="reference internal" href="#from-plist"><tt class="docutils literal"><span class="pre">from_plist</span></tt></a></li>
+<li><a class="reference internal" href="#to-html"><tt class="docutils literal"><span class="pre">to_html</span></tt></a></li>
+<li><a class="reference internal" href="#from-html"><tt class="docutils literal"><span class="pre">from_html</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="authorization.html"
+                        title="previous chapter">Authorization</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="throttling.html"
+                        title="next chapter">Throttling</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/serialization.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="throttling.html" title="Throttling"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="authorization.html" title="Authorization"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
