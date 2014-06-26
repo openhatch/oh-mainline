@@ -495,7 +495,7 @@ urlpatterns = patterns('',
 
                        # regex for the robots.txt file, for search engine
                        # exclusion
-                       (r'^robots\.txt$', TemplateView.as_view(template_name="robots.txt", mimetype='text/plain')),
+                       (r'^robots\.txt$', mysite.base.views.render_robots_txt),
 
                        # the OpenHatch guide
                        (r'^guide/$', TemplateView.as_view(template_name="base/guide.html")),
