@@ -21,33 +21,33 @@
 
 {% block side_nav_links %}
 <li id='link-main_page'>
-  <a href='{% url mysite.missions.git.views.main_page %}'>
+  <a href='{% url "mysite.missions.git.views.main_page" %}'>
     Mission start page
   </a>
 </li>
 <li id='link-long_description'
      {% if git_config_done %}class='tick-progress'{% else %}class='cross-progress'{%endif%}>
-  <a href='{% url mysite.missions.git.views.long_description %}'>
+  <a href='{% url "mysite.missions.git.views.long_description" %}'>
     Setup Git
   </a>
 </li>
 <li id='link-checkout' {% if git_checkout_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.git.views.checkout %}'>
+  <a href='{% url "mysite.missions.git.views.checkout" %}'>
     Cloning a project
   </a>
 </li>
 <li id='link-diff' {% if git_diff_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.git.views.diff %}'>
+  <a href='{% url "mysite.missions.git.views.diff" %}'>
     Creating a patch
   </a>
 </li>
 <li id='link-rebase' {% if git_rebase_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.git.views.rebase %}'>
+  <a href='{% url "mysite.missions.git.views.rebase" %}'>
     Rebase and merge
   </a>
 </li>
 <li id='link-reference' class='bump-over'>
-  <a href='{% url mysite.missions.git.views.reference %}'>
+  <a href='{% url "mysite.missions.git.views.reference" %}'>
     Quick reference
   </a>
 </li>

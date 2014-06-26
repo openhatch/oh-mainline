@@ -19,7 +19,7 @@
 {% if mentors %}
           <p>
               There {{ mentors|length|pluralize:"is,are" }}
-              <a href='{% url mysite.profile.views.people %}?q=can_mentor:"{{ topic|urlencode }}"'>
+              <a href='{% url "mysite.profile.views.people" %}?q=can_mentor:"{{ topic|urlencode }}"'>
                   <strong>{{ mentors|length}}</strong>
                   {{ mentors|length|pluralize:"person,people" }}
                   who can mentor in
@@ -31,7 +31,7 @@
           <p>
               No one on OpenHatch has signed up as a mentor
               for {{ topic }}. Can you?
-              <a href="{% url mysite.profile.views.edit_info %}">Add the tag</a>.
+              <a href="{% url "mysite.profile.views.edit_info" %}">Add the tag</a>.
           </p>
 
 {% endif %}

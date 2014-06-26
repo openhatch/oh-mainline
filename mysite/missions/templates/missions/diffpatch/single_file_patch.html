@@ -45,12 +45,12 @@
     <p>Essential links:</p>
 
     <ul class="raquo_bullets">
-      <li><a href="{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}">Your original recipe</a></li>
-      <li><a href="{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}">Patch file adding the oven temperature</a></li>
+      <li><a href="{% url "mysite.missions.diffpatch.views.patchsingle_get_original_file" %}">Your original recipe</a></li>
+      <li><a href="{% url "mysite.missions.diffpatch.views.patchsingle_get_patch" %}">Patch file adding the oven temperature</a></li>
     </ul>
 
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchsingle_submit %}#patchsingle-form">{% csrf_token %}
+    <form method="post" enctype="multipart/form-data" action="{% url "mysite.missions.diffpatch.views.patchsingle_submit" %}#patchsingle-form">{% csrf_token %}
       <div class="form-row file-upload-row">
         <a name="patchsingle-form"></a>
         After you patch the file, upload it here:
@@ -76,7 +76,7 @@
     </form>
     {% if patchsingle_done %}
     <p class="next_mission_link">
-      <a href="{% url mysite.missions.diffpatch.views.single_file_diff %}">On to diffing files &raquo;</a></p>
+      <a href="{% url "mysite.missions.diffpatch.views.single_file_diff" %}">On to diffing files &raquo;</a></p>
     {% endif %}
 
     <div id="hint_tabs">
@@ -111,8 +111,8 @@
       </pre>
       <p>Then, download the original file and the modified file.</p>
       <pre>
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.patchsingle_get_original_file" %}
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.patchsingle_get_patch" %}
       </pre>
       <p>Then, use the <tt>patch</tt> command to apply the changes.</p>
       <pre>

@@ -22,14 +22,14 @@
         {% if helpers %}
             <ul>
                 <li>
-                    <a href='{% url mysite.profile.views.people %}?q=icanhelp:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See on map</a>
+                    <a href='{% url "mysite.profile.views.people" %}?q=icanhelp:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See on map</a>
                 </li>
             </ul>
         {% endif %}
     </div>
     {% if people_to_show %}
       <div id="iwh_handler" class="body tab">
-	<form id='mark_contacted_do_form' action="{% url mysite.project.views.mark_contacted_do %}" method="POST">{% csrf_token %}
+	<form id='mark_contacted_do_form' action="{% url "mysite.project.views.mark_contacted_do" %}" method="POST">{% csrf_token %}
         <div class="explanation">
           <p>The following people are interested in helping.
 	    Send them an email! (<a href="//openhatch.org/wiki/Contacting_new_contributors">tips</a>)
@@ -76,7 +76,7 @@
     </form>
 {% endwith %}
 {% if user_wants_to_help %}
-            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">{% csrf_token %}
+            <form action="{% url "mysite.project.views.unlist_self_from_wanna_help_do" %}" id='delist_me_as_a_helper' method="POST">{% csrf_token %}
                 <input type='hidden' name='project' value='{{project.id}}'>
                 <input type='submit' style='float: left; margin-left: 10px;' id='delist_helper_button' value='De-list me!'>
             </form>
