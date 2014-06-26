@@ -1,21 +1,19 @@
 from django.conf.urls.defaults import *
-from django.views.generic.simple import direct_to_template
+
+from django.views.generic import TemplateView
 
 from registration.forms import RegistrationFormTermsOfService
 from invitation.views import invite, invited, register
 
 urlpatterns = patterns('',
     url(r'^invite/complete/$',
-                direct_to_template,
-                {'template': 'invitation/invitation_complete.html'},
-                name='invitation_complete'),
+                TemplateView.as_view(template_name="invitation/invitation_complete.html")),
     url(r'^invite/$',
-                invite,
-                name='invitation_invite'),
-    url(r'^invited/(?P<invitation_key>\w+)/$', 
+                invite, TemplateView.as_view(template_name='invitation_invite')),
+    url(r'^invited/(?P<invitation_key>\w+)/$',
                 invited,
-                name='invitation_invited'),
+                TemplateView.as_view(template_name='invitation_invited')),
     url(r'^register/$',
                 register,
-                name='registration_register'),
+                TemplateView.as_view(template_name='registration_register')),
 )
