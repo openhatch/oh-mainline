@@ -44,7 +44,7 @@ about the projects we index
 
 {% block pagetop %}
     <h3>
-        <a href='{% url mysite.project.views.projects %}'>
+        <a href='{% url "mysite.project.views.projects" %}'>
             <img alt='Projects on OpenHatch' id='projects' alt='Projects on OpenHatch' src={% version '/static/images/projects.png' %} width='960' height='141'/>
         </a>
     </h3>
@@ -83,7 +83,7 @@ about the projects we index
             {% if no_project_matches_query_exactly %}
                 <form method="POST"
                         name="create_project"
-                        action="{% url mysite.project.views.create_project_page_do %}"
+                        action="{% url "mysite.project.views.create_project_page_do" %}"
                         style='clear: left; float: left; padding: 8px;
                         -moz-border-radius: 8px; border-radius: 8px;
                         background-color: #ffc; '>{% csrf_token %}

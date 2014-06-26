@@ -21,6 +21,29 @@
 {% block mission_main %}
 <div class='submodule fat'>
   <div class="submodule-body body">
+<<<<<<< HEAD
+=======
+      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url "mysite.missions.tar.views.download_tarball_for_extract_mission" %}">{{ tarball_for_unpacking_mission }}</a>. (Note that the tarball is following convention by using a directory that holds all of the files from that tarball.)</p>
+      <p>Your mission is to to upload {{ file_we_want }}.</p>
+      <form method="post" enctype="multipart/form-data" action="{% url "mysite.missions.tar.views.extract_mission_upload" %}#unpack-form">{% csrf_token %}
+        <div class="form-row file-upload-row">
+          <a name="unpack-form"></a>
+          After you extract that file, upload it here:
+    {% if unpack_success %}
+      <!-- unpack status: success -->
+    {% else %}
+      <!-- unpack status: failure -->
+    {% endif %}
+          {% if what_was_wrong_with_the_extracted_file %}
+          <ul class="errorlist"><li>{{ what_was_wrong_with_the_extracted_file }}</li></ul>
+          {% endif %}
+          {{ unpack_form.extracted_file.errors }}
+          <div class="file-upload">
+          {{ unpack_form.extracted_file }}
+          <input type="submit" value="Upload" style="float: none;" />
+          </div>
+        </div>
+      </form>
     {% if unpack_done %}
       <div id="success-msg" class="successmsg">
         <p><strong>You have successfully completed this part of the mission.</strong></p>
@@ -33,12 +56,16 @@
         <script type='text/javascript' src="{% version '/static/js/missions/base.js' %}"></script>
         <script type='text/javascript'>
         if (typeof OH === 'undefined') OH = {};
-        if (typeof OH.Page === 'undefined') OH.Page = {};
-        OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
+        if (typeof OH.Page === 'undefined') OH.Page = {};        
+        OH.Page['post_url'] = '{% url "mysite.missions.tar.views.reset" %}';
         OH.Page['mission_parts'] = 'tar_extract';
         </script>
         {% endblock %}
       </div>
+    {% endif %}
+      {% if unpack_done %}
+      <p class="next_mission_link">
+	<a href="{% url "mysite.missions.tar.views.creating" %}">On to creating a tarball &raquo;</a></p>
       {% endif %}
       <div class="mission-step">
         <oppia oppia-id="12" exploration-version="4" src="http://missions-beta.openhatch.org">

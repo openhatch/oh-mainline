@@ -2,40 +2,24 @@
 HTML Widget classes
 """
 
-<<<<<<< HEAD
-from __future__ import absolute_import
-=======
 from __future__ import absolute_import, unicode_literals
->>>>>>> Add Django 1.5.8
 
 import copy
 import datetime
 from itertools import chain
-<<<<<<< HEAD
-from urlparse import urljoin
-=======
 try:
     from urllib.parse import urljoin
 except ImportError:     # Python 2
     from urlparse import urljoin
->>>>>>> Add Django 1.5.8
 
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
-<<<<<<< HEAD
-from django.utils.html import escape, conditional_escape
-from django.utils.translation import ugettext, ugettext_lazy
-from django.utils.encoding import StrAndUnicode, force_unicode
-from django.utils.safestring import mark_safe
-from django.utils import datetime_safe, formats
-=======
 from django.utils.html import conditional_escape, format_html, format_html_join
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six
->>>>>>> Add Django 1.5.8
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -48,12 +32,9 @@ __all__ = (
 
 MEDIA_TYPES = ('css','js')
 
-<<<<<<< HEAD
-class Media(StrAndUnicode):
-=======
+
 @python_2_unicode_compatible
 class Media(object):
->>>>>>> Add Django 1.5.8
     def __init__(self, media=None, **kwargs):
         if media:
             media_attrs = media.__dict__
@@ -70,16 +51,6 @@ class Media(object):
         # if media_attrs != {}:
         #     raise TypeError("'class Media' has invalid attribute(s): %s" % ','.join(media_attrs.keys()))
 
-<<<<<<< HEAD
-    def __unicode__(self):
-        return self.render()
-
-    def render(self):
-        return mark_safe(u'\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
-
-    def render_js(self):
-        return [u'<script type="text/javascript" src="%s"></script>' % self.absolute_path(path) for path in self._js]
-=======
     def __str__(self):
         return self.render()
 
@@ -88,30 +59,18 @@ class Media(object):
 
     def render_js(self):
         return [format_html('<script type="text/javascript" src="{0}"></script>', self.absolute_path(path)) for path in self._js]
->>>>>>> Add Django 1.5.8
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
-<<<<<<< HEAD
-        media = self._css.keys()
-        media.sort()
-        return chain(*[
-            [u'<link href="%s" type="text/css" media="%s" rel="stylesheet" />' % (self.absolute_path(path), medium)
-=======
         media = sorted(self._css.keys())
         return chain(*[
                 [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
->>>>>>> Add Django 1.5.8
                     for path in self._css[medium]]
                 for medium in media])
 
     def absolute_path(self, path, prefix=None):
-<<<<<<< HEAD
-        if path.startswith(u'http://') or path.startswith(u'https://') or path.startswith(u'/'):
-=======
         if path.startswith(('http://', 'https://', '/')):
->>>>>>> Add Django 1.5.8
             return path
         if prefix is None:
             if settings.STATIC_URL is None:
@@ -183,12 +142,8 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
         return new_class
 
-<<<<<<< HEAD
-class SubWidget(StrAndUnicode):
-=======
 @python_2_unicode_compatible
 class SubWidget(object):
->>>>>>> Add Django 1.5.8
     """
     Some widgets are made of multiple HTML elements -- namely, RadioSelect.
     This is a class that represents the "inner" HTML element of a widget.
@@ -198,22 +153,13 @@ class SubWidget(object):
         self.name, self.value = name, value
         self.attrs, self.choices = attrs, choices
 
-<<<<<<< HEAD
-    def __unicode__(self):
-=======
     def __str__(self):
->>>>>>> Add Django 1.5.8
         args = [self.name, self.value, self.attrs]
         if self.choices:
             args.append(self.choices)
         return self.parent_widget.render(*args)
 
-<<<<<<< HEAD
-class Widget(object):
-    __metaclass__ = MediaDefiningClass
-=======
 class Widget(six.with_metaclass(MediaDefiningClass)):
->>>>>>> Add Django 1.5.8
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False # Determines does this widget need multipart form
     is_localized = False
@@ -269,18 +215,6 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         """
         # For purposes of seeing whether something has changed, None is
         # the same as an empty string, if the data or inital value we get
-<<<<<<< HEAD
-        # is None, replace it w/ u''.
-        if data is None:
-            data_value = u''
-        else:
-            data_value = data
-        if initial is None:
-            initial_value = u''
-        else:
-            initial_value = initial
-        if force_unicode(initial_value) != force_unicode(data_value):
-=======
         # is None, replace it w/ ''.
         if data is None:
             data_value = ''
@@ -291,7 +225,6 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         else:
             initial_value = initial
         if force_text(initial_value) != force_text(data_value):
->>>>>>> Add Django 1.5.8
             return True
         return False
 
@@ -325,21 +258,12 @@ class Input(Widget):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-<<<<<<< HEAD
-            final_attrs['value'] = force_unicode(self._format_value(value))
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
-=======
             final_attrs['value'] = force_text(self._format_value(value))
         return format_html('<input{0} />', flatatt(final_attrs))
 
->>>>>>> Add Django 1.5.8
 
 class TextInput(Input):
     input_type = 'text'
-
-<<<<<<< HEAD
-class PasswordInput(Input):
-=======
     def __init__(self, attrs=None):
         if attrs is not None:
             self.input_type = attrs.pop('type', self.input_type)
@@ -347,7 +271,6 @@ class PasswordInput(Input):
 
 
 class PasswordInput(TextInput):
->>>>>>> Add Django 1.5.8
     input_type = 'password'
 
     def __init__(self, attrs=None, render_value=False):
@@ -378,22 +301,13 @@ class MultipleHiddenInput(HiddenInput):
         id_ = final_attrs.get('id', None)
         inputs = []
         for i, v in enumerate(value):
-<<<<<<< HEAD
-            input_attrs = dict(value=force_unicode(v), **final_attrs)
-=======
             input_attrs = dict(value=force_text(v), **final_attrs)
->>>>>>> Add Django 1.5.8
             if id_:
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
                 input_attrs['id'] = '%s_%s' % (id_, i)
-<<<<<<< HEAD
-            inputs.append(u'<input%s />' % flatatt(input_attrs))
-        return mark_safe(u'\n'.join(inputs))
-=======
             inputs.append(format_html('<input{0} />', flatatt(input_attrs)))
         return mark_safe('\n'.join(inputs))
->>>>>>> Add Django 1.5.8
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
@@ -423,15 +337,9 @@ class ClearableFileInput(FileInput):
     input_text = ugettext_lazy('Change')
     clear_checkbox_label = ugettext_lazy('Clear')
 
-<<<<<<< HEAD
-    template_with_initial = u'%(initial_text)s: %(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
-
-    template_with_clear = u'%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
-=======
     template_with_initial = '%(initial_text)s: %(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
 
     template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
->>>>>>> Add Django 1.5.8
 
     def clear_checkbox_name(self, name):
         """
@@ -453,24 +361,14 @@ class ClearableFileInput(FileInput):
             'clear_template': '',
             'clear_checkbox_label': self.clear_checkbox_label,
         }
-<<<<<<< HEAD
-        template = u'%(input)s'
-=======
         template = '%(input)s'
->>>>>>> Add Django 1.5.8
         substitutions['input'] = super(ClearableFileInput, self).render(name, value, attrs)
 
         if value and hasattr(value, "url"):
             template = self.template_with_initial
-<<<<<<< HEAD
-            substitutions['initial'] = (u'<a href="%s">%s</a>'
-                                        % (escape(value.url),
-                                           escape(force_unicode(value))))
-=======
             substitutions['initial'] = format_html('<a href="{0}">{1}</a>',
                                                    value.url,
                                                    force_text(value))
->>>>>>> Add Django 1.5.8
             if not self.is_required:
                 checkbox_name = self.clear_checkbox_name(name)
                 checkbox_id = self.clear_checkbox_id(checkbox_name)
@@ -497,9 +395,7 @@ class ClearableFileInput(FileInput):
 class Textarea(Widget):
     def __init__(self, attrs=None):
         # The 'rows' and 'cols' attributes are required for HTML correctness.
-<<<<<<< HEAD
-        default_attrs = {'cols': '40', 'rows': '3'}
-=======
+
         default_attrs = {'cols': '40', 'rows': '10'}
 >>>>>>> Add Django 1.5.8
         if attrs:
@@ -509,7 +405,6 @@ class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-<<<<<<< HEAD
         return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
                 conditional_escape(force_unicode(value))))
 
@@ -552,11 +447,6 @@ class DateInput(TextInput):
             pass
         return super(DateInput, self)._has_changed(self._format_value(initial), data)
 
-<<<<<<< HEAD
-class DateTimeInput(Input):
-    input_type = 'text'
-
-=======
 
 class DateTimeInput(TextInput):
 >>>>>>> Add Django 1.5.8
@@ -588,11 +478,6 @@ class DateTimeInput(TextInput):
             pass
         return super(DateTimeInput, self)._has_changed(self._format_value(initial), data)
 
-<<<<<<< HEAD
-class TimeInput(Input):
-    input_type = 'text'
-
-=======
 
 class TimeInput(TextInput):
 >>>>>>> Add Django 1.5.8
@@ -638,25 +523,12 @@ class CheckboxInput(Widget):
 
     def render(self, name, value, attrs=None):
         final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-<<<<<<< HEAD
-        try:
-            result = self.check_test(value)
-        except: # Silently catch exceptions
-            result = False
-        if result:
-            final_attrs['checked'] = 'checked'
-        if not (value is True or value is False or value is None or value == ''):
-            # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_unicode(value)
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
-=======
         if self.check_test(value):
             final_attrs['checked'] = 'checked'
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(value)
         return format_html('<input{0} />', flatatt(final_attrs))
->>>>>>> Add Django 1.5.8
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -665,7 +537,6 @@ class CheckboxInput(Widget):
             return False
         value = data.get(name)
         # Translate true and false strings to boolean values.
-<<<<<<< HEAD
         values =  {'true': True, 'false': False}
         if isinstance(value, basestring):
             value = values.get(value.lower(), value)
@@ -702,19 +573,6 @@ class Select(Widget):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-<<<<<<< HEAD
-        output = [u'<select%s>' % flatatt(final_attrs)]
-        options = self.render_options(choices, [value])
-        if options:
-            output.append(options)
-        output.append(u'</select>')
-        return mark_safe(u'\n'.join(output))
-
-    def render_option(self, selected_choices, option_value, option_label):
-        option_value = force_unicode(option_value)
-        if option_value in selected_choices:
-            selected_html = u' selected="selected"'
-=======
         output = [format_html('<select{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, [value])
         if options:
@@ -726,31 +584,11 @@ class Select(Widget):
         option_value = force_text(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
->>>>>>> Add Django 1.5.8
             if not self.allow_multiple_selected:
                 # Only allow for a single selection.
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-<<<<<<< HEAD
-        return u'<option value="%s"%s>%s</option>' % (
-            escape(option_value), selected_html,
-            conditional_escape(force_unicode(option_label)))
-
-    def render_options(self, choices, selected_choices):
-        # Normalize to strings.
-        selected_choices = set(force_unicode(v) for v in selected_choices)
-        output = []
-        for option_value, option_label in chain(self.choices, choices):
-            if isinstance(option_label, (list, tuple)):
-                output.append(u'<optgroup label="%s">' % escape(force_unicode(option_value)))
-                for option in option_label:
-                    output.append(self.render_option(selected_choices, *option))
-                output.append(u'</optgroup>')
-            else:
-                output.append(self.render_option(selected_choices, option_value, option_label))
-        return u'\n'.join(output)
-=======
         return format_html('<option value="{0}"{1}>{2}</option>',
                            option_value,
                            selected_html,
@@ -769,50 +607,30 @@ class Select(Widget):
             else:
                 output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
->>>>>>> Add Django 1.5.8
 
 class NullBooleanSelect(Select):
     """
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-<<<<<<< HEAD
-        choices = ((u'1', ugettext_lazy('Unknown')),
-                   (u'2', ugettext_lazy('Yes')),
-                   (u'3', ugettext_lazy('No')))
-=======
         choices = (('1', ugettext_lazy('Unknown')),
                    ('2', ugettext_lazy('Yes')),
                    ('3', ugettext_lazy('No')))
->>>>>>> Add Django 1.5.8
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
         try:
-<<<<<<< HEAD
-            value = {True: u'2', False: u'3', u'2': u'2', u'3': u'3'}[value]
-        except KeyError:
-            value = u'1'
-=======
             value = {True: '2', False: '3', '2': '2', '3': '3'}[value]
         except KeyError:
             value = '1'
->>>>>>> Add Django 1.5.8
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
-<<<<<<< HEAD
-        return {u'2': True,
-                True: True,
-                'True': True,
-                u'3': False,
-=======
         return {'2': True,
                 True: True,
                 'True': True,
                 '3': False,
->>>>>>> Add Django 1.5.8
                 'False': False,
                 False: False}.get(value, None)
 
@@ -831,20 +649,12 @@ class SelectMultiple(Select):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
-<<<<<<< HEAD
-        output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
-=======
         output = [format_html('<select multiple="multiple"{0}>', flatatt(final_attrs))]
->>>>>>> Add Django 1.5.8
         options = self.render_options(choices, value)
         if options:
             output.append(options)
         output.append('</select>')
-<<<<<<< HEAD
-        return mark_safe(u'\n'.join(output))
-=======
         return mark_safe('\n'.join(output))
->>>>>>> Add Django 1.5.8
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
@@ -858,18 +668,11 @@ class SelectMultiple(Select):
             data = []
         if len(initial) != len(data):
             return True
-<<<<<<< HEAD
-        initial_set = set([force_unicode(value) for value in initial])
-        data_set = set([force_unicode(value) for value in data])
-        return data_set != initial_set
-
-=======
         initial_set = set([force_text(value) for value in initial])
         data_set = set([force_text(value) for value in data])
         return data_set != initial_set
 
 @python_2_unicode_compatible
->>>>>>> Add Django 1.5.8
 class RadioInput(SubWidget):
     """
     An object used by RadioFieldRenderer that represents a single
@@ -879,19 +682,11 @@ class RadioInput(SubWidget):
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
         self.attrs = attrs
-<<<<<<< HEAD
-        self.choice_value = force_unicode(choice[0])
-        self.choice_label = force_unicode(choice[1])
-        self.index = index
-
-    def __unicode__(self):
-=======
         self.choice_value = force_text(choice[0])
         self.choice_label = force_text(choice[1])
         self.index = index
 
     def __str__(self):
->>>>>>> Add Django 1.5.8
         return self.render()
 
     def render(self, name=None, value=None, attrs=None, choices=()):
@@ -899,19 +694,11 @@ class RadioInput(SubWidget):
         value = value or self.value
         attrs = attrs or self.attrs
         if 'id' in self.attrs:
-<<<<<<< HEAD
-            label_for = ' for="%s_%s"' % (self.attrs['id'], self.index)
-        else:
-            label_for = ''
-        choice_label = conditional_escape(force_unicode(self.choice_label))
-        return mark_safe(u'<label%s>%s %s</label>' % (label_for, self.tag(), choice_label))
-=======
             label_for = format_html(' for="{0}_{1}"', self.attrs['id'], self.index)
         else:
             label_for = ''
         choice_label = force_text(self.choice_label)
         return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), choice_label)
->>>>>>> Add Django 1.5.8
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -922,16 +709,10 @@ class RadioInput(SubWidget):
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
-<<<<<<< HEAD
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
-
-class RadioFieldRenderer(StrAndUnicode):
-=======
         return format_html('<input{0} />', flatatt(final_attrs))
 
 @python_2_unicode_compatible
 class RadioFieldRenderer(object):
->>>>>>> Add Django 1.5.8
     """
     An object used by RadioSelect to enable customization of radio widgets.
     """
@@ -948,24 +729,14 @@ class RadioFieldRenderer(object):
         choice = self.choices[idx] # Let the IndexError propogate
         return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
 
-<<<<<<< HEAD
-    def __unicode__(self):
-=======
-    def __str__(self):
->>>>>>> Add Django 1.5.8
         return self.render()
 
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-<<<<<<< HEAD
-        return mark_safe(u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>'
-                % force_unicode(w) for w in self]))
-=======
         return format_html('<ul>\n{0}\n</ul>',
                            format_html_join('\n', '<li>{0}</li>',
                                             [(force_text(w),) for w in self]
                                             ))
->>>>>>> Add Django 1.5.8
 
 class RadioSelect(Select):
     renderer = RadioFieldRenderer
@@ -984,11 +755,7 @@ class RadioSelect(Select):
     def get_renderer(self, name, value, attrs=None, choices=()):
         """Returns an instance of the renderer."""
         if value is None: value = ''
-<<<<<<< HEAD
-        str_value = force_unicode(value) # Normalize to string.
-=======
         str_value = force_text(value) # Normalize to string.
->>>>>>> Add Django 1.5.8
         final_attrs = self.build_attrs(attrs)
         choices = list(chain(self.choices, choices))
         return self.renderer(name, str_value, final_attrs, choices)
@@ -1010,37 +777,19 @@ class CheckboxSelectMultiple(SelectMultiple):
         if value is None: value = []
         has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
-<<<<<<< HEAD
-        output = [u'<ul>']
-        # Normalize to strings
-        str_values = set([force_unicode(v) for v in value])
-=======
         output = ['<ul>']
         # Normalize to strings
         str_values = set([force_text(v) for v in value])
->>>>>>> Add Django 1.5.8
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
             # If an ID attribute was given, add a numeric index as a suffix,
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
-<<<<<<< HEAD
-                label_for = u' for="%s"' % final_attrs['id']
-=======
                 label_for = format_html(' for="{0}"', final_attrs['id'])
->>>>>>> Add Django 1.5.8
             else:
                 label_for = ''
 
             cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
-<<<<<<< HEAD
-            option_value = force_unicode(option_value)
-            rendered_cb = cb.render(name, option_value)
-            option_label = conditional_escape(force_unicode(option_label))
-            output.append(u'<li><label%s>%s %s</label></li>' % (label_for, rendered_cb, option_label))
-        output.append(u'</ul>')
-        return mark_safe(u'\n'.join(output))
-=======
             option_value = force_text(option_value)
             rendered_cb = cb.render(name, option_value)
             option_label = force_text(option_label)
@@ -1048,7 +797,6 @@ class CheckboxSelectMultiple(SelectMultiple):
                                       label_for, rendered_cb, option_label))
         output.append('</ul>')
         return mark_safe('\n'.join(output))
->>>>>>> Add Django 1.5.8
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
@@ -1119,11 +867,7 @@ class MultiWidget(Widget):
 
     def _has_changed(self, initial, data):
         if initial is None:
-<<<<<<< HEAD
-            initial = [u'' for x in range(0, len(data))]
-=======
             initial = ['' for x in range(0, len(data))]
->>>>>>> Add Django 1.5.8
         else:
             if not isinstance(initial, list):
                 initial = self.decompress(initial)
@@ -1140,11 +884,7 @@ class MultiWidget(Widget):
         This hook allows you to format the HTML design of the widgets, if
         needed.
         """
-<<<<<<< HEAD
-        return u''.join(rendered_widgets)
-=======
         return ''.join(rendered_widgets)
->>>>>>> Add Django 1.5.8
 
     def decompress(self, value):
         """

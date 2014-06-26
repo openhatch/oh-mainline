@@ -31,7 +31,7 @@
         <script type='text/javascript'>
         if (typeof OH === 'undefined') OH = {};
         if (typeof OH.Page === 'undefined') OH.Page = {};
-        OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
+        OH.Page['post_url'] = '{% url "mysite.missions.tar.views.reset" %}';
         OH.Page['mission_parts'] = 'tar,tar_extract';
         </script>
         <script type="text/javascript">
@@ -42,9 +42,9 @@
         {% endblock %}
       </div>
       {% endif %}
-      <div class="mission-step">
-        <oppia oppia-id="10" exploration-version="1" src="http://missions-beta.openhatch.org">
-      </div>
+
+      <p class="next_mission_link">
+	<a href="{% url "mysite.missions.tar.views.unpacking" %}">Get started with unpacking &raquo;</a></p>
   </div>
 </div>
 {% endblock mission_main %}
