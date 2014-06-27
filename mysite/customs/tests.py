@@ -1113,7 +1113,8 @@ class ImportBugsFromFiles(django.test.TestCase):
              'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068),
              'looks_closed': False,
              'good_for_newcomers': True,
-             'concerns_just_documentation': False}]
+             'concerns_just_documentation': False,
+             }]
         mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
         self.assertTrue(Bug.all_bugs.all())
 
