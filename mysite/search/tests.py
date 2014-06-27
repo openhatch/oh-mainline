@@ -175,10 +175,12 @@ class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
 class SearchResults(TwillTests):
     fixtures = [u'bugs-for-two-projects.json']
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_query_object_is_false_when_no_terms_or_facets(self):
         query = mysite.search.view_helpers.Query.create_from_GET_data({})
         self.assertFalse(query)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_show_no_bugs_if_no_query(self):
         # Call up search page with no query.
         response = self.client.get(u'/search/')
@@ -280,7 +282,7 @@ class SearchResults(TwillTests):
         for bug in bugs:
             tc.find(bug.description)
 
-
+@skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
 class RecommendationsCanBeDisabled(SearchTest):
     fixtures = ['user-paulproteus.json',
                 'person-paulproteus.json',
