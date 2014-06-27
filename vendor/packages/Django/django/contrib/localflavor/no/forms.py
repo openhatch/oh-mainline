@@ -2,20 +2,26 @@
 Norwegian-specific Form helpers
 """
 
-import re, datetime
+from __future__ import absolute_import
+
+import re
+import datetime
+
+from django.contrib.localflavor.no.no_municipalities import MUNICIPALITY_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
+
 
 class NOZipCodeField(RegexField):
     default_error_messages = {
         'invalid': _('Enter a zip code in the format XXXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(NOZipCodeField, self).__init__(r'^\d{4}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 class NOMunicipalitySelect(Select):
     """
@@ -23,7 +29,6 @@ class NOMunicipalitySelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from no_municipalities import MUNICIPALITY_CHOICES
         super(NOMunicipalitySelect, self).__init__(attrs, choices=MUNICIPALITY_CHOICES)
 
 class NOSocialSecurityNumber(Field):

@@ -6,6 +6,15 @@ This file contains information on things that you don't have to do! If
 you're a completionist or really just like installing dependencies or
 reading the OpenHatch documentation, keep reading.
 
+Overriding local settings
+=========================
+
+If you wish to override the default settings, you may create a
+separate file with individual settings you wish to change.
+There is a hook at the end of the in mysite/settings.py that allows
+contributors to override indiviual settings. To override settings,
+create a new file in the mysite directory and name it local_settings.py.
+You can place any settings you wish to override in this file.
 
 Automated testing
 =================
@@ -114,7 +123,7 @@ Debian/Ubuntu systems, do::
 Maintenance
 ===========
 
-You may want to about how to maintain an OpenHatchsite. `maintenance.rst`_ tells
+You may want to read about how to maintain an OpenHatch site. `maintenance.rst`_ tells
 you about that.
 
 

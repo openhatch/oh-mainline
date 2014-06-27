@@ -1,4 +1,8 @@
-from django import template, templatetags
+import inspect
+import os
+import re
+
+from django import template
 from django.template import RequestContext
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -12,7 +16,6 @@ from django.contrib.sites.models import Site
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
@@ -21,32 +24,23 @@ class GenericSite(object):
     domain = 'example.com'
     name = 'my site'
 
-def get_root_path():
-    try:
-        return urlresolvers.reverse('admin:index')
-    except urlresolvers.NoReverseMatch:
-        from django.contrib import admin
-        try:
-            return urlresolvers.reverse(admin.site.root, args=[''])
-        except urlresolvers.NoReverseMatch:
-            return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
-
+@staff_member_required
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
     return render_to_response('admin_doc/index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
     }, context_instance=RequestContext(request))
-doc_index = staff_member_required(doc_index)
 
+@staff_member_required
 def bookmarklets(request):
-    admin_root = get_root_path()
+    admin_root = urlresolvers.reverse('admin:index')
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
         'admin_url': mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root)),
     }, context_instance=RequestContext(request))
-bookmarklets = staff_member_required(bookmarklets)
 
+@staff_member_required
 def template_tag_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -77,11 +71,11 @@ def template_tag_index(request):
                 'library': tag_library,
             })
     return render_to_response('admin_doc/template_tag_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'tags': tags
     }, context_instance=RequestContext(request))
-template_tag_index = staff_member_required(template_tag_index)
 
+@staff_member_required
 def template_filter_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -112,11 +106,11 @@ def template_filter_index(request):
                 'library': tag_library,
             })
     return render_to_response('admin_doc/template_filter_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'filters': filters
     }, context_instance=RequestContext(request))
-template_filter_index = staff_member_required(template_filter_index)
 
+@staff_member_required
 def view_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -136,18 +130,17 @@ def view_index(request):
             site_obj = GenericSite()
         for (func, regex) in view_functions:
             views.append({
-                'name': getattr(func, '__name__', func.__class__.__name__),
-                'module': func.__module__,
+                'full_name': '%s.%s' % (func.__module__, getattr(func, '__name__', func.__class__.__name__)),
                 'site_id': settings_mod.SITE_ID,
                 'site': site_obj,
                 'url': simplify_regex(regex),
             })
     return render_to_response('admin_doc/view_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'views': views
     }, context_instance=RequestContext(request))
-view_index = staff_member_required(view_index)
 
+@staff_member_required
 def view_detail(request, view):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -165,24 +158,24 @@ def view_detail(request, view):
     for key in metadata:
         metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
     return render_to_response('admin_doc/view_detail.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'name': view,
         'summary': title,
         'body': body,
         'meta': metadata,
     }, context_instance=RequestContext(request))
-view_detail = staff_member_required(view_detail)
 
+@staff_member_required
 def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
     m_list = [m._meta for m in models.get_models()]
     return render_to_response('admin_doc/model_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'models': m_list
     }, context_instance=RequestContext(request))
-model_index = staff_member_required(model_index)
 
+@staff_member_required
 def model_detail(request, app_label, model_name):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -208,7 +201,7 @@ def model_detail(request, app_label, model_name):
         # ForeignKey is a special case since the field will actually be a
         # descriptor that returns the other object
         if isinstance(field, models.ForeignKey):
-            data_type = related_object_name = field.rel.to.__name__
+            data_type = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
             verbose = utils.parse_rst((_("the related `%(app_label)s.%(data_type)s` object")  % {'app_label': app_label, 'data_type': data_type}), 'model', _('model:') + data_type)
         else:
@@ -223,7 +216,7 @@ def model_detail(request, app_label, model_name):
 
     # Gather many-to-many fields.
     for field in opts.many_to_many:
-        data_type = related_object_name = field.rel.to.__name__
+        data_type = field.rel.to.__name__
         app_label = field.rel.to._meta.app_label
         verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': app_label, 'object_name': data_type}
         fields.append({
@@ -270,14 +263,14 @@ def model_detail(request, app_label, model_name):
             'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
         })
     return render_to_response('admin_doc/model_detail.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'name': '%s.%s' % (opts.app_label, opts.object_name),
         'summary': _("Fields on %s objects") % opts.object_name,
         'description': model.__doc__,
         'fields': fields,
     }, context_instance=RequestContext(request))
-model_detail = staff_member_required(model_detail)
 
+@staff_member_required
 def template_detail(request, template):
     templates = []
     for site_settings_module in settings.ADMIN_FOR:
@@ -297,11 +290,10 @@ def template_detail(request, template):
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
     return render_to_response('admin_doc/template_detail.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'name': template,
         'templates': templates,
     }, context_instance=RequestContext(request))
-template_detail = staff_member_required(template_detail)
 
 ####################
 # Helper functions #
@@ -315,11 +307,14 @@ def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
     for module_name in template.get_templatetags_modules():
         mod = import_module(module_name)
-        libraries = [
-            os.path.splitext(p)[0]
-            for p in os.listdir(os.path.dirname(mod.__file__))
-            if p.endswith('.py') and p[0].isalpha()
-        ]
+        try:
+            libraries = [
+                os.path.splitext(p)[0]
+                for p in os.listdir(os.path.dirname(mod.__file__))
+                if p.endswith('.py') and p[0].isalpha()
+            ]
+        except OSError:
+            libraries = []
         for library_name in libraries:
             try:
                 lib = template.get_library(library_name)
@@ -350,17 +345,17 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
     views = []
     for p in urlpatterns:
-        if hasattr(p, '_get_callback'):
-            try:
-                views.append((p._get_callback(), base + p.regex.pattern))
-            except ViewDoesNotExist:
-                continue
-        elif hasattr(p, '_get_url_patterns'):
+        if hasattr(p, 'url_patterns'):
             try:
                 patterns = p.url_patterns
             except ImportError:
                 continue
             views.extend(extract_views_from_urlpatterns(patterns, base + p.regex.pattern))
+        elif hasattr(p, 'callback'):
+            try:
+                views.append((p.callback, base + p.regex.pattern))
+            except ViewDoesNotExist:
+                continue
         else:
             raise TypeError(_("%s does not appear to be a urlpattern object") % p)
     return views

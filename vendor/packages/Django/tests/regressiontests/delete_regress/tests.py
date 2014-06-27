@@ -1,12 +1,14 @@
+from __future__ import absolute_import
+
 import datetime
 
 from django.conf import settings
-from django.db import backend, connection, transaction, DEFAULT_DB_ALIAS
+from django.db import backend, transaction, DEFAULT_DB_ALIAS
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
-    PlayedWithNote, Contact, Email, Researcher, Food, Eaten,
-    Policy, Version, Location, Item)
+from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
+    PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
+    Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy)
 
 
 # Can't run this test under SQLite, because you can't
@@ -54,7 +56,7 @@ class DeleteLockingTest(TransactionTestCase):
         # Delete something using connection 2.
         cursor2 = self.conn2.cursor()
         cursor2.execute('DELETE from delete_regress_book WHERE id=1')
-        self.conn2._commit();
+        self.conn2._commit()
 
         # Now perform a queryset delete that covers the object
         # deleted in connection 2. This causes an infinite loop
@@ -145,3 +147,114 @@ class LargeDeleteTests(TestCase):
             track = Book.objects.create(pagecount=x+100)
         Book.objects.all().delete()
         self.assertEqual(Book.objects.count(), 0)
+
+
+
+class ProxyDeleteTest(TestCase):
+    """
+    Tests on_delete behavior for proxy models.
+
+    See #16128.
+
+    """
+    def create_image(self):
+        """Return an Image referenced by both a FooImage and a FooFile."""
+        # Create an Image
+        test_image = Image()
+        test_image.save()
+        foo_image = FooImage(my_image=test_image)
+        foo_image.save()
+
+        # Get the Image instance as a File
+        test_file = File.objects.get(pk=test_image.pk)
+        foo_file = FooFile(my_file=test_file)
+        foo_file.save()
+
+        return test_image
+
+
+    def test_delete_proxy(self):
+        """
+        Deleting the *proxy* instance bubbles through to its non-proxy and
+        *all* referring objects are deleted.
+
+        """
+        self.create_image()
+
+        Image.objects.all().delete()
+
+        # An Image deletion == File deletion
+        self.assertEqual(len(Image.objects.all()), 0)
+        self.assertEqual(len(File.objects.all()), 0)
+
+        # The Image deletion cascaded and *all* references to it are deleted.
+        self.assertEqual(len(FooImage.objects.all()), 0)
+        self.assertEqual(len(FooFile.objects.all()), 0)
+
+
+    def test_delete_proxy_of_proxy(self):
+        """
+        Deleting a proxy-of-proxy instance should bubble through to its proxy
+        and non-proxy parents, deleting *all* referring objects.
+
+        """
+        test_image = self.create_image()
+
+        # Get the Image as a Photo
+        test_photo = Photo.objects.get(pk=test_image.pk)
+        foo_photo = FooPhoto(my_photo=test_photo)
+        foo_photo.save()
+
+        Photo.objects.all().delete()
+
+        # A Photo deletion == Image deletion == File deletion
+        self.assertEqual(len(Photo.objects.all()), 0)
+        self.assertEqual(len(Image.objects.all()), 0)
+        self.assertEqual(len(File.objects.all()), 0)
+
+        # The Photo deletion should have cascaded and deleted *all*
+        # references to it.
+        self.assertEqual(len(FooPhoto.objects.all()), 0)
+        self.assertEqual(len(FooFile.objects.all()), 0)
+        self.assertEqual(len(FooImage.objects.all()), 0)
+
+
+    def test_delete_concrete_parent(self):
+        """
+        Deleting an instance of a concrete model should also delete objects
+        referencing its proxy subclass.
+
+        """
+        self.create_image()
+
+        File.objects.all().delete()
+
+        # A File deletion == Image deletion
+        self.assertEqual(len(File.objects.all()), 0)
+        self.assertEqual(len(Image.objects.all()), 0)
+
+        # The File deletion should have cascaded and deleted *all* references
+        # to it.
+        self.assertEqual(len(FooFile.objects.all()), 0)
+        self.assertEqual(len(FooImage.objects.all()), 0)
+
+
+    def test_delete_proxy_pair(self):
+        """
+        If a pair of proxy models are linked by an FK from one concrete parent
+        to the other, deleting one proxy model cascade-deletes the other, and
+        the deletion happens in the right order (not triggering an
+        IntegrityError on databases unable to defer integrity checks).
+
+        Refs #17918.
+
+        """
+        # Create an Image (proxy of File) and FooFileProxy (proxy of FooFile,
+        # which has an FK to File)
+        image = Image.objects.create()
+        as_file = File.objects.get(pk=image.pk)
+        FooFileProxy.objects.create(my_file=as_file)
+
+        Image.objects.all().delete()
+
+        self.assertEqual(len(FooFileProxy.objects.all()), 0)

@@ -28,6 +28,7 @@ import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils import datetime_safe
+from django.utils.timezone import is_aware
 
 def rfc2822_date(date):
     # We can't use strftime() because it produces locale-dependant results, so
@@ -40,9 +41,9 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    if date.tzinfo:
+    if is_aware(date):
         offset = date.tzinfo.utcoffset(date)
-        timezone = (offset.days * 24 * 60) + (offset.seconds / 60)
+        timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
         return time_str + "%+03d%02d" % (hour, minute)
     else:
@@ -51,10 +52,10 @@ def rfc2822_date(date):
 def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
-    if date.tzinfo:
+    if is_aware(date):
         time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
         offset = date.tzinfo.utcoffset(date)
-        timezone = (offset.days * 24 * 60) + (offset.seconds / 60)
+        timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
         return time_str + "%+03d:%02d" % (hour, minute)
     else:
@@ -66,17 +67,11 @@ def get_tag_uri(url, date):
 
     See http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
-    url_split = urlparse.urlparse(url)
-
-    # Python 2.4 didn't have named attributes on split results or the hostname.
-    hostname = getattr(url_split, 'hostname', url_split[1].split(':')[0])
-    path = url_split[2]
-    fragment = url_split[5]
-
+    bits = urlparse.urlparse(url)
     d = ''
     if date is not None:
         d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')
-    return u'tag:%s%s:%s/%s' % (hostname, d, path, fragment)
+    return u'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
@@ -205,7 +200,7 @@ class Enclosure(object):
         self.url = iri_to_uri(url)
 
 class RssFeed(SyndicationFeed):
-    mime_type = 'application/rss+xml'
+    mime_type = 'application/rss+xml; charset=utf-8'
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
         handler.startDocument()
@@ -230,7 +225,9 @@ class RssFeed(SyndicationFeed):
         handler.addQuickElement(u"title", self.feed['title'])
         handler.addQuickElement(u"link", self.feed['link'])
         handler.addQuickElement(u"description", self.feed['description'])
-        handler.addQuickElement(u"atom:link", None, {u"rel": u"self", u"href": self.feed['feed_url']})
+        if self.feed['feed_url'] is not None:
+            handler.addQuickElement(u"atom:link", None,
+                    {u"rel": u"self", u"href": self.feed['feed_url']})
         if self.feed['language'] is not None:
             handler.addQuickElement(u"language", self.feed['language'])
         for cat in self.feed['categories']:
@@ -291,7 +288,7 @@ class Rss201rev2Feed(RssFeed):
 
 class Atom1Feed(SyndicationFeed):
     # Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
-    mime_type = 'application/atom+xml; charset=utf8'
+    mime_type = 'application/atom+xml; charset=utf-8'
     ns = u"http://www.w3.org/2005/Atom"
 
     def write(self, outfile, encoding):

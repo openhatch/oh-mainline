@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.unittest import TestCase
 
 class PaginatorTests(TestCase):
@@ -26,6 +26,15 @@ class PaginatorTests(TestCase):
         self.assertEqual(expected, got,
             "For '%s', expected %s but got %s.  Paginator parameters were: %s"
             % (name, expected, got, params))
+
+    def test_invalid_page_number(self):
+        """
+        Tests that invalid page numbers result in the correct exception being
+        raised.
+        """
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertRaises(PageNotAnInteger, paginator.validate_number, None)
+        self.assertRaises(PageNotAnInteger, paginator.validate_number, 'x')
 
     def test_paginator(self):
         """
@@ -85,6 +94,11 @@ class PaginatorTests(TestCase):
             (([1, 2], 1, 1, True), (2, 1, [1])),
             (([1, 2, 3], 2, 1, True), (3, 1, [1])),
             ((eleven, 10, 1, True), (11, 1, [1])),
+            # Non-integer inputs
+            ((ten, '4', 1, False), (10, 3, [1, 2, 3])),
+            ((ten, u'4', 1, False), (10, 3, [1, 2, 3])),
+            ((ten, 4, '1', False), (10, 3, [1, 2, 3])),
+            ((ten, 4, u'1', False), (10, 3, [1, 2, 3])),
         )
         for params, output in tests:
             self.check_paginator(params, output)
@@ -154,3 +168,15 @@ class PaginatorTests(TestCase):
         self.assertRaises(EmptyPage, self.check_indexes, ([], 4, 0, False), 1, None)
         self.assertRaises(EmptyPage, self.check_indexes, ([], 4, 1, False), 1, None)
         self.assertRaises(EmptyPage, self.check_indexes, ([], 4, 2, False), 1, None)
+
+    def test_page_sequence(self):
+        """
+        Tests that a paginator page acts like a standard sequence.
+        """
+        eleven = 'abcdefghijk'
+        page2 = Paginator(eleven, per_page=5, orphans=1).page(2)
+        self.assertEqual(len(page2), 6)
+        self.assertTrue('k' in page2)
+        self.assertFalse('a' in page2)
+        self.assertEqual(''.join(page2), 'fghijk')
+        self.assertEqual(''.join(reversed(page2)), 'kjihgf')

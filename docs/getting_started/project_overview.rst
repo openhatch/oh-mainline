@@ -17,7 +17,7 @@ Other elements of the OpenHatch project:
 
 * The website is also powered by the "OpenHatch bugimporters," a separate Python-based codebase to download bugs from open source projects' bug trackers, based on Scrapy.
 
-  * code: https://github.com/openhatch/oh-bugimprters
+  * code: https://github.com/openhatch/oh-bugimporters
   * docs: http://oh-bugimporters.readthedocs.org/
   * main contact: http://lists.openhatch.org/mailman/listinfo/devel or #openhatch on irc.freenode.net
 
@@ -62,7 +62,7 @@ Oppia-based rewrite of the training missions:
  * main contact: Tarashish (sunu) on http://lists.openhatch.org/devel or #openhatch on irc.freenode.net
 
 "Greenhouse," a project to help open source projects greet new contributors:
-  * code: https://github.com/openhatch/oh-greenhousehttps://github.com/openhatch/oh-greenhouse
+  * code: https://github.com/openhatch/oh-greenhouse
   * main contact: Dave (daveeloo) on http://lists.openhatch.org/devel or #openhatc on irc.freenode.net
   * Other lists used by the project: http://lists.openhatch.org/mailman/listinfo/greenhouse and http://lists.alioth.debian.org/mailman/listinfo/welcome-team
 

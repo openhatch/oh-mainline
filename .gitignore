@@ -33,3 +33,10 @@ mysite/static/twisted-ping-dir/twisted-ping-file
 mysite/missions-userdata/git/*
 mysite/site.db
 mysite/local_settings.py
+.idea/
+.tags
+tags
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+

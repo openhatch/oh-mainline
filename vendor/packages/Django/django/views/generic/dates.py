@@ -1,10 +1,10 @@
-import time
 import datetime
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
@@ -192,7 +192,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         allow_empty = self.get_allow_empty()
 
         if not allow_future:
-            qs = qs.filter(**{'%s__lte' % date_field: datetime.datetime.now()})
+            qs = qs.filter(**{'%s__lte' % date_field: timezone.now()})
 
         if not allow_empty and not qs:
             raise Http404(_(u"No %(verbose_name_plural)s available") % {
@@ -460,7 +460,8 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
                                  month, self.get_month_format(),
                                  day, self.get_day_format())
 
-        qs = self.get_queryset()
+        # Use a custom queryset if provided
+        qs = queryset or self.get_queryset()
 
         if not self.get_allow_future() and date > datetime.date.today():
             raise Http404(_(u"Future %(verbose_name_plural)s not available because %(class_name)s.allow_future is False.") % {
@@ -495,7 +496,7 @@ def _date_from_string(year, year_format, month, month_format, day='', day_format
     format = delim.join((year_format, month_format, day_format))
     datestr = delim.join((year, month, day))
     try:
-        return datetime.date(*time.strptime(datestr, format)[:3])
+        return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
         raise Http404(_(u"Invalid date string '%(datestr)s' given format '%(format)s'") % {
             'datestr': datestr,

@@ -1,20 +1,16 @@
-from django.test import TestCase
-from django.core.exceptions import FieldError
+from __future__ import absolute_import
 
-from models import Author, Article
+from django.core.exceptions import FieldError
+from django.test import TestCase
+
+from .models import Author, Article
+
 
 def pks(objects):
     """ Return pks to be able to compare lists"""
     return [o.pk for o in objects]
 
 class CustomColumnRegression(TestCase):
-
-    def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception, e:
-            self.assertEqual(msg, str(e))
-            self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
 
     def setUp(self):
         self.a1 = Author.objects.create(first_name='John', last_name='Smith')

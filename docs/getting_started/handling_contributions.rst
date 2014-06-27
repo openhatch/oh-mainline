@@ -31,14 +31,14 @@ Test your changes
        additions. Try to apply `pep8`_ standards.
     3. Test your changes on a local instance of the website. Prove to yourself
        that your changes address the issue they are supposed to address.
-    4. Run the `test suite <internals/continuous_integration.html>`_, and make sure your unit tests pass and all tests that
+    4. Run the `test suite`_, and make sure your unit tests pass and all tests that
        passed before your changes still pass.
     5. Use a tool like `PyChecker`_ to check for bugs.
 
 
 .. _pep8: http://pypi.python.org/pypi/pep8
 .. _PyChecker: http://pypi.python.org/pypi/PyChecker/0.8.12
-
+.. _test suite: ../internals/continuous_integration.html
 
 Generate a pull request
 #######################
@@ -60,9 +60,15 @@ Submitting a pull request
     2. Change the issue status to "need-review".
     3. Join IRC and say that you have an issue ready for review.
 
+The pull request will be checked for code style errors (such as `pep8`_ violations) by the lint-review bot. To know more about the bot, see `Checking code style errors in pull requests with lint-review`_.
+
 If the reviewer says it's ready to go, your request will get merged in short
 order. If the reviewer has feedback he/she wants addressed, make the necessary
 revisions and start back at the "Check/test your changes" section.
+
+.. _pep8: http://pypi.python.org/pypi/pep8
+.. _Checking coding style errors in pull requests with lint-review: ../internals/pull_request_linting.html
+
 
 Permit us to share your work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,17 +117,17 @@ Things to think about:
 Push and deploy
 ~~~~~~~~~~~~~~~
 
-If you want to deploy the changes, and you have push access to the repository, you 
+If you want to deploy the changes, and you have push access to the repository, you
 can do so by following the steps listed in the section labeled `Deployment <http://openhatch.readthedocs.org/en/latest/advanced/deployment.html>`_.
 
-If you don't have push access, you will need to rope someone else in for this. Anyone 
-in the `Login team <http://openhatch.readthedocs.org/en/latest/community/login_team.html>`_ 
-can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the traditional 
+If you don't have push access, you will need to rope someone else in for this. Anyone
+in the `Login team <http://openhatch.readthedocs.org/en/latest/community/login_team.html>`_
+can do a push as well as deploy access. Asheesh Laroia (paulproteus) is the traditional
 person to do this, but it's good to ask someone else so they get practice!
 
 Things to know:
 
-    * If you push to origin/master, Hudson will test it.
+    * If you push to origin/master, Jenkins will test it.
     * Once you're happy, you can run the deploy script, but note that will push
       the current HEAD to origin/master. ::
 
@@ -131,8 +137,8 @@ Things to know:
 
     * When you deploy, check a page or two to make sure things are okay.
 
-For more details on how we use Hudson and how to force a Hudson build, see
-`Continuous integration with Hudson`_.
+For more details on how we use Jenkins and how to force a Jenkins build, see
+`Continuous integration with Jenkins and Travis CI`_.
 
 .. _Login team: https://openhatch.org/wiki/Login_team
-.. _Continuous integration with Hudson: ../internals/continuous_integration.html
+.. _Continuous integration with Jenkins and Travis CI: ../internals/continuous_integration.html

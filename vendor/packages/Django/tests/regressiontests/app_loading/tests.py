@@ -1,31 +1,13 @@
+from __future__ import absolute_import
+
 import copy
 import os
 import sys
 import time
 
 from django.conf import Settings
-from django.db.models.loading import cache, load_app
-from django.utils.unittest import TestCase, skipIf
-
-
-class InstalledAppsGlobbingTest(TestCase):
-    def setUp(self):
-        self.OLD_SYS_PATH = sys.path[:]
-        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-        self.OLD_TZ = os.environ.get("TZ")
-
-    @skipIf('test_settings' in sys.modules,
-            'A toplevel module named test_settings already exists')
-    def test_globbing(self):
-        settings = Settings('test_settings')
-        self.assertEqual(settings.INSTALLED_APPS, ['parent.app', 'parent.app1', 'parent.app_2'])
-
-    def tearDown(self):
-        sys.path = self.OLD_SYS_PATH
-        if hasattr(time, "tzset") and self.OLD_TZ:
-            os.environ["TZ"] = self.OLD_TZ
-            time.tzset()
-
+from django.db.models.loading import cache, load_app, get_model, get_models
+from django.utils.unittest import TestCase
 
 class EggLoadingTest(TestCase):
 
@@ -83,3 +65,45 @@ class EggLoadingTest(TestCase):
             # Make sure the message is indicating the actual
             # problem in the broken app.
             self.assertTrue("modelz" in e.args[0])
+
+
+class GetModelsTest(TestCase):
+    def setUp(self):
+        from .not_installed import models
+        self.not_installed_module = models
+
+
+    def test_get_model_only_returns_installed_models(self):
+        self.assertEqual(
+            get_model("not_installed", "NotInstalledModel"), None)
+
+
+    def test_get_model_with_not_installed(self):
+        self.assertEqual(
+            get_model(
+                "not_installed", "NotInstalledModel", only_installed=False),
+            self.not_installed_module.NotInstalledModel)
+
+
+    def test_get_models_only_returns_installed_models(self):
+        self.assertFalse(
+            "NotInstalledModel" in
+            [m.__name__ for m in get_models()])
+
+
+    def test_get_models_with_app_label_only_returns_installed_models(self):
+        self.assertEqual(get_models(self.not_installed_module), [])
+
+
+    def test_get_models_with_not_installed(self):
+        self.assertTrue(
+            "NotInstalledModel" in [
+                m.__name__ for m in get_models(only_installed=False)])
+
+
+class NotInstalledModelsTest(TestCase):
+    def test_related_not_installed_model(self):
+        from .not_installed.models import NotInstalledModel
+        self.assertEqual(
+            set(NotInstalledModel._meta.get_all_field_names()),
+            set(["id", "relatedmodel", "m2mrelatedmodel"]))

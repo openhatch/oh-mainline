@@ -34,6 +34,12 @@ function notify_web_server() {
     touch mysite/scripts/app.wsgi
 }
 
+function notify_github() {
+    ### Update deploy_$(hostname) branch on github.com so that
+    ### it is very clear which commits are deployed where.
+    git push origin HEAD:deployed_$(hostname -f)
+}
+
 ### Update the bug import code
 cd ~/oh-bugimporters
 check_for_changed_files
@@ -44,5 +50,6 @@ cd ~/milestone-a
 
 check_for_changed_files
 update_to_latest
+notify_github
 update_database
 notify_web_server

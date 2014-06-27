@@ -1,5 +1,5 @@
 from django.db import models
-from django.conf import settings
+
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -12,3 +12,8 @@ class Article(models.Model):
         app_label = 'fixtures_model_package'
         ordering = ('-pub_date', 'headline')
 
+class Book(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ('name',)

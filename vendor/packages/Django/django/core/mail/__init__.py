@@ -11,15 +11,15 @@ from django.utils.importlib import import_module
 # django/core/mail.py before the introduction of email
 # backends and the subsequent reorganization (See #10355)
 from django.core.mail.utils import CachedDnsName, DNS_NAME
-from django.core.mail.message import \
-    EmailMessage, EmailMultiAlternatives, \
-    SafeMIMEText, SafeMIMEMultipart, \
-    DEFAULT_ATTACHMENT_MIME_TYPE, make_msgid, \
-    BadHeaderError, forbid_multi_line_headers
-from django.core.mail.backends.smtp import EmailBackend as _SMTPConnection
+from django.core.mail.message import (
+    EmailMessage, EmailMultiAlternatives,
+    SafeMIMEText, SafeMIMEMultipart,
+    DEFAULT_ATTACHMENT_MIME_TYPE, make_msgid,
+    BadHeaderError, forbid_multi_line_headers)
+
 
 def get_connection(backend=None, fail_silently=False, **kwds):
-    """Load an e-mail backend and return an instance of it.
+    """Load an email backend and return an instance of it.
 
     If backend is None (default) settings.EMAIL_BACKEND is used.
 
@@ -65,7 +65,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
                    auth_password=None, connection=None):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), sends
-    each message to each recipient list. Returns the number of e-mails sent.
+    each message to each recipient list. Returns the number of emails sent.
 
     If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
     If auth_user and auth_password are set, they're used to log in.
@@ -107,13 +107,3 @@ def mail_managers(subject, message, fail_silently=False, connection=None,
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
     mail.send(fail_silently=fail_silently)
-
-
-class SMTPConnection(_SMTPConnection):
-    def __init__(self, *args, **kwds):
-        import warnings
-        warnings.warn(
-            'mail.SMTPConnection is deprecated; use mail.get_connection() instead.',
-            DeprecationWarning
-        )
-        super(SMTPConnection, self).__init__(*args, **kwds)

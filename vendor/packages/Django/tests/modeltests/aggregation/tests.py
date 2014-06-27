@@ -1,14 +1,16 @@
+from __future__ import absolute_import
+
 import datetime
 from decimal import Decimal
 
 from django.db.models import Avg, Sum, Count, Max, Min
 from django.test import TestCase, Approximate
 
-from models import Author, Publisher, Book, Store
+from .models import Author, Publisher, Book, Store
 
 
 class BaseAggregateTestCase(TestCase):
-    fixtures = ["initial_data.json"]
+    fixtures = ["aggregation.json"]
 
     def test_empty_aggregate(self):
         self.assertEqual(Author.objects.all().aggregate(), {})

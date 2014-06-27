@@ -5,63 +5,62 @@ Databrowse
 .. module:: django.contrib.databrowse
    :synopsis: Databrowse is a Django application that lets you browse your data.
 
+.. deprecated:: 1.4
+    This module has been deprecated.
+
 Databrowse is a Django application that lets you browse your data.
 
 As the Django admin dynamically creates an admin interface by introspecting
 your models, Databrowse dynamically creates a rich, browsable Web site by
 introspecting your models.
 
-.. admonition:: Note
-
-    Databrowse is **very** new and is currently under active development. It
-    may change substantially before the next Django release.
-
-    With that said, it's easy to use, and it doesn't require writing any
-    code. So you can play around with it today, with very little investment in
-    time or coding.
-
 How to use Databrowse
 =====================
 
-    1. Point Django at the default Databrowse templates. There are two ways to
-       do this:
+1. Point Django at the default Databrowse templates. There are two ways to
+   do this:
 
-       * Add ``'django.contrib.databrowse'`` to your :setting:`INSTALLED_APPS`
-         setting. This will work if your :setting:`TEMPLATE_LOADERS` setting
-         includes the ``app_directories`` template loader (which is the case by
-         default). See the :ref:`template loader docs <template-loaders>` for
-         more.
+   * Add ``'django.contrib.databrowse'`` to your :setting:`INSTALLED_APPS`
+     setting. This will work if your :setting:`TEMPLATE_LOADERS` setting
+     includes the ``app_directories`` template loader (which is the case by
+     default). See the :ref:`template loader docs <template-loaders>` for
+     more.
 
-       * Otherwise, determine the full filesystem path to the
-         :file:`django/contrib/databrowse/templates` directory, and add that
-         directory to your :setting:`TEMPLATE_DIRS` setting.
+   * Otherwise, determine the full filesystem path to the
+     :file:`django/contrib/databrowse/templates` directory, and add that
+     directory to your :setting:`TEMPLATE_DIRS` setting.
 
-    2. Register a number of models with the Databrowse site::
+2. Register a number of models with the Databrowse site::
 
-           from django.contrib import databrowse
-           from myapp.models import SomeModel, SomeOtherModel
+       from django.contrib import databrowse
+       from myapp.models import SomeModel, SomeOtherModel, YetAnotherModel
 
-           databrowse.site.register(SomeModel)
-           databrowse.site.register(SomeOtherModel)
+       databrowse.site.register(SomeModel)
+       databrowse.site.register(SomeOtherModel, YetAnotherModel)
 
-       Note that you should register the model *classes*, not instances.
+   Note that you should register the model *classes*, not instances.
 
-       It doesn't matter where you put this, as long as it gets executed at some
-       point. A good place for it is in your :doc:`URLconf file
-       </topics/http/urls>` (``urls.py``).
+   .. versionchanged:: 1.4
 
-    3. Change your URLconf to import the :mod:`~django.contrib.databrowse` module::
+   Since Django 1.4, it is possible to register several models in the same
+   call to :func:`~databrowse.site.register`.
 
-           from django.contrib import databrowse
+   It doesn't matter where you put this, as long as it gets executed at some
+   point. A good place for it is in your :doc:`URLconf file
+   </topics/http/urls>` (``urls.py``).
 
-       ...and add the following line to your URLconf::
+3. Change your URLconf to import the :mod:`~django.contrib.databrowse` module::
 
-           (r'^databrowse/(.*)', databrowse.site.root),
+       from django.contrib import databrowse
 
-       The prefix doesn't matter -- you can use ``databrowse/`` or ``db/`` or
-       whatever you'd like.
+   ...and add the following line to your URLconf::
 
-    4. Run the Django server and visit ``/databrowse/`` in your browser.
+       (r'^databrowse/(.*)', databrowse.site.root),
+
+   The prefix doesn't matter -- you can use ``databrowse/`` or ``db/`` or
+   whatever you'd like.
+
+4. Run the Django server and visit ``/databrowse/`` in your browser.
 
 Requiring user login
 ====================

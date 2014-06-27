@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement, absolute_import
+
 import datetime
+
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import models
 from django.forms import Form, ModelForm, FileField, ModelChoiceField
+from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
-from regressiontests.forms.models import ChoiceModel, ChoiceOptionModel, ChoiceFieldModel, FileModel, Group, BoundaryModel, Defaults
+
+from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
+    BoundaryModel, Defaults)
 
 
 class ChoiceFieldForm(ModelForm):
@@ -21,11 +28,10 @@ class TestTicket12510(TestCase):
         self.groups = [Group.objects.create(name=name) for name in 'abc']
 
     def test_choices_not_fetched_when_not_rendering(self):
-        def test():
+        # only one query is required to pull the model from DB
+        with self.assertNumQueries(1):
             field = ModelChoiceField(Group.objects.order_by('-name'))
             self.assertEqual('a', field.clean(self.groups[0].pk).name)
-        # only one query is required to pull the model from DB
-        self.assertNumQueries(1, test)
 
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):
@@ -41,7 +47,7 @@ class ModelFormCallableModelDefault(TestCase):
         obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
-        self.assertEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
+        self.assertHTMLEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
@@ -67,7 +73,7 @@ class ModelFormCallableModelDefault(TestCase):
         obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
-        self.assertEqual(ChoiceFieldForm(initial={
+        self.assertHTMLEqual(ChoiceFieldForm(initial={
                 'choice': obj2,
                 'choice_int': obj2,
                 'multi_choice': [obj2,obj3],
@@ -159,3 +165,34 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.name, u'class default value')
         self.assertEqual(obj.value, 99)
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
+
+class RelatedModelFormTests(TestCase):
+    def test_invalid_loading_order(self):
+        """
+        Test for issue 10405
+        """
+        class A(models.Model):
+            ref = models.ForeignKey("B")
+
+        class Meta:
+            model=A
+
+        self.assertRaises(ValueError, ModelFormMetaclass, 'Form', (ModelForm,), {'Meta': Meta})
+
+        class B(models.Model):
+            pass
+
+    def test_valid_loading_order(self):
+        """
+        Test for issue 10405
+        """
+        class A(models.Model):
+            ref = models.ForeignKey("B")
+
+        class B(models.Model):
+            pass
+
+        class Meta:
+            model=A
+
+        self.assertTrue(issubclass(ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta}), ModelForm))

@@ -11,6 +11,7 @@ packages/django-authopenid
 packages/django-celery
 packages/django-debug-toolbar
 packages/django-extensions
+packages/django-inplaceedit
 packages/django-invitation
 packages/django-kombu
 packages/django-model-utils
@@ -52,6 +53,7 @@ packages/sessionprofile
 packages/six
 packages/south
 packages/sphinx
+packages/sqlparse
 packages/staticgenerator
 packages/twill
 packages/twisted

@@ -17,10 +17,10 @@ class osx_install_data(install_data):
         self.set_undefined_options('install', ('install_lib', 'install_dir'))
         install_data.finalize_options(self)
 
-if sys.platform == "darwin": 
-    cmdclasses = {'install_data': osx_install_data} 
-else: 
-    cmdclasses = {'install_data': install_data} 
+if sys.platform == "darwin":
+    cmdclasses = {'install_data': osx_install_data}
+else:
+    cmdclasses = {'install_data': install_data}
 
 def fullsplit(path, result=None):
     """
@@ -36,7 +36,7 @@ def fullsplit(path, result=None):
         return result
     return fullsplit(head, [tail] + result)
 
-# Tell distutils to put the data_files in platform-specific installation
+# Tell distutils not to put the data_files in platform-specific installation
 # locations. See here for an explanation:
 # http://groups.google.com/group/comp.lang.python/browse_thread/thread/35ec7b2fed36eaec/2105ee4d9e8042cb
 for scheme in INSTALL_SCHEMES.values():
@@ -67,36 +67,34 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
-if u'SVN' in version:
-    version = ' '.join(version.split(' ')[:-1])
 
 setup(
     name = "Django",
-    version = version.replace(' ', '-'),
+    version = version,
     url = 'http://www.djangoproject.com/',
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
-    download_url = 'https://www.djangoproject.com/m/releases/1.3/Django-1.3.3.tar.gz',
+    download_url = 'https://www.djangoproject.com/m/releases/1.4/Django-1.4.13.tar.gz',
     packages = packages,
     cmdclass = cmdclasses,
     data_files = data_files,
     scripts = ['django/bin/django-admin.py'],
-    classifiers = ['Development Status :: 5 - Production/Stable',
-                   'Environment :: Web Environment',
-                   'Framework :: Django',
-                   'Intended Audience :: Developers',
-                   'License :: OSI Approved :: BSD License',
-                   'Operating System :: OS Independent',
-                   'Programming Language :: Python',
-                   'Programming Language :: Python :: 2.4',
-                   'Programming Language :: Python :: 2.5',
-                   'Programming Language :: Python :: 2.6',
-                   'Programming Language :: Python :: 2.7',
-                   'Topic :: Internet :: WWW/HTTP',
-                   'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-                   'Topic :: Internet :: WWW/HTTP :: WSGI',
-                   'Topic :: Software Development :: Libraries :: Application Frameworks',
-                   'Topic :: Software Development :: Libraries :: Python Modules',
-                   ],
+    classifiers = [
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Web Environment',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Internet :: WWW/HTTP :: WSGI',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+   ],
 )

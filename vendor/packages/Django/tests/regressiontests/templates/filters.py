@@ -113,7 +113,7 @@ def get_filter_tests():
         'filter-make_list03': ('{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}', {"a": mark_safe("&")}, u"[u'&']"),
         'filter-make_list04': ('{{ a|make_list|stringformat:"s"|safe }}', {"a": mark_safe("&")}, u"[u'&']"),
 
-        # Running slugify on a pre-escaped string leads to odd behaviour,
+        # Running slugify on a pre-escaped string leads to odd behavior,
         # but the result is still safe.
         'filter-slugify01': ("{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}", {"a": "a & b", "b": mark_safe("a &amp; b")}, u"a-b a-amp-b"),
         'filter-slugify02': ("{{ a|slugify }} {{ b|slugify }}", {"a": "a & b", "b": mark_safe("a &amp; b")}, u"a-b a-amp-b"),
@@ -133,6 +133,9 @@ def get_filter_tests():
             {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha & ... alpha &amp; ..."),
         'filter-truncatewords02': ('{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}',
             {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha &amp; ... alpha &amp; ..."),
+
+        'filter-truncatechars01': ('{{ a|truncatechars:5 }}', {'a': "Testing, testing"}, u"Te..."),
+        'filter-truncatechars02': ('{{ a|truncatechars:7 }}', {'a': "Testing"}, u"Testing"),
 
         # The "upper" filter messes up entities (which are case-sensitive),
         # so it's not safe for non-escaping purposes.
@@ -342,11 +345,17 @@ def get_filter_tests():
         'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
         #Ticket 9520: Make sure |date doesn't blow up on non-dates
         'date03': (r'{{ d|date:"m" }}', {'d': 'fail_string'}, ''),
+        # ISO date formats
+        'date04': (r'{{ d|date:"o" }}', {'d': datetime(2008, 12, 29)}, '2009'),
+        'date05': (r'{{ d|date:"o" }}', {'d': datetime(2010, 1, 3)}, '2009'),
+        # Timezone name
+        'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'),
+        'date07': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''),
 
-         # Tests for #11687
+         # Tests for #11687 and #16676
          'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
-         'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, '2000'),
-         'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, 'not_an_int'),
+         'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, ''),
+         'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, ''),
          'add04': (r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'),
          'add05': (r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'),
          'add06': (r'{{ t1|add:t2 }}', {'t1': (3, 4), 't2': (1, 2)}, '(3, 4, 1, 2)'),

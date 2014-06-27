@@ -1,7 +1,7 @@
 from django import forms
-from django.conf import settings
 from django.contrib.admin.util import (flatten_fieldsets, lookup_field,
     display_for_field, label_for_field, help_text_for_field)
+from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
@@ -11,6 +11,7 @@ from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 
 ACTION_CHECKBOX_NAME = '_selected_action'
@@ -75,8 +76,11 @@ class Fieldset(object):
 
     def _media(self):
         if 'collapse' in self.classes:
-            js = ['js/jquery.min.js', 'js/jquery.init.js', 'js/collapse.min.js']
-            return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
+            extra = '' if settings.DEBUG else '.min'
+            js = ['jquery%s.js' % extra,
+                  'jquery.init.js',
+                  'collapse%s.js' % extra]
+            return forms.Media(js=[static('admin/js/%s' % url) for url in js])
         return forms.Media()
     media = property(_media)
 
@@ -115,17 +119,17 @@ class AdminField(object):
 
     def label_tag(self):
         classes = []
+        contents = conditional_escape(force_unicode(self.field.label))
         if self.is_checkbox:
             classes.append(u'vCheckboxLabel')
-            contents = force_unicode(escape(self.field.label))
         else:
-            contents = force_unicode(escape(self.field.label)) + u':'
+            contents += u':'
         if self.field.field.required:
             classes.append(u'required')
         if not self.is_first:
             classes.append(u'inline')
         attrs = classes and {'class': u' '.join(classes)} or {}
-        return self.field.label_tag(contents=contents, attrs=attrs)
+        return self.field.label_tag(contents=mark_safe(contents), attrs=attrs)
 
     def errors(self):
         return mark_safe(self.field.errors.as_ul())
@@ -193,7 +197,8 @@ class InlineAdminFormSet(object):
     """
     A wrapper around an inline formset for use in the admin system.
     """
-    def __init__(self, inline, formset, fieldsets, readonly_fields=None, model_admin=None):
+    def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
+            readonly_fields=None, model_admin=None):
         self.opts = inline
         self.formset = formset
         self.fieldsets = fieldsets
@@ -201,18 +206,21 @@ class InlineAdminFormSet(object):
         if readonly_fields is None:
             readonly_fields = ()
         self.readonly_fields = readonly_fields
+        if prepopulated_fields is None:
+            prepopulated_fields = {}
+        self.prepopulated_fields = prepopulated_fields
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             yield InlineAdminForm(self.formset, form, self.fieldsets,
-                self.opts.prepopulated_fields, original, self.readonly_fields,
+                self.prepopulated_fields, original, self.readonly_fields,
                 model_admin=self.opts)
         for form in self.formset.extra_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets,
-                self.opts.prepopulated_fields, None, self.readonly_fields,
+                self.prepopulated_fields, None, self.readonly_fields,
                 model_admin=self.opts)
         yield InlineAdminForm(self.formset, self.formset.empty_form,
-            self.fieldsets, self.opts.prepopulated_fields, None,
+            self.fieldsets, self.prepopulated_fields, None,
             self.readonly_fields, model_admin=self.opts)
 
     def fields(self):

@@ -13,6 +13,8 @@ return model instances`__, or you can avoid the model layer entirely and
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
 
+.. _executing-raw-queries:
+
 Performing raw queries
 ======================
 
@@ -66,6 +68,16 @@ options that make it very powerful.
     Django expects that the statement will return a set of rows from the
     database, but does nothing to enforce that. If the query does not
     return rows, a (possibly cryptic) error will result.
+
+.. warning::
+
+    If you are performing queries on MySQL, note that MySQL's silent type coercion
+    may cause unexpected results when mixing types. If you query on a string
+    type column, but with an integer value, MySQL will coerce the types of all values
+    in the table to an integer before performing the comparison. For example, if your
+    table contains the values ``'abc'``, ``'def'`` and you query for ``WHERE mycolumn=0``,
+    both rows will match. To prevent this, perform the correct typecasting
+    before using the value in a query.
 
 Mapping query fields to model fields
 ------------------------------------
@@ -122,8 +134,8 @@ Fields may also be left out::
     >>> people = Person.objects.raw('SELECT id, first_name FROM myapp_person')
 
 The ``Person`` objects returned by this query will be deferred model instances
-(see :meth:`~django.db.models.QuerySet.defer()`). This means that the fields
-that are omitted from the query will be loaded on demand. For example::
+(see :meth:`~django.db.models.query.QuerySet.defer()`). This means that the
+fields that are omitted from the query will be loaded on demand. For example::
 
     >>> for p in Person.objects.raw('SELECT id, first_name FROM myapp_person'):
     ...     print p.first_name, # This will be retrieved by the original query
@@ -189,6 +201,8 @@ parameters from the ``params`` list.
     ``params`` list you'll be protected.
 
 __ http://en.wikipedia.org/wiki/SQL_injection
+
+.. _executing-custom-sql:
 
 Executing custom SQL directly
 =============================
@@ -279,14 +293,12 @@ as dirty using ``transaction.set_dirty()`` when using raw SQL calls.
 Connections and cursors
 -----------------------
 
-``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
-(except when it comes to :doc:`transaction handling </topics/db/transactions>`).
-If you're not familiar with the Python DB-API, note that the SQL statement in
-``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
-directly within the SQL. If you use this technique, the underlying database
-library will automatically add quotes and escaping to your parameter(s) as
-necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
-``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
-the sake of consistency and sanity.)
-
-.. _Python DB-API: http://www.python.org/dev/peps/pep-0249/
+``connection`` and ``cursor`` mostly implement the standard Python DB-API
+described in :pep:`249` (except when it comes to :doc:`transaction handling
+</topics/db/transactions>`). If you're not familiar with the Python DB-API, note
+that the SQL statement in ``cursor.execute()`` uses placeholders, ``"%s"``,
+rather than adding parameters directly within the SQL. If you use this
+technique, the underlying database library will automatically add quotes and
+escaping to your parameter(s) as necessary. (Also note that Django expects the
+``"%s"`` placeholder, *not* the ``"?"`` placeholder, which is used by the SQLite
+Python bindings. This is for the sake of consistency and sanity.)

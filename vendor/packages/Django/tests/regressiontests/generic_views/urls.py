@@ -1,8 +1,10 @@
-from django.conf.urls.defaults import *
-from django.views.generic import TemplateView
-from django.views.decorators.cache import cache_page
+from __future__ import absolute_import
 
-import views
+from django.conf.urls import patterns, url
+from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView
+
+from . import views
 
 
 urlpatterns = patterns('',
@@ -30,8 +32,12 @@ urlpatterns = patterns('',
     url(r'^detail/author/(?P<pk>\d+)/$',
         views.AuthorDetail.as_view(),
         name="author_detail"),
+    (r'^detail/author/bycustompk/(?P<foo>\d+)/$',
+        views.AuthorDetail.as_view(pk_url_kwarg='foo')),
     (r'^detail/author/byslug/(?P<slug>[\w-]+)/$',
         views.AuthorDetail.as_view()),
+    (r'^detail/author/bycustomslug/(?P<foo>[\w-]+)/$',
+        views.AuthorDetail.as_view(slug_url_kwarg='foo')),
     (r'^detail/author/(?P<pk>\d+)/template_name_suffix/$',
         views.AuthorDetail.as_view(template_name_suffix='_view')),
     (r'^detail/author/(?P<pk>\d+)/template_name/$',
@@ -211,6 +217,9 @@ urlpatterns = patterns('',
 
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/byslug/(?P<slug>[\w-]+)/$',
         views.BookDetail.as_view()),
+
+    (r'^dates/books/get_object_custom_queryset/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/(?P<pk>\d+)/$',
+        views.BookDetailGetObjectCustomQueryset.as_view()),
 
     # Useful for testing redirects
     (r'^accounts/login/$',  'django.contrib.auth.views.login')

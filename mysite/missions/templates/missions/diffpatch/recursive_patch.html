@@ -58,6 +58,12 @@
       <div class="form-row">
         <a name="patchrecursive-form"></a>
 	<br style="clear: left;" />
+    {% if patchrecursive_form.amount_of_garlic.errors %}
+        <ul class="errorlist">
+            <li style="width: inherit;">{{ patchrecursive_form.amount_of_garlic.errors }}</li>
+        </ul>
+        <br style="clear: left;" />
+    {% endif %}
 	How many cloves of garlic would now be required to cook both recipes in the recipes/ directory? <br style="clear: left;" />
 	{{ patchrecursive_form.amount_of_garlic }}
 	<br style="clear: left;" />
@@ -89,18 +95,17 @@
 	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
     </div>
     <div id="low">
-      <pre>man patch</pre>
-      <p>or
-	<a href="http://linux.die.net/man/1/patch">read the patch page online</a>.</p>
+      <p><a href="http://linux.die.net/man/1/patch">Read the man page for patch online</a>,</p>
+      <p>or, if you're on Linux or Mac, use the terminal command: <pre>man patch</pre></p>
     </div>
     <div id="medium">
       <p>Tips:</p>
 
-      <p>You can invoke <code>patch</code> on the downloaded file as follows:</p>
+      <p>You can invoke <tt>patch</tt> on the downloaded file as follows:</p>
 
-      <p><code>patch -p1 &lt; recipes.patch</code></p>
+      <p><pre>patch -p1 &lt; recipes.patch</pre></p>
 
-      <p>That should apply the patch file. Open up <code>recipes.patch</code> in a text editor and read the patch file "headers". Pay special attention to the directory paths. The <code>-p1</code> says to ignore up through the first "/" in the paths in the patch headers when trying to find files to patch.</p>
+      <p>That should apply the patch file. Open up <tt>recipes.patch</tt> in a text editor and read the patch file "headers". Pay special attention to the directory paths. The <tt>-p1</tt> says to ignore up through the first "/" in the paths in the patch headers when trying to find files to patch.</p>
     </div>
     <div id="high">
       <p>Open a command prompt, and type these commands in, one at a time. You need to copy them exactly. Make sure to press enter between each one.</p>
@@ -111,7 +116,7 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
       </pre>
       <p>Unpack it, but do not change into its directory.</p>
       <pre>
@@ -119,10 +124,10 @@
       </pre>
       <p>Now, download the patch file contributed by the "enterprising American" in this mission step:</p>
       <pre>
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}
       </pre>
       <p>Apply that patch (you can read more in the "medium" hints about how this works):</p>
-      <p><code>patch -p1 &lt; more-garlic.patch</code></p>
+      <p><code>patch -p1 &lt; recipes.patch</code></p>
       <p>Now, change directory into <tt>recipes</tt> and open each of the text files in your favorite text editor. Answer the question above!</p>
     </div>
   </div>

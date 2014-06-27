@@ -472,12 +472,6 @@ function updatePortfolio(response) {
 
     bindEventHandlers();
 
-    if (typeof response.messages != 'undefined') {
-        for (var m = 0; m < response.messages.length; m++) {
-            Notifier.displayMessage(response.messages[m]);
-        };
-    }
-
     SaveAllButton.updateDisplay();
 
     var conditions = PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue;
@@ -664,6 +658,7 @@ FlagIcon.flag = function () {
     var $flaggerLink = $(this);
 
     FlagIcon.postOptions.data = {
+        'csrfmiddlewaretoken': $.cookie('csrftoken'),
         'portfolio_entry__pk': $flaggerLink.closest('.portfolio_entry')
             .attr('portfolio_entry__pk')
     };
@@ -799,6 +794,7 @@ PortfolioEntry.Save.save = function () {
         }
     }
     PortfolioEntry.Save.postOptions.data = {
+        'csrfmiddlewaretoken': $.cookie('csrftoken'),
         'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
         'project_name': $pfEntry.find('.project_name').val(),
         'project_description': $pfEntry.find('.project_description').val(),
@@ -853,6 +849,7 @@ PortfolioEntry.Delete.deleteIt = function (deleteLink) {
     }
     else {
         PortfolioEntry.Delete.postOptions.data = {
+            'csrfmiddlewaretoken': $.cookie('csrftoken'),
             'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
         };
         PortfolioEntry.Delete.post();

@@ -1,16 +1,28 @@
+from __future__ import absolute_import
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
+from django.views.generic.edit import FormMixin
 
-from regressiontests.generic_views.models import Artist, Author
-from regressiontests.generic_views import views
+from . import views
+from .models import Artist, Author
+
+
+class FormMixinTests(TestCase):
+     def test_initial_data(self):
+         """ Test instance independence of initial data dict (see #16138) """
+         initial_1 = FormMixin().get_initial()
+         initial_1['foo'] = 'bar'
+         initial_2 = FormMixin().get_initial()
+         self.assertNotEqual(initial_1, initial_2)
 
 class ModelFormMixinTests(TestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
-        self.assertEqual(form_class.Meta.model, Author)
+        self.assertEqual(form_class._meta.model, Author)
 
 class CreateViewTests(TestCase):
     urls = 'regressiontests.generic_views.urls'
@@ -123,6 +135,10 @@ class UpdateViewTests(TestCase):
 
         res = self.client.put('/edit/author/%d/update/' % a.pk,
                         {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
+        # Here is the expected failure. PUT data are not processed in any special
+        # way by django. So the request will equal to a POST without data, hence
+        # the form will be invalid and redisplayed with errors (status code 200).
+        # See also #12635
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])

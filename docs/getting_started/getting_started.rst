@@ -31,7 +31,7 @@ kind of a big repository. (Sixty megabytes, or so.)
 How to run a local site
 =======================
 
-Read installation.rst inside getting_started directory
+Read installation.rst inside docs/getting_started directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you have the repository, open up the installation.rst file in any
@@ -55,10 +55,10 @@ but we'll all be happier if you do)
   1. Join the `Devel mailing list`_ and say hello.
   2. :doc:`the #openhatch IRC channel in freenode </community/contact>`.
 
-We used to have weekly development meetings on IRC, but they are on hiatus for now. If you find the idea interesting and would show up, do `email devel@`_ and say so!
+
+OpenHatch holds development meetings on IRC; our goal is to hold these meetings weekly. The meetings are announced on `devel@openhatch.org`. Please join us on IRC and share your ideas or ask questions.
 
 .. _Devel mailing list: http://lists.openhatch.org/mailman/listinfo/devel
-.. _email devel@: devel@lists.openhatch.org
 
 
 Read more documentation

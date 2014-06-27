@@ -1,6 +1,15 @@
+from __future__ import with_statement
+import os
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm,  PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm
+from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
+    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
+from django.core import mail
+from django.forms.fields import Field, EmailField
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.encoding import force_unicode
+from django.utils import translation
+from django.utils.translation import ugettext as _
 
 
 class UserCreationFormTest(TestCase):
@@ -16,7 +25,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [u'A user with that username already exists.'])
+                         [force_unicode(form.error_messages['duplicate_username'])])
 
     def test_invalid_data(self):
         data = {
@@ -27,8 +36,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [u'This value may contain only letters, numbers and @/./+/-/_ characters.'])
-
+                         [force_unicode(form.fields['username'].error_messages['invalid'])])
 
     def test_password_verification(self):
         # The verification password is incorrect.
@@ -40,29 +48,24 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["password2"].errors,
-                         [u"The two password fields didn't match."])
-
+                         [force_unicode(form.error_messages['password_mismatch'])])
 
     def test_both_passwords(self):
         # One (or both) passwords weren't given
         data = {'username': 'jsmith'}
         form = UserCreationForm(data)
+        required_error = [force_unicode(Field.default_error_messages['required'])]
         self.assertFalse(form.is_valid())
-        self.assertEqual(form['password1'].errors,
-                         [u'This field is required.'])
-        self.assertEqual(form['password2'].errors,
-                         [u'This field is required.'])
-
+        self.assertEqual(form['password1'].errors, required_error)
+        self.assertEqual(form['password2'].errors, required_error)
 
         data['password2'] = 'test123'
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form['password1'].errors,
-                         [u'This field is required.'])
+        self.assertEqual(form['password1'].errors, required_error)
 
     def test_success(self):
         # The success case.
-
         data = {
             'username': 'jsmith@example.com',
             'password1': 'test123',
@@ -72,6 +75,8 @@ class UserCreationFormTest(TestCase):
         self.assertTrue(form.is_valid())
         u = form.save()
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
+
+UserCreationFormTest = override_settings(USE_TZ=False)(UserCreationFormTest)
 
 
 class AuthenticationFormTest(TestCase):
@@ -88,7 +93,7 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [u'Please enter a correct username and password. Note that both fields are case-sensitive.'])
+                         [force_unicode(form.error_messages['invalid_login'])])
 
     def test_inactive_user(self):
         # The user is inactive.
@@ -99,8 +104,20 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
-                         [u'This account is inactive.'])
+                         [force_unicode(form.error_messages['inactive'])])
 
+    def test_inactive_user_i18n(self):
+        with self.settings(USE_I18N=True):
+            with translation.override('pt-br', deactivate=True):
+                # The user is inactive.
+                data = {
+                    'username': 'inactive',
+                    'password': 'password',
+                    }
+                form = AuthenticationForm(None, data)
+                self.assertFalse(form.is_valid())
+                self.assertEqual(form.non_field_errors(),
+                                 [force_unicode(form.error_messages['inactive'])])
 
     def test_success(self):
         # The success case
@@ -111,6 +128,8 @@ class AuthenticationFormTest(TestCase):
         form = AuthenticationForm(None, data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
+
+AuthenticationFormTest = override_settings(USE_TZ=False)(AuthenticationFormTest)
 
 
 class SetPasswordFormTest(TestCase):
@@ -127,7 +146,7 @@ class SetPasswordFormTest(TestCase):
         form = SetPasswordForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
-                         [u"The two password fields didn't match."])
+                         [force_unicode(form.error_messages['password_mismatch'])])
 
     def test_success(self):
         user = User.objects.get(username='testclient')
@@ -137,6 +156,8 @@ class SetPasswordFormTest(TestCase):
             }
         form = SetPasswordForm(user, data)
         self.assertTrue(form.is_valid())
+
+SetPasswordFormTest = override_settings(USE_TZ=False)(SetPasswordFormTest)
 
 
 class PasswordChangeFormTest(TestCase):
@@ -153,8 +174,7 @@ class PasswordChangeFormTest(TestCase):
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["old_password"].errors,
-                         [u'Your old password was entered incorrectly. Please enter it again.'])
-
+                         [force_unicode(form.error_messages['password_incorrect'])])
 
     def test_password_verification(self):
         # The two new passwords do not match.
@@ -167,8 +187,7 @@ class PasswordChangeFormTest(TestCase):
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors,
-                         [u"The two password fields didn't match."])
-
+                         [force_unicode(form.error_messages['password_mismatch'])])
 
     def test_success(self):
         # The success case.
@@ -187,6 +206,9 @@ class PasswordChangeFormTest(TestCase):
         self.assertEqual(PasswordChangeForm(user, {}).fields.keys(),
                          ['old_password', 'new_password1', 'new_password2'])
 
+PasswordChangeFormTest = override_settings(USE_TZ=False)(PasswordChangeFormTest)
+
+
 class UserChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -197,7 +219,7 @@ class UserChangeFormTest(TestCase):
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['username'].errors,
-                         [u'This value may contain only letters, numbers and @/./+/-/_ characters.'])
+                         [force_unicode(form.fields['username'].error_messages['invalid'])])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the
@@ -214,6 +236,27 @@ class UserChangeFormTest(TestCase):
         # Just check we can create it
         form = MyUserForm({})
 
+    def test_bug_17944_empty_password(self):
+        user = User.objects.get(username='empty_password')
+        form = UserChangeForm(instance=user)
+        # Just check that no error is raised.
+        form.as_table()
+
+    def test_bug_17944_unmanageable_password(self):
+        user = User.objects.get(username='unmanageable_password')
+        form = UserChangeForm(instance=user)
+        # Just check that no error is raised.
+        form.as_table()
+
+    def test_bug_17944_unknown_password_algorithm(self):
+        user = User.objects.get(username='unknown_password')
+        form = UserChangeForm(instance=user)
+        # Just check that no error is raised.
+        form.as_table()
+
+
+UserChangeFormTest = override_settings(USE_TZ=False)(UserChangeFormTest)
+
 
 class PasswordResetFormTest(TestCase):
 
@@ -229,19 +272,19 @@ class PasswordResetFormTest(TestCase):
         return (user, username, email)
 
     def test_invalid_email(self):
-        data = {'email':'not valid'}
+        data = {'email': 'not valid'}
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['email'].errors,
-                         [u'Enter a valid e-mail address.'])
+                         [force_unicode(EmailField.default_error_messages['invalid'])])
 
     def test_nonexistant_email(self):
         # Test nonexistant email address
-        data = {'email':'foo@bar.com'}
+        data = {'email': 'foo@bar.com'}
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors,
-                         {'email': [u"That e-mail address doesn't have an associated user account. Are you sure you've registered?"]})
+                         {'email': [force_unicode(form.error_messages['unknown'])]})
 
     def test_cleaned_data(self):
         # Regression test
@@ -251,6 +294,18 @@ class PasswordResetFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['email'], email)
 
+    def test_custom_email_subject(self):
+        template_path = os.path.join(os.path.dirname(__file__), 'templates')
+        with self.settings(TEMPLATE_DIRS=(template_path,)):
+            data = {'email': 'testclient@example.com'}
+            form = PasswordResetForm(data)
+            self.assertTrue(form.is_valid())
+            # Since we're not providing a request object, we must provide a
+            # domain_override to prevent the save operation from failing in the
+            # potential case where contrib.sites is not installed. Refs #16412.
+            form.save(domain_override='example.com')
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual(mail.outbox[0].subject, u'Custom password reset on example.com')
 
     def test_bug_5605(self):
         # bug #5605, preserve the case of the user name (before the @ in the
@@ -268,3 +323,17 @@ class PasswordResetFormTest(TestCase):
         user.save()
         form = PasswordResetForm({'email': email})
         self.assertFalse(form.is_valid())
+
+    def test_unusable_password(self):
+        user = User.objects.create_user('testuser', 'test@example.com', 'test')
+        data = {"email": "test@example.com"}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        user.set_unusable_password()
+        user.save()
+        form = PasswordResetForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form["email"].errors,
+                         [_(u"The user account associated with this e-mail address cannot reset the password.")])
+
+PasswordResetFormTest = override_settings(USE_TZ=False)(PasswordResetFormTest)

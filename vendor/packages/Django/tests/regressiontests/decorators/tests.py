@@ -1,18 +1,18 @@
-from sys import version_info
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
+import warnings
+from functools import wraps
 
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponse, HttpRequest
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
+from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
 from django.utils.unittest import TestCase
-from django.views.decorators.http import require_http_methods, require_GET, require_POST
-from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 from django.views.decorators.cache import cache_page, never_cache, cache_control
+from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
+from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
+from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 
 
 def fully_decorated(request):
@@ -20,36 +20,61 @@ def fully_decorated(request):
     return HttpResponse('<html><body>dummy</body></html>')
 fully_decorated.anything = "Expected __dict__"
 
-# django.views.decorators.http
-fully_decorated = require_http_methods(["GET"])(fully_decorated)
-fully_decorated = require_GET(fully_decorated)
-fully_decorated = require_POST(fully_decorated)
 
-# django.views.decorators.vary
-fully_decorated = vary_on_headers('Accept-language')(fully_decorated)
-fully_decorated = vary_on_cookie(fully_decorated)
+def compose(*functions):
+    # compose(f, g)(*args, **kwargs) == f(g(*args, **kwargs))
+    functions = list(reversed(functions))
+    def _inner(*args, **kwargs):
+        result = functions[0](*args, **kwargs)
+        for f in functions[1:]:
+            result = f(result)
+        return result
+    return _inner
 
-# django.views.decorators.cache
-fully_decorated = cache_page(60*15)(fully_decorated)
-fully_decorated = cache_control(private=True)(fully_decorated)
-fully_decorated = never_cache(fully_decorated)
 
-# django.contrib.auth.decorators
-# Apply user_passes_test twice to check #9474
-fully_decorated = user_passes_test(lambda u:True)(fully_decorated)
-fully_decorated = login_required(fully_decorated)
-fully_decorated = permission_required('change_world')(fully_decorated)
+full_decorator = compose(
+    # django.views.decorators.http
+    require_http_methods(["GET"]),
+    require_GET,
+    require_POST,
+    require_safe,
+    condition(lambda r: None, lambda r: None),
 
-# django.contrib.admin.views.decorators
-fully_decorated = staff_member_required(fully_decorated)
+    # django.views.decorators.vary
+    vary_on_headers('Accept-language'),
+    vary_on_cookie,
 
-# django.utils.functional
-fully_decorated = memoize(fully_decorated, {}, 1)
-fully_decorated = allow_lazy(fully_decorated)
-fully_decorated = lazy(fully_decorated)
+    # django.views.decorators.cache
+    cache_page(60*15),
+    cache_control(private=True),
+    never_cache,
 
+    # django.contrib.auth.decorators
+    # Apply user_passes_test twice to check #9474
+    user_passes_test(lambda u:True),
+    login_required,
+    permission_required('change_world'),
+
+    # django.contrib.admin.views.decorators
+    staff_member_required,
+
+    # django.utils.functional
+    lambda f: memoize(f, {}, 1),
+    allow_lazy,
+    lazy,
+)
+
+fully_decorated = full_decorator(fully_decorated)
 
 class DecoratorsTest(TestCase):
+
+    def setUp(self):
+        self.warning_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
+                                module='django.views.decorators.cache')
+
+    def tearDown(self):
+        restore_warnings_state(self.warning_state)
 
     def test_attributes(self):
         """
@@ -114,6 +139,27 @@ class DecoratorsTest(TestCase):
         self.assertEqual(my_view_cached3(HttpRequest()), "response")
         my_view_cached4 = cache_page()(my_view)
         self.assertEqual(my_view_cached4(HttpRequest()), "response")
+
+    def test_require_safe_accepts_only_safe_methods(self):
+        """
+        Test for the require_safe decorator.
+        A view returns either a response or an exception.
+        Refs #15637.
+        """
+        def my_view(request):
+            return HttpResponse("OK")
+        my_safe_view = require_safe(my_view)
+        request = HttpRequest()
+        request.method = 'GET'
+        self.assertTrue(isinstance(my_safe_view(request), HttpResponse))
+        request.method = 'HEAD'
+        self.assertTrue(isinstance(my_safe_view(request), HttpResponse))
+        request.method = 'POST'
+        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        request.method = 'PUT'
+        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        request.method = 'DELETE'
+        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
 
 
 # For testing method_decorator, a decorator that assumes a single argument.
@@ -183,3 +229,47 @@ class MethodDecoratorTests(TestCase):
 
         self.assertEqual(Test.method.__doc__, 'A method')
         self.assertEqual(Test.method.im_func.__name__, 'method')
+
+
+class XFrameOptionsDecoratorsTests(TestCase):
+    """
+    Tests for the X-Frame-Options decorators.
+    """
+    def test_deny_decorator(self):
+        """
+        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
+        """
+        @xframe_options_deny
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(r['X-Frame-Options'], 'DENY')
+
+    def test_sameorigin_decorator(self):
+        """
+        Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
+        header.
+        """
+        @xframe_options_sameorigin
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+
+    def test_exempt_decorator(self):
+        """
+        Ensures @xframe_options_exempt properly instructs the
+        XFrameOptionsMiddleware to NOT set the header.
+        """
+        @xframe_options_exempt
+        def a_view(request):
+            return HttpResponse()
+        req = HttpRequest()
+        resp = a_view(req)
+        self.assertEqual(resp.get('X-Frame-Options', None), None)
+        self.assertTrue(resp.xframe_options_exempt)
+
+        # Since the real purpose of the exempt decorator is to suppress
+        # the middleware's functionality, let's make sure it actually works...
+        r = XFrameOptionsMiddleware().process_response(req, resp)
+        self.assertEqual(r.get('X-Frame-Options', None), None)

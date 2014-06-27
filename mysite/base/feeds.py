@@ -15,39 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.contrib.syndication.feeds import Feed, FeedDoesNotExist
+from django.contrib.syndication.views import Feed, FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.feedgenerator import Atom1Feed
 from mysite.profile.models import Person
-from mysite.profile.view_helpers import RecommendBugs
 from mysite.search.models import Answer, WannaHelperNote
-
-
-class RecommendedBugsFeed(Feed):
-    feed_type = Atom1Feed
-    title = "Recommended bugs"
-
-    def get_object(self, bits):
-        if len(bits) != 1:
-            raise ObjectDoesNotExist
-        return Person.get_by_username(bits[0])
-
-    def link(self, obj):
-        if not obj:
-            raise FeedDoesNotExist
-        return "/"
-
-    def subtitle(self, obj):
-        return "Recommended bugs for %s" % (obj.get_full_name() or obj.user.username)
-
-    def items(self, obj):
-        suggested_searches = obj.get_recommended_search_terms()
-        recommender = RecommendBugs(
-            suggested_searches, n=15)
-        return recommender.recommend()
-
-    def item_link(self, obj):
-        return obj.canonical_bug_link
 
 
 class RecentActivityFeed(Feed):

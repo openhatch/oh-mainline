@@ -1,15 +1,24 @@
 # coding: utf-8
 
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.contrib.contenttypes.generic import generic_inlineformset_factory
+from django.contrib import admin
+from django.contrib.admin.sites import AdminSite
+from django.contrib.contenttypes.generic import (
+    generic_inlineformset_factory, GenericTabularInline)
+from django.forms.formsets import DEFAULT_MAX_NUM
+from django.forms.models import ModelForm
 from django.test import TestCase
 
 # local test models
-from models import Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude, \
-                   Media, EpisodePermanent, MediaPermanentInline, Category
+from .admin import MediaInline, MediaPermanentInline
+from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
+    EpisodePermanent, Category)
 
 
 class GenericAdminViewTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -87,29 +96,28 @@ class GenericAdminViewTest(TestCase):
         self.assertEqual(response.status_code, 302) # redirect somewhere
 
     def testGenericInlineFormset(self):
-        EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, extra=3)
+        EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, exclude=['description', 'keywords'], extra=3)
         e = Episode.objects.get(name='This Week in Django')
 
         # Works with no queryset
         formset = EpisodeMediaFormSet(instance=e)
         self.assertEqual(len(formset.forms), 5)
-        self.assertEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/podcast.mp3" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.mp3_media_pk)
-        self.assertEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>' % self.png_media_pk)
-        self.assertEqual(formset.forms[2].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="text" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>')
+        self.assertHTMLEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/podcast.mp3" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.mp3_media_pk)
+        self.assertHTMLEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>' % self.png_media_pk)
+        self.assertHTMLEqual(formset.forms[2].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="text" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>')
 
         # A queryset can be used to alter display ordering
         formset = EpisodeMediaFormSet(instance=e, queryset=Media.objects.order_by('url'))
         self.assertEqual(len(formset.forms), 5)
-        self.assertEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.png_media_pk)
-        self.assertEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" value="http://example.com/podcast.mp3" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>' % self.mp3_media_pk)
-        self.assertEqual(formset.forms[2].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="text" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>')
-
+        self.assertHTMLEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.png_media_pk)
+        self.assertHTMLEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" value="http://example.com/podcast.mp3" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>' % self.mp3_media_pk)
+        self.assertHTMLEqual(formset.forms[2].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="text" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>')
 
         # Works with a queryset that omits items
         formset = EpisodeMediaFormSet(instance=e, queryset=Media.objects.filter(url__endswith=".png"))
         self.assertEqual(len(formset.forms), 4)
-        self.assertEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.png_media_pk)
-        self.assertEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>')
+        self.assertHTMLEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.png_media_pk)
+        self.assertHTMLEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>')
 
     def testGenericInlineFormsetFactory(self):
         # Regression test for #10522.
@@ -122,6 +130,7 @@ class GenericAdminViewTest(TestCase):
         self.assertTrue(formset.get_queryset().ordered)
 
 class GenericInlineAdminParametersTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -172,16 +181,9 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.total_form_count(), 2)
         self.assertEqual(formset.initial_form_count(), 1)
 
-    def testExcludeParam(self):
-        """
-        Generic inline formsets should respect include.
-        """
-        e = self._create_object(EpisodeExclude)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeexclude/%s/' % e.pk)
-        formset = response.context['inline_admin_formsets'][0].formset
-        self.assertFalse('url' in formset.forms[0], 'The formset has excluded "url" field.')
 
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -208,9 +210,115 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         self.assertEqual(response.status_code, 302) # redirect somewhere
 
 class NoInlineDeletionTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
+
     def test_no_deletion(self):
         fake_site = object()
         inline = MediaPermanentInline(EpisodePermanent, fake_site)
         fake_request = object()
         formset = inline.get_formset(fake_request)
         self.assertFalse(formset.can_delete)
+
+
+class MockRequest(object):
+    pass
+
+class MockSuperUser(object):
+    def has_perm(self, perm):
+        return True
+
+request = MockRequest()
+request.user = MockSuperUser()
+
+
+class GenericInlineModelAdminTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
+
+    def setUp(self):
+        self.site = AdminSite()
+
+    def test_get_formset_kwargs(self):
+        media_inline = MediaInline(Media, AdminSite())
+
+        # Create a formset with default arguments
+        formset = media_inline.get_formset(request)
+        self.assertEqual(formset.max_num, DEFAULT_MAX_NUM)
+        self.assertEqual(formset.can_order, False)
+
+        # Create a formset with custom keyword arguments
+        formset = media_inline.get_formset(request, max_num=100, can_order=True)
+        self.assertEqual(formset.max_num, 100)
+        self.assertEqual(formset.can_order, True)
+
+    def test_custom_form_meta_exclude_with_readonly(self):
+        """
+        Ensure that the custom ModelForm's `Meta.exclude` is respected when
+        used in conjunction with `GenericInlineModelAdmin.readonly_fields`
+        and when no `ModelAdmin.exclude` is defined.
+        """
+        class MediaForm(ModelForm):
+
+            class Meta:
+                model = Media
+                exclude = ['url']
+
+        class MediaInline(GenericTabularInline):
+            readonly_fields = ['description']
+            form = MediaForm
+            model = Media
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                MediaInline
+            ]
+
+        ma = EpisodeAdmin(Episode, self.site)
+        self.assertEqual(
+            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            ['keywords', 'id', 'DELETE'])
+
+    def test_custom_form_meta_exclude(self):
+        """
+        Ensure that the custom ModelForm's `Meta.exclude` is respected by
+        `GenericInlineModelAdmin.get_formset`, and overridden if
+        `ModelAdmin.exclude` or `GenericInlineModelAdmin.exclude` are defined.
+        Refs #15907.
+        """
+        # First with `GenericInlineModelAdmin`  -----------------
+
+        class MediaForm(ModelForm):
+
+            class Meta:
+                model = Media
+                exclude = ['url']
+
+        class MediaInline(GenericTabularInline):
+            exclude = ['description']
+            form = MediaForm
+            model = Media
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                MediaInline
+            ]
+
+        ma = EpisodeAdmin(Episode, self.site)
+        self.assertEqual(
+            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            ['url', 'keywords', 'id', 'DELETE'])
+
+        # Then, only with `ModelForm`  -----------------
+
+        class MediaInline(GenericTabularInline):
+            form = MediaForm
+            model = Media
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                MediaInline
+            ]
+
+        ma = EpisodeAdmin(Episode, self.site)
+        self.assertEqual(
+            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            ['description', 'keywords', 'id', 'DELETE'])

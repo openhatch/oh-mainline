@@ -1,7 +1,8 @@
 {% extends "admin/base_site.html" %}
-{% load i18n %}
+{% load i18n admin_static %}
+{% load url from future %}
 
-{% block extrastyle %}{% load adminmedia %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/login.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />{% endblock %}
 
 {% block bodyclass %}login{% endblock %}
 
@@ -14,7 +15,7 @@
 {% block content %}
 {% if form.errors and not form.non_field_errors and not form.this_is_the_login_form.errors %}
 <p class="errornote">
-{% blocktrans count form.errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+{% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
 </p>
 {% endif %}
 
@@ -38,6 +39,12 @@
     <input type="hidden" name="this_is_the_login_form" value="1" />
     <input type="hidden" name="next" value="{{ next }}" />
   </div>
+  {% url 'admin_password_reset' as password_reset_url %}
+  {% if password_reset_url %}
+  <div class="password-reset-link">
+    <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+  </div>
+  {% endif %}
   <div class="submit-row">
     <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
   </div>

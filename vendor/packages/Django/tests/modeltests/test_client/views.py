@@ -1,13 +1,14 @@
 from xml.dom.minidom import parseString
 
-from django.core import mail
-from django.template import Context, Template
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
-from django.forms.forms import Form
+from django.core import mail
 from django.forms import fields
+from django.forms.forms import Form
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
+from django.template import Context, Template
 from django.utils.decorators import method_decorator
+
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -43,7 +44,7 @@ def raw_post_view(request):
     """A view which expects raw XML to be posted and returns content extracted
     from the XML"""
     if request.method == 'POST':
-        root = parseString(request.raw_post_data)
+        root = parseString(request.body)
         first_book = root.firstChild.firstChild
         title, author = [n.firstChild.nodeValue for n in first_book.childNodes]
         t = Template("{{ title }} - {{ author }}", name="Book template")
@@ -143,7 +144,7 @@ def login_protected_view_changed_redirect(request):
     return HttpResponse(t.render(c))
 login_protected_view_changed_redirect = login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
 
-def permission_protected_view(request):
+def _permission_protected_view(request):
     "A simple view that is permission protected."
     t = Template('This is a permission protected test. '
                  'Username is {{ user.username }}. '
@@ -151,7 +152,8 @@ def permission_protected_view(request):
                  name='Permissions Template')
     c = Context({'user': request.user})
     return HttpResponse(t.render(c))
-permission_protected_view = permission_required('modeltests.test_perm')(permission_protected_view)
+permission_protected_view = permission_required('modeltests.test_perm')(_permission_protected_view)
+permission_protected_view_exception = permission_required('modeltests.test_perm', raise_exception=True)(_permission_protected_view)
 
 class _ViewManager(object):
     @method_decorator(login_required)

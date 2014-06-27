@@ -6,9 +6,9 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 
 
 import datetime
+import decimal
 import sys
-import time
-from decimal import Decimal
+import warnings
 
 
 def _setup_environment(environ):
@@ -45,6 +45,7 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
+from django.conf import settings
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
@@ -52,6 +53,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import smart_str, force_unicode
+from django.utils import timezone
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -70,6 +72,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
+    has_select_for_update = True
+    has_select_for_update_nowait = True
     can_return_id_from_insert = True
     allow_sliced_subqueries = False
     supports_subqueries_in_group_by = False
@@ -77,6 +81,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_bitwise_or = False
     can_defer_constraint_checks = True
     ignores_nulls_in_unique_constraints = False
+    has_bulk_insert = True
+    supports_tablespaces = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
@@ -84,8 +90,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
-        sq_name = get_sequence_name(table)
-        tr_name = get_trigger_name(table)
+        sq_name = self._get_sequence_name(table)
+        tr_name = self._get_trigger_name(table)
         tbl_name = self.quote_name(table)
         col_name = self.quote_name(column)
         sequence_sql = """
@@ -174,12 +180,6 @@ WHEN (new.%(col_name)s IS NULL)
         # classes to normalize values from the database (the to_python
         # method is used for validation and isn't what we want here).
         elif isinstance(value, Database.Timestamp):
-            # In Python 2.3, the cx_Oracle driver returns its own
-            # Timestamp object that we must convert to a datetime class.
-            if not isinstance(value, datetime.datetime):
-                value = datetime.datetime(value.year, value.month,
-                        value.day, value.hour, value.minute, value.second,
-                        value.fsecond)
             if field and field.get_internal_type() == 'DateTimeField':
                 pass
             elif field and field.get_internal_type() == 'DateField':
@@ -197,7 +197,7 @@ WHEN (new.%(col_name)s IS NULL)
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def drop_sequence_sql(self, table):
-        return "DROP SEQUENCE %s;" % self.quote_name(get_sequence_name(table))
+        return "DROP SEQUENCE %s;" % self.quote_name(self._get_sequence_name(table))
 
     def fetch_returned_insert_id(self, cursor):
         return long(cursor._insert_id_var.getvalue())
@@ -208,8 +208,13 @@ WHEN (new.%(col_name)s IS NULL)
         else:
             return "%s"
 
+    def last_executed_query(self, cursor, sql, params):
+        # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
+        # The DB API definition does not define this attribute.
+        return cursor.statement
+
     def last_insert_id(self, cursor, table_name, pk_name):
-        sq_name = get_sequence_name(table_name)
+        sq_name = self._get_sequence_name(table_name)
         cursor.execute('SELECT "%s".currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
@@ -258,9 +263,8 @@ WHEN (new.%(col_name)s IS NULL)
     def regex_lookup(self, lookup_type):
         # If regex_lookup is called before it's been initialized, then create
         # a cursor to initialize it and recur.
-        from django.db import connection
-        connection.cursor()
-        return connection.ops.regex_lookup(lookup_type)
+        self.connection.cursor()
+        return self.connection.ops.regex_lookup(lookup_type)
 
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
@@ -285,7 +289,7 @@ WHEN (new.%(col_name)s IS NULL)
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             for sequence_info in sequences:
-                sequence_name = get_sequence_name(sequence_info['table'])
+                sequence_name = self._get_sequence_name(sequence_info['table'])
                 table_name = self.quote_name(sequence_info['table'])
                 column_name = self.quote_name(sequence_info['column'] or 'id')
                 query = _get_sequence_reset_sql() % {'sequence': sequence_name,
@@ -304,7 +308,7 @@ WHEN (new.%(col_name)s IS NULL)
             for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
                     table_name = self.quote_name(model._meta.db_table)
-                    sequence_name = get_sequence_name(model._meta.db_table)
+                    sequence_name = self._get_sequence_name(model._meta.db_table)
                     column_name = self.quote_name(f.column)
                     output.append(query % {'sequence': sequence_name,
                                            'table': table_name,
@@ -315,7 +319,7 @@ WHEN (new.%(col_name)s IS NULL)
             for f in model._meta.many_to_many:
                 if not f.rel.through:
                     table_name = self.quote_name(f.m2m_db_table())
-                    sequence_name = get_sequence_name(f.m2m_db_table())
+                    sequence_name = self._get_sequence_name(f.m2m_db_table())
                     column_name = self.quote_name('id')
                     output.append(query % {'sequence': sequence_name,
                                            'table': table_name,
@@ -326,26 +330,34 @@ WHEN (new.%(col_name)s IS NULL)
         return ''
 
     def tablespace_sql(self, tablespace, inline=False):
-        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""),
-            self.quote_name(tablespace))
+        if inline:
+            return "USING INDEX TABLESPACE %s" % self.quote_name(tablespace)
+        else:
+            return "TABLESPACE %s" % self.quote_name(tablespace)
 
     def value_to_db_datetime(self, value):
-        # Oracle doesn't support tz-aware datetimes
-        if getattr(value, 'tzinfo', None) is not None:
-            raise ValueError("Oracle backend does not support timezone-aware datetimes.")
+        if value is None:
+            return None
 
-        return super(DatabaseOperations, self).value_to_db_datetime(value)
+        # Oracle doesn't support tz-aware datetimes
+        if timezone.is_aware(value):
+            if settings.USE_TZ:
+                value = value.astimezone(timezone.utc).replace(tzinfo=None)
+            else:
+                raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
+
+        return unicode(value)
 
     def value_to_db_time(self, value):
         if value is None:
             return None
 
         if isinstance(value, basestring):
-            return datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
+            return datetime.datetime.strptime(value, '%H:%M:%S')
 
-        # Oracle doesn't support tz-aware datetimes
-        if value.tzinfo is not None:
-            raise ValueError("Oracle backend does not support timezone-aware datetimes.")
+        # Oracle doesn't support tz-aware times
+        if timezone.is_aware(value):
+            raise ValueError("Oracle backend does not support timezone-aware times.")
 
         return datetime.datetime(1900, 1, 1, value.hour, value.minute,
                                  value.second, value.microsecond)
@@ -364,6 +376,18 @@ WHEN (new.%(col_name)s IS NULL)
         elif connector == '|':
             raise NotImplementedError("Bit-wise or is not supported in Oracle.")
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
+    def _get_sequence_name(self, table):
+        name_length = self.max_name_length() - 3
+        return '%s_SQ' % util.truncate_name(table, name_length).upper()
+
+    def _get_trigger_name(self, table):
+        name_length = self.max_name_length() - 3
+        return '%s_TR' % util.truncate_name(table, name_length).upper()
+
+    def bulk_insert_sql(self, fields, num_values):
+        items_sql = "SELECT %s FROM DUAL" % ", ".join(["%s"] * len(fields))
+        return " UNION ALL ".join([items_sql] * num_values)
 
 
 class _UninitializedOperatorsDescriptor(object):
@@ -415,11 +439,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
+
+    def check_constraints(self, table_names=None):
+        """
+        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
+        are returned to deferred.
+        """
+        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
+        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
 
     def _valid_connection(self):
         return self.connection is not None
@@ -449,9 +481,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory
             # to 'AMERICA' which forces Sunday to evaluate to a '1' in TO_CHAR().
-            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' "
-                           "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF' "
-                           "NLS_TERRITORY = 'AMERICA'")
+            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
+                           " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
+                           " NLS_TERRITORY = 'AMERICA'"
+                           + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
 
             if 'operators' not in self.__dict__:
                 # Ticket #14149: Check whether our LIKE implementation will
@@ -529,6 +562,17 @@ class OracleParam(object):
     """
 
     def __init__(self, param, cursor, strings_only=False):
+        # With raw SQL queries, datetimes can reach this function
+        # without being converted by DateTimeField.get_db_prep_value.
+        if settings.USE_TZ and isinstance(param, datetime.datetime):
+            if timezone.is_naive(param):
+                warnings.warn(u"Oracle received a naive datetime (%s)"
+                              u" while time zone support is active." % param,
+                              RuntimeWarning)
+                default_timezone = timezone.get_default_timezone()
+                param = timezone.make_aware(param, default_timezone)
+            param = param.astimezone(timezone.utc).replace(tzinfo=None)
+
         if hasattr(param, 'bind_parameter'):
             self.smart_str = param.bind_parameter(cursor)
         else:
@@ -638,6 +682,9 @@ class FormatStylePlaceholderCursor(object):
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, params=None):
+        # cx_Oracle doesn't support iterators, convert them to lists
+        if params is not None and not isinstance(params, (list, tuple)):
+            params = list(params)
         try:
             args = [(':arg%d' % i) for i in range(len(params[0]))]
         except (IndexError, TypeError):
@@ -723,7 +770,7 @@ def _rowfactory(row, cursor):
                     # This will normally be an integer from a sequence,
                     # but it could be a decimal value.
                     if '.' in value:
-                        value = Decimal(value)
+                        value = decimal.Decimal(value)
                     else:
                         value = int(value)
                 else:
@@ -736,14 +783,20 @@ def _rowfactory(row, cursor):
                 if scale == 0:
                     value = int(value)
                 else:
-                    value = Decimal(value)
+                    value = decimal.Decimal(value)
             elif '.' in value:
                 # No type information. This normally comes from a
                 # mathematical expression in the SELECT list. Guess int
                 # or Decimal based on whether it has a decimal point.
-                value = Decimal(value)
+                value = decimal.Decimal(value)
             else:
                 value = int(value)
+        # datetimes are returned as TIMESTAMP, except the results
+        # of "dates" queries, which are returned as DATETIME.
+        elif desc[1] in (Database.TIMESTAMP, Database.DATETIME):
+            # Confirm that dt is naive before overwriting its tzinfo.
+            if settings.USE_TZ and value is not None and timezone.is_naive(value):
+                value = value.replace(tzinfo=timezone.utc)
         elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
                          Database.LONG_STRING):
             value = to_unicode(value)
@@ -776,13 +829,3 @@ BEGIN
     END LOOP;
 END;
 /"""
-
-
-def get_sequence_name(table):
-    name_length = DatabaseOperations().max_name_length() - 3
-    return '%s_SQ' % util.truncate_name(table, name_length).upper()
-
-
-def get_trigger_name(table):
-    name_length = DatabaseOperations().max_name_length() - 3
-    return '%s_TR' % util.truncate_name(table, name_length).upper()

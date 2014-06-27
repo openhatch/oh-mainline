@@ -4,10 +4,9 @@ How to use Django with FastCGI, SCGI, or AJP
 
 .. highlight:: bash
 
-Although the current preferred setup for running Django is :doc:`Apache with
-mod_wsgi </howto/deployment/modwsgi>`, many people use shared hosting, on
-which protocols such as FastCGI, SCGI or AJP are the only viable options. In
-some setups, these protocols may provide better performance than mod_wsgi_.
+Although :doc:`WSGI</howto/deployment/wsgi/index>` is the preferred deployment
+platform for Django, many people use shared hosting, on which protocols such as
+FastCGI, SCGI or AJP are the only viable options.
 
 .. admonition:: Note
 
@@ -20,13 +19,13 @@ serve pages to a Web server. The Web server delegates the incoming Web requests
 (via a socket) to FastCGI, which executes the code and passes the response back
 to the Web server, which, in turn, passes it back to the client's Web browser.
 
-Like mod_wsgi, FastCGI allows code to stay in memory, allowing requests to be
-served with no startup time. While mod_wsgi can either be configured embedded
-in the Apache Web server process or as a separate daemon process, a FastCGI
-process never runs inside the Web server process, always in a separate,
+Like WSGI, FastCGI allows code to stay in memory, allowing requests to be
+served with no startup time. While
+e.g. :doc:`mod_wsgi</howto/deployment/wsgi/modwsgi>` can either be configured
+embedded in the Apache Web server process or as a separate daemon process, a
+FastCGI process never runs inside the Web server process, always in a separate,
 persistent process.
 
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _mod_perl: http://perl.apache.org/
 
 .. admonition:: Why run code in a separate process?
@@ -110,7 +109,7 @@ Running a threaded server on a TCP port::
 Running a preforked server on a Unix domain socket::
 
     ./manage.py runfcgi method=prefork socket=/home/user/mysite.sock pidfile=django.pid
-    
+
 .. admonition:: Socket security
 
     Django's default umask requires that the webserver and the Django fastcgi
@@ -168,9 +167,9 @@ Once you've got that set up, point Apache at your Django FastCGI instance by
 editing the ``httpd.conf`` (Apache configuration) file. You'll need to do two
 things:
 
-    * Use the ``FastCGIExternalServer`` directive to specify the location of
-      your FastCGI server.
-    * Use ``mod_rewrite`` to point URLs at FastCGI as appropriate.
+* Use the ``FastCGIExternalServer`` directive to specify the location of
+  your FastCGI server.
+* Use ``mod_rewrite`` to point URLs at FastCGI as appropriate.
 
 .. _mod_fastcgi: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html
 
@@ -223,7 +222,25 @@ This is probably the most common case, if you're using Django's admin site:
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
 Django will automatically use the pre-rewrite version of the URL when
-constructing URLs with the ``{% url %}`` template tag (and similar methods).
+constructing URLs with the :ttag:`{% url %}<url>` template tag (and similar
+methods).
+
+Using mod_fcgid as alternative to mod_fastcgi
+----------------------------------------------
+
+Another way to serve applications through FastCGI is by using Apache's
+`mod_fcgid`_ module. Compared to mod_fastcgi mod_fcgid handles FastCGI
+applications differently in that it manages the spawning of worker processes
+by itself and doesn't offer something like ``FastCGIExternalServer``. This
+means that the configuration looks slightly different.
+
+In effect, you have to go the way of adding a script handler similar to what
+is described later on regarding running Django in a :ref:`shared-hosting
+environment <apache_shared_hosting>`. For further details please refer to the
+`mod_fcgid reference`_
+
+.. _mod_fcgid: http://httpd.apache.org/mod_fcgid/
+.. _mod_Fcgid reference: http://httpd.apache.org/mod_fcgid/mod/mod_fcgid.html
 
 lighttpd setup
 ==============
@@ -306,6 +323,8 @@ The Cherokee project provides a documentation to `setting up Django`_ with Chero
 
 .. _setting up Django: http://www.cherokee-project.com/doc/cookbook_django.html
 
+.. _apache_shared_hosting:
+
 Running Django on a shared-hosting provider with Apache
 =======================================================
 
@@ -349,6 +368,18 @@ be sure to make it executable:
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(method="threaded", daemonize="false")
 
+This works if your server uses mod_fastcgi. If, on the other hand, you are
+using mod_fcgid the setup is mostly the same except for a slight change in the
+``.htaccess`` file. Instead of adding a fastcgi-script handler, you have to
+add a fcgid-handler:
+
+.. code-block:: apache
+
+    AddHandler fcgid-script .fcgi
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
+
 Restarting the spawned server
 -----------------------------
 
@@ -378,8 +409,8 @@ Because many of these fastcgi-based solutions require rewriting the URL at
 some point inside the Web server, the path information that Django sees may not
 resemble the original URL that was passed in. This is a problem if the Django
 application is being served from under a particular prefix and you want your
-URLs from the ``{% url %}`` tag to look like the prefix, rather than the
-rewritten version, which might contain, for example, ``mysite.fcgi``.
+URLs from the :ttag:`{% url %}<url>` tag to look like the prefix, rather than
+the rewritten version, which might contain, for example, ``mysite.fcgi``.
 
 Django makes a good attempt to work out what the real script name prefix
 should be. In particular, if the Web server sets the ``SCRIPT_URL`` (specific

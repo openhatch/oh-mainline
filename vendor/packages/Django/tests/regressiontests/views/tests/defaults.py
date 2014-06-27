@@ -1,10 +1,10 @@
-from os import path
+from __future__ import absolute_import
 
-from django.conf import settings
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 
-from regressiontests.views.models import Author, Article, UrlArticle
+from ..models import Author, Article, UrlArticle
+
 
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""

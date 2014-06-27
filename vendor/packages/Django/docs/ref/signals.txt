@@ -62,24 +62,22 @@ Arguments sent with this signal:
     A dictionary of keyword arguments passed to
     :meth:`~django.db.models.Model.__init__`:.
 
-For example, the :doc:`tutorial </intro/tutorial01>` has this line:
-
-.. code-block:: python
+For example, the :doc:`tutorial </intro/tutorial01>` has this line::
 
     p = Poll(question="What's up?", pub_date=datetime.now())
 
 The arguments sent to a :data:`pre_init` handler would be:
 
-    ==========  ===============================================================
-    Argument    Value
-    ==========  ===============================================================
-    ``sender``  ``Poll`` (the class itself)
+==========  ===============================================================
+Argument    Value
+==========  ===============================================================
+``sender``  ``Poll`` (the class itself)
 
-    ``args``    ``[]`` (an empty list because there were no positional
-                arguments passed to ``__init__``.)
+``args``    ``[]`` (an empty list because there were no positional
+            arguments passed to ``__init__``.)
 
-    ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
-    ==========  ===============================================================
+``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+==========  ===============================================================
 
 post_init
 ---------
@@ -114,6 +112,12 @@ Arguments sent with this signal:
 ``instance``
     The actual instance being saved.
 
+``raw``
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a fixture). One should not query/modify other
+    records in the database as the database might not be in a
+    consistent state yet.
+
 .. versionadded:: 1.3
 
 ``using``
@@ -139,6 +143,12 @@ Arguments sent with this signal:
 ``created``
     A boolean; ``True`` if a new record was created.
 
+``raw``
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a fixture). One should not query/modify other
+    records in the database as the database might not be in a
+    consistent state yet.
+
 .. versionadded:: 1.3
 
 ``using``
@@ -151,7 +161,7 @@ pre_delete
    :module:
 
 Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
-method.
+method and a queryset's :meth:`~django.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -172,8 +182,9 @@ post_delete
 .. data:: django.db.models.signals.post_delete
    :module:
 
-Like :data:`pre_delete`, but sent at the end of the
-:meth:`~django.db.models.Model.delete` method.
+Like :data:`pre_delete`, but sent at the end of a model's
+:meth:`~django.db.models.Model.delete` method and a queryset's
+:meth:`~django.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -256,75 +267,79 @@ Arguments sent with this signal:
     The database alias being used.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
-like this:
-
-.. code-block:: python
+like this::
 
     class Topping(models.Model):
         # ...
+        pass
 
     class Pizza(models.Model):
         # ...
         toppings = models.ManyToManyField(Topping)
 
-If we would do something like this:
+If we connected a handler like this::
 
-.. code-block:: python
+    def toppings_changed(sender, **kwargs):
+        # Do something
+        pass
+
+    m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
+
+and then did something like this::
 
     >>> p = Pizza.object.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
-the arguments sent to a :data:`m2m_changed` handler would be:
+the arguments sent to a :data:`m2m_changed` handler (``topppings_changed`` in
+the example above) would be:
 
-    ==============  ============================================================
-    Argument        Value
-    ==============  ============================================================
-    ``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+==============  ============================================================
+Argument        Value
+==============  ============================================================
+``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
 
-    ``instance``    ``p`` (the ``Pizza`` instance being modified)
+``instance``    ``p`` (the ``Pizza`` instance being modified)
 
-    ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
+``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
-    ``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
-                    so this call modifies the forward relation)
+``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
+                so this call modifies the forward relation)
 
-    ``model``       ``Topping`` (the class of the objects added to the
-                    ``Pizza``)
+``model``       ``Topping`` (the class of the objects added to the
+                ``Pizza``)
 
-    ``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
 
-    ``using``       ``"default"`` (since the default router sends writes here)
-    ==============  ============================================================
+``using``       ``"default"`` (since the default router sends writes here)
+==============  ============================================================
 
-And if we would then do something like this:
-
-.. code-block:: python
+And if we would then do something like this::
 
     >>> t.pizza_set.remove(p)
 
 the arguments sent to a :data:`m2m_changed` handler would be:
 
-    ==============  ============================================================
-    Argument        Value
-    ==============  ============================================================
-    ``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+==============  ============================================================
+Argument        Value
+==============  ============================================================
+``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
 
-    ``instance``    ``t`` (the ``Topping`` instance being modified)
+``instance``    ``t`` (the ``Topping`` instance being modified)
 
-    ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
+``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
-    ``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
-                    so this call modifies the reverse relation)
+``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
+                so this call modifies the reverse relation)
 
-    ``model``       ``Pizza`` (the class of the objects removed from the
-                    ``Topping``)
+``model``       ``Pizza`` (the class of the objects removed from the
+                ``Topping``)
 
-    ``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
-                    relation)
+``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+                relation)
 
-    ``using``       ``"default"`` (since the default router sends writes here)
-    ==============  ============================================================
+``using``       ``"default"`` (since the default router sends writes here)
+==============  ============================================================
 
 class_prepared
 --------------
@@ -352,7 +367,7 @@ post_syncdb
 .. data:: django.db.models.signals.post_syncdb
    :module:
 
-Sent by :djadmin:`syncdb` command after it installs an application, and
+Sent by the :djadmin:`syncdb` command after it installs an application, and the
 :djadmin:`flush` command.
 
 Any handlers that listen to this signal need to be written in a particular
@@ -462,6 +477,33 @@ Test signals
    :synopsis: Signals sent during testing.
 
 Signals only sent when :doc:`running tests </topics/testing>`.
+
+setting_changed
+---------------
+
+.. versionadded:: 1.4
+
+.. data:: django.test.signals.setting_changed
+   :module:
+
+This signal is sent when the value of a setting is changed through the
+:meth:`django.test.TestCase.setting` context manager or the
+:func:`django.test.utils.override_settings` decorator/context manager.
+
+It's actually sent twice: when the new value is applied ("setup") and when the
+original value is restored ("teardown").
+
+Arguments sent with this signal:
+
+``sender``
+    The settings handler.
+
+``setting``
+    The name of the setting.
+
+``value``
+    The value of the setting after the change. For settings that initially
+    don't exist, in the "teardown" phase, ``value`` is ``None``.
 
 template_rendered
 -----------------

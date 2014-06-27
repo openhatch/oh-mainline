@@ -1,8 +1,4 @@
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
-
+from functools import wraps
 from django.utils.decorators import decorator_from_middleware_with_args, available_attrs
 from django.utils.cache import patch_cache_control, add_never_cache_headers
 from django.middleware.cache import CacheMiddleware
@@ -43,8 +39,17 @@ def cache_page(*args, **kwargs):
     cache_alias = kwargs.pop('cache', None)
     key_prefix = kwargs.pop('key_prefix', None)
     assert not kwargs, "The only keyword arguments are cache and key_prefix"
+    def warn():
+        import warnings
+        warnings.warn('The cache_page decorator must be called like: '
+                      'cache_page(timeout, [cache=cache name], [key_prefix=key prefix]). '
+                      'All other ways are deprecated.',
+                      PendingDeprecationWarning,
+                      stacklevel=3)
+
     if len(args) > 1:
         assert len(args) == 2, "cache_page accepts at most 2 arguments"
+        warn()
         if callable(args[0]):
             return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[1], cache_alias=cache_alias, key_prefix=key_prefix)(args[0])
         elif callable(args[1]):
@@ -53,20 +58,24 @@ def cache_page(*args, **kwargs):
             assert False, "cache_page must be passed a view function if called with two arguments"
     elif len(args) == 1:
         if callable(args[0]):
+            warn()
             return decorator_from_middleware_with_args(CacheMiddleware)(cache_alias=cache_alias, key_prefix=key_prefix)(args[0])
         else:
+            # The One True Way
             return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], cache_alias=cache_alias, key_prefix=key_prefix)
     else:
+        warn()
         return decorator_from_middleware_with_args(CacheMiddleware)(cache_alias=cache_alias, key_prefix=key_prefix)
 
 
 def cache_control(**kwargs):
     def _cache_controller(viewfunc):
+        @wraps(viewfunc, assigned=available_attrs(viewfunc))
         def _cache_controlled(request, *args, **kw):
             response = viewfunc(request, *args, **kw)
             patch_cache_control(response, **kwargs)
             return response
-        return wraps(viewfunc, assigned=available_attrs(viewfunc))(_cache_controlled)
+        return _cache_controlled
     return _cache_controller
 
 
@@ -75,8 +84,9 @@ def never_cache(view_func):
     Decorator that adds headers to a response so that it will
     never be cached.
     """
+    @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view_func(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
         add_never_cache_headers(response)
         return response
-    return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view_func)
+    return _wrapped_view_func

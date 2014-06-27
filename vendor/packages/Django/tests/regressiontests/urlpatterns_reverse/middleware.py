@@ -1,6 +1,7 @@
-from django.core.urlresolvers import set_urlconf
+from __future__ import absolute_import
 
-import urlconf_inner
+from . import urlconf_inner
+
 
 class ChangeURLconfMiddleware(object):
     def process_request(self, request):

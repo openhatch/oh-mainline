@@ -1,4 +1,5 @@
-import os, re, sys
+import os
+import re
 from ctypes import c_char_p, CDLL
 from ctypes.util import find_library
 from django.contrib.gis.gdal.error import OGRException
@@ -17,7 +18,7 @@ elif os.name == 'nt':
     lib_names = ['gdal18', 'gdal17', 'gdal16', 'gdal15']
 elif os.name == 'posix':
     # *NIX library names.
-    lib_names = ['gdal', 'GDAL', 'gdal1.7.0', 'gdal1.6.0', 'gdal1.5.0', 'gdal1.4.0']
+    lib_names = ['gdal', 'GDAL', 'gdal1.8.0', 'gdal1.7.0', 'gdal1.6.0', 'gdal1.5.0', 'gdal1.4.0']
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 

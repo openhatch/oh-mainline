@@ -25,7 +25,7 @@ class Command(NoArgsCommand):
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_inspection(self, options):
-        connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
+        connection = connections[options.get('database')]
 
         table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
 
@@ -62,15 +62,22 @@ class Command(NoArgsCommand):
                 if ' ' in att_name or '-' in att_name or keyword.iskeyword(att_name) or column_name != att_name:
                     extra_params['db_column'] = column_name
 
+                # Add primary_key and unique, if necessary.
+                if column_name in indexes:
+                    if indexes[column_name]['primary_key']:
+                        extra_params['primary_key'] = True
+                    elif indexes[column_name]['unique']:
+                        extra_params['unique'] = True
+
                 # Modify the field name to make it Python-compatible.
                 if ' ' in att_name:
                     att_name = att_name.replace(' ', '_')
                     comment_notes.append('Field renamed to remove spaces.')
-                    
+
                 if '-' in att_name:
                     att_name = att_name.replace('-', '_')
                     comment_notes.append('Field renamed to remove dashes.')
-                    
+
                 if column_name != att_name:
                     comment_notes.append('Field name made lowercase.')
 
@@ -88,18 +95,17 @@ class Command(NoArgsCommand):
                     extra_params.update(field_params)
                     comment_notes.extend(field_notes)
 
-                    # Add primary_key and unique, if necessary.
-                    if column_name in indexes:
-                        if indexes[column_name]['primary_key']:
-                            extra_params['primary_key'] = True
-                        elif indexes[column_name]['unique']:
-                            extra_params['unique'] = True
-
                     field_type += '('
-                    
+
                 if keyword.iskeyword(att_name):
                     att_name += '_field'
                     comment_notes.append('Field renamed because it was a Python reserved word.')
+
+                if att_name[0].isdigit():
+                    att_name = 'number_%s' % att_name
+                    extra_params['db_column'] = unicode(column_name)
+                    comment_notes.append("Field renamed because it wasn't a "
+                        "valid Python identifier.")
 
                 # Don't output 'id = meta.AutoField(primary_key=True)', because
                 # that's assumed if it doesn't exist.

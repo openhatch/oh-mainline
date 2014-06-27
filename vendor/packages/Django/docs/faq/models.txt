@@ -23,9 +23,8 @@ the following::
 
 ``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
 SELECTs, etc. Each time your app hits the database, the query will be recorded.
-Note that the raw SQL logged in ``connection.queries`` may not include
-parameter quoting.  Parameter quoting is performed by the database-specific
-backend, and not all backends provide a way to retrieve the SQL after quoting.
+Note that the SQL recorded here may be :ref:`incorrectly quoted under SQLite
+<sqlite-connection-queries>`.
 
 .. versionadded:: 1.2
 
@@ -43,18 +42,16 @@ Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't mind clearing data, your project's ``manage.py`` utility has an
-option to reset the SQL for a particular application::
-
-    manage.py reset appname
-
-This drops any tables associated with ``appname`` and recreates them.
+If you don't mind clearing data, your project's ``manage.py`` utility has a
+:djadmin:`flush` option to reset the database to the state it was in
+immediately after :djadmin:`syncdb` was executed.
 
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
-statements manually in your database. That's the way we've always done it,
-because dealing with data is a very sensitive operation that we've wanted to
-avoid automating. That said, there's some work being done to add partially
-automated database-upgrade functionality.
+statements manually in your database.
+
+There are `external projects which handle schema updates
+<http://www.djangopackages.com/grids/g/database-migration/>`_, of which the current
+defacto standard is `south <http://south.aeracode.org/>`_.
 
 Do Django models support multiple-column primary keys?
 ------------------------------------------------------

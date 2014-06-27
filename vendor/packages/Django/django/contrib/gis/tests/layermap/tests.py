@@ -1,16 +1,19 @@
+from __future__ import absolute_import
+
 import os
+from copy import copy
 from decimal import Decimal
 
-from django.utils.copycompat import copy
 from django.utils.unittest import TestCase
 
-from django.contrib.gis.gdal import DataSource, OGRException
+from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.tests.utils import mysql
 from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
 
-from models import \
-    City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State, \
-    city_mapping, co_mapping, cofeat_mapping, inter_mapping
+from .models import (
+    City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
+    city_mapping, co_mapping, cofeat_mapping, inter_mapping)
+
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
@@ -79,8 +82,8 @@ class LayerMapTest(TestCase):
 
             # Comparing the geometries.
             pnt1, pnt2 = feat.geom, city.point
-            self.assertAlmostEqual(pnt1.x, pnt2.x, 6)
-            self.assertAlmostEqual(pnt1.y, pnt2.y, 6)
+            self.assertAlmostEqual(pnt1.x, pnt2.x, 5)
+            self.assertAlmostEqual(pnt1.y, pnt2.y, 5)
 
     def test03_layermap_strict(self):
         "Testing the `strict` keyword, and import of a LineString shapefile."

@@ -1,10 +1,9 @@
 import time
-import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.utils import simplejson
+from django.utils import unittest
 from django.views.generic import View, TemplateView, RedirectView
 
 
@@ -20,8 +19,14 @@ class SimplePostView(SimpleView):
     post = SimpleView.get
 
 
+class PostOnlyView(View):
+    def post(self, request):
+        return HttpResponse('This view only accepts POST')
+
+
 class CustomizableView(SimpleView):
     parameter = {}
+
 
 def decorator(view):
     view.is_decorated = True
@@ -101,6 +106,21 @@ class ViewTest(unittest.TestCase):
             self.rf.get('/', REQUEST_METHOD='FAKE')
         ).status_code, 405)
 
+    def test_get_and_head(self):
+        """
+        Test a view which supplies a GET method also responds correctly to HEAD.
+        """
+        self._assert_simple(SimpleView.as_view()(self.rf.get('/')))
+        response = SimpleView.as_view()(self.rf.head('/'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_head_no_get(self):
+        """
+        Test a view which supplies no GET method responds to HEAD with HTTP 405.
+        """
+        response = PostOnlyView.as_view()(self.rf.head('/'))
+        self.assertEqual(response.status_code, 405)
+
     def test_get_and_post(self):
         """
         Test a view which only allows both GET and POST.
@@ -166,6 +186,13 @@ class TemplateViewTest(TestCase):
         Test a view that simply renders a template on GET
         """
         self._assert_about(AboutTemplateView.as_view()(self.rf.get('/about/')))
+
+    def test_head(self):
+        """
+        Test a TemplateView responds correctly to HEAD
+        """
+        response = AboutTemplateView.as_view()(self.rf.head('/about/'))
+        self.assertEqual(response.status_code, 200)
 
     def test_get_template_attribute(self):
         """
@@ -234,7 +261,7 @@ class RedirectViewTest(unittest.TestCase):
         response = RedirectView.as_view()(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 410)
 
-    def test_permanaent_redirect(self):
+    def test_permanent_redirect(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 301)
@@ -255,6 +282,13 @@ class RedirectViewTest(unittest.TestCase):
         response = RedirectView.as_view(url='/bar/', query_string=True)(self.rf.get('/foo/?pork=spam'))
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/?pork=spam')
+
+    def test_include_urlencoded_args(self):
+        "GET arguments can be URL-encoded when included in the redirected URL"
+        response = RedirectView.as_view(url='/bar/', query_string=True)(
+            self.rf.get('/foo/?unicode=%E2%9C%93'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/?unicode=%E2%9C%93')
 
     def test_parameter_substitution(self):
         "Redirection URLs can be parameterized"
@@ -291,3 +325,9 @@ class RedirectViewTest(unittest.TestCase):
         response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/')
+
+    def test_redirect_when_meta_contains_no_query_string(self):
+        "regression for #16705"
+        # we can't use self.rf.get because it always sets QUERY_STRING
+        response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
+        self.assertEqual(response.status_code, 301)

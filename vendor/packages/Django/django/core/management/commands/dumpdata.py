@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-from django.db import connections, router, DEFAULT_DB_ALIAS
+from django.db import router, DEFAULT_DB_ALIAS
 from django.utils.datastructures import SortedDict
 
 from optparse import make_option
@@ -13,8 +13,8 @@ class Command(BaseCommand):
         make_option('--indent', default=None, dest='indent', type='int',
             help='Specifies the indent level to use when pretty-printing output'),
         make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
-                'fixtures into. Defaults to the "default" database.'),
+            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to dump '
+                'fixtures from. Defaults to the "default" database.'),
         make_option('-e', '--exclude', dest='exclude',action='append', default=[],
             help='An appname or appname.ModelName to exclude (use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
@@ -28,16 +28,15 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.db.models import get_app, get_apps, get_models, get_model
+        from django.db.models import get_app, get_apps, get_model
 
-        format = options.get('format','json')
-        indent = options.get('indent',None)
-        using = options.get('database', DEFAULT_DB_ALIAS)
-        connection = connections[using]
-        excludes = options.get('exclude',[])
-        show_traceback = options.get('traceback', False)
-        use_natural_keys = options.get('use_natural_keys', False)
-        use_base_manager = options.get('use_base_manager', False)
+        format = options.get('format')
+        indent = options.get('indent')
+        using = options.get('database')
+        excludes = options.get('exclude')
+        show_traceback = options.get('traceback')
+        use_natural_keys = options.get('use_natural_keys')
+        use_base_manager = options.get('use_base_manager')
 
         excluded_apps = set()
         excluded_models = set()

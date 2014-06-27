@@ -1,7 +1,11 @@
+from __future__ import absolute_import
+
 from django.forms import ModelForm
-from models import USPlace
+
+from .models import USPlace
+
 
 class USPlaceForm(ModelForm):
-    """docstring for PlaceForm"""
+
     class Meta:
         model = USPlace

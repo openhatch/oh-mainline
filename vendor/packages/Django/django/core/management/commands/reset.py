@@ -1,6 +1,5 @@
 from optparse import make_option
 
-from django.conf import settings
 from django.core.management.base import AppCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import sql_reset
@@ -24,9 +23,9 @@ class Command(AppCommand):
         import warnings
         warnings.warn(
             'This command has been deprecated. The command ``flush`` can be used to delete everything. You can also use ALTER TABLE or DROP TABLE statements manually.',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
-        using = options.get('database', DEFAULT_DB_ALIAS)
+        using = options.get('database')
         connection = connections[using]
 
         app_name = app.__name__.split('.')[-2]

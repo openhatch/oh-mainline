@@ -1,12 +1,15 @@
-from datetime import datetime
+from __future__ import with_statement
+
 import os
 import pickle
 import time
+from datetime import datetime
+
 from django.utils import unittest
 from django.test import RequestFactory, TestCase
 from django.conf import settings
 import django.template.context
-from django.template import Template, Context, RequestContext
+from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 
@@ -190,9 +193,27 @@ class SimpleTemplateResponseTest(BaseTemplateResponseTest):
 
         # ...and the unpickled reponse doesn't have the
         # template-related attributes, so it can't be re-rendered
-        self.assertFalse(hasattr(unpickled_response, 'template_name'))
-        self.assertFalse(hasattr(unpickled_response, 'context_data'))
-        self.assertFalse(hasattr(unpickled_response, '_post_render_callbacks'))
+        template_attrs = ('template_name', 'context_data', '_post_render_callbacks')
+        for attr in template_attrs:
+            self.assertFalse(hasattr(unpickled_response, attr))
+
+        # ...and requesting any of those attributes raises an exception
+        for attr in template_attrs:
+            with self.assertRaises(AttributeError):
+                getattr(unpickled_response, attr)
+
+    def test_repickling(self):
+        response = SimpleTemplateResponse('first/test.html', {
+                'value': 123,
+                'fn': datetime.now,
+            })
+        self.assertRaises(ContentNotRenderedError,
+                          pickle.dumps, response)
+
+        response.render()
+        pickled_response = pickle.dumps(response)
+        unpickled_response = pickle.loads(pickled_response)
+        repickled_response = pickle.dumps(unpickled_response)
 
 class TemplateResponseTest(BaseTemplateResponseTest):
 
@@ -255,10 +276,28 @@ class TemplateResponseTest(BaseTemplateResponseTest):
 
         # ...and the unpickled reponse doesn't have the
         # template-related attributes, so it can't be re-rendered
-        self.assertFalse(hasattr(unpickled_response, '_request'))
-        self.assertFalse(hasattr(unpickled_response, 'template_name'))
-        self.assertFalse(hasattr(unpickled_response, 'context_data'))
-        self.assertFalse(hasattr(unpickled_response, '_post_render_callbacks'))
+        template_attrs = ('template_name', 'context_data',
+            '_post_render_callbacks', '_request', '_current_app')
+        for attr in template_attrs:
+            self.assertFalse(hasattr(unpickled_response, attr))
+
+        # ...and requesting any of those attributes raises an exception
+        for attr in template_attrs:
+            with self.assertRaises(AttributeError):
+                getattr(unpickled_response, attr)
+
+    def test_repickling(self):
+        response = SimpleTemplateResponse('first/test.html', {
+                'value': 123,
+                'fn': datetime.now,
+            })
+        self.assertRaises(ContentNotRenderedError,
+                          pickle.dumps, response)
+
+        response.render()
+        pickled_response = pickle.dumps(response)
+        unpickled_response = pickle.loads(pickled_response)
+        repickled_response = pickle.dumps(unpickled_response)
 
 
 class CustomURLConfTest(TestCase):

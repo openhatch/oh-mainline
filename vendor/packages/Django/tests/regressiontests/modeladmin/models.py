@@ -1,8 +1,7 @@
 # coding: utf-8
-from datetime import date
-
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 class Band(models.Model):
     name = models.CharField(max_length=100)
@@ -34,6 +33,7 @@ class ValidationTestModel(models.Model):
     is_active = models.BooleanField()
     pub_date = models.DateTimeField()
     band = models.ForeignKey(Band)
+    no = models.IntegerField(verbose_name="Number", blank=True, null=True) # This field is intentionally 2 characters long. See #16080.
 
     def decade_published_in(self):
         return self.pub_date.strftime('%Y')[:3] + "0's"

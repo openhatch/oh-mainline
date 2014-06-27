@@ -245,6 +245,10 @@ ul#links { margin-left: 20px; }
 
 }
 
+#training-missions {
+    width: 100%;
+}
+
 h3 { margin-bottom: 0px; text-align: left; clear: left; font-weight: normal; font-size: 1.1em; color: @default-text-color; letter-spacing: 0; margin: 0; }
 
 h3.nofloat { float: none; }
@@ -372,6 +376,10 @@ body ul.raquo_bullets {
     li { margin-bottom: .4em; 
         &:last-child { margin-bottom: 0; }
         &:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
+        code {
+            display: inline-table;
+            margin-left: 16px;
+        }
     }
 }
 
@@ -423,4 +431,20 @@ body#people-map #search_engine_is_down_message { float: left; display: block; ma
 
 .module .link-without-style {
     color: inherit;
+}
+
+/* Add responsive design only for phones and tablets */
+@media (max-width: 800px) {
+  /* Based on observation, overwrite existing css styles */
+  #footer .threecol, body #container, body#missions_index .submodule,
+  body.one_column #main .submodule.skinny, body.one_column #main .submodule.fat,
+  .column, body#profile .project-display,
+  body#search #container #pagetop img#volunteer-opportunities,
+  /*  Overwrite selectors that call LESS mix-in width-and-padding */
+  #nav, #pagetop, #content {
+    width: 100%;
+  }
+  #footer .column {
+    width: 30%;
+  }
 }

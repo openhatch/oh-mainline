@@ -542,7 +542,9 @@ class PatchRecursiveTests(TwillTests):
             answers[key] = value + 1
         response = self.client.post(
             reverse(views.patchrecursive_submit), answers)
+
         self.assertFalse(response.context['patchrecursive_success'])
+        self.assertIn('That is not the right number of garlic cloves', response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(

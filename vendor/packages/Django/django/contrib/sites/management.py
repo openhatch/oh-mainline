@@ -22,7 +22,7 @@ def create_default_site(app, created_models, verbosity, db, **kwargs):
         Site(pk=1, domain="example.com", name="example.com").save(using=db)
 
         # We set an explicit pk instead of relying on auto-incrementation,
-        # so we need to reset the database sequence.
+        # so we need to reset the database sequence. See #17415.
         sequence_sql = connections[db].ops.sequence_reset_sql(no_style(), [Site])
         if sequence_sql:
             if verbosity >= 2:

@@ -1,7 +1,7 @@
-from django.utils.unittest import TestCase
+from __future__ import absolute_import
 
-from modeltests.validation import ValidationTestCase
-from models import *
+from . import ValidationTestCase
+from .models import ModelToValidate
 
 
 class TestModelsWithValidators(ValidationTestCase):

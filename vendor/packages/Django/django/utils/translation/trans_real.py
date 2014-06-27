@@ -4,10 +4,13 @@ import locale
 import os
 import re
 import sys
-import warnings
 import gettext as gettext_module
-from cStringIO import StringIO
 from threading import local
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData
@@ -30,10 +33,12 @@ CONTEXT_SEPARATOR = u"\x04"
 
 # Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
 accept_language_re = re.compile(r'''
-        ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)   # "en", "en-au", "x-y-z", "*"
-        (?:;q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
-        (?:\s*,\s*|$)                            # Multiple accepts per header.
+        ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)         # "en", "en-au", "x-y-z", "*"
+        (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
+        (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
+
+language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 def to_locale(language, to_lower=False):
     """
@@ -63,18 +68,11 @@ def to_language(locale):
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with regard to output
-    charset. Django uses a defined DEFAULT_CHARSET as the output charset on
-    Python 2.4.
+    charset.
     """
     def __init__(self, *args, **kw):
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
-        # Starting with Python 2.4, there's a function to define
-        # the output charset. Before 2.4, the output charset is
-        # identical with the translation file charset.
-        try:
-            self.set_output_charset('utf-8')
-        except AttributeError:
-            pass
+        self.set_output_charset('utf-8')
         self.django_output_charset = 'utf-8'
         self.__language = '??'
 
@@ -193,12 +191,6 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if isinstance(language, basestring) and language == 'no':
-        warnings.warn(
-            "The use of the language code 'no' is deprecated. "
-            "Please use the 'nb' translation instead.",
-            DeprecationWarning
-        )
     _active.value = translation(language)
 
 def deactivate():
@@ -349,24 +341,46 @@ def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
-    available. This is only used for language codes from either the cookies or
-    session and during format localization.
+    available. This is only used for language codes from either the cookies
+    or session and during format localization.
     """
     for path in all_locale_paths():
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
             return True
     return False
 
-def get_language_from_request(request):
+def get_language_from_path(path, supported=None):
+    """
+    Returns the language-code if there is a valid language-code
+    found in the `path`.
+    """
+    if supported is None:
+        from django.conf import settings
+        supported = dict(settings.LANGUAGES)
+    regex_match = language_code_prefix_re.match(path)
+    if regex_match:
+        lang_code = regex_match.group(1)
+        if lang_code in supported and check_for_language(lang_code):
+            return lang_code
+
+def get_language_from_request(request, check_path=False):
     """
     Analyzes the request to find what language the user wants the system to
     show. Only languages listed in settings.LANGUAGES are taken into account.
     If the user requests a sublanguage where we have a main language, we send
     out the main language.
+
+    If check_path is True, the URL path prefix will be checked for a language
+    code, otherwise this is skipped for backwards compatibility.
     """
     global _accepted
     from django.conf import settings
     supported = dict(settings.LANGUAGES)
+
+    if check_path:
+        lang_code = get_language_from_path(request.path_info, supported)
+        if lang_code is not None:
+            return lang_code
 
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)
@@ -423,11 +437,14 @@ def blankout(src, char):
     """
     return dot_re.sub(char, src)
 
-inline_re = re.compile(r"""^\s*trans\s+((?:".*?")|(?:'.*?'))\s*""")
-block_re = re.compile(r"""^\s*blocktrans(?:\s+|$)""")
+context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
+inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
+block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+one_percent_re = re.compile(r"""(?<!%)%(?!%)""")
+
 
 def templatize(src, origin=None):
     """
@@ -438,6 +455,7 @@ def templatize(src, origin=None):
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
     out = StringIO()
+    message_context = None
     intrans = False
     inplural = False
     singular = []
@@ -467,15 +485,22 @@ def templatize(src, origin=None):
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
                     if inplural:
-                        out.write(' ngettext(%r,%r,count) ' % (''.join(singular), ''.join(plural)))
+                        if message_context:
+                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
+                        else:
+                            out.write(' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
-                        out.write(' gettext(%r) ' % ''.join(singular))
+                        if message_context:
+                            out.write(' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
+                        else:
+                            out.write(' gettext(%r) ' % ''.join(singular))
                         for part in singular:
                             out.write(blankout(part, 'S'))
+                    message_context = None
                     intrans = False
                     inplural = False
                     singular = []
@@ -493,7 +518,7 @@ def templatize(src, origin=None):
                 else:
                     singular.append('%%(%s)s' % t.contents)
             elif t.token_type == TOKEN_TEXT:
-                contents = t.contents.replace('%', '%%')
+                contents = one_percent_re.sub('%%', t.contents)
                 if inplural:
                     plural.append(contents)
                 else:
@@ -505,12 +530,34 @@ def templatize(src, origin=None):
                 cmatches = constant_re.findall(t.contents)
                 if imatch:
                     g = imatch.group(1)
-                    if g[0] == '"': g = g.strip('"')
-                    elif g[0] == "'": g = g.strip("'")
-                    out.write(' gettext(%r) ' % g)
+                    if g[0] == '"':
+                        g = g.strip('"')
+                    elif g[0] == "'":
+                        g = g.strip("'")
+                    g = one_percent_re.sub('%%', g)
+                    if imatch.group(2):
+                        # A context is provided
+                        context_match = context_re.match(imatch.group(2))
+                        message_context = context_match.group(1)
+                        if message_context[0] == '"':
+                            message_context = message_context.strip('"')
+                        elif message_context[0] == "'":
+                            message_context = message_context.strip("'")
+                        out.write(' pgettext(%r, %r) ' % (message_context, g))
+                        message_context = None
+                    else:
+                        out.write(' gettext(%r) ' % g)
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
+                    if bmatch.group(1):
+                        # A context is provided
+                        context_match = context_re.match(bmatch.group(1))
+                        message_context = context_match.group(1)
+                        if message_context[0] == '"':
+                            message_context = message_context.strip('"')
+                        elif message_context[0] == "'":
+                            message_context = message_context.strip("'")
                     intrans = True
                     inplural = False
                     singular = []
@@ -557,51 +604,3 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
     return result
-
-# get_date_formats and get_partial_date_formats aren't used anymore by Django
-# and are kept for backward compatibility.
-# Note, it's also important to keep format names marked for translation.
-# For compatibility we still want to have formats on translation catalogs.
-# That makes template code like {{ my_date|date:_('DATE_FORMAT') }} still work
-def get_date_formats():
-    """
-    Checks whether translation files provide a translation for some technical
-    message ID to store date and time formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-    """
-    warnings.warn(
-        "'django.utils.translation.get_date_formats' is deprecated. "
-        "Please update your code to use the new i18n aware formatting.",
-        DeprecationWarning
-    )
-    from django.conf import settings
-    date_format = ugettext('DATE_FORMAT')
-    datetime_format = ugettext('DATETIME_FORMAT')
-    time_format = ugettext('TIME_FORMAT')
-    if date_format == 'DATE_FORMAT':
-        date_format = settings.DATE_FORMAT
-    if datetime_format == 'DATETIME_FORMAT':
-        datetime_format = settings.DATETIME_FORMAT
-    if time_format == 'TIME_FORMAT':
-        time_format = settings.TIME_FORMAT
-    return date_format, datetime_format, time_format
-
-def get_partial_date_formats():
-    """
-    Checks whether translation files provide a translation for some technical
-    message ID to store partial date formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-    """
-    warnings.warn(
-        "'django.utils.translation.get_partial_date_formats' is deprecated. "
-        "Please update your code to use the new i18n aware formatting.",
-        DeprecationWarning
-    )
-    from django.conf import settings
-    year_month_format = ugettext('YEAR_MONTH_FORMAT')
-    month_day_format = ugettext('MONTH_DAY_FORMAT')
-    if year_month_format == 'YEAR_MONTH_FORMAT':
-        year_month_format = settings.YEAR_MONTH_FORMAT
-    if month_day_format == 'MONTH_DAY_FORMAT':
-        month_day_format = settings.MONTH_DAY_FORMAT
-    return year_month_format, month_day_format

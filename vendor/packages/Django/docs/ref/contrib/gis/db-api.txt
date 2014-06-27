@@ -23,30 +23,6 @@ its functionality into full-fledged spatial database backends:
 * :mod:`django.contrib.gis.db.backends.oracle`
 * :mod:`django.contrib.gis.db.backends.spatialite`
 
-Database Settings Backwards-Compatibility
------------------------------------------
-
-In :doc:`Django 1.2 </releases/1.2>`, the way
-to :ref:`specify databases <specifying-databases>` in your settings was changed.
-The old database settings format (e.g., the ``DATABASE_*`` settings)
-is backwards compatible with GeoDjango, and  will automatically use the
-appropriate spatial backend as long as :mod:`django.contrib.gis` is in
-your :setting:`INSTALLED_APPS`.  For example, if you have the following in
-your settings::
-
-    DATABASE_ENGINE='postgresql_psycopg2'
-
-    ...
-
-    INSTALLED_APPS = (
-      ...
-      'django.contrib.gis',
-      ...
-    )
-
-Then, :mod:`django.contrib.gis.db.backends.postgis` is automatically used as your
-spatial backend.
-
 .. _mysql-spatial-limitations:
 
 MySQL Spatial Limitations
@@ -143,7 +119,7 @@ A complete reference can be found in the :ref:`spatial lookup reference
 .. note::
 
     GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a
-    subclass of :class:`~django.db.models.QuerySet`.  The
+    subclass of :class:`~django.db.models.query.QuerySet`.  The
     :class:`GeoManager` instance attached to your model is what
     enables use of :class:`GeoQuerySet`.
 
@@ -239,7 +215,7 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-__ http://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+__ https://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
 
 .. _compatibility-table:
 
@@ -311,9 +287,9 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X
 :meth:`GeoQuerySet.geojson`           X
-:meth:`GeoQuerySet.gml`               X        X
+:meth:`GeoQuerySet.gml`               X        X       X
 :meth:`GeoQuerySet.intersection`      X        X       X
-:meth:`GeoQuerySet.kml`               X
+:meth:`GeoQuerySet.kml`               X                X
 :meth:`GeoQuerySet.length`            X        X       X
 :meth:`GeoQuerySet.make_line`         X
 :meth:`GeoQuerySet.mem_size`          X

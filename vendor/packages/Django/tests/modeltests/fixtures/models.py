@@ -11,8 +11,7 @@ in the application directory, or in one of the directories named in the
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db import models, DEFAULT_DB_ALIAS
-from django.conf import settings
+from django.db import models
 
 
 class Category(models.Model):
@@ -93,8 +92,8 @@ class Book(models.Model):
     authors = models.ManyToManyField(Person)
 
     def __unicode__(self):
-        return '%s by %s' % (self.name,
-                          ' and '.join(a.name for a in self.authors.all()))
+        authors = ' and '.join(a.name for a in self.authors.all())
+        return '%s by %s' % (self.name, authors) if authors else self.name
 
     class Meta:
         ordering = ('name',)

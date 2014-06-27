@@ -20,11 +20,13 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
 
-from views import get_view
+from .views import get_view
 
 
 class ClientTest(TestCase):
@@ -369,6 +371,21 @@ class ClientTest(TestCase):
         self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_view/')
 
         # TODO: Log in with right permissions and request the page again
+
+    def test_view_with_permissions_exception(self):
+        "Request a page that is protected with @permission_required but raises a exception"
+
+        # Get the page without logging in. Should result in 403.
+        response = self.client.get('/test_client/permission_protected_view_exception/')
+        self.assertEquals(response.status_code, 403)
+
+        # Log in
+        login = self.client.login(username='testclient', password='password')
+        self.assertTrue(login, 'Could not log in')
+
+        # Log in with wrong permissions. Should result in 403.
+        response = self.client.get('/test_client/permission_protected_view_exception/')
+        self.assertEquals(response.status_code, 403)
 
     def test_view_with_method_permissions(self):
         "Request a page that is protected with a @permission_required method"

@@ -1,7 +1,4 @@
-from datetime import datetime
-
 from django.contrib.auth.models import User
-from django.core import management
 from django.db import models
 
 
@@ -57,17 +54,20 @@ class B(models.Model):
 
 # Using to_field on the through model
 class Car(models.Model):
-    make = models.CharField(max_length=20, unique=True)
+    make = models.CharField(max_length=20, unique=True, null=True)
     drivers = models.ManyToManyField('Driver', through='CarDriver')
 
     def __unicode__(self, ):
-        return self.make
+        return "%s" % self.make
 
 class Driver(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=20, unique=True, null=True)
 
-    def __unicode__(self, ):
-        return self.name
+    def __unicode__(self):
+        return "%s" % self.name
+
+    class Meta:
+        ordering = ('name',)
 
 class CarDriver(models.Model):
     car = models.ForeignKey('Car', to_field='make')

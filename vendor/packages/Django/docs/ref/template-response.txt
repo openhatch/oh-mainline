@@ -105,7 +105,7 @@ Methods
 
     Override this method in order to customize template rendering.
 
-.. method:: SimpleTemplateResponse.add_post_rendering_callback
+.. method:: SimpleTemplateResponse.add_post_render_callback
 
     Add a callback that will be invoked after rendering has taken
     place. This hook can be used to defer certain processing
@@ -126,7 +126,8 @@ Methods
 .. method:: SimpleTemplateResponse.render():
 
     Sets :attr:`response.content` to the result obtained by
-    :attr:`SimpleTemplateResponse.rendered_content`.
+    :attr:`SimpleTemplateResponse.rendered_content`, runs all post-rendering
+    callbacks, and returns the resulting response object.
 
     :meth:`~SimpleTemplateResponse.render()` will only have an effect
     the first time it is called. On subsequent calls, it will return
@@ -192,14 +193,14 @@ final byte stream that can be served to the client.
 There are three circumstances under which a TemplateResponse will be
 rendered:
 
-    * When the TemplateResponse instance is explicitly rendered, using
-      the :meth:`SimpleTemplateResponse.render()` method.
+* When the TemplateResponse instance is explicitly rendered, using
+  the :meth:`SimpleTemplateResponse.render()` method.
 
-    * When the content of the response is explicitly set by assigning
-      :attr:`response.content`.
+* When the content of the response is explicitly set by assigning
+  :attr:`response.content`.
 
-    * After passing through template response middleware, but before
-      passing through response middleware.
+* After passing through template response middleware, but before
+  passing through response middleware.
 
 A TemplateResponse can only be rendered once. The first call to
 :meth:`SimpleTemplateResponse.render` sets the content of the
@@ -277,7 +278,7 @@ Using TemplateResponse and SimpleTemplateResponse
 
 A TemplateResponse object can be used anywhere that a normal
 HttpResponse can be used. It can also be used as an alternative to
-calling :meth:`~django.shortcuts.render_to_response()`.
+calling :func:`~django.shortcuts.render_to_response()`.
 
 For example, the following simple view returns a
 :class:`TemplateResponse()` with a simple template, and a context

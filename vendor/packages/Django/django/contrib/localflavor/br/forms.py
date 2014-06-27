@@ -3,12 +3,17 @@
 BR-specific Form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.br.br_states import STATE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, CharField, Select
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-import re
+
 
 phone_digits_re = re.compile(r'^(\d{2})[-\.]?(\d{4})[-\.]?(\d{4})$')
 
@@ -17,9 +22,9 @@ class BRZipCodeField(RegexField):
         'invalid': _('Enter a zip code in the format XXXXX-XXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(BRZipCodeField, self).__init__(r'^\d{5}-\d{3}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 class BRPhoneNumberField(Field):
     default_error_messages = {
@@ -42,7 +47,6 @@ class BRStateSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from br_states import STATE_CHOICES
         super(BRStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class BRStateChoiceField(Field):
@@ -58,7 +62,6 @@ class BRStateChoiceField(Field):
                  initial=None, help_text=None):
         super(BRStateChoiceField, self).__init__(required, widget, label,
                                                  initial, help_text)
-        from br_states import STATE_CHOICES
         self.widget.choices = STATE_CHOICES
 
     def clean(self, value):
@@ -92,8 +95,8 @@ class BRCPFField(CharField):
         'digits_only': _("This field requires only numbers."),
     }
 
-    def __init__(self, *args, **kwargs):
-        super(BRCPFField, self).__init__(max_length=14, min_length=11, *args, **kwargs)
+    def __init__(self, max_length=14, min_length=11, *args, **kwargs):
+        super(BRCPFField, self).__init__(max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         """

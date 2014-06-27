@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import pickle
 import sys
@@ -11,29 +13,17 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.utils import unittest
 from django.utils.datastructures import SortedDict
 
-from models import (Annotation, Article, Author, Celebrity, Child, Cover, Detail,
-    DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ, ManagedModel,
-    Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
-    Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node, ObjectA, ObjectB,
-    ObjectC)
+from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
+    Detail, DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ,
+    ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
+    Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
+    Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
+    SpecialCategory, OneToOneCategory)
 
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
         return self.assertQuerysetEqual(qs, values, transform=lambda x: x)
-
-    def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception, e:
-            self.assertEqual(msg, str(e))
-            self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
-        else:
-            if hasattr(exc, '__name__'):
-                excName = exc.__name__
-            else:
-                excName = str(exc)
-            raise AssertionError("%s not raised" % excName)
 
 
 class Queries1Tests(BaseQuerysetTest):
@@ -244,17 +234,21 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Item: four>', '<Item: one>']
         )
 
-    # FIXME: This is difficult to fix and very much an edge case, so punt for
-    # now.  This is related to the order_by() tests for ticket #2253, but the
-    # old bug exhibited itself here (q2 was pulling too many tables into the
-    # combined query with the new ordering, but only because we have evaluated
-    # q2 already).
-    @unittest.expectedFailure
     def test_order_by_tables(self):
         q1 = Item.objects.order_by('name')
         q2 = Item.objects.filter(id=self.i1.id)
         list(q2)
         self.assertEqual(len((q1 & q2).order_by('name').query.tables), 1)
+
+    def test_order_by_join_unref(self):
+        """
+        This test is related to the above one, testing that there aren't
+        old JOINs in the query.
+        """
+        qs = Celebrity.objects.order_by('greatest_fan__fan_of')
+        self.assertIn('OUTER JOIN', str(qs.query))
+        qs = qs.order_by('id')
+        self.assertNotIn('OUTER JOIN', str(qs.query))
 
     def test_tickets_4088_4306(self):
         self.assertQuerysetEqual(
@@ -836,6 +830,17 @@ class Queries1Tests(BaseQuerysetTest):
             1
         )
 
+    def test_ticket17429(self):
+        """
+        Ensure that Meta.ordering=None works the same as Meta.ordering=[]
+        """
+        original_ordering = Tag._meta.ordering
+        Tag._meta.ordering = None
+        self.assertQuerysetEqual(
+            Tag.objects.all(),
+            ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
+        )
+        Tag._meta.ordering = original_ordering
 
 class Queries2Tests(TestCase):
     def setUp(self):
@@ -1056,11 +1061,135 @@ class Queries4Tests(BaseQuerysetTest):
             []
         )
 
+    def test_ticket15316_filter_false(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.filter(category__specialcategory__isnull=False)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
+    def test_ticket15316_exclude_false(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.exclude(category__specialcategory__isnull=False)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_filter_true(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.filter(category__specialcategory__isnull=True)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_exclude_true(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.exclude(category__specialcategory__isnull=True)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
+    def test_ticket15316_one2one_filter_false(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=False)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
+    def test_ticket15316_one2one_exclude_false(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=False)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_one2one_filter_true(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=True)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_one2one_exclude_true(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=True)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
 
 class Queries5Tests(TestCase):
     def setUp(self):
-        # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
-        # will be rank3, rank2, rank1.
+        # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the
+        # Meta.ordering will be rank3, rank2, rank1.
         n1 = Note.objects.create(note='n1', misc='foo', id=1)
         n2 = Note.objects.create(note='n2', misc='bar', id=2)
         e1 = ExtraInfo.objects.create(info='e1', note=n1)
@@ -1240,7 +1369,7 @@ class Queries6Tests(TestCase):
         ann1.notes.add(n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
 
-    # This next test used to cause really weird PostgreSQL behaviour, but it was
+    # This next test used to cause really weird PostgreSQL behavior, but it was
     # only apparent much later when the full test suite ran.
     #@unittest.expectedFailure
     def test_slicing_and_cache_interaction(self):
@@ -1302,11 +1431,6 @@ class Queries6Tests(TestCase):
             []
         )
 
-        # This next makes exactly *zero* sense, but it works. It's needed
-        # because MySQL fails to give the right results the first time this
-        # query is executed. If you run the same query a second time, it
-        # works fine. It's a hack, but it works...
-        list(Tag.objects.exclude(children=None))
         self.assertQuerysetEqual(
             Tag.objects.exclude(children=None),
             ['<Tag: t1>', '<Tag: t3>']
@@ -1321,7 +1445,7 @@ class Queries6Tests(TestCase):
 
         # The annotation->tag link is single values and tag->children links is
         # multi-valued. So we have to split the exclude filter in the middle
-        # and then optimise the inner query without losing results.
+        # and then optimize the inner query without losing results.
         self.assertQuerysetEqual(
             Annotation.objects.exclude(tag__children__name="t2"),
             ['<Annotation: a2>']
@@ -1339,6 +1463,23 @@ class Queries6Tests(TestCase):
         # The all() method on querysets returns a copy of the queryset.
         q1 = Tag.objects.order_by('name')
         self.assertIsNot(q1, q1.all())
+
+
+class RawQueriesTests(TestCase):
+    def setUp(self):
+        n1 = Note.objects.create(note='n1', misc='foo', id=1)
+
+    def test_ticket14729(self):
+        # Test representation of raw query with one or few parameters passed as list
+        query = "SELECT * FROM queries_note WHERE note = %s"
+        params = ['n1']
+        qs = Note.objects.raw(query, params=params)
+        self.assertEqual(repr(qs), "<RawQuerySet: 'SELECT * FROM queries_note WHERE note = n1'>")
+
+        query = "SELECT * FROM queries_note WHERE note = %s and misc = %s"
+        params = ['n1', 'foo']
+        qs = Note.objects.raw(query, params=params)
+        self.assertEqual(repr(qs), "<RawQuerySet: 'SELECT * FROM queries_note WHERE note = n1 and misc = foo'>")
 
 
 class GeneratorExpressionTests(TestCase):
@@ -1602,7 +1743,7 @@ class ToFieldTests(TestCase):
 
 
 class ConditionalTests(BaseQuerysetTest):
-    """Tests whose execution depend on dfferent environment conditions like
+    """Tests whose execution depend on different environment conditions like
     Python version or DB backend features"""
 
     def setUp(self):
@@ -1612,6 +1753,7 @@ class ConditionalTests(BaseQuerysetTest):
         t3 = Tag.objects.create(name='t3', parent=t1)
         t4 = Tag.objects.create(name='t4', parent=t3)
         t5 = Tag.objects.create(name='t5', parent=t3)
+
 
     # In Python 2.6 beta releases, exceptions raised in __len__ are swallowed
     # (Python issue 1242657), so these cases return an empty list, rather than
@@ -1665,8 +1807,7 @@ class ConditionalTests(BaseQuerysetTest):
         # Test that the "in" lookup works with lists of 1000 items or more.
         Number.objects.all().delete()
         numbers = range(2500)
-        for num in numbers:
-            _ = Number.objects.create(num=num)
+        Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(
             Number.objects.filter(num__in=numbers[:1000]).count(),
             1000
@@ -1683,6 +1824,7 @@ class ConditionalTests(BaseQuerysetTest):
             Number.objects.filter(num__in=numbers).count(),
             2500
         )
+
 
 class UnionTests(unittest.TestCase):
     """
@@ -1742,3 +1884,12 @@ class UnionTests(unittest.TestCase):
         Q1 = Q(objecta__name='one', objectc__objecta__name='two')
         Q2 = Q(objecta__objectc__name='ein', objectc__objecta__name='three', objecta__objectb__name='trois')
         self.check_union(ObjectB, Q1, Q2)
+
+
+class DefaultValuesInsertTest(TestCase):
+    def test_no_extra_params(self):
+        # Ticket #17056 -- affects Oracle
+        try:
+            DumbCategory.objects.create()
+        except TypeError:
+            self.fail("Creation of an instance of a model with only the PK field shouldn't error out after bulk insert refactoring (#17056)")

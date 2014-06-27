@@ -4,7 +4,7 @@ more information.
 """
 
 from django.db import models
-from django.test import TestCase
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=30)
@@ -30,5 +30,4 @@ class Entry(models.Model):
         return self.title
 
 class Book(models.Model):
-    dewey_decimal = models.DecimalField(primary_key = True, decimal_places=2, max_digits=5)
-    
+    dewey_decimal = models.DecimalField(primary_key=True, decimal_places=2, max_digits=5)

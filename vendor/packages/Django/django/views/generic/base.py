@@ -1,8 +1,7 @@
+from functools import update_wrapper
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.template import RequestContext, loader
 from django.template.response import TemplateResponse
-from django.utils.functional import update_wrapper
 from django.utils.log import getLogger
 from django.utils.decorators import classonlymethod
 
@@ -44,6 +43,8 @@ class View(object):
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
+            if hasattr(self, 'get') and not hasattr(self, 'head'):
+                self.head = self.get
             return self.dispatch(request, *args, **kwargs)
 
         # take name and docstring from class
@@ -69,7 +70,7 @@ class View(object):
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         allowed_methods = [m for m in self.http_method_names if hasattr(self, m)]
-        logger.warning('Method Not Allowed (%s): %s' % (request.method, request.path),
+        logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
             extra={
                 'status_code': 405,
                 'request': self.request
@@ -138,12 +139,11 @@ class RedirectView(View):
         are provided as kwargs to this method.
         """
         if self.url:
-            args = self.request.META["QUERY_STRING"]
+            url = self.url % kwargs
+            args = self.request.META.get('QUERY_STRING', '')
             if args and self.query_string:
-                url = "%s?%s" % (self.url, args)
-            else:
-                url = self.url
-            return url % kwargs
+                url = "%s?%s" % (url, args)
+            return url
         else:
             return None
 
@@ -155,7 +155,7 @@ class RedirectView(View):
             else:
                 return http.HttpResponseRedirect(url)
         else:
-            logger.warning('Gone: %s' % self.request.path,
+            logger.warning('Gone: %s', self.request.path,
                         extra={
                             'status_code': 410,
                             'request': self.request

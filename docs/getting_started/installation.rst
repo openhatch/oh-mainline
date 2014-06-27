@@ -4,7 +4,7 @@ Installation
 
 *These installation instructions are tested nightly on 
 Ubuntu 12.04 and Debian stable.  Last verified on Windows XP 11/7/2013 and on 
-Mac in spring 2013.*
+Mac OS X 10.9.2 May 11, 2014.*
 
 OpenHatch is currently designed to run on Python 2.6 or above.
 
@@ -101,38 +101,27 @@ Step 1: Create the database file and add tables for our dependencies
 
 Run this command::
 
-  python manage.py syncdb --noinput
-
-This will print some messages and eventually give you your command prompt
-back. If you would like to know if what you got was correct, check
-at the bottom of this file in the section Output Samples.
+  python manage.py syncdb --migrate --noinput
 
 (We have to pass "--noinput" to request that Django not ask you
 questions. This is due to a bad interaction between Django's superuser
 creation system and our custom profiles.)
 
-If you are using Windows and do not have Python installed, you may get the 
-error "Python: command not found."  You can follow `these instructions 
-<https://openhatch.org/wiki/Boston_Python_Workshop_8/Friday/Windows_set_up_Python>`_ 
-to install Python.
-
-Step 2: Run the "migrations" to create the OpenHatch tables
-
-Run this command::
-
-  python manage.py migrate
-
-This will print out *lots* of text, at the end of which, your tables
-should be ready. You're ready to run the site.
-
-(Note that this creates an empty database, with zero users and zero
+(--migrate creates an empty database, with zero users and zero
 projects, ready for you to fill with data as you use your local
 version of the site. If you want your site to have a database filled
 with data like what is on the main OpenHatch.org site, you can import
 a data snapshot. See `maintenance.rst`_ for more info about that.)
 
+This will print out *lots* of text. Once all of the text is printed, you should see something like the output listed in `Output Samples`_ below. Afterwards, your tables should be ready. You're ready to run the site.
 
 .. _maintenance.rst: ../advanced/maintenance.html
+
+
+If you are using Windows and do not have Python installed, you may get the 
+error "Python: command not found."  You can follow `these instructions 
+<https://openhatch.org/wiki/Boston_Python_Workshop_8/Friday/Windows_set_up_Python>`_ 
+to install Python.
 
 
 Run the site
@@ -167,30 +156,34 @@ your local site in `maintenance.rst`_.
 Output Samples
 ==============
 
-Here is a sample from the output from python manage.py syncdb --noinput ::
+Here is a sample output from python manage.py syncdb --migrate --noinput ::
 
-  2012-01-17 12:16:57,136 <module>:46 INFO     Some parts of the OpenHatch site may fail
-  because the lxml library is not installed. Look in `advanced_installation.rst`_ for
-  information about lxml.
-  Syncing...
-  Creating tables ...
-  Creating table ghettoq_queue
-  Creating table ghettoq_message
-  Creating table auth_permission
-  ......
-  Creating table djkombu_message
-  Installing custom SQL ...
-  Installing indexes ...
-  No fixtures found.
-  ......
-  Synced:
+ Synced:
    > ghettoq
    > django.contrib.auth
    > django.contrib.contenttypes
-  .....
-  Not synced (use migrations):
+   > django.contrib.sessions
+   > django.contrib.sites
+   > django.contrib.webdesign
+   > django.contrib.admin
+   > registration
+   > django_authopenid
+   > django_extensions
+   > south
+   > django_assets
+   > invitation
+   > voting
+   > reversion
+   > debug_toolbar
+   > sessionprofile
+   > model_utils
+   > djkombu
+ Migrated:
    - mysite.search
    - mysite.profile
    - mysite.customs
-  .....
-  (use ./manage.py migrate to migrate these)
+   - mysite.account
+   - mysite.base
+   - mysite.project
+   - mysite.missions
+   - djcelery

@@ -20,6 +20,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'IntegerField':                 'integer',
         'BigIntegerField':              'bigint',
         'IPAddressField':               'char(15)',
+        'GenericIPAddressField':        'char(39)',
         'NullBooleanField':             'bool',
         'OneToOneField':                'integer',
         'PositiveIntegerField':         'integer unsigned',
@@ -68,3 +69,21 @@ class DatabaseCreation(BaseDatabaseCreation):
         if test_database_name and test_database_name != ":memory:":
             # Remove the SQLite database file
             os.remove(test_database_name)
+
+    def set_autocommit(self):
+        self.connection.connection.isolation_level = None
+
+    def test_db_signature(self):
+        """
+        Returns a tuple that uniquely identifies a test database.
+
+        This takes into account the special cases of ":memory:" and "" for
+        SQLite since the databases will be distinct despite having the same
+        TEST_NAME. See http://www.sqlite.org/inmemorydb.html
+        """
+        settings_dict = self.connection.settings_dict
+        test_dbname = self._get_test_db_name()
+        sig = [self.connection.settings_dict['NAME']]
+        if test_dbname == ':memory:':
+            sig.append(self.connection.alias)
+        return tuple(sig)

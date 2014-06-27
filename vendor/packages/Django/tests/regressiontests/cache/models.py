@@ -1,9 +1,11 @@
+from django.utils import timezone
+
 from django.db import models
-from datetime import datetime
+
 
 def expensive_calculation():
     expensive_calculation.num_runs += 1
-    return datetime.now()
+    return timezone.now()
 
 class Poll(models.Model):
     question = models.CharField(max_length=200)

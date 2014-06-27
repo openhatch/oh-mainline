@@ -14,19 +14,17 @@ class BaseHandler(object):
     response_fixes = [
         http.fix_location_header,
         http.conditional_content_removal,
-        http.fix_IE_for_attach,
-        http.fix_IE_for_vary,
     ]
 
     def __init__(self):
-        self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
+        self._request_middleware = self._view_middleware = self._template_response_middleware = self._response_middleware = self._exception_middleware = None
 
 
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
 
-        Must be called after the environment is fixed (see __call__).
+        Must be called after the environment is fixed (see __call__ in subclasses).
         """
         from django.conf import settings
         from django.core import exceptions
@@ -136,7 +134,7 @@ class BaseHandler(object):
                     response = response.render()
 
             except http.Http404, e:
-                logger.warning('Not Found: %s' % request.path,
+                logger.warning('Not Found: %s', request.path,
                             extra={
                                 'status_code': 404,
                                 'request': request
@@ -152,20 +150,30 @@ class BaseHandler(object):
                         try:
                             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
                         finally:
-                            receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+                            signals.got_request_exception.send(sender=self.__class__, request=request)
             except exceptions.PermissionDenied:
-                logger.warning('Forbidden (Permission denied): %s' % request.path,
-                            extra={
-                                'status_code': 403,
-                                'request': request
-                            })
-                response = http.HttpResponseForbidden('<h1>Permission denied</h1>')
+                logger.warning(
+                    'Forbidden (Permission denied): %s', request.path,
+                    extra={
+                        'status_code': 403,
+                        'request': request
+                    })
+                try:
+                    callback, param_dict = resolver.resolve403()
+                    response = callback(request, **param_dict)
+                except:
+                    try:
+                        response = self.handle_uncaught_exception(request,
+                            resolver, sys.exc_info())
+                    finally:
+                        signals.got_request_exception.send(
+                            sender=self.__class__, request=request)
             except SystemExit:
                 # Allow sys.exit() to actually exit. See tickets #1023 and #4701
                 raise
             except: # Handle everything else, including SuspiciousOperation, etc.
                 # Get the exception info now, in case another exception is thrown later.
-                receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+                signals.got_request_exception.send(sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
         finally:
             # Reset URLconf for this thread on the way out for complete
@@ -178,7 +186,7 @@ class BaseHandler(object):
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
-            receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+            signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
         return response
@@ -198,17 +206,17 @@ class BaseHandler(object):
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
-        if settings.DEBUG:
-            from django.views import debug
-            return debug.technical_500_response(request, *exc_info)
-
-        logger.error('Internal Server Error: %s' % request.path,
+        logger.error('Internal Server Error: %s', request.path,
             exc_info=exc_info,
             extra={
                 'status_code': 500,
-                'request':request
+                'request': request
             }
         )
+
+        if settings.DEBUG:
+            from django.views import debug
+            return debug.technical_500_response(request, *exc_info)
 
         # If Http500 handler is not installed, re-raise last exception
         if resolver.urlconf_module is None:
@@ -232,8 +240,8 @@ def get_script_name(environ):
     Returns the equivalent of the HTTP request's SCRIPT_NAME environment
     variable. If Apache mod_rewrite has been used, returns what would have been
     the script name prior to any rewriting (so it's the script name as seen
-    from the client's perspective), unless DJANGO_USE_POST_REWRITE is set (to
-    anything).
+    from the client's perspective), unless the FORCE_SCRIPT_NAME setting is
+    set (to anything).
     """
     from django.conf import settings
     if settings.FORCE_SCRIPT_NAME is not None:

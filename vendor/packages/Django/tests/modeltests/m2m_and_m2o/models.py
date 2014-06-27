@@ -6,6 +6,7 @@ Make sure to set ``related_name`` if you use relationships to the same table.
 
 from django.db import models
 
+
 class User(models.Model):
     username = models.CharField(max_length=20)
 
@@ -19,3 +20,7 @@ class Issue(models.Model):
 
     class Meta:
         ordering = ('num',)
+
+class UnicodeReferenceModel(models.Model):
+    others = models.ManyToManyField(u"UnicodeReferenceModel")
+

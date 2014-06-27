@@ -94,3 +94,8 @@ body#missions_index .submodule .status {
     text-align: center;
     width: 80%;
 }
+
+/* When there are hints for training missions, the "low" hint sometimes needs help laying out its child elements properly. */
+#low {
+    clear: both;
+}

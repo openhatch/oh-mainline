@@ -71,3 +71,5 @@ body#landing ul.nudgebuttons a .notification { margin: 0; }
 ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
 
 body#edit_profile_info_form #contact_blurb:target label { background-color: #faffaa; float: none; }
+
+body div.photo-wide { width: 64%;}

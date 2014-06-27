@@ -42,6 +42,15 @@ class FeedgeneratorTest(unittest.TestCase):
             "Fri, 14 Nov 2008 13:37:00 +0100"
         )
 
+    def test_rfc2822_date_without_time(self):
+        """
+        Test rfc2822_date() correctly formats date objects.
+        """
+        self.assertEqual(
+            feedgenerator.rfc2822_date(datetime.date(2008, 11, 14)),
+            "Fri, 14 Nov 2008 00:00:00 -0000"
+        )
+
     def test_rfc3339_date(self):
         """
         Test rfc3339_date() correctly formats datetime objects.
@@ -60,12 +69,43 @@ class FeedgeneratorTest(unittest.TestCase):
             "2008-11-14T13:37:00+02:00"
         )
 
+    def test_rfc3339_date_without_time(self):
+        """
+        Test rfc3339_date() correctly formats date objects.
+        """
+        self.assertEqual(
+            feedgenerator.rfc3339_date(datetime.date(2008, 11, 14)),
+            "2008-11-14T00:00:00Z"
+        )
+
     def test_atom1_mime_type(self):
         """
         Test to make sure Atom MIME type has UTF8 Charset parameter set
         """
         atom_feed = feedgenerator.Atom1Feed("title", "link", "description")
         self.assertEqual(
-            atom_feed.mime_type, "application/atom+xml; charset=utf8"
+            atom_feed.mime_type, "application/atom+xml; charset=utf-8"
         )
 
+    def test_rss_mime_type(self):
+        """
+        Test to make sure RSS MIME type has UTF8 Charset parameter set
+        """
+        rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
+        self.assertEqual(
+            rss_feed.mime_type, "application/rss+xml; charset=utf-8"
+        )
+
+    # Two regression tests for #14202
+
+    def test_feed_without_feed_url_gets_rendered_without_atom_link(self):
+        feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr')
+        self.assertEquals(feed.feed['feed_url'], None)
+        feed_content = feed.writeString('utf-8')
+        self.assertNotIn('<atom:link href=', feed_content)
+
+    def test_feed_with_feed_url_gets_rendered_with_atom_link(self):
+        feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr', feed_url='/feed/')
+        self.assertEquals(feed.feed['feed_url'], '/feed/')
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('<atom:link href="/feed/" rel="self"></atom:link>', feed_content)

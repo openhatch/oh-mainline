@@ -115,6 +115,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = [
+    'django.middleware.csrf.CsrfViewMiddleware',
     # This must live on top of Auth + Session middleware
     'mysite.base.middleware.DetectLogin',
     'django.middleware.common.CommonMiddleware',
@@ -125,8 +126,6 @@ MIDDLEWARE_CLASSES = [
     'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.HandleWannaHelpQueue',
     'django.middleware.transaction.TransactionMiddleware',
-    # Django debug toolbar
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -144,6 +143,8 @@ STATIC_GENERATOR_URLS = (
     r'^/\+cacheable/',
 )
 
+STATIC_URL = '/statik/'
+
 STATIC_DOC_ROOT = 'static/'
 
 # Sessions in /tmp
@@ -158,6 +159,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'django.contrib.webdesign',
     'django.contrib.admin',
     'registration',
@@ -174,6 +176,7 @@ INSTALLED_APPS = (
     'mysite.base',
     'mysite.project',
     'mysite.missions',
+    'mysite.bugsets',
     'voting',
     'reversion',
     'debug_toolbar',
@@ -181,6 +184,7 @@ INSTALLED_APPS = (
     'model_utils',
     'djcelery',
     'djkombu',
+    'inplaceeditform',
 )
 
 # testrunner allows us to control which testrunner to use
@@ -289,6 +293,9 @@ GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/'
 
 # This setting is used by the customs bug importers.
 TRACKER_POLL_INTERVAL = 1  # Days
+
+# Inline edit permissions
+ADAPTOR_INPLACEEDIT_EDIT = 'mysite.bugsets.perms.InlineEditPermissions'
 
 # Initialize celery
 import djcelery

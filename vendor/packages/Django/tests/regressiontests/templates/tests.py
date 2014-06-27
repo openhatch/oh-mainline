@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement, absolute_import
+
 from django.conf import settings
 
 if __name__ == '__main__':
@@ -6,38 +8,47 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import time
 import os
 import sys
 import traceback
+import warnings
+from urlparse import urljoin
 
 from django import template
-from django.template import base as template_base
+from django.template import base as template_base, RequestContext, Template, Context
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
-from django.test.utils import setup_test_template_loader,\
-    restore_template_loaders
+from django.test import RequestFactory
+from django.test.utils import (get_warnings_state, restore_warnings_state,
+    setup_test_template_loader, restore_template_loaders, override_settings)
 from django.utils import unittest
+from django.utils.formats import date_format
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
-from context import ContextTests
-from custom import CustomTagTests, CustomFilterTests
-from parser import ParserTests
-from unicode import UnicodeTests
-from nodelist import NodelistTest
-from smartif import *
-from response import *
+from .callables import CallableVariablesTests
+from .context import ContextTests
+from .custom import CustomTagTests, CustomFilterTests
+from .parser import ParserTests
+from .unicode import UnicodeTests
+from .nodelist import NodelistTest, ErrorIndexTest
+from .smartif import SmartIfTests
+from .response import (TemplateResponseTest, BaseTemplateResponseTest,
+    CacheMiddlewareTest, SimpleTemplateResponseTest, CustomURLConfTest)
 
 try:
-    from loaders import *
-except ImportError:
-    pass # If setuptools isn't installed, that's fine. Just move on.
+    from .loaders import RenderToStringTest, EggLoaderTest
+except ImportError, e:
+    if "pkg_resources" in e.message:
+        pass # If setuptools isn't installed, that's fine. Just move on.
+    else:
+        raise
 
-import filters
+from . import filters
 
 #################################
 # Custom template tag for tests #
@@ -75,6 +86,9 @@ class SomeOtherException(Exception):
     pass
 
 class ContextStackException(Exception):
+    pass
+
+class ShouldNotExecuteException(Exception):
     pass
 
 class SomeClass:
@@ -120,8 +134,7 @@ class TestObj(object):
         return False
 
     def is_bad(self):
-        time.sleep(0.3)
-        return True
+        raise ShouldNotExecuteException()
 
 class SilentGetItemClass(object):
     def __getitem__(self, key):
@@ -139,6 +152,10 @@ class UTF8Class:
 
 class Templates(unittest.TestCase):
     def setUp(self):
+        self._warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.template.defaulttags')
+
         self.old_static_url = settings.STATIC_URL
         self.old_media_url = settings.MEDIA_URL
         settings.STATIC_URL = u"/static/"
@@ -147,14 +164,15 @@ class Templates(unittest.TestCase):
     def tearDown(self):
         settings.STATIC_URL = self.old_static_url
         settings.MEDIA_URL = self.old_media_url
+        restore_warnings_state(self._warnings_state)
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
         fs_loader = filesystem.Loader()
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
-                # Fix expected sources so they are normcased and abspathed
-                expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
+                # Fix expected sources so they are abspathed
+                expected_sources = [os.path.abspath(s) for s in expected_sources]
             # Test the two loaders (app_directores and filesystem).
             func1 = lambda p, t: list(ad_loader.get_template_sources(p, t))
             func2 = lambda p, t: list(fs_loader.get_template_sources(p, t))
@@ -197,9 +215,9 @@ class Templates(unittest.TestCase):
         if os.path.normcase('/TEST') == os.path.normpath('/test'):
             template_dirs = ['/dir1', '/DIR2']
             test_template_sources('index.html', template_dirs,
-                                  ['/dir1/index.html', '/dir2/index.html'])
+                                  ['/dir1/index.html', '/DIR2/index.html'])
             test_template_sources('/DIR1/index.HTML', template_dirs,
-                                  ['/dir1/index.html'])
+                                  ['/DIR1/index.HTML'])
 
     def test_loader_debug_origin(self):
         # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
@@ -295,9 +313,9 @@ class Templates(unittest.TestCase):
             r = None
             try:
                 r = tmpl.render(template.Context({}))
-            except template.TemplateSyntaxError, e:
+            except template.TemplateDoesNotExist, e:
                 settings.TEMPLATE_DEBUG = old_td
-                self.assertEqual(e.args[0], 'Caught TemplateDoesNotExist while rendering: missing.html')
+                self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
@@ -322,8 +340,8 @@ class Templates(unittest.TestCase):
             r = None
             try:
                 r = tmpl.render(template.Context({}))
-            except template.TemplateSyntaxError, e:
-                self.assertEqual(e.args[0], 'Caught TemplateDoesNotExist while rendering: missing.html')
+            except template.TemplateDoesNotExist, e:
+                self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
 
             # For the cached loader, repeat the test, to ensure the first attempt did not cache a
@@ -331,8 +349,8 @@ class Templates(unittest.TestCase):
             tmpl = loader.get_template(load_name)
             try:
                 tmpl.render(template.Context({}))
-            except template.TemplateSyntaxError, e:
-                self.assertEqual(e.args[0], 'Caught TemplateDoesNotExist while rendering: missing.html')
+            except template.TemplateDoesNotExist, e:
+                self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
@@ -344,27 +362,31 @@ class Templates(unittest.TestCase):
         split = token.split_contents()
         self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
 
+    @override_settings(SETTINGS_MODULE=None, TEMPLATE_DEBUG=True)
     def test_url_reverse_no_settings_module(self):
         # Regression test for #9005
-        from django.template import Template, Context, TemplateSyntaxError
-
-        old_settings_module = settings.SETTINGS_MODULE
-        old_template_debug = settings.TEMPLATE_DEBUG
-
-        settings.SETTINGS_MODULE = None
-        settings.TEMPLATE_DEBUG = True
+        from django.template import Template, Context
 
         t = Template('{% url will_not_match %}')
         c = Context()
-        try:
-            rendered = t.render(c)
-        except TemplateSyntaxError, e:
-            # Assert that we are getting the template syntax error and not the
-            # string encoding error.
-            self.assertEqual(e.args[0], "Caught NoReverseMatch while rendering: Reverse for 'will_not_match' with arguments '()' and keyword arguments '{}' not found.")
+        with self.assertRaises(urlresolvers.NoReverseMatch):
+            t.render(c)
 
-        settings.SETTINGS_MODULE = old_settings_module
-        settings.TEMPLATE_DEBUG = old_template_debug
+
+    @override_settings(DEBUG=True, TEMPLATE_DEBUG = True)
+    def test_no_wrapped_exception(self):
+        """
+        The template system doesn't wrap exceptions, but annotates them.
+        Refs #16770
+
+        """
+        c = Context({"coconuts": lambda: 42 / 0})
+        t = Template("{{ coconuts }}")
+        with self.assertRaises(ZeroDivisionError) as cm:
+            t.render(c)
+
+        self.assertEqual(cm.exception.django_template_source[1], (0, 14))
+
 
     def test_invalid_block_suggestion(self):
         # See #7876
@@ -372,7 +394,7 @@ class Templates(unittest.TestCase):
         try:
             t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
         except TemplateSyntaxError, e:
-            self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'else' or 'endif'")
+            self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
 
     def test_templates(self):
         template_tests = self.get_template_tests()
@@ -385,19 +407,10 @@ class Templates(unittest.TestCase):
 
         template_tests.update(filter_tests)
 
-        # Register our custom template loader.
-        def test_template_loader(template_name, template_dirs=None):
-            "A custom template loader that loads the unit-test templates."
-            try:
-                return (template_tests[template_name][0] , "test:%s" % template_name)
-            except KeyError:
-                raise template.TemplateDoesNotExist(template_name)
-
-        cache_loader = cached.Loader(('test_template_loader',))
-        cache_loader._cached_loaders = (test_template_loader,)
-
-        old_template_loaders = loader.template_source_loaders
-        loader.template_source_loaders = [cache_loader]
+        cache_loader = setup_test_template_loader(
+            dict([(name, t[0]) for name, t in template_tests.iteritems()]),
+            use_cached_loader=True,
+        )
 
         failures = []
         tests = template_tests.items()
@@ -455,24 +468,21 @@ class Templates(unittest.TestCase):
                 settings.TEMPLATE_DEBUG = template_debug
                 for is_cached in (False, True):
                     try:
-                        start = datetime.now()
-                        test_template = loader.get_template(name)
-                        end = datetime.now()
-                        if end-start > timedelta(seconds=0.2):
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Took too long to parse test" % (is_cached, invalid_str, template_debug, name))
+                        try:
+                            test_template = loader.get_template(name)
+                        except ShouldNotExecuteException:
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
-                        start = datetime.now()
-                        output = self.render(test_template, vals)
-                        end = datetime.now()
-                        if end-start > timedelta(seconds=0.2):
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Took too long to render test" % (is_cached, invalid_str, template_debug, name))
+                        try:
+                            output = self.render(test_template, vals)
+                        except ShouldNotExecuteException:
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
                     except ContextStackException:
                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, template_debug, name))
                         continue
                     except Exception:
                         exc_type, exc_value, exc_tb = sys.exc_info()
                         if exc_type != result:
-                            print "CHECK", name, exc_type, result
                             tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, template_debug, name, exc_type, exc_value, tb))
                         continue
@@ -487,7 +497,7 @@ class Templates(unittest.TestCase):
                 expected_invalid_str = 'INVALID'
                 template_base.invalid_var_format_string = False
 
-        loader.template_source_loaders = old_template_loaders
+        restore_template_loaders()
         deactivate()
         settings.TEMPLATE_DEBUG = old_td
         settings.TEMPLATE_STRING_IF_INVALID = old_invalid
@@ -666,7 +676,7 @@ class Templates(unittest.TestCase):
 
             # In methods that raise an exception without a
             # "silent_variable_attribute" set to True, the exception propagates
-            'filter-syntax14': (r'1{{ var.method4 }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException, template.TemplateSyntaxError)),
+            'filter-syntax14': (r'1{{ var.method4 }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
 
             # Escaped backslash in argument
             'filter-syntax15': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
@@ -695,8 +705,8 @@ class Templates(unittest.TestCase):
             # In attribute and dict lookups that raise an unexpected exception
             # without a "silent_variable_attribute" set to True, the exception
             # propagates
-            'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException, template.TemplateSyntaxError)),
-            'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException, template.TemplateSyntaxError)),
+            'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
+            'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
@@ -753,7 +763,7 @@ class Templates(unittest.TestCase):
             ### EXCEPTIONS ############################################################
 
             # Raise exception for invalid template name
-            'exception01': ("{% extends 'nonexistent' %}", {}, (template.TemplateDoesNotExist, template.TemplateDoesNotExist, template.TemplateSyntaxError)),
+            'exception01': ("{% extends 'nonexistent' %}", {}, (template.TemplateDoesNotExist, template.TemplateDoesNotExist)),
 
             # Raise exception for invalid template name (in variable)
             'exception02': ("{% extends nonexistent %}", {}, (template.TemplateSyntaxError, template.TemplateDoesNotExist)),
@@ -780,6 +790,7 @@ class Templates(unittest.TestCase):
             'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
             'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
+            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'), # Variables are NOT auto-escaped.
 
             ### FOR TAG ###############################################################
             'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),
@@ -813,6 +824,17 @@ class Templates(unittest.TestCase):
             'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
             'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
             'if-tag03': ("{% if foo %}yes{% else %}no{% endif %}", {}, "no"),
+
+            'if-tag04': ("{% if foo %}foo{% elif bar %}bar{% endif %}", {'foo': True}, "foo"),
+            'if-tag05': ("{% if foo %}foo{% elif bar %}bar{% endif %}", {'bar': True}, "bar"),
+            'if-tag06': ("{% if foo %}foo{% elif bar %}bar{% endif %}", {}, ""),
+            'if-tag07': ("{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {'foo': True}, "foo"),
+            'if-tag08': ("{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {'bar': True}, "bar"),
+            'if-tag09': ("{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {}, "nothing"),
+            'if-tag10': ("{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'foo': True}, "foo"),
+            'if-tag11': ("{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'bar': True}, "bar"),
+            'if-tag12': ("{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'baz': True}, "baz"),
+            'if-tag13': ("{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {}, "nothing"),
 
             # Filters
             'if-tag-filter01': ("{% if foo|length == 5 %}yes{% else %}no{% endif %}", {'foo': 'abcde'}, "yes"),
@@ -920,9 +942,7 @@ class Templates(unittest.TestCase):
             'if-tag-error12': ("{% if a not b %}yes{% endif %}", {}, template.TemplateSyntaxError),
 
             # If evaluations are shortcircuited where possible
-            # These tests will fail by taking too long to run. When the if clause
-            # is shortcircuiting correctly, the is_bad() function shouldn't be
-            # evaluated, and the deliberate sleep won't happen.
+            # If is_bad is invoked, it will raise a ShouldNotExecuteException
             'if-tag-shortcircuit01': ('{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "yes"),
             'if-tag-shortcircuit02': ('{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"),
 
@@ -1052,7 +1072,7 @@ class Templates(unittest.TestCase):
             'include-fail2': ('{% load broken_tag %}', {}, template.TemplateSyntaxError),
             'include-error07': ('{% include "include-fail1" %}', {}, ('', '', RuntimeError)),
             'include-error08': ('{% include "include-fail2" %}', {}, ('', '', template.TemplateSyntaxError)),
-            'include-error09': ('{% include failed_include %}', {'failed_include': 'include-fail1'}, ('', '', template.TemplateSyntaxError)),
+            'include-error09': ('{% include failed_include %}', {'failed_include': 'include-fail1'}, ('', '', RuntimeError)),
             'include-error10': ('{% include failed_include %}', {'failed_include': 'include-fail2'}, ('', '', template.TemplateSyntaxError)),
 
 
@@ -1186,18 +1206,26 @@ class Templates(unittest.TestCase):
             'inheritance40': ("{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}", {'optional': 1}, '1new23'),
             'inheritance41': ("{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}", {'numbers': '123'}, '_new1_new2_new3_'),
 
+            # Expression starting and ending with a quote
+            'inheritance42': ("{% extends 'inheritance02'|cut:' ' %}", {}, '1234'),
+
             ### LOADING TAG LIBRARIES #################################################
+            'load01': ("{% load testtags subpackage.echo %}{% echo test %} {% echo2 \"test\" %}", {}, "test test"),
+            'load02': ("{% load subpackage.echo %}{% echo2 \"test\" %}", {}, "test"),
 
             # {% load %} tag, importing individual tags
-            'load1': ("{% load echo from testtags %}{% echo this that theother %}", {}, 'this that theother'),
-            'load2': ("{% load echo other_echo from testtags %}{% echo this that theother %} {% other_echo and another thing %}", {}, 'this that theother and another thing'),
-            'load3': ("{% load echo upper from testtags %}{% echo this that theother %} {{ statement|upper }}", {'statement': 'not shouting'}, 'this that theother NOT SHOUTING'),
+            'load03': ("{% load echo from testtags %}{% echo this that theother %}", {}, 'this that theother'),
+            'load04': ("{% load echo other_echo from testtags %}{% echo this that theother %} {% other_echo and another thing %}", {}, 'this that theother and another thing'),
+            'load05': ("{% load echo upper from testtags %}{% echo this that theother %} {{ statement|upper }}", {'statement': 'not shouting'}, 'this that theother NOT SHOUTING'),
+            'load06': ("{% load echo2 from subpackage.echo %}{% echo2 \"test\" %}", {}, "test"),
 
             # {% load %} tag errors
-            'load4': ("{% load echo other_echo bad_tag from testtags %}", {}, template.TemplateSyntaxError),
-            'load5': ("{% load echo other_echo bad_tag from %}", {}, template.TemplateSyntaxError),
-            'load6': ("{% load from testtags %}", {}, template.TemplateSyntaxError),
-            'load7': ("{% load echo from bad_library %}", {}, template.TemplateSyntaxError),
+            'load07': ("{% load echo other_echo bad_tag from testtags %}", {}, template.TemplateSyntaxError),
+            'load08': ("{% load echo other_echo bad_tag from %}", {}, template.TemplateSyntaxError),
+            'load09': ("{% load from testtags %}", {}, template.TemplateSyntaxError),
+            'load10': ("{% load echo from bad_library %}", {}, template.TemplateSyntaxError),
+            'load11': ("{% load subpackage.echo_invalid %}", {}, template.TemplateSyntaxError),
+            'load12': ("{% load subpackage.missing %}", {}, template.TemplateSyntaxError),
 
             ### I18N ##################################################################
 
@@ -1283,7 +1311,7 @@ class Templates(unittest.TestCase):
             'legacyi18n28': ('{% load i18n %}{% blocktrans with anton as a and berta as b %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, u'α + β'),
 
             # retrieving language information
-            'i18n28': ('{% load i18n %}{% get_language_info for "de" as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {}, 'de: German/Deutsch bidi=False'),
+            'i18n28_2': ('{% load i18n %}{% get_language_info for "de" as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {}, 'de: German/Deutsch bidi=False'),
             'i18n29': ('{% load i18n %}{% get_language_info for LANGUAGE_CODE as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {'LANGUAGE_CODE': 'fi'}, 'fi: Finnish/suomi bidi=False'),
             'i18n30': ('{% load i18n %}{% get_language_info_list for langcodes as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': ['it', 'no']}, u'it: Italian/italiano bidi=False; no: Norwegian/Norsk bidi=False; '),
             'i18n31': ('{% load i18n %}{% get_language_info_list for langcodes as langs %}{% for l in langs %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}; {% endfor %}', {'langcodes': (('sl', 'Slovenian'), ('fa', 'Persian'))}, u'sl: Slovenian/Sloven\u0161\u010dina bidi=False; fa: Persian/\u0641\u0627\u0631\u0633\u06cc bidi=True; '),
@@ -1293,13 +1321,19 @@ class Templates(unittest.TestCase):
             # blocktrans handling of variables which are not in the context.
             'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, u''),
 
+            # trans tag with as var
+            'i18n35': ('{% load i18n %}{% trans "Page not found" as page_not_found %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
+            'i18n36': ('{% load i18n %}{% trans "Page not found" noop as page_not_found %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
+            'i18n36': ('{% load i18n %}{% trans "Page not found" as page_not_found noop %}{{ page_not_found }}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
+            'i18n37': ('{% load i18n %}{% trans "Page not found" as page_not_found %}{% blocktrans %}Error: {{ page_not_found }}{% endblocktrans %}', {'LANGUAGE_CODE': 'de'}, "Error: Seite nicht gefunden"),
+
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
             'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
             'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
-            'invalidstr04': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
+            'invalidstr04_2': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
             'invalidstr05': ('{{ var }}', {}, ('', ('INVALID %s', 'var'))),
             'invalidstr06': ('{{ var.prop }}', {'var': {}}, ('', ('INVALID %s', 'var.prop'))),
 
@@ -1324,12 +1358,12 @@ class Templates(unittest.TestCase):
                             """),
 
             ### REGROUP TAG ###########################################################
-            'regroup01': ('{% regroup data by bar as grouped %}' + \
-                          '{% for group in grouped %}' + \
-                          '{{ group.grouper }}:' + \
-                          '{% for item in group.list %}' + \
-                          '{{ item.foo }}' + \
-                          '{% endfor %},' + \
+            'regroup01': ('{% regroup data by bar as grouped %}'
+                          '{% for group in grouped %}'
+                          '{{ group.grouper }}:'
+                          '{% for item in group.list %}'
+                          '{{ item.foo }}'
+                          '{% endfor %},'
                           '{% endfor %}',
                           {'data': [ {'foo':'c', 'bar':1},
                                      {'foo':'d', 'bar':1},
@@ -1339,14 +1373,41 @@ class Templates(unittest.TestCase):
                           '1:cd,2:ab,3:x,'),
 
             # Test for silent failure when target variable isn't found
-            'regroup02': ('{% regroup data by bar as grouped %}' + \
-                          '{% for group in grouped %}' + \
-                          '{{ group.grouper }}:' + \
-                          '{% for item in group.list %}' + \
-                          '{{ item.foo }}' + \
-                          '{% endfor %},' + \
+            'regroup02': ('{% regroup data by bar as grouped %}'
+                          '{% for group in grouped %}'
+                          '{{ group.grouper }}:'
+                          '{% for item in group.list %}'
+                          '{{ item.foo }}'
+                          '{% endfor %},'
                           '{% endfor %}',
                           {}, ''),
+
+            # Regression tests for #17675
+            # The date template filter has expects_localtime = True
+            'regroup03': ('{% regroup data by at|date:"m" as grouped %}'
+                          '{% for group in grouped %}'
+                          '{{ group.grouper }}:'
+                          '{% for item in group.list %}'
+                          '{{ item.at|date:"d" }}'
+                          '{% endfor %},'
+                          '{% endfor %}',
+                          {'data': [{'at': date(2012, 2, 14)},
+                                    {'at': date(2012, 2, 28)},
+                                    {'at': date(2012, 7, 4)}]},
+                          '02:1428,07:04,'),
+            # The join template filter has needs_autoescape = True
+            'regroup04': ('{% regroup data by bar|join:"" as grouped %}'
+                          '{% for group in grouped %}'
+                          '{{ group.grouper }}:'
+                          '{% for item in group.list %}'
+                          '{{ item.foo|first }}'
+                          '{% endfor %},'
+                          '{% endfor %}',
+                          {'data': [{'foo': 'x', 'bar': ['ab', 'c']},
+                                    {'foo': 'y', 'bar': ['a', 'bc']},
+                                    {'foo': 'z', 'bar': ['a', 'd']}]},
+                          'abc:xy,ad:z,'),
+
             ### SSI TAG ########################################################
 
             # Test normal behavior
@@ -1393,9 +1454,14 @@ class Templates(unittest.TestCase):
             'templatetag11': ('{% templatetag opencomment %}', {}, '{#'),
             'templatetag12': ('{% templatetag closecomment %}', {}, '#}'),
 
+            # Simple tags with customized names
+            'simpletag-renamed01': ('{% load custom %}{% minusone 7 %}', {}, '6'),
+            'simpletag-renamed02': ('{% load custom %}{% minustwo 7 %}', {}, '5'),
+            'simpletag-renamed03': ('{% load custom %}{% minustwo_overridden_name 7 %}', {}, template.TemplateSyntaxError),
+
             ### WIDTHRATIO TAG ########################################################
             'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
-            'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, ''),
+            'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, '0'),
             'widthratio03': ('{% widthratio a b 100 %}', {'a':0,'b':100}, '0'),
             'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
             'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
@@ -1428,12 +1494,18 @@ class Templates(unittest.TestCase):
 
             ### NOW TAG ########################################################
             # Simple case
-            'now01': ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
-
-            # Check parsing of escaped and special characters
-            'now02': ('{% now "j "n" Y"%}', {}, template.TemplateSyntaxError),
-        #    'now03': ('{% now "j \"n\" Y"%}', {}, str(datetime.now().day) + '"' + str(datetime.now().month) + '"' + str(datetime.now().year)),
-        #    'now04': ('{% now "j \nn\n Y"%}', {}, str(datetime.now().day) + '\n' + str(datetime.now().month) + '\n' + str(datetime.now().year))
+            'now01': ('{% now "j n Y" %}', {}, "%d %d %d" % (
+                datetime.now().day, datetime.now().month, datetime.now().year)),
+            # Check parsing of locale strings
+            'now02': ('{% now "DATE_FORMAT" %}', {},  date_format(datetime.now())),
+            # Also accept simple quotes - #15092
+            'now03': ("{% now 'j n Y' %}", {}, "%d %d %d" % (
+                datetime.now().day, datetime.now().month, datetime.now().year)),
+            'now04': ("{% now 'DATE_FORMAT' %}", {},  date_format(datetime.now())),
+            'now05': ('''{% now 'j "n" Y'%}''', {}, '''%d "%d" %d''' % (
+                datetime.now().day, datetime.now().month, datetime.now().year)),
+            'now06': ('''{% now "j 'n' Y"%}''', {}, '''%d '%d' %d''' % (
+                datetime.now().day, datetime.now().month, datetime.now().year)),
 
             ### URL TAG ########################################################
             # Successes
@@ -1466,12 +1538,12 @@ class Templates(unittest.TestCase):
             'old-url13': ('{% url regressiontests.templates.views.client_action id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
             'old-url14': ('{% url regressiontests.templates.views.client_action client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
             'old-url15': ('{% url regressiontests.templates.views.client_action 12 "test" %}', {}, '/url_tag/client/12/test/'),
-            'old-url18': ('{% url regressiontests.templates.views.client "1,2" %}', {}, '/url_tag/client/1,2/'),
+            'old-url16': ('{% url regressiontests.templates.views.client "1,2" %}', {}, '/url_tag/client/1,2/'),
 
             # Failures
             'old-url-fail01': ('{% url %}', {}, template.TemplateSyntaxError),
-            'old-url-fail02': ('{% url no_such_view %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
-            'old-url-fail03': ('{% url regressiontests.templates.views.client %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
+            'old-url-fail02': ('{% url no_such_view %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
+            'old-url-fail03': ('{% url regressiontests.templates.views.client %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
             'old-url-fail04': ('{% url view id, %}', {}, template.TemplateSyntaxError),
             'old-url-fail05': ('{% url view id= %}', {}, template.TemplateSyntaxError),
             'old-url-fail06': ('{% url view a.id=id %}', {}, template.TemplateSyntaxError),
@@ -1507,11 +1579,12 @@ class Templates(unittest.TestCase):
             'url18': ('{% load url from future %}{% url "regressiontests.templates.views.client" "1,2" %}', {}, '/url_tag/client/1,2/'),
 
             'url19': ('{% load url from future %}{% url named_url client.id %}', {'named_url': 'regressiontests.templates.views.client', 'client': {'id': 1}}, '/url_tag/client/1/'),
+            'url20': ('{% load url from future %}{% url url_name_in_var client.id %}', {'url_name_in_var': 'named.client', 'client': {'id': 1}}, '/url_tag/named-client/1/'),
 
             # Failures
             'url-fail01': ('{% load url from future %}{% url %}', {}, template.TemplateSyntaxError),
-            'url-fail02': ('{% load url from future %}{% url "no_such_view" %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
-            'url-fail03': ('{% load url from future %}{% url "regressiontests.templates.views.client" %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
+            'url-fail02': ('{% load url from future %}{% url "no_such_view" %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
+            'url-fail03': ('{% load url from future %}{% url "regressiontests.templates.views.client" %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
             'url-fail04': ('{% load url from future %}{% url "view" id, %}', {}, template.TemplateSyntaxError),
             'url-fail05': ('{% load url from future %}{% url "view" id= %}', {}, template.TemplateSyntaxError),
             'url-fail06': ('{% load url from future %}{% url "view" a.id=id %}', {}, template.TemplateSyntaxError),
@@ -1519,9 +1592,9 @@ class Templates(unittest.TestCase):
             'url-fail08': ('{% load url from future %}{% url "view" id="unterminatedstring %}', {}, template.TemplateSyntaxError),
             'url-fail09': ('{% load url from future %}{% url "view" id=", %}', {}, template.TemplateSyntaxError),
 
-            'url-fail11': ('{% load url from future %}{% url named_url %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
-            'url-fail12': ('{% load url from future %}{% url named_url %}', {'named_url': 'no_such_view'}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
-            'url-fail13': ('{% load url from future %}{% url named_url %}', {'named_url': 'regressiontests.templates.views.client'}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch, template.TemplateSyntaxError)),
+            'url-fail11': ('{% load url from future %}{% url named_url %}', {}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
+            'url-fail12': ('{% load url from future %}{% url named_url %}', {'named_url': 'no_such_view'}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
+            'url-fail13': ('{% load url from future %}{% url named_url %}', {'named_url': 'regressiontests.templates.views.client'}, (urlresolvers.NoReverseMatch, urlresolvers.NoReverseMatch)),
             'url-fail14': ('{% load url from future %}{% url named_url id, %}', {'named_url': 'view'}, template.TemplateSyntaxError),
             'url-fail15': ('{% load url from future %}{% url named_url id= %}', {'named_url': 'view'}, template.TemplateSyntaxError),
             'url-fail16': ('{% load url from future %}{% url named_url a.id=id %}', {'named_url': 'view'}, template.TemplateSyntaxError),
@@ -1608,6 +1681,8 @@ class Templates(unittest.TestCase):
             'static-prefixtag02': ('{% load static %}{% get_static_prefix as static_prefix %}{{ static_prefix }}', {}, settings.STATIC_URL),
             'static-prefixtag03': ('{% load static %}{% get_media_prefix %}', {}, settings.MEDIA_URL),
             'static-prefixtag04': ('{% load static %}{% get_media_prefix as media_prefix %}{{ media_prefix }}', {}, settings.MEDIA_URL),
+            'static-statictag01': ('{% load static %}{% static "admin/base.css" %}', {}, urljoin(settings.STATIC_URL, 'admin/base.css')),
+            'static-statictag02': ('{% load static %}{% static base_css %}', {'base_css': 'admin/base.css'}, urljoin(settings.STATIC_URL, 'admin/base.css')),
         }
         # Until Django 1.5, the ssi tag takes an unquoted constant in argument,
         # and there's no way to escape spaces. As a consequence it's impossible
@@ -1690,6 +1765,35 @@ class RequestContextTests(BaseTemplateResponseTest):
             'none'
         )
 
+skip_reason = "The {%% ssi %%} tag in Django 1.4 doesn't support spaces in path."
+class SSITests(unittest.TestCase):
+    def setUp(self):
+        self.this_dir = os.path.dirname(os.path.abspath(__file__))
+        self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
 
-if __name__ == "__main__":
-    unittest.main()
+    def render_ssi(self, path):
+        # the path must exist for the test to be reliable
+        self.assertTrue(os.path.exists(path))
+        return template.Template('{%% ssi %s %%}' % path).render(Context())
+
+    @unittest.skipIf(' ' in __file__, skip_reason)
+    def test_allowed_paths(self):
+        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
+
+    @unittest.skipIf(' ' in __file__, skip_reason)
+    def test_relative_include_exploit(self):
+        """
+        May not bypass ALLOWED_INCLUDE_ROOTS with relative paths
+
+        e.g. if ALLOWED_INCLUDE_ROOTS = ("/var/www",), it should not be
+        possible to do {% ssi "/var/www/../../etc/passwd" %}
+        """
+        disallowed_paths = [
+            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
+            os.path.join(self.ssi_dir, "..", "second", "test.html"),
+        ]
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            for path in disallowed_paths:
+                self.assertEqual(self.render_ssi(path), '')

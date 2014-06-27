@@ -1,17 +1,20 @@
-import sys
-import time
-import os
+from __future__ import with_statement
+
 import warnings
-from django.conf import settings
+from django.conf import settings, UserSettingsHolder
 from django.core import mail
-from django.core.mail.backends import locmem
-from django.test import signals
+from django import http
+from django.test.signals import template_rendered, setting_changed
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.utils.translation import deactivate
+from django.utils.functional import wraps
 
-__all__ = ('Approximate', 'ContextList', 'setup_test_environment',
-       'teardown_test_environment', 'get_runner')
+
+__all__ = (
+    'Approximate', 'ContextList',  'get_runner', 'override_settings',
+    'setup_test_environment', 'teardown_test_environment',
+)
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
 
@@ -56,7 +59,7 @@ def instrumented_test_render(self, context):
     An instrumented Template render method, providing a signal
     that can be intercepted by the test system Client
     """
-    signals.template_rendered.send(sender=self, template=self, context=context)
+    template_rendered.send(sender=self, template=self, context=context)
     return self.nodelist.render(context)
 
 
@@ -67,14 +70,17 @@ def setup_test_environment():
         - Set the email backend to the locmem email backend.
         - Setting the active locale to match the LANGUAGE_CODE setting.
     """
-    Template.original_render = Template._render
+    Template._original_render = Template._render
     Template._render = instrumented_test_render
 
-    mail.original_SMTPConnection = mail.SMTPConnection
-    mail.SMTPConnection = locmem.EmailBackend
+    # Storing previous values in the settings module itself is problematic.
+    # Store them in arbitrary (but related) modules instead. See #20636.
 
-    mail.original_email_backend = settings.EMAIL_BACKEND
+    mail._original_email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+    http._original_allowed_hosts = settings.ALLOWED_HOSTS
+    settings.ALLOWED_HOSTS = ['*']
 
     mail.outbox = []
 
@@ -88,14 +94,14 @@ def teardown_test_environment():
         - Restoring the email sending functions
 
     """
-    Template._render = Template.original_render
-    del Template.original_render
+    Template._render = Template._original_render
+    del Template._original_render
 
-    mail.SMTPConnection = mail.original_SMTPConnection
-    del mail.original_SMTPConnection
+    settings.EMAIL_BACKEND = mail._original_email_backend
+    del mail._original_email_backend
 
-    settings.EMAIL_BACKEND = mail.original_email_backend
-    del mail.original_email_backend
+    settings.ALLOWED_HOSTS = http._original_allowed_hosts
+    del http._original_allowed_hosts
 
     del mail.outbox
 
@@ -118,8 +124,11 @@ def restore_warnings_state(state):
     warnings.filters = state[:]
 
 
-def get_runner(settings):
-    test_path = settings.TEST_RUNNER.split('.')
+def get_runner(settings, test_runner_class=None):
+    if not test_runner_class:
+        test_runner_class = settings.TEST_RUNNER
+
+    test_path = test_runner_class.split('.')
     # Allow for Python 2.5 relative paths
     if len(test_path) > 1:
         test_module_name = '.'.join(test_path[:-1])
@@ -166,3 +175,59 @@ def restore_template_loaders():
     """
     loader.template_source_loaders = getattr(loader, RESTORE_LOADERS_ATTR)
     delattr(loader, RESTORE_LOADERS_ATTR)
+
+
+class override_settings(object):
+    """
+    Acts as either a decorator, or a context manager. If it's a decorator it
+    takes a function and returns a wrapped function. If it's a contextmanager
+    it's used with the ``with`` statement. In either event entering/exiting
+    are called before and after, respectively, the function/block is executed.
+    """
+    def __init__(self, **kwargs):
+        self.options = kwargs
+        self.wrapped = settings._wrapped
+
+    def __enter__(self):
+        self.enable()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.disable()
+
+    def __call__(self, test_func):
+        from django.test import TransactionTestCase
+        if isinstance(test_func, type) and issubclass(test_func, TransactionTestCase):
+            original_pre_setup = test_func._pre_setup
+            original_post_teardown = test_func._post_teardown
+            def _pre_setup(innerself):
+                self.enable()
+                original_pre_setup(innerself)
+            def _post_teardown(innerself):
+                original_post_teardown(innerself)
+                self.disable()
+            test_func._pre_setup = _pre_setup
+            test_func._post_teardown = _post_teardown
+            return test_func
+        else:
+            @wraps(test_func)
+            def inner(*args, **kwargs):
+                with self:
+                    return test_func(*args, **kwargs)
+        return inner
+
+    def enable(self):
+        override = UserSettingsHolder(settings._wrapped)
+        for key, new_value in self.options.items():
+            setattr(override, key, new_value)
+        settings._wrapped = override
+        for key, new_value in self.options.items():
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting=key, value=new_value)
+
+    def disable(self):
+        settings._wrapped = self.wrapped
+        for key in self.options:
+            new_value = getattr(settings, key, None)
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting=key, value=new_value)
+

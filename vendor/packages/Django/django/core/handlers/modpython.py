@@ -1,5 +1,4 @@
 import os
-from pprint import pformat
 import sys
 from warnings import warn
 
@@ -8,15 +7,10 @@ from django.core import signals
 from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode, smart_str, iri_to_uri
+from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.log import getLogger
 
 logger = getLogger('django.request')
-
-
-# NOTE: do *not* import settings (or any module which eventually imports
-# settings) until after ModPythonHandler has been called; otherwise os.environ
-# won't be set up correctly (with respect to settings).
 
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
@@ -45,38 +39,12 @@ class ModPythonRequest(http.HttpRequest):
         self._stream = self._req
         self._read_started = False
 
-    def __repr__(self):
-        # Since this is called as part of error handling, we need to be very
-        # robust against potentially malformed input.
-        try:
-            get = pformat(self.GET)
-        except:
-            get = '<could not parse>'
-        if self._post_parse_error:
-            post = '<could not parse>'
-        else:
-            try:
-                post = pformat(self.POST)
-            except:
-                post = '<could not parse>'
-        try:
-            cookies = pformat(self.COOKIES)
-        except:
-            cookies = '<could not parse>'
-        try:
-            meta = pformat(self.META)
-        except:
-            meta = '<could not parse>'
-        return smart_str(u'<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
-                         (self.path, unicode(get), unicode(post),
-                          unicode(cookies), unicode(meta)))
-
     def get_full_path(self):
         # RFC 3986 requires self._req.args to be in the ASCII range, but this
         # doesn't always happen, so rather than crash, we defensively encode it.
         return '%s%s' % (self.path, self._req.args and ('?' + iri_to_uri(self._req.args)) or '')
 
-    def is_secure(self):
+    def _is_secure(self):
         try:
             return self._req.is_https()
         except AttributeError:
@@ -160,7 +128,7 @@ class ModPythonHandler(BaseHandler):
 
     def __call__(self, req):
         warn(('The mod_python handler is deprecated; use a WSGI or FastCGI server instead.'),
-             PendingDeprecationWarning)
+             DeprecationWarning)
 
         # mod_python fakes the environ, and thus doesn't process SetEnv.  This fixes that
         os.environ.update(req.subprocess_env)

@@ -1,7 +1,7 @@
-from django.db import models
-
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+
 
 class Award(models.Model):
     name = models.CharField(max_length=25)
@@ -67,3 +67,29 @@ class Location(models.Model):
 class Item(models.Model):
     version = models.ForeignKey(Version)
     location = models.ForeignKey(Location, blank=True, null=True)
+
+# Models for #16128
+
+class File(models.Model):
+    pass
+
+class Image(File):
+    class Meta:
+        proxy = True
+
+class Photo(Image):
+    class Meta:
+        proxy = True
+
+class FooImage(models.Model):
+    my_image = models.ForeignKey(Image)
+
+class FooFile(models.Model):
+    my_file = models.ForeignKey(File)
+
+class FooPhoto(models.Model):
+    my_photo = models.ForeignKey(Photo)
+
+class FooFileProxy(FooFile):
+    class Meta:
+        proxy = True

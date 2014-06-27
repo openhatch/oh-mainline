@@ -4,8 +4,9 @@ import re
 import sys
 import urllib
 import urlparse
-from email.Utils import formatdate
+from email.utils import formatdate
 
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
 
@@ -30,7 +31,6 @@ def urlquote(url, safe='/'):
     without double-quoting occurring.
     """
     return force_unicode(urllib.quote(smart_str(url), smart_str(safe)))
-
 urlquote = allow_lazy(urlquote, unicode)
 
 def urlquote_plus(url, safe=''):
@@ -43,13 +43,31 @@ def urlquote_plus(url, safe=''):
     return force_unicode(urllib.quote_plus(smart_str(url), smart_str(safe)))
 urlquote_plus = allow_lazy(urlquote_plus, unicode)
 
+def urlunquote(quoted_url):
+    """
+    A wrapper for Python's urllib.unquote() function that can operate on
+    the result of django.utils.http.urlquote().
+    """
+    return force_unicode(urllib.unquote(smart_str(quoted_url)))
+urlunquote = allow_lazy(urlunquote, unicode)
+
+def urlunquote_plus(quoted_url):
+    """
+    A wrapper for Python's urllib.unquote_plus() function that can operate on
+    the result of django.utils.http.urlquote_plus().
+    """
+    return force_unicode(urllib.unquote_plus(smart_str(quoted_url)))
+urlunquote_plus = allow_lazy(urlunquote_plus, unicode)
+
 def urlencode(query, doseq=0):
     """
     A version of Python's urllib.urlencode() function that can operate on
     unicode strings. The parameters are first case to UTF-8 encoded strings and
     then encoded as per normal.
     """
-    if hasattr(query, 'items'):
+    if isinstance(query, MultiValueDict):
+        query = query.lists()
+    elif hasattr(query, 'items'):
         query = query.items()
     return urllib.urlencode(
         [(smart_str(k),
@@ -153,6 +171,8 @@ def int_to_base36(i):
     """
     digits = "0123456789abcdefghijklmnopqrstuvwxyz"
     factor = 0
+    if not 0 <= i <= sys.maxint:
+        raise ValueError("Base36 conversion input too large or incorrect type.")
     # Find starting factor
     while True:
         factor += 1
@@ -163,7 +183,7 @@ def int_to_base36(i):
     # Construct base36 representation
     while factor >= 0:
         j = 36 ** factor
-        base36.append(digits[i / j])
+        base36.append(digits[i // j])
         i = i % j
         factor -= 1
     return ''.join(base36)
@@ -195,8 +215,8 @@ if sys.version_info >= (2, 6):
         p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
         return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
 else:
-    # Python 2.4, 2.5 compatibility. This actually works for Python 2.6 and
-    # above, but the above definition is much more obviously correct and so is
+    # Python 2.5 compatibility. This actually works for Python 2.6 and above,
+    # but the above definition is much more obviously correct and so is
     # preferred going forward.
     def same_origin(url1, url2):
         """
@@ -204,3 +224,28 @@ else:
         """
         p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
         return p1[0:2] == p2[0:2]
+
+def is_safe_url(url, host=None):
+    """
+    Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
+    a different host and uses a safe scheme).
+
+    Always returns ``False`` on an empty url.
+    """
+    if not url:
+        return False
+    # Chrome treats \ completely as /
+    url = url.replace('\\', '/')
+    # Chrome considers any URL with more than two slashes to be absolute, but
+    # urlaprse is not so flexible. Treat any url with three slashes as unsafe.
+    if url.startswith('///'):
+        return False
+    url_info = urlparse.urlparse(url)
+    # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
+    # In that URL, example.com is not the hostname but, a path component. However,
+    # Chrome will still consider example.com to be the hostname, so we must not
+    # allow this syntax.
+    if not url_info[1] and url_info[0]:
+        return False
+    return (not url_info[1] or url_info[1] == host) and \
+        (not url_info[0] or url_info[0] in ['http', 'https'])

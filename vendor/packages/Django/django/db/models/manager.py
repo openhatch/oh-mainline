@@ -1,5 +1,4 @@
-from django.utils import copycompat as copy
-from django.conf import settings
+import copy
 from django.db import router
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query, RawQuerySet
 from django.db.models import signals
@@ -137,6 +136,9 @@ class Manager(object):
     def create(self, **kwargs):
         return self.get_query_set().create(**kwargs)
 
+    def bulk_create(self, *args, **kwargs):
+        return self.get_query_set().bulk_create(*args, **kwargs)
+
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)
 
@@ -164,8 +166,14 @@ class Manager(object):
     def order_by(self, *args, **kwargs):
         return self.get_query_set().order_by(*args, **kwargs)
 
+    def select_for_update(self, *args, **kwargs):
+        return self.get_query_set().select_for_update(*args, **kwargs)
+
     def select_related(self, *args, **kwargs):
         return self.get_query_set().select_related(*args, **kwargs)
+
+    def prefetch_related(self, *args, **kwargs):
+        return self.get_query_set().prefetch_related(*args, **kwargs)
 
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
@@ -191,8 +199,8 @@ class Manager(object):
     def exists(self, *args, **kwargs):
         return self.get_query_set().exists(*args, **kwargs)
 
-    def _insert(self, values, **kwargs):
-        return insert_query(self.model, values, **kwargs)
+    def _insert(self, objs, fields, **kwargs):
+        return insert_query(self.model, objs, fields, **kwargs)
 
     def _update(self, values, **kwargs):
         return self.get_query_set()._update(values, **kwargs)

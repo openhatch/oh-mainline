@@ -1,5 +1,4 @@
-from django.conf.urls.defaults import *
-
+from django.conf.urls import patterns, include
 
 urlpatterns = patterns('',
     # test_client modeltest urls
@@ -22,25 +21,13 @@ urlpatterns = patterns('',
     # test urlconf for middleware tests
     (r'^middleware/', include('regressiontests.middleware.urls')),
 
-    # admin view tests
-    (r'^test_admin/', include('regressiontests.admin_views.urls')),
-    (r'^generic_inline_admin/', include('regressiontests.generic_inline_admin.urls')),
-
     # admin widget tests
     (r'widget_admin/', include('regressiontests.admin_widgets.urls')),
 
-    # test urlconf for syndication tests
-    (r'^syndication/', include('regressiontests.syndication.urls')),
+    # admin custom URL tests
+    (r'^custom_urls/', include('regressiontests.admin_custom_urls.urls')),
 
-    # conditional get views
-    (r'condition/', include('regressiontests.conditional_processing.urls')),
+    # admin scripts tests
+    (r'^admin_scripts/', include('regressiontests.admin_scripts.urls')),
 
-    # middleware exceptions tests
-    (r'middleware_exceptions/', include('regressiontests.middleware_exceptions.urls')),
-
-    # special headers views
-    (r'special_headers/', include('regressiontests.special_headers.urls')),
-
-    # test util views
-    (r'test_utils/', include('regressiontests.test_utils.urls')),
 )

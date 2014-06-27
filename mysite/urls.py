@@ -44,12 +44,8 @@ import mysite.profile.api
 import mysite.missions.svn.views
 import mysite.missions.setup.views
 
-from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
+from mysite.base.feeds import RecentActivityFeed
 
-feeds = {
-    'recbugs': RecommendedBugsFeed,
-    'activity': RecentActivityFeed,
-}
 
 urlpatterns = patterns('',
                        # Okay, sometimes people link /, or /) because of bad linkification
@@ -110,8 +106,7 @@ urlpatterns = patterns('',
                                              allow_xmlhttprequest=True)),
 
                        # Feed URL pattern
-                       url(r'^\+feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-                           {'feed_dict': feeds}, name='oh_feed_url'),
+                       url(r'^\+feeds/activity/$', RecentActivityFeed()),
 
                        # Mission-related URLs
                        (r'^missions/$',
@@ -206,6 +201,8 @@ urlpatterns = patterns('',
                         'mysite.missions.git.views.rebase'),
                        (r'^missions/git/rebase/submit$',
                         'mysite.missions.git.views.rebase_submit'),
+                       (r'^missions/git/reference$',
+                        'mysite.missions.git.views.reference'),
 
                        (r'^missions/windows-setup',
                         include(
@@ -237,6 +234,13 @@ urlpatterns = patterns('',
                         'mysite.customs.views.delete_tracker_url'),
                        (r'^customs/delete_url/(?P<tracker_type>\w*)/(?P<tracker_id>\d+)/(?P<tracker_name>.+)/url/(?P<url_id>\d*)/do$',
                         'mysite.customs.views.delete_tracker_url_do'),
+
+                       # Bug set creator URLs
+                       (r'^bugsets/$', 'mysite.bugsets.views.list_index'),
+                       (r'^bugsets/(?P<pk>\d+)-(?P<slug>.*)$',
+                        'mysite.bugsets.views.listview_index'),
+                           # This is a view for robots, do not modify
+                       (r'^inplaceeditform/', include('inplaceeditform.urls')),
 
                        # Invitation-related URLs
                        (r'^invitation/', include('invitation.urls')),
@@ -287,8 +291,8 @@ urlpatterns = patterns('',
 
                        (r'^account/logout/$', 'django.contrib.auth.views.logout',
                         {
-                            #'next_page': '/',
-                            'redirect_field_name': 'next'
+                            'next_page': '/',
+                            'redirect_field_name': None,
                         },
                            'oh_logout'),
 
@@ -413,9 +417,6 @@ urlpatterns = patterns('',
 
                        (r'^profile/views/delete_portfolio_entry_do$',
                         'mysite.profile.views.delete_portfolio_entry_do'),
-
-                       (r'^\+profile/bug_recommendation_list_as_template_fragment$',
-                        'mysite.profile.views.bug_recommendation_list_as_template_fragment'),
 
                        (r'^people/portfolio/import/$',
                         'mysite.profile.views.importer'),

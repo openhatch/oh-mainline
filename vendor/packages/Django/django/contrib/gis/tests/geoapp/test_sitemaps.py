@@ -1,11 +1,17 @@
-import cStringIO
+from __future__ import absolute_import
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 from xml.dom import minidom
 import zipfile
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from models import City, Country
+from .models import City, Country
 
 
 class GeoSitemapTest(TestCase):
@@ -60,7 +66,7 @@ class GeoSitemapTest(TestCase):
                     kml_doc = minidom.parseString(self.client.get(kml_url).content)
                 elif kml_type == 'kmz':
                     # Have to decompress KMZ before parsing.
-                    buf = cStringIO.StringIO(self.client.get(kml_url).content)
+                    buf = StringIO(self.client.get(kml_url).content)
                     zf = zipfile.ZipFile(buf)
                     self.assertEqual(1, len(zf.filelist))
                     self.assertEqual('doc.kml', zf.filelist[0].filename)
@@ -75,7 +81,7 @@ class GeoSitemapTest(TestCase):
 
     def test_geositemap_georss(self):
         "Tests GeoRSS geographic sitemaps."
-        from feeds import feed_dict
+        from .feeds import feed_dict
 
         doc = minidom.parseString(self.client.get('/sitemaps/georss.xml').content)
 

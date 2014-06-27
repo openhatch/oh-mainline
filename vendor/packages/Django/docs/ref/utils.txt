@@ -21,9 +21,8 @@ managing the ``Vary`` header of responses. It includes functions to patch the
 header of response objects directly and decorators that change functions to do
 that header-patching themselves.
 
-For information on the ``Vary`` header, see `RFC 2616 section 14.44`_.
-
-.. _RFC 2616 section 14.44: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+For information on the ``Vary`` header, see :rfc:`2616#section-14.44` section
+14.44.
 
 Essentially, the ``Vary`` HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -38,12 +37,12 @@ to distinguish caches by the ``Accept-language`` header.
     This function patches the ``Cache-Control`` header by adding all keyword
     arguments to it. The transformation is as follows:
 
-     * All keyword parameter names are turned to lowercase, and underscores
-       are converted to hyphens.
-     * If the value of a parameter is ``True`` (exactly ``True``, not just a
-       true value), only the parameter name is added to the header.
-     * All other parameters are added with their value, after applying
-       ``str()`` to it.
+    * All keyword parameter names are turned to lowercase, and underscores
+      are converted to hyphens.
+    * If the value of a parameter is ``True`` (exactly ``True``, not just a
+      true value), only the parameter name is added to the header.
+    * All other parameters are added with their value, after applying
+      ``str()`` to it.
 
 .. function:: get_max_age(response)
 
@@ -54,10 +53,10 @@ to distinguish caches by the ``Accept-language`` header.
 
     Adds some useful headers to the given ``HttpResponse`` object:
 
-     * ``ETag``
-     * ``Last-Modified``
-     * ``Expires``
-     * ``Cache-Control``
+    * ``ETag``
+    * ``Last-Modified``
+    * ``Expires``
+    * ``Cache-Control``
 
     Each header is only added if it isn't already set.
 
@@ -98,11 +97,11 @@ to distinguish caches by the ``Accept-language`` header.
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
 
-SortedDict
-==========
+``django.utils.datastructures``
+===============================
 
 .. module:: django.utils.datastructures
-   :synopsis: A dictionary that keeps its keys in the order in which they're inserted.
+   :synopsis: Data structures that aren't in Python's standard library.
 
 .. class:: SortedDict
 
@@ -131,6 +130,72 @@ will not work. Passing in a basic Python ``dict`` could produce unreliable
 results. Instead do::
 
     SortedDict([('b', 1), ('a', 2), ('c', 3)])
+
+``django.utils.dateparse``
+==========================
+
+.. versionadded:: 1.4
+
+.. module:: django.utils.dateparse
+   :synopsis: Functions to parse datetime objects.
+
+The functions defined in this module share the following properties:
+
+- They raise :exc:`ValueError` if their input is well formatted but isn't a
+  valid date or time.
+- They return ``None`` if it isn't well formatted at all.
+- They accept up to picosecond resolution in input, but they truncate it to
+  microseconds, since that's what Python supports.
+
+.. function:: parse_date(value)
+
+    Parses a string and returns a :class:`datetime.date`.
+
+.. function:: parse_time(value)
+
+    Parses a string and returns a :class:`datetime.time`.
+
+    UTC offsets aren't supported; if ``value`` describes one, the result is
+    ``None``.
+
+.. function:: parse_datetime(value)
+
+    Parses a string and returns a :class:`datetime.datetime`.
+
+    UTC offsets are supported; if ``value`` describes one, the result's
+    ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
+    instance.
+
+``django.utils.decorators``
+===========================
+
+.. module:: django.utils.decorators
+    :synopsis: Functions that help with creating decorators for views.
+
+.. function:: method_decorator(decorator)
+
+    Converts a function decorator into a method decorator. See :ref:`decorating
+    class based views<decorating-class-based-views>` for example usage.
+
+.. function:: decorator_from_middleware(middleware_class)
+
+    Given a middleware class, returns a view decorator. This lets you use
+    middleware functionality on a per-view basis. The middleware is created
+    with no params passed.
+
+.. function:: decorator_from_middleware_with_args(middleware_class)
+
+    Like ``decorator_from_middleware``, but returns a function
+    that accepts the arguments to be passed to the middleware_class.
+    For example, the :func:`~django.views.decorators.cache.cache_page`
+    decorator is created from the
+    :class:`~django.middleware.cache.CacheMiddleware` like this::
+
+         cache_page = decorator_from_middleware_with_args(CacheMiddleware)
+
+         @cache_page(3600)
+         def my_view(request):
+             pass
 
 ``django.utils.encoding``
 =========================
@@ -179,11 +244,9 @@ results. Instead do::
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of `RFC 3987`_.  However, since we
-    are assuming input is either UTF-8 or unicode already, we can simplify
-    things a little from the full method.
-
-    .. _RFC 3987: http://www.ietf.org/rfc/rfc3987.txt
+    This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`. However,
+    since we are assuming input is either UTF-8 or unicode already, we can
+    simplify things a little from the full method.
 
     Returns an ASCII string containing the encoded result.
 
@@ -215,13 +278,13 @@ For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
 For definitions of the different versions of RSS, see:
-http://diveintomark.org/archives/2004/02/04/incompatible-rss
+http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
 
 SyndicationFeed
 ---------------
@@ -229,12 +292,12 @@ SyndicationFeed
 .. class:: SyndicationFeed
 
     Base class for all syndication feeds. Subclasses should provide write().
-    
+
     .. method:: __init__(title, link, description, [language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs])
 
         Initialize the feed with the given dictionary of metadata, which applies
         to the entire feed.
-        
+
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
 
@@ -299,7 +362,7 @@ Rss201rev2Feed
 
 .. class:: Rss201rev2Feed(RssFeed)
 
-    Spec: http://blogs.law.harvard.edu/tech/rss
+    Spec: http://cyber.law.harvard.edu/rss/rss.html
 
 RssUserland091Feed
 ------------------
@@ -313,7 +376,7 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
+    Spec: http://tools.ietf.org/html/rfc4287
 
 ``django.utils.functional``
 ===========================
@@ -397,10 +460,8 @@ Atom1Feed
 
 .. function:: http_date(epoch_seconds=None)
 
-    Formats the time to match the RFC 1123 date format as specified by HTTP
-    `RFC 2616`_ section 3.3.1.
-
-    .. _RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616.txt
+    Formats the time to match the :rfc:`1123` date format as specified by HTTP
+    :rfc:`2616#section-3.3.1` section 3.3.1.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,
@@ -414,7 +475,7 @@ Atom1Feed
 
 .. function:: int_to_base36(i)
 
-    Converts an integer to a base 36 string.
+    Converts a positive integer less than sys.maxint to a base 36 string.
 
 ``django.utils.safestring``
 ===========================
@@ -460,7 +521,7 @@ appropriate entities.
    :synopsis: Internationalization support.
 
 For a complete discussion on the usage of the following see the
-:doc:`Internationalization documentation </topics/i18n/internationalization>`.
+:doc:`translation documentation </topics/i18n/translation>`.
 
 .. function:: gettext(message)
 
@@ -523,9 +584,8 @@ For a complete discussion on the usage of the following see the
 
 .. function:: activate(language)
 
-    Fetches the translation object for a given tuple of application name and
-    language and installs it as the current translation object for the current
-    thread.
+    Fetches the translation object for a given language and installs it as
+    the current translation object for the current thread.
 
 .. function:: deactivate()
 
@@ -538,6 +598,19 @@ For a complete discussion on the usage of the following see the
     useful when we want delayed translations to appear as the original string
     for some reason.
 
+.. function:: override(language, deactivate=False)
+
+    .. versionadded:: 1.4
+
+    A Python context manager that uses
+    :func:`django.utils.translation.activate` to fetch the translation object
+    for a given language, installing it as the translation object for the
+    current thread and reinstall the previous active language on exit.
+    Optionally it can simply deinstall the temporary translation on exit with
+    :func:`django.utils.translation.deactivate` if the deactivate argument is
+    True. If you pass None as the language argument, a NullTranslations()
+    instance is installed while the context is active.
+
 .. function:: get_language()
 
     Returns the currently selected language code.
@@ -546,21 +619,21 @@ For a complete discussion on the usage of the following see the
 
     Returns selected language's BiDi layout:
 
-     * ``False`` = left-to-right layout
-     * ``True`` = right-to-left layout
+    * ``False`` = left-to-right layout
+    * ``True`` = right-to-left layout
 
-.. function:: get_date_formats()
+.. function:: get_language_from_request(request, check_path=False)
 
-    Checks whether translation files provide a translation for some technical
-    message ID to store date and time formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-
-.. function:: get_language_from_request(request)
+    .. versionchanged:: 1.4
 
     Analyzes the request to find what language the user wants the system to show.
     Only languages listed in settings.LANGUAGES are taken into account. If the user
     requests a sublanguage where we have a main language, we send out the main
     language.
+
+    If ``check_path`` is ``True``, the function first checks the requested URL
+    for whether its path begins with a language code listed in the
+    :setting:`LANGUAGES` setting.
 
 .. function:: to_locale(language)
 
@@ -571,6 +644,91 @@ For a complete discussion on the usage of the following see the
     Turns a Django template into something that is understood by xgettext. It does
     so by translating the Django translation tags into standard gettext function
     invocations.
+
+.. _time-zone-selection-functions:
+
+``django.utils.timezone``
+=========================
+
+.. versionadded:: 1.4
+
+.. module:: django.utils.timezone
+    :synopsis: Timezone support.
+
+.. data:: utc
+
+    :class:`~datetime.tzinfo` instance that represents UTC.
+
+.. function:: get_default_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`default time zone <default-current-time-zone>`.
+
+.. function:: get_default_timezone_name()
+
+    Returns the name of the :ref:`default time zone
+    <default-current-time-zone>`.
+
+.. function:: get_current_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: get_current_timezone_name()
+
+    Returns the name of the :ref:`current time zone
+    <default-current-time-zone>`.
+
+.. function:: activate(timezone)
+
+    Sets the :ref:`current time zone <default-current-time-zone>`. The
+    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
+    subclass or, if pytz_ is available, a time zone name.
+
+.. function:: deactivate()
+
+    Unsets the :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: override(timezone)
+
+    This is a Python context manager that sets the :ref:`current time zone
+    <default-current-time-zone>` on entry with :func:`activate()`, and restores
+    the previously active time zone on exit. If the ``timezone`` argument is
+    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
+    on entry with :func:`deactivate()` instead.
+
+.. function:: now()
+
+    Returns an aware or naive :class:`~datetime.datetime` that represents the
+    current point in time when :setting:`USE_TZ` is ``True`` or ``False``
+    respectively.
+
+.. function:: is_aware(value)
+
+    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: is_naive(value)
+
+    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: make_aware(value, timezone)
+
+    Returns an aware :class:`~datetime.datetime` that represents the same
+    point in time as ``value`` in ``timezone``, ``value`` being a naive
+    :class:`~datetime.datetime`.
+
+    This function can raise an exception if ``value`` doesn't exist or is
+    ambiguous because of DST transitions.
+
+.. function:: make_naive(value, timezone)
+
+    Returns an naive :class:`~datetime.datetime` that represents in
+    ``timezone``  the same point in time as ``value``, ``value`` being an
+    aware :class:`~datetime.datetime`
+
+.. _pytz: http://pytz.sourceforge.net/
 
 ``django.utils.tzinfo``
 =======================

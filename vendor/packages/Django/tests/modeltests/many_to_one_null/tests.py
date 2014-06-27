@@ -1,8 +1,11 @@
+from __future__ import with_statement, absolute_import
+
 from django.test import TestCase
-from models import Reporter, Article
+
+from .models import Reporter, Article
+
 
 class ManyToOneNullTests(TestCase):
-
     def setUp(self):
         # Create a Reporter.
         self.r = Reporter(name='John Smith')
@@ -82,3 +85,11 @@ class ManyToOneNullTests(TestCase):
         self.assertQuerysetEqual(self.r.article_set.all(), [])
         self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
                                  ['<Article: First>', '<Article: Fourth>'])
+
+    def test_clear_efficiency(self):
+        r = Reporter.objects.create()
+        for _ in xrange(3):
+            r.article_set.create()
+        with self.assertNumQueries(1):
+            r.article_set.clear()
+        self.assertEqual(r.article_set.count(), 0)

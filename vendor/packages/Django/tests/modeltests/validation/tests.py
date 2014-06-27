@@ -1,17 +1,34 @@
+from __future__ import absolute_import
+
+import warnings
+
 from django import forms
-from django.test import TestCase
 from django.core.exceptions import NON_FIELD_ERRORS
-from modeltests.validation import ValidationTestCase
-from modeltests.validation.models import Author, Article, ModelToValidate
+from django.test import TestCase
+
+# Import the verify_exists_urls from the 'forms' test app
+from regressiontests.forms.tests.fields import verify_exists_urls
+
+from . import ValidationTestCase
+from .models import (Author, Article, ModelToValidate,
+    GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
 
 # Import other tests for this package.
-from modeltests.validation.validators import TestModelsWithValidators
-from modeltests.validation.test_unique import (GetUniqueCheckTests,
-    PerformUniqueChecksTest)
-from modeltests.validation.test_custom_messages import CustomMessagesTest
+from .test_custom_messages import CustomMessagesTest
+from .test_error_messages import ValidationMessagesTest
+from .test_unique import GetUniqueCheckTests, PerformUniqueChecksTest
+from .validators import TestModelsWithValidators
 
 
 class BaseModelValidationTests(ValidationTestCase):
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.core.validators')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_missing_required_field_raises_error(self):
         mtv = ModelToValidate(f_with_custom_validator=42)
@@ -58,14 +75,17 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=404')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url_verify', [u'This URL appears to be a broken link.'])
 
+    @verify_exists_urls(existing_urls=('http://www.google.com/',))
     def test_correct_url_value_passes(self):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://www.google.com/')
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
+    @verify_exists_urls(existing_urls=('http://qa-dev.w3.org/link-testsuite/http.php?code=301',))
     def test_correct_url_with_redirect(self):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=301') #example.com is a redirect to iana.org now
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
+    @verify_exists_urls(existing_urls=())
     def test_correct_https_url_but_nonexisting(self):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='https://www.example.com/')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url_verify', [u'This URL appears to be a broken link.'])
@@ -73,6 +93,7 @@ class BaseModelValidationTests(ValidationTestCase):
     def test_text_greater_that_charfields_max_length_raises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)
         self.assertFailsValidation(mtv.full_clean, ['name',])
+
 
 class ArticleForm(forms.ModelForm):
     class Meta:
@@ -121,3 +142,58 @@ class ModelFormsTests(TestCase):
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
         self.assertEqual(form.errors.keys(), ['pub_date'])
+
+
+class GenericIPAddressFieldTests(ValidationTestCase):
+
+    def test_correct_generic_ip_passes(self):
+        giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4")
+        self.assertEqual(None, giptm.full_clean())
+        giptm = GenericIPAddressTestModel(generic_ip="2001::2")
+        self.assertEqual(None, giptm.full_clean())
+
+    def test_invalid_generic_ip_raises_error(self):
+        giptm = GenericIPAddressTestModel(generic_ip="294.4.2.1")
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip',])
+        giptm = GenericIPAddressTestModel(generic_ip="1:2")
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip',])
+
+    def test_correct_v4_ip_passes(self):
+        giptm = GenericIPAddressTestModel(v4_ip="1.2.3.4")
+        self.assertEqual(None, giptm.full_clean())
+
+    def test_invalid_v4_ip_raises_error(self):
+        giptm = GenericIPAddressTestModel(v4_ip="294.4.2.1")
+        self.assertFailsValidation(giptm.full_clean, ['v4_ip',])
+        giptm = GenericIPAddressTestModel(v4_ip="2001::2")
+        self.assertFailsValidation(giptm.full_clean, ['v4_ip',])
+
+    def test_correct_v6_ip_passes(self):
+        giptm = GenericIPAddressTestModel(v6_ip="2001::2")
+        self.assertEqual(None, giptm.full_clean())
+
+    def test_invalid_v6_ip_raises_error(self):
+        giptm = GenericIPAddressTestModel(v6_ip="1.2.3.4")
+        self.assertFailsValidation(giptm.full_clean, ['v6_ip',])
+        giptm = GenericIPAddressTestModel(v6_ip="1:2")
+        self.assertFailsValidation(giptm.full_clean, ['v6_ip',])
+
+    def test_v6_uniqueness_detection(self):
+        # These two addresses are the same with different syntax
+        giptm = GenericIPAddressTestModel(generic_ip="2001::1:0:0:0:0:2")
+        giptm.save()
+        giptm = GenericIPAddressTestModel(generic_ip="2001:0:1:2")
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip',])
+
+    def test_v4_unpack_uniqueness_detection(self):
+        # These two are different, because we are not doing IPv4 unpacking
+        giptm = GenericIPAddressTestModel(generic_ip="::ffff:10.10.10.10")
+        giptm.save()
+        giptm = GenericIPAddressTestModel(generic_ip="10.10.10.10")
+        self.assertEqual(None, giptm.full_clean())
+
+        # These two are the same, because we are doing IPv4 unpacking
+        giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="::ffff:18.52.18.52")
+        giptm.save()
+        giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="18.52.18.52")
+        self.assertFailsValidation(giptm.full_clean, ['generic_v4unpack_ip',])

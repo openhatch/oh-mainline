@@ -97,9 +97,8 @@
 	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
     </div>
     <div id="low">
-      <pre>man patch</pre>
-      <p>or
-	<a href="http://linux.die.net/man/1/patch">read the patch page online</a>.</p>
+      <p><a href="http://linux.die.net/man/1/diff">Read the man page for diff online</a>,</p>
+      <p>or, if you're on Linux or Mac, use the terminal command: <pre>man diff</pre></p>
     </div>
     <div id="medium">
       <p>In this mission, you have to do a few things. Tips:</p>
@@ -117,7 +116,7 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	curl {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %} > recipes.tar.gz
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
       </pre>
       <p>Unzip the archive file, but do not extract it.</p>
       <pre>

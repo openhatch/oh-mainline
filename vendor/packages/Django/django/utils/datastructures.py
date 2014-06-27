@@ -1,7 +1,5 @@
+import copy
 from types import GeneratorType
-
-from django.utils.copycompat import copy, deepcopy
-
 
 class MergeDict(object):
     """
@@ -127,7 +125,7 @@ class SortedDict(dict):
                     seen.add(key)
 
     def __deepcopy__(self, memo):
-        return self.__class__([(key, deepcopy(value, memo))
+        return self.__class__([(key, copy.deepcopy(value, memo))
                                for key, value in self.iteritems()])
 
     def __setitem__(self, key, value):
@@ -230,6 +228,10 @@ class MultiValueDict(dict):
     'Simon'
     >>> d.getlist('name')
     ['Adrian', 'Simon']
+    >>> d.getlist('doesnotexist')
+    []
+    >>> d.getlist('doesnotexist', ['Adrian', 'Simon'])
+    ['Adrian', 'Simon']
     >>> d.get('lastname', 'nonexistent')
     'nonexistent'
     >>> d.setlist('lastname', ['Holovaty', 'Willison'])
@@ -269,7 +271,6 @@ class MultiValueDict(dict):
         ])
 
     def __deepcopy__(self, memo=None):
-        import django.utils.copycompat as copy
         if memo is None:
             memo = {}
         result = self.__class__()
@@ -303,15 +304,17 @@ class MultiValueDict(dict):
             return default
         return val
 
-    def getlist(self, key):
+    def getlist(self, key, default=None):
         """
         Returns the list of values for the passed key. If key doesn't exist,
-        then an empty list is returned.
+        then a default value is returned.
         """
         try:
             return super(MultiValueDict, self).__getitem__(key)
         except KeyError:
-            return []
+            if default is None:
+                return []
+            return default
 
     def setlist(self, key, list_):
         super(MultiValueDict, self).__setitem__(key, list_)
@@ -368,7 +371,7 @@ class MultiValueDict(dict):
 
     def copy(self):
         """Returns a shallow copy of this object."""
-        return copy(self)
+        return copy.copy(self)
 
     def update(self, *args, **kwargs):
         """
@@ -390,6 +393,12 @@ class MultiValueDict(dict):
                     raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
         for key, value in kwargs.iteritems():
             self.setlistdefault(key).append(value)
+
+    def dict(self):
+        """
+        Returns current object as a dict with singular values.
+        """
+        return dict((key, self[key]) for key in self)
 
 class DotExpandedDict(dict):
     """

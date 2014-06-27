@@ -55,67 +55,69 @@
 
                         <div class='form-row'>
                             <label>Bio:</label>
-                            {{ form.bio }}
                             <p class='example'>Example: I like traffic lights.
                             On weekends, I like to make websites, destroy
                             Twitter, and eat breakfast.</p>
+                            {{ form.bio }}
                         </div>
 
                         <div class='form-row'>
                             <label>Web site:</label>
+                            <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                             {{ form.homepage_url.errors }}
                             {{ form.homepage_url }}
-                            <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                         </div>
 
                         <div class='form-row'>
                             <label>IRC nick:</label>
+                            <p class='example'>Example: sufjan</p>
                             {{ form.irc_nick.errors }}
                             {{ form.irc_nick }}
-                            <p class='example'>Example: sufjan</p>
                         </div>
 
                         <div class='form-row'>
-                            <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
+                            <h3 style='width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
                             <p class='why'>After you save, these tags will appear on your profile. Click them to find similar people. {# In the near future, this information will help people find you in the <a href='/people/'>People Search</a>.#} </p>
                         </div>
 
                         <div class='form-row'>
                             <label>I understand:</label>
-                            {{ form.understands }}
                             <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
+                            {{ form.understands }}
                         </div>
 
                         <div class='form-row'>
                             <label>I will never understand:</label>
-                            {{ form.understands_not }}
                             <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
+                            {{ form.understands_not }}
                         </div>
 
                         <div class='form-row'>
                             <label>I'm currently studying:</label>
-                            {{ form.studying }}
                             <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
+                            {{ form.studying }}
                         </div>
 
                         <div class='form-row'>
-                            <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Volunteering</h3>
+                            <h3 style='width: 95%; margin-bottom: 3px;'>Volunteering</h3>
                             <p class='why'>These tags help us match you with interesting people and projects.</p>
                         </div>
 
                         <div class='form-row'>
                             <label>When projects need help, I'm willing to pitch in with:</label>
-                            {{ form.can_pitch_in }}
                             <p class='example'>Example: documentation, testing, c++, mac compatibility, design</p>
+                            {{ form.can_pitch_in }}
                         </div>
 
                         <div class='form-row'>
                             <label>I can mentor in:</label>
-                            {{ form.can_mentor }}
                             <p class='example'>Example: python, unicode, git, GTK+</p>
+                            {{ form.can_mentor }}
                         </div>
                         <div class='form-row' id='contact_blurb'>
                             <label>How to contact me:</label>
+                            <p class='example'>Example: "The best way to reach me is by
+                            private message at http://identi.ca/rafpaf."</p>
                             {% if contact_blurb_error %}
                             <!--contact_blurb_error-->
                             <ul id="error_msg" class="errorlist">
@@ -125,8 +127,6 @@
                             </ul>
                             {% endif %}
                             {{ contact_blurb_form.contact_blurb }}
-                            <p class='example'>Example: "The best way to reach me is by
-                            private message at http://identi.ca/rafpaf."</p>
                             <p class='example'>
                                 We preserve linebreaks, and turn URLs into links.
                             </p>

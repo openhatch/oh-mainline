@@ -61,13 +61,34 @@ If your database table name is an SQL reserved word, or contains characters that
 aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
 Django quotes column and table names behind the scenes.
 
+.. admonition:: Use lowercase table names for MySQL
+
+    It is strongly advised that you use lowercase table names when you override
+    the table name via ``db_table``, particularly if you are using the MySQL
+    backend. See the :ref:`MySQL notes <mysql-notes>` for more details.
+
+.. admonition:: Table name quoting for Oracle
+
+   In order to to meet the 30-char limitation Oracle has on table names,
+   and match the usual conventions for Oracle databases, Django may shorten
+   table names and turn them all-uppercase. To prevent such transformations,
+   use a quoted name as the value for ``db_table``::
+
+       db_table = '"name_left_in_lowercase"'
+
+   Such quoted names can also be used with Django's other supported database 
+   backends; except for Oracle, however, the quotes have no effect. See the
+   :ref:`Oracle notes <oracle-notes>` for more details.
+
 ``db_tablespace``
 -----------------
 
 .. attribute:: Options.db_tablespace
 
-    The name of the database tablespace to use for the model. If the backend
-    doesn't support tablespaces, this option is ignored.
+    The name of the :doc:`database tablespace </topics/db/tablespaces>` to use
+    for this model. The default is the project's :setting:`DEFAULT_TABLESPACE`
+    setting, if set. If the backend doesn't support tablespaces, this option is
+    ignored.
 
 ``get_latest_by``
 -----------------
@@ -82,7 +103,7 @@ Django quotes column and table names behind the scenes.
 
         get_latest_by = "order_date"
 
-    See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
+    See the docs for :meth:`~django.db.models.query.QuerySet.latest` for more.
 
 ``managed``
 -----------
@@ -91,7 +112,8 @@ Django quotes column and table names behind the scenes.
 
     Defaults to ``True``, meaning Django will create the appropriate database
     tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
-    management command. That is, Django *manages* the database tables' lifecycles.
+    management command. That is, Django *manages* the database tables'
+    lifecycles.
 
     If ``False``, no database table creation or deletion operations will be
     performed for this model. This is useful if the model represents an existing
@@ -99,21 +121,21 @@ Django quotes column and table names behind the scenes.
     the *only* difference when ``managed=False``. All other aspects of
     model handling are exactly the same as normal. This includes
 
-        1. Adding an automatic primary key field to the model if you don't declare
-           it.  To avoid confusion for later code readers, it's recommended to
-           specify all the columns from the database table you are modeling when
-           using unmanaged models.
+    1. Adding an automatic primary key field to the model if you don't
+       declare it.  To avoid confusion for later code readers, it's
+       recommended to specify all the columns from the database table you
+       are modeling when using unmanaged models.
 
-        2. If a model with ``managed=False`` contains a
-           :class:`~django.db.models.ManyToManyField` that points to another
-           unmanaged model, then the intermediate table for the many-to-many join
-           will also not be created. However, the intermediary table between one
-           managed and one unmanaged model *will* be created.
+    2. If a model with ``managed=False`` contains a
+       :class:`~django.db.models.ManyToManyField` that points to another
+       unmanaged model, then the intermediate table for the many-to-many
+       join will also not be created. However, the intermediary table
+       between one managed and one unmanaged model *will* be created.
 
-           If you need to change this default behavior, create the intermediary
-           table as an explicit model (with ``managed`` set as needed) and use the
-           :attr:`ManyToManyField.through` attribute to make the relation use your
-           custom model.
+       If you need to change this default behavior, create the intermediary
+       table as an explicit model (with ``managed`` set as needed) and use
+       the :attr:`ManyToManyField.through` attribute to make the relation
+       use your custom model.
 
     For tests involving models with ``managed=False``, it's up to you to ensure
     the correct tables are created as part of the test setup.
@@ -186,11 +208,6 @@ Django quotes column and table names behind the scenes.
     "-" prefix, which indicates descending order. Fields without a leading "-" will
     be ordered ascending. Use the string "?" to order randomly.
 
-    .. note::
-
-        Regardless of how many fields are in :attr:`~Options.ordering`, the admin
-        site uses only the first field.
-
     For example, to order by a ``pub_date`` field ascending, use this::
 
         ordering = ['pub_date']
@@ -202,6 +219,10 @@ Django quotes column and table names behind the scenes.
     To order by ``pub_date`` descending, then by ``author`` ascending, use this::
 
         ordering = ['-pub_date', 'author']
+
+    .. versionchanged:: 1.4
+       The Django admin honors all elements in the list/tuple; before 1.4, only
+       the first one was respected.
 
 ``permissions``
 ---------------
@@ -235,21 +256,21 @@ Django quotes column and table names behind the scenes.
 
         unique_together = (("driver", "restaurant"),)
 
-    This is a list of lists of fields that must be unique when considered together.
+    This is a tuple of tuples that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
     appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
-    For convenience, unique_together can be a single list when dealing with a single
+    For convenience, unique_together can be a single tuple when dealing with a single
     set of fields::
 
         unique_together = ("driver", "restaurant")
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
-    unique_together (it's not even clear what that would mean). If you
+    unique_together. (It's not clear what that would even mean!) If you
     need to validate uniqueness related to a
-    :class:`~django.db.models.ManyToManyField`, look at signals or
-    using an explicit :attr:`through <ManyToManyField.through>` model.
+    :class:`~django.db.models.ManyToManyField`, try using a signal or
+    an explicit :attr:`through <ManyToManyField.through>` model.
 
 ``verbose_name``
 ----------------

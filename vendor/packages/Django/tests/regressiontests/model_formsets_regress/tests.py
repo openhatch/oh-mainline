@@ -1,10 +1,12 @@
+from __future__ import absolute_import, with_statement
+
 from django import forms
 from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
 from django.forms.util import ErrorDict, ErrorList
 from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
 from django.test import TestCase
 
-from models import User, UserSite, Restaurant, Manager, Network, Host
+from .models import User, UserSite, Restaurant, Manager, Network, Host
 
 
 class InlineFormsetTests(TestCase):
@@ -202,6 +204,17 @@ class InlineFormsetTests(TestCase):
             ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
             )
 
+    def test_initial_data(self):
+        user = User.objects.create(username="bibi", serial=1)
+        UserSite.objects.create(user=user, data=7)
+        FormSet = inlineformset_factory(User, UserSite, extra=2)
+
+        formset = FormSet(instance=user, initial=[{'data': 41}, {'data': 42}])
+        self.assertEqual(formset.forms[0].initial['data'], 7)
+        self.assertEqual(formset.extra_forms[0].initial['data'], 41)
+        self.assertTrue(u'value="42"' in formset.extra_forms[1].as_p())
+
+
 class FormsetTests(TestCase):
     def test_error_class(self):
         '''
@@ -227,6 +240,25 @@ class FormsetTests(TestCase):
         for form in formset.forms:
             self.assertTrue(isinstance(form.errors, ErrorDict))
             self.assertTrue(isinstance(form.non_field_errors(), ErrorList))
+
+    def test_initial_data(self):
+        User.objects.create(username="bibi", serial=1)
+        Formset = modelformset_factory(User, extra=2)
+        formset = Formset(initial=[{'username': u'apollo11'}, {'username': u'apollo12'}])
+        self.assertEqual(formset.forms[0].initial['username'], "bibi")
+        self.assertEqual(formset.extra_forms[0].initial['username'], "apollo11")
+        self.assertTrue(u'value="apollo12"' in formset.extra_forms[1].as_p())
+
+    def test_extraneous_query_is_not_run(self):
+        Formset = modelformset_factory(Network)
+        data = {u'test-TOTAL_FORMS': u'1',
+                u'test-INITIAL_FORMS': u'0',
+                u'test-MAX_NUM_FORMS': u'',
+                u'test-0-name': u'Random Place', }
+        with self.assertNumQueries(1):
+            formset = Formset(data, prefix="test")
+            formset.save()
+
 
 class CustomWidget(forms.CharField):
     pass

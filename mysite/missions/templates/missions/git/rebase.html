@@ -43,7 +43,7 @@
 <p class="next_mission_link">
   <a href="{% url mysite.missions.base.views.main_page %}">Return to the main mission page &raquo;</a></p>
 {% else %}
-<form method="post" action="{% url mysite.missions.git.views.rebase_submit %}#gitrebase-form">
+<form method="post" action="{% url mysite.missions.git.views.rebase_submit %}#gitrebase-form">{% csrf_token %}
   <div class="form-row">
     <a name="gitrebase-form"></a>
     {% if git_rebase_error_message %}

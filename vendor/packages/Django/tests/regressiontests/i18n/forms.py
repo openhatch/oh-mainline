@@ -1,6 +1,10 @@
-from django import template, forms
+from __future__ import absolute_import
+
+from django import forms
 from django.forms.extras import SelectDateWidget
-from models import Company
+
+from .models import Company
+
 
 class I18nForm(forms.Form):
     decimal_field = forms.DecimalField(localize=True)
@@ -14,7 +18,7 @@ class SelectDateForm(forms.Form):
     date_field = forms.DateField(widget=SelectDateWidget)
 
 class CompanyForm(forms.ModelForm):
-    cents_payed = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
+    cents_paid = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
     products_delivered = forms.IntegerField(localize=True)
     date_added = forms.DateTimeField(localize=True)
 

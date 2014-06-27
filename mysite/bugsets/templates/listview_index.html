@@ -1,0 +1,78 @@
+{% extends 'base/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+# Copyright (C) 2011 Jessica McKellar
+# Copyright (C) 2014 Elana Hashman
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load inplace_edit %}
+
+{% load search %}
+{% comment %}{% load cache %}{% endcomment %}
+{% load profile_extras %}
+{% load base_extras %}
+
+{% block title %}
+Event Bugs
+{% endblock title %}
+
+{% block js_in_head %}
+{% inplace_static %}
+{% endblock %}
+
+{% block body_id %}search{% endblock %}
+
+{% block css %}
+{{ block.super }}
+{% if not bugs %}
+#results-sidebar {
+    display: none;
+}
+{% endif %}
+{% endblock css %}
+
+{% block pagetop %}
+    <h1 style='margin: 0 0 10px 10px; font-weight: bold; color: #222'>{{ bugset.name }}</h1>
+{% endblock pagetop %}
+
+
+{% block content %}
+  <div id='results' class='module'>
+    <div class='module-body'>
+
+      {% include 'results_widget.html' %}
+
+      <ul>
+        {% for bug in bugs %}
+          <li class='bug'>
+            {% include 'result.html' %}
+          </li>
+        {% endfor %}
+      </ul>
+
+    </div>
+  </div>
+{% endblock content %}
+
+{% block js %}
+<script type='text/javascript'>
+    $(function () {
+            $(SearchResults.bindEventHandlers);
+            });
+</script>
+{% endblock js %}

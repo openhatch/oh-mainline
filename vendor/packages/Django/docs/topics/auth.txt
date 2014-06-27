@@ -14,15 +14,11 @@ Overview
 
 The auth system consists of:
 
-    * Users
-    * Permissions: Binary (yes/no) flags designating whether a user may perform
-      a certain task.
-    * Groups: A generic way of applying labels and permissions to more than one
-      user.
-    * Messages: A simple way to queue messages for given users.
-
-.. deprecated:: 1.2
-   The Messages component of the auth system will be removed in Django 1.4.
+* Users
+* Permissions: Binary (yes/no) flags designating whether a user may perform
+  a certain task.
+* Groups: A generic way of applying labels and permissions to more than one
+  user.
 
 Installation
 ============
@@ -30,11 +26,11 @@ Installation
 Authentication support is bundled as a Django application in
 ``django.contrib.auth``. To install it, do the following:
 
-    1. Put ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
-       your :setting:`INSTALLED_APPS` setting.
-       (The :class:`~django.contrib.auth.models.Permission` model in
-       :mod:`django.contrib.auth` depends on :mod:`django.contrib.contenttypes`.)
-    2. Run the command ``manage.py syncdb``.
+1. Put ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
+   your :setting:`INSTALLED_APPS` setting.
+   (The :class:`~django.contrib.auth.models.Permission` model in
+   :mod:`django.contrib.auth` depends on :mod:`django.contrib.contenttypes`.)
+2. Run the command ``manage.py syncdb``.
 
 Note that the default :file:`settings.py` file created by
 :djadmin:`django-admin.py startproject <startproject>` includes
@@ -84,7 +80,7 @@ Fields
 
     .. attribute:: models.User.email
 
-        Optional. E-mail address.
+        Optional. Email address.
 
     .. attribute:: models.User.password
 
@@ -105,12 +101,13 @@ Fields
 
         This doesn't necessarily control whether or not the user can log in.
         Authentication backends aren't required to check for the ``is_active``
-        flag, so if you want to reject a login based on ``is_active`` being
-        ``False``, it's up to you to check that in your own login view.
-        However, the :class:`~django.contrib.auth.forms.AuthenticationForm`
-        used by the :func:`~django.contrib.auth.views.login` view *does*
-        perform this check, as do the permission-checking methods such as
-        :meth:`~models.User.has_perm` and the authentication in the Django
+        flag, and the default backends do not. If you want to reject a login
+        based on ``is_active`` being ``False``, it's up to you to check that in
+        your own login view or a custom authentication backend. However, the
+        :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
+        :func:`~django.contrib.auth.views.login` view (which is the default)
+        *does* perform this check, as do the permission-checking methods such
+        as :meth:`~models.User.has_perm` and the authentication in the Django
         admin. All of those functions/methods will return ``False`` for
         inactive users.
 
@@ -135,7 +132,7 @@ Methods
 .. class:: models.User
 
     :class:`~django.contrib.auth.models.User` objects have two many-to-many
-    fields: models.User. ``groups`` and ``user_permissions``.
+    fields: ``groups`` and ``user_permissions``.
     :class:`~django.contrib.auth.models.User` objects can access their related
     objects in the same way as any other :doc:`Django model
     </topics/db/models>`:
@@ -256,14 +253,9 @@ Methods
         (the Django app label). If the user is inactive, this method will
         always return ``False``.
 
-    .. method:: models.User.get_and_delete_messages()
-
-        Returns a list of :class:`~django.contrib.auth.models.Message` objects
-        in the user's queue and deletes the messages from the queue.
-
     .. method:: models.User.email_user(subject, message, from_email=None)
 
-        Sends an e-mail to the user. If
+        Sends an email to the user. If
         :attr:`~django.contrib.auth.models.User.from_email` is ``None``, Django
         uses the :setting:`DEFAULT_FROM_EMAIL`.
 
@@ -271,9 +263,10 @@ Methods
 
         Returns a site-specific profile for this user. Raises
         :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
-        current site doesn't allow profiles. For information on how to define a
-        site-specific user profile, see the section on `storing additional user
-        information`_ below.
+        current site doesn't allow profiles, or
+        :exc:`django.core.exceptions.ObjectDoesNotExist` if the user does not
+        have a profile. For information on how to define a site-specific user
+        profile, see the section on `storing additional user information`_ below.
 
 .. _storing additional user information: #storing-additional-information-about-users
 
@@ -285,7 +278,12 @@ Manager functions
     The :class:`~django.contrib.auth.models.User` model has a custom manager
     that has the following helper functions:
 
-    .. method:: models.UserManager.create_user(username, email, password=None)
+    .. method:: models.UserManager.create_user(username, email=None, password=None)
+
+        .. versionchanged:: 1.4
+           The ``email`` parameter was made optional. The username
+           parameter is now checked for emptiness and raises a
+           :exc:`ValueError` in case of a negative result.
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 
@@ -308,10 +306,10 @@ Manager functions
         allowed characters. (Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:
 
-            * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
-              letter L, uppercase letter i, and the number one)
-            * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
-              and zero)
+        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
+          letter L, uppercase letter i, and the number one)
+        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
+          and zero)
 
 Basic usage
 -----------
@@ -376,35 +374,175 @@ Don't set the :attr:`~django.contrib.auth.models.User.password` attribute
 directly unless you know what you're doing. This is explained in the next
 section.
 
-Passwords
----------
+.. _auth_password_storage:
+
+How Django stores passwords
+---------------------------
+
+.. versionadded:: 1.4
+   Django 1.4 introduces a new flexible password storage system and uses
+   PBKDF2 by default. Previous versions of Django used SHA1, and other
+   algorithms couldn't be chosen.
 
 The :attr:`~django.contrib.auth.models.User.password` attribute of a
 :class:`~django.contrib.auth.models.User` object is a string in this format::
 
-    hashtype$salt$hash
+    algorithm$hash
 
-That's hashtype, salt and hash, separated by the dollar-sign character.
+That's a storage algorithm, and hash, separated by the dollar-sign
+character. The algorithm is one of a number of one way hashing or password
+storage algorithms Django can use; see below. The hash is the result of the one-
+way function.
 
-Hashtype is either ``sha1`` (default), ``md5`` or ``crypt`` -- the algorithm
-used to perform a one-way hash of the password. Salt is a random string used
-to salt the raw password to create the hash. Note that the ``crypt`` method is
-only supported on platforms that have the standard Python ``crypt`` module
-available.
+By default, Django uses the PBKDF2_ algorithm with a SHA256 hash, a
+password stretching mechanism recommended by NIST_. This should be
+sufficient for most users: it's quite secure, requiring massive
+amounts of computing time to break.
 
-For example::
+However, depending on your requirements, you may choose a different
+algorithm, or even use a custom algorithm to match your specific
+security situation. Again, most users shouldn't need to do this -- if
+you're not sure, you probably don't.  If you do, please read on:
 
-    sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+Django chooses the an algorithm by consulting the :setting:`PASSWORD_HASHERS`
+setting. This is a list of hashing algorithm classes that this Django
+installation supports. The first entry in this list (that is,
+``settings.PASSWORD_HASHERS[0]``) will be used to store passwords, and all the
+other entries are valid hashers that can be used to check existing passwords.
+This means that if you want to use a different algorithm, you'll need to modify
+:setting:`PASSWORD_HASHERS` to list your prefered algorithm first in the list.
 
-The :meth:`~django.contrib.auth.models.User.set_password` and
-:meth:`~django.contrib.auth.models.User.check_password` functions handle the
-setting and checking of these values behind the scenes.
+The default for :setting:`PASSWORD_HASHERS` is::
 
-Previous Django versions, such as 0.90, used simple MD5 hashes without password
-salts. For backwards compatibility, those are still supported; they'll be
-converted automatically to the new style the first time
-:meth:`~django.contrib.auth.models.User.check_password()` works correctly for
-a given user.
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.CryptPasswordHasher',
+    )
+
+This means that Django will use PBKDF2_ to store all passwords, but will support
+checking passwords stored with PBKDF2SHA1, bcrypt_, SHA1_, etc. The next few
+sections describe a couple of common ways advanced users may want to modify this
+setting.
+
+.. _bcrypt_usage:
+
+Using bcrypt with Django
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bcrypt_ is a popular password storage algorithm that's specifically designed
+for long-term password storage. It's not the default used by Django since it
+requires the use of third-party libraries, but since many people may want to
+use it Django supports bcrypt with minimal effort.
+
+To use Bcrypt as your default storage algorithm, do the following:
+
+1. Install the `py-bcrypt`_ library (probably by running ``sudo pip install
+   py-bcrypt``, or downloading the library and installing it with ``python
+   setup.py install``).
+
+2. Modify :setting:`PASSWORD_HASHERS` to list ``BCryptPasswordHasher``
+   first. That is, in your settings file, you'd put::
+
+        PASSWORD_HASHERS = (
+            'django.contrib.auth.hashers.BCryptPasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+            'django.contrib.auth.hashers.SHA1PasswordHasher',
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+            'django.contrib.auth.hashers.CryptPasswordHasher',
+        )
+
+   (You need to keep the other entries in this list, or else Django won't
+   be able to upgrade passwords; see below).
+
+That's it -- now your Django install will use Bcrypt as the default storage
+algorithm.
+
+.. admonition:: Password truncation with BCryptPasswordHasher
+
+    The designers of bcrypt truncate all passwords at 72 characters which means
+    that ``bcrypt(password_with_100_chars) == bcrypt(password_with_100_chars[:72])``.
+    ``BCryptPasswordHasher`` does not have any special handling and
+    thus is also subject to this hidden password length limit. The practical
+    ramification of this truncation is pretty marginal as the average user does
+    not have a password greater than 72 characters in length and even being
+    truncated at 72 the compute powered required to brute force bcrypt in any
+    useful amount of time is still astronomical.
+
+.. admonition:: Other bcrypt implementations
+
+   There are several other implementations that allow bcrypt to be
+   used with Django. Django's bcrypt support is NOT directly
+   compatible with these. To upgrade, you will need to modify the
+   hashes in your database to be in the form `bcrypt$(raw bcrypt
+   output)`. For example:
+   `bcrypt$$2a$12$NT0I31Sa7ihGEWpka9ASYrEFkhuTNeBQ2xfZskIiiJeyFXhRgS.Sy`.
+
+Increasing the work factor
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The PDKDF2 and bcrypt algorithms use a number of iterations or rounds of
+hashing. This deliberately slows down attackers, making attacks against hashed
+passwords harder. However, as computing power increases, the number of
+iterations needs to be increased. We've chosen a reasonable default (and will
+increase it with each release of Django), but you may wish to tune it up or
+down, depending on your security needs and available processing power. To do so,
+you'll subclass the appropriate algorithm and override the ``iterations``
+parameters. For example, to increase the number of iterations used by the
+default PDKDF2 algorithm:
+
+1. Create a subclass of ``django.contrib.auth.hashers.PBKDF2PasswordHasher``::
+
+        from django.contrib.auth.hashers import PBKDF2PasswordHasher
+
+        class MyPBKDF2PasswordHasher(PBKDF2PasswordHasher):
+            """
+            A subclass of PBKDF2PasswordHasher that uses 100 times more iterations.
+            """
+            iterations = PBKDF2PasswordHasher.iterations * 100
+
+   Save this somewhere in your project. For example, you might put this in
+   a file like ``myproject/hashers.py``.
+
+2. Add your new hasher as the first entry in :setting:`PASSWORD_HASHERS`::
+
+        PASSWORD_HASHERS = (
+            'myproject.hashers.MyPBKDF2PasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+            'django.contrib.auth.hashers.BCryptPasswordHasher',
+            'django.contrib.auth.hashers.SHA1PasswordHasher',
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+            'django.contrib.auth.hashers.CryptPasswordHasher',
+        )
+
+
+That's it -- now your Django install will use more iterations when it
+stores passwords using PBKDF2.
+
+Password upgrading
+~~~~~~~~~~~~~~~~~~
+
+When users log in, if their passwords are stored with anything other than
+the preferred algorithm, Django will automatically upgrade the algorithm
+to the preferred one. This means that old installs of Django will get
+automatically more secure as users log in, and it also means that you
+can switch to new (and better) storage algorithms as they get invented.
+
+However, Django can only upgrade passwords that use algorithms mentioned in
+:setting:`PASSWORD_HASHERS`, so as you upgrade to new systems you should make
+sure never to *remove* entries from this list. If you do, users using un-
+mentioned algorithms won't be able to upgrade.
+
+.. _sha1: http://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
+.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _py-bcrypt: http://pypi.python.org/pypi/py-bcrypt/
 
 Anonymous users
 ---------------
@@ -479,7 +617,18 @@ you'd like to have available, and also add a
 :class:`~django.db.models.Field.OneToOneField` named ``user`` from your model
 to the :class:`~django.contrib.auth.models.User` model. This will ensure only
 one instance of your model can be created for each
-:class:`~django.contrib.auth.models.User`.
+:class:`~django.contrib.auth.models.User`. For example::
+
+    from django.contrib.auth.models import User
+
+    class UserProfile(models.Model):
+        # This field is required.
+        user = models.OneToOneField(User)
+
+        # Other fields here
+        accepted_eula = models.BooleanField()
+        favorite_animal = models.CharField(max_length=20, default="Dragons.")
+
 
 To indicate that this model is the user profile model for a given site, fill in
 the setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
@@ -505,14 +654,56 @@ instance of the user profile model associated with that
 :class:`~django.contrib.auth.models.User`.
 
 The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create the profile, if it does not exist. You need to
-register a handler for the signal
-:attr:`django.db.models.signals.post_save` on the User model, and, in
-the handler, if created=True, create the associated user profile.
+does not create a profile if one does not exist. You need to register a handler
+for the User model's :attr:`django.db.models.signals.post_save` signal and, in
+the handler, if ``created`` is ``True``, create the associated user profile::
 
-For more information, see `Chapter 12 of the Django book`_.
+    # in models.py
 
-.. _Chapter 12 of the Django book: http://www.djangobook.com/en/1.0/chapter12/#cn222
+    from django.contrib.auth.models import User
+    from django.db.models.signals import post_save
+
+    # definition of UserProfile from above
+    # ...
+
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)
+
+    post_save.connect(create_user_profile, sender=User)
+
+.. seealso:: :doc:`/topics/signals` for more information on Django's signal
+    dispatcher.
+
+Adding UserProfile fields to the admin
+--------------------------------------
+
+To add the UserProfile fields to the user page in the admin, define an
+:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
+:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
+add it to a ``UserAdmin`` class which is registered with the
+:class:`~django.contrib.auth.models.User` class::
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    from my_user_profile_app.models import UserProfile
+
+    # Define an inline admin descriptor for UserProfile model
+    # which acts a bit like a singleton
+    class UserProfileInline(admin.StackedInline):
+        model = UserProfile
+        can_delete = False
+        verbose_name_plural = 'profile'
+
+    # Define a new User admin
+    class UserAdmin(UserAdmin):
+        inlines = (UserProfileInline, )
+
+    # Re-register UserAdmin
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
 
 Authentication in Web requests
 ==============================
@@ -580,6 +771,9 @@ Django provides two functions in :mod:`django.contrib.auth`:
     using Django's session framework, so, as mentioned above, you'll need to
     make sure to have the session middleware installed.
 
+    Note that data set during the anonymous session is retained when the user
+    logs in.
+
     This example shows how you might use both
     :func:`~django.contrib.auth.authenticate()` and
     :func:`~django.contrib.auth.login()`::
@@ -612,19 +806,49 @@ Django provides two functions in :mod:`django.contrib.auth`:
 
 .. _backends documentation: #other-authentication-sources
 
-Manually checking a user's password
+Manually managing a user's password
 -----------------------------------
 
-.. currentmodule:: django.contrib.auth.models
+.. currentmodule:: django.contrib.auth.hashers
 
-.. function:: check_password()
+.. versionadded:: 1.4
+    The :mod:`django.contrib.auth.hashers` module provides a set of functions
+    to create and validate hashed password. You can use them independently
+    from the ``User`` model.
+
+.. function:: check_password(password, encoded)
+
+    .. versionadded:: 1.4
 
     If you'd like to manually authenticate a user by comparing a plain-text
     password to the hashed password in the database, use the convenience
-    function :func:`django.contrib.auth.models.check_password`. It takes two
-    arguments: the plain-text password to check, and the full value of a user's
-    ``password`` field in the database to check against, and returns ``True``
-    if they match, ``False`` otherwise.
+    function :func:`django.contrib.auth.hashers.check_password`. It takes two
+    arguments: the plain-text password to check, and the full value of a
+    user's ``password`` field in the database to check against, and returns
+    ``True`` if they match, ``False`` otherwise.
+
+.. function:: make_password(password[, salt, hashers])
+
+    .. versionadded:: 1.4
+
+    Creates a hashed password in the format used by this application. It takes
+    one mandatory argument: the password in plain-text. Optionally, you can
+    provide a salt and a hashing algorithm to use, if you don't want to use the
+    defaults (first entry of ``PASSWORD_HASHERS`` setting).
+    Currently supported algorithms are: ``'pbkdf2_sha256'``, ``'pbkdf2_sha1'``,
+    ``'bcrypt'`` (see :ref:`bcrypt_usage`), ``'sha1'``, ``'md5'``,
+    ``'unsalted_md5'`` (only for backward compatibility) and ``'crypt'``
+    if you have the ``crypt`` library installed. If the password argument is
+    ``None``, an unusable password is returned (a one that will be never
+    accepted by :func:`django.contrib.auth.hashers.check_password`).
+
+.. function:: is_password_usable(encoded_password)
+
+   .. versionadded:: 1.4
+
+   Checks if the given string is a hashed password that has a chance
+   of being verified against :func:`django.contrib.auth.hashers.check_password`.
+
 
 How to log a user out
 ---------------------
@@ -672,29 +896,29 @@ Sent when a user logs in successfully.
 
 Arguments sent with this signal:
 
-    ``sender``
-        As above: the class of the user that just logged in.
+``sender``
+    As above: the class of the user that just logged in.
 
-    ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+``request``
+    The current :class:`~django.http.HttpRequest` instance.
 
-    ``user``
-        The user instance that just logged in.
+``user``
+    The user instance that just logged in.
 
 .. data:: django.contrib.auth.signals.user_logged_out
 
 Sent when the logout method is called.
 
-    ``sender``
-        As above: the class of the user that just logged out or ``None``
-        if the user was not authenticated.
+``sender``
+    As above: the class of the user that just logged out or ``None``
+    if the user was not authenticated.
 
-    ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+``request``
+    The current :class:`~django.http.HttpRequest` instance.
 
-    ``user``
-        The user instance that just logged out or ``None`` if the
-        user was not authenticated.
+``user``
+    The user instance that just logged out or ``None`` if the
+    user was not authenticated.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -759,7 +983,7 @@ The login_required decorator
     Note that if you provide a value to ``redirect_field_name``, you will most
     likely need to customize your login template as well, since the template
     context variable which stores the redirect path will use the value of
-    ``redirect_field_name`` as it's key rather than ``"next"`` (the default).
+    ``redirect_field_name`` as its key rather than ``"next"`` (the default).
 
     .. versionadded:: 1.3
 
@@ -780,40 +1004,45 @@ The login_required decorator
 
 .. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 
+    **URL name:** ``login``
+
+    See :doc:`the URL documentation </topics/http/urls>` for details on using
+    named URL patterns.
+
     Here's what ``django.contrib.auth.views.login`` does:
 
-        * If called via ``GET``, it displays a login form that POSTs to the
-          same URL. More on this in a bit.
+    * If called via ``GET``, it displays a login form that POSTs to the
+      same URL. More on this in a bit.
 
-        * If called via ``POST``, it tries to log the user in. If login is
-          successful, the view redirects to the URL specified in ``next``. If
-          ``next`` isn't provided, it redirects to
-          :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>` (which
-          defaults to ``/accounts/profile/``). If login isn't successful, it
-          redisplays the login form.
+    * If called via ``POST``, it tries to log the user in. If login is
+      successful, the view redirects to the URL specified in ``next``. If
+      ``next`` isn't provided, it redirects to
+      :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>` (which
+      defaults to ``/accounts/profile/``). If login isn't successful, it
+      redisplays the login form.
 
     It's your responsibility to provide the login form in a template called
     ``registration/login.html`` by default. This template gets passed four
     template context variables:
 
-        * ``form``: A :class:`~django.forms.Form` object representing the login
-          form. See the :doc:`forms documentation </topics/forms/index>` for
-          more on ``Form`` objects.
+    * ``form``: A :class:`~django.forms.Form` object representing the login
+      form. See the :doc:`forms documentation </topics/forms/index>` for
+      more on ``Form`` objects.
 
-        * ``next``: The URL to redirect to after successful login. This may
-          contain a query string, too.
+    * ``next``: The URL to redirect to after successful login. This may
+      contain a query string, too.
 
-        * ``site``: The current :class:`~django.contrib.sites.models.Site`,
-          according to the :setting:`SITE_ID` setting. If you don't have the
-          site framework installed, this will be set to an instance of
-          :class:`~django.contrib.sites.models.RequestSite`, which derives the
-          site name and domain from the current
-          :class:`~django.http.HttpRequest`.
+    * ``site``: The current :class:`~django.contrib.sites.models.Site`,
+      according to the :setting:`SITE_ID` setting. If you don't have the
+      site framework installed, this will be set to an instance of
+      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      site name and domain from the current
+      :class:`~django.http.HttpRequest`.
 
-        * ``site_name``: An alias for ``site.name``. If you don't have the site
-          framework installed, this will be set to the value of
-          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
-          For more on sites, see :doc:`/ref/contrib/sites`.
+    * ``site_name``: An alias for ``site.name``. If you don't have the site
+      framework installed, this will be set to the value of
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      For more on sites, see :doc:`/ref/contrib/sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
     you can pass the ``template_name`` parameter via the extra arguments to
@@ -872,6 +1101,16 @@ The login_required decorator
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
 
+    .. versionadded:: 1.4
+
+    The :func:`~views.login` view and the :ref:`other-built-in-views` now all
+    return a :class:`~django.template.response.TemplateResponse` instance,
+    which allows you to easily customize the response data before rendering.
+    For more details, see the
+    :doc:`TemplateResponse documentation </ref/template-response>`.
+
+.. _other-built-in-views:
+
 Other built-in views
 --------------------
 
@@ -885,100 +1124,174 @@ includes a few other useful built-in views located in
 
     Logs a user out.
 
+    **URL name:** ``logout``
+
+    See :doc:`the URL documentation </topics/http/urls>` for details on using
+    named URL patterns.
+
     **Optional arguments:**
 
-        * ``next_page``: The URL to redirect to after logout.
+    * ``next_page``: The URL to redirect to after logout.
 
-        * ``template_name``: The full name of a template to display after
-          logging the user out. This will default to
-          :file:`registration/logged_out.html` if no argument is supplied.
+    * ``template_name``: The full name of a template to display after
+      logging the user out. Defaults to
+      :file:`registration/logged_out.html` if no argument is supplied.
 
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next_page`` if the given
-          ``GET`` parameter is passed.
+    * ``redirect_field_name``: The name of a ``GET`` field containing the
+      URL to redirect to after log out. Overrides ``next_page`` if the given
+      ``GET`` parameter is passed.
 
     **Template context:**
 
-        * ``title``: The string "Logged out", localized.
+    * ``title``: The string "Logged out", localized.
+
+    * ``site``: The current :class:`~django.contrib.sites.models.Site`,
+      according to the :setting:`SITE_ID` setting. If you don't have the
+      site framework installed, this will be set to an instance of
+      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      site name and domain from the current
+      :class:`~django.http.HttpRequest`.
+
+    * ``site_name``: An alias for ``site.name``. If you don't have the site
+      framework installed, this will be set to the value of
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      For more on sites, see :doc:`/ref/contrib/sites`.
 
 .. function:: logout_then_login(request[, login_url])
 
     Logs a user out, then redirects to the login page.
 
+    **URL name:** No default URL provided
+
     **Optional arguments:**
 
-        * ``login_url``: The URL of the login page to redirect to. This will
-          default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+    * ``login_url``: The URL of the login page to redirect to.
+      Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
 .. function:: password_change(request[, template_name, post_change_redirect, password_change_form])
 
     Allows a user to change their password.
 
+    **URL name:** ``password_change``
+
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use for
-          displaying the password change form. This will default to
-          :file:`registration/password_change_form.html` if not supplied.
+    * ``template_name``: The full name of a template to use for
+      displaying the password change form. Defaults to
+      :file:`registration/password_change_form.html` if not supplied.
 
-        * ``post_change_redirect``: The URL to redirect to after a successful
-          password change.
+    * ``post_change_redirect``: The URL to redirect to after a successful
+      password change.
 
-        * .. versionadded:: 1.2
+      .. versionadded:: 1.2
 
-          ``password_change_form``: A custom "change password" form which must
-          accept a ``user`` keyword argument. The form is responsible for
-          actually changing the user's password.
-
+    * ``password_change_form``: A custom "change password" form which must
+      accept a ``user`` keyword argument. The form is responsible for
+      actually changing the user's password. Defaults to
+      :class:`~django.contrib.auth.forms.PasswordChangeForm`.
 
     **Template context:**
 
-        * ``form``: The password change form.
+    * ``form``: The password change form (see ``password_change_form`` above).
 
 .. function:: password_change_done(request[, template_name])
 
     The page shown after a user has changed their password.
 
+    **URL name:** ``password_change_done``
+
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use. This will
-          default to :file:`registration/password_change_done.html` if not
-          supplied.
+    * ``template_name``: The full name of a template to use.
+      Defaults to :file:`registration/password_change_done.html` if not
+      supplied.
 
 .. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
-    user's registered e-mail address.
+    user's registered email address.
 
     .. versionchanged:: 1.3
         The ``from_email`` argument was added.
 
+    .. versionchanged:: 1.4
+        Users flagged with an unusable password (see
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        will not be able to request a password reset to prevent misuse
+        when using an external authentication source like LDAP.
+
+    **URL name:** ``password_reset``
+
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use for
-          displaying the password reset form. This will default to
-          :file:`registration/password_reset_form.html` if not supplied.
+    * ``template_name``: The full name of a template to use for
+      displaying the password reset form. Defaults to
+      :file:`registration/password_reset_form.html` if not supplied.
 
-        * ``email_template_name``: The full name of a template to use for
-          generating the e-mail with the new password. This will default to
-          :file:`registration/password_reset_email.html` if not supplied.
+    * ``email_template_name``: The full name of a template to use for
+      generating the email with the reset password link. Defaults to
+      :file:`registration/password_reset_email.html` if not supplied.
 
-        * ``password_reset_form``: Form that will be used to set the password.
-          Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
+    * ``subject_template_name``: The full name of a template to use for
+      the subject of the email with the reset password link. Defaults
+      to :file:`registration/password_reset_subject.txt` if not supplied.
 
-        * ``token_generator``: Instance of the class to check the password. This
-          will default to ``default_token_generator``, it's an instance of
-          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+      .. versionadded:: 1.4
 
-        * ``post_reset_redirect``: The URL to redirect to after a successful
-          password change.
+    * ``password_reset_form``: Form that will be used to get the email of
+      the user to reset the password for. Defaults to
+      :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
-        * ``from_email``: A valid e-mail address. By default Django uses
-          the :setting:`DEFAULT_FROM_EMAIL`.
+    * ``token_generator``: Instance of the class to check the one time link.
+      This will default to ``default_token_generator``, it's an instance of
+      ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+
+    * ``post_reset_redirect``: The URL to redirect to after a successful
+      password reset request.
+
+    * ``from_email``: A valid email address. By default Django uses
+      the :setting:`DEFAULT_FROM_EMAIL`.
 
     **Template context:**
 
-        * ``form``: The form for resetting the user's password.
+    * ``form``: The form (see ``password_reset_form`` above) for resetting
+      the user's password.
+
+    **Email template context:**
+
+    * ``email``: An alias for ``user.email``
+
+    * ``user``: The current :class:`~django.contrib.auth.models.User`,
+      according to the ``email`` form field. Only active users are able to
+      reset their passwords (``User.is_active is True``).
+
+    * ``site_name``: An alias for ``site.name``. If you don't have the site
+      framework installed, this will be set to the value of
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      For more on sites, see :doc:`/ref/contrib/sites`.
+
+    * ``domain``: An alias for ``site.domain``. If you don't have the site
+      framework installed, this will be set to the value of
+      ``request.get_host()``.
+
+    * ``protocol``: http or https
+
+    * ``uid``: The user's id encoded in base 36.
+
+    * ``token``: Token to check that the reset link is valid.
+
+    Sample ``registration/password_reset_email.html`` (email body template):
+
+    .. code-block:: html+django
+
+        {% load url from future %}
+        Someone asked for password reset for email {{ email }}. Follow the link below:
+        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb36=uid token=token %}
+
+    The same template context is used for subject template. Subject must be
+    single line plain text string.
+
 
 .. function:: password_reset_done(request[, template_name])
 
@@ -986,40 +1299,59 @@ includes a few other useful built-in views located in
     password. This view is called by default if the :func:`password_reset` view
     doesn't have an explicit ``post_reset_redirect`` URL set.
 
+    **URL name:** ``password_reset_done``
+
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use. This will
-          default to :file:`registration/password_reset_done.html` if not
-          supplied.
+    * ``template_name``: The full name of a template to use.
+      Defaults to :file:`registration/password_reset_done.html` if not
+      supplied.
 
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
 
+    **URL name:** ``password_reset_confirm``
+
     **Optional arguments:**
 
-        * ``uidb36``: The user's id encoded in base 36. This will default to
-          ``None``.
-        * ``token``: Token to check that the password is valid. This will default to ``None``.
-        * ``template_name``: The full name of a template to display the confirm
-          password view. Default value is :file:`registration/password_reset_confirm.html`.
-        * ``token_generator``: Instance of the class to check the password. This
-          will default to ``default_token_generator``, it's an instance of
-          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
-        * ``set_password_form``: Form that will be used to set the password.
-          This will default to ``SetPasswordForm``.
-        * ``post_reset_redirect``: URL to redirect after the password reset
-          done. This will default to ``None``.
+    * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
+
+    * ``token``: Token to check that the password is valid. Defaults to
+      ``None``.
+
+    * ``template_name``: The full name of a template to display the confirm
+      password view. Default value is :file:`registration/password_reset_confirm.html`.
+
+    * ``token_generator``: Instance of the class to check the password. This
+      will default to ``default_token_generator``, it's an instance of
+      ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+
+    * ``set_password_form``: Form that will be used to set the password.
+      Defaults to :class:`~django.contrib.auth.forms.SetPasswordForm`
+
+    * ``post_reset_redirect``: URL to redirect after the password reset
+      done. Defaults to ``None``.
+
+    **Template context:**
+
+    * ``form``: The form (see ``set_password_form`` above) for setting the
+      new user's password.
+
+    * ``validlink``: Boolean, True if the link (combination of uidb36 and
+      token) is valid or unused yet.
 
 .. function:: password_reset_complete(request[,template_name])
 
    Presents a view which informs the user that the password has been
    successfully changed.
 
+   **URL name:** ``password_reset_complete``
+
    **Optional arguments:**
 
-       * ``template_name``: The full name of a template to display the view.
-         This will default to :file:`registration/password_reset_complete.html`.
+   * ``template_name``: The full name of a template to display the view.
+     Defaults to :file:`registration/password_reset_complete.html`.
 
 Helper functions
 ----------------
@@ -1033,16 +1365,16 @@ Helper functions
 
     **Required arguments:**
 
-        * ``next``: The URL to redirect to after a successful login.
+    * ``next``: The URL to redirect to after a successful login.
 
     **Optional arguments:**
 
-        * ``login_url``: The URL of the login page to redirect to. This will
-          default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+    * ``login_url``: The URL of the login page to redirect to.
+      Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next`` if the given
-          ``GET`` parameter is passed.
+    * ``redirect_field_name``: The name of a ``GET`` field containing the
+      URL to redirect to after log out. Overrides ``next`` if the given
+      ``GET`` parameter is passed.
 
 Built-in forms
 --------------
@@ -1067,7 +1399,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: PasswordResetForm
 
-    A form for generating and e-mailing a one-time use link to reset a
+    A form for generating and emailing a one-time use link to reset a
     user's password.
 
 .. class:: SetPasswordForm
@@ -1102,7 +1434,7 @@ checks to make sure the user is logged in and has the permission
             return HttpResponse("You can't vote in this poll.")
         # ...
 
-.. function:: user_passes_test()
+.. function:: user_passes_test(func, [login_url=None])
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
@@ -1140,7 +1472,7 @@ checks to make sure the user is logged in and has the permission
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: permission_required()
+.. function:: permission_required([login_url=None, raise_exception=False])
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the
@@ -1169,14 +1501,22 @@ The permission_required decorator
     As in the :func:`~decorators.login_required` decorator, ``login_url``
     defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
+    .. versionchanged:: 1.4
+
+    Added ``raise_exception`` parameter. If given, the decorator will raise
+    :exc:`~django.core.exceptions.PermissionDenied`, prompting
+    :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` instead of
+    redirecting to the login page.
+
 .. currentmodule:: django.contrib.auth
 
-Limiting access to generic views
---------------------------------
+Applying permissions to generic views
+-------------------------------------
 
-Controlling access to a :doc:`class-based generic view </ref/class-based-views>`
-is done by decorating the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
-method on the class. See :ref:`decorating-class-based-views` for the details.
+To apply a permission to a :doc:`class-based generic view
+</ref/class-based-views>`, decorate the :meth:`View.dispatch
+<django.views.generic.base.View.dispatch>` method on the class. See
+:ref:`decorating-class-based-views` for details.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1204,20 +1544,21 @@ code.
 
 The Django admin site uses permissions as follows:
 
-    * Access to view the "add" form and add an object is limited to users with
-      the "add" permission for that type of object.
-    * Access to view the change list, view the "change" form and change an
-      object is limited to users with the "change" permission for that type of
-      object.
-    * Access to delete an object is limited to users with the "delete"
-      permission for that type of object.
+* Access to view the "add" form and add an object is limited to users with
+  the "add" permission for that type of object.
+* Access to view the change list, view the "change" form and change an
+  object is limited to users with the "change" permission for that type of
+  object.
+* Access to delete an object is limited to users with the "delete"
+  permission for that type of object.
 
-Permissions are set globally per type of object, not per specific object
-instance. For example, it's possible to say "Mary may change news stories," but
-it's not currently possible to say "Mary may change news stories, but only the
-ones she created herself" or "Mary may only change news stories that have a
-certain status, publication date or ID." The latter functionality is something
-Django developers are currently discussing.
+Permissions can be set not only per type of object, but also per specific
+object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
+:meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
+:meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
+by the :class:`~django.contrib.admin.ModelAdmin` class, it is possible to
+customize permissions for different object instances of the same type.
 
 Default permissions
 -------------------
@@ -1239,9 +1580,9 @@ Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
 to test for basic permissions you should use:
 
-    * add: ``user.has_perm('foo.add_bar')``
-    * change: ``user.has_perm('foo.change_bar')``
-    * delete: ``user.has_perm('foo.delete_bar')``
+* add: ``user.has_perm('foo.add_bar')``
+* change: ``user.has_perm('foo.change_bar')``
+* delete: ``user.has_perm('foo.delete_bar')``
 
 .. _custom-permissions:
 
@@ -1277,12 +1618,7 @@ API reference
 
 .. currentmodule:: django.contrib.auth.models
 
-.. class:: Permission
-
-    Just like users, permissions are implemented in a Django model that lives
-    in `django/contrib/auth/models.py`_.
-
-.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
+.. class:: models.Permission
 
 Fields
 ~~~~~~
@@ -1310,6 +1646,27 @@ Methods
 data-access methods like any other :doc:`Django model </ref/models/instances>`.
 
 .. currentmodule:: django.contrib.auth
+
+Programmatically creating permissions
+-------------------------------------
+
+While custom permissions can be defined within a model's ``Meta`` class, you
+can also create permissions directly. For example, you can create the
+``can_publish`` permission for a ``BlogPost`` model in ``myapp``::
+
+    from myapp.models import BlogPost
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    content_type = ContentType.objects.get_for_model(BlogPost)
+    permission = Permission.objects.create(codename='can_publish',
+                                           name='Can Publish Posts',
+                                           content_type=content_type)
+
+The permission can then be assigned to a
+:class:`~django.contrib.auth.models.User` via its ``user_permissions``
+attribute or to a :class:`~django.contrib.auth.models.Group` via its
+``permissions`` attribute.
 
 Authentication data in templates
 ================================
@@ -1355,7 +1712,7 @@ template-friendly proxy of permissions.
 
 .. versionchanged:: 1.3
     Prior to version 1.3, ``PermWrapper`` was located in
-    ``django.contrib.auth.context_processors``.
+    ``django.core.context_processors``.
 
 In the ``{{ perms }}`` object, single-attribute lookup is a proxy to
 :meth:`User.has_module_perms <django.contrib.auth.models.User.has_module_perms>`.
@@ -1400,72 +1757,32 @@ example, if the group ``Site editors`` has the permission
 Beyond permissions, groups are a convenient way to categorize users to give
 them some label, or extended functionality. For example, you could create a
 group ``'Special users'``, and you could write code that could, say, give them
-access to a members-only portion of your site, or send them members-only e-mail
+access to a members-only portion of your site, or send them members-only email
 messages.
 
-Messages
-========
+API reference
+-------------
 
-.. deprecated:: 1.2
-   This functionality will be removed in Django 1.4.  You should use the
-   :doc:`messages framework </ref/contrib/messages>` for all new projects and
-   begin to update your existing code immediately.
+.. class:: models.Group
 
-The message system is a lightweight way to queue messages for given users.
+Fields
+~~~~~~
 
-A message is associated with a :class:`~django.contrib.auth.models.User`.
-There's no concept of expiration or timestamps.
+:class:`~django.contrib.auth.models.Group` objects have the following fields:
 
-Messages are used by the Django admin after successful actions. For example,
-``"The poll Foo was created successfully."`` is a message.
+.. attribute:: Group.name
 
-The API is simple:
+    Required. 80 characters or fewer. Any characters are permitted. Example:
+    ``'Awesome Users'``.
 
-.. method:: models.User.message_set.create(message)
+.. attribute:: Group.permissions
 
-    To create a new message, use
-    ``user_obj.message_set.create(message='message_text')``.
+    Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
 
-    To retrieve/delete messages, use
-    :meth:`user_obj.get_and_delete_messages() <django.contrib.auth.models.User.get_and_delete_messages>`,
-    which returns a list of ``Message`` objects in the user's queue (if any)
-    and deletes the messages from the queue.
-
-In this example view, the system saves a message for the user after creating
-a playlist::
-
-    def create_playlist(request, songs):
-        # Create the playlist with the given songs.
-        # ...
-        request.user.message_set.create(message="Your playlist was added successfully.")
-        return render_to_response("playlists/create.html",
-            context_instance=RequestContext(request))
-
-When you use :class:`~django.template.context.RequestContext`, the currently
-logged-in user and his/her messages are made available in the
-:doc:`template context </ref/templates/api>` as the template variable
-``{{ messages }}``. Here's an example of template code that displays messages:
-
-.. code-block:: html+django
-
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-.. versionchanged:: 1.2
-   The ``messages`` template variable uses a backwards compatible method in the
-   :doc:`messages framework </ref/contrib/messages>` to retrieve messages from
-   both the user ``Message`` model and from the new framework.  Unlike in
-   previous revisions, the messages will not be erased unless they are actually
-   displayed.
-
-Finally, note that this messages framework only works with users in the user
-database. To send messages to anonymous users, use the
-:doc:`messages framework </ref/contrib/messages>`.
+        group.permissions = [permission_list]
+        group.permissions.add(permission, permission, ...)
+        group.permissions.remove(permission, permission, ...)
+        group.permissions.clear()
 
 .. _authentication-backends:
 
@@ -1508,7 +1825,11 @@ By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
 
     ('django.contrib.auth.backends.ModelBackend',)
 
-That's the basic authentication scheme that checks the Django users database.
+That's the basic authentication backend that checks the Django users database
+and queries the builtin permissions. It does not provide protection against
+brute force attacks via any rate limiting mechanism. You may either implement
+your own rate limiting mechanism in a custom auth backend, or use the
+mechanisms provided by most Web servers.
 
 The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
 username and password is valid in multiple backends, Django will stop
@@ -1528,8 +1849,9 @@ processing at the first positive match.
 Writing an authentication backend
 ---------------------------------
 
-An authentication backend is a class that implements two methods:
-``get_user(user_id)`` and ``authenticate(**credentials)``.
+An authentication backend is a class that implements two required methods:
+``get_user(user_id)`` and ``authenticate(**credentials)``, as well as a set of
+optional permission related :ref:`authorization methods <authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever -- and returns a ``User`` object.
@@ -1537,13 +1859,13 @@ database ID or whatever -- and returns a ``User`` object.
 The ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
 
-    class MyBackend:
+    class MyBackend(object):
         def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 But it could also authenticate a token, like so::
 
-    class MyBackend:
+    class MyBackend(object):
         def authenticate(self, token=None):
             # Check the token and return a User.
 
@@ -1565,7 +1887,7 @@ object the first time a user authenticates::
     from django.conf import settings
     from django.contrib.auth.models import User, check_password
 
-    class SettingsBackend:
+    class SettingsBackend(object):
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
@@ -1575,8 +1897,6 @@ object the first time a user authenticates::
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
         """
 
-        supports_object_permissions = False
-        supports_anonymous_user = False
         supports_inactive_user = False
 
         def authenticate(self, username=None, password=None):
@@ -1602,6 +1922,8 @@ object the first time a user authenticates::
             except User.DoesNotExist:
                 return None
 
+.. _authorization_methods:
+
 Handling authorization in custom backends
 -----------------------------------------
 
@@ -1621,26 +1943,31 @@ any one backend grants.
 The simple backend above could implement permissions for the magic admin
 fairly simply::
 
-    class SettingsBackend:
+    class SettingsBackend(object):
 
         # ...
 
-        def has_perm(self, user_obj, perm):
+        def has_perm(self, user_obj, perm, obj=None):
             if user_obj.username == settings.ADMIN_LOGIN:
                 return True
             else:
                 return False
 
 This gives full permissions to the user granted access in the above example.
-Notice that the backend auth functions all take the user object as an argument,
-and they also accept the same arguments given to the associated
-:class:`django.contrib.auth.models.User` functions.
+Notice that in addition to the same arguments given to the associated
+:class:`django.contrib.auth.models.User` functions, the backend auth functions
+all take the user object, which may be an anonymous user, as an argument.
 
-A full authorization implementation can be found in
-`django/contrib/auth/backends.py`_, which is the default backend and queries
-the ``auth_permission`` table most of the time.
+A full authorization implementation can be found in the ``ModelBackend`` class
+in `django/contrib/auth/backends.py`_, which is the default backend and queries
+the ``auth_permission`` table most of the time. If you wish to provide
+custom behavior for only part of the backend API, you can take advantage of
+Python inheritence and subclass ``ModelBackend`` instead of implementing the
+complete API in a custom backend.
 
-.. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+.. _django/contrib/auth/backends.py: https://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+
+.. _anonymous_auth:
 
 Authorization for anonymous users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1654,38 +1981,27 @@ authorize anonymous users to browse most of the site, and many allow anonymous
 posting of comments etc.
 
 Django's permission framework does not have a place to store permissions for
-anonymous users. However, it has a foundation that allows custom authentication
-backends to specify authorization for anonymous users. This is especially useful
-for the authors of re-usable apps, who can delegate all questions of authorization
-to the auth backend, rather than needing settings, for example, to control
-anonymous access.
+anonymous users. However, the user object passed to an authentication backend
+may be an :class:`django.contrib.auth.models.AnonymousUser` object, allowing
+the backend to specify custom authorization behavior for anonymous users. This
+is especially useful for the authors of re-usable apps, who can delegate all
+questions of authorization to the auth backend, rather than needing settings,
+for example, to control anonymous access.
 
-To enable this in your own backend, you must set the class attribute
-``supports_anonymous_user`` to ``True``. (This precaution is to maintain
-compatibility with backends that assume that all user objects are actual
-instances of the :class:`django.contrib.auth.models.User` class). With this
-in place, :class:`django.contrib.auth.models.AnonymousUser` will delegate all
-the relevant permission methods to the authentication backends.
-
-A nonexistent ``supports_anonymous_user`` attribute will raise a hidden
-``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
-warning will be upgraded to a ``DeprecationWarning``, which will be displayed
-loudly. Additionally ``supports_anonymous_user`` will be set to ``False``.
-Django 1.4 will assume that every backend supports anonymous users being
-passed to the authorization methods.
+.. _inactive_auth:
 
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.3
+.. versionchanged:: 1.3
 
 An inactive user is a one that is authenticated but has its attribute
 ``is_active`` set to ``False``. However this does not mean they are not
 authorized to do anything. For example they are allowed to activate their
 account.
 
-The support for anonymous users in the permission system allows for
-anonymous users to have permissions to do something while inactive
+The support for anonymous users in the permission system allows for a scenario
+where anonymous users have permissions to do something while inactive
 authenticated users do not.
 
 To enable this on your own backend, you must set the class attribute
@@ -1700,22 +2016,11 @@ passed to the authorization methods.
 
 
 Handling object permissions
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django's permission framework has a foundation for object permissions, though
 there is no implementation for it in the core. That means that checking for
 object permissions will always return ``False`` or an empty list (depending on
-the check performed).
-
-To enable object permissions in your own
-:doc:`authentication backend </ref/authbackends>` you'll just have
-to allow passing an ``obj`` parameter to the permission methods and set the
-``supports_object_permissions`` class attribute to ``True``.
-
-A nonexistent ``supports_object_permissions`` will raise a hidden
-``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
-warning will be upgraded to a ``DeprecationWarning``, which will be displayed
-loudly. Additionally ``supports_object_permissions`` will be set to ``False``.
-Django 1.4 will assume that every backend supports object permissions and
-won't check for the existence of ``supports_object_permissions``, which
-means not supporting ``obj`` as a parameter will raise a ``TypeError``.
+the check performed). An authentication backend will receive the keyword
+parameters ``obj`` and ``user_obj`` for each object related authorization
+method and can return the object level permission as appropriate.

@@ -5,7 +5,8 @@
 This example exists purely to point out errors in models.
 """
 
-from django.db import models
+from django.db import connection, models
+
 
 class FieldErrors(models.Model):
     charfield = models.CharField()
@@ -220,7 +221,8 @@ class InvalidSetDefault(models.Model):
     fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
 
 class UnicodeForeignKeys(models.Model):
-    """Foreign keys which can translate to ascii should be OK, but fail if they're not."""
+    """Foreign keys which can translate to ascii should be OK, but fail if
+    they're not."""
     good = models.ForeignKey(u'FKTarget')
     also_good = models.ManyToManyField(u'FKTarget', related_name='unicode2')
 
@@ -228,6 +230,18 @@ class UnicodeForeignKeys(models.Model):
     # when adding the errors in core/management/validation.py
     #bad = models.ForeignKey(u'★')
 
+class PrimaryKeyNull(models.Model):
+    my_pk_field = models.IntegerField(primary_key=True, null=True)
+
+class OrderByPKModel(models.Model):
+    """
+    Model to test that ordering by pk passes validation.
+    Refs #8291
+    """
+    name = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        ordering = ('pk',)
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
@@ -238,8 +252,7 @@ invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_pl
 invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
-invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than the value of the "decimal_places" attribute.
-invalid_models.fielderrors: "decimalfield5": DecimalFields require a "max_digits" attribute value that is greater than the value of the "decimal_places" attribute.
+invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
@@ -338,4 +351,8 @@ invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have 
 invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
+"""
+
+if not connection.features.interprets_empty_strings_as_nulls:
+    model_errors += """invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True.
 """

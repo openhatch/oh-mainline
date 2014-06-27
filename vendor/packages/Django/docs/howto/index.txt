@@ -11,7 +11,6 @@ you quickly accomplish common tasks.
 
    apache-auth
    auth-remote-user
-   contribute
    custom-management-commands
    custom-model-fields
    custom-template-tags
@@ -19,7 +18,6 @@ you quickly accomplish common tasks.
    deployment/index
    error-reporting
    initial-data
-   i18n
    jython
    legacy-databases
    outputting-csv
@@ -32,4 +30,4 @@ you quickly accomplish common tasks.
     global Django community. Many writers in the aggregator write this sort of
     how-to material.
 
-    .. _django community aggregator: http://www.djangoproject.com/community/
+    .. _django community aggregator: https://www.djangoproject.com/community/

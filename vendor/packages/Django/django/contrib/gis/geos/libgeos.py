@@ -6,7 +6,9 @@
  This module also houses GEOS Pointer utilities, including
  get_pointer_arr(), and GEOM_PTR.
 """
-import os, re, sys
+import os
+import re
+import sys
 from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
 from ctypes.util import find_library
 from django.contrib.gis.geos.error import GEOSException
@@ -99,8 +101,8 @@ geos_version.argtypes = None
 geos_version.restype = c_char_p
 
 # Regular expression should be able to parse version strings such as
-# '3.0.0rc4-CAPI-1.3.3', or '3.0.0-CAPI-1.4.1'
-version_regex = re.compile(r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<subminor>\d+))(rc(?P<release_candidate>\d+))?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)$')
+# '3.0.0rc4-CAPI-1.3.3', '3.0.0-CAPI-1.4.1' or '3.4.0dev-CAPI-1.8.0'
+version_regex = re.compile(r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<subminor>\d+))((rc(?P<release_candidate>\d+))|dev)?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)$')
 def geos_version_info():
     """
     Returns a dictionary containing the various version metadata parsed from

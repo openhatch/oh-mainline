@@ -187,6 +187,7 @@ class SearchResults(TwillTests):
         # list.
         self.assertEqual(response.context[0][u'bunch_of_bugs'], [])
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_json_view(self):
         tc.go(make_twill_url(
             u'http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
@@ -199,6 +200,7 @@ class SearchResults(TwillTests):
         objects = simplejson.loads(json_string)
         self.assert_(u'pk' in objects[0][u'bugs'][0])
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def testPagination(self):
         url = u'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
@@ -222,6 +224,7 @@ class SearchResults(TwillTests):
         for bug in bugs:
             tc.find(bug.description)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def testPaginationWithAnyFacet(self):
 
         url = u'http://openhatch.org/search/?q=&language='
@@ -240,6 +243,7 @@ class SearchResults(TwillTests):
         for bug in bugs:
             tc.find(bug.description)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def testPaginationAndChangingSearchQuery(self):
 
         url = u'http://openhatch.org/search/'

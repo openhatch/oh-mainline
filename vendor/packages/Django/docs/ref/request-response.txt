@@ -16,17 +16,37 @@ passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects.
+:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+module.
 
 HttpRequest objects
 ===================
 
 .. class:: HttpRequest
 
+.. _httprequest-attributes:
+
 Attributes
 ----------
 
-All attributes except ``session`` should be considered read-only.
+All attributes should be considered read-only, unless stated otherwise below.
+``session`` is a notable exception.
+
+.. attribute:: HttpRequest.body
+
+    .. versionchanged:: 1.4
+
+    Before Django 1.4, ``HttpRequest.body`` was named
+    ``HttpRequest.raw_post_data``.
+
+    The raw HTTP request body as a byte string. This is useful for processing
+    data in different ways than conventional HTML forms: binary images,
+    XML payload etc. For processing conventional form data, use ``HttpRequest.POST``.
+
+    .. versionadded:: 1.3
+
+    You can also read from an HttpRequest using a file-like interface. See
+    :meth:`HttpRequest.read()`.
 
 .. attribute:: HttpRequest.path
 
@@ -123,20 +143,20 @@ All attributes except ``session`` should be considered read-only.
     Available headers depend on the client and server, but here are some
     examples:
 
-        * ``CONTENT_LENGTH``
-        * ``CONTENT_TYPE``
-        * ``HTTP_ACCEPT_ENCODING``
-        * ``HTTP_ACCEPT_LANGUAGE``
-        * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
-        * ``HTTP_REFERER`` -- The referring page, if any.
-        * ``HTTP_USER_AGENT`` -- The client's user-agent string.
-        * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
-        * ``REMOTE_ADDR`` -- The IP address of the client.
-        * ``REMOTE_HOST`` -- The hostname of the client.
-        * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
-        * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
-        * ``SERVER_NAME`` -- The hostname of the server.
-        * ``SERVER_PORT`` -- The port of the server.
+    * ``CONTENT_LENGTH`` -- the length of the request body (as a string).
+    * ``CONTENT_TYPE`` -- the MIME type of the request body.
+    * ``HTTP_ACCEPT_ENCODING`` -- Acceptable encodings for the response.
+    * ``HTTP_ACCEPT_LANGUAGE`` -- Acceptable languages for the response.
+    * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
+    * ``HTTP_REFERER`` -- The referring page, if any.
+    * ``HTTP_USER_AGENT`` -- The client's user-agent string.
+    * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
+    * ``REMOTE_ADDR`` -- The IP address of the client.
+    * ``REMOTE_HOST`` -- The hostname of the client.
+    * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
+    * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
+    * ``SERVER_NAME`` -- The hostname of the server.
+    * ``SERVER_PORT`` -- The port of the server (as a string).
 
     With the exception of ``CONTENT_LENGTH`` and ``CONTENT_TYPE``, as given
     above, any HTTP headers in the request are converted to ``META`` keys by
@@ -168,17 +188,6 @@ All attributes except ``session`` should be considered read-only.
     support activated. See the :doc:`session documentation
     </topics/http/sessions>` for full details.
 
-.. attribute:: HttpRequest.raw_post_data
-
-    The raw HTTP POST data as a byte string. This is useful for processing
-    data in different formats than of conventional HTML forms: binary images,
-    XML payload etc. For processing form data use ``HttpRequest.POST``.
-
-    .. versionadded:: 1.3
-
-    You can also read from an HttpRequest using file-like interface. See
-    :meth:`HttpRequest.read()`.
-
 .. attribute:: HttpRequest.urlconf
 
     Not defined by Django itself, but will be read if other code (e.g., a custom
@@ -191,13 +200,11 @@ Methods
 
 .. method:: HttpRequest.get_host()
 
-    Returns the originating host of the request using information from
-    the ``HTTP_X_FORWARDED_HOST`` (if enabled in the settings) and ``HTTP_HOST``
-    headers (in that order). If they don't provide a value, the method
-    uses a combination of ``SERVER_NAME`` and ``SERVER_PORT`` as
+    Returns the originating host of the request using information from the
+    ``HTTP_X_FORWARDED_HOST`` (if :setting:`USE_X_FORWARDED_HOST` is enabled)
+    and ``HTTP_HOST`` headers, in that order. If they don't provide a value,
+    the method uses a combination of ``SERVER_NAME`` and ``SERVER_PORT`` as
     detailed in :pep:`3333`.
-
-    .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
 
     Example: ``"127.0.0.1:8000"``
 
@@ -223,8 +230,8 @@ Methods
                                 parts = request.META[field].split(',')
                                 request.META[field] = parts[-1].strip()
 
-        This middleware should be positionned before any other middleware that
-        relies on the value of :meth:`~HttpRequest.get_host()`, for instance
+        This middleware should be positioned before any other middleware that
+        relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
         :class:`~django.middleware.common.CommonMiddleware` or
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
@@ -244,6 +251,43 @@ Methods
    this request.
 
    Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+
+.. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
+
+   .. versionadded:: 1.4
+
+   Returns a cookie value for a signed cookie, or raises a
+   :class:`~django.core.signing.BadSignature` exception if the signature is
+   no longer valid. If you provide the ``default`` argument the exception
+   will be suppressed and that default value will be returned instead.
+
+   The optional ``salt`` argument can be used to provide extra protection
+   against brute force attacks on your secret key. If supplied, the
+   ``max_age`` argument will be checked against the signed timestamp
+   attached to the cookie value to ensure the cookie is not older than
+   ``max_age`` seconds.
+
+   For example::
+
+          >>> request.get_signed_cookie('name')
+          'Tony'
+          >>> request.get_signed_cookie('name', salt='name-salt')
+          'Tony' # assuming cookie was set using the same salt
+          >>> request.get_signed_cookie('non-existing-cookie')
+          ...
+          KeyError: 'non-existing-cookie'
+          >>> request.get_signed_cookie('non-existing-cookie', False)
+          False
+          >>> request.get_signed_cookie('cookie-that-was-tampered-with')
+          ...
+          BadSignature: ...
+          >>> request.get_signed_cookie('name', max_age=60)
+          ...
+          SignatureExpired: Signature age 1677.3839159 > 60 seconds
+          >>> request.get_signed_cookie('name', False, max_age=60)
+          False
+
+   See :doc:`cryptographic signing </topics/signing>` for more information.
 
 .. method:: HttpRequest.is_secure()
 
@@ -416,11 +460,15 @@ In addition, ``QueryDict`` has the following methods:
     standard library. The copy will be mutable -- that is, you can change its
     values.
 
-.. method:: QueryDict.getlist(key)
+.. method:: QueryDict.getlist(key, default)
 
     Returns the data with the requested key, as a Python list. Returns an
-    empty list if the key doesn't exist. It's guaranteed to return a list of
-    some sort.
+    empty list if the key doesn't exist and no default value was provided.
+    It's guaranteed to return a list of some sort unless the default value
+    was no list.
+
+    .. versionchanged:: 1.4
+        The ``default`` parameter was added.
 
 .. method:: QueryDict.setlist(key, list_)
 
@@ -443,6 +491,38 @@ In addition, ``QueryDict`` has the following methods:
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.lists()
         [(u'a', [u'1', u'2', u'3'])]
+
+.. method:: QueryDict.pop(key)
+
+    Returns a list of values for the given key and removes them from the
+    dictionary. Raises ``KeyError`` if the key does not exist. For example::
+
+        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+        >>> q.pop('a')
+        [u'1', u'2', u'3']
+
+.. method:: QueryDict.popitem()
+
+    Removes an arbitrary member of the dictionary (since there's no concept
+    of ordering), and returns a two value tuple containing the key and a list
+    of all values for the key. Raises ``KeyError`` when called on an empty
+    dictionary. For example::
+
+        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+        >>> q.popitem()
+        (u'a', [u'1', u'2', u'3'])
+
+.. method:: QueryDict.dict()
+
+    .. versionadded:: 1.4
+
+    Returns ``dict`` representation of ``QueryDict``. For every (key, list)
+    pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
+    element of the list, using same logic as :meth:`QueryDict.__getitem__()`::
+
+        >>> q = QueryDict('a=1&a=3&a=5')
+        >>> q.dict()
+        {u'a': u'5'}
 
 .. method:: QueryDict.urlencode([safe])
 
@@ -484,8 +564,9 @@ Passing strings
 Typical usage is to pass the contents of the page, as a string, to the
 :class:`HttpResponse` constructor::
 
+    >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
-    >>> response = HttpResponse("Text only, please.", mimetype="text/plain")
+    >>> response = HttpResponse("Text only, please.", content_type="text/plain")
 
 But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
@@ -500,10 +581,10 @@ Passing iterators
 Finally, you can pass ``HttpResponse`` an iterator rather than passing it
 hard-coded strings. If you use this technique, follow these guidelines:
 
-    * The iterator should return strings.
-    * If an :class:`HttpResponse` has been initialized with an iterator as its
-      content, you can't use the class:`HttpResponse` instance as a file-like
-      object. Doing so will raise ``Exception``.
+* The iterator should return strings.
+* If an :class:`HttpResponse` has been initialized with an iterator as its
+  content, you can't use the :class:`HttpResponse` instance as a file-like
+  object. Doing so will raise ``Exception``.
 
 Setting headers
 ~~~~~~~~~~~~~~~
@@ -524,11 +605,11 @@ Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To tell the browser to treat the response as a file attachment, use the
-``mimetype`` argument and set the ``Content-Disposition`` header. For example,
+``content_type`` argument and set the ``Content-Disposition`` header. For example,
 this is how you might return a Microsoft Excel spreadsheet::
 
-    >>> response = HttpResponse(my_data, mimetype='application/vnd.ms-excel')
-    >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
+    >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
+    >>> response['Content-Disposition'] = 'attachment; filename="foo.xls"'
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -538,7 +619,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A normal Python string representing the content, encoded from a Unicode
+    A string representing the content, encoded from a Unicode
     object if necessary.
 
 .. attribute:: HttpResponse.status_code
@@ -554,9 +635,11 @@ Methods
     string) and MIME type. The :setting:`DEFAULT_CONTENT_TYPE` is
     ``'text/html'``.
 
-    ``content`` can be an iterator or a string. If it's an iterator, it should
-    return strings, and those strings will be joined together to form the
-    content of the response.
+    ``content`` should be an iterator or a string. If it's an
+    iterator, it should return strings, and those strings will be
+    joined together to form the content of the response. If it is not
+    an iterator or a string, it will be converted to a string when
+    accessed.
 
     ``status`` is the `HTTP Status code`_ for the response.
 
@@ -595,33 +678,47 @@ Methods
     ``expires``, and the auto-calculation of ``max_age`` in such case
     was added. The ``httponly`` argument was also added.
 
-    Sets a cookie. The parameters are the same as in the `cookie Morsel`_
+    .. versionchanged:: 1.4
+
+    The default value for httponly was changed from ``False`` to ``True``.
+
+    Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
     object in the Python standard library.
 
-        * ``max_age`` should be a number of seconds, or ``None`` (default) if
-          the cookie should last only as long as the client's browser session.
-          If ``expires`` is not specified, it will be calculated.
-        * ``expires`` should either be a string in the format
-          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
-          in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
-          will be calculated.
-        * Use ``domain`` if you want to set a cross-domain cookie. For example,
-          ``domain=".lawrence.com"`` will set a cookie that is readable by
-          the domains www.lawrence.com, blogs.lawrence.com and
-          calendars.lawrence.com. Otherwise, a cookie will only be readable by
-          the domain that set it.
-        * Use ``httponly=True`` if you want to prevent client-side
-          JavaScript from having access to the cookie.
+    * ``max_age`` should be a number of seconds, or ``None`` (default) if
+      the cookie should last only as long as the client's browser session.
+      If ``expires`` is not specified, it will be calculated.
+    * ``expires`` should either be a string in the format
+      ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
+      in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
+      will be calculated.
+    * Use ``domain`` if you want to set a cross-domain cookie. For example,
+      ``domain=".lawrence.com"`` will set a cookie that is readable by
+      the domains www.lawrence.com, blogs.lawrence.com and
+      calendars.lawrence.com. Otherwise, a cookie will only be readable by
+      the domain that set it.
+    * Use ``httponly=True`` if you want to prevent client-side
+      JavaScript from having access to the cookie.
 
-          HTTPOnly_ is a flag included in a Set-Cookie HTTP response
-          header. It is not part of the RFC2109 standard for cookies,
-          and it isn't honored consistently by all browsers. However,
-          when it is honored, it can be a useful way to mitigate the
-          risk of client side script accessing the protected cookie
-          data.
+      HTTPOnly_ is a flag included in a Set-Cookie HTTP response
+      header. It is not part of the :rfc:`2109` standard for cookies,
+      and it isn't honored consistently by all browsers. However,
+      when it is honored, it can be a useful way to mitigate the
+      risk of client side script accessing the protected cookie
+      data.
 
-    .. _`cookie Morsel`: http://docs.python.org/library/cookie.html#Cookie.Morsel
-    .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+    .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+
+.. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
+
+    .. versionadded:: 1.4
+
+    Like :meth:`~HttpResponse.set_cookie()`, but
+    :doc:`cryptographic signing </topics/signing>` the cookie before setting
+    it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
+    You can use the optional ``salt`` argument for added key strength, but
+    you will need to remember to pass it to the corresponding
+    :meth:`HttpRequest.get_signed_cookie` call.
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
 
@@ -697,3 +794,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. class:: HttpResponseServerError
 
     Acts just like :class:`HttpResponse` but uses a 500 status code.
+
+.. note::
+
+    If a custom subclass of :class:`HttpResponse` implements a ``render``
+    method, Django will treat it as emulating a
+    :class:`~django.template.response.SimpleTemplateResponse`, and the
+    ``render`` method must itself return a valid response object.

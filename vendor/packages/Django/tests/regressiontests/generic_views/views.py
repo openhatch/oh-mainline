@@ -1,11 +1,13 @@
+from __future__ import absolute_import
+
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from regressiontests.generic_views.models import Artist, Author, Book, Page
-from regressiontests.generic_views.forms import AuthorForm
+from .forms import AuthorForm
+from .models import Artist, Author, Book, Page
 
 
 class CustomTemplateView(generic.TemplateView):
@@ -42,7 +44,7 @@ class DictList(generic.ListView):
     """A ListView that doesn't use a model."""
     queryset = [
         {'first': 'John', 'last': 'Lennon'},
-        {'last': 'Yoko',  'last': 'Ono'}
+        {'first': 'Yoko',  'last': 'Ono'}
     ]
     template_name = 'generic_views/list.html'
 
@@ -65,7 +67,7 @@ class CustomPaginator(Paginator):
             allow_empty_first_page=allow_empty_first_page)
 
 class AuthorListCustomPaginator(AuthorList):
-    paginate_by = 5;
+    paginate_by = 5
 
     def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         return super(AuthorListCustomPaginator, self).get_paginator(
@@ -177,3 +179,8 @@ class BookDetail(BookConfig, generic.DateDetailView):
 class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
     def get_queryset(self):
         return Author.objects.all()
+
+class BookDetailGetObjectCustomQueryset(BookDetail):
+    def get_object(self, queryset=None):
+        return super(BookDetailGetObjectCustomQueryset,self).get_object(
+            queryset=Book.objects.filter(pk=2))

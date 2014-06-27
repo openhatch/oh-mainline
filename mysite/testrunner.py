@@ -75,7 +75,7 @@ class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
             logging.info(
                 "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
             args = (['base', 'profile', 'account', 'project',
-                    'missions', 'search', 'customs'],)
+                    'missions', 'search', 'customs', 'bugsets'],)
 
         override_settings_for_testing()
         n = 1
@@ -93,7 +93,7 @@ class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
             logging.info(
                 "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
             args = (['base', 'profile', 'account', 'project',
-                    'missions', 'search', 'customs'],)
+                    'missions', 'search', 'customs', 'bugsets'],)
 
         override_settings_for_testing()
         n = 1

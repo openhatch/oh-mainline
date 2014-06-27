@@ -26,7 +26,7 @@
   </a>
 </li>
 <li id='link-long_description'
-     {% if git_config_done %}class='tick_progress'{% else %}class='cross-progress'{%endif%}>
+     {% if git_config_done %}class='tick-progress'{% else %}class='cross-progress'{%endif%}>
   <a href='{% url mysite.missions.git.views.long_description %}'>
     Setup Git
   </a>
@@ -44,6 +44,11 @@
 <li id='link-rebase' {% if git_rebase_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.git.views.rebase %}'>
     Rebase and merge
+  </a>
+</li>
+<li id='link-reference' class='bump-over'>
+  <a href='{% url mysite.missions.git.views.reference %}'>
+    Quick reference
   </a>
 </li>
 {% endblock side_nav_links %}

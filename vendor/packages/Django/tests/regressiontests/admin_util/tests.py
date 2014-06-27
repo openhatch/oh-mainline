@@ -1,17 +1,22 @@
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.util import display_for_field, label_for_field, lookup_field
-from django.contrib.admin.util import NestedObjects
+from django.contrib.admin import helpers
+from django.contrib.admin.util import (display_for_field, label_for_field,
+    lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
+from django import forms
 from django.test import TestCase
 from django.utils import unittest
 from django.utils.formats import localize
+from django.utils.safestring import mark_safe
 
-from models import Article, Count, Event, Location
+from .models import Article, Count, Event, Location
 
 
 class NestedObjectsTests(TestCase):
@@ -133,7 +138,7 @@ class UtilTests(unittest.TestCase):
         # Regression test for #13071: NullBooleanField has special
         # handling.
         display_value = display_for_field(None, models.NullBooleanField())
-        expected = u'<img src="%simg/admin/icon-unknown.gif" alt="None" />' % settings.ADMIN_MEDIA_PREFIX
+        expected = u'<img src="%sadmin/img/icon-unknown.gif" alt="None" />' % settings.STATIC_URL
         self.assertEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField())
@@ -235,3 +240,47 @@ class UtilTests(unittest.TestCase):
             label_for_field('guest', Event, return_attr=True),
             ('awesome guest', None),
         )
+
+    def test_logentry_unicode(self):
+        """
+        Regression test for #15661
+        """
+        log_entry = admin.models.LogEntry()
+
+        log_entry.action_flag = admin.models.ADDITION
+        self.assertTrue(
+            unicode(log_entry).startswith('Added ')
+        )
+
+        log_entry.action_flag = admin.models.CHANGE
+        self.assertTrue(
+            unicode(log_entry).startswith('Changed ')
+        )
+
+        log_entry.action_flag = admin.models.DELETION
+        self.assertTrue(
+            unicode(log_entry).startswith('Deleted ')
+        )
+
+    def test_safestring_in_field_label(self):
+        # safestring should not be escaped
+        class MyForm(forms.Form):
+            text = forms.CharField(label=mark_safe('<i>text</i>'))
+            cb   = forms.BooleanField(label=mark_safe('<i>cb</i>'))
+
+        form = MyForm()
+        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                         '<label for="id_text" class="required inline"><i>text</i>:</label>')
+        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                         '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
+
+        # normal strings needs to be escaped
+        class MyForm(forms.Form):
+            text = forms.CharField(label='&text')
+            cb   = forms.BooleanField(label='&cb')
+
+        form = MyForm()
+        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                         '<label for="id_text" class="required inline">&amp;text:</label>')
+        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                         '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')

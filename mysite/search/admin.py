@@ -14,22 +14,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.search.models import Project, Bug, Buildhelper, BuildhelperStep
+from mysite.search.models import Project, Bug
 from django.contrib import admin
-
-
-class BuildhelperStepInline(admin.StackedInline):
-    model = BuildhelperStep
-    extra = 1
-
-
-class BuildhelperAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['project']}),
-        (None, {'fields': ['default_frustration_handler']})
-    ]
-    inlines = [BuildhelperStepInline]
 
 admin.site.register(Project)
 admin.site.register(Bug)
-admin.site.register(Buildhelper, BuildhelperAdmin)

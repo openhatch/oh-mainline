@@ -92,12 +92,15 @@
 	<p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
     </div>
     <div id="low">
-      <pre>man patch</pre>
-      <p>or
-	<a href="http://linux.die.net/man/1/patch">read the man page online</a>.</p>
-    </div>
+      <p><a href="http://linux.die.net/man/1/patch">Read the man page for patch online</a>,</p>
+      <p>or, if you're on Linux or Mac, use the terminal command: <pre>man patch</pre></p>
+	</div>
     <div id="medium">
-	 <p>One way to accomplish this is by running a command like <pre>patch -p0 &lt; patch_file</pre> from the command-line, in the directory containing both <code>patch_file</code> and the original file (replace <code>"patch_file"</code> with the actual name of the file you downloaded). This command says "use the patch program to apply the diff in <code>patch_file</code> to a file in the current directory". You can read more about the <code>patch</code> program in its <a href="http://linux.die.net/man/1/patch">man page</a> (or type <code>man patch</code> at the command-line).</p>
+	 <p>One way to accomplish this is by running a command like</p>
+	 <tt>patch &lt; patch_file</tt> 
+	 <p>from the command-line, in the directory containing both <tt>patch_file</tt> and the original file (replace <tt>"patch_file"</tt> with the actual name of the file you downloaded).</p> 
+	 <p>This command says "use the patch program to apply the diff in <tt>patch_file</tt> to a file in the current directory".</p> 
+	 <p>You can read more about the <tt>patch</tt> program in its <a href="http://linux.die.net/man/1/patch">man page</a> or if you are on Mac or Linux, type: <pre>man patch</pre> at the command-line.</p>
     </div>
     <div id="high">
       <p>Open a command prompt, and type these commands in, one at a time. You need to copy them exactly. Make sure to press enter between each one.</p>
@@ -108,12 +111,12 @@
       </pre>
       <p>Then, download the original file and the modified file.</p>
       <pre>
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}
-	wget {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_original_file %}
+	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchsingle_get_patch %}
       </pre>
       <p>Then, use the <tt>patch</tt> command to apply the changes.</p>
       <pre>
-	patch -p0 &lt; add-oven-temp.patch
+	patch &lt; add-oven-temp.patch
       </pre>
       <p>At this point, oven-pancake.txt has been modified. You can
 	verify that by opening that file in your favorite text editor.</p>

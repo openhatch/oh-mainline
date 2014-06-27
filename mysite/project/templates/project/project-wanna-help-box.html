@@ -29,7 +29,7 @@
     </div>
     {% if people_to_show %}
       <div id="iwh_handler" class="body tab">
-	<form id='mark_contacted_do_form' action="{% url mysite.project.views.mark_contacted_do %}" method="POST">
+	<form id='mark_contacted_do_form' action="{% url mysite.project.views.mark_contacted_do %}" method="POST">{% csrf_token %}
         <div class="explanation">
           <p>The following people are interested in helping.
 	    Send them an email! (<a href="//openhatch.org/wiki/Contacting_new_contributors">tips</a>)
@@ -49,7 +49,6 @@
 	  </p>
         </div>
 	<div class="wannahelper_checkboxes">
-        {% csrf_token %}
 	<ul class="people-list">
         {% for person in mark_contacted_forms %}
           {% with person.person as person %}{% include 'profile/person-summary-li.html' %}{% endwith %}
@@ -77,7 +76,7 @@
     </form>
 {% endwith %}
 {% if user_wants_to_help %}
-            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
+            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">{% csrf_token %}
                 <input type='hidden' name='project' value='{{project.id}}'>
                 <input type='submit' style='float: left; margin-left: 10px;' id='delist_helper_button' value='De-list me!'>
             </form>

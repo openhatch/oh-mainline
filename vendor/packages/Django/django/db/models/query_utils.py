@@ -7,11 +7,9 @@ circular import difficulties.
 """
 
 import weakref
-from django.utils.copycompat import deepcopy
 
 from django.db.backends import util
 from django.utils import tree
-from django.utils.datastructures import SortedDict
 
 
 class InvalidQuery(Exception):
