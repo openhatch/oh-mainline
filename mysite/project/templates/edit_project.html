@@ -160,6 +160,7 @@ Editing project - {{ project.display_name }}
 		    <li><a href="{% url mysite.customs.views.add_tracker launchpad %}launchpad?project_id={{ project.id }}">Launchpad</a></li>
 		    <li><a href="{% url mysite.customs.views.add_tracker roundup %}roundup?project_id={{ project.id }}">Roundup</a></li>
 		    <li><a href="{% url mysite.customs.views.add_tracker trac %}trac?project_id={{ project.id }}">Trac</a></li>
+		    <li><a href="{% url mysite.customs.views.add_tracker tigris %}tigris?project_id={{ project.id }}">Tigris</a></li>
 		    </ul>
 		  {% endif %}
 		</div>
