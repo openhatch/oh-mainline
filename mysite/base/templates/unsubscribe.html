@@ -41,12 +41,12 @@ Hi
 {% if unsubscribe_this_user.email_me_re_projects %}
 <p> This page allows you to unsubscribe from periodic emails from OpenHatch about activity in your projects. </p>
 
-<form method='POST' action='{% url mysite.profile.views.unsubscribe_do %}'>{% csrf_token %}
+<form method='POST' action='{% url "mysite.profile.views.unsubscribe_do" %}'>{% csrf_token %}
     <input type='hidden' name='token_string' value='{{ token_string }}'>
     <input type='submit' value='Unsubscribe and be free' >
 </form>
 {% else %}
-<p> You are no longer signed up to receive periodic emails from OpenHatch about activity in your projects. You can change this in <a href='{% url mysite.account.views.edit_contact_info %}'>your settings page</a>. </p>
+<p> You are no longer signed up to receive periodic emails from OpenHatch about activity in your projects. You can change this in <a href='{% url "mysite.account.views.edit_contact_info" %}'>your settings page</a>. </p>
 {% endif %}
 
 {% else %}
