@@ -58,25 +58,90 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
 
 class EditInfoForm(django.forms.Form):
     bio = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
-    homepage_url = django.forms.URLField(required=False)
+        required=False,
+        widget=django.forms.Textarea(
+            attrs={
+                'placeholder':'I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.'
+            }
+        )
+    )
+    homepage_url = django.forms.URLField(
+        required=False,
+        widget=django.forms.TextInput(
+            attrs=
+                {
+                    'placeholder':'www.github.io/myAccountName',
+                    'size':'40',
+                 }
+        )
+    )
     irc_nick = django.forms.CharField(
-        required=False, widget=django.forms.TextInput())
+        required=False,
+        widget=django.forms.TextInput(
+            attrs=
+                {
+                    'placeholder':'ArcTanSusan',
+                    'size':'40',
+                }
+        )
+    )
     understands = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
+        required=False,
+        widget=django.forms.Textarea(
+            attrs=
+                {
+                    'placeholder':'ruby, wordpress, regular expressions, classical guitar',
+                }
+        )
+    )
     understands_not = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
+        required=False,
+        widget=django.forms.Textarea(
+                attrs=
+                    {
+                        'placeholder':'Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch',
+                    }
+        )
+    )
     studying = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
+        required=False,
+        widget=django.forms.Textarea(
+            attrs=
+                {
+                    'placeholder':'Qt, DVD DRM circumvention, Bayesian inference, neural networks',
+                }
+        )
+    )
     can_pitch_in = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
+        required=False,
+        widget=django.forms.Textarea(
+            attrs=
+                {
+                    'placeholder':'documentation, testing, c++, mac compatibility, design',
+                }
+        )
+    )
     can_mentor = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
+        required=False,
+        widget=django.forms.Textarea(
+            attrs=
+                {
+                    'placeholder':'python, unicode, git, GTK+',
+                }
+        )
+    )
 
 
 class ContactBlurbForm(django.forms.Form):
     contact_blurb = django.forms.CharField(
-        required=False, widget=django.forms.Textarea())
+        required=False,
+        widget=django.forms.Textarea(
+            attrs=
+                {
+                    'placeholder':'The best way to reach me is by private message on Twitter, email, and/or IRC.',
+                }
+        )
+    )
 
 
 class UseDescriptionFromThisPortfolioEntryForm(django.forms.ModelForm):
