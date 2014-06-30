@@ -50,11 +50,11 @@
         <p>
         To add or remove projects, 
         {% if rich_text %}
-        <a href='http://openhatch.org{% url mysite.profile.views.importer %}'>
+        <a href='http://openhatch.org{% url "mysite.profile.views.importer" %}'>
             edit your profile</a>.
         {% else %}
         edit your profile:
-        &lt;http://openhatch.org{% url mysite.profile.views.importer %}&gt;.
+        &lt;http://openhatch.org{% url "mysite.profile.views.importer" %}&gt;.
         {% endif %}
         </p>
 
