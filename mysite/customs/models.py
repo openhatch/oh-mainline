@@ -353,6 +353,9 @@ class GoogleTrackerModel(TrackerModel):
 
     all_trackers = models.Manager()
 
+    BUG_STATUS_OPEN = 2
+    BUG_STATUS_ALL = 1
+
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
@@ -363,11 +366,10 @@ class GoogleTrackerModel(TrackerModel):
             'last_polled__min']
         if lowest_last_polled is None:
             lowest_last_polled = datetime.datetime(1970, 1, 1)
-        query_data = {u'can': u'all',
-                      u'updated-min': unicode(lowest_last_polled.isoformat())}
-        query_url = google_query_url(self.google_name,
-                                     **query_data)
+
+        query_url = google_query_url(self.google_name, can=self.BUG_STATUS_ALL)
         out['get_older_bug_data'] = query_url
+
         return out
 
     def get_base_url(self):
@@ -375,13 +377,29 @@ class GoogleTrackerModel(TrackerModel):
 
 
 def google_query_url(project_name, **kwargs):
-    extra_data = {u'max-results': u'10000',
-                  u'can': u'open',
-                  }
+    extra_data = {
+        u'num': 1000,  # 1000 is the maximum we can fetch
+        u'can': GoogleTrackerModel.BUG_STATUS_OPEN,
+        u'colspec': ' '.join((
+            'ID',
+            'Status',
+            'Priority',
+            'Owner',
+            'Summary',
+            'Stars',
+            'Opened',
+            'Closed',
+            'Reporter',
+            'Cc',
+            'Difficulty',
+            'Modified',
+            'Type',
+        )),
+    }
     extra_data.update(kwargs)
-    base = 'https://code.google.com/feeds/issues/p/%s/issues/full' % (project_name,)
-    url = base + '?' + http.urlencode(extra_data)
-    return url
+
+    base = 'https://code.google.com/p/{project}/issues/csv'.format(project=project_name)
+    return '{url}?{params}'.format(url=base, params=http.urlencode(extra_data))
 
 
 class GoogleQueryModel(TrackerQueryModel):
