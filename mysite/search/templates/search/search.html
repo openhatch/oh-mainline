@@ -74,7 +74,7 @@ Volunteer opportunities in free and open source software
                         }
                     {% endcomment %}
                     <div class="submodule facet-list">
-                        <h3>{{ facet.sidebar_heading }}</h3>
+                        <h3>{{ facet.sidebar_heading }} {{ facet.sorted_by }}</h3>
                         <ul>
                             {% if query %}
                                 {% for option in facet.options|slice:':4' %}
