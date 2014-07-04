@@ -516,6 +516,10 @@ urlpatterns = patterns('',
                        (r'^donate/t-shirts/$', direct_to_template,
                         {'template': 'base/shirts.html'}),
 
+                       #the test 500 page
+                       (r'^sample-500/$', direct_to_template,
+                        {'template': '500.html'}),
+
                        # This dangerous regex is last
                        (r'^people/(?P<user_to_display__username>[^/]+)/$',
                         'mysite.profile.views.display_person_web'),
