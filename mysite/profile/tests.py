@@ -2658,6 +2658,11 @@ class ProfileApiTest(TwillTests):
         self.assertEqual(1, parsed['meta']['total_count'])
 
     def test_api_view_when_logged_out(self):
+        self.client.logout()
+        # Test that user is logged out
+        response = self.client.get('/+api/v1/delete_user_for_being_spammy/')
+        self.assertEqual(302, response.status_code)
+
         response = self.client.get(
             '/+api/v1/profile/portfolio_entry/?format=json')
         parsed = simplejson.loads(response.content)
