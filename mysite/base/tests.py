@@ -24,7 +24,7 @@ from django.core.urlresolvers import reverse
 import twill
 from twill import commands as tc
 from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 from StringIO import StringIO
 from django.test.client import Client
 import os
@@ -74,7 +74,7 @@ class TwillTests(django.test.TestCase):
 
     @staticmethod
     def _twill_setup():
-        app = AdminMediaHandler(WSGIHandler())
+        app = StaticFilesHandler(WSGIHandler())
         twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
 
     @staticmethod

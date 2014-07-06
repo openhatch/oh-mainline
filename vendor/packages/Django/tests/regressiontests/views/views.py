@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import sys
 
-from django import forms
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import get_resolver
 from django.http import HttpResponse, HttpResponseRedirect
@@ -14,32 +13,12 @@ from django.views.decorators.debug import (sensitive_post_parameters,
 from django.utils.log import getLogger
 
 from . import BrokenException, except_args
-from .models import Article
 
 
 
 def index_page(request):
     """Dummy index page"""
     return HttpResponse('<html><body>Dummy page</body></html>')
-
-def custom_create(request):
-    """
-    Calls create_object generic view with a custom form class.
-    """
-    class SlugChangingArticleForm(forms.ModelForm):
-        """Custom form class to overwrite the slug."""
-
-        class Meta:
-            model = Article
-
-        def save(self, *args, **kwargs):
-            self.instance.slug = 'some-other-slug'
-            return super(SlugChangingArticleForm, self).save(*args, **kwargs)
-
-    from django.views.generic.create_update import create_object
-    return create_object(request,
-        post_save_redirect='/create_update/view/article/%(slug)s/',
-        form_class=SlugChangingArticleForm)
 
 def raises(request):
     # Make sure that a callable that raises an exception in the stack frame's
@@ -72,6 +51,9 @@ def template_exception(request, n):
     return render_to_response('debug/template_exception.html',
         {'arg': except_args[int(n)]})
 
+def jsi18n(request):
+    return render_to_response('jsi18n.html')
+
 # Some views to exercise the shortcuts
 
 def render_to_response_view(request):
@@ -86,11 +68,11 @@ def render_to_response_view_with_request_context(request):
         'bar': 'BAR',
     }, context_instance=RequestContext(request))
 
-def render_to_response_view_with_mimetype(request):
+def render_to_response_view_with_content_type(request):
     return render_to_response('debug/render_test.html', {
         'foo': 'FOO',
         'bar': 'BAR',
-    }, mimetype='application/x-rendertest')
+    }, content_type='application/x-rendertest')
 
 def render_view(request):
     return render(request, 'debug/render_test.html', {
@@ -150,6 +132,7 @@ def send_log(request, exc_info):
         ][0]
     orig_filters = admin_email_handler.filters
     admin_email_handler.filters = []
+    admin_email_handler.include_html = True
     logger.error('Internal Server Error: %s', request.path,
         exc_info=exc_info,
         extra={
@@ -201,6 +184,38 @@ def paranoid_view(request):
         exc_info = sys.exc_info()
         send_log(request, exc_info)
         return technical_500_response(request, *exc_info)
+
+def sensitive_args_function_caller(request):
+    try:
+        sensitive_args_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+@sensitive_variables('sauce')
+def sensitive_args_function(sauce):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    raise Exception
+
+def sensitive_kwargs_function_caller(request):
+    try:
+        sensitive_kwargs_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+@sensitive_variables('sauce')
+def sensitive_kwargs_function(sauce=None):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    raise Exception
 
 class UnsafeExceptionReporterFilter(SafeExceptionReporterFilter):
     """

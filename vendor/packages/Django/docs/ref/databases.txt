@@ -33,6 +33,11 @@ aggregate with a database backend that falls within the affected release range.
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
 .. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
 
+PostgreSQL connection settings
+-------------------------------
+
+See :setting:`HOST` for details.
+
 Optimizing PostgreSQL's configuration
 -------------------------------------
 
@@ -111,7 +116,7 @@ outputs a single ``CREATE INDEX`` statement.  However, if the database type
 for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
 ``FileField``, and ``TextField``), then Django will create
 an additional index that uses an appropriate `PostgreSQL operator class`_
-for the column.  The extra index is necessary to correctly perfrom
+for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
@@ -122,30 +127,23 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 MySQL notes
 ===========
 
-Django expects the database to support transactions, referential integrity, and
-Unicode (UTF-8 encoding). Fortunately, MySQL_ has all these features as
-available as far back as 3.23. While it may be possible to use 3.23 or 4.0,
-you'll probably have less trouble if you use 4.1 or 5.0.
+Version support
+---------------
 
-MySQL 4.1
----------
-
-`MySQL 4.1`_ has greatly improved support for character sets. It is possible to
-set different default character sets on the database, table, and column.
-Previous versions have only a server-wide character set setting. It's also the
-first version where the character set can be changed on the fly. 4.1 also has
-support for views, but Django currently doesn't use views.
-
-MySQL 5.0
----------
+Django supports MySQL 5.0.3 and higher.
 
 `MySQL 5.0`_ adds the ``information_schema`` database, which contains detailed
-data on all database schema. Django's ``inspectdb`` feature uses this
-``information_schema`` if it's available. 5.0 also has support for stored
-procedures, but Django currently doesn't use stored procedures.
+data on all database schema. Django's ``inspectdb`` feature uses it.
+
+.. versionchanged:: 1.5
+    The minimum version requirement of MySQL 5.0.3 was set in Django 1.5.
+
+Django expects the database to support Unicode (UTF-8 encoding) and delegates to
+it the task of enforcing transactions and referential integrity. It is important
+to be aware of the fact that the two latter ones aren't actually enforced by
+MySQL when using the MyISAM storage engine, see the next section.
 
 .. _MySQL: http://www.mysql.com/
-.. _MySQL 4.1: http://dev.mysql.com/doc/refman/4.1/en/index.html
 .. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
 
 .. _mysql-storage-engines:
@@ -153,17 +151,20 @@ procedures, but Django currently doesn't use stored procedures.
 Storage engines
 ---------------
 
-MySQL has several `storage engines`_ (previously called table types). You can
-change the default storage engine in the server configuration.
+MySQL has several `storage engines`_. You can change the default storage engine
+in the server configuration.
 
 Until MySQL 5.5.4, the default engine was MyISAM_ [#]_. The main drawbacks of
 MyISAM are that it doesn't support transactions or enforce foreign-key
-constraints. On the plus side, it's currently the only engine that supports
-full-text indexing and searching.
+constraints. On the plus side, it was the only engine that supported full-text
+indexing and searching until MySQL 5.6.4.
 
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
-choice at this point.
+choice at this point. However, note that the the InnoDB autoincrement counter
+is lost on a MySQL restart because it does not remember the
+``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
+result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
 
 If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
 tables, ensure that your tables are using the same storage engine (i.e. MyISAM
@@ -189,7 +190,7 @@ key references and an `IntegrityError` is raised if any are found.
 
 .. _storage engines: http://dev.mysql.com/doc/refman/5.5/en/storage-engines.html
 .. _MyISAM: http://dev.mysql.com/doc/refman/5.5/en/myisam-storage-engine.html
-.. _InnoDB: http://dev.mysql.com/doc/refman/5.5/en/innodb.html
+.. _InnoDB: http://dev.mysql.com/doc/refman/5.5/en/innodb-storage-engine.html
 
 .. [#] Unless this was changed by the packager of your MySQL package. We've
    had reports that the Windows Community Server installer sets up InnoDB as
@@ -210,6 +211,15 @@ required for full MySQL support in Django.
     directory that was left by an earlier version.
 
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
+
+Python 3
+--------
+
+At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
+Python 3. In order to use MySQL under Python 3, you'll have to install an
+unofficial fork, such as `MySQL-for-Python-3`_.
+
+.. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
 
 Creating your database
 ----------------------
@@ -237,7 +247,7 @@ the model definition.
 .. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci_swedish`` collation. This results in all string equality
+``utf8_general_ci`` collation. This results in all string equality
 comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
@@ -255,7 +265,7 @@ to you, the developer, to handle the fact that you will receive bytestrings if
 you configure your table(s) to use ``utf8_bin`` collation. Django itself should
 mostly work smoothly with such columns (except for the ``contrib.sessions``
 ``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.smart_unicode()`` at
+your code must be prepared to call ``django.utils.encoding.smart_text()`` at
 times if it really wants to work with consistent data -- Django will not do
 this for you (the database backend layer and the model population layer are
 separated internally so the database layer doesn't know it needs to make this
@@ -274,10 +284,10 @@ bytestrings (which shouldn't be too difficult) as described above is the
 recommended solution.
 
 Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_collation_ci_swedish``
-(the default) collation for the :class:`django.contrib.sessions.models.Session`
+MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
+(the default) collation for the ``django.contrib.sessions.models.Session``
 table (usually called ``django_session``) and the
-:class:`django.contrib.admin.models.LogEntry` table (usually called
+``django.contrib.admin.models.LogEntry`` table (usually called
 ``django_admin_log``). Those are the two standard tables that use
 :class:`~django.db.models.TextField` internally.
 
@@ -320,8 +330,8 @@ Here's a sample configuration which uses a MySQL option file::
     default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,
-``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
-`MySQLdb documentation`_ for more details.
+``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
+more details.
 
 .. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
@@ -392,15 +402,6 @@ these methods in no-op's based in the results of such detection.
 Notes on specific fields
 ------------------------
 
-Boolean fields
-~~~~~~~~~~~~~~
-
-.. versionchanged:: 1.2
-
-In previous versions of Django when running under MySQL ``BooleanFields`` would
-return their data as ``ints``, instead of true ``bools``.  See the release
-notes for a complete description of the change.
-
 Character fields
 ~~~~~~~~~~~~~~~~
 
@@ -409,10 +410,6 @@ Any fields that are stored with ``VARCHAR`` column types have their
 for the field. This affects :class:`~django.db.models.CharField`,
 :class:`~django.db.models.SlugField` and
 :class:`~django.db.models.CommaSeparatedIntegerField`.
-
-Furthermore, if you are using a version of MySQL prior to 5.0.3, all of those
-column types have a maximum length restriction of 255 characters, regardless
-of whether ``unique=True`` is specified or not.
 
 DateTime fields
 ~~~~~~~~~~~~~~~
@@ -505,17 +502,6 @@ Versions of SQLite 3.3.5 and older contains the following bugs:
 SQLite 3.3.6 was released in April 2006, so most current binary distributions
 for different platforms include newer version of SQLite usable from Python
 through either the ``pysqlite2`` or the ``sqlite3`` modules.
-
-However, some platform/Python version combinations include older versions of
-SQLite (e.g. the official binary distribution of Python 2.5 for Windows, 2.5.4
-as of this writing, includes SQLite 3.3.4). There are (as of Django 1.1) even
-some tests in the Django test suite that will fail when run under this setup.
-
-As described :ref:`below<using-newer-versions-of-pysqlite>`, this can be solved
-by downloading and installing a newer version of ``pysqlite2``
-(``pysqlite-2.x.x.win32-py2.5.exe`` in the described case) that includes and
-uses a newer version of SQLite. Python 2.6 for Windows ships with a version of
-SQLite that is not affected by these issues.
 
 Version 3.5.9
 -------------
@@ -650,6 +636,14 @@ To run Django's test suite, the user needs these *additional* privileges:
 * CONNECT WITH ADMIN OPTION
 * RESOURCE WITH ADMIN OPTION
 
+The Oracle database backend uses the ``SYS.DBMS_LOB`` package, so your user
+will require execute permissions on it. It's normally accessible to all users
+by default, but in case it is not, you'll need to grant permissions like so:
+
+.. code-block:: sql
+
+    GRANT EXECUTE ON SYS.DBMS_LOB TO user;
+
 Connecting to the database
 --------------------------
 
@@ -688,9 +682,9 @@ as empty strings.
 Threaded option
 ----------------
 
-If you plan to run Django in a multithreaded environment (e.g. Apache in Windows
-using the default MPM module), then you **must** set the ``threaded`` option of
-your Oracle database configuration to True::
+If you plan to run Django in a multithreaded environment (e.g. Apache using the
+the default MPM module on any modern operating system), then you **must** set
+the ``threaded`` option of your Oracle database configuration to True::
 
             'OPTIONS': {
                 'threaded': True,
@@ -751,11 +745,11 @@ NULL and empty strings
 
 Django generally prefers to use the empty string ('') rather than
 NULL, but Oracle treats both identically. To get around this, the
-Oracle backend coerces the ``null=True`` option on fields that have
-the empty string as a possible value. When fetching from the database,
-it is assumed that a NULL value in one of these fields really means
-the empty string, and the data is silently converted to reflect this
-assumption.
+Oracle backend ignores an explicit ``null`` option on fields that
+have the empty string as a possible value and generates DDL as if
+``null=True``. When fetching from the database, it is assumed that
+a ``NULL`` value in one of these fields really means the empty
+string, and the data is silently converted to reflect this assumption.
 
 ``TextField`` limitations
 -------------------------

@@ -1,10 +1,6 @@
 docutils
 Markdown
 numpy
-PIL
-py-bcrypt
-python-memcached
-pytz
 PyYAML
+pytz
 selenium
-Textile

@@ -1,0 +1,812 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Testing &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Compatibility Notes" href="compatibility_notes.html" />
+    <link rel="prev" title="Tools" href="tools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compatibility_notes.html" title="Compatibility Notes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="testing">
+<span id="ref-testing"></span><h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<p>Having integrated unit tests that cover your API&#8217;s behavior is important, as
+it helps provide verification that your API code is still valid &amp; working
+correctly with the rest of your application.</p>
+<p>Tastypie provides some basic facilities that build on top of <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/">Django&#8217;s testing</a>
+support, in the form of a specialized <tt class="docutils literal"><span class="pre">TestApiClient</span></tt> &amp; <tt class="docutils literal"><span class="pre">ResourceTestCase</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">ResourceTestCase</span></tt> builds on top of Django&#8217;s <tt class="docutils literal"><span class="pre">TestCase</span></tt>. It provides quite
+a few extra assertion methods that are specific to APIs. Under the hood, it
+uses the <tt class="docutils literal"><span class="pre">TestApiClient</span></tt> to perform requests properly.</p>
+<p>The <tt class="docutils literal"><span class="pre">TestApiClient</span></tt> builds on &amp; exposes an interface similar to that of Django&#8217;s
+<tt class="docutils literal"><span class="pre">Client</span></tt>. However, under the hood, it hands all the setup needed to construct
+a proper request.</p>
+<div class="section" id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<p>The typical use case will primarily consist of subclassing the
+<tt class="docutils literal"><span class="pre">ResourceTestCase</span></tt> class &amp; using the built-in assertions to ensure your
+API is behaving correctly. For the purposes of this example, we&#8217;ll assume the
+resource in question looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.authentication</span> <span class="kn">import</span> <span class="n">BasicAuthentication</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">entries.models</span> <span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span> <span class="nc">EntryResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">authentication</span> <span class="o">=</span> <span class="n">BasicAuthentication</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An example usage might look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.test</span> <span class="kn">import</span> <span class="n">ResourceTestCase</span>
+<span class="kn">from</span> <span class="nn">entries.models</span> <span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span> <span class="nc">EntryResourceTest</span><span class="p">(</span><span class="n">ResourceTestCase</span><span class="p">):</span>
+    <span class="c"># Use ``fixtures`` &amp; ``urls`` as normal. See Django&#39;s ``TestCase``</span>
+    <span class="c"># documentation for the gory details.</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;test_entries.json&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EntryResourceTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+
+        <span class="c"># Create a user.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="s">&#39;daniel&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="s">&#39;pass&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="s">&#39;daniel@example.com&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+
+        <span class="c"># Fetch the ``Entry`` object we&#39;ll use in testing.</span>
+        <span class="c"># Note that we aren&#39;t using PKs because they can change depending</span>
+        <span class="c"># on what other tests are running.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry_1</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slug</span><span class="o">=</span><span class="s">&#39;first-post&#39;</span><span class="p">)</span>
+
+        <span class="c"># We also build a detail URI, since we will be using it all over.</span>
+        <span class="c"># DRY, baby. DRY.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span> <span class="o">=</span> <span class="s">&#39;/api/v1/entry/{0}/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_1</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="c"># The data we&#39;ll send on POST requests. Again, because we&#39;ll use it</span>
+        <span class="c"># frequently (enough).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="s">&#39;/api/v1/user/{0}/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span>
+            <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Second Post!&#39;</span><span class="p">,</span>
+            <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="s">&#39;second-post&#39;</span><span class="p">,</span>
+            <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="s">&#39;2012-05-01T22:05:12&#39;</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">get_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_basic</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_get_list_unauthorzied</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpUnauthorized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/api/v1/entries/&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_get_list_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/api/v1/entries/&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertValidJSONResponse</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+
+        <span class="c"># Scope out the data for correctness.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">resp</span><span class="p">)[</span><span class="s">&#39;objects&#39;</span><span class="p">]),</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="c"># Here, we&#39;re checking an entire structure for the expected data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">resp</span><span class="p">)[</span><span class="s">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="p">{</span>
+            <span class="s">&#39;pk&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_1</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span>
+            <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="s">&#39;/api/v1/user/{0}/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span>
+            <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;First post&#39;</span><span class="p">,</span>
+            <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="s">&#39;first-post&#39;</span><span class="p">,</span>
+            <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="s">&#39;2012-05-01T19:13:42&#39;</span><span class="p">,</span>
+            <span class="s">&#39;resource_uri&#39;</span><span class="p">:</span> <span class="s">&#39;/api/v1/entry/{0}/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_1</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+        <span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">test_get_list_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertValidXMLResponse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/api/v1/entries/&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;xml&#39;</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">test_get_detail_unauthenticated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpUnauthorized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_get_detail_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertValidJSONResponse</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+
+        <span class="c"># We use ``assertKeys`` here to just verify the keys, not all the data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertKeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">resp</span><span class="p">),</span> <span class="p">[</span><span class="s">&#39;created&#39;</span><span class="p">,</span> <span class="s">&#39;slug&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">resp</span><span class="p">)[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="s">&#39;First post&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_get_detail_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertValidXMLResponse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;xml&#39;</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">test_post_list_unauthenticated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpUnauthorized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;/api/v1/entries/&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">post_data</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_post_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Check how many are there first.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpCreated</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;/api/v1/entries/&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">post_data</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">()))</span>
+        <span class="c"># Verify a new one has been added.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">6</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_put_detail_unauthenticated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpUnauthorized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{}))</span>
+
+    <span class="k">def</span> <span class="nf">test_put_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Grab the current data &amp; modify it slightly.</span>
+        <span class="n">original_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">()))</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="n">original_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">new_data</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Updated: First Post&#39;</span>
+        <span class="n">new_data</span><span class="p">[</span><span class="s">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;2012-05-01T20:06:12&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpAccepted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">new_data</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">()))</span>
+        <span class="c"># Make sure the count hasn&#39;t changed &amp; we did an update.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="c"># Check for updated data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="s">&#39;Updated: First Post&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">slug</span><span class="p">,</span> <span class="s">&#39;first-post&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">created</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_delete_detail_unauthenticated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpUnauthorized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_delete_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertHttpAccepted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detail_url</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="n">authentication</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_credentials</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that this example doesn&#8217;t cover other cases, such as filtering, <tt class="docutils literal"><span class="pre">PUT</span></tt> to
+a list endpoint, <tt class="docutils literal"><span class="pre">DELETE</span></tt> to a list endpoint, <tt class="docutils literal"><span class="pre">PATCH</span></tt> support, etc.</p>
+<div class="section" id="resourcetestcase-api-reference">
+<h3><tt class="docutils literal"><span class="pre">ResourceTestCase</span></tt> API Reference<a class="headerlink" href="#resourcetestcase-api-reference" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">ResourceTestCase</span></tt> exposes the following methods for use. Most are
+enhanced assertions or provide API-specific behaviors.</p>
+<div class="section" id="get-credentials">
+<h4><tt class="docutils literal"><span class="pre">get_credentials</span></tt><a class="headerlink" href="#get-credentials" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.get_credentials">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">get_credentials</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#ResourceTestCase.get_credentials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A convenience method for the user as a way to shorten up the
+often repetitious calls to create the same authentication.</p>
+<p>Raises <tt class="docutils literal"><span class="pre">NotImplementedError</span></tt> by default.</p>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyResourceTestCase</span><span class="p">(</span><span class="n">ResourceTestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_basic</span><span class="p">(</span><span class="s">&#39;daniel&#39;</span><span class="p">,</span> <span class="s">&#39;pass&#39;</span><span class="p">)</span>
+
+    <span class="c"># Then the usual tests...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-basic">
+<h4><tt class="docutils literal"><span class="pre">create_basic</span></tt><a class="headerlink" href="#create-basic" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.create_basic">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">create_basic</tt><big>(</big><em>self</em>, <em>username</em>, <em>password</em><big>)</big><a class="headerlink" href="#ResourceTestCase.create_basic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Creates &amp; returns the HTTP <tt class="docutils literal"><span class="pre">Authorization</span></tt> header for use with BASIC Auth.</p>
+</div>
+<div class="section" id="create-apikey">
+<h4><tt class="docutils literal"><span class="pre">create_apikey</span></tt><a class="headerlink" href="#create-apikey" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.create_apikey">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">create_apikey</tt><big>(</big><em>self</em>, <em>username</em>, <em>api_key</em><big>)</big><a class="headerlink" href="#ResourceTestCase.create_apikey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Creates &amp; returns the HTTP <tt class="docutils literal"><span class="pre">Authorization</span></tt> header for use with <tt class="docutils literal"><span class="pre">ApiKeyAuthentication</span></tt>.</p>
+</div>
+<div class="section" id="create-digest">
+<h4><tt class="docutils literal"><span class="pre">create_digest</span></tt><a class="headerlink" href="#create-digest" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.create_digest">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">create_digest</tt><big>(</big><em>self</em>, <em>username</em>, <em>api_key</em>, <em>method</em>, <em>uri</em><big>)</big><a class="headerlink" href="#ResourceTestCase.create_digest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Creates &amp; returns the HTTP <tt class="docutils literal"><span class="pre">Authorization</span></tt> header for use with Digest Auth.</p>
+</div>
+<div class="section" id="create-oauth">
+<h4><tt class="docutils literal"><span class="pre">create_oauth</span></tt><a class="headerlink" href="#create-oauth" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.create_oauth">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">create_oauth</tt><big>(</big><em>self</em>, <em>user</em><big>)</big><a class="headerlink" href="#ResourceTestCase.create_oauth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Creates &amp; returns the HTTP <tt class="docutils literal"><span class="pre">Authorization</span></tt> header for use with Oauth.</p>
+</div>
+<div class="section" id="asserthttpok">
+<h4><tt class="docutils literal"><span class="pre">assertHttpOK</span></tt><a class="headerlink" href="#asserthttpok" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpOK">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpOK</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpOK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 200.</p>
+</div>
+<div class="section" id="asserthttpcreated">
+<h4><tt class="docutils literal"><span class="pre">assertHttpCreated</span></tt><a class="headerlink" href="#asserthttpcreated" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpCreated">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpCreated</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpCreated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 201.</p>
+</div>
+<div class="section" id="asserthttpaccepted">
+<h4><tt class="docutils literal"><span class="pre">assertHttpAccepted</span></tt><a class="headerlink" href="#asserthttpaccepted" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpAccepted">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpAccepted</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpAccepted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning either a HTTP 202 or a HTTP 204.</p>
+</div>
+<div class="section" id="asserthttpmultiplechoices">
+<h4><tt class="docutils literal"><span class="pre">assertHttpMultipleChoices</span></tt><a class="headerlink" href="#asserthttpmultiplechoices" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpMultipleChoices">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpMultipleChoices</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpMultipleChoices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 300.</p>
+</div>
+<div class="section" id="asserthttpseeother">
+<h4><tt class="docutils literal"><span class="pre">assertHttpSeeOther</span></tt><a class="headerlink" href="#asserthttpseeother" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpSeeOther">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpSeeOther</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpSeeOther" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 303.</p>
+</div>
+<div class="section" id="asserthttpnotmodified">
+<h4><tt class="docutils literal"><span class="pre">assertHttpNotModified</span></tt><a class="headerlink" href="#asserthttpnotmodified" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpNotModified">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpNotModified</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpNotModified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 304.</p>
+</div>
+<div class="section" id="asserthttpbadrequest">
+<h4><tt class="docutils literal"><span class="pre">assertHttpBadRequest</span></tt><a class="headerlink" href="#asserthttpbadrequest" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpBadRequest">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpBadRequest</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpBadRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 400.</p>
+</div>
+<div class="section" id="asserthttpunauthorized">
+<h4><tt class="docutils literal"><span class="pre">assertHttpUnauthorized</span></tt><a class="headerlink" href="#asserthttpunauthorized" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpUnauthorized">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpUnauthorized</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpUnauthorized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 401.</p>
+</div>
+<div class="section" id="asserthttpforbidden">
+<h4><tt class="docutils literal"><span class="pre">assertHttpForbidden</span></tt><a class="headerlink" href="#asserthttpforbidden" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpForbidden">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpForbidden</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpForbidden" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 403.</p>
+</div>
+<div class="section" id="asserthttpnotfound">
+<h4><tt class="docutils literal"><span class="pre">assertHttpNotFound</span></tt><a class="headerlink" href="#asserthttpnotfound" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpNotFound">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpNotFound</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpNotFound" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 404.</p>
+</div>
+<div class="section" id="asserthttpmethodnotallowed">
+<h4><tt class="docutils literal"><span class="pre">assertHttpMethodNotAllowed</span></tt><a class="headerlink" href="#asserthttpmethodnotallowed" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpMethodNotAllowed">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpMethodNotAllowed</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpMethodNotAllowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 405.</p>
+</div>
+<div class="section" id="asserthttpconflict">
+<h4><tt class="docutils literal"><span class="pre">assertHttpConflict</span></tt><a class="headerlink" href="#asserthttpconflict" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpConflict">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpConflict</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpConflict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 409.</p>
+</div>
+<div class="section" id="asserthttpgone">
+<h4><tt class="docutils literal"><span class="pre">assertHttpGone</span></tt><a class="headerlink" href="#asserthttpgone" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpGone">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpGone</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpGone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 410.</p>
+</div>
+<div class="section" id="asserthttptoomanyrequests">
+<h4><tt class="docutils literal"><span class="pre">assertHttpTooManyRequests</span></tt><a class="headerlink" href="#asserthttptoomanyrequests" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpTooManyRequests">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpTooManyRequests</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpTooManyRequests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 429.</p>
+</div>
+<div class="section" id="asserthttpapplicationerror">
+<h4><tt class="docutils literal"><span class="pre">assertHttpApplicationError</span></tt><a class="headerlink" href="#asserthttpapplicationerror" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpApplicationError">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpApplicationError</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpApplicationError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 500.</p>
+</div>
+<div class="section" id="asserthttpnotimplemented">
+<h4><tt class="docutils literal"><span class="pre">assertHttpNotImplemented</span></tt><a class="headerlink" href="#asserthttpnotimplemented" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertHttpNotImplemented">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertHttpNotImplemented</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertHttpNotImplemented" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Ensures the response is returning a HTTP 501.</p>
+</div>
+<div class="section" id="assertvalidjson">
+<h4><tt class="docutils literal"><span class="pre">assertValidJSON</span></tt><a class="headerlink" href="#assertvalidjson" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidJSON">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidJSON</tt><big>(</big><em>self</em>, <em>data</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidJSON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given the provided <tt class="docutils literal"><span class="pre">data</span></tt> as a string, ensures that it is valid JSON &amp;
+can be loaded properly.</p>
+</div>
+<div class="section" id="assertvalidxml">
+<h4><tt class="docutils literal"><span class="pre">assertValidXML</span></tt><a class="headerlink" href="#assertvalidxml" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidXML">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidXML</tt><big>(</big><em>self</em>, <em>data</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given the provided <tt class="docutils literal"><span class="pre">data</span></tt> as a string, ensures that it is valid XML &amp;
+can be loaded properly.</p>
+</div>
+<div class="section" id="assertvalidyaml">
+<h4><tt class="docutils literal"><span class="pre">assertValidYAML</span></tt><a class="headerlink" href="#assertvalidyaml" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidYAML">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidYAML</tt><big>(</big><em>self</em>, <em>data</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidYAML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given the provided <tt class="docutils literal"><span class="pre">data</span></tt> as a string, ensures that it is valid YAML &amp;
+can be loaded properly.</p>
+</div>
+<div class="section" id="assertvalidplist">
+<h4><tt class="docutils literal"><span class="pre">assertValidPlist</span></tt><a class="headerlink" href="#assertvalidplist" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidPlist">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidPlist</tt><big>(</big><em>self</em>, <em>data</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidPlist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given the provided <tt class="docutils literal"><span class="pre">data</span></tt> as a string, ensures that it is valid binary plist &amp;
+can be loaded properly.</p>
+</div>
+<div class="section" id="assertvalidjsonresponse">
+<h4><tt class="docutils literal"><span class="pre">assertValidJSONResponse</span></tt><a class="headerlink" href="#assertvalidjsonresponse" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidJSONResponse">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidJSONResponse</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidJSONResponse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> coming back from using the <tt class="docutils literal"><span class="pre">client</span></tt>, assert that
+you get back:</p>
+<ul class="simple">
+<li>An HTTP 200</li>
+<li>The correct content-type (<tt class="docutils literal"><span class="pre">application/json</span></tt>)</li>
+<li>The content is valid JSON</li>
+</ul>
+</div>
+<div class="section" id="assertvalidxmlresponse">
+<h4><tt class="docutils literal"><span class="pre">assertValidXMLResponse</span></tt><a class="headerlink" href="#assertvalidxmlresponse" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidXMLResponse">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidXMLResponse</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidXMLResponse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> coming back from using the <tt class="docutils literal"><span class="pre">client</span></tt>, assert that
+you get back:</p>
+<ul class="simple">
+<li>An HTTP 200</li>
+<li>The correct content-type (<tt class="docutils literal"><span class="pre">application/xml</span></tt>)</li>
+<li>The content is valid XML</li>
+</ul>
+</div>
+<div class="section" id="assertvalidyamlresponse">
+<h4><tt class="docutils literal"><span class="pre">assertValidYAMLResponse</span></tt><a class="headerlink" href="#assertvalidyamlresponse" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidYAMLResponse">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidYAMLResponse</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidYAMLResponse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> coming back from using the <tt class="docutils literal"><span class="pre">client</span></tt>, assert that
+you get back:</p>
+<ul class="simple">
+<li>An HTTP 200</li>
+<li>The correct content-type (<tt class="docutils literal"><span class="pre">text/yaml</span></tt>)</li>
+<li>The content is valid YAML</li>
+</ul>
+</div>
+<div class="section" id="assertvalidplistresponse">
+<h4><tt class="docutils literal"><span class="pre">assertValidPlistResponse</span></tt><a class="headerlink" href="#assertvalidplistresponse" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertValidPlistResponse">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertValidPlistResponse</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertValidPlistResponse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> coming back from using the <tt class="docutils literal"><span class="pre">client</span></tt>, assert that
+you get back:</p>
+<ul class="simple">
+<li>An HTTP 200</li>
+<li>The correct content-type (<tt class="docutils literal"><span class="pre">application/x-plist</span></tt>)</li>
+<li>The content is valid binary plist data</li>
+</ul>
+</div>
+<div class="section" id="deserialize">
+<h4><tt class="docutils literal"><span class="pre">deserialize</span></tt><a class="headerlink" href="#deserialize" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.deserialize">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">deserialize</tt><big>(</big><em>self</em>, <em>resp</em><big>)</big><a class="headerlink" href="#ResourceTestCase.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> coming back from using the <tt class="docutils literal"><span class="pre">client</span></tt>, this method
+checks the <tt class="docutils literal"><span class="pre">Content-Type</span></tt> header &amp; attempts to deserialize the data based on
+that.</p>
+<p>It returns a Python datastructure (typically a <tt class="docutils literal"><span class="pre">dict</span></tt>) of the serialized data.</p>
+</div>
+<div class="section" id="serialize">
+<h4><tt class="docutils literal"><span class="pre">serialize</span></tt><a class="headerlink" href="#serialize" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.serialize">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">serialize</tt><big>(</big><em>self</em>, <em>data</em>, <em>format='application/json'</em><big>)</big><a class="headerlink" href="#ResourceTestCase.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a Python datastructure (typically a <tt class="docutils literal"><span class="pre">dict</span></tt>) &amp; a desired content-type,
+this method will return a serialized string of that data.</p>
+</div>
+<div class="section" id="assertkeys">
+<h4><tt class="docutils literal"><span class="pre">assertKeys</span></tt><a class="headerlink" href="#assertkeys" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="ResourceTestCase.assertKeys">
+<tt class="descclassname">ResourceTestCase.</tt><tt class="descname">assertKeys</tt><big>(</big><em>self</em>, <em>data</em>, <em>expected</em><big>)</big><a class="headerlink" href="#ResourceTestCase.assertKeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This method ensures that the keys of the <tt class="docutils literal"><span class="pre">data</span></tt> match up to the keys of
+<tt class="docutils literal"><span class="pre">expected</span></tt>.</p>
+<p>It covers the (extremely) common case where you want to make sure the keys of
+a response match up to what is expected. This is typically less fragile than
+testing the full structure, which can be prone to data changes.</p>
+</div>
+</div>
+<div class="section" id="testapiclient-api-reference">
+<h3><tt class="docutils literal"><span class="pre">TestApiClient</span></tt> API Reference<a class="headerlink" href="#testapiclient-api-reference" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">TestApiClient</span></tt> simulates a HTTP client making calls to the API. It&#8217;s
+important to note that it uses Django&#8217;s testing infrastructure, so it&#8217;s not
+making actual calls against a webserver.</p>
+<div class="section" id="init">
+<h4><tt class="docutils literal"><span class="pre">__init__</span></tt><a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.__init__">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">__init__</tt><big>(</big><em>self</em>, <em>serializer=None</em><big>)</big><a class="headerlink" href="#TestApiClient.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Sets up a fresh <tt class="docutils literal"><span class="pre">TestApiClient</span></tt> instance.</p>
+<p>If you are employing a custom serializer, you can pass the class to the
+<tt class="docutils literal"><span class="pre">serializer=</span></tt> kwarg.</p>
+</div>
+<div class="section" id="get-content-type">
+<h4><tt class="docutils literal"><span class="pre">get_content_type</span></tt><a class="headerlink" href="#get-content-type" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.get_content_type">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">get_content_type</tt><big>(</big><em>self</em>, <em>short_format</em><big>)</big><a class="headerlink" href="#TestApiClient.get_content_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Given a short name (such as <tt class="docutils literal"><span class="pre">json</span></tt> or <tt class="docutils literal"><span class="pre">xml</span></tt>), returns the full content-type
+for it (<tt class="docutils literal"><span class="pre">application/json</span></tt> or <tt class="docutils literal"><span class="pre">application/xml</span></tt> in this case).</p>
+</div>
+<div class="section" id="get">
+<h4><tt class="docutils literal"><span class="pre">get</span></tt><a class="headerlink" href="#get" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.get">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">get</tt><big>(</big><em>self</em>, <em>uri</em>, <em>format='json'</em>, <em>data=None</em>, <em>authentication=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#TestApiClient.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Performs a simulated <tt class="docutils literal"><span class="pre">GET</span></tt> request to the provided URI.</p>
+<p>Optionally accepts a <tt class="docutils literal"><span class="pre">data</span></tt> kwarg, which in the case of <tt class="docutils literal"><span class="pre">GET</span></tt>, lets you
+send along <tt class="docutils literal"><span class="pre">GET</span></tt> parameters. This is useful when testing filtering or other
+things that read off the <tt class="docutils literal"><span class="pre">GET</span></tt> params. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.test</span> <span class="kn">import</span> <span class="n">TestApiClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestApiClient</span><span class="p">()</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/api/v1/entry/1/&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;title__startswith&#39;</span><span class="p">:</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;limit&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s">&#39;offset&#39;</span><span class="p">:</span> <span class="mi">60</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Optionally accepts an <tt class="docutils literal"><span class="pre">authentication</span></tt> kwarg, which should be an HTTP header
+with the correct authentication data already setup.</p>
+<p>All other <tt class="docutils literal"><span class="pre">**kwargs</span></tt> passed in get passed through to the Django
+<tt class="docutils literal"><span class="pre">TestClient</span></tt>. See <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client">https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client</a>
+for details.</p>
+</div>
+<div class="section" id="post">
+<h4><tt class="docutils literal"><span class="pre">post</span></tt><a class="headerlink" href="#post" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.post">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">post</tt><big>(</big><em>self</em>, <em>uri</em>, <em>format='json'</em>, <em>data=None</em>, <em>authentication=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#TestApiClient.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Performs a simulated <tt class="docutils literal"><span class="pre">POST</span></tt> request to the provided URI.</p>
+<p>Optionally accepts a <tt class="docutils literal"><span class="pre">data</span></tt> kwarg. <strong>Unlike</strong> <tt class="docutils literal"><span class="pre">GET</span></tt>, in <tt class="docutils literal"><span class="pre">POST</span></tt> the
+<tt class="docutils literal"><span class="pre">data</span></tt> gets serialized &amp; sent as the body instead of becoming part of the URI.
+Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.test</span> <span class="kn">import</span> <span class="n">TestApiClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestApiClient</span><span class="p">()</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;/api/v1/entry/&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+    <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="s">&#39;2012-05-01T20:02:36&#39;</span><span class="p">,</span>
+    <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="s">&#39;another-post&#39;</span><span class="p">,</span>
+    <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Another Post&#39;</span><span class="p">,</span>
+    <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="s">&#39;/api/v1/user/1/&#39;</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>Optionally accepts an <tt class="docutils literal"><span class="pre">authentication</span></tt> kwarg, which should be an HTTP header
+with the correct authentication data already setup.</p>
+<p>All other <tt class="docutils literal"><span class="pre">**kwargs</span></tt> passed in get passed through to the Django
+<tt class="docutils literal"><span class="pre">TestClient</span></tt>. See <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client">https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client</a>
+for details.</p>
+</div>
+<div class="section" id="put">
+<h4><tt class="docutils literal"><span class="pre">put</span></tt><a class="headerlink" href="#put" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.put">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">put</tt><big>(</big><em>self</em>, <em>uri</em>, <em>format='json'</em>, <em>data=None</em>, <em>authentication=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#TestApiClient.put" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Performs a simulated <tt class="docutils literal"><span class="pre">PUT</span></tt> request to the provided URI.</p>
+<p>Optionally accepts a <tt class="docutils literal"><span class="pre">data</span></tt> kwarg. <strong>Unlike</strong> <tt class="docutils literal"><span class="pre">GET</span></tt>, in <tt class="docutils literal"><span class="pre">PUT</span></tt> the
+<tt class="docutils literal"><span class="pre">data</span></tt> gets serialized &amp; sent as the body instead of becoming part of the URI.
+Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.test</span> <span class="kn">import</span> <span class="n">TestApiClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestApiClient</span><span class="p">()</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;/api/v1/entry/1/&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+    <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="s">&#39;2012-05-01T20:02:36&#39;</span><span class="p">,</span>
+    <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="s">&#39;another-post&#39;</span><span class="p">,</span>
+    <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Another Post&#39;</span><span class="p">,</span>
+    <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="s">&#39;/api/v1/user/1/&#39;</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>Optionally accepts an <tt class="docutils literal"><span class="pre">authentication</span></tt> kwarg, which should be an HTTP header
+with the correct authentication data already setup.</p>
+<p>All other <tt class="docutils literal"><span class="pre">**kwargs</span></tt> passed in get passed through to the Django
+<tt class="docutils literal"><span class="pre">TestClient</span></tt>. See <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client">https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client</a>
+for details.</p>
+</div>
+<div class="section" id="patch">
+<h4><tt class="docutils literal"><span class="pre">patch</span></tt><a class="headerlink" href="#patch" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.patch">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">patch</tt><big>(</big><em>self</em>, <em>uri</em>, <em>format='json'</em>, <em>data=None</em>, <em>authentication=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#TestApiClient.patch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Performs a simulated <tt class="docutils literal"><span class="pre">PATCH</span></tt> request to the provided URI.</p>
+<p>Optionally accepts a <tt class="docutils literal"><span class="pre">data</span></tt> kwarg. <strong>Unlike</strong> <tt class="docutils literal"><span class="pre">GET</span></tt>, in <tt class="docutils literal"><span class="pre">PATCH</span></tt> the
+<tt class="docutils literal"><span class="pre">data</span></tt> gets serialized &amp; sent as the body instead of becoming part of the URI.
+Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.test</span> <span class="kn">import</span> <span class="n">TestApiClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestApiClient</span><span class="p">()</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="s">&#39;/api/v1/entry/1/&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+    <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="s">&#39;2012-05-01T20:02:36&#39;</span><span class="p">,</span>
+    <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="s">&#39;another-post&#39;</span><span class="p">,</span>
+    <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Another Post&#39;</span><span class="p">,</span>
+    <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="s">&#39;/api/v1/user/1/&#39;</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>Optionally accepts an <tt class="docutils literal"><span class="pre">authentication</span></tt> kwarg, which should be an HTTP header
+with the correct authentication data already setup.</p>
+<p>All other <tt class="docutils literal"><span class="pre">**kwargs</span></tt> passed in get passed through to the Django
+<tt class="docutils literal"><span class="pre">TestClient</span></tt>. See <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client">https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client</a>
+for details.</p>
+</div>
+<div class="section" id="delete">
+<h4><tt class="docutils literal"><span class="pre">delete</span></tt><a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="TestApiClient.delete">
+<tt class="descclassname">TestApiClient.</tt><tt class="descname">delete</tt><big>(</big><em>self</em>, <em>uri</em>, <em>format='json'</em>, <em>data=None</em>, <em>authentication=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#TestApiClient.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Performs a simulated <tt class="docutils literal"><span class="pre">DELETE</span></tt> request to the provided URI.</p>
+<p>Optionally accepts a <tt class="docutils literal"><span class="pre">data</span></tt> kwarg, which in the case of <tt class="docutils literal"><span class="pre">DELETE</span></tt>, lets you
+send along <tt class="docutils literal"><span class="pre">DELETE</span></tt> parameters. This is useful when testing filtering or other
+things that read off the <tt class="docutils literal"><span class="pre">DELETE</span></tt> params. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.test</span> <span class="kn">import</span> <span class="n">TestApiClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">TestApiClient</span><span class="p">()</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s">&#39;/api/v1/entry/1/&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;json&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Optionally accepts an <tt class="docutils literal"><span class="pre">authentication</span></tt> kwarg, which should be an HTTP header
+with the correct authentication data already setup.</p>
+<p>All other <tt class="docutils literal"><span class="pre">**kwargs</span></tt> passed in get passed through to the Django
+<tt class="docutils literal"><span class="pre">TestClient</span></tt>. See <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client">https://docs.djangoproject.com/en/dev/topics/testing/#module-django.test.client</a>
+for details.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Testing</a><ul>
+<li><a class="reference internal" href="#example-usage">Example Usage</a><ul>
+<li><a class="reference internal" href="#resourcetestcase-api-reference"><tt class="docutils literal"><span class="pre">ResourceTestCase</span></tt> API Reference</a><ul>
+<li><a class="reference internal" href="#get-credentials"><tt class="docutils literal"><span class="pre">get_credentials</span></tt></a></li>
+<li><a class="reference internal" href="#create-basic"><tt class="docutils literal"><span class="pre">create_basic</span></tt></a></li>
+<li><a class="reference internal" href="#create-apikey"><tt class="docutils literal"><span class="pre">create_apikey</span></tt></a></li>
+<li><a class="reference internal" href="#create-digest"><tt class="docutils literal"><span class="pre">create_digest</span></tt></a></li>
+<li><a class="reference internal" href="#create-oauth"><tt class="docutils literal"><span class="pre">create_oauth</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpok"><tt class="docutils literal"><span class="pre">assertHttpOK</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpcreated"><tt class="docutils literal"><span class="pre">assertHttpCreated</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpaccepted"><tt class="docutils literal"><span class="pre">assertHttpAccepted</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpmultiplechoices"><tt class="docutils literal"><span class="pre">assertHttpMultipleChoices</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpseeother"><tt class="docutils literal"><span class="pre">assertHttpSeeOther</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpnotmodified"><tt class="docutils literal"><span class="pre">assertHttpNotModified</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpbadrequest"><tt class="docutils literal"><span class="pre">assertHttpBadRequest</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpunauthorized"><tt class="docutils literal"><span class="pre">assertHttpUnauthorized</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpforbidden"><tt class="docutils literal"><span class="pre">assertHttpForbidden</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpnotfound"><tt class="docutils literal"><span class="pre">assertHttpNotFound</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpmethodnotallowed"><tt class="docutils literal"><span class="pre">assertHttpMethodNotAllowed</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpconflict"><tt class="docutils literal"><span class="pre">assertHttpConflict</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpgone"><tt class="docutils literal"><span class="pre">assertHttpGone</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttptoomanyrequests"><tt class="docutils literal"><span class="pre">assertHttpTooManyRequests</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpapplicationerror"><tt class="docutils literal"><span class="pre">assertHttpApplicationError</span></tt></a></li>
+<li><a class="reference internal" href="#asserthttpnotimplemented"><tt class="docutils literal"><span class="pre">assertHttpNotImplemented</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidjson"><tt class="docutils literal"><span class="pre">assertValidJSON</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidxml"><tt class="docutils literal"><span class="pre">assertValidXML</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidyaml"><tt class="docutils literal"><span class="pre">assertValidYAML</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidplist"><tt class="docutils literal"><span class="pre">assertValidPlist</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidjsonresponse"><tt class="docutils literal"><span class="pre">assertValidJSONResponse</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidxmlresponse"><tt class="docutils literal"><span class="pre">assertValidXMLResponse</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidyamlresponse"><tt class="docutils literal"><span class="pre">assertValidYAMLResponse</span></tt></a></li>
+<li><a class="reference internal" href="#assertvalidplistresponse"><tt class="docutils literal"><span class="pre">assertValidPlistResponse</span></tt></a></li>
+<li><a class="reference internal" href="#deserialize"><tt class="docutils literal"><span class="pre">deserialize</span></tt></a></li>
+<li><a class="reference internal" href="#serialize"><tt class="docutils literal"><span class="pre">serialize</span></tt></a></li>
+<li><a class="reference internal" href="#assertkeys"><tt class="docutils literal"><span class="pre">assertKeys</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testapiclient-api-reference"><tt class="docutils literal"><span class="pre">TestApiClient</span></tt> API Reference</a><ul>
+<li><a class="reference internal" href="#init"><tt class="docutils literal"><span class="pre">__init__</span></tt></a></li>
+<li><a class="reference internal" href="#get-content-type"><tt class="docutils literal"><span class="pre">get_content_type</span></tt></a></li>
+<li><a class="reference internal" href="#get"><tt class="docutils literal"><span class="pre">get</span></tt></a></li>
+<li><a class="reference internal" href="#post"><tt class="docutils literal"><span class="pre">post</span></tt></a></li>
+<li><a class="reference internal" href="#put"><tt class="docutils literal"><span class="pre">put</span></tt></a></li>
+<li><a class="reference internal" href="#patch"><tt class="docutils literal"><span class="pre">patch</span></tt></a></li>
+<li><a class="reference internal" href="#delete"><tt class="docutils literal"><span class="pre">delete</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="previous chapter">Tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="compatibility_notes.html"
+                        title="next chapter">Compatibility Notes</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/testing.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compatibility_notes.html" title="Compatibility Notes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

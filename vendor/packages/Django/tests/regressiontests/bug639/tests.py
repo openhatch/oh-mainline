@@ -11,6 +11,7 @@ import shutil
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import unittest
+from django.utils._os import upath
 
 from .models import Photo, PhotoForm, temp_storage_dir
 
@@ -23,8 +24,9 @@ class Bug639Test(unittest.TestCase):
         called.
         """
         # Grab an image for testing.
-        filename = os.path.join(os.path.dirname(__file__), "test.jpg")
-        img = open(filename, "rb").read()
+        filename = os.path.join(os.path.dirname(upath(__file__)), "test.jpg")
+        with open(filename, "rb") as fp:
+            img = fp.read()
 
         # Fake a POST QueryDict and FILES MultiValueDict.
         data = {'title': 'Testing'}

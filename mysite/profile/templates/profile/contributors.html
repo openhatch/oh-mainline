@@ -57,11 +57,11 @@
     </ul>
     {% if contributor_count <= 5 %}
         <a class='see-all'
-            href='{% url mysite.profile.views.people %}?q=project:{{ project.name|urlencode }}'
+            href='{% url "mysite.profile.views.people" %}?q=project:{{ project.name|urlencode }}'
         >Show on map &raquo;</a>
     {% else %}
         <a class='see-all'
-                href='{% url mysite.profile.views.people %}?q=project:{{ project.name|urlencode }}'
+                href='{% url "mysite.profile.views.people" %}?q=project:{{ project.name|urlencode }}'
             >Show all on map &raquo;</a>
     {% endif %}
 

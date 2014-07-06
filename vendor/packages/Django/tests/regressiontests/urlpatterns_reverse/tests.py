@@ -2,21 +2,22 @@
 """
 Unit tests for reverse URL lookups.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import sys
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, resolve, NoReverseMatch,
-    Resolver404, ResolverMatch, RegexURLResolver, RegexURLPattern)
+from django.core.urlresolvers import (reverse, resolve, get_callable,
+    get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
+    RegexURLPattern)
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
-from django.utils import unittest
-from django.contrib.auth.models import User
+from django.utils import unittest, six
 
-from . import urlconf_outer, urlconf_inner, middleware, views
+from . import urlconf_outer, middleware, views
 
 
 resolve_test_data = (
@@ -164,7 +165,7 @@ class URLPatternReverse(TestCase):
         for name, expected, args, kwargs in test_data:
             try:
                 got = reverse(name, args=args, kwargs=kwargs)
-            except NoReverseMatch, e:
+            except NoReverseMatch:
                 self.assertEqual(expected, NoReverseMatch)
             else:
                 self.assertEqual(got, expected)
@@ -173,7 +174,29 @@ class URLPatternReverse(TestCase):
         # Reversing None should raise an error, not return the last un-named view.
         self.assertRaises(NoReverseMatch, reverse, None)
 
+    def test_prefix_braces(self):
+        self.assertEqual('/%7B%7Binvalid%7D%7D/includes/non_path_include/',
+               reverse('non_path_include', prefix='/{{invalid}}/'))
+
+    def test_prefix_parenthesis(self):
+        self.assertEqual('/bogus%29/includes/non_path_include/',
+               reverse('non_path_include', prefix='/bogus)/'))
+
+    def test_prefix_format_char(self):
+        self.assertEqual('/bump%2520map/includes/non_path_include/',
+               reverse('non_path_include', prefix='/bump%20map/'))
+
 class ResolverTests(unittest.TestCase):
+    def test_resolver_repr(self):
+        """
+        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        (#17892).
+        """
+        # Pick a resolver from a namespaced urlconf
+        resolver = get_resolver('regressiontests.urlpatterns_reverse.namespace_urls')
+        sub_resolver = resolver.namespace_dict['test-ns1'][1]
+        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+
     def test_non_regex(self):
         """
         Verifies that we raise a Resolver404 if what we are resolving doesn't
@@ -210,14 +233,14 @@ class ResolverTests(unittest.TestCase):
         try:
             resolve('/included/non-existent-url', urlconf=urls)
             self.fail('resolve did not raise a 404')
-        except Resolver404, e:
+        except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
             self.assertTrue('tried' in e.args[0])
             tried = e.args[0]['tried']
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
-                    self.assertTrue(isinstance(t, e['type']), '%s is not an instance of %s' % (t, e['type']))
+                    self.assertTrue(isinstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type']))
                     if 'name' in e:
                         if not e['name']:
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
@@ -427,8 +450,8 @@ class RequestURLconfTests(TestCase):
     def test_urlconf(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'outer:/test/me/,'
-                                           'inner:/inner_urlconf/second_test/')
+        self.assertEqual(response.content, b'outer:/test/me/,'
+                                           b'inner:/inner_urlconf/second_test/')
         response = self.client.get('/inner_urlconf/second_test/')
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/second_test/')
@@ -444,7 +467,7 @@ class RequestURLconfTests(TestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'outer:,inner:/second_test/')
+        self.assertEqual(response.content, b'outer:,inner:/second_test/')
 
     def test_urlconf_overridden_with_null(self):
         settings.MIDDLEWARE_CLASSES += (
@@ -523,6 +546,11 @@ class ResolverMatchTests(TestCase):
             self.assertEqual(match[1], args)
             self.assertEqual(match[2], kwargs)
 
+    def test_resolver_match_on_request(self):
+        response = self.client.get('/resolver_match/')
+        resolver_match = response.resolver_match
+        self.assertEqual(resolver_match.url_name, 'test-resolver-match')
+
 class ErroneousViewTests(TestCase):
     urls = 'regressiontests.urlpatterns_reverse.erroneous_urls'
 
@@ -532,3 +560,24 @@ class ErroneousViewTests(TestCase):
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_inner/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_outer/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable/')
+
+    def test_erroneous_reverse(self):
+        """
+        Ensure that a useful exception is raised when a regex is invalid in the
+        URLConf.
+        Refs #6170.
+        """
+        # The regex error will be hit before NoReverseMatch can be raised
+        self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
+
+class ViewLoadingTests(TestCase):
+    def test_view_loading(self):
+        # A missing view (identified by an AttributeError) should raise
+        # ViewDoesNotExist, ...
+        six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*",
+            get_callable,
+            'regressiontests.urlpatterns_reverse.views.i_should_not_exist')
+        # ... but if the AttributeError is caused by something else don't
+        # swallow it.
+        self.assertRaises(AttributeError, get_callable,
+            'regressiontests.urlpatterns_reverse.views_broken.i_am_broken')

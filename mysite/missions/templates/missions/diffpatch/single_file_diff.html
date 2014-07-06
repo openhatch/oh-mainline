@@ -45,7 +45,7 @@
     <p>Nutty as it sounds, the answer is <em>walnuts</em>. Your mission is to:</p>
 
     <ul class="raquo_bullets">
-      <li><a href="{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}">Download the original recipe</a> to your computer.</li>
+      <li><a href="{% url "mysite.missions.diffpatch.views.diffsingle_get_original_file" %}">Download the original recipe</a> to your computer.</li>
       <li>On your own computer, make a copy of the recipe, and open that copy in a text editor.</li>
       <li>Replace "almond" with "walnut". You should expect to find "almond" twice in the original recipe.</li>
       <li>Invoke the <tt>diff</tt> program to summarize the changes you made, creating a "unified diff" (the universally preferred flavor of diff output). Paste that diff into the box below! (See Hints for help.)</li>
@@ -55,7 +55,7 @@
 
     <p>When you are submitting changes to a project, you will often need to run <code>diff</code> to create a patch that you can submit.  Large patches can be stored in files and attached to whatever medium you use to submit the patch; for short patches, contributors often paste them into email messages or bug reports.  So instead of uploading the patch in a file, your mission will be to make your patch and copy and paste it into the box below.</p>
 
-    <form method="post" action="{% url mysite.missions.diffpatch.views.diffsingle_submit %}#diffsingle-form">{% csrf_token %}
+    <form method="post" action="{% url "mysite.missions.diffpatch.views.diffsingle_submit" %}#diffsingle-form">{% csrf_token %}
       <div class="form-row">
         <a name="diffsingle-form"></a>
         Paste the unified diff here:
@@ -80,7 +80,7 @@
     </form>
     {% if diffsingle_done %}
     <p class="next_mission_link">
-      <a href="{% url mysite.missions.diffpatch.views.recursive_diff %}">On to diffing entire directories &raquo;</a></p>
+      <a href="{% url "mysite.missions.diffpatch.views.recursive_diff" %}">On to diffing entire directories &raquo;</a></p>
     {% endif %}
 
     <div id="hint_tabs">
@@ -116,8 +116,8 @@
       </pre>
       <p>Then, download the original file twice. (You'll only modify one.)</p>
       <pre>
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %}
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffsingle_get_original_file %} -O original
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.diffsingle_get_original_file" %}
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.diffsingle_get_original_file" %} -O original
       </pre>
       <p>Open <tt>nutty-pancake.txt</tt> in your favorite text editor, and look for the two occurrences of "almond". Replace them both with "walnut".</p>
       <p>Go back to the terminal and run this command.</p>

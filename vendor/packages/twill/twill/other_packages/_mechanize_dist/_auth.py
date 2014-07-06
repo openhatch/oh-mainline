@@ -11,7 +11,7 @@ included with the distribution).
 
 """
 
-import re, base64, urlparse, posixpath, md5, sha, sys, copy
+import re, base64, urlparse, posixpath, hashlib, sys, copy
 
 from urllib2 import BaseHandler
 from urllib import getproxies, unquote, splittype, splituser, splitpasswd, \
@@ -338,7 +338,7 @@ class AbstractDigestAuthHandler:
         # and server to avoid chosen plaintext attacks, to provide mutual
         # authentication, and to provide some message integrity protection.
         # This isn't a fabulous effort, but it's probably Good Enough.
-        dig = sha.new("%s:%s:%s:%s" % (self.nonce_count, nonce, time.ctime(),
+        dig = hashlib.new("%s:%s:%s:%s" % (self.nonce_count, nonce, time.ctime(),
                                        randombytes(8))).hexdigest()
         return dig[:16]
 

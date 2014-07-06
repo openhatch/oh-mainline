@@ -7,9 +7,10 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
+
 setup(
     name='django-tastypie',
-    version='0.9.11',
+    version='0.11.1',
     description='A flexible & capable API layer for Django.',
     author='Daniel Lindsley',
     author_email='daniel@toastdriven.com',
@@ -21,18 +22,23 @@ setup(
         'tastypie.management',
         'tastypie.management.commands',
         'tastypie.migrations',
+        'tastypie.contrib',
+        'tastypie.contrib.gis',
+        'tastypie.contrib.contenttypes',
     ],
     package_data={
         'tastypie': ['templates/tastypie/*'],
     },
+    zip_safe=False,
     requires=[
-        'mimeparse',
-        'python_dateutil(>=1.5, < 2.0)',
+        'python_mimeparse(>=0.1.4)',
+        'dateutil(>=1.5, !=2.0)',
     ],
     install_requires=[
-        'mimeparse',
-        'python_dateutil >= 1.5, < 2.0',
+        'python-mimeparse >= 0.1.4',
+        'python-dateutil >= 1.5, != 2.0',
     ],
+    tests_require=['mock'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
@@ -41,6 +47,8 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
         'Topic :: Utilities'
     ],
 )

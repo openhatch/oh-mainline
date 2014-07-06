@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Resource Fields &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Resource Fields &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,8 +22,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
-    <link rel="next" title="Authentication / Authorization" href="authentication_authorization.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Caching" href="caching.html" />
     <link rel="prev" title="Api" href="api.html" /> 
   </head>
   <body>
@@ -37,12 +37,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="authentication_authorization.html" title="Authentication / Authorization"
+          <a href="caching.html" title="Caching"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="api.html" title="Api"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -60,8 +60,7 @@ for various types of data.</p>
 <div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
 <p>For the impatient:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">from</span> <span class="nn">tastypie</span> <span class="kn">import</span> <span class="n">fields</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie</span> <span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">Resource</span>
 <span class="kn">from</span> <span class="nn">myapp.api.resources</span> <span class="kn">import</span> <span class="n">ProfileResource</span><span class="p">,</span> <span class="n">NoteResource</span>
 
@@ -69,7 +68,7 @@ for various types of data.</p>
 <span class="k">class</span> <span class="nc">PersonResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s">&#39;name&#39;</span><span class="p">)</span>
     <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s">&#39;years_old&#39;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">created</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;When the person was created&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">created</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;When the person was created&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
     <span class="n">is_active</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">profile</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToOneField</span><span class="p">(</span><span class="n">ProfileResource</span><span class="p">,</span> <span class="s">&#39;profile&#39;</span><span class="p">)</span>
     <span class="n">notes</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToManyField</span><span class="p">(</span><span class="n">NoteResource</span><span class="p">,</span> <span class="s">&#39;notes&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -158,6 +157,17 @@ on the request, such as the <tt class="docutils literal"><span class="pre">user<
 
 <p>A human-readable description of the field exposed at the schema level.
 Defaults to the per-Field definition.</p>
+</div>
+<div class="section" id="use-in">
+<h4><tt class="docutils literal"><span class="pre">use_in</span></tt><a class="headerlink" href="#use-in" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.use_in">
+<tt class="descclassname">ApiField.</tt><tt class="descname">use_in</tt><a class="headerlink" href="#ApiField.use_in" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Optionally omit this field in list or detail views.  It can be either &#8216;all&#8217;,
+&#8216;list&#8217;, or &#8216;detail&#8217; or a callable which accepts a bundle and returns a boolean
+value.</p>
 </div>
 </div>
 <div class="section" id="module-tastypie.fields">
@@ -249,7 +259,36 @@ Required.</p>
 <p>Indicates how the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt>. If
 <tt class="xref docutils literal"><span class="pre">False</span></tt>, the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear as a URL to the endpoint of
 that resource. If <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result of the sub-resource&#8217;s <tt class="docutils literal"><span class="pre">dehydrate</span></tt> will
-be included in full.</p>
+be included in full. You can further control post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt> behaviour when
+requesting a resource or a list of resources by setting <tt class="docutils literal"><span class="pre">full_list</span></tt> and <tt class="docutils literal"><span class="pre">full_detail</span></tt>.</p>
+</div>
+<div class="section" id="full-list">
+<h4><tt class="docutils literal"><span class="pre">full_list</span></tt><a class="headerlink" href="#full-list" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.full_list">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">full_list</tt><a class="headerlink" href="#tastypie.fields.RelatedField.full_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates how the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt> when requesting a
+list of resources. The value is one of <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt> or a callable that accepts a
+bundle and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>. If <tt class="xref docutils literal"><span class="pre">False</span></tt>, the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear
+as a URL to the endpoint of that resource if accessing a list of resources.  If <tt class="xref docutils literal"><span class="pre">True</span></tt> and <tt class="docutils literal"><span class="pre">full</span></tt>
+is also <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result of thesub-resource&#8217;s <tt class="docutils literal"><span class="pre">dehydrate</span></tt> will be included in
+full. Default is <tt class="xref docutils literal"><span class="pre">True</span></tt></p>
+</div>
+<div class="section" id="full-detail">
+<h4><tt class="docutils literal"><span class="pre">full_detail</span></tt><a class="headerlink" href="#full-detail" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.full_detail">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">full_detail</tt><a class="headerlink" href="#tastypie.fields.RelatedField.full_detail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates how the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt> when requesting a
+single resource. The value is one of <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt> or a callable that accepts a
+bundle and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>. If <tt class="xref docutils literal"><span class="pre">False</span></tt>, the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear
+as a URL to the endpoint of that resource if accessing a specific resources. If <tt class="xref docutils literal"><span class="pre">True</span></tt> and <tt class="docutils literal"><span class="pre">full</span></tt>
+is also <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result of thesub-resource&#8217;s <tt class="docutils literal"><span class="pre">dehydrate</span></tt> will be included
+in full. Default is <tt class="xref docutils literal"><span class="pre">True</span></tt></p>
 </div>
 <div class="section" id="related-name">
 <h4><tt class="docutils literal"><span class="pre">related_name</span></tt><a class="headerlink" href="#related-name" title="Permalink to this headline">¶</a></h4>
@@ -341,6 +380,7 @@ This is due to the way Django implements M2M relationships.</p>
 <li><a class="reference internal" href="#readonly"><tt class="docutils literal"><span class="pre">readonly</span></tt></a></li>
 <li><a class="reference internal" href="#unique"><tt class="docutils literal"><span class="pre">unique</span></tt></a></li>
 <li><a class="reference internal" href="#help-text"><tt class="docutils literal"><span class="pre">help_text</span></tt></a></li>
+<li><a class="reference internal" href="#use-in"><tt class="docutils literal"><span class="pre">use_in</span></tt></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-tastypie.fields">Field Types</a></li>
@@ -361,6 +401,8 @@ This is due to the way Django implements M2M relationships.</p>
 <li><a class="reference internal" href="#id1">Common Field Options</a><ul>
 <li><a class="reference internal" href="#to"><tt class="docutils literal"><span class="pre">to</span></tt></a></li>
 <li><a class="reference internal" href="#full"><tt class="docutils literal"><span class="pre">full</span></tt></a></li>
+<li><a class="reference internal" href="#full-list"><tt class="docutils literal"><span class="pre">full_list</span></tt></a></li>
+<li><a class="reference internal" href="#full-detail"><tt class="docutils literal"><span class="pre">full_detail</span></tt></a></li>
 <li><a class="reference internal" href="#related-name"><tt class="docutils literal"><span class="pre">related_name</span></tt></a></li>
 </ul>
 </li>
@@ -383,8 +425,8 @@ This is due to the way Django implements M2M relationships.</p>
   <p class="topless"><a href="api.html"
                         title="previous chapter">Api</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="authentication_authorization.html"
-                        title="next chapter">Authentication / Authorization</a></p>
+  <p class="topless"><a href="caching.html"
+                        title="next chapter">Caching</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/fields.txt"
@@ -417,16 +459,16 @@ This is due to the way Django implements M2M relationships.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="authentication_authorization.html" title="Authentication / Authorization"
+          <a href="caching.html" title="Caching"
              >next</a> |</li>
         <li class="right" >
           <a href="api.html" title="Api"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

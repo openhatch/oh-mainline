@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Getting Started with Tastypie &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Getting Started with Tastypie &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +22,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Interacting With The API" href="interacting.html" />
-    <link rel="prev" title="Sites Using Tastypie" href="who_uses.html" /> 
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,9 +40,9 @@
           <a href="interacting.html" title="Interacting With The API"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="who_uses.html" title="Sites Using Tastypie"
+          <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -68,7 +68,7 @@ how proper REST-style APIs ought to work. We will only explain the portions
 of the code that are Tastypie-specific in any kind of depth.</p>
 <p>For example purposes, we&#8217;ll be adding an API to a simple blog application.
 Here is <tt class="docutils literal"><span class="pre">myapp/models.py</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">datetime</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.utils.timezone</span> <span class="kn">import</span> <span class="n">now</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
 <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 <span class="kn">from</span> <span class="nn">django.template.defaultfilters</span> <span class="kn">import</span> <span class="n">slugify</span>
@@ -76,7 +76,7 @@ Here is <tt class="docutils literal"><span class="pre">myapp/models.py</span></t
 
 <span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
-    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">now</span><span class="p">)</span>
     <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
     <span class="n">slug</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">SlugField</span><span class="p">()</span>
     <span class="n">body</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
@@ -110,7 +110,7 @@ your project or <tt class="docutils literal"><span class="pre">PYTHONPATH</span>
 </ul>
 </li>
 <li><tt class="docutils literal"><span class="pre">dateutil</span></tt> (<a class="reference external" href="http://labix.org/python-dateutil">http://labix.org/python-dateutil</a>)</li>
-<li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">lxml</span></tt> (<a class="reference external" href="http://codespeak.net/lxml/">http://codespeak.net/lxml/</a>) if using the XML serializer</li>
+<li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">lxml</span></tt> (<a class="reference external" href="http://lxml.de/">http://lxml.de/</a>) if using the XML serializer</li>
 <li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">pyyaml</span></tt> (<a class="reference external" href="http://pyyaml.org/">http://pyyaml.org/</a>) if using the YAML serializer</li>
 <li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">uuid</span></tt> (present in 2.5+, downloadable from
 <a class="reference external" href="http://pypi.python.org/pypi/uuid/">http://pypi.python.org/pypi/uuid/</a>) if using the <tt class="docutils literal"><span class="pre">ApiKey</span></tt> authentication</li>
@@ -373,7 +373,8 @@ you require more granular control, both <tt class="docutils literal"><span class
 more features, like:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="authentication_authorization.html"><em>Authentication / Authorization</em></a></li>
+<li><a class="reference internal" href="authentication.html"><em>Authentication</em></a></li>
+<li><a class="reference internal" href="authorization.html"><em>Authorization</em></a></li>
 <li><a class="reference internal" href="caching.html"><em>Caching</em></a></li>
 <li><a class="reference internal" href="throttling.html"><em>Throttling</em></a></li>
 <li><a class="reference internal" href="resources.html"><em>Resources</em></a> (filtering &amp; sorting)</li>
@@ -407,8 +408,8 @@ approaches, you should refer to the <a class="reference internal" href="cookbook
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="who_uses.html"
-                        title="previous chapter">Sites Using Tastypie</a></p>
+  <p class="topless"><a href="contributing.html"
+                        title="previous chapter">Contributing</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="interacting.html"
                         title="next chapter">Interacting With The API</a></p>
@@ -447,13 +448,13 @@ approaches, you should refer to the <a class="reference internal" href="cookbook
           <a href="interacting.html" title="Interacting With The API"
              >next</a> |</li>
         <li class="right" >
-          <a href="who_uses.html" title="Sites Using Tastypie"
+          <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

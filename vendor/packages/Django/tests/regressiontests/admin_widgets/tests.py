@@ -1,5 +1,5 @@
 # encoding: utf-8
-from __future__ import with_statement, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -10,8 +10,9 @@ from django.contrib.admin import widgets
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import DateField
+from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
+from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.html import conditional_escape
 from django.utils.unittest import TestCase
@@ -20,8 +21,8 @@ from . import models
 from .widgetadmin import site as widget_admin_site
 
 
-admin_media_prefix = lambda: {
-    'ADMIN_MEDIA_PREFIX': "%sadmin/" % settings.STATIC_URL,
+admin_static_prefix = lambda: {
+    'ADMIN_STATIC_PREFIX': "%sadmin/" % settings.STATIC_URL,
 }
 
 class AdminFormfieldForDBFieldTests(TestCase):
@@ -111,6 +112,23 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertFormfield(models.Event, 'start_date', forms.TextInput,
                              formfield_overrides={DateField: {'widget': forms.TextInput}})
 
+    def testFormfieldOverridesWidgetInstances(self):
+        """
+        Test that widget instances in formfield_overrides are not shared between
+        different fields. (#19423)
+        """
+        class BandAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                CharField: {'widget': forms.TextInput(attrs={'size':'10'})}
+            }
+        ma = BandAdmin(models.Band, admin.site)
+        f1 = ma.formfield_for_dbfield(models.Band._meta.get_field('name'), request=None)
+        f2 = ma.formfield_for_dbfield(models.Band._meta.get_field('style'), request=None)
+        self.assertNotEqual(f1.widget, f2.widget)
+        self.assertEqual(f1.widget.attrs['maxlength'], '100')
+        self.assertEqual(f2.widget.attrs['maxlength'], '20')
+        self.assertEqual(f2.widget.attrs['size'], '10')
+
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
 
@@ -122,6 +140,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
@@ -131,10 +150,11 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         """
         self.client.login(username="super", password="secret")
         response = self.client.get("/widget_admin/admin_widgets/cartire/add/")
-        self.assertTrue("BMW M3" not in response.content)
-        self.assertTrue("Volkswagon Passat" in response.content)
+        self.assertNotContains(response, "BMW M3")
+        self.assertContains(response, "Volkswagon Passat")
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
     admin_root = '/widget_admin'
@@ -147,9 +167,10 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
 
     def test_changelist_foreignkey(self):
         response = self.client.get('%s/admin_widgets/car/' % self.admin_root)
-        self.assertTrue('%s/auth/user/add/' % self.admin_root in response.content)
+        self.assertContains(response, '%s/auth/user/add/' % self.admin_root)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminForeignKeyRawIdWidget(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
     admin_root = '/widget_admin'
@@ -165,7 +186,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "band": u'%s' % pk,
+            "band": '%s' % pk,
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
@@ -196,14 +217,14 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
         w = widgets.FilteredSelectMultiple('test', False)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'test')),
-            '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_MEDIA_PREFIX)s"); });</script>\n' % admin_media_prefix()
+            '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
     def test_stacked_render(self):
         w = widgets.FilteredSelectMultiple('test', True)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'test')),
-            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_MEDIA_PREFIX)s"); });</script>\n' % admin_media_prefix()
+            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
 class AdminDateWidgetTest(DjangoTestCase):
@@ -262,6 +283,43 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
                 )
 
 
+class AdminURLWidgetTest(DjangoTestCase):
+    def test_render(self):
+        w = widgets.AdminURLFieldWidget()
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', '')),
+            '<input class="vURLField" name="test" type="text" />'
+        )
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://example.com')),
+            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com" /></p>'
+        )
+
+    def test_render_idn(self):
+        w = widgets.AdminURLFieldWidget()
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://example-äüö.com')),
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com" /></p>'
+        )
+
+    def test_render_quoting(self):
+        # WARNING: Don't use assertHTMLEqual in that testcase!
+        # assertHTMLEqual will get rid of some escapes which are tested here!
+        w = widgets.AdminURLFieldWidget()
+        self.assertEqual(
+            w.render('test', 'http://example.com/<sometag>some text</sometag>'),
+            '<p class="url">Currently: <a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="text" value="http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+        )
+        self.assertEqual(
+            w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>'),
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="text" value="http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+        )
+        self.assertEqual(
+            w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"'),
+            '<p class="url">Currently: <a href="http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22">http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;</a><br />Change: <input class="vURLField" name="test" type="text" value="http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;" /></p>'
+        )
+
+
 class AdminFileWidgetTest(DjangoTestCase):
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
@@ -276,7 +334,7 @@ class AdminFileWidgetTest(DjangoTestCase):
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', SimpleUploadedFile('test', 'content'))),
+            conditional_escape(w.render('test', SimpleUploadedFile('test', b'content'))),
             '<input type="file" name="test" />',
         )
 
@@ -292,7 +350,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', band.pk, attrs={})),
-            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_media_prefix(), bandpk=band.pk)
+            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
     def test_relations_to_non_primary_key(self):
@@ -307,7 +365,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_media_prefix()
+            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -349,7 +407,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
         self.assertHTMLEqual(
             w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_media_prefix()
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
         )
 
 
@@ -365,20 +423,20 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', [m1.pk, m2.pk], attrs={})),
-            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_media_prefix(), m1pk=m1.pk, m2pk=m2.pk)
+            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
             conditional_escape(w.render('test', [m1.pk])),
-            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_media_prefix(), m1pk=m1.pk)
+            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
         self.assertEqual(w._has_changed(None, None), False)
         self.assertEqual(w._has_changed([], None), False)
-        self.assertEqual(w._has_changed(None, [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'2']), False)
-        self.assertEqual(w._has_changed([1, 2], [u'1']), True)
-        self.assertEqual(w._has_changed([1, 2], [u'1', u'3']), True)
+        self.assertEqual(w._has_changed(None, ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '2']), False)
+        self.assertEqual(w._has_changed([1, 2], ['1']), True)
+        self.assertEqual(w._has_changed([1, 2], ['1', '3']), True)
 
     def test_m2m_related_model_not_in_admin(self):
         # M2M relationship with model not registered with admin site. Raw ID
@@ -411,6 +469,7 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
 
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']
@@ -466,6 +525,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']

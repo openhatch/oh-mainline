@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 import errno
 import os
 import shutil
@@ -6,10 +8,7 @@ import sys
 import tempfile
 import time
 from datetime import datetime, timedelta
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 try:
     import threading
@@ -18,12 +17,16 @@ except ImportError:
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
-from django.core.files.base import ContentFile
+from django.core.files.base import File, ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
+from django.utils import six
 from django.utils import unittest
+from django.utils._os import upath
+from django.test.utils import override_settings
+from ..servers.tests import LiveServerBase
 
 # Try to import PIL in either of the two ways it can end up installed.
 # Checking for the existence of Image is enough for CPython, but
@@ -73,10 +76,10 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested module don't exist.
         """
         # Error message may or may not be the fully qualified path.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             ImproperlyConfigured,
             ('Error importing storage module django.core.files.non_existing_'
-                'storage: "No module named .*non_existing_storage"'),
+                'storage: "No module named .*non_existing_storage'),
             get_storage_class,
             'django.core.files.non_existing_storage.NonExistingStorage'
         )
@@ -102,7 +105,7 @@ class FileStorageTests(unittest.TestCase):
         """
         storage = self.storage_class(location='')
         self.assertEqual(storage.base_location, '')
-        self.assertEqual(storage.location, os.getcwd())
+        self.assertEqual(storage.location, upath(os.getcwd()))
 
     def test_file_access_options(self):
         """
@@ -198,8 +201,8 @@ class FileStorageTests(unittest.TestCase):
             ContentFile('file saved with path'))
 
         self.assertTrue(self.storage.exists('path/to'))
-        self.assertEqual(self.storage.open('path/to/test.file').read(),
-            'file saved with path')
+        with self.storage.open('path/to/test.file') as f:
+            self.assertEqual(f.read(), b'file saved with path')
 
         self.assertTrue(os.path.exists(
             os.path.join(self.temp_dir, 'path', 'to', 'test.file')))
@@ -252,9 +255,9 @@ class FileStorageTests(unittest.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), set([u'storage_dir_1']))
+        self.assertEqual(set(dirs), set(['storage_dir_1']))
         self.assertEqual(set(files),
-                         set([u'storage_test_1', u'storage_test_2']))
+                         set(['storage_test_1', 'storage_test_2']))
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')
@@ -306,13 +309,13 @@ class FileStorageTests(unittest.TestCase):
 
             self.storage.save('normal/test.file',
                 ContentFile('saved normally'))
-            self.assertEqual(self.storage.open('normal/test.file').read(),
-                'saved normally')
+            with self.storage.open('normal/test.file') as f:
+                self.assertEqual(f.read(), b'saved normally')
 
             self.storage.save('raced/test.file',
                 ContentFile('saved with race'))
-            self.assertEqual(self.storage.open('raced/test.file').read(),
-                'saved with race')
+            with self.storage.open('raced/test.file') as f:
+                self.assertEqual(f.read(), b'saved with race')
 
             # Check that OSErrors aside from EEXIST are still raised.
             self.assertRaises(OSError,
@@ -356,6 +359,17 @@ class FileStorageTests(unittest.TestCase):
         finally:
             os.remove = real_remove
 
+    def test_file_chunks_error(self):
+        """
+        Test behaviour when file.chunks() is raising an error
+        """
+        f1 = ContentFile('chunks fails')
+        def failing_chunks():
+            raise IOError
+        f1.chunks = failing_chunks
+        with self.assertRaises(IOError):
+            self.storage.save('error.file', f1)
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
@@ -389,7 +403,7 @@ class UnicodeFileNameTests(unittest.TestCase):
         out the encoding situation between doctest and this file, but the actual
         repr doesn't matter; it just shouldn't return a unicode object.
         """
-        uf = UploadedFile(name=u'¿Cómo?',content_type='text')
+        uf = UploadedFile(name='¿Cómo?',content_type='text')
         self.assertEqual(type(uf.__repr__()), str)
 
 # Tests for a race condition on file saving (#4948).
@@ -411,7 +425,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         shutil.rmtree(self.storage_dir)
 
     def save_file(self, name):
-        name = self.storage.save(name, SlowFile("Data"))
+        name = self.storage.save(name, SlowFile(b"Data"))
 
     def test_race_condition(self):
         self.thread.start()
@@ -422,22 +436,29 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.storage.delete('conflict')
         self.storage.delete('conflict_1')
 
+@unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
-        self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
-        settings.FILE_UPLOAD_PERMISSIONS = 0666
+        self.umask = 0o027
+        self.old_umask = os.umask(self.umask)
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
 
     def tearDown(self):
-        settings.FILE_UPLOAD_PERMISSIONS = self.old_perms
         shutil.rmtree(self.storage_dir)
+        os.umask(self.old_umask)
 
+    @override_settings(FILE_UPLOAD_PERMISSIONS=0o654)
     def test_file_upload_permissions(self):
         name = self.storage.save("the_file", ContentFile("data"))
-        actual_mode = os.stat(self.storage.path(name))[0] & 0777
-        self.assertEqual(actual_mode, 0666)
+        actual_mode = os.stat(self.storage.path(name))[0] & 0o777
+        self.assertEqual(actual_mode, 0o654)
 
+    @override_settings(FILE_UPLOAD_PERMISSIONS=None)
+    def test_file_upload_default_permissions(self):
+        fname = self.storage.save("some_file", ContentFile("data"))
+        mode = os.stat(self.storage.path(fname))[0] & 0o777
+        self.assertEqual(mode, 0o666 & ~self.umask)
 
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):
@@ -470,12 +491,7 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/.test', ContentFile("2"))
 
         self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
-        # Before 2.6, a leading dot was treated as an extension, and so
-        # underscore gets added to beginning instead of end.
-        if sys.version_info < (2, 6):
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_1.test')))
-        else:
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
 
 class DimensionClosingBug(unittest.TestCase):
     """
@@ -486,7 +502,7 @@ class DimensionClosingBug(unittest.TestCase):
         """
         Open files passed into get_image_dimensions() should stay opened.
         """
-        empty_io = StringIO()
+        empty_io = BytesIO()
         try:
             get_image_dimensions(empty_io)
         finally:
@@ -519,7 +535,7 @@ class DimensionClosingBug(unittest.TestCase):
         from django.core.files import images
         images.open = catching_open
         try:
-            get_image_dimensions(os.path.join(os.path.dirname(__file__), "test1.png"))
+            get_image_dimensions(os.path.join(os.path.dirname(upath(__file__)), "test1.png"))
         finally:
             del images.open
         self.assertTrue(FileWrapper._closed)
@@ -536,7 +552,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         """
         from django.core.files.images import ImageFile
 
-        img_path = os.path.join(os.path.dirname(__file__), "test.png")
+        img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
         image = ImageFile(open(img_path, 'rb'))
         image_pil = Image.open(img_path)
         size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
@@ -544,12 +560,75 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         self.assertEqual(size_1, size_2)
 
 class ContentFileTestCase(unittest.TestCase):
-    """
-    Test that the constructor of ContentFile accepts 'name' (#16590).
-    """
-    def test_content_file_default_name(self):
-        self.assertEqual(ContentFile("content").name, None)
 
-    def test_content_file_custome_name(self):
+    def setUp(self):
+        self.storage_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(self.storage_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.storage_dir)
+
+    def test_content_file_default_name(self):
+        self.assertEqual(ContentFile(b"content").name, None)
+
+    def test_content_file_custom_name(self):
+        """
+        Test that the constructor of ContentFile accepts 'name' (#16590).
+        """
         name = "I can have a name too!"
-        self.assertEqual(ContentFile("content", name=name).name, name)
+        self.assertEqual(ContentFile(b"content", name=name).name, name)
+
+    def test_content_file_input_type(self):
+        """
+        Test that ContentFile can accept both bytes and unicode and that the
+        retrieved content is of the same type.
+        """
+        self.assertTrue(isinstance(ContentFile(b"content").read(), bytes))
+        if six.PY3:
+            self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
+        else:
+            self.assertTrue(isinstance(ContentFile("español").read(), bytes))
+
+    def test_content_saving(self):
+        """
+        Test that ContentFile can be saved correctly with the filesystem storage,
+        both if it was initialized with string or unicode content"""
+        self.storage.save('bytes.txt', ContentFile(b"content"))
+        self.storage.save('unicode.txt', ContentFile("español"))
+
+
+class NoNameFileTestCase(unittest.TestCase):
+    """
+    Other examples of unnamed files may be tempfile.SpooledTemporaryFile or
+    urllib.urlopen()
+    """
+    def test_noname_file_default_name(self):
+        self.assertEqual(File(BytesIO(b'A file with no name')).name, None)
+
+    def test_noname_file_get_size(self):
+        self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
+
+class FileLikeObjectTestCase(LiveServerBase):
+    """
+    Test file-like objects (#15644).
+    """
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(location=self.temp_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
+    def test_urllib2_urlopen(self):
+        """
+        Test the File storage API with a file like object coming from urllib2.urlopen()
+        """
+
+        file_like_object = self.urlopen('/example_view/')
+        f = File(file_like_object)
+        stored_filename = self.storage.save("remote_file.html", f)
+
+        stored_file = self.storage.open(stored_filename)
+        remote_file = self.urlopen('/example_view/')
+
+        self.assertEqual(stored_file.read(), remote_file.read())

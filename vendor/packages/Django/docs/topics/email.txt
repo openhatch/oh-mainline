@@ -119,8 +119,6 @@ The "From:" header of the email will be the value of the
 
 This method exists for convenience and readability.
 
-.. versionchanged:: 1.3
-
 If ``html_message`` is provided, the resulting email will be a
 :mimetype:`multipart/alternative` email with ``message`` as the
 :mimetype:`text/plain` content type and ``html_message`` as the
@@ -235,9 +233,6 @@ The :class:`~django.core.mail.EmailMessage` class is initialized with the
 following parameters (in the given order, if positional arguments are used).
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
-
-.. versionchanged:: 1.3
-   The ``cc`` argument was added.
 
 * ``subject``: The subject line of the email.
 
@@ -365,8 +360,6 @@ subtype. For example::
 Email backends
 ==============
 
-.. versionadded:: 1.2
-
 The actual sending of an email is handled by the email backend.
 
 The email backend class has the following methods:
@@ -429,7 +422,7 @@ Console backend
 ~~~~~~~~~~~~~~~
 
 Instead of sending out real emails the console backend just writes the
-emails that would be send to the standard output. By default, the console
+emails that would be sent to the standard output. By default, the console
 backend writes to ``stdout``. You can use a different stream-like object by
 providing the ``stream`` keyword argument when constructing the connection.
 
@@ -468,7 +461,7 @@ The ``'locmem'`` backend stores messages in a special attribute of the
 ``django.core.mail`` module. The ``outbox`` attribute is created when the
 first message is sent. It's a list with an
 :class:`~django.core.mail.EmailMessage` instance for each message that would
-be send.
+be sent.
 
 To specify this backend, put the following in your settings::
 

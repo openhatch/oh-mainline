@@ -1,5 +1,3 @@
-import sys
-
 from django.test import LiveServerTestCase
 from django.utils.importlib import import_module
 from django.utils.unittest import SkipTest
@@ -10,24 +8,23 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        if sys.version_info < (2, 6):
-            raise SkipTest('Selenium Webdriver does not support Python < 2.6.')
         try:
             # Import and start the WebDriver class.
             module, attr = cls.webdriver_class.rsplit('.', 1)
             mod = import_module(module)
             WebDriver = getattr(mod, attr)
             cls.selenium = WebDriver()
-        except Exception, e:
+        except Exception as e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
                            'operational: %s' % (cls.webdriver_class, str(e)))
+        # This has to be last to ensure that resources are cleaned up properly!
         super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
-        super(AdminSeleniumWebDriverTestCase, cls).tearDownClass()
+        super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
 
     def wait_until(self, callback, timeout=10):
         """

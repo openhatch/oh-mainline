@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from django.conf.urls.defaults import patterns, url
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 
 # views
 from django.contrib.auth import views as auth_views
@@ -49,8 +49,7 @@ urlpatterns = patterns('',
     url(r'^signin/complete/$', oid_views.complete_signin, name='user_complete_signin'),
     url(r'^signin/$', oid_views.signin, name='user_signin'),
     url(r'^signup/$', reg_views.register, name='registration_register'),
-    url(r'^signup/complete/$',direct_to_template, 
-        {'template': 'registration/registration_complete.html'},
+    url(r'^signup/complete/$',TemplateView.as_view(template_name="registration/registration_complete.html"),
         name='registration_complete'),
         
     # yadis uri
