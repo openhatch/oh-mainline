@@ -28,6 +28,7 @@ import bleach
 import mysite.project.view_helpers
 
 from django.utils.html import *
+from jinja2.utils import _punctuation_re as punctuation_re
 
 register = template.Library()
 
