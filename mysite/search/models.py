@@ -43,7 +43,7 @@ from django.utils import http
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
-    modified_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         abstract = True
