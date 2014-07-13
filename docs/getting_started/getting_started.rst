@@ -18,14 +18,18 @@ Getting the source
 OpenHatch source code can be seen through a web interface at
 https://github.com/openhatch/oh-mainline
 
-To make contributions, you will need to clone our git repository. This requires
-having the git version control system installed. Once you do, type this into a
-terminal::
+To make contributions, you will need to do acquire the source code of www.openhatch.org. Complete these one-time tasks in the following 
+order:
 
-    $ git clone https://github.com/openhatch/oh-mainline.git
+    #. Make a new Github account on https://www.github.com if you don't already have one.
+    #. Fork the oh-mainline Github repository located here at https://github.com/openhatch/oh-mainline. Click on the fork button located on the upper  right corner of the project page. Now you have your own personal copy of the oh-mainline repository.
+    #. Install git the version control system. If you have already done so, skip to the next step.
+    #. Clone your personal copy of the oh-mainline repository to your computer by typing this command into your terminal::
+
+        $ git clone https://github.com/<YOUR_GITHUB_USERNAME>/oh-mainline.git
 
 It will take up to five minutes, depending on your Internet connection. it's
-kind of a big repository. (Sixty megabytes, or so.)
+kind of a big repository. (90 megabytes, or so.)
 
 
 How to run a local site
