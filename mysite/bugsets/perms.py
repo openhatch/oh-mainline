@@ -23,4 +23,4 @@ class InlineEditPermissions(object):
 
     @classmethod
     def can_edit(cls, adaptor_field):
-       return True  # All users can edit
+        return True  # All users can edit

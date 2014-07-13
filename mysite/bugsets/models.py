@@ -33,12 +33,15 @@ from django.core.urlresolvers import reverse
 class Skill(models.Model):
     text = models.CharField(max_length=200, unique=True)
 
+    def __unicode__(self):
+        return self.text
+
 
 class AnnotatedBug(models.Model):
     url = models.URLField(max_length=200, unique=True)
     title = models.CharField(max_length=500, blank=True)
     description = models.TextField(blank=True, verbose_name='Task Description')
-    assigned_to = models.CharField(max_length=200, default='No one')
+    assigned_to = models.CharField(max_length=200, blank=True)
     mentor = models.CharField(max_length=200, blank=True,
                               verbose_name='Assigned Mentor')
     time_estimate = models.CharField(max_length=200, blank=True,
@@ -51,9 +54,16 @@ class AnnotatedBug(models.Model):
     )
     status = models.CharField(max_length=1, default='u',
                               choices=STATUS_CHOICES)
+
+    # Putting this on hold for the MVP
     skills = models.ManyToManyField(Skill)
-    project = models.ForeignKey(mysite.search.models.Project, null=True, 
-                                                              blank=True)
+
+    # Kludgey replacement field for skills
+    skill_list = models.CharField(max_length=500, blank=True)
+
+    project = models.ForeignKey(mysite.search.models.Project,
+                                null=True,
+                                blank=True)
 
 
 class BugSet(models.Model):
