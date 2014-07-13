@@ -1,5 +1,5 @@
 # coding: utf-8
-import warnings 
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
@@ -11,14 +11,6 @@ class URLHandling(TestCase):
     urls = 'regressiontests.views.generic_urls'
     redirect_target = "/%E4%B8%AD%E6%96%87/target/"
 
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.simple')
-
-    def tearDown(self):
-        self.restore_warnings_state()
-
     def test_combining_redirect(self):
         """
         Tests that redirecting to an IRI, requiring encoding before we use it
@@ -27,7 +19,7 @@ class URLHandling(TestCase):
         characters so this test ensures the creation of the full path with a
         base non-ASCII part is handled correctly.
         """
-        response = self.client.get(u'/中文/')
+        response = self.client.get('/中文/')
         self.assertRedirects(response, self.redirect_target)
 
     def test_nonascii_redirect(self):

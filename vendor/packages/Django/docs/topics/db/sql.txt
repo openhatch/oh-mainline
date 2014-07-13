@@ -18,19 +18,16 @@ __ `executing custom SQL directly`_
 Performing raw queries
 ======================
 
-.. versionadded:: 1.2
-
 The ``raw()`` manager method can be used to perform raw SQL queries that
 return model instances:
 
 .. method:: Manager.raw(raw_query, params=None, translations=None)
 
-This method method takes a raw SQL query, executes it, and returns a
-:class:`~django.db.models.query.RawQuerySet` instance. This
-:class:`~django.db.models.query.RawQuerySet` instance can be iterated
-over just like an normal QuerySet to provide object instances.
+This method takes a raw SQL query, executes it, and returns a
+``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
+can be iterated over just like a normal QuerySet to provide object instances.
 
-This is best illustrated with an example. Suppose you've got the following model::
+This is best illustrated with an example. Suppose you have the following model::
 
     class Person(models.Model):
         first_name = models.CharField(...)
@@ -40,7 +37,7 @@ This is best illustrated with an example. Suppose you've got the following model
 You could then execute custom SQL like so::
 
     >>> for p in Person.objects.raw('SELECT * FROM myapp_person'):
-    ...     print p
+    ...     print(p)
     John Smith
     Jane Jones
 
@@ -121,7 +118,7 @@ write::
     >>> first_person = Person.objects.raw('SELECT * from myapp_person')[0]
 
 However, the indexing and slicing are not performed at the database level. If
-you have a big amount of ``Person`` objects in your database, it is more
+you have a large number of ``Person`` objects in your database, it is more
 efficient to limit the query at the SQL level::
 
     >>> first_person = Person.objects.raw('SELECT * from myapp_person LIMIT 1')[0]
@@ -138,8 +135,8 @@ The ``Person`` objects returned by this query will be deferred model instances
 fields that are omitted from the query will be loaded on demand. For example::
 
     >>> for p in Person.objects.raw('SELECT id, first_name FROM myapp_person'):
-    ...     print p.first_name, # This will be retrieved by the original query
-    ...     print p.last_name # This will be retrieved on demand
+    ...     print(p.first_name, # This will be retrieved by the original query
+    ...           p.last_name) # This will be retrieved on demand
     ...
     John Smith
     Jane Jones
@@ -163,7 +160,7 @@ of people with their ages calculated by the database::
 
     >>> people = Person.objects.raw('SELECT *, age(birth_date) AS age FROM myapp_person')
     >>> for p in people:
-    ...     print "%s is %s." % (p.first_name, p.age)
+    ...     print("%s is %s." % (p.first_name, p.age))
     John is 37.
     Jane is 42.
     ...
@@ -239,8 +236,8 @@ is required. For example::
 
         return row
 
-If you are using more than one database you can use
-``django.db.connections`` to obtain the connection (and cursor) for a
+If you are using :doc:`more than one database </topics/db/multi-db>`, you can
+use ``django.db.connections`` to obtain the connection (and cursor) for a
 specific database. ``django.db.connections`` is a dictionary-like
 object that allows you to retrieve a specific connection using its
 alias::
@@ -254,7 +251,7 @@ By default, the Python DB API will return results without their field
 names, which means you end up with a ``list`` of values, rather than a
 ``dict``. At a small performance cost, you can return results as a
 ``dict`` by using something like this::
-    
+
     def dictfetchall(cursor):
         "Returns all rows from a cursor as a dict"
         desc = cursor.description
@@ -268,7 +265,7 @@ Here is an example of the difference between the two::
     >>> cursor.execute("SELECT id, parent_id from test LIMIT 2");
     >>> cursor.fetchall()
     ((54360982L, None), (54360880L, None))
-    
+
     >>> cursor.execute("SELECT id, parent_id from test LIMIT 2");
     >>> dictfetchall(cursor)
     [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
@@ -284,11 +281,6 @@ current transaction as dirty. You must then ensure that the
 transaction containing those calls is closed correctly. See :ref:`the
 notes on the requirements of Django's transaction handling
 <topics-db-transactions-requirements>` for more details.
-
-.. versionchanged:: 1.3
-
-Prior to Django 1.3, it was necessary to manually mark a transaction
-as dirty using ``transaction.set_dirty()`` when using raw SQL calls.
 
 Connections and cursors
 -----------------------

@@ -38,14 +38,14 @@
         <script type='text/javascript'>
         if (typeof OH === 'undefined') OH = {};
         if (typeof OH.Page === 'undefined') OH.Page = {};
-        OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
+        OH.Page['post_url'] = '{% url "mysite.missions.tar.views.reset" %}';
         OH.Page['mission_parts'] = 'tar,tar_extract';
         </script>
         {% endblock %}
       </div>
       {% endif %}
       <p class="next_mission_link">
-	<a href="{% url mysite.missions.tar.views.unpacking %}">Get started with unpacking &raquo;</a></p>
+	<a href="{% url "mysite.missions.tar.views.unpacking" %}">Get started with unpacking &raquo;</a></p>
   </div>
 </div>
 {% endblock mission_main %}

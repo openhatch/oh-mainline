@@ -1,6 +1,7 @@
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class Episode(models.Model):
@@ -9,6 +10,7 @@ class Episode(models.Model):
     author = models.CharField(max_length=100, blank=True)
 
 
+@python_2_unicode_compatible
 class Media(models.Model):
     """
     Media that can associated to any object.
@@ -16,11 +18,11 @@ class Media(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
-    url = models.URLField(verify_exists=False)
+    url = models.URLField()
     description = models.CharField(max_length=100, blank=True)
     keywords = models.CharField(max_length=100, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.url
 
 #

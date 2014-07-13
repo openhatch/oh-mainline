@@ -54,18 +54,18 @@ about how you can help {{ project.display_name }}
         </style>
     </noscript>
 
-    <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>&laquo; Projects</a></h3>
+    <h3 class='supertitle'><a href='{% url "mysite.project.views.projects" %}'>&laquo; Projects</a></h3>
     <h1>{{ project.display_name }}</h1>
 
     <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'> {% comment %} CSSTODO {% endcomment %}
         <div class='module-head'>
             <h3>Next steps for helpers
                 <a id='show' style='font-weight: normal;' href='#'>(show)</a>
-		<form style="display: none;" id="show_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">{% csrf_token %}
+		<form style="display: none;" id="show_form" method='POST' action="{% url "mysite.profile.views.set_expand_next_steps_do" %}">{% csrf_token %}
 		  <input type="hidden" name="value" value="True" />
 		</form>
                 <a id='hide' style='font-weight: normal;' href='#'>(hide)</a>
-		<form style="display: none;" id="hide_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">{% csrf_token %}
+		<form style="display: none;" id="hide_form" method='POST' action="{% url "mysite.profile.views.set_expand_next_steps_do" %}">{% csrf_token %}
 		  <input type="hidden" name="value" value="False" />
 		</form>
             </h3>
@@ -75,12 +75,12 @@ about how you can help {{ project.display_name }}
     <div class='next_steps_for_helpers contains_just_the_body {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='module-body'>
                 <ul class='raquo_bullets'>
-                    <li><a href='{% url mysite.profile.views.edit_info %}'>
+                    <li><a href='{% url "mysite.profile.views.edit_info" %}'>
                             Talk about your skills and interests on your profile</a></li>
-                    <li><a href='{% url mysite.search.views.search_index %}?q={{ project.name|urlencode }}&toughness=bitesize'>
+                    <li><a href='{% url "mysite.search.views.search_index" %}?q={{ project.name|urlencode }}&toughness=bitesize'>
                             Find a bite-size bug in {{ project.display_name }}
                         </a></li>
-                    <li><a href='{% url mysite.profile.views.edit_info %}#contact_blurb'>
+                    <li><a href='{% url "mysite.profile.views.edit_info" %}#contact_blurb'>
                                 Make sure your contact info is up to date</a></li>
                 </ul>
             </span>
@@ -170,7 +170,7 @@ about how you can help {{ project.display_name }}
             {% endfor %}
         </ul>
         <strong id="other-questions">
-            <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
+            <a href="{% url "mysite.project.views.suggest_question" %}?project__pk={{project.pk}}">
                 What else do you want to talk about?
             </a>
         </strong>
@@ -214,7 +214,7 @@ about how you can help {{ project.display_name }}
                 {% else %}
                     <div style='color: #777; font-size: .85em;'>
                         No one has described this project yet. To describe the
-                        project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.display_name|urlencode }}'>
+                        project, <a href='{% url "mysite.profile.views.importer" %}?add_project_name={{ project.display_name|urlencode }}'>
                             add it to your profile</a>.
                     </div>
                 {% endif %}
@@ -238,7 +238,7 @@ about how you can help {{ project.display_name }}
 
     {% if not user_wants_to_help %}
         <div class='module' id='wannahelp'>
-            <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">{% csrf_token %}
+            <form id='want2help_form' action="{% url "mysite.project.views.wanna_help_do" %}" method="POST">{% csrf_token %}
                 <input type='hidden' name='project' value='{{project.id}}'>
                 <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
             </form>
@@ -256,9 +256,9 @@ about how you can help {{ project.display_name }}
             <ul>
                 <li>
                     {% if project.cached_contributor_count %}
-                        <a class='actionlink' href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"'>See all</a>
+                        <a class='actionlink' href='{% url "mysite.profile.views.people" %}?q=project:"{{project.name|urlencode}}"'>See all</a>
                     {% endif %}
-                    <a class='actionlink' href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>Add yourself</a>
+                    <a class='actionlink' href='{% url "mysite.profile.views.importer" %}?add_project_name={{ project.name|urlencode }}'>Add yourself</a>
                 </li>
             </ul>
     </div>
@@ -291,7 +291,7 @@ about how you can help {{ project.display_name }}
         {% else %}
             <p>
                 No volunteer opportunities in {{project.display_name}} indexed here yet. 
-                <a href='{% url mysite.project.views.edit_project project.name %}#edit_bug_trackers'>
+                <a href='{% url "mysite.project.views.edit_project" project.name %}#edit_bug_trackers'>
                     Add a bug tracker</a>.
 
             </p>
@@ -537,7 +537,7 @@ Want2HelpJacker.prototype = {
     'initialize': function () {
         /* Hijack the 'I want to help' form so that it POST's asynchronously. */
         var options = {
-            'url': "{% url mysite.project.views.wanna_help_do %}",
+            'url': "{% url "mysite.project.views.wanna_help_do" %}",
             'type': 'POST',
             'success': function (response) {
                 /* HACK! In the case that we need to log in, accept a message from the server

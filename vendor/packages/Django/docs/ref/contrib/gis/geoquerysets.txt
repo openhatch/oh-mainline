@@ -117,8 +117,6 @@ SpatiaLite  ``Contains(poly, geom)``
 contains_properly
 -----------------
 
-.. versionadded:: 1.2
-
 *Availability*: PostGIS
 
 Returns true if the lookup geometry intersects the interior of the
@@ -685,7 +683,7 @@ Keyword Argument       Description
                        a method name clashes with an existing
                        ``GeoQuerySet`` method -- if you wanted to use the
                        ``area()`` method on model with a ``PolygonField``
-		       named ``area``, for example.
+                       named ``area``, for example.
 =====================  =====================================================
 
 Measurement
@@ -714,7 +712,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
 :class:`PointField` in the ``AustraliaCity`` queryset is calculated::
 
     >>> pnt = AustraliaCity.objects.get(name='Hobart').point
-    >>> for city in AustraliaCity.objects.distance(pnt): print city.name, city.distance
+    >>> for city in AustraliaCity.objects.distance(pnt): print(city.name, city.distance)
     Wollongong 990071.220408 m
     Shellharbour 972804.613941 m
     Thirroul 1002334.36351 m
@@ -736,7 +734,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     in kilometers.  See the :ref:`ref-measure` for usage details and the list of
     :ref:`supported_units`.
 
-__ https://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+__ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
 __ http://en.wikipedia.org/wiki/Tasmania
 
 ``length``
@@ -803,8 +801,6 @@ Geometry Editors
 
 .. method:: GeoQuerySet.force_rhr(**kwargs)
 
-.. versionadded:: 1.2
-
 *Availability*: PostGIS
 
 Returns a modified version of the polygon/multipolygon in which all
@@ -815,8 +811,6 @@ of the vertices follow the Right-Hand-Rule, and attaches as a
 ~~~~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.reverse_geom(**kwargs)
-
-.. versionadded:: 1.2
 
 *Availability*: PostGIS, Oracle
 
@@ -874,9 +868,9 @@ Example::
 
     >>> qs = Zipcode.objects.all().transform() # Transforms to WGS84
     >>> qs = Zipcode.objects.all().transform(32140) # Transforming to "NAD83 / Texas South Central"
-    >>> print qs[0].poly.srid
+    >>> print(qs[0].poly.srid)
     32140
-    >>> print qs[0].poly
+    >>> print(qs[0].poly)
     POLYGON ((234055.1698884720099159 4937796.9232223574072123 ...
 
 ``translate``
@@ -941,9 +935,7 @@ of the geometry field in each model converted to the requested output format.
 ``geohash``
 ~~~~~~~~~~~
 
-.. method:: GeoQuerySet.geohash(preceision=20, **kwargs)
-
-.. versionadded:: 1.2
+.. method:: GeoQuerySet.geohash(precision=20, **kwargs)
 
 Attaches a ``geohash`` attribute to every model the queryset
 containing the `GeoHash`__ representation of the geometry.
@@ -955,7 +947,10 @@ __ http://geohash.org/
 
 .. method:: GeoQuerySet.geojson(**kwargs)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite
+
+.. versionchanged:: 1.5
+    ``geojson`` support for Spatialite > 3.0 has been added.
 
 Attaches a ``geojson`` attribute to every model in the queryset that contains the
 `GeoJSON`__ representation of the geometry.
@@ -990,7 +985,7 @@ Attaches a ``gml`` attribute to every model in the queryset that contains the
 Example::
 
     >>> qs = Zipcode.objects.all().gml()
-    >>> print qs[0].gml
+    >>> print(qs[0].gml)
     <gml:Polygon srsName="EPSG:4326"><gml:OuterBoundaryIs>-147.78711,70.245363 ...  -147.78711,70.245363</gml:OuterBoundaryIs></gml:Polygon>
 
 =====================  =====================================================
@@ -1023,7 +1018,7 @@ necessary.
 Example::
 
     >>> qs = Zipcode.objects.all().kml()
-    >>> print qs[0].kml
+    >>> print(qs[0].kml)
     <Polygon><outerBoundaryIs><LinearRing><coordinates>-103.04135,36.217596,0 ... -103.04135,36.217596,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
 
 =====================  =====================================================
@@ -1051,7 +1046,7 @@ Keyword Argument       Description
 =====================  =====================================================
 ``relative``           If set to ``True``, the path data will be implemented
                        in terms of relative moves.  Defaults to ``False``,
-		       meaning that absolute moves are used instead.
+                       meaning that absolute moves are used instead.
 
 ``precision``          This keyword may be used to specify the number of
                        significant digits for the coordinates in the SVG
@@ -1128,15 +1123,13 @@ lower left coordinate and the upper right coordinate.
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print qs.extent()
+    >>> print(qs.extent())
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``extent3d``
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.extent3d(**kwargs)
-
-.. versionadded:: 1.2
 
 *Availability*: PostGIS
 
@@ -1146,7 +1139,7 @@ the lower left coordinate and upper right coordinate.
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print qs.extent3d()
+    >>> print(qs.extent3d())
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``make_line``
@@ -1161,7 +1154,7 @@ Returns a ``LineString`` constructed from the point field geometries in the
 
 Example::
 
-     >>> print City.objects.filter(name__in=('Houston', 'Dallas')).make_line()
+     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')).make_line())
      LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``unionagg``
@@ -1223,8 +1216,6 @@ Returns the same as the :meth:`GeoQuerySet.extent` aggregate method.
 ~~~~~~~~~~~~
 
 .. class:: Extent3D(geo_field)
-
-.. versionadded:: 1.2
 
 Returns the same as the :meth:`GeoQuerySet.extent3d` aggregate method.
 

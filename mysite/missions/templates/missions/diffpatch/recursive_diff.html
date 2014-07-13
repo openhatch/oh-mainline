@@ -39,7 +39,7 @@
 
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li><a href="{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}">Download this tarball</a> containing your work targeted at the UK.</li>
+      <li><a href="{% url "mysite.missions.diffpatch.views.diffrecursive_get_original_tarball" %}">Download this tarball</a> containing your work targeted at the UK.</li>
       <li>Unpack the tarball, and make a second copy.</li>
       <li>In that second copy, find all places where "aubergine" is mentioned and replace them with the synonym, "eggplant". (If you see "Aubergine" with a capital "A", replace that with a similarly-capitalized word!)</li>
       <li>Make a unified diff of your changes.  It should be possible to apply it with "patch -p1" from the "recipes" directory.  (One way to do this is <code>diff -ur recipes recipes-us</code>, where <code>recipes</code> is an unmodified copy of the <code>recipes</code> directory.)</li>
@@ -54,7 +54,7 @@
       depend on one another or it is the same adjustment to a
       number of files.</p>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffrecursive_submit %}#diffrecursive-form">{% csrf_token %}
+    <form method="post" enctype="multipart/form-data" action="{% url "mysite.missions.diffpatch.views.diffrecursive_submit" %}#diffrecursive-form">{% csrf_token %}
       <div class="form-row file-upload-row">
         <a name="diffrecursive-form"></a>
         Upload the unified diff here:
@@ -80,7 +80,7 @@
     </form>
     {% if diffrecursive_done %}
     <p class="next_mission_link">
-      <a href="{% url mysite.missions.diffpatch.views.recursive_patch %}">
+      <a href="{% url "mysite.missions.diffpatch.views.recursive_patch" %}">
 	Try the final step, patching entire directories &raquo;
     </a></p>
     {% endif %}
@@ -116,7 +116,7 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.diffrecursive_get_original_tarball" %}
       </pre>
       <p>Unzip the archive file, but do not extract it.</p>
       <pre>

@@ -33,7 +33,7 @@ Manage projects
         <h3>Manage projects</h3>
         <ul>
             <li>
-            <a id='back_to_profile' href='{% url mysite.profile.views.display_person_web person.user.username %}'>
+            <a id='back_to_profile' href='{% url "mysite.profile.views.display_person_web" person.user.username %}'>
                 &laquo; Back to profile
             </a>
             </li>
@@ -49,7 +49,7 @@ Manage projects
             
             <p style='font-size: 11pt;'>(To find things to do in the free/open source
             community, check out the
-            <a href='{% url mysite.search.views.search_index %}'>
+            <a href='{% url "mysite.search.views.search_index" %}'>
                 volunteer opportunity finder</a>.)
             </p></div>
 
@@ -70,7 +70,7 @@ Manage projects
           <button style='display: none;' id='done_reordering'>Save this ordering</button>
           <button id='save_all_projects'>Save all projects</button>
           <a id='back_to_profile'
-             href='{% url mysite.profile.views.display_person_web person.user.username %}'>
+             href='{% url "mysite.profile.views.display_person_web" person.user.username %}'>
             &laquo; Back to profile
           </a>
 	</div>

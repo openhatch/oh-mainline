@@ -34,7 +34,7 @@ Widgetize yourself -
     <div class='body'>
         <p>Show off your open source participation on your web things.</p>
         <script type='text/javascript'
-            src='{% url mysite.profile.views.widget_display_js user.username %}'></script>
+            src='{% url "mysite.profile.views.widget_display_js" user.username %}'></script>
 
         <div id='widget-instructions'>
             Include this <acronym title="Hot Taxidermists Making Latkes">HTML</acronym> wherever in your page you want to put the widget:

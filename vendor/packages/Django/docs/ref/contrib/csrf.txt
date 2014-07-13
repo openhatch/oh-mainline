@@ -72,9 +72,9 @@ To enable CSRF protection for your views, follow these steps:
       :func:`~django.shortcuts.render_to_response()` wrapper that takes care
       of this step for you.
 
-The utility script ``extras/csrf_migration_helper.py`` can help to automate the
-finding of code and templates that may need these steps. It contains full help
-on how to use it.
+The utility script ``extras/csrf_migration_helper.py`` (located in the Django
+distribution, but not installed) can help to automate the finding of code and
+templates that may need these steps. It contains full help on how to use it.
 
 .. _csrf-ajax:
 
@@ -181,7 +181,7 @@ protecting the CSRF token from being sent to other domains.
     correctly on that version. Make sure you are running at least jQuery 1.5.1.
 
 You can use `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in
-jQuery 1.5 and newer in order to replace the `sameOrigin` logic above:
+jQuery 1.5 and newer in order to replace the ``sameOrigin`` logic above:
 
 .. code-block:: javascript
 
@@ -448,7 +448,7 @@ should be the innermost decorator).
 View needs protection for one path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A view needs CRSF protection under one set of conditions only, and mustn't have
+A view needs CSRF protection under one set of conditions only, and mustn't have
 it for the rest of the time.
 
 Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` for the whole
@@ -495,14 +495,12 @@ A number of settings can be used to control Django's CSRF behavior.
 CSRF_COOKIE_DOMAIN
 ------------------
 
-.. versionadded:: 1.2
-
 Default: ``None``
 
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
+``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
 Please note that, with or without use of this setting, this CSRF protection
@@ -510,8 +508,6 @@ mechanism is not safe against cross-subdomain attacks -- see `Limitations`_.
 
 CSRF_COOKIE_NAME
 ----------------
-
-.. versionadded:: 1.2
 
 Default: ``'csrftoken'``
 
@@ -545,8 +541,6 @@ cookie is only sent under an HTTPS connection.
 
 CSRF_FAILURE_VIEW
 -----------------
-
-.. versionadded:: 1.2
 
 Default: ``'django.views.csrf.csrf_failure'``
 

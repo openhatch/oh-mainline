@@ -13,7 +13,7 @@ There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
 Django as just another WSGI application. The second is to use Gunicorn's
 special `integration with Django`_.
 
-.. _integration with Django: http://gunicorn.org/run.html#django-manage-py_
+.. _integration with Django: http://gunicorn.org/run.html#django-manage-py
 
 Installing Gunicorn
 ===================
@@ -48,6 +48,12 @@ ensure that is to run this command from the same directory as your
 Using Gunicorn's Django integration
 ===================================
 
+.. note::
+
+    If you are using Django 1.4 or newer, it’s highly recommended to simply run
+    your application with the WSGI interface using the ``gunicorn`` command
+    as described above.
+
 To use Gunicorn's built-in Django integration, first add ``"gunicorn"`` to
 :setting:`INSTALLED_APPS`. Then run ``python manage.py run_gunicorn``.
 
@@ -58,7 +64,7 @@ This provides a few Django-specific niceties:
 * validates installed models
 
 * allows an ``--adminmedia`` option for passing in the location of the
-  admin media files, mimicing the behavior of runserver.
+  admin media files.
 
 See Gunicorn's `deployment documentation`_ for additional tips on starting and
 maintaining the Gunicorn server.

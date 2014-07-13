@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 <form id="suggest_question" class="suggest_question" name='suggest_question'
-        method='post' action='{% url mysite.project.views.suggest_question_do%}'>{% csrf_token %}
+        method='post' action='{% url "mysite.project.views.suggest_question_do" %}'>{% csrf_token %}
         <input type="hidden" name="project__pk"
             value="{{project__pk}}" />
 

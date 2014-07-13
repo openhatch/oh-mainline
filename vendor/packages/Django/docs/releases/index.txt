@@ -6,13 +6,31 @@ Release notes for the official Django releases. Each release note will tell you
 what's new in each version, and will also describe any backwards-incompatible
 changes made in that version.
 
-For those upgrading to a new version of Django, you will need to check
-all the backwards-incompatible changes and deprecated features for
-each 'final' release from the one after your current Django version,
-up to and including the new version.
+For those :doc:`upgrading to a new version of Django</howto/upgrade-version>`,
+you will need to check all the backwards-incompatible changes and
+:doc:`deprecated features</internals/deprecation>` for each 'final' release
+from the one after your current Django version, up to and including the new
+version.
 
 Final releases
 ==============
+
+.. _development_release_notes:
+
+1.5 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   1.5.8
+   1.5.7
+   1.5.6
+   1.5.5
+   1.5.4
+   1.5.3
+   1.5.2
+   1.5.1
+   1.5
 
 1.4 release
 -----------
@@ -89,6 +107,16 @@ Pre-1.0 releases
    0.96
    0.95
 
+Security releases
+=================
+
+Whenever a security issue is disclosed via :doc:`Django's security
+policies </internals/security>`, appropriate release notes are now
+added to all affected release series.
+
+Additionally, :doc:`an archive of disclosed security issues
+</releases/security>` is maintained.
+
 Development releases
 ====================
 
@@ -99,6 +127,9 @@ notes.
 .. toctree::
    :maxdepth: 1
 
+   security
+   1.5-beta-1
+   1.5-alpha-1
    1.4-beta-1
    1.4-alpha-1
    1.3-beta-1

@@ -248,7 +248,7 @@ class BugzillaTrackerModel(TrackerModel):
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False, verify_exists=False,
+                               blank=False, null=False,
                                help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
                                                help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
@@ -455,7 +455,7 @@ class TracTrackerModel(TrackerModel):
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False, verify_exists=False,
+                               blank=False, null=False,
                                help_text="This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
                                                help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
@@ -520,7 +520,7 @@ class RoundupTrackerModel(TrackerModel):
                                     blank=False, null=False,
                                     help_text="This is the name that OpenHatch will use to identify the project.")
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False, verify_exists=False,
+                               blank=False, null=False,
                                help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
     closed_status = models.CharField(max_length=200, blank=False,
                                      help_text="This is the text that the 'Status' field will contain that indicates a bug is closed. For multiple values to mean 'closed', separate with commas.")
@@ -723,7 +723,7 @@ class JiraTrackerModel(TrackerModel):
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False, verify_exists=False,
+                               blank=False, null=False,
                                help_text="This is the URL to the homepage of the Jira instance, i.e http://jira.cyanogenmod.org")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
                                                help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")

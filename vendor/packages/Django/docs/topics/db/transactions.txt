@@ -48,10 +48,9 @@ you use the session middleware after the transaction middleware, session
 creation will be part of the transaction.
 
 The various cache middlewares are an exception:
-:class:`~django.middleware.cache.CacheMiddleware`,
-:class:`~django.middleware.cache.UpdateCacheMiddleware`, and
-:class:`~django.middleware.cache.FetchFromCacheMiddleware` are never affected.
-Even when using database caching, Django's cache backend uses its own
+``CacheMiddleware``, :class:`~django.middleware.cache.UpdateCacheMiddleware`,
+and :class:`~django.middleware.cache.FetchFromCacheMiddleware` are never
+affected. Even when using database caching, Django's cache backend uses its own
 database cursor (which is mapped to its own database connection internally).
 
 .. note::
@@ -65,9 +64,6 @@ database cursor (which is mapped to its own database connection internally).
 
 Controlling transaction management in views
 ===========================================
-
-.. versionchanged:: 1.3
-   Transaction management context managers are new in Django 1.3.
 
 For most people, implicit request-based transactions work wonderfully. However,
 if you need more fine-grained control over how transactions are managed, you can
@@ -100,9 +96,7 @@ These functions, described in detail below, can be used in two different ways:
             # this code executes inside a transaction
             # ...
 
-Both techniques work with all supported version of Python. However, in Python
-2.5, you must add ``from __future__ import with_statement`` at the beginning
-of your module if you are using the ``with`` statement.
+Both techniques work with all supported version of Python.
 
 .. _decorator: http://docs.python.org/glossary.html#term-decorator
 .. _context manager: http://docs.python.org/glossary.html#term-context-manager
@@ -166,8 +160,12 @@ managers, too.
     transactions. It tells Django you'll be managing the transaction on your
     own.
 
-    If your view changes data and doesn't ``commit()`` or ``rollback()``,
-    Django will raise a ``TransactionManagementError`` exception.
+    Whether you are writing or simply reading from the database, you must
+    ``commit()`` or ``rollback()`` explicitly or Django will raise a
+    :exc:`TransactionManagementError` exception. This is required when reading
+    from the database because ``SELECT`` statements may call functions which
+    modify tables, and thus it is impossible to know if any data has been
+    modified.
 
     Manual transaction management looks like this::
 
@@ -197,12 +195,11 @@ managers, too.
 Requirements for transaction handling
 =====================================
 
-.. versionadded:: 1.3
-
 Django requires that every transaction that is opened is closed before
 the completion of a request. If you are using :func:`autocommit` (the
 default commit mode) or :func:`commit_on_success`, this will be done
-for you automatically. However, if you are manually managing
+for you automatically (with the exception of :ref:`executing custom SQL
+<executing-custom-sql>`). However, if you are manually managing
 transactions (using the :func:`commit_manually` decorator), you must
 ensure that the transaction is either committed or rolled back before
 a request is completed.
@@ -211,11 +208,13 @@ This applies to all database operations, not just write operations. Even
 if your transaction only reads from the database, the transaction must
 be committed or rolled back before you complete a request.
 
+.. _deactivate-transaction-management:
+
 How to globally deactivate transaction management
 =================================================
 
 Control freaks can totally disable all transaction management by setting
-``DISABLE_TRANSACTION_MANAGEMENT`` to ``True`` in the Django settings file.
+:setting:`TRANSACTIONS_MANAGED` to ``True`` in the Django settings file.
 
 If you do this, Django won't provide any automatic transaction management
 whatsoever. Middleware will no longer implicitly commit transactions, and
@@ -234,9 +233,9 @@ Savepoints
 
 A savepoint is a marker within a transaction that enables you to roll back part
 of a transaction, rather than the full transaction. Savepoints are available
-with the PostgreSQL 8, Oracle and MySQL (version 5.0.3 and newer, when using
-the InnoDB storage engine) backends. Other backends provide the savepoint
-functions, but they're empty operations -- they don't actually do anything.
+with the PostgreSQL 8, Oracle and MySQL (when using the InnoDB storage engine)
+backends. Other backends provide the savepoint functions, but they're empty
+operations -- they don't actually do anything.
 
 .. versionchanged:: 1.4
    Savepoint support for the MySQL backend was added in Django 1.4.
