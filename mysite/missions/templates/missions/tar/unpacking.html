@@ -50,7 +50,8 @@
             $('#link-unpacking').removeClass('cross-progress').addClass('tick-progress');
             $.post(
                    "{% url mysite.missions.tar.views.extract_mission_success %}",
-                   {unpack_success: true},
+                   {'csrfmiddlewaretoken': $.cookie('csrftoken'),
+                    unpack_success: true},
                    function (response) {
                      console.log(response);
                    });

@@ -53,7 +53,8 @@
             $('#link-creating').removeClass('cross-progress').addClass('tick-progress');
             $.post(
                    "{% url mysite.missions.tar.views.create_mission_success %}",
-                   {create_success: true},
+                   {'csrfmiddlewaretoken': $.cookie('csrftoken'),
+                    create_success: true},
                    function (response) {
                      console.log(response);
                    });
