@@ -181,20 +181,27 @@ Making it Accessible
 --------------------
 
 The final step to writing your Mission is to make it accessible on the
-site. This requires telling OpenHatch how to route the URLs. Django
-projects define URL routing in a file cunningly named ``urls.py``. You
-can find this in the ``mysite`` directory. If you open it, you'll find
-a list of URL patterns -- regular expressions which Django will use to
-match URLs and figure out where to send requests. You can add the new
-mission by adding a new item after the other missions::
+site by telling OpenHatch how to route the URLs. Django projects define 
+URL routing in a file cunningly named ``urls.py``. You can find this 
+in the ``mysite`` directory. The first step to making your mission accessible 
+is to tell ``urls.py`` where the file ``views.py`` for your new mission 
+lives by adding an ``import`` statement near the top of ``urls.py`` right 
+after the ``import`` statements for the existing training missions like so::
+
+    import mysite.missions.makeamission.views
+
+Next, if you open ``urls.py``, you'll find a list of URL patterns -- regular 
+expressions which Django will use to match URLs and figure out where to 
+send requests. The second and final step to making your mission accessible 
+is to add the new mission by adding a new item after the other missions::
 
      (r'^missions/makeamission',
          include(mysite.missions.makeamission.views.MakeAMission.urls())),
 
 Two important things to note:
 
-* ``makeamission`` in the ``include`` statement refers to the
-  directory you created, so you'll need to make sure the name matches.
+* ``makeamission`` in the ``include`` and ``import`` statements above refer 
+  to the directory you created, so you'll need to make sure the name matches.
 * ``MakeAMission`` is the name you give your Mission class.
 
 Once you've added it to the URLs, you can start the server and visit
