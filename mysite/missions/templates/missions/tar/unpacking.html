@@ -20,80 +20,47 @@
 
 {% block mission_main %}
 <div class='submodule fat'>
-  <div class='submodule-head head'>
-    <h3>Unpacking tarballs</h3>
-  </div>
   <div class="submodule-body body">
-      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url mysite.missions.tar.views.download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a>. (Note that the tarball is following convention by using a directory that holds all of the files from that tarball.)</p>
-      <p>Your mission is to to upload {{ file_we_want }}.</p>
-      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.extract_mission_upload %}#unpack-form">{% csrf_token %}
-        <div class="form-row file-upload-row">
-          <a name="unpack-form"></a>
-          After you extract that file, upload it here:
-    {% if unpack_success %}
-      <!-- unpack status: success -->
-    {% else %}
-      <!-- unpack status: failure -->
-    {% endif %}
-          {% if what_was_wrong_with_the_extracted_file %}
-          <ul class="errorlist"><li>{{ what_was_wrong_with_the_extracted_file }}</li></ul>
-          {% endif %}
-          {{ unpack_form.extracted_file.errors }}
-          <div class="file-upload">
-          {{ unpack_form.extracted_file }}
-          <input type="submit" value="Upload" style="float: none;" />
-          </div>
-        </div>
-      </form>
     {% if unpack_done %}
       <div id="success-msg" class="successmsg">
         <p><strong>You have successfully completed this part of the mission.</strong></p>
-        {% if unpack_success %}
-        <p>The file you uploaded has the correct contents.</p>
-        {% else %}
         <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
+        <p class="next_mission_link">
+           <a href="{% url mysite.missions.tar.views.creating %}">On to creating a tarball &raquo;</a>
+        </p>
         {% block js %}
-        {{ block.super }}        
+        {{ block.super }}
         <script type='text/javascript' src="{% version '/static/js/missions/base.js' %}"></script>
         <script type='text/javascript'>
         if (typeof OH === 'undefined') OH = {};
-        if (typeof OH.Page === 'undefined') OH.Page = {};        
+        if (typeof OH.Page === 'undefined') OH.Page = {};
         OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
         OH.Page['mission_parts'] = 'tar_extract';
         </script>
         {% endblock %}
-        {% endif %}
       </div>
-    {% endif %}
-      {% if unpack_done %}
-      <p class="next_mission_link">
-	<a href="{% url mysite.missions.tar.views.creating %}">On to creating a tarball &raquo;</a></p>
       {% endif %}
-      <div id="hint_tabs">
-	<ul>
-	  <li><a href="#hints">Hints</a></li>
-	  <li><a href="#low">Low</a></li>
-	  <li><a href="#high">High</a></li>
-	</ul>
-	<div id="hints">
-	  <p>If you need help with this step, try clicking through these hints.</p>
-	  <p>The "low" hint level is perfect if you're just confused as to what to do.</p>
-	  <p>The "high" level is great if you are unfamiliar with the commands and tools you'd use.</p>
-	</div>
-	<div id="low">
-	  <ul class="raquo_bullets">
-            <li>Download the tarball</li>
-            <li>Unpack it</li>
-            <li>Find and upload the <tt>{{ file_we_want }}</tt> file</li>
-        </ul>
-	</div>
-	<div id="high">
-	  <p>To unpack the tarball, you might want to use this command:</p>
-	  <ul class="raquo_bullets">
-	    <li><tt>tar xvzf ghello-0.4.tar.gz</tt></li>
-	  </ul>
-	</div>
+      <div class="mission-step">
+        <oppia oppia-id="12" exploration-version="4" src="http://missions-beta.openhatch.org">
       </div>
+      <script type="text/javascript">
+        window.OPPIA_PLAYER.onStateTransitionPostHook = function(
+            iframeNode, oldStateName, jsonAnswer, newStateName) {
+          if (newStateName == 'success') {
+            $('#link-unpacking').removeClass('cross-progress').addClass('tick-progress');
+            $.post(
+                   "{% url mysite.missions.tar.views.extract_mission_success %}",
+                   {'csrfmiddlewaretoken': $.cookie('csrftoken'),
+                    unpack_success: true},
+                   function (response) {
+                     console.log(response);
+                   });
+          }
+        }
+        window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
+          window.location = "{% url mysite.missions.tar.views.creating %}";
+        }
+      </script>
   </div>
 </div>
 {% endblock mission_main %}
