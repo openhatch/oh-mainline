@@ -84,7 +84,7 @@ class BasicBugsetViewTests(TwillTests):
 
     def test_bugset_listview_load_empty(self):
         # Create set with no bugs
-        s = mysite.bugsets.models.BugSet.objects.create(name="test event")
+        mysite.bugsets.models.BugSet.objects.create(name="test event")
         url = reverse(mysite.bugsets.views.listview_index, kwargs={
             'pk': 1,
             'slug': '',
@@ -129,20 +129,13 @@ class BasicBugsetViewTests(TwillTests):
         b.mentor = "Elana"
         b.time_estimate = "2 hours"
         b.status = "c"
-
-        # Create and add some skills tags
-        t = mysite.bugsets.models.Skill.objects.create(text="python")
-        t.save()
-        b.skills.add(t)
-        t = mysite.bugsets.models.Skill.objects.create(text="html")
-        t.save()
-        b.skills.add(t)
+        b.skill_list = "python, html"
 
         # Make a project
         p = mysite.search.models.Project.objects.create(
-            name='openhatch', 
-            display_name='OpenHatch DisplayName', 
-            homepage='http://openhatch.org', 
+            name='openhatch',
+            display_name='OpenHatch DisplayName',
+            homepage='http://openhatch.org',
             language='Python',
         )
         p.save()
@@ -169,5 +162,4 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "Elana")
         self.assertContains(response, "2 hours")
         self.assertContains(response, "claimed")
-        self.assertContains(response, "python")
-        self.assertContains(response, "html")
+        self.assertContains(response, "python, html")
