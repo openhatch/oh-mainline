@@ -191,4 +191,4 @@ class SecurityBugsetViewTests(TwillTests):
                 "value": '"LOLPWNED"'     # new value
             })
  
-        self.assertEqual(User.objects.get(pk=u.pk).username, "LOLPWNED")
+        self.assertEqual(User.objects.get(pk=u.pk).username, u'paulproteus')
