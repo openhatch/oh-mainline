@@ -129,14 +129,7 @@ class BasicBugsetViewTests(TwillTests):
         b.mentor = "Elana"
         b.time_estimate = "2 hours"
         b.status = "c"
-
-        # Create and add some skills tags
-        t = mysite.bugsets.models.Skill.objects.create(text="python")
-        t.save()
-        b.skills.add(t)
-        t = mysite.bugsets.models.Skill.objects.create(text="html")
-        t.save()
-        b.skills.add(t)
+        b.skill_list = "python, html"
 
         # Make a project
         p = mysite.search.models.Project.objects.create(
@@ -169,5 +162,4 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "Elana")
         self.assertContains(response, "2 hours")
         self.assertContains(response, "claimed")
-        self.assertContains(response, "python")
-        self.assertContains(response, "html")
+        self.assertContains(response, "python, html")
