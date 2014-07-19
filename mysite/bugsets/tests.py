@@ -26,6 +26,7 @@ import mysite.bugsets.models
 from mysite.base.tests import TwillTests
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 # }}}
 
 
@@ -171,3 +172,23 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "claimed")
         self.assertContains(response, "python")
         self.assertContains(response, "html")
+
+
+class SecurityBugsetViewTests(TwillTests):
+    def test_will_inplaceedit_allow_us_to_pwn_ourselves(self):
+        # Asheesh: "total cost of pwnership: 1 test"
+        # note: user paulproteus has poor password hygiene
+        u = User.objects.create(username='paulproteus', password='password')
+        u.save()
+
+        self.client.post(
+            '/inplaceeditform/save/',
+            {
+                "app_label": "auth",      # the django app
+                "module_name": "user",    # the django table
+                "field_name": "username", # the field name
+                "obj_id": u.pk,           # the pk
+                "value": '"LOLPWNED"'     # new value
+            })
+ 
+        self.assertEqual(User.objects.get(pk=u.pk).username, "LOLPWNED")
