@@ -236,9 +236,9 @@ urlpatterns = patterns('',
                         'mysite.customs.views.delete_tracker_url_do'),
 
                        # Bug set creator URLs
-                       (r'^bugsets/$', 'mysite.bugsets.views.list_index'),
+                       (r'^bugsets/$', 'mysite.bugsets.views.main_index'),
                        (r'^bugsets/(?P<pk>\d+)-(?P<slug>.*)$',
-                        'mysite.bugsets.views.listview_index'),
+                        'mysite.bugsets.views.list_index'),
                            # This is a view for robots, do not modify
                        (r'^inplaceeditform/', include('inplaceeditform.urls')),
 

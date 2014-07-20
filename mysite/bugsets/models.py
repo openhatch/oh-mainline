@@ -73,7 +73,7 @@ class BugSet(models.Model):
     bugs = models.ManyToManyField(AnnotatedBug)
 
     def get_absolute_url(self):
-        return reverse(mysite.bugsets.views.listview_index, kwargs={
+        return reverse(mysite.bugsets.views.list_index, kwargs={
             'pk': self.pk,
             'slug': slugify(self.name),
         })

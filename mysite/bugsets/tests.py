@@ -30,11 +30,11 @@ from django.contrib.auth.models import User
 # }}}
 
 
-class BasicBugsetListTests(TwillTests):
+class BasicBugsetMainViewTests(TwillTests):
     def test_bugset_names_load(self):
         mysite.bugsets.models.BugSet.objects.create(name="best event")
         mysite.bugsets.models.BugSet.objects.create(name="bestest event")
-        url = reverse(mysite.bugsets.views.list_index)
+        url = reverse(mysite.bugsets.views.main_index)
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
@@ -43,21 +43,21 @@ class BasicBugsetListTests(TwillTests):
 
     def test_bugset_view_link(self):
         s = mysite.bugsets.models.BugSet.objects.create(name="best event")
-        url = reverse(mysite.bugsets.views.list_index)
+        url = reverse(mysite.bugsets.views.main_index)
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, s.get_absolute_url())
 
 
-class BasicBugsetViewTests(TwillTests):
+class BasicBugsetListViewTests(TwillTests):
     def test_bugset_listview_load(self):
         s = mysite.bugsets.models.BugSet.objects.create(name="test event")
         b = mysite.bugsets.models.AnnotatedBug.objects.create(
             url="http://openhatch.org/bugs/issue995",
         )
         s.bugs.add(b)
-        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+        url = reverse(mysite.bugsets.views.list_index, kwargs={
             'pk': 1,
             'slug': '',
         })
@@ -73,7 +73,7 @@ class BasicBugsetViewTests(TwillTests):
             url="http://openhatch.org/bugs/issue995",
         )
         s.bugs.add(b)
-        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+        url = reverse(mysite.bugsets.views.list_index, kwargs={
             'pk': 1,
             'slug': 'best-event',  # this can be anything!
         })
@@ -86,7 +86,7 @@ class BasicBugsetViewTests(TwillTests):
     def test_bugset_listview_load_empty(self):
         # Create set with no bugs
         mysite.bugsets.models.BugSet.objects.create(name="test event")
-        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+        url = reverse(mysite.bugsets.views.list_index, kwargs={
             'pk': 1,
             'slug': '',
         })
@@ -104,7 +104,7 @@ class BasicBugsetViewTests(TwillTests):
         )
         s.bugs.add(b)
 
-        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+        url = reverse(mysite.bugsets.views.list_index, kwargs={
             'pk': 1,
             'slug': '',
         })
@@ -146,7 +146,7 @@ class BasicBugsetViewTests(TwillTests):
         b.save()
         s.bugs.add(b)
 
-        url = reverse(mysite.bugsets.views.listview_index, kwargs={
+        url = reverse(mysite.bugsets.views.list_index, kwargs={
             'pk': 1,
             'slug': '',
         })
@@ -166,7 +166,7 @@ class BasicBugsetViewTests(TwillTests):
         self.assertContains(response, "python, html")
 
 
-class SecurityBugsetViewTests(TwillTests):
+class SecurityBugsetListViewTests(TwillTests):
     def test_will_inplaceedit_allow_us_to_pwn_ourselves(self):
         # Asheesh: "total cost of pwnership: 1 test"
         # note: user paulproteus has poor password hygiene
