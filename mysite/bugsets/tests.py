@@ -184,3 +184,12 @@ class SecurityBugsetListViewTests(TwillTests):
             })
  
         self.assertEqual(User.objects.get(pk=u.pk).username, u'paulproteus')
+
+
+class BasicBugsetCreateViewTests(TwillTests):
+    def test_create_view_load(self):
+        url = reverse(mysite.bugsets.views.create_index)
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "Create a Bug Set")

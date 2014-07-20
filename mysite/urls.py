@@ -239,6 +239,7 @@ urlpatterns = patterns('',
                        (r'^bugsets/$', 'mysite.bugsets.views.main_index'),
                        (r'^bugsets/(?P<pk>\d+)-(?P<slug>.*)$',
                         'mysite.bugsets.views.list_index'),
+                       (r'^bugsets/create$', 'mysite.bugsets.views.create_index'),
                            # This is a view for robots, do not modify
                        (r'^inplaceeditform/', include('inplaceeditform.urls')),
 
