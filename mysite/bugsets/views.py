@@ -21,7 +21,9 @@ from __future__ import absolute_import
 
 # Imports {{{
 import mysite.bugsets.models
+from mysite.bugsets.forms import BugsForm
 
+from django import forms
 from django.shortcuts import render
 # }}}
 
@@ -46,5 +48,14 @@ def list_index(request, pk, slug):
 
 def create_index(request):
     context = {}
-    return render(request, 'create_index.html', context)
 
+    if request.method == 'POST':
+        form = BugsForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(reverse(create_index) +'?submit=1')
+        # else:
+        context['form'] = form
+
+    if 'form' not in context:
+        context['form'] = BugsForm()
+    return render(request, 'create_index.html', context)

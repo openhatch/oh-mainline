@@ -1,5 +1,3 @@
-{% extends 'base/one_column.html' %}
-{% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2014 Elana Hashman
 #
@@ -15,33 +13,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-{% endcomment %}
 
-{% block title %}
-Event Bug Sets
-{% endblock title %}
+from django import forms
 
-{% block pagetop %}
-<h1 style='margin: 10px 0 0 10px; font-weight: bold; color: #222'>
-  OpenHatch's Bug Set Organizer
-</h1>
-{% endblock %}
-
-{% block main %}
-<div class='module'>
-  <div class='module-body'>
-    <p>
-      If you'd like, you can
-      <a href="{% url mysite.bugsets.views.create_index %}">create a bugset</a>!
-    </p>
-    <p>
-      Here are some bug sets:
-    </p>
-    <ul class="raquo_bullets">
-    {% for set in bugsets.all %}
-    <li><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></li>
-    {% endfor %}
-    </ul>
-  </div>
-</div>
-{% endblock main %}
+class BugsForm(forms.Form):
+    buglist = forms.CharField(widget=forms.Textarea)
