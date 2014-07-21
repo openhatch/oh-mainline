@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-# vim: set ai et ts=4 sw=4:
-
+{% extends 'base/base.html' %}
+{% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2014 Elana Hashman
 #
@@ -17,34 +15,24 @@ from __future__ import absolute_import
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 
+{% block title %}
+Event Bug Sets
+{% endblock title %}
 
-# Imports {{{
-import mysite.bugsets.models
-
-from django.shortcuts import render
-# }}}
-
-
-def main_index(request):
-    bugsets = mysite.bugsets.models.BugSet.objects.all()
-    context = {
-        'bugsets': bugsets,
-    }
-    return render(request, 'main_index.html', context)
-
-
-def list_index(request, pk, slug):
-    bugset = mysite.bugsets.models.BugSet.objects.get(pk=pk)
-    bugs = bugset.bugs.all()
-    context = {
-        'bugset': bugset,
-        'bugs': bugs,
-    }
-    return render(request, 'list_index.html', context)
-
-
-def create_index(request):
-    context = {}
-    return render(request, 'create_index.html', context)
-
+{% block content %}
+<div class='module'>
+  <div class='head'>
+    <h3>{% block heading %}Event Bug Sets{% endblock %}</h3>
+    <p>
+      Here are some bug sets:
+    </p>
+  </div>
+  <div class='body'>
+    {% for set in bugsets.all %}
+    <p><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}
