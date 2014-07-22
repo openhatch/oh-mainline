@@ -51,7 +51,9 @@ document.documentElement.className = 'javascript_is_enabled';
     <div class='submodule skinny' style="margin-right: 1em; width: 23%;">
       <div class='submodule-body' id="tab_me">
         <ul class="tab_nav">
-	  <li id='link-about'>
+
+       <li id='link-about'><a href='#portfolio_editor'>Adding your project(s)</a></li>
+	  <li>
 	    <a href='#represent'>
 	      Represent your project
 	    </a>
@@ -66,6 +68,7 @@ document.documentElement.className = 'javascript_is_enabled';
 	      Use proven social strategies
 	    </a>
 	  </li>
+
 	</ul>
 	<ul>
 	  <li><hr></li>
@@ -79,6 +82,17 @@ document.documentElement.className = 'javascript_is_enabled';
     </div>
     <div class='submodule fat'  style="width: 71%;">
       <div class="submodule-body" style="margin: 0.5em;">
+     <div id="portfolio_editor" class="tab">
+	  <p>You can start by letting new contributors know about your project.</p>
+	  <ul class="raquo_bullets fairly-big">
+	    <li><a href='{% url mysite.profile.views.portfolio_editor %}'>Add a project</a> and  describe your involvement.</li>
+	    <li>Once your project has been added you can proceed towards adding it's bug tracker.
+	    	<span class="normal-size"><a href="/wiki/Bug_trackers">(instructions)</a>
+	    	</span>
+	    </li>
+	  </ul>
+	</div>
+
 	<div id="represent" class="tab">
 	  <p>New contributors are browsing this site to find a good project to join.
 	    Here's how you can make your project findable and attractive.</p>
