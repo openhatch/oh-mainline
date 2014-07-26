@@ -32,7 +32,6 @@ __all__ = (
 
 MEDIA_TYPES = ('css','js')
 
-
 @python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
@@ -264,6 +263,7 @@ class Input(Widget):
 
 class TextInput(Input):
     input_type = 'text'
+
     def __init__(self, attrs=None):
         if attrs is not None:
             self.input_type = attrs.pop('type', self.input_type)
@@ -395,9 +395,7 @@ class ClearableFileInput(FileInput):
 class Textarea(Widget):
     def __init__(self, attrs=None):
         # The 'rows' and 'cols' attributes are required for HTML correctness.
-
         default_attrs = {'cols': '40', 'rows': '10'}
->>>>>>> Add Django 1.5.8
         if attrs:
             default_attrs.update(attrs)
         super(Textarea, self).__init__(default_attrs)
@@ -405,20 +403,12 @@ class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
-                conditional_escape(force_unicode(value))))
-
-class DateInput(Input):
-    input_type = 'text'
-
-=======
         return format_html('<textarea{0}>\r\n{1}</textarea>',
                            flatatt(final_attrs),
                            force_text(value))
 
 
 class DateInput(TextInput):
->>>>>>> Add Django 1.5.8
     def __init__(self, attrs=None, format=None):
         super(DateInput, self).__init__(attrs)
         if format:
@@ -449,7 +439,6 @@ class DateInput(TextInput):
 
 
 class DateTimeInput(TextInput):
->>>>>>> Add Django 1.5.8
     def __init__(self, attrs=None, format=None):
         super(DateTimeInput, self).__init__(attrs)
         if format:
@@ -480,7 +469,6 @@ class DateTimeInput(TextInput):
 
 
 class TimeInput(TextInput):
->>>>>>> Add Django 1.5.8
     def __init__(self, attrs=None, format=None):
         super(TimeInput, self).__init__(attrs)
         if format:
@@ -537,15 +525,6 @@ class CheckboxInput(Widget):
             return False
         value = data.get(name)
         # Translate true and false strings to boolean values.
-        values =  {'true': True, 'false': False}
-        if isinstance(value, basestring):
-            value = values.get(value.lower(), value)
-        return value
-
-    def _has_changed(self, initial, data):
-        # Sometimes data or initial could be None or u'' which should be the
-        # same thing as False.
-=======
         values = {'true': True, 'false': False}
         if isinstance(value, six.string_types):
             value = values.get(value.lower(), value)
@@ -557,7 +536,6 @@ class CheckboxInput(Widget):
         if initial == 'False':
             # show_hidden_initial may have transformed False to 'False'
             initial = False
->>>>>>> Add Django 1.5.8
         return bool(initial) != bool(data)
 
 class Select(Widget):
@@ -729,6 +707,7 @@ class RadioFieldRenderer(object):
         choice = self.choices[idx] # Let the IndexError propogate
         return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
 
+    def __str__(self):
         return self.render()
 
     def render(self):
