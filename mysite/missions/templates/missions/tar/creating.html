@@ -57,7 +57,7 @@
         <p><strong>You have successfully completed this part of the mission.</strong></p>
         <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
         <p id="next-mission-link" class="next_mission_link">
-        Congratulations! You've totally completed the tar mission. Want to go <a href="{% url mysite.missions.base.views.main_page %}">back to the list of missions</a>?</p>
+        Congratulations! You've totally completed the tar mission. Want to go <a href="{% url "mysite.missions.base.views.main_page" %}">back to the list of missions</a>?</p>
         {% block js %}
         {{ block.super }}
         <script type='text/javascript' src="{% version '/static/js/missions/base.js' %}"></script>
@@ -85,7 +85,7 @@
           if (newStateName == 'success') {
             $('#link-creating').removeClass('cross-progress').addClass('tick-progress');
             $.post(
-                   "{% url mysite.missions.tar.views.create_mission_success %}",
+                   "{% url "mysite.missions.tar.views.create_mission_success" %}",
                    {'csrfmiddlewaretoken': $.cookie('csrftoken'),
                     create_success: true},
                    function (response) {
@@ -94,7 +94,7 @@
           }
         };
         window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-          window.location = "{% url mysite.missions.base.views.main_page %}";
+          window.location = "{% url "mysite.missions.base.views.main_page" %}";
         };
       </script>
   </div>

@@ -49,7 +49,7 @@
         <p><strong>You have successfully completed this part of the mission.</strong></p>
         <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
         <p class="next_mission_link">
-           <a href="{% url mysite.missions.tar.views.creating %}">On to creating a tarball &raquo;</a>
+           <a href="{% url "mysite.missions.tar.views.creating" %}">On to creating a tarball &raquo;</a>
         </p>
         {% block js %}
         {{ block.super }}
@@ -76,7 +76,7 @@
           if (newStateName == 'success') {
             $('#link-unpacking').removeClass('cross-progress').addClass('tick-progress');
             $.post(
-                   "{% url mysite.missions.tar.views.extract_mission_success %}",
+                   "{% url "mysite.missions.tar.views.extract_mission_success" %}",
                    {'csrfmiddlewaretoken': $.cookie('csrftoken'),
                     unpack_success: true},
                    function (response) {
@@ -85,7 +85,7 @@
           }
         }
         window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-          window.location = "{% url mysite.missions.tar.views.creating %}";
+          window.location = "{% url "mysite.missions.tar.views.creating" %}";
         }
       </script>
   </div>
