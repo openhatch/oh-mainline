@@ -58,7 +58,7 @@ class BasicBugsetListViewTests(TwillTests):
         )
         s.bugs.add(b)
         url = reverse(mysite.bugsets.views.list_index, kwargs={
-            'pk': 1,
+            'pk': s.pk,
             'slug': '',
         })
         response = self.client.get(url)
@@ -74,7 +74,7 @@ class BasicBugsetListViewTests(TwillTests):
         )
         s.bugs.add(b)
         url = reverse(mysite.bugsets.views.list_index, kwargs={
-            'pk': 1,
+            'pk': s.pk,
             'slug': 'best-event',  # this can be anything!
         })
         response = self.client.get(url)
@@ -187,12 +187,43 @@ class SecurityBugsetListViewTests(TwillTests):
 
 
 class BasicBugsetCreateViewTests(TwillTests):
+    event_name = "Party at Asheesh's Place"
+    bugset = """
+        http://openhatch.org/bugs/issue978
+        http://openhatch.org/bugs/issue994
+        http://openhatch.org/bugs/issue995
+        http://openhatch.org/bugs/issue1003
+    """
+
     def test_create_view_load(self):
         url = reverse(mysite.bugsets.views.create_index)
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, "Create a Bug Set")
+
+    def test_create_view_redirect(self):
+        url = reverse(mysite.bugsets.views.create_index)
+        response = self.client.post(
+            url,
+            { 
+                'event_name': self.event_name,
+                'buglist': self.bugset,
+            })
+
+        self.assertEqual(302, response.status_code)
+
+        s = mysite.bugsets.models.BugSet.objects.get()
+        self.assertEqual(
+            'http://testserver' + s.get_edit_url(), 
+            response['location'])
+
+        response = self.client.get(response['location'])
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.event_name)
+        self.assertContains(response, 'http://openhatch.org/bugs/issue978')
+
 
 class BasicBugsetCreateFormTests(TwillTests):
     event_name = "Party at Asheesh's Place"
@@ -202,6 +233,17 @@ class BasicBugsetCreateFormTests(TwillTests):
         http://openhatch.org/bugs/issue995
         http://openhatch.org/bugs/issue1003
     """
+
+    def test_submit_form_valid(self):
+        url = reverse(mysite.bugsets.views.create_index)
+        response = self.client.post(
+            url,
+            { 
+                'event_name': self.event_name,
+                'buglist': self.bugset,
+            })
+
+        self.assertEqual(302, response.status_code)
 
     def test_create_form(self):
         f = mysite.bugsets.forms.BugsForm({

@@ -77,3 +77,9 @@ class BugSet(models.Model):
             'pk': self.pk,
             'slug': slugify(self.name),
         })
+
+    def get_edit_url(self):
+        return reverse(mysite.bugsets.views.create_index, kwargs={
+            'pk': self.pk,
+            'slug': slugify(self.name),
+        })

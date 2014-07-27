@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pdb
 import mysite.bugsets.models
 
 import django.forms
@@ -22,7 +21,10 @@ from django.core.validators import URLValidator
 
 class BugsForm(django.forms.Form):
     event_name = django.forms.CharField(max_length=200)
-    buglist = django.forms.CharField(widget=django.forms.Textarea)
+    buglist = django.forms.CharField(
+        widget=django.forms.Textarea,
+        label='Enter some bugs URLs here, each separated by a newline:',
+    )
 
     def clean_buglist(self):
         bugtext = self.cleaned_data['buglist']
@@ -64,3 +66,6 @@ class BugsForm(django.forms.Form):
                 b = mysite.bugsets.models.AnnotatedBug(url=url)
                 b.save()
                 s.bugs.add(b)
+
+            # We need the form to return the set info
+            self.object = s

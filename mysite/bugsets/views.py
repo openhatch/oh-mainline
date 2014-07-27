@@ -24,6 +24,8 @@ import mysite.bugsets.models
 from mysite.bugsets.forms import BugsForm
 
 from django import forms
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 # }}}
 
@@ -46,16 +48,35 @@ def list_index(request, pk, slug):
     return render(request, 'list_index.html', context)
 
 
-def create_index(request):
+def create_index(request, pk=None, slug=None):
     context = {}
 
+    # Edit form
+    if pk:
+        s = mysite.bugsets.models.BugSet.objects.get(pk=pk)
+        bugs = s.bugs.all()
+
+        form = BugsForm({
+            'event_name': s.name,
+            'buglist': "\n".join([bug.url for bug in bugs]),
+        })
+
+        context = {
+            'form': form,
+            'bugs': bugs,
+        }
+
+        return render(request, 'edit_index.html', context)
+
+    # Submit create form
     if request.method == 'POST':
         form = BugsForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse(create_index) +'?submit=1')
+            return HttpResponseRedirect(form.object.get_edit_url())
         # else:
         context['form'] = form
 
+    # Blank create form
     if 'form' not in context:
         context['form'] = BugsForm()
     return render(request, 'create_index.html', context)
