@@ -193,3 +193,41 @@ class BasicBugsetCreateViewTests(TwillTests):
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, "Create a Bug Set")
+
+class BasicBugsetCreateFormTests(TwillTests):
+    event_name = "Party at Asheesh's Place"
+    bugset = """
+        http://openhatch.org/bugs/issue978
+        http://openhatch.org/bugs/issue994
+        http://openhatch.org/bugs/issue995
+        http://openhatch.org/bugs/issue1003
+    """
+
+    def test_create_form(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': self.event_name,
+            'buglist': self.bugset,
+        })
+
+        self.assertTrue(f.is_valid())
+
+        s = mysite.bugsets.models.BugSet.objects.get(name=self.event_name)
+        l = mysite.bugsets.models.AnnotatedBug.objects.filter(
+            url__in=self.bugset
+        )
+
+        self.assertTrue(set(s.bugs.all()), set(l))
+
+    def test_evil_urls(self):
+        evil_urls = [
+        #    'ftp://pr1v8.warex0z.s3rv3r.net/',
+            'wiefjoiefoaehroaherhaevo',
+            'javascript:alert("hi")',
+        ] 
+
+        for url in evil_urls:
+            self.assertFalse(
+                mysite.bugsets.forms.BugsForm({
+                    'event_name': self.event_name,
+                    'buglist': url,
+            }).is_valid())
