@@ -95,7 +95,7 @@ class UpdateCacheMiddleware(object):
             # We don't need to update the cache, just return.
             return response
 
-        if not response.status_code == 200:
+        if response.streaming or response.status_code != 200:
             return response
 
         # Don't cache responses that set a user-specific (and maybe security

@@ -199,7 +199,7 @@ Create a view that can set the current timezone::
 
     def set_timezone(request):
         if request.method == 'POST':
-            request.session[session_key] = pytz.timezone(request.POST['timezone'])
+            request.session['django_timezone'] = pytz.timezone(request.POST['timezone'])
             return redirect('/')
         else:
             return render(request, 'template.html', {'timezones': pytz.common_timezones})
@@ -208,7 +208,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
 
 .. code-block:: html+django
 
-    {% load tz %}{% load url from future %}
+    {% load tz %}
     <form action="{% url 'set_timezone' %}" method="POST">
         {% csrf_token %}
         <label for="timezone">Time zone:</label>
@@ -307,18 +307,12 @@ time zone is unset, the default time zone applies.
         Server time: {{ value }}
     {% endtimezone %}
 
-.. note::
-
-    In the second block, ``None`` resolves to the Python object ``None``
-    because it isn't defined in the template context, not because it's the
-    string ``None``.
-
 .. templatetag:: get_current_timezone
 
 get_current_timezone
 ~~~~~~~~~~~~~~~~~~~~
 
-When the :func:`django.core.context_processors.tz` context processor is
+When the ``django.core.context_processors.tz`` context processor is
 enabled -- by default, it is -- each :class:`~django.template.RequestContext`
 contains a ``TIME_ZONE`` variable that provides the name of the current time
 zone.
@@ -462,8 +456,9 @@ zone support.
 
 Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
 "naive" format. If your project contains such fixtures, after you enable time
-zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
-rid of the warnings, you must convert your fixtures to the "aware" format.
+zone support, you'll see :exc:`~exceptions.RuntimeWarning`\ s when you load
+them. To get rid of the warnings, you must convert your fixtures to the "aware"
+format.
 
 You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
 Or, if they're small enough, you can simply edit them to add the UTC offset
@@ -515,7 +510,7 @@ Setup
    Finally, our calendar system contains interesting traps for computers::
 
        >>> import datetime
-       >>> def substract_one_year(value):       # DON'T DO THAT!
+       >>> def one_year_before(value):       # DON'T DO THAT!
        ...     return value.replace(year=value.year - 1)
        >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
        datetime.datetime(2011, 3, 1, 10, 0)
@@ -662,15 +657,15 @@ Usage
        >>> from django.utils.dateparse import parse_datetime
        >>> naive = parse_datetime("2012-02-21 10:28:45")
        >>> import pytz
-       >>> pytz.timezone("Europe/Helsinki").localize(naive)
+       >>> pytz.timezone("Europe/Helsinki").localize(naive, is_dst=None)
        datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=<DstTzInfo 'Europe/Helsinki' EET+2:00:00 STD>)
 
    Note that ``localize`` is a pytz extension to the :class:`~datetime.tzinfo`
-   API. Also, you may want to catch :exc:`~pytz.InvalidTimeError`. The
+   API. Also, you may want to catch ``pytz.InvalidTimeError``. The
    documentation of pytz contains `more examples`_. You should review it
    before attempting to manipulate aware datetimes.
 
-2. **How can I obtain the current time in the local time zone?**
+2. **How can I obtain the local time in the current time zone?**
 
    Well, the first question is, do you really need to?
 
@@ -684,15 +679,14 @@ Usage
    the datetime in UTC returned by :func:`django.utils.timezone.now` will be
    sufficient.
 
-   For the sake of completeness, though, if you really wanted the current time
-   in the local time zone, here's how you would obtain it::
+   For the sake of completeness, though, if you really want the local time
+   in the current time zone, here's how you can obtain it::
 
-       >>> import datetime
        >>> from django.utils import timezone
-       >>> datetime.datetime.now(tz=timezone.get_default_timezone())
+       >>> timezone.localtime(timezone.now())
        datetime.datetime(2012, 3, 3, 20, 10, 53, 873365, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>)
 
-   In this example, pytz_ is installed and :setting:`TIME_ZONE` is
+   In this example, pytz_ is installed and the current time zone is
    ``"Europe/Paris"``.
 
 3. **How can I see all available time zones?**

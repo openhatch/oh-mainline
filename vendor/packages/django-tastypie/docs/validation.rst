@@ -10,8 +10,8 @@ to complex validation that compares different fields together.
 
 If the data is valid, an empty dictionary is returned and processing continues
 as normal. If the data is invalid, a dictionary of error messages (keys being
-the field names, values being a list of error messages). This will be
-immediately returned to the user, serialized in the format they requested.
+the field names, values being a list of error messages) is immediately 
+returned to the user, serialized in the format they requested.
 
 Usage
 =====
@@ -55,7 +55,7 @@ to its constructor. You supply a Django ``Form`` (or ``ModelForm``, though
 ``Bundle`` against the form.
 
 This class **DOES NOT** alter the data sent, only verifies it. If you
-want to alter the data, please use the ``CleanDataFormValidation`` class
+want to alter the data, please use the ``CleanedDataFormValidation`` class
 instead.
 
 .. warning::

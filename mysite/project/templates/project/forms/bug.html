@@ -23,7 +23,7 @@
     class="answer_question{% if edit_form %} is_edit_form active{% endif %}" 
     name='question-long-{{question.pk}}'
     method='POST'
-    action='{% url mysite.project.views.create_answer_do %}'
+    action='{% url "mysite.project.views.create_answer_do" %}'
     >{% csrf_token %}
 
     <input type='hidden' name='project__pk' value='{{ project.pk }}'>

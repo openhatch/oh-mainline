@@ -1,13 +1,14 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.db.models.fields import Field, FieldDoesNotExist
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article
+from .models import Article, SelfRef
 
 
 class ModelTest(TestCase):
@@ -81,22 +82,22 @@ class ModelTest(TestCase):
 
         # Django raises an Article.DoesNotExist exception for get() if the
         # parameters don't match any object.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             ObjectDoesNotExist,
             "Article matching query does not exist.",
             Article.objects.get,
             id__exact=2000,
         )
-
-        self.assertRaisesRegexp(
+        # To avoid dict-ordering related errors check only one lookup
+        # in single assert.
+        self.assertRaises(
             ObjectDoesNotExist,
-            "Article matching query does not exist.",
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=8,
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             ObjectDoesNotExist,
             "Article matching query does not exist.",
             Article.objects.get,
@@ -116,6 +117,40 @@ class ModelTest(TestCase):
         a = Article.objects.get(pk=a.id)
         b = Article.objects.get(pk=a.id)
         self.assertEqual(a, b)
+
+        # Create a very similar object
+        a = Article(
+            id=None,
+            headline='Area man programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        a.save()
+
+        self.assertEqual(Article.objects.count(), 2)
+
+        # Django raises an Article.MultipleObjectsReturned exception if the
+        # lookup matches more than one object
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 2!",
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 2!",
+            Article.objects.get,
+            pub_date__year=2005,
+        )
+
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 2!",
+            Article.objects.get,
+            pub_date__year=2005,
+            pub_date__month=7,
+        )
 
     def test_object_creation(self):
         # Create an Article.
@@ -157,7 +192,7 @@ class ModelTest(TestCase):
         self.assertEqual(a4.headline, 'Fourth article')
 
         # Don't use invalid keyword arguments.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             TypeError,
             "'foo' is an invalid keyword argument for this function",
             Article,
@@ -177,7 +212,7 @@ class ModelTest(TestCase):
         # the default.
         a6 = Article(pub_date=datetime(2005, 7, 31))
         a6.save()
-        self.assertEqual(a6.headline, u'Default headline')
+        self.assertEqual(a6.headline, 'Default headline')
 
         # For DateTimeFields, Django saves as much precision (in seconds)
         # as you give it.
@@ -248,13 +283,12 @@ class ModelTest(TestCase):
              "datetime.datetime(2005, 7, 28, 0, 0)"])
 
         # dates() requires valid arguments.
-        self.assertRaisesRegexp(
+        self.assertRaises(
             TypeError,
-            "dates\(\) takes at least 3 arguments \(1 given\)",
             Article.objects.dates,
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             FieldDoesNotExist,
             "Article has no field named 'invalid_field'",
             Article.objects.dates,
@@ -262,7 +296,7 @@ class ModelTest(TestCase):
             "year",
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             AssertionError,
             "'kind' must be one of 'year', 'month' or 'day'.",
             Article.objects.dates,
@@ -270,7 +304,7 @@ class ModelTest(TestCase):
             "bad_kind",
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             AssertionError,
             "'order' must be either 'ASC' or 'DESC'.",
             Article.objects.dates,
@@ -311,17 +345,18 @@ class ModelTest(TestCase):
             ["<Article: Area man programs in Python>",
              "<Article: Third article>"])
 
-        # Slicing works with longs.
-        self.assertEqual(Article.objects.all()[0L], a)
-        self.assertQuerysetEqual(Article.objects.all()[1L:3L],
-            ["<Article: Second article>", "<Article: Third article>"])
-        self.assertQuerysetEqual((s1 | s2 | s3)[::2L],
-            ["<Article: Area man programs in Python>",
-             "<Article: Third article>"])
+        # Slicing works with longs (Python 2 only -- Python 3 doesn't have longs).
+        if not six.PY3:
+            self.assertEqual(Article.objects.all()[long(0)], a)
+            self.assertQuerysetEqual(Article.objects.all()[long(1):long(3)],
+                ["<Article: Second article>", "<Article: Third article>"])
+            self.assertQuerysetEqual((s1 | s2 | s3)[::long(2)],
+                ["<Article: Area man programs in Python>",
+                "<Article: Third article>"])
 
-        # And can be mixed with ints.
-        self.assertQuerysetEqual(Article.objects.all()[1:3L],
-            ["<Article: Second article>", "<Article: Third article>"])
+            # And can be mixed with ints.
+            self.assertQuerysetEqual(Article.objects.all()[1:long(3)],
+                ["<Article: Second article>", "<Article: Third article>"])
 
         # Slices (without step) are lazy:
         self.assertQuerysetEqual(Article.objects.all()[0:5].filter(),
@@ -357,14 +392,14 @@ class ModelTest(TestCase):
              "<Article: Updated article 8>"])
 
         # Also, once you have sliced you can't filter, re-order or combine
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             AssertionError,
             "Cannot filter a query once a slice has been taken.",
             Article.objects.all()[0:5].filter,
             id=a.id,
         )
 
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             AssertionError,
             "Cannot reorder a query once a slice has been taken.",
             Article.objects.all()[0:5].order_by,
@@ -374,9 +409,9 @@ class ModelTest(TestCase):
         try:
             Article.objects.all()[0:1] & Article.objects.all()[4:5]
             self.fail('Should raise an AssertionError')
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertEqual(str(e), "Cannot combine queries once a slice has been taken.")
-        except Exception, e:
+        except Exception as e:
             self.fail('Should raise an AssertionError, not %s' % e)
 
         # Negative slices are not supported, due to database constraints.
@@ -384,22 +419,22 @@ class ModelTest(TestCase):
         try:
             Article.objects.all()[-1]
             self.fail('Should raise an AssertionError')
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertEqual(str(e), "Negative indexing is not supported.")
-        except Exception, e:
+        except Exception as e:
             self.fail('Should raise an AssertionError, not %s' % e)
 
         error = None
         try:
             Article.objects.all()[0:-5]
-        except Exception, e:
+        except Exception as e:
             error = e
         self.assertTrue(isinstance(error, AssertionError))
         self.assertEqual(str(error), "Negative indexing is not supported.")
 
         # An Article instance doesn't have access to the "objects" attribute.
         # That's only available on the class.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(self,
             AttributeError,
             "Manager isn't accessible via Article instances",
             getattr,
@@ -456,7 +491,7 @@ class ModelTest(TestCase):
         )
         a101.save()
         a101 = Article.objects.get(pk=101)
-        self.assertEqual(a101.headline, u'Article 101')
+        self.assertEqual(a101.headline, 'Article 101')
 
     def test_create_method(self):
         # You can create saved objects in a single step
@@ -483,12 +518,12 @@ class ModelTest(TestCase):
     def test_unicode_data(self):
         # Unicode data works, too.
         a = Article(
-            headline=u'\u6797\u539f \u3081\u3050\u307f',
+            headline='\u6797\u539f \u3081\u3050\u307f',
             pub_date=datetime(2005, 7, 28),
         )
         a.save()
         self.assertEqual(Article.objects.get(pk=a.id).headline,
-            u'\u6797\u539f \u3081\u3050\u307f')
+            '\u6797\u539f \u3081\u3050\u307f')
 
     def test_hash_function(self):
         # Model instances have a hash function, so they can be used in sets
@@ -509,6 +544,22 @@ class ModelTest(TestCase):
 
         s = set([a10, a11, a12])
         self.assertTrue(Article.objects.get(headline='Article 11') in s)
+
+    def test_field_ordering(self):
+        """
+        Field instances have a `__lt__` comparison function to define an
+        ordering based on their creation. Prior to #17851 this ordering
+        comparison relied on the now unsupported `__cmp__` and was assuming
+        compared objects were both Field instances raising `AttributeError`
+        when it should have returned `NotImplemented`.
+        """
+        f1 = Field()
+        f2 = Field(auto_created=True)
+        f3 = Field()
+        self.assertTrue(f2 < f1)
+        self.assertTrue(f3 > f1)
+        self.assertFalse(f1 == None)
+        self.assertFalse(f2 in (None, 1, ''))
 
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
@@ -531,7 +582,7 @@ class ModelTest(TestCase):
                 select={'dashed-value': '1'}
             ).values('headline', 'dashed-value')
         self.assertEqual([sorted(d.items()) for d in dicts],
-            [[('dashed-value', 1), ('headline', u'Article 11')], [('dashed-value', 1), ('headline', u'Article 12')]])
+            [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
 
     def test_extra_method_select_argument_with_dashes(self):
         # If you use 'select' with extra() and names containing dashes on a
@@ -560,7 +611,7 @@ class ModelTest(TestCase):
         Test that ugettext_lazy objects work when saving model instances
         through various methods. Refs #10498.
         """
-        notlazy = u'test'
+        notlazy = 'test'
         lazy = ugettext_lazy(notlazy)
         reporter = Article.objects.create(headline=lazy, pub_date=datetime.now())
         article = Article.objects.get()
@@ -578,3 +629,8 @@ class ModelTest(TestCase):
         Article.objects.bulk_create([Article(headline=lazy, pub_date=datetime.now())])
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
+
+    def test_ticket_20278(self):
+        sr = SelfRef.objects.create()
+        with self.assertRaises(ObjectDoesNotExist):
+            SelfRef.objects.get(selfref=sr)

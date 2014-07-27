@@ -7,13 +7,14 @@ import time
 
 from django.conf import Settings
 from django.db.models.loading import cache, load_app, get_model, get_models
+from django.utils._os import upath
 from django.utils.unittest import TestCase
 
 class EggLoadingTest(TestCase):
 
     def setUp(self):
         self.old_path = sys.path[:]
-        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
         # This test adds dummy applications to the app cache. These
         # need to be removed in order to prevent bad interactions
@@ -61,7 +62,7 @@ class EggLoadingTest(TestCase):
         self.assertRaises(ImportError, load_app, 'broken_app')
         try:
             load_app('broken_app')
-        except ImportError, e:
+        except ImportError as e:
             # Make sure the message is indicating the actual
             # problem in the broken app.
             self.assertTrue("modelz" in e.args[0])

@@ -3,8 +3,8 @@ from __future__ import absolute_import
 from django.contrib import admin
 from django.core.paginator import Paginator
 
-from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
+from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
+    Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
 
 
 site = admin.AdminSite(name="admin")
@@ -15,6 +15,15 @@ class CustomPaginator(Paginator):
             allow_empty_first_page=allow_empty_first_page)
 
 
+class EventAdmin(admin.ModelAdmin):
+    list_display = ['event_date_func']
+
+    def event_date_func(self, event):
+        return event.date
+
+site.register(Event, EventAdmin)
+
+
 class ParentAdmin(admin.ModelAdmin):
     list_filter = ['child__name']
     search_fields = ['child__name']
@@ -23,6 +32,7 @@ class ParentAdmin(admin.ModelAdmin):
 class ChildAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent']
     list_per_page = 10
+    list_filter = ['parent', 'age']
 
     def queryset(self, request):
         return super(ChildAdmin, self).queryset(request).select_related("parent__name")
@@ -81,3 +91,14 @@ class SwallowAdmin(admin.ModelAdmin):
     list_display = ('origin', 'load', 'speed')
 
 site.register(Swallow, SwallowAdmin)
+
+class DynamicListFilterChildAdmin(admin.ModelAdmin):
+    list_filter = ('parent', 'name', 'age')
+
+    def get_list_filter(self, request):
+        my_list_filter = super(DynamicListFilterChildAdmin, self).get_list_filter(request)
+        if request.user.username == 'noparents':
+            my_list_filter = list(my_list_filter)
+            my_list_filter.remove('parent')
+        return my_list_filter
+

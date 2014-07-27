@@ -76,7 +76,7 @@ Editing project - {{ project.display_name }}
                 </div>
 
                 <div id='control_descriptions' class='tab'>
-                    <form action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}'
+                    <form action='{% url "mysite.profile.views.set_pfentries_dot_use_my_description_do" %}'
                             method='POST'>{% csrf_token %}
                         <input type='hidden' name='project_pk' value='{{ project.pk}}' />
 
@@ -88,11 +88,11 @@ Editing project - {{ project.display_name }}
                                 {% else %}
                                     To submit a description,
                                 {% endif %}
-                                <a target=_new href='{% url mysite.profile.views.importer %}'>
+                                <a target=_new href='{% url "mysite.profile.views.importer" %}'>
                                     edit your profile</a>.
                             {% else %}
                                 To submit a description,
-                                <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
+                                <a target=_new href='{% url "mysite.profile.views.importer" %}?add_project_name={{ project.name|urlencode }}'>
                                     add it to your profile</a>.
                             {% endif %}
                         </p>
@@ -148,18 +148,18 @@ Editing project - {{ project.display_name }}
 		    {% else %}
 		  <p>If you register bug trackers with OpenHatch, we will crawl them
 		    for bugs.
-		   Those bugs will appear on the <a href="{% url mysite.search.views.search_index %}">volunteer opportunity finder</a>; we'll highlight the ones that are <em>bitesize</em> (meaning, good for newcomers)
+		   Those bugs will appear on the <a href="{% url "mysite.search.views.search_index" %}">volunteer opportunity finder</a>; we'll highlight the ones that are <em>bitesize</em> (meaning, good for newcomers)
 		    and those related to non-code tasks (e.g., documentation, graphic design, outreach).
 		  </p>
 		  <p>What sort of bug tracker does your project use?</p>
 		  <ul class="raquo_bullets">
-		    <li><a href="{% url mysite.customs.views.add_tracker bugzilla %}bugzilla?project_id={{ project.id }}">Bugzilla</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker github %}github?project_id={{ project.id }}">GitHub</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker google %}google?project_id={{ project.id }}">Google Code</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker jira %}jira?project_id={{ project.id }}">Jira</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker launchpad %}launchpad?project_id={{ project.id }}">Launchpad</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker roundup %}roundup?project_id={{ project.id }}">Roundup</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker trac %}trac?project_id={{ project.id }}">Trac</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" bugzilla %}bugzilla?project_id={{ project.id }}">Bugzilla</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" github %}github?project_id={{ project.id }}">GitHub</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" google %}google?project_id={{ project.id }}">Google Code</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" jira %}jira?project_id={{ project.id }}">Jira</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" launchpad %}launchpad?project_id={{ project.id }}">Launchpad</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" roundup %}roundup?project_id={{ project.id }}">Roundup</a></li>
+		    <li><a href="{% url "mysite.customs.views.add_tracker" trac %}trac?project_id={{ project.id }}">Trac</a></li>
 		    </ul>
 		  {% endif %}
 		</div>

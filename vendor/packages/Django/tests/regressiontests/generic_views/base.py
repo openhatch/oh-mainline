@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import time
 
 from django.core.exceptions import ImproperlyConfigured
@@ -6,6 +8,7 @@ from django.test import TestCase, RequestFactory
 from django.utils import unittest
 from django.views.generic import View, TemplateView, RedirectView
 
+from . import views
 
 class SimpleView(View):
     """
@@ -66,7 +69,7 @@ class ViewTest(unittest.TestCase):
 
     def _assert_simple(self, response):
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'This is a simple view')
+        self.assertEqual(response.content, b'This is a simple view')
 
     def test_no_init_kwargs(self):
         """
@@ -170,6 +173,60 @@ class ViewTest(unittest.TestCase):
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
+    def test_options(self):
+        """
+        Test that views respond to HTTP OPTIONS requests with an Allow header
+        appropriate for the methods implemented by the view class.
+        """
+        request = self.rf.options('/')
+        view = SimpleView.as_view()
+        response = view(request)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response['Allow'])
+
+    def test_options_for_get_view(self):
+        """
+        Test that a view implementing GET allows GET and HEAD.
+        """
+        request = self.rf.options('/')
+        view = SimpleView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'GET', 'HEAD')
+
+    def test_options_for_get_and_post_view(self):
+        """
+        Test that a view implementing GET and POST allows GET, HEAD, and POST.
+        """
+        request = self.rf.options('/')
+        view = SimplePostView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'GET', 'HEAD', 'POST')
+
+    def test_options_for_post_view(self):
+        """
+        Test that a view implementing POST allows POST.
+        """
+        request = self.rf.options('/')
+        view = PostOnlyView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'POST')
+
+    def _assert_allows(self, response, *expected_methods):
+        "Assert allowed HTTP methods reported in the Allow response header"
+        response_allows = set(response['Allow'].split(', '))
+        self.assertEqual(set(expected_methods + ('OPTIONS',)), response_allows)
+
+    def test_args_kwargs_request_on_self(self):
+        """
+        Test a view only has args, kwargs & request once `as_view`
+        has been called.
+        """
+        bare_view = InstanceView()
+        view = InstanceView.as_view()(self.rf.get('/'))
+        for attribute in ('args', 'kwargs', 'request'):
+            self.assertNotIn(attribute, dir(bare_view))
+            self.assertIn(attribute, dir(view))
+
 
 class TemplateViewTest(TestCase):
     urls = 'regressiontests.generic_views.urls'
@@ -220,7 +277,8 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/simple/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['foo'], 'bar')
+        self.assertTrue(isinstance(response.context['view'], View))
 
     def test_extra_template_params(self):
         """
@@ -228,8 +286,9 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/custom/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['foo'], 'bar')
         self.assertEqual(response.context['key'], 'value')
+        self.assertTrue(isinstance(response.context['view'], View))
 
     def test_cached_views(self):
         """
@@ -252,6 +311,11 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response2.status_code, 200)
 
         self.assertNotEqual(response.content, response2.content)
+
+    def test_content_type(self):
+        response = self.client.get('/template/content_type/')
+        self.assertEqual(response['Content-Type'], 'text/plain')
+
 
 class RedirectViewTest(unittest.TestCase):
     rf = RequestFactory()
@@ -331,3 +395,19 @@ class RedirectViewTest(unittest.TestCase):
         # we can't use self.rf.get because it always sets QUERY_STRING
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 301)
+
+
+class GetContextDataTest(unittest.TestCase):
+
+    def test_get_context_data_super(self):
+        test_view = views.CustomContextView()
+        context = test_view.get_context_data(kwarg_test='kwarg_value')
+
+        # the test_name key is inserted by the test classes parent
+        self.assertTrue('test_name' in context)
+        self.assertEqual(context['kwarg_test'], 'kwarg_value')
+        self.assertEqual(context['custom_key'], 'custom_value')
+
+        # test that kwarg overrides values assigned higher up
+        context = test_view.get_context_data(test_name='test_value')
+        self.assertEqual(context['test_name'], 'test_value')

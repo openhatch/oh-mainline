@@ -13,11 +13,12 @@ Installation
 
 To install the redirects app, follow these steps:
 
-1. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS`
-   setting.
-2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
+1. Ensure that the ``django.contrib.sites`` framework
+   :ref:`is installed <enabling-the-sites-framework>`.
+2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
+3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE_CLASSES` setting.
-3. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
 
 How it works
 ============
@@ -67,4 +68,4 @@ Via the Python API
     which lives in `django/contrib/redirects/models.py`_. You can access redirect
     objects via the :doc:`Django database API </topics/db/queries>`.
 
-.. _django/contrib/redirects/models.py: https://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py
+.. _django/contrib/redirects/models.py: https://github.com/django/django/blob/master/django/contrib/redirects/models.py

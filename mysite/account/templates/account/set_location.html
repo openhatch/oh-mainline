@@ -25,7 +25,7 @@ Change your location -
 {% endblock title %}
 
 {% block form_action %}
-'{% url mysite.account.views.set_location_do %}'
+'{% url "mysite.account.views.set_location_do" %}'
 {% endblock form_action %}
 
 {% block submodule_head %}
@@ -37,6 +37,7 @@ Change your location
 <p id="success_message">
 If you want us to forget your location, empty out the text field and hit save.</p>
 {% else %}
+
 {% endif %}
 
 {{ edit_location_form.as_p }}

@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Api &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Api &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Resource Fields" href="fields.html" />
     <link rel="prev" title="Bundles" href="bundles.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="bundles.html" title="Bundles"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -121,7 +121,16 @@ resource being registered is the canonical variant. Defaults to
 <tt class="descname">Api.override_urls(self):</tt></dt>
 <dd></dd></dl>
 
-<p>A hook for adding your own URLs or overriding the default URLs. Useful for
+<p>Deprecated. Will be removed by v1.0.0. Please use <tt class="docutils literal"><span class="pre">Api.prepend_urls</span></tt> instead.</p>
+</div>
+<div class="section" id="prepend-urls">
+<h4><tt class="docutils literal"><span class="pre">prepend_urls</span></tt><a class="headerlink" href="#prepend-urls" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt>
+<tt class="descname">Api.prepend_urls(self):</tt></dt>
+<dd></dd></dl>
+
+<p>A hook for adding your own URLs or matching before the default URLs. Useful for
 adding custom endpoints or overriding the built-in ones.</p>
 <p>Should return a list of individual URLconf lines (<strong>NOT</strong> wrapped in
 <tt class="docutils literal"><span class="pre">patterns</span></tt>).</p>
@@ -166,6 +175,7 @@ to the <tt class="docutils literal"><span class="pre">Api</span></tt>. Useful fo
 <li><a class="reference internal" href="#unregister"><tt class="docutils literal"><span class="pre">unregister</span></tt></a></li>
 <li><a class="reference internal" href="#canonical-resource-for"><tt class="docutils literal"><span class="pre">canonical_resource_for</span></tt></a><ul>
 <li><a class="reference internal" href="#override-urls"><tt class="docutils literal"><span class="pre">override_urls</span></tt></a></li>
+<li><a class="reference internal" href="#prepend-urls"><tt class="docutils literal"><span class="pre">prepend_urls</span></tt></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#urls"><tt class="docutils literal"><span class="pre">urls</span></tt></a></li>
@@ -219,11 +229,11 @@ to the <tt class="docutils literal"><span class="pre">Api</span></tt>. Useful fo
         <li class="right" >
           <a href="bundles.html" title="Bundles"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

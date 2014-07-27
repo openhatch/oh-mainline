@@ -18,6 +18,10 @@ class CustomField(TestCase):
         self.assertEqual(d.data, [1, 2, 3])
 
         d = DataModel.objects.defer("data").get(pk=d.pk)
+        self.assertTrue(isinstance(d.data, list))
+        self.assertEqual(d.data, [1, 2, 3])
+        # Refetch for save
+        d = DataModel.objects.defer("data").get(pk=d.pk)
         d.save()
 
         d = DataModel.objects.get(pk=d.pk)
@@ -57,7 +61,11 @@ class CustomField(TestCase):
 
         # Serialization works, too.
         stream = serializers.serialize("json", MyModel.objects.all())
-        self.assertEqual(stream, '[{"pk": %d, "model": "field_subclassing.mymodel", "fields": {"data": "12", "name": "m"}}]' % m1.pk)
+        self.assertJSONEqual(stream, [{
+            "pk": m1.pk,
+            "model": "field_subclassing.mymodel",
+            "fields": {"data": "12", "name": "m"}
+        }])
 
         obj = list(serializers.deserialize("json", stream))[0]
         self.assertEqual(obj.object, m)

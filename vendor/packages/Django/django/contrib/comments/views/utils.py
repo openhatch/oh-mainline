@@ -2,29 +2,32 @@
 A few bits of helper functions for comment views.
 """
 
-import urllib
 import textwrap
-from django.core import urlresolvers
+try:
+    from urllib.parse import urlencode
+except ImportError:     # Python 2
+    from urllib import urlencode
+
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, resolve_url
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import comments
 from django.utils.http import is_safe_url
 
-def next_redirect(request, default, default_view, **get_kwargs):
+def next_redirect(request, fallback, **get_kwargs):
     """
     Handle the "where should I go next?" part of comment views.
 
-    The next value could be a kwarg to the function (``default``), or a
-    ``?next=...`` GET arg, or the URL of a given view (``default_view``). See
+    The next value could be a
+    ``?next=...`` GET arg or the URL of a given view (``fallback``). See
     the view modules for examples.
 
     Returns an ``HttpResponseRedirect``.
     """
-    next = request.POST.get('next', default)
+    next = request.POST.get('next')
     if not is_safe_url(url=next, host=request.get_host()):
-        next = urlresolvers.reverse(default_view)
+        next = resolve_url(fallback)
 
     if get_kwargs:
         if '#' in next:
@@ -35,7 +38,7 @@ def next_redirect(request, default, default_view, **get_kwargs):
             anchor = ''
 
         joiner = ('?' in next) and '&' or '?'
-        next += joiner + urllib.urlencode(get_kwargs) + anchor
+        next += joiner + urlencode(get_kwargs) + anchor
     return HttpResponseRedirect(next)
 
 def confirmation_view(template, doc="Display a confirmation view."):
@@ -58,7 +61,7 @@ def confirmation_view(template, doc="Display a confirmation view."):
     confirmed.__doc__ = textwrap.dedent("""\
         %s
 
-        Templates: `%s``
+        Templates: :template:`%s``
         Context:
             comment
                 The posted comment
