@@ -23,9 +23,7 @@ from __future__ import absolute_import
 import mysite.bugsets.models
 from mysite.bugsets.forms import BugsForm
 
-from django import forms
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 # }}}
 

@@ -19,6 +19,7 @@ import mysite.bugsets.models
 import django.forms
 from django.core.validators import URLValidator
 
+
 class BugsForm(django.forms.Form):
     event_name = django.forms.CharField(max_length=200)
     buglist = django.forms.CharField(
@@ -35,14 +36,16 @@ class BugsForm(django.forms.Form):
         # 3. Filter out all empty strings by passing the first-order function
         #    "bool" (to see why: bool(x) == False if and only if x == "")
         # 4. Turn the list into a set to filter out duplicates
-        buglist = set(filter( 
+        buglist = set(filter(
             bool,
             [x.strip() for x in bugtext.split("\n")]
         ))
 
         u = URLValidator()
+
         def is_valid_url(x):
-            try: u(x)
+            try:
+                u(x)
             except django.forms.ValidationError:
                 return False
             return True
@@ -50,7 +53,7 @@ class BugsForm(django.forms.Form):
         # Use list generator () instead of comprehension [] for lazy evaluation
         if not all([is_valid_url(url) for url in buglist]):
             raise django.forms.ValidationError(
-                "You have entered an invalid URL: " + url) # evil
+                "You have entered an invalid URL: " + url)  # evil
 
         return buglist
 

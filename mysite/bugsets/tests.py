@@ -176,13 +176,13 @@ class SecurityBugsetListViewTests(TwillTests):
         self.client.post(
             '/inplaceeditform/save/',
             {
-                "app_label": "auth",      # the django app
-                "module_name": "user",    # the django table
-                "field_name": "username", # the field name
-                "obj_id": u.pk,           # the pk
-                "value": '"LOLPWNED"'     # new value
+                "app_label": "auth",       # the django app
+                "module_name": "user",     # the django table
+                "field_name": "username",  # the field name
+                "obj_id": u.pk,            # the pk
+                "value": '"LOLPWNED"'      # new value
             })
- 
+
         self.assertEqual(User.objects.get(pk=u.pk).username, u'paulproteus')
 
 
@@ -206,7 +206,7 @@ class BasicBugsetCreateViewTests(TwillTests):
         url = reverse(mysite.bugsets.views.create_index)
         response = self.client.post(
             url,
-            { 
+            {
                 'event_name': self.event_name,
                 'buglist': self.bugset,
             })
@@ -215,7 +215,7 @@ class BasicBugsetCreateViewTests(TwillTests):
 
         s = mysite.bugsets.models.BugSet.objects.get()
         self.assertEqual(
-            'http://testserver' + s.get_edit_url(), 
+            'http://testserver' + s.get_edit_url(),
             response['location'])
 
         response = self.client.get(response['location'])
@@ -238,7 +238,7 @@ class BasicBugsetCreateFormTests(TwillTests):
         url = reverse(mysite.bugsets.views.create_index)
         response = self.client.post(
             url,
-            { 
+            {
                 'event_name': self.event_name,
                 'buglist': self.bugset,
             })
@@ -265,11 +265,11 @@ class BasicBugsetCreateFormTests(TwillTests):
         #    'ftp://pr1v8.warex0z.s3rv3r.net/',
             'wiefjoiefoaehroaherhaevo',
             'javascript:alert("hi")',
-        ] 
+        ]
 
         for url in evil_urls:
             self.assertFalse(
                 mysite.bugsets.forms.BugsForm({
                     'event_name': self.event_name,
                     'buglist': url,
-            }).is_valid())
+                }).is_valid())
