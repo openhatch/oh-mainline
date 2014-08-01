@@ -33,7 +33,7 @@ Create Bug Set
 {% block main %}
 <div class='module'>
   <div class='module-body'>
-    <form action="{% url mysite.bugsets.views.create_index %}" method="post">
+    <form action="{{ request.get_full_path }}" method="post">
       {% csrf_token %}
       {{ form.as_p }}
       <div id="button-container">

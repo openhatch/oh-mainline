@@ -27,38 +27,46 @@ class BugsForm(django.forms.Form):
         label='Enter some bugs URLs here, each separated by a newline:',
     )
 
+    @staticmethod
+    def bug_list_from_set(bugset):
+        return [bug.url for bug in bugset.bugs.all()]
+
+    # What is happening here?!
+    # 1. Split the hunk of text on newlines
+    # 2. Strip all the strings of leading/trailing whitespace
+    # 3. Filter out all empty strings by passing the first-order function
+    #    "bool" (to see why: bool(x) == False if and only if x == "")
+    @staticmethod
+    def url_list_from_bugtext(bugtext):
+        return filter(bool, [x.strip() for x in bugtext.split("\n")])
+
     def __init__(self, *args, **kwargs):
         self.pk = kwargs.get('pk')
+        self.object = None
+
         if self.pk is not None:
             kwargs.pop('pk')
-            data = {
-                'event_name': mysite.bugsets.models.BugSet.objects.get(
-                    pk=self.pk).name,
-                'buglist': "\n".join([bug.url for bug in
-                    mysite.bugsets.models.BugSet.objects.get(
-                    pk=self.pk).bugs.all()])
-            }
-            kwargs['data'] = data
+            self.object = mysite.bugsets.models.BugSet.objects.get(pk=self.pk)
+
+            if kwargs.get('data') is None:
+                data = {
+                    'event_name': self.object.name,
+                    'buglist': "\n".join(
+                        BugsForm.bug_list_from_set(self.object)),
+                }
+                kwargs['data'] = data
 
         super(BugsForm, self).__init__(*args, **kwargs)
 
     def clean_buglist(self):
         # If this corresponds to an existing set, fetch it
-        if self.pk is not None:
+        if self.object is not None:
             return self.cleaned_data['buglist']
 
         bugtext = self.cleaned_data['buglist']
 
-        # What is happening here?!
-        # 1. Split the hunk of text on newlines
-        # 2. Strip all the strings of leading/trailing whitespace
-        # 3. Filter out all empty strings by passing the first-order function
-        #    "bool" (to see why: bool(x) == False if and only if x == "")
-        # 4. Turn the list into a set to filter out duplicates
-        buglist = set(filter(
-            bool,
-            [x.strip() for x in bugtext.split("\n")]
-        ))
+        # Turn the list into a set to filter out duplicates
+        buglist = set(BugsForm.url_list_from_bugtext(bugtext))
 
         u = URLValidator()
 
@@ -69,7 +77,6 @@ class BugsForm(django.forms.Form):
                 return False
             return True
 
-        # Use list generator () instead of comprehension [] for lazy evaluation
         if not all([is_valid_url(url) for url in buglist]):
             raise django.forms.ValidationError(
                 "You have entered an invalid URL: " + url)  # evil
@@ -89,3 +96,26 @@ class BugsForm(django.forms.Form):
 
         # We need the form to return the set info
         self.object = s
+
+    def update(self):
+        s = self.object
+        old_name = s.name
+        old_bugs = set(BugsForm.bug_list_from_set(s))
+
+        new_name = self.cleaned_data.get('event_name')
+        new_bugs = set(BugsForm.url_list_from_bugtext(
+            self.cleaned_data.get('buglist')))
+
+        if old_name != new_name:
+            s.name = new_name
+            s.save()
+
+        for bug in old_bugs - new_bugs:
+            s.bugs.remove(mysite.bugsets.models.AnnotatedBug.objects.get(
+                url=bug))
+
+        for bug in new_bugs - old_bugs:
+            # get_or_create returns a tuple (object b, bool created?)
+            b = mysite.bugsets.models.AnnotatedBug.objects.get_or_create(
+                url=bug)[0]
+            s.bugs.add(b)

@@ -233,6 +233,26 @@ class BasicBugsetCreateFormTests(TwillTests):
         http://openhatch.org/bugs/issue995
         http://openhatch.org/bugs/issue1003
     """
+    bugset_reduced = """
+        http://openhatch.org/bugs/issue978
+        http://openhatch.org/bugs/issue994
+        http://openhatch.org/bugs/issue995
+    """
+    removed_bug = "http://openhatch.org/bugs/issue1003"
+    bugset_expanded = """
+        http://openhatch.org/bugs/issue978
+        http://openhatch.org/bugs/issue994
+        http://openhatch.org/bugs/issue995
+        http://openhatch.org/bugs/issue1003
+        http://openhatch.org/bugs/issue1020
+    """
+    added_bug = "http://openhatch.org/bugs/issue1020"
+    bugset_changed = """
+        http://openhatch.org/bugs/issue978
+        http://openhatch.org/bugs/issue994
+        http://openhatch.org/bugs/issue995
+        http://openhatch.org/bugs/issue1020
+    """
 
     def test_submit_form_valid(self):
         url = reverse(mysite.bugsets.views.create_index)
@@ -244,6 +264,20 @@ class BasicBugsetCreateFormTests(TwillTests):
             })
 
         self.assertEqual(302, response.status_code)
+
+    def test_evil_urls(self):
+        evil_urls = [
+            # 'ftp://pr1v8.warex0z.s3rv3r.net/',  Django 1.5+ only
+            'wiefjoiefoaehroaherhaevo',
+            'javascript:alert("hi")',
+        ]
+
+        for url in evil_urls:
+            self.assertFalse(
+                mysite.bugsets.forms.BugsForm({
+                    'event_name': self.event_name,
+                    'buglist': url,
+                }).is_valid())
 
     def test_create_form(self):
         f = mysite.bugsets.forms.BugsForm({
@@ -261,16 +295,91 @@ class BasicBugsetCreateFormTests(TwillTests):
 
         self.assertTrue(set(s.bugs.all()), set(l))
 
-    def test_evil_urls(self):
-        evil_urls = [
-        #    'ftp://pr1v8.warex0z.s3rv3r.net/',
-            'wiefjoiefoaehroaherhaevo',
-            'javascript:alert("hi")',
-        ]
+    def test_edit_view_modify_name(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': self.event_name,
+            'buglist': self.bugset,
+        })
 
-        for url in evil_urls:
-            self.assertFalse(
-                mysite.bugsets.forms.BugsForm({
-                    'event_name': self.event_name,
-                    'buglist': url,
-                }).is_valid())
+        self.assertTrue(f.is_valid())
+        f.save()
+
+        response = self.client.post(
+            f.object.get_edit_url(),
+            {
+                'event_name': 'New event name',
+                'buglist': self.bugset,
+            })
+
+        self.assertEqual(302, response.status_code)
+        response = self.client.get(response['location'])
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'New event name')
+
+    def test_edit_view_remove_bugs(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': self.event_name,
+            'buglist': self.bugset,
+        })
+
+        self.assertTrue(f.is_valid())
+        f.save()
+
+        response = self.client.post(
+            f.object.get_edit_url(),
+            {
+                'event_name': self.event_name,
+                'buglist': self.bugset_reduced,
+            })
+
+        self.assertEqual(302, response.status_code)
+        response = self.client.get(response['location'])
+
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, self.removed_bug)
+
+    def test_edit_view_add_bugs(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': self.event_name,
+            'buglist': self.bugset,
+        })
+
+        self.assertTrue(f.is_valid())
+        f.save()
+
+        response = self.client.post(
+            f.object.get_edit_url(),
+            {
+                'event_name': self.event_name,
+                'buglist': self.bugset_expanded,
+            })
+
+        self.assertEqual(302, response.status_code)
+        response = self.client.get(response['location'])
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.added_bug)
+
+    def test_edit_view_change_bugs(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': self.event_name,
+            'buglist': self.bugset,
+        })
+
+        self.assertTrue(f.is_valid())
+        f.save()
+
+        response = self.client.post(
+            f.object.get_edit_url(),
+            {
+                'event_name': self.event_name,
+                'buglist': self.bugset_changed,
+            })
+
+        self.assertEqual(302, response.status_code)
+        response = self.client.get(response['location'])
+
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, self.removed_bug)
+        self.assertContains(response, self.added_bug)
