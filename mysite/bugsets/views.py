@@ -20,6 +20,7 @@ from __future__ import absolute_import
 
 
 # Imports {{{
+import pdb
 import mysite.bugsets.models
 from mysite.bugsets.forms import BugsForm
 
@@ -54,10 +55,7 @@ def create_index(request, pk=None, slug=None):
         s = mysite.bugsets.models.BugSet.objects.get(pk=pk)
         bugs = s.bugs.all()
 
-        form = BugsForm({
-            'event_name': s.name,
-            'buglist': "\n".join([bug.url for bug in bugs]),
-        })
+        form = BugsForm(data=None, pk=s.pk)
 
         context = {
             'form': form,
@@ -70,6 +68,7 @@ def create_index(request, pk=None, slug=None):
     if request.method == 'POST':
         form = BugsForm(request.POST)
         if form.is_valid():
+            form.save()
             return HttpResponseRedirect(form.object.get_edit_url())
         # else:
         context['form'] = form

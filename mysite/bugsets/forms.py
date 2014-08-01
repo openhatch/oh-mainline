@@ -27,7 +27,26 @@ class BugsForm(django.forms.Form):
         label='Enter some bugs URLs here, each separated by a newline:',
     )
 
+    def __init__(self, *args, **kwargs):
+        self.pk = kwargs.get('pk')
+        if self.pk is not None:
+            kwargs.pop('pk')
+            data = {
+                'event_name': mysite.bugsets.models.BugSet.objects.get(
+                    pk=self.pk).name,
+                'buglist': "\n".join([bug.url for bug in
+                    mysite.bugsets.models.BugSet.objects.get(
+                    pk=self.pk).bugs.all()])
+            }
+            kwargs['data'] = data
+
+        super(BugsForm, self).__init__(*args, **kwargs)
+
     def clean_buglist(self):
+        # If this corresponds to an existing set, fetch it
+        if self.pk is not None:
+            return self.cleaned_data['buglist']
+
         bugtext = self.cleaned_data['buglist']
 
         # What is happening here?!
@@ -55,20 +74,18 @@ class BugsForm(django.forms.Form):
             raise django.forms.ValidationError(
                 "You have entered an invalid URL: " + url)  # evil
 
-        return buglist
+        # Put this back into text blob format
+        return "\n".join(buglist)
 
-    def clean(self):
-        cleaned_data = super(BugsForm, self).clean()
-        cleaned_name = cleaned_data.get("event_name")
-        cleaned_list = cleaned_data.get("buglist")
+    def save(self):
+        s = mysite.bugsets.models.BugSet(
+            name=self.cleaned_data.get('event_name'))
+        s.save()
 
-        if cleaned_name and cleaned_list:
-            s = mysite.bugsets.models.BugSet(name=cleaned_name)
-            s.save()
-            for url in cleaned_list:
-                b = mysite.bugsets.models.AnnotatedBug(url=url)
-                b.save()
-                s.bugs.add(b)
+        for url in self.cleaned_data.get('buglist').split("\n"):
+            b = mysite.bugsets.models.AnnotatedBug(url=url)
+            b.save()
+            s.bugs.add(b)
 
-            # We need the form to return the set info
-            self.object = s
+        # We need the form to return the set info
+        self.object = s

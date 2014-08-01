@@ -221,7 +221,7 @@ class BasicBugsetCreateViewTests(TwillTests):
         response = self.client.get(response['location'])
 
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, self.event_name)
+        self.assertContains(response, 'Party at Asheesh&#39;s Place')
         self.assertContains(response, 'http://openhatch.org/bugs/issue978')
 
 
@@ -252,6 +252,7 @@ class BasicBugsetCreateFormTests(TwillTests):
         })
 
         self.assertTrue(f.is_valid())
+        f.save()
 
         s = mysite.bugsets.models.BugSet.objects.get(name=self.event_name)
         l = mysite.bugsets.models.AnnotatedBug.objects.filter(
