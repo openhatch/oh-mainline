@@ -63,3 +63,4 @@ logger = logging.getLogger('')
 logger.setLevel(logging.WARNING)
 
 DEPRESSINGLY_BREAK_FRONT_PAGE_BLOG_FEED=True
+ALLOWED_HOSTS=['testserver', 'openhatch.org']
