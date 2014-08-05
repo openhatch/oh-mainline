@@ -4,6 +4,7 @@ from django.conf.urls import patterns, url
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
+from . import models
 from . import views
 
 
@@ -19,6 +20,8 @@ urlpatterns = patterns('',
         TemplateView.as_view(template_name='generic_views/about.html')),
     (r'^template/custom/(?P<foo>\w+)/$',
         views.CustomTemplateView.as_view(template_name='generic_views/about.html')),
+    (r'^template/content_type/$',
+        TemplateView.as_view(template_name='generic_views/robots.txt', content_type='text/plain')),
 
     (r'^template/cached/(?P<foo>\w+)/$',
         cache_page(2.0)(TemplateView.as_view(template_name='generic_views/about.html'))),
@@ -52,6 +55,12 @@ urlpatterns = patterns('',
         views.AuthorDetail.as_view()),
     (r'^detail/author/invalid/qs/$',
         views.AuthorDetail.as_view(queryset=None)),
+    (r'^detail/nonmodel/1/$',
+        views.NonModelDetail.as_view()),
+
+    # FormView
+    (r'^contact/$',
+        views.ContactView.as_view()),
 
     # Create/UpdateView
     (r'^edit/artists/create/$',
@@ -108,6 +117,12 @@ urlpatterns = patterns('',
         views.BookArchive.as_view(queryset=None)),
     (r'^dates/books/paginated/$',
         views.BookArchive.as_view(paginate_by=10)),
+    (r'^dates/books/reverse/$',
+        views.BookArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+    (r'^dates/books/by_month/$',
+        views.BookArchive.as_view(date_list_period='month')),
+    (r'^dates/booksignings/$',
+        views.BookSigningArchive.as_view()),
 
     # ListView
     (r'^list/dict/$',
@@ -126,6 +141,8 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(paginate_by=30)),
     (r'^list/authors/notempty/$',
         views.AuthorList.as_view(allow_empty=False)),
+    (r'^list/authors/notempty/paginated/$',
+        views.AuthorList.as_view(allow_empty=False, paginate_by=2)),
     (r'^list/authors/template_name/$',
         views.AuthorList.as_view(template_name='generic_views/list.html')),
     (r'^list/authors/template_name_suffix/$',
@@ -138,6 +155,8 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(queryset=None)),
     (r'^list/authors/paginated/custom_class/$',
         views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
+    (r'^list/authors/paginated/custom_page_kwarg/$',
+        views.AuthorList.as_view(paginate_by=30, page_kwarg='pagina')),
     (r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
 
@@ -156,6 +175,10 @@ urlpatterns = patterns('',
         views.BookYearArchive.as_view(make_object_list=True, paginate_by=30)),
     (r'^dates/books/no_year/$',
         views.BookYearArchive.as_view()),
+    (r'^dates/books/(?P<year>\d{4})/reverse/$',
+        views.BookYearArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+    (r'^dates/booksignings/(?P<year>\d{4})/$',
+        views.BookSigningYearArchive.as_view()),
 
     # MonthArchiveView
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/$',
@@ -170,6 +193,8 @@ urlpatterns = patterns('',
         views.BookMonthArchive.as_view(paginate_by=30)),
     (r'^dates/books/(?P<year>\d{4})/no_month/$',
         views.BookMonthArchive.as_view()),
+    (r'^dates/booksignings/(?P<year>\d{4})/(?P<month>[a-z]{3})/$',
+        views.BookSigningMonthArchive.as_view()),
 
     # WeekArchiveView
     (r'^dates/books/(?P<year>\d{4})/week/(?P<week>\d{1,2})/$',
@@ -184,6 +209,8 @@ urlpatterns = patterns('',
         views.BookWeekArchive.as_view()),
     (r'^dates/books/(?P<year>\d{4})/week/(?P<week>\d{1,2})/monday/$',
         views.BookWeekArchive.as_view(week_format='%W')),
+    (r'^dates/booksignings/(?P<year>\d{4})/week/(?P<week>\d{1,2})/$',
+        views.BookSigningWeekArchive.as_view()),
 
     # DayArchiveView
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/$',
@@ -194,16 +221,22 @@ urlpatterns = patterns('',
         views.BookDayArchive.as_view(allow_empty=True)),
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/allow_future/$',
         views.BookDayArchive.as_view(allow_future=True)),
+    (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/allow_empty_and_future/$',
+        views.BookDayArchive.as_view(allow_empty=True, allow_future=True)),
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/paginated/$',
         views.BookDayArchive.as_view(paginate_by=True)),
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/no_day/$',
         views.BookDayArchive.as_view()),
+    (r'^dates/booksignings/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/$',
+        views.BookSigningDayArchive.as_view()),
 
     # TodayArchiveView
-    (r'dates/books/today/$',
+    (r'^dates/books/today/$',
         views.BookTodayArchive.as_view()),
-    (r'dates/books/today/allow_empty/$',
+    (r'^dates/books/today/allow_empty/$',
         views.BookTodayArchive.as_view(allow_empty=True)),
+    (r'^dates/booksignings/today/$',
+        views.BookSigningTodayArchive.as_view()),
 
     # DateDetailView
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/(?P<pk>\d+)/$',
@@ -220,6 +253,9 @@ urlpatterns = patterns('',
 
     (r'^dates/books/get_object_custom_queryset/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/(?P<pk>\d+)/$',
         views.BookDetailGetObjectCustomQueryset.as_view()),
+
+    (r'^dates/booksignings/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/(?P<pk>\d+)/$',
+        views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
     (r'^accounts/login/$',  'django.contrib.auth.views.login')

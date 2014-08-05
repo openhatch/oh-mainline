@@ -20,22 +20,22 @@
 
 {% block side_nav_links %}
 <li id='link-about'>
-  <a href='{% url mysite.missions.tar.views.about %}'>
+  <a href='{% url "mysite.missions.tar.views.about" %}'>
     About this mission
   </a>
 </li>
 <li id='link-unpacking' {% if unpack_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.tar.views.unpacking %}'>
+  <a href='{% url "mysite.missions.tar.views.unpacking" %}'>
     Unpacking tarballs
   </a>
 </li>
 <li id='link-creating' {% if create_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
-  <a href='{% url mysite.missions.tar.views.creating %}'>
+  <a href='{% url "mysite.missions.tar.views.creating" %}'>
     Creating tarballs
   </a>
 </li>
 <li id='link-hints' class='bump-over'>
-  <a href='{% url mysite.missions.tar.views.hints %}'>
+  <a href='{% url "mysite.missions.tar.views.hints" %}'>
     Quick reference
   </a>
 </li>

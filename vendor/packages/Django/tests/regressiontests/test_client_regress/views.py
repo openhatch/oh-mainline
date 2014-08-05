@@ -1,12 +1,10 @@
-import warnings
+import json
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import render_to_response
-from django.utils import simplejson
-from django.utils.encoding import smart_str
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import CONTENT_TYPE_RE
 from django.template import RequestContext
@@ -72,6 +70,11 @@ def request_methods_view(request):
 def return_unicode(request):
     return render_to_response('unicode.html')
 
+def return_undecodable_binary(request):
+    return HttpResponse(
+        b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e ReportLab Generated PDF document http://www.reportlab.com'
+    )
+
 def return_json_file(request):
     "A view that parses and returns a JSON string as a file."
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
@@ -81,12 +84,10 @@ def return_json_file(request):
         charset = settings.DEFAULT_CHARSET
 
     # This just checks that the uploaded data is JSON
-    obj_dict = simplejson.loads(request.body.decode(charset))
-    obj_json = simplejson.dumps(obj_dict, encoding=charset,
-                                cls=DjangoJSONEncoder,
-                                ensure_ascii=False)
-    response = HttpResponse(smart_str(obj_json, encoding=charset), status=200,
-                            mimetype='application/json; charset=' + charset)
+    obj_dict = json.loads(request.body.decode(charset))
+    obj_json = json.dumps(obj_dict, cls=DjangoJSONEncoder, ensure_ascii=False)
+    response = HttpResponse(obj_json.encode(charset), status=200,
+                            content_type='application/json; charset=%s' % charset)
     response['Content-Disposition'] = 'attachment; filename=testfile.json'
     return response
 

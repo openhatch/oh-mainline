@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Validation &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Validation &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +22,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
-    <link rel="next" title="Caching" href="caching.html" />
-    <link rel="prev" title="Authentication / Authorization" href="authentication_authorization.html" /> 
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Authentication" href="authentication.html" />
+    <link rel="prev" title="Caching" href="caching.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,12 +37,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="caching.html" title="Caching"
+          <a href="authentication.html" title="Authentication"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="authentication_authorization.html" title="Authentication / Authorization"
+          <a href="caching.html" title="Caching"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,8 +58,8 @@ is appropriate for storage. This can range from simple type checking on up
 to complex validation that compares different fields together.</p>
 <p>If the data is valid, an empty dictionary is returned and processing continues
 as normal. If the data is invalid, a dictionary of error messages (keys being
-the field names, values being a list of error messages). This will be
-immediately returned to the user, serialized in the format they requested.</p>
+the field names, values being a list of error messages) is immediately
+returned to the user, serialized in the format they requested.</p>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Using these classes is simple. Simply provide them (or your own class) as a
@@ -94,6 +94,9 @@ valid.</p>
 to its constructor. You supply a Django <tt class="docutils literal"><span class="pre">Form</span></tt> (or <tt class="docutils literal"><span class="pre">ModelForm</span></tt>, though
 <tt class="docutils literal"><span class="pre">save</span></tt> will never get called) and Tastypie will verify the <tt class="docutils literal"><span class="pre">data</span></tt> in the
 <tt class="docutils literal"><span class="pre">Bundle</span></tt> against the form.</p>
+<p>This class <strong>DOES NOT</strong> alter the data sent, only verifies it. If you
+want to alter the data, please use the <tt class="docutils literal"><span class="pre">CleanDataFormValidation</span></tt> class
+instead.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">Data in the bundle must line up with the fieldnames in the <tt class="docutils literal"><span class="pre">Form</span></tt>. If they
@@ -111,6 +114,12 @@ do not, you&#8217;ll need to either munge the data or change your form.</p>
 <span class="n">form</span> <span class="o">=</span> <span class="n">FormValidation</span><span class="p">(</span><span class="n">form_class</span><span class="o">=</span><span class="n">NoteForm</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="cleaneddataformvalidation">
+<h3><tt class="docutils literal"><span class="pre">CleanedDataFormValidation</span></tt><a class="headerlink" href="#cleaneddataformvalidation" title="Permalink to this headline">¶</a></h3>
+<p>Similar to the <tt class="docutils literal"><span class="pre">FormValidation</span></tt> class, this uses a Django <tt class="docutils literal"><span class="pre">Form</span></tt> to handle
+validation. <strong>However</strong>, it will use the <tt class="docutils literal"><span class="pre">form.cleaned_data</span></tt> to replace the
+<tt class="docutils literal"><span class="pre">bundle</span></tt> data sent by user! Usage is identical to <tt class="docutils literal"><span class="pre">FormValidation</span></tt>.</p>
 </div>
 </div>
 <div class="section" id="implementing-your-own-validation">
@@ -156,6 +165,7 @@ method to implement is the <tt class="docutils literal"><span class="pre">is_val
 <li><a class="reference internal" href="#validation-options">Validation Options</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">Validation</span></tt></a></li>
 <li><a class="reference internal" href="#formvalidation"><tt class="docutils literal"><span class="pre">FormValidation</span></tt></a></li>
+<li><a class="reference internal" href="#cleaneddataformvalidation"><tt class="docutils literal"><span class="pre">CleanedDataFormValidation</span></tt></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementing-your-own-validation">Implementing Your Own Validation</a></li>
@@ -164,11 +174,11 @@ method to implement is the <tt class="docutils literal"><span class="pre">is_val
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="authentication_authorization.html"
-                        title="previous chapter">Authentication / Authorization</a></p>
-  <h4>Next topic</h4>
   <p class="topless"><a href="caching.html"
-                        title="next chapter">Caching</a></p>
+                        title="previous chapter">Caching</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="next chapter">Authentication</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/validation.txt"
@@ -201,16 +211,16 @@ method to implement is the <tt class="docutils literal"><span class="pre">is_val
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="caching.html" title="Caching"
+          <a href="authentication.html" title="Authentication"
              >next</a> |</li>
         <li class="right" >
-          <a href="authentication_authorization.html" title="Authentication / Authorization"
+          <a href="caching.html" title="Caching"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

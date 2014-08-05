@@ -115,11 +115,11 @@ form { width: 350px; }
                     What is OpenID?
                 </a></li>
 
-                <li><a href='{% url oh_login_pwd %}?next={{ next|urlencode }}'>
+                <li><a href='{% url "oh_login_pwd" %}?next={{ next|urlencode }}'>
                     Log in with a password
                 </a></li>
 
-                <li><a href='{% url mysite.account.views.signup %}?next={{ next|urlencode }}'>
+                <li><a href='{% url "mysite.account.views.signup" %}?next={{ next|urlencode }}'>
                     Sign up without OpenID
                 </a></li>
             </ul>

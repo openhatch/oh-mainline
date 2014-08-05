@@ -24,7 +24,8 @@ $(function() {
         function() {
             $.post(
                 OH.Page['post_url'],
-                { mission_parts: OH.Page['mission_parts'] },
+                { 'csrfmiddlewaretoken': $.cookie('csrftoken'),
+                  mission_parts: OH.Page['mission_parts'] },
                 function(response) {
                     var items = ['#success-msg', '#next-mission-link'];
                     var len = items.length;

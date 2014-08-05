@@ -3,9 +3,11 @@ import sys
 import imp
 from zipimport import zipimporter
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import unittest
 from django.utils.importlib import import_module
-from django.utils.module_loading import module_has_submodule
+from django.utils.module_loading import import_by_path, module_has_submodule
+from django.utils._os import upath
 
 
 class DefaultLoader(unittest.TestCase):
@@ -50,7 +52,7 @@ class DefaultLoader(unittest.TestCase):
 class EggLoader(unittest.TestCase):
     def setUp(self):
         self.old_path = sys.path[:]
-        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
 
     def tearDown(self):
         sys.path = self.old_path
@@ -102,6 +104,23 @@ class EggLoader(unittest.TestCase):
         self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
+
+class ModuleImportTestCase(unittest.TestCase):
+    def test_import_by_path(self):
+        cls = import_by_path(
+            'django.utils.module_loading.import_by_path')
+        self.assertEqual(cls, import_by_path)
+
+        # Test exceptions raised
+        for path in ('no_dots_in_path', 'unexistent.path',
+                'tests.regressiontests.utils.unexistent'):
+            self.assertRaises(ImproperlyConfigured, import_by_path, path)
+
+        with self.assertRaises(ImproperlyConfigured) as cm:
+            import_by_path('unexistent.module.path', error_prefix="Foo")
+        self.assertTrue(str(cm.exception).startswith('Foo'))
+
+
 class ProxyFinder(object):
     def __init__(self):
         self._cache = {}
@@ -109,7 +128,12 @@ class ProxyFinder(object):
     def find_module(self, fullname, path=None):
         tail = fullname.rsplit('.', 1)[-1]
         try:
-            self._cache[fullname] = imp.find_module(tail, path)
+            fd, fn, info = imp.find_module(tail, path)
+            if fullname in self._cache:
+                old_fd = self._cache[fullname][0]
+                if old_fd:
+                    old_fd.close()
+            self._cache[fullname] = (fd, fn, info)
         except ImportError:
             return None
         else:
@@ -119,7 +143,11 @@ class ProxyFinder(object):
         if fullname in sys.modules:
             return sys.modules[fullname]
         fd, fn, info = self._cache[fullname]
-        return imp.load_module(fullname, fd, fn, info)
+        try:
+            return imp.load_module(fullname, fd, fn, info)
+        finally:
+            if fd:
+                fd.close()
 
 class TestFinder(object):
     def __init__(self, *args, **kwargs):

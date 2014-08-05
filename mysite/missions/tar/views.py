@@ -19,9 +19,8 @@
 
 from django.http import HttpResponse
 
-from mysite.base.unicode_sanity import utf8
 from mysite.missions.base.views import *
-from mysite.missions.tar import forms, view_helpers
+from mysite.missions.tar import view_helpers
 
 
 # POST handlers
@@ -41,27 +40,6 @@ def reset(request):
         message = 'An error occured'
 
     return HttpResponse(message)
-
-
-def upload(request):
-    # Initialize data array and some default values.
-    data = {}
-    data['create_form'] = forms.UploadForm()
-    data['create_success'] = False
-    data['what_was_wrong_with_the_tarball'] = ''
-    if request.method == 'POST':
-        form = forms.UploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                view_helpers.TarMission.check_tarfile(
-                    form.cleaned_data['tarfile'].read())
-                data['create_success'] = True
-                view_helpers.set_mission_completed(
-                    request.user.get_profile(), 'tar')
-            except view_helpers.IncorrectTarFile, e:
-                data['what_was_wrong_with_the_tarball'] = utf8(e)
-        data['create_form'] = form
-    return creating(request, data)
 
 
 def file_download(request, name):
@@ -85,24 +63,25 @@ def download_tarball_for_extract_mission(request):
 
 
 @login_required
-def extract_mission_upload(request):
-    # Initialize data array and some default values.
-    data = {}
-    data['unpack_form'] = forms.ExtractUploadForm()
-    data['unpack_success'] = False
-    data['what_was_wrong_with_the_extracted_file'] = ''
-    if request.method == 'POST':
-        form = forms.ExtractUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            if form.cleaned_data['extracted_file'].read() == view_helpers.UntarMission.get_contents_we_want():
-                data['unpack_success'] = True
-                view_helpers.set_mission_completed(
-                    request.user.get_profile(), 'tar_extract')
-            else:
-                data[
-                    'what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
-        data['unpack_form'] = form
-    return unpacking(request, data)
+def extract_mission_success(request):
+    if request.method == 'POST' and request.POST['unpack_success']:
+        view_helpers.set_mission_completed(
+            request.user.get_profile(), 'tar_extract')
+        message = 'Step successfully completed'
+    else:
+        message = 'An error occured'
+    return HttpResponse(message)
+
+
+@login_required
+def create_mission_success(request):
+    if request.method == 'POST' and request.POST['create_success']:
+        view_helpers.set_mission_completed(
+            request.user.get_profile(), 'tar')
+        message = 'Step successfully completed'
+    else:
+        message = 'An error occured'
+    return HttpResponse(message)
 
 # State manager
 
@@ -115,10 +94,6 @@ class TarMissionPageState(MissionPageState):
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
-        data.update({
-            'filenames_for_tarball': view_helpers.TarMission.FILES.keys(),
-            'tarball_for_unpacking_mission': view_helpers.UntarMission.TARBALL_NAME,
-            'file_we_want': view_helpers.UntarMission.FILE_WE_WANT})
         if person:
             data.update({
                 'create_done': view_helpers.mission_completed(person, 'tar'),
@@ -143,7 +118,6 @@ def unpacking(request, passed_data={}):
     state = TarMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Unpacking'
     data = state.as_dict_for_template_context()
-    data['unpack_form'] = forms.ExtractUploadForm()
     return (request, 'missions/tar/unpacking.html', data)
 
 
@@ -153,7 +127,6 @@ def creating(request, passed_data={}):
     state = TarMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Creating'
     data = state.as_dict_for_template_context()
-    data['create_form'] = forms.UploadForm()
     return (request, 'missions/tar/creating.html', data)
 
 

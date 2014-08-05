@@ -1,46 +1,41 @@
-from __future__ import with_statement, absolute_import
+# -*- coding: utf-8 -*-
+# This coding header is significant for tests, as the debug view is parsing
+# files to search for such a header to decode the source file content
+from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
 import sys
 
-from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, RequestFactory
-from django.test.utils import (setup_test_template_loader,
-                               restore_template_loaders)
-from django.core.urlresolvers import reverse
-from django.views.debug import ExceptionReporter
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
+from django.test import TestCase, RequestFactory
+from django.test.utils import (override_settings, setup_test_template_loader,
+    restore_template_loaders)
+from django.utils.encoding import force_text
+from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
-    custom_exception_reporter_filter_view, sensitive_method_view)
+    custom_exception_reporter_filter_view, sensitive_method_view,
+    sensitive_args_function_caller, sensitive_kwargs_function_caller)
 
 
+@override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
 class DebugViewTests(TestCase):
     urls = "regressiontests.views.urls"
-
-    def setUp(self):
-        self.old_debug = settings.DEBUG
-        settings.DEBUG = True
-        self.old_template_debug = settings.TEMPLATE_DEBUG
-        settings.TEMPLATE_DEBUG = True
-
-    def tearDown(self):
-        settings.DEBUG = self.old_debug
-        settings.TEMPLATE_DEBUG = self.old_template_debug
 
     def test_files(self):
         response = self.client.get('/raises/')
         self.assertEqual(response.status_code, 500)
 
         data = {
-            'file_data.txt': SimpleUploadedFile('file_data.txt', 'haha'),
+            'file_data.txt': SimpleUploadedFile('file_data.txt', b'haha'),
         }
         response = self.client.post('/raises/', data)
-        self.assertTrue('file_data.txt' in response.content)
-        self.assertFalse('haha' in response.content)
+        self.assertContains(response, 'file_data.txt', status_code=500)
+        self.assertNotContains(response, 'haha', status_code=500)
 
     def test_403(self):
         # Ensure no 403.html template exists to test the default case.
@@ -311,16 +306,28 @@ class ExceptionReportTestMixin(object):
             response = view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
+
             # Frames vars are never shown in plain text email reports.
-            self.assertNotIn('cooked_eggs', email.body)
-            self.assertNotIn('scrambled', email.body)
-            self.assertNotIn('sauce', email.body)
-            self.assertNotIn('worcestershire', email.body)
+            body_plain = force_text(email.body)
+            self.assertNotIn('cooked_eggs', body_plain)
+            self.assertNotIn('scrambled', body_plain)
+            self.assertNotIn('sauce', body_plain)
+            self.assertNotIn('worcestershire', body_plain)
+
+            # Frames vars are shown in html email reports.
+            body_html = force_text(email.alternatives[0][0])
+            self.assertIn('cooked_eggs', body_html)
+            self.assertIn('scrambled', body_html)
+            self.assertIn('sauce', body_html)
+            self.assertIn('worcestershire', body_html)
+
             if check_for_POST_params:
                 for k, v in self.breakfast_data.items():
                     # All POST parameters are shown.
-                    self.assertIn(k, email.body)
-                    self.assertIn(v, email.body)
+                    self.assertIn(k, body_plain)
+                    self.assertIn(v, body_plain)
+                    self.assertIn(k, body_html)
+                    self.assertIn(v, body_html)
 
     def verify_safe_email(self, view, check_for_POST_params=True):
         """
@@ -332,21 +339,35 @@ class ExceptionReportTestMixin(object):
             response = view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
+
             # Frames vars are never shown in plain text email reports.
-            self.assertNotIn('cooked_eggs', email.body)
-            self.assertNotIn('scrambled', email.body)
-            self.assertNotIn('sauce', email.body)
-            self.assertNotIn('worcestershire', email.body)
+            body_plain = force_text(email.body)
+            self.assertNotIn('cooked_eggs', body_plain)
+            self.assertNotIn('scrambled', body_plain)
+            self.assertNotIn('sauce', body_plain)
+            self.assertNotIn('worcestershire', body_plain)
+
+            # Frames vars are shown in html email reports.
+            body_html = force_text(email.alternatives[0][0])
+            self.assertIn('cooked_eggs', body_html)
+            self.assertIn('scrambled', body_html)
+            self.assertIn('sauce', body_html)
+            self.assertNotIn('worcestershire', body_html)
+
             if check_for_POST_params:
                 for k, v in self.breakfast_data.items():
                     # All POST parameters' names are shown.
-                    self.assertIn(k, email.body)
+                    self.assertIn(k, body_plain)
                 # Non-sensitive POST parameters' values are shown.
-                self.assertIn('baked-beans-value', email.body)
-                self.assertIn('hash-brown-value', email.body)
+                self.assertIn('baked-beans-value', body_plain)
+                self.assertIn('hash-brown-value', body_plain)
+                self.assertIn('baked-beans-value', body_html)
+                self.assertIn('hash-brown-value', body_html)
                 # Sensitive POST parameters' values are not shown.
-                self.assertNotIn('sausage-value', email.body)
-                self.assertNotIn('bacon-value', email.body)
+                self.assertNotIn('sausage-value', body_plain)
+                self.assertNotIn('bacon-value', body_plain)
+                self.assertNotIn('sausage-value', body_html)
+                self.assertNotIn('bacon-value', body_html)
 
     def verify_paranoid_email(self, view):
         """
@@ -359,15 +380,16 @@ class ExceptionReportTestMixin(object):
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
-            self.assertNotIn('cooked_eggs', email.body)
-            self.assertNotIn('scrambled', email.body)
-            self.assertNotIn('sauce', email.body)
-            self.assertNotIn('worcestershire', email.body)
+            body = force_text(email.body)
+            self.assertNotIn('cooked_eggs', body)
+            self.assertNotIn('scrambled', body)
+            self.assertNotIn('sauce', body)
+            self.assertNotIn('worcestershire', body)
             for k, v in self.breakfast_data.items():
                 # All POST parameters' names are shown.
-                self.assertIn(k, email.body)
+                self.assertIn(k, body)
                 # No POST parameters' values are shown.
-                self.assertNotIn(v, email.body)
+                self.assertNotIn(v, body)
 
 
 class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
@@ -446,6 +468,36 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
                                       check_for_POST_params=False)
             self.verify_safe_email(sensitive_method_view,
                                    check_for_POST_params=False)
+
+    def test_sensitive_function_arguments(self):
+        """
+        Ensure that sensitive variables don't leak in the sensitive_variables
+        decorator's frame, when those variables are passed as arguments to the
+        decorated function.
+        Refs #19453.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(sensitive_args_function_caller)
+            self.verify_unsafe_email(sensitive_args_function_caller)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(sensitive_args_function_caller, check_for_POST_params=False)
+            self.verify_safe_email(sensitive_args_function_caller, check_for_POST_params=False)
+
+    def test_sensitive_function_keyword_arguments(self):
+        """
+        Ensure that sensitive variables don't leak in the sensitive_variables
+        decorator's frame, when those variables are passed as keyword arguments
+        to the decorated function.
+        Refs #19453.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(sensitive_kwargs_function_caller)
+            self.verify_unsafe_email(sensitive_kwargs_function_caller)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(sensitive_kwargs_function_caller, check_for_POST_params=False)
+            self.verify_safe_email(sensitive_kwargs_function_caller, check_for_POST_params=False)
 
 
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):

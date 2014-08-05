@@ -40,7 +40,7 @@
 
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li>Download <a href="{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}">this patch</a> to the same directory.</li>
+      <li>Download <a href="{% url "mysite.missions.diffpatch.views.diffrecursive_get_original_tarball" %}">this tarball</a> and <a href="{% url "mysite.missions.diffpatch.views.patchrecursive_get_patch" %}">this patch</a> to the same directory.</li>
       <li>Unpack the tarball. This will create a familiar <code>recipes</code> directory.</li>
       <li>Look at the <code>recipes.patch</code> file. Note the file paths in the headers.</li>
       <li>Apply the patch to your <code>recipes</code> directory.</li>
@@ -54,7 +54,7 @@
       version of these recipes.
 
     <p>Sometimes you might have to apply a patch that affects more than one file.  The <code>patch</code> program can tell what parts of the patch apply to what files by examining the headers, but you might need to help it out by giving the <code>-p</code> option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchrecursive_submit %}#patchrecursive-form">{% csrf_token %}
+    <form method="post" enctype="multipart/form-data" action="{% url "mysite.missions.diffpatch.views.patchrecursive_submit" %}#patchrecursive-form">{% csrf_token %}
       <div class="form-row">
         <a name="patchrecursive-form"></a>
 	<br style="clear: left;" />
@@ -80,7 +80,7 @@
     {% if patchrecursive_done %} {# FIXME add the rest of the _done things #}
     <p class="next_mission_link">
       Congratulations! You've totally completed the mission.
-      Want to go <a href="{% url mysite.missions.base.views.main_page %}">back to the list of missions</a>?</p>
+      Want to go <a href="{% url "mysite.missions.base.views.main_page" %}">back to the list of missions</a>?</p>
     {% endif %}
     <div id="hint_tabs">
       <ul>
@@ -116,7 +116,7 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.diffrecursive_get_original_tarball %}
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.diffrecursive_get_original_tarball" %}
       </pre>
       <p>Unpack it, but do not change into its directory.</p>
       <pre>
@@ -124,7 +124,7 @@
       </pre>
       <p>Now, download the patch file contributed by the "enterprising American" in this mission step:</p>
       <pre>
-	curl -O {{ url_prefix }}{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}
+	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.patchrecursive_get_patch" %}
       </pre>
       <p>Apply that patch (you can read more in the "medium" hints about how this works):</p>
       <p><code>patch -p1 &lt; recipes.patch</code></p>

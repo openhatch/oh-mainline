@@ -27,7 +27,13 @@ import urlparse
 import bleach
 import mysite.project.view_helpers
 
-from django.utils.html import *
+import string
+from django.utils.html import mark_safe, word_split_re, escape, urlize, simple_email_re
+from django.utils.functional import allow_lazy
+from django.utils.safestring import SafeData
+from django.utils.encoding import force_unicode
+from django.utils.http import urlquote
+from jinja2.utils import _punctuation_re as punctuation_re
 
 register = template.Library()
 

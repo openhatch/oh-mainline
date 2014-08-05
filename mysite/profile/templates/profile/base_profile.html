@@ -43,7 +43,7 @@
                     <span class='username' style="font-size: .7em;">
                         ({{ person.user.username }})
                         {% if editable %}
-                            (<a href='{% url account.views.edit_name %}'>edit name</a>)
+                            (<a href='{% url "account.views.edit_name" %}'>edit name</a>)
                         {% endif %}
                     </span>
             </h1>
@@ -58,7 +58,7 @@
 
 
             {% if editable %}
-              <a href='{% url account.views.edit_name %}' class="edit-name-link">
+              <a href='{% url "account.views.edit_name" %}' class="edit-name-link">
                 <div id='edit_your_name_notification' 
                     class='notification'>Tell us your name!</div>
               </a>
@@ -67,15 +67,14 @@
 
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
-              <a style='color: #555;' href="/people/?center={{ person.location_display_name }}">
               {{ person.location_display_name }}
           </a>
 	      {% endif %}
           {% if editable %}
           {% if person.location_display_name and person.location_confirmed %}
-          (<a href="{% url mysite.account.views.set_location %}">edit</a>)
+          (<a href="{% url "mysite.account.views.set_location" %}">edit</a>)
           {% else %}
-          <a href="{% url mysite.account.views.set_location %}">Set your location</a>
+          <a href="{% url "mysite.account.views.set_location" %}">Set your location</a>
           {% endif %}
           {% endif %}
 
@@ -139,7 +138,7 @@
         {% ifequal user.get_profile person %}
         <ul class='nudgebuttons'>
             <li>
-            <a href='{% url mysite.profile.views.edit_info %}'>
+            <a href='{% url "mysite.profile.views.edit_info" %}'>
                 <div class='notification smaller'>
                     <strong>Add info to your profile!</strong>
                     <p>We'll use it to suggest interesting projects.</p>
@@ -190,7 +189,7 @@
             <h4>understands</h4>
 
             {% for thingamabob in tags.understands %}
-            <a href="{% url mysite.profile.views.people %}?q=understands:&quot;{{thingamabob.text|urlencode}}&quot;">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url "mysite.profile.views.people" %}?q=understands:&quot;{{thingamabob.text|urlencode}}&quot;">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -198,7 +197,7 @@
         <div class='tags' id='tags-understands_not'>
             <h4>will never understand</h4>
             {% for thingamabob in tags.understands_not %}
-            <a href="{% url mysite.profile.views.people %}?q=understands_not:&quot;{{thingamabob.text|urlencode}}&quot;">
+            <a href="{% url "mysite.profile.views.people" %}?q=understands_not:&quot;{{thingamabob.text|urlencode}}&quot;">
               {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
@@ -207,7 +206,7 @@
         <div class='tags' id='tags-can_pitch_in'>
             <h4>can pitch in with</h4>
             {% for thingamabob in tags.can_pitch_in %}
-            <a href="{% url mysite.profile.views.people %}?q=can_pitch_in:&quot;{{thingamabob.text|urlencode}}&quot;">
+            <a href="{% url "mysite.profile.views.people" %}?q=can_pitch_in:&quot;{{thingamabob.text|urlencode}}&quot;">
             {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
@@ -216,7 +215,7 @@
         <div class='tags' id='tags-studying'>
             <h4>currently studying</h4>
             {% for thingamabob in tags.studying %}
-            <a href="{% url mysite.profile.views.people %}?q=studying:&quot;{{thingamabob.text|urlencode}}&quot;">
+            <a href="{% url "mysite.profile.views.people" %}?q=studying:&quot;{{thingamabob.text|urlencode}}&quot;">
               {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
@@ -225,7 +224,7 @@
         <div class='tags' id='tags-can_mentor'>
             <h4>can mentor in</h4>
             {% for thingamabob in tags.can_mentor %}
-            <a href="{% url mysite.profile.views.people %}?q=can_mentor:&quot;{{thingamabob.text|urlencode}}&quot;">
+            <a href="{% url "mysite.profile.views.people" %}?q=can_mentor:&quot;{{thingamabob.text|urlencode}}&quot;">
               {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
@@ -248,7 +247,7 @@
     <div class="module-foot">
         {% if editable and not info_edit_mode %}
         <ul>
-            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a></li>
+            <li><a class='edit' href='{% url "mysite.profile.views.edit_info" %}'>Edit</a></li>
         </ul>
         {% endif %}
     </div>
@@ -260,7 +259,7 @@
     <div class='module-head'>
         {% if editable and not info_edit_mode %}
         <ul>
-            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}#contact_blurb'>Edit</a></li>
+            <li><a class='edit' href='{% url "mysite.profile.views.edit_info" %}#contact_blurb'>Edit</a></li>
         </ul>
         {% endif %}
 

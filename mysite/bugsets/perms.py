@@ -18,9 +18,13 @@ from __future__ import absolute_import
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.conf import settings
 
 class InlineEditPermissions(object):
 
     @classmethod
     def can_edit(cls, adaptor_field):
-       return True  # All users can edit
+        if settings.DEBUG:
+            return True  # All users can edit
+
+        return False

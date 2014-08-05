@@ -22,7 +22,7 @@
                                         More {{ facet_name }}s &raquo;
                                     </a>
                                     <div style='display: none;' id='{{ facet_name }}s'>
-                                        <h2>Select a {{ facet_name }}</h2>
+                                        <h2>Select a {{ facet_name }} {{ facet.sorted_by }}</h2>
                                         <ul class='facet_more_options'>
                                             {% for option in facet.options %}
                                                 {% include 'facet_option.html' %}

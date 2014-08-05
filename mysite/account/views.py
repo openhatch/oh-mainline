@@ -286,9 +286,7 @@ def set_location(request, edit_location_form=None):
     if (not request.user.get_profile().location_display_name) or (
         request.user.get_profile().location_display_name ==
             mysite.profile.models.DEFAULT_LOCATION):
-        geoip_guess = mysite.profile.view_helpers.get_geoip_guess_for_ip(
-            mysite.base.middleware.get_user_ip(request))[1]
-        initial['location_display_name'] = geoip_guess
+        initial['location_display_name'] = "Inaccessible Island"
     else:
         initial['location_display_name'] = request.user.get_profile(
         ).location_display_name
@@ -335,23 +333,6 @@ def set_location_do(request):
     else:
         return set_location(request,
                             edit_location_form=edit_location_form)
-
-
-@login_required
-def confirm_location_suggestion_do(request):
-    person = request.user.get_profile()
-    person.location_confirmed = True
-    person.save()
-    return HttpResponse()
-
-
-@login_required
-def dont_guess_location_do(request):
-    person = request.user.get_profile()
-    person.dont_guess_my_location = True
-    person.location_display_name = ''
-    person.save()
-    return HttpResponse()
 
 
 @login_required

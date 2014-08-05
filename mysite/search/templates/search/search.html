@@ -30,6 +30,7 @@ Volunteer opportunities in free and open source software
 {% endblock title %}
 
 {% block body_id %}search{% endblock %}
+{% block body_class %}{{ block.super }} actually_search{% endblock %}
 
 {% block css %}
 {{ block.super }}
@@ -41,7 +42,7 @@ Volunteer opportunities in free and open source software
 {% endblock css %}
 
 {% block pagetop %}
-    <h3><a href='{% url mysite.search.views.search_index %}'><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></a></h3>
+    <h3><a href='{% url "mysite.search.views.search_index" %}'><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></a></h3>
 
 {% endblock pagetop %}
 
@@ -74,7 +75,7 @@ Volunteer opportunities in free and open source software
                         }
                     {% endcomment %}
                     <div class="submodule facet-list">
-                        <h3>{{ facet.sidebar_heading }}</h3>
+                        <h3>{{ facet.sidebar_heading }} {{ facet.sorted_by }}</h3>
                         <ul>
                             {% if query %}
                                 {% for option in facet.options|slice:':4' %}
@@ -141,7 +142,7 @@ Volunteer opportunities in free and open source software
                         </ul>
                     </form>
                     {% else %}
-                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                        <a href='{% url "mysite.profile.views.portfolio_editor" %}'>
                             <strong>List some projects in your portfolio</strong>
                             to receive recommendations.
                         </a>
@@ -181,21 +182,21 @@ Volunteer opportunities in free and open source software
             Tracking opportunities in
         </h3>
         <h4 id='how_many_projects'>
-            <a href='{% url mysite.project.views.projects %}'>
+            <a href='{% url "mysite.project.views.projects" %}'>
                 <strong style='color: #FF6D3D;'>{{ project_count }}</strong>
                 projects
             </a>
         </h4>
         <div id='learn_more'>
-            <a href='{% url mysite.project.views.projects %}'>See all</a>
+            <a href='{% url "mysite.project.views.projects" %}'>See all</a>
             <span style='color: #999;'>&bull;</span>
-            <a href='{% url mysite.customs.views.list_trackers %}'>Add a bug tracker</a>
+            <a href='{% url "mysite.customs.views.list_trackers" %}'>Add a bug tracker</a>
         </div>
     </div>
 
     <div id='textual_search' class='module right'>
         <div class='module-body'>
-            <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.search_index %}'> 
+            <form name='search_opps' method='GET' id='search_fulltext' action='{% url "mysite.search.views.search_index" %}'> 
                 <input type='text' name='q' id='q' rel='hint'
                 placeholder='Textual search'
                 value='{{ query.terms_string }}' />
@@ -264,7 +265,7 @@ Volunteer opportunities in free and open source software
                     matching this query. 
                 </p>
                 <form name='alert' method='POST' 
-                        action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+                        action='{% url "mysite.search.views.subscribe_to_bug_alert_do" %}'>
                     {{ subscribe_to_alert_form.as_p }}
                     <input type="submit" value="Notify me when opportunities appear">
                 </form>

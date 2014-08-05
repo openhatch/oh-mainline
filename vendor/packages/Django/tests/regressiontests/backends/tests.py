@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
-from __future__ import with_statement, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import threading
@@ -13,14 +13,36 @@ from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.utils import ConnectionHandler, DatabaseError, load_backend
-from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
+from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
+    TransactionTestCase)
 from django.test.utils import override_settings
+from django.utils import six
+from django.utils.six.moves import xrange
 from django.utils import unittest
 
 from . import models
 
 
+class DummyBackendTest(TestCase):
+    def test_no_databases(self):
+        """
+        Test that empty DATABASES setting default to the dummy backend.
+        """
+        DATABASES = {}
+        conns = ConnectionHandler(DATABASES)
+        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
+            'django.db.backends.dummy')
+
+
 class OracleChecks(unittest.TestCase):
+
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle quote_name semantics")
+    def test_quote_name(self):
+        # Check that '%' chars are escaped for query execution.
+        name = '"SOME%NAME"'
+        quoted_name = connection.ops.quote_name(name)
+        self.assertEqual(quoted_name % (), name)
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")
@@ -49,7 +71,7 @@ class OracleChecks(unittest.TestCase):
         # than 4000 chars and read it properly
         c = connection.cursor()
         c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join([unicode(x) for x in xrange(4000)])
+        long_str = ''.join([six.text_type(x) for x in xrange(4000)])
         c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
         c.execute('SELECT text FROM ltext')
         row = c.fetchone()
@@ -61,16 +83,50 @@ class OracleChecks(unittest.TestCase):
     def test_client_encoding(self):
         # If the backend is Oracle, test that the client encoding is set
         # correctly.  This was broken under Cygwin prior to r14781.
-        c = connection.cursor()  # Ensure the connection is initialized.
+        connection.cursor()  # Ensure the connection is initialized.
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
+
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle connection semantics")
+    def test_order_of_nls_parameters(self):
+        # an 'almost right' datetime should work with configured
+        # NLS parameters as per #18465.
+        c = connection.cursor()
+        query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+        # Test that the query succeeds without errors - pre #18465 this
+        # wasn't the case.
+        c.execute(query)
+        self.assertEqual(c.fetchone()[0], 1)
 
 class MySQLTests(TestCase):
     @unittest.skipUnless(connection.vendor == 'mysql',
                         "Test valid only for MySQL")
+    def test_autoincrement(self):
+        """
+        Check that auto_increment fields are reset correctly by sql_flush().
+        Before MySQL version 5.0.13 TRUNCATE did not do auto_increment reset.
+        Refs #16961.
+        """
+        statements = connection.ops.sql_flush(no_style(),
+                                              tables=['test'],
+                                              sequences=[{
+                                                  'table': 'test',
+                                                  'col': 'somecol',
+                                              }])
+        found_reset = False
+        for sql in statements:
+            found_reset = found_reset or 'ALTER TABLE' in sql
+        if connection.mysql_version < (5,0,13):
+            self.assertTrue(found_reset)
+        else:
+            self.assertFalse(found_reset)
+
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                        "Test valid only for MySQL")
     def test_server_version_connections(self):
         connection.close()
-        connection.get_server_version()
+        connection.mysql_version
         self.assertTrue(connection.connection is None)
 
 class DateQuotingTest(TestCase):
@@ -102,35 +158,25 @@ class DateQuotingTest(TestCase):
         classes = models.SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
+
 class LastExecutedQueryTest(TestCase):
+    @override_settings(DEBUG=True)
+    def test_debug_sql(self):
+        list(models.Tag.objects.filter(name="test"))
+        sql = connection.queries[-1]['sql'].lower()
+        self.assertTrue(sql.startswith("select"))
+        self.assertIn(models.Tag._meta.db_table, sql)
 
-    def setUp(self):
-        # connection.queries will not be filled in without this
-        settings.DEBUG = True
+    def test_query_encoding(self):
+        """
+        Test that last_executed_query() returns an Unicode string
+        """
+        tags = models.Tag.objects.extra(select={'föö':1})
+        sql, params = tags.query.sql_with_params()
+        cursor = tags.query.get_compiler('default').execute_sql(None)
+        last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
+        self.assertTrue(isinstance(last_sql, six.text_type))
 
-    def tearDown(self):
-        settings.DEBUG = False
-
-    # There are no tests for the sqlite backend because it does not
-    # implement paramater escaping. See #14091.
-
-    @unittest.skipUnless(connection.vendor in ('oracle', 'postgresql'),
-                         "These backends use the standard parameter escaping rules")
-    def test_parameter_escaping(self):
-        # check that both numbers and string are properly quoted
-        list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
-        sql = connection.queries[-1]['sql']
-        self.assertTrue("= 'special:\\\"'':' " in sql)
-        self.assertTrue("= 12 " in sql)
-
-    @unittest.skipUnless(connection.vendor == 'mysql',
-                         "MySQL uses backslashes to escape parameters.")
-    def test_parameter_escaping(self):
-        list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
-        sql = connection.queries[-1]['sql']
-        # only this line is different from the test above
-        self.assertTrue("= 'special:\\\\\\\"\\':' " in sql)
-        self.assertTrue("= 12 " in sql)
 
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
@@ -370,15 +416,33 @@ class BackendTestCase(TestCase):
              qn(f3.column)))
         cursor = connection.cursor()
         cursor.execute(query2)
-        self.assertEqual(cursor.fetchone(), (u'Clark', u'Kent'))
-        self.assertEqual(list(cursor.fetchmany(2)), [(u'Jane', u'Doe'), (u'John', u'Doe')])
-        self.assertEqual(list(cursor.fetchall()), [(u'Mary', u'Agnelline'), (u'Peter', u'Parker')])
+        self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
+        self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
+        self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
+
+    def test_unicode_password(self):
+        old_password = connection.settings_dict['PASSWORD']
+        connection.settings_dict['PASSWORD'] = "françois"
+        try:
+            cursor = connection.cursor()
+        except backend.Database.DatabaseError:
+            # As password is probably wrong, a database exception is expected
+            pass
+        except Exception as e:
+            self.fail("Unexpected error raised with unicode password: %s" % e)
+        finally:
+            connection.settings_dict['PASSWORD'] = old_password
 
     def test_database_operations_helper_class(self):
         # Ticket #13630
         self.assertTrue(hasattr(connection, 'ops'))
         self.assertTrue(hasattr(connection.ops, 'connection'))
         self.assertEqual(connection, connection.ops.connection)
+
+    def test_cached_db_features(self):
+        self.assertIn(connection.features.supports_transactions, (True, False))
+        self.assertIn(connection.features.supports_stddev, (True, False))
+        self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
 
     def test_duplicate_table_error(self):
         """ Test that creating an existing table returns a DatabaseError """
@@ -500,11 +564,11 @@ class ThreadTests(TestCase):
             from django.db import connection
             connection.cursor()
             connections_set.add(connection.connection)
-        for x in xrange(2):
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        self.assertEquals(len(connections_set), 3)
+        self.assertEqual(len(connections_set), 3)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).
@@ -517,25 +581,27 @@ class ThreadTests(TestCase):
         Ensure that the connections are different for each thread.
         Refs #17258.
         """
-        connections_set = set()
+        # Map connections by id because connections with identical aliases
+        # have the same hash.
+        connections_dict = {}
         for conn in connections.all():
-            connections_set.add(conn)
+            connections_dict[id(conn)] = conn
         def runner():
             from django.db import connections
             for conn in connections.all():
                 # Allow thread sharing so the connection can be closed by the
                 # main thread.
                 conn.allow_thread_sharing = True
-                connections_set.add(conn)
-        for x in xrange(2):
+                connections_dict[id(conn)] = conn
+        for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        self.assertEquals(len(connections_set), 6)
+        self.assertEqual(len(connections_dict), 6)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).
-        for conn in connections_set:
+        for conn in connections_dict.values():
             if conn != connection:
                 conn.close()
 
@@ -552,7 +618,7 @@ class ThreadTests(TestCase):
                 connections['default'] = main_thread_connection
                 try:
                     models.Person.objects.get(first_name="John", last_name="Doe")
-                except DatabaseError, e:
+                except Exception as e:
                     exceptions.append(e)
             t = threading.Thread(target=runner, args=[connections['default']])
             t.start()
@@ -562,21 +628,21 @@ class ThreadTests(TestCase):
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to False
         connections['default'].allow_thread_sharing = False
         exceptions = []
         do_thread()
         # Forbidden!
-        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+        self.assertIsInstance(exceptions[0], DatabaseError)
 
         # If explicitly setting allow_thread_sharing to True
         connections['default'].allow_thread_sharing = True
         exceptions = []
         do_thread()
         # All good
-        self.assertEqual(len(exceptions), 0)
+        self.assertEqual(exceptions, [])
 
     def test_closing_non_shared_connections(self):
         """
@@ -590,7 +656,7 @@ class ThreadTests(TestCase):
             def runner2(other_thread_connection):
                 try:
                     other_thread_connection.close()
-                except DatabaseError, e:
+                except DatabaseError as e:
                     exceptions.add(e)
             t2 = threading.Thread(target=runner2, args=[connections['default']])
             t2.start()
@@ -607,7 +673,7 @@ class ThreadTests(TestCase):
             def runner2(other_thread_connection):
                 try:
                     other_thread_connection.close()
-                except DatabaseError, e:
+                except DatabaseError as e:
                     exceptions.add(e)
             # Enable thread sharing
             connections['default'].allow_thread_sharing = True
@@ -621,8 +687,13 @@ class ThreadTests(TestCase):
         self.assertEqual(len(exceptions), 0)
 
 
-class BackendLoadingTests(TestCase):
-    def test_old_style_backends_raise_useful_exception(self):
-        self.assertRaisesRegexp(ImproperlyConfigured,
-            "Try using django.db.backends.sqlite3 instead",
-            load_backend, 'sqlite3')
+class MySQLPKZeroTests(TestCase):
+    """
+    Zero as id for AutoField should raise exception in MySQL, because MySQL
+    does not allow zero for automatic primary key.
+    """
+
+    @skipIfDBFeature('allows_primary_key_0')
+    def test_zero_as_autoval(self):
+        with self.assertRaises(ValueError):
+            models.Square.objects.create(id=0, root=0, square=1)

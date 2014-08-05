@@ -1,80 +1,26 @@
+# -*- encoding: utf-8 -*-
 """
 Tests for django.core.servers.
 """
-import os
-from urlparse import urljoin
-import urllib2
+from __future__ import unicode_literals
 
-import django
-from django.conf import settings
+import os
+import socket
+try:
+    from urllib.request import urlopen, HTTPError
+except ImportError:     # Python 2
+    from urllib2 import urlopen, HTTPError
+
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, LiveServerTestCase
-from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler, WSGIServerException
+from django.test import LiveServerTestCase
 from django.test.utils import override_settings
+from django.utils.http import urlencode
+from django.utils._os import upath
 
 from .models import Person
 
-class AdminMediaHandlerTests(TestCase):
 
-    def setUp(self):
-        self.admin_media_url = urljoin(settings.STATIC_URL, 'admin/')
-        self.admin_media_file_path = os.path.abspath(
-            os.path.join(django.__path__[0], 'contrib', 'admin', 'static', 'admin')
-        )
-        self.handler = AdminMediaHandler(WSGIHandler())
-
-    def test_media_urls(self):
-        """
-        Tests that URLs that look like absolute file paths after the
-        settings.STATIC_URL don't turn into absolute file paths.
-        """
-        # Cases that should work on all platforms.
-        data = (
-            ('%scss/base.css' % self.admin_media_url, ('css', 'base.css')),
-        )
-        # Cases that should raise an exception.
-        bad_data = ()
-
-        # Add platform-specific cases.
-        if os.sep == '/':
-            data += (
-                # URL, tuple of relative path parts.
-                ('%s\\css/base.css' % self.admin_media_url, ('\\css', 'base.css')),
-            )
-            bad_data += (
-                '%s/css/base.css' % self.admin_media_url,
-                '%s///css/base.css' % self.admin_media_url,
-                '%s../css/base.css' % self.admin_media_url,
-            )
-        elif os.sep == '\\':
-            bad_data += (
-                '%sC:\css/base.css' % self.admin_media_url,
-                '%s/\\css/base.css' % self.admin_media_url,
-                '%s\\css/base.css' % self.admin_media_url,
-                '%s\\\\css/base.css' % self.admin_media_url
-            )
-        for url, path_tuple in data:
-            try:
-                output = self.handler.file_path(url)
-            except ValueError:
-                self.fail("Got a ValueError exception, but wasn't expecting"
-                          " one. URL was: %s" % url)
-            rel_path = os.path.join(*path_tuple)
-            desired = os.path.join(self.admin_media_file_path, rel_path)
-            self.assertEqual(
-                os.path.normcase(output), os.path.normcase(desired),
-                "Got: %s, Expected: %s, URL was: %s" % (output, desired, url))
-        for url in bad_data:
-            try:
-                output = self.handler.file_path(url)
-            except ValueError:
-                continue
-            self.fail('URL: %s should have caused a ValueError exception.'
-                      % url)
-
-
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),
@@ -101,7 +47,7 @@ class LiveServerBase(LiveServerTestCase):
         super(LiveServerBase, cls).tearDownClass()
 
     def urlopen(self, url):
-        return urllib2.urlopen(self.live_server_url + url)
+        return urlopen(self.live_server_url + url)
 
 
 class LiveServerAddress(LiveServerBase):
@@ -120,7 +66,7 @@ class LiveServerAddress(LiveServerBase):
         cls.raises_exception('localhost', ImproperlyConfigured)
 
         # The host must be valid
-        cls.raises_exception('blahblahblah:8081', WSGIServerException)
+        cls.raises_exception('blahblahblah:8081', socket.error)
 
         # The list of ports must be in a valid format
         cls.raises_exception('localhost:8081,', ImproperlyConfigured)
@@ -150,6 +96,8 @@ class LiveServerAddress(LiveServerBase):
             raise Exception("The line above should have raised an exception")
         except exception:
             pass
+        finally:
+            super(LiveServerAddress, cls).tearDownClass()
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
@@ -164,8 +112,8 @@ class LiveServerViews(LiveServerBase):
         """
         try:
             self.urlopen('/')
-        except urllib2.HTTPError, err:
-            self.assertEquals(err.code, 404, 'Expected 404 response')
+        except HTTPError as err:
+            self.assertEqual(err.code, 404, 'Expected 404 response')
         else:
             self.fail('Expected 404 response')
 
@@ -175,7 +123,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/example_view/')
-        self.assertEquals(f.read(), 'example view')
+        self.assertEqual(f.read(), b'example view')
 
     def test_static_files(self):
         """
@@ -183,7 +131,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/static/example_static_file.txt')
-        self.assertEquals(f.read(), 'example static file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_media_files(self):
         """
@@ -191,7 +139,11 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/media/example_media_file.txt')
-        self.assertEquals(f.read(), 'example media file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
+
+    def test_environ(self):
+        f = self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))
+        self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
 
 class LiveServerDatabase(LiveServerBase):
@@ -203,7 +155,7 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/model_view/')
-        self.assertEquals(f.read().splitlines(), ['jane', 'robert'])
+        self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
 
     def test_database_writes(self):
         """
@@ -211,5 +163,8 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         self.urlopen('/create_model_instance/')
-        names = [person.name for person in Person.objects.all()]
-        self.assertEquals(names, ['jane', 'robert', 'emily'])
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('pk'),
+            ['jane', 'robert', 'emily'],
+            lambda b: b.name
+        )

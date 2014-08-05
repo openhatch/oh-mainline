@@ -29,7 +29,10 @@ You can evaluate a ``QuerySet`` in the following ways:
   the headline of all entries in the database::
 
       for e in Entry.objects.all():
-          print e.headline
+          print(e.headline)
+
+  Note: Don't use this if all you want to do is determine if at least one
+  result exists. It's more efficient to use :meth:`~QuerySet.exists`.
 
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
@@ -71,11 +74,11 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``True``, otherwise ``False``. For example::
 
       if Entry.objects.filter(headline="Test"):
-         print "There is at least one Entry with the headline Test"
+         print("There is at least one Entry with the headline Test")
 
   Note: *Don't* use this if all you want to do is determine if at least one
   result exists, and don't need the actual objects. It's more efficient to
-  use :meth:`exists() <QuerySet.exists>` (see below).
+  use :meth:`~QuerySet.exists` (see below).
 
 .. _pickling QuerySets:
 
@@ -107,7 +110,7 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of QuerySets are only valid for the version of Django that
+    Pickles of ``QuerySets`` are only valid for the version of Django that
     was used to generate them. If you generate a pickle using Django
     version N, there is no guarantee that pickle will be readable with
     Django version N+1. Pickles should not be used as part of a long-term
@@ -296,14 +299,30 @@ Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
 
-It is permissible to specify a multi-valued field to order the results by (for
-example, a :class:`~django.db.models.ManyToManyField` field). Normally
-this won't be a sensible thing to do and it's really an advanced usage
-feature. However, if you know that your queryset's filtering or available data
-implies that there will only be one ordering piece of data for each of the main
-items you are selecting, the ordering may well be exactly what you want to do.
-Use ordering on multi-valued fields with care and make sure the results are
-what you expect.
+.. note::
+    It is permissible to specify a multi-valued field to order the results by
+    (for example, a :class:`~django.db.models.ManyToManyField` field, or the
+    reverse relation of a :class:`~django.db.models.ForeignKey` field).
+
+    Consider this case::
+
+         class Event(Model):
+            parent = models.ForeignKey('self', related_name='children')
+            date = models.DateField()
+
+         Event.objects.order_by('children__date')
+
+    Here, there could potentially be multiple ordering data for each ``Event``;
+    each ``Event`` with multiple ``children`` will be returned multiple times
+    into the new ``QuerySet`` that ``order_by()`` creates. In other words,
+    using ``order_by()`` on the ``QuerySet`` could return more items than you
+    were working on to begin with - which is probably neither expected nor
+    useful.
+
+    Thus, take care when using multi-valued field to order the results. **If**
+    you can be sure that there will only be one ordering piece of data for each
+    of the items you're ordering, this approach should not present problems. If
+    not, make sure the results are what you expect.
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
@@ -325,7 +344,7 @@ Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
 ordering back to the normal direction.
 
-To retrieve the ''last'' five items in a queryset, you could do this::
+To retrieve the "last" five items in a queryset, you could do this::
 
     my_queryset.reverse()[:5]
 
@@ -391,7 +410,7 @@ the specified field names.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
-    QuerySet, and the fields in ``order_by()`` must start with the fields in
+    ``QuerySet``, and the fields in ``order_by()`` must start with the fields in
     ``distinct()``, in the same order.
 
     For example, ``SELECT DISTINCT ON (a)`` gives you the first row for each
@@ -502,15 +521,8 @@ followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
 
-.. versionchanged:: 1.3
-
-The ``values()`` method previously did not return anything for
-:class:`~django.db.models.ManyToManyField` attributes and would raise an error
-if you tried to pass this type of field to it.
-
-This restriction has been lifted, and you can now also refer to fields on
-related models with reverse relations through ``OneToOneField``, ``ForeignKey``
-and ``ManyToManyField`` attributes::
+You can also refer to fields on related models with reverse relations through
+``OneToOneField``, ``ForeignKey`` and ``ManyToManyField`` attributes::
 
     Blog.objects.values('name', 'entry__headline')
     [{'name': 'My blog', 'entry__headline': 'An entry'},
@@ -680,21 +692,12 @@ Note that, by default, ``select_related()`` does not follow foreign keys that
 have ``null=True``.
 
 Usually, using ``select_related()`` can vastly improve performance because your
-app can avoid many database calls. However, in situations with deeply nested
-sets of relationships ``select_related()`` can sometimes end up following "too
-many" relations, and can generate queries so large that they end up being slow.
+app can avoid many database calls. However, there are times you are only
+interested in specific related models, or have deeply nested sets of
+relationships, and in these cases ``select_related()`` can be optimized by
+explicitly passing the related field names you are interested in. Only
+the specified relations will be followed.
 
-In these situations, you can use the ``depth`` argument to ``select_related()``
-to control how many "levels" of relations ``select_related()`` will actually
-follow::
-
-    b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Requires a database call.
-
-Sometimes you only want to access specific models that are related to your root
-model, not all of the related models. In these cases, you can pass the related
-field names to ``select_related()`` and it will only follow those relations.
 You can even do this for models that are more than one relation away by
 separating the field names with double underscores, just as for filters. For
 example, if you have this model::
@@ -727,14 +730,23 @@ passed to ``select_related()``. This includes foreign keys that have
 It's an error to use both a list of fields and the ``depth`` parameter in the
 same ``select_related()`` call; they are conflicting options.
 
-.. versionchanged:: 1.2
-
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
 ``select_related`` — that is, you can traverse a
 :class:`~django.db.models.OneToOneField` back to the object on which the field
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
+
+.. deprecated:: 1.5
+    The ``depth`` parameter to ``select_related()`` has been deprecated. You
+    should replace it with the use of the ``(*fields)`` listing specific
+    related fields instead as documented above.
+
+A depth limit of relationships to follow can also be specified::
+
+    b = Book.objects.select_related(depth=1).get(id=4)
+    p = b.author         # Doesn't hit the database.
+    c = p.hometown       # Requires a database call.
 
 A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
 direction if you are performing a depth-based ``select_related()`` call.
@@ -754,8 +766,8 @@ stop the deluge of database queries that is caused by accessing related objects,
 but the strategy is quite different.
 
 ``select_related`` works by creating a SQL join and including the fields of the
-related object in the SELECT statement. For this reason, ``select_related`` gets
-the related objects in the same database query. However, to avoid the much
+related object in the ``SELECT`` statement. For this reason, ``select_related``
+gets the related objects in the same database query. However, to avoid the much
 larger result set that would result from joining across a 'many' relationship,
 ``select_related`` is limited to single-valued relationships - foreign key and
 one-to-one.
@@ -781,39 +793,54 @@ For example, suppose you have these models::
             return u"%s (%s)" % (self.name, u", ".join([topping.name
                                                         for topping in self.toppings.all()]))
 
-and run this code::
+and run::
 
     >>> Pizza.objects.all()
     [u"Hawaiian (ham, pineapple)", u"Seafood (prawns, smoked salmon)"...
 
-The problem with this code is that it will run a query on the Toppings table for
-**every** item in the Pizza ``QuerySet``.  Using ``prefetch_related``, this can
-be reduced to two:
+The problem with this is that every time ``Pizza.__unicode__()`` asks for
+``self.toppings.all()`` it has to query the database, so
+``Pizza.objects.all()`` will run a query on the Toppings table for **every**
+item in the Pizza ``QuerySet``.
+
+We can reduce to just two queries using ``prefetch_related``:
 
     >>> Pizza.objects.all().prefetch_related('toppings')
 
-All the relevant toppings will be fetched in a single query, and used to make
-``QuerySets`` that have a pre-filled cache of the relevant results. These
-``QuerySets`` are then used in the ``self.toppings.all()`` calls.
+This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
+``self.toppings.all()`` is called, instead of having to go to the database for
+the items, it will find them in a prefetched ``QuerySet`` cache that was
+populated in a single query.
 
-The additional queries are executed after the QuerySet has begun to be evaluated
-and the primary query has been executed. Note that the result cache of the
-primary QuerySet and all specified related objects will then be fully loaded
-into memory, which is often avoided in other cases - even after a query has been
-executed in the database, QuerySet normally tries to make uses of chunking
-between the database to avoid loading all objects into memory before you need
-them.
+That is, all the relevant toppings will have been fetched in a single query,
+and used to make ``QuerySets`` that have a pre-filled cache of the relevant
+results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
 
-Also remember that, as always with QuerySets, any subsequent chained methods
-which imply a different database query will ignore previously cached results,
-and retrieve data using a fresh database query. So, if you write the following:
+The additional queries in ``prefetch_related()`` are executed after the
+``QuerySet`` has begun to be evaluated and the primary query has been executed.
 
-    >>> pizzas = Pizza.objects.prefetch_related('toppings')
-    >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
+Note that the result cache of the primary ``QuerySet`` and all specified related
+objects will then be fully loaded into memory. This changes the typical
+behavior of ``QuerySets``, which normally try to avoid loading all objects into
+memory before they are needed, even after a query has been executed in the
+database.
 
-...then the fact that ``pizza.toppings.all()`` has been prefetched will not help
-you - in fact it hurts performance, since you have done a database query that
-you haven't used. So use this feature with caution!
+.. note::
+
+    Remember that, as always with ``QuerySets``, any subsequent chained methods
+    which imply a different database query will ignore previously cached
+    results, and retrieve data using a fresh database query. So, if you write
+    the following:
+
+        >>> pizzas = Pizza.objects.prefetch_related('toppings')
+        >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
+
+    ...then the fact that ``pizza.toppings.all()`` has been prefetched will not
+    help you. The ``prefetch_related('toppings')`` implied
+    ``pizza.toppings.all()``, but ``pizza.toppings.filter()`` is a new and
+    different query. The prefetched cache can't help here; in fact it hurts
+    performance, since you have done a database query that you haven't used. So
+    use this feature with caution!
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -866,7 +893,7 @@ additional queries on the ``ContentType`` table if the relevant rows have not
 already been fetched.
 
 ``prefetch_related`` in most cases will be implemented using a SQL query that
-uses the 'IN' operator. This means that for a large QuerySet a large 'IN' clause
+uses the 'IN' operator. This means that for a large ``QuerySet`` a large 'IN' clause
 could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
 profile for your use case!
@@ -968,11 +995,11 @@ of the arguments is required, but you should use at least one of them.
 
   Example::
 
-      Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
+      Entry.objects.extra(where=["foo='a' OR bar = 'a'", "baz = 'a'"])
 
   ...translates (roughly) into the following SQL::
 
-      SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
+      SELECT * FROM blog_entry WHERE (foo='a' OR bar='a') AND (baz='a')
 
   Be careful when using the ``tables`` parameter if you're specifying
   tables that are already used in the query. When you add extra tables
@@ -1059,7 +1086,7 @@ defer
 In some complex data-modeling situations, your models might contain a lot of
 fields, some of which could contain a lot of data (for example, text fields),
 or require expensive processing to convert them to Python objects. If you are
-using the results of a queryset in some situation where you know you don't know
+using the results of a queryset in some situation where you don't know
 if you need those particular fields when you initially fetch the data, you can
 tell Django not to retrieve them from the database.
 
@@ -1093,11 +1120,13 @@ to ``defer()``::
     # Load all fields immediately.
     my_queryset.defer(None)
 
+.. versionchanged:: 1.5
+
 Some fields in a model won't be deferred, even if you ask for them. You can
 never defer the loading of the primary key. If you are using
 :meth:`select_related()` to retrieve related models, you shouldn't defer the
-loading of the field that connects from the primary model to the related one
-(at the moment, that doesn't raise an error, but it will eventually).
+loading of the field that connects from the primary model to the related
+one, doing so will result in an error.
 
 .. note::
 
@@ -1119,6 +1148,14 @@ loading of the field that connects from the primary model to the related one
     might otherwise call ``defer()``. This makes your code more explicit to the
     reader, is slightly faster and consumes a little less memory in the Python
     process.
+
+.. versionchanged:: 1.5
+
+.. note::
+
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 
 only
@@ -1157,16 +1194,25 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
+.. versionchanged:: 1.5
+
 All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
-options.
+options. Also note that using :meth:`only` and omitting a field requested
+using :meth:`select_related` is an error as well.
+
+.. versionchanged:: 1.5
+
+.. note::
+
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
 
 .. method:: using(alias)
-
-.. versionadded:: 1.2
 
 This method is for controlling which database the ``QuerySet`` will be
 evaluated against if you are using more than one database.  The only argument
@@ -1243,7 +1289,7 @@ the format described in `Field lookups`_.
 
 ``get()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
 than one object was found. The
-:exc:`~django.core.excpetions.MultipleObjectsReturned` exception is an
+:exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
 attribute of the model class.
 
 ``get()`` raises a :exc:`~django.core.exceptions.DoesNotExist` exception if an
@@ -1261,7 +1307,7 @@ The :exc:`~django.core.exceptions.DoesNotExist` exception inherits from
         e = Entry.objects.get(id=3)
         b = Blog.objects.get(id=1)
     except ObjectDoesNotExist:
-        print "Either the entry or blog doesn't exist."
+        print("Either the entry or blog doesn't exist.")
 
 create
 ~~~~~~
@@ -1292,15 +1338,14 @@ get_or_create
 
 .. method:: get_or_create(**kwargs)
 
-A convenience method for looking up an object with the given kwargs, creating
-one if necessary.
+A convenience method for looking up an object with the given ``kwargs``,
+creating one if necessary.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
 
-This is meant as a shortcut to boilerplatish code and is mostly useful for
-data-import scripts. For example::
+This is meant as a shortcut to boilerplatish code. For example::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -1316,10 +1361,12 @@ The above example can be rewritten using ``get_or_create()`` like so::
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is
-found, ``get_or_create()`` returns a tuple of that object and ``False``. If an
-object is *not* found, ``get_or_create()`` will instantiate and save a new
-object, returning a tuple of the new object and ``True``. The new object will
-be created roughly according to this algorithm::
+found, ``get_or_create()`` returns a tuple of that object and ``False``. If
+multiple objects are found, ``get_or_create`` raises
+:exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
+found, ``get_or_create()`` will instantiate and save a new object, returning a
+tuple of the new object and ``True``. The new object will be created roughly
+according to this algorithm::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
@@ -1346,20 +1393,32 @@ when you're using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
 :exc:`~django.db.IntegrityError` will be raised.
 
-Finally, a word on using ``get_or_create()`` in Django views. As mentioned
-earlier, ``get_or_create()`` is mostly useful in scripts that need to parse
-data and create new records if existing ones aren't available. But if you need
-to use ``get_or_create()`` in a view, please make sure to use it only in
-``POST`` requests unless you have a good reason not to. ``GET`` requests
-shouldn't have any effect on data; use ``POST`` whenever a request to a page
-has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
+This method is atomic assuming correct usage, correct database configuration,
+and correct behavior of the underlying database. However, if uniqueness is not
+enforced at the database level for the ``kwargs`` used in a ``get_or_create``
+call (see :attr:`~django.db.models.Field.unique` or
+:attr:`~django.db.models.Options.unique_together`), this method is prone to a
+race-condition which can result in multiple rows with the same parameters being
+inserted simultaneously.
+
+If you are using MySQL, be sure to use the ``READ COMMITTED`` isolation level
+rather than ``REPEATABLE READ`` (the default), otherwise you may see cases
+where ``get_or_create`` will raise an :exc:`~django.db.IntegrityError` but the
+object won't appear in a subsequent :meth:`~django.db.models.query.QuerySet.get`
+call.
+
+Finally, a word on using ``get_or_create()`` in Django views. Please make sure
+to use it only in ``POST`` requests unless you have a good reason not to.
+``GET`` requests shouldn't have any effect on data. Instead, use ``POST``
+whenever a request to a page has a side effect on your data. For more, see
+`Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
 bulk_create
 ~~~~~~~~~~~
 
-.. method:: bulk_create(objs)
+.. method:: bulk_create(objs, batch_size=None)
 
 .. versionadded:: 1.4
 
@@ -1381,20 +1440,12 @@ This has a number of caveats though:
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
   does not retrieve and set the primary key attribute, as ``save()`` does.
 
-.. admonition:: Limits of SQLite
+The ``batch_size`` parameter controls how many objects are created in single
+query. The default is to create all objects in one batch, except for SQLite
+where the default is such that at maximum 999 variables per query is used.
 
-    SQLite sets a limit on the number of parameters per SQL statement. The
-    maximum is defined by the SQLITE_MAX_VARIABLE_NUMBER_ compilation option,
-    which defaults to 999. For instance, if your model has 8 fields (including
-    the primary key), you cannot create more than 999 // 8 = 124 instances at
-    a time. If you exceed this limit, you'll get an exception::
-
-        django.db.utils.DatabaseError: too many SQL variables
-
-    If your application's performance requirements exceed SQLite's limits, you
-    should switch to another database engine, such as PostgreSQL.
-
-.. _SQLITE_MAX_VARIABLE_NUMBER: http://sqlite.org/limits.html#max_variable_number
+.. versionadded:: 1.5
+    The ``batch_size`` parameter was added in version 1.5.
 
 count
 ~~~~~
@@ -1532,13 +1583,42 @@ exists
 
 .. method:: exists()
 
-.. versionadded:: 1.2
-
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
-possible, but it *does* execute nearly the same query. This means that calling
-:meth:`.QuerySet.exists` is faster than ``bool(some_query_set)``, but not by
-a large degree. If ``some_query_set`` has not yet been evaluated, but you know
+possible, but it *does* execute nearly the same query as a normal
+:class:`.QuerySet` query.
+
+:meth:`~.QuerySet.exists` is useful for searches relating to both
+object membership in a :class:`.QuerySet` and to the existence of any objects in
+a :class:`.QuerySet`, particularly in the context of a large :class:`.QuerySet`.
+
+The most efficient method of finding whether a model with a unique field
+(e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
+
+    entry = Entry.objects.get(pk=123)
+    if some_query_set.filter(pk=entry.pk).exists():
+        print("Entry contained in queryset")
+
+Which will be faster than the following which requires evaluating and iterating
+through the entire queryset::
+
+    if entry in some_query_set:
+       print("Entry contained in QuerySet")
+
+And to find whether a queryset contains any items::
+
+    if some_query_set.exists():
+        print("There is at least one object in some_query_set")
+
+Which will be faster than::
+
+    if some_query_set:
+        print("There is at least one object in some_query_set")
+
+... but not by a large degree (hence needing a large queryset for efficiency
+gains).
+
+Additionally, if a ``some_query_set`` has not yet been evaluated, but you know
 that it will be at some point, then using ``some_query_set.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than simply using ``bool(some_query_set)``, which
@@ -1609,9 +1689,9 @@ Finally, realize that ``update()`` does an update at the SQL level and, thus,
 does not call any ``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.pre_save` or
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
-calling :meth:`Model.save() <~django.db.models.Model.save()>`). If you want to
+calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
 update a bunch of records for a model that has a custom
-:meth:`~django.db.models.Model.save()`` method, loop over them and call
+:meth:`~django.db.models.Model.save()` method, loop over them and call
 :meth:`~django.db.models.Model.save()`, like this::
 
     for e in Entry.objects.filter(pub_date__year=2010):
@@ -1644,16 +1724,30 @@ For example::
     # This will delete all Blogs and all of their Entry objects.
     blogs.delete()
 
-.. versionadded:: 1.3
-    This cascade behavior is customizable via the
-    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
-    :class:`~django.db.models.ForeignKey`.
+This cascade behavior is customizable via the
+:attr:`~django.db.models.ForeignKey.on_delete` argument to the
+:class:`~django.db.models.ForeignKey`.
 
 The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.pre_delete` and
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
 (including cascaded deletions).
+
+.. versionadded:: 1.5
+    Allow fast-path deletion of objects
+
+Django needs to fetch objects into memory to send signals and handle cascades.
+However, if there are no cascades and no signals, then Django may take a
+fast-path and delete objects without fetching into memory. For large
+deletes this can result in significantly reduced memory usage. The amount of
+executed queries can be reduced, too.
+
+ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
+DO_NOTHING do not prevent taking the fast-path in deletion.
+
+Note that the queries generated in object deletion is an implementation
+detail subject to change.
 
 .. _field-lookups:
 
@@ -1789,22 +1883,6 @@ instead of providing a list of literal values::
 This queryset will be evaluated as subselect statement::
 
     SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
-
-The above code fragment could also be written as follows::
-
-    inner_q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
-    entries = Entry.objects.filter(blog__in=inner_q)
-
-.. warning::
-
-    This ``query`` attribute should be considered an opaque internal attribute.
-    It's fine to use it like above, but its API may change between Django
-    versions.
-
-This second form is a bit less readable and unnatural to write, since it
-accesses the internal ``query`` attribute and requires a ``ValuesQuerySet``.
-If your code doesn't require compatibility with Django 1.0, use the first
-form, passing in a queryset directly.
 
 If you pass in a ``ValuesQuerySet`` or ``ValuesListQuerySet`` (the result of
 calling ``values()`` or ``values_list()`` on a queryset) as the value to an
@@ -1975,6 +2053,17 @@ SQL equivalent::
 You can use ``range`` anywhere you can use ``BETWEEN`` in SQL — for dates,
 numbers and even characters.
 
+.. warning::
+
+    Filtering a ``DateTimeField`` with dates won't include items on the last
+    day, because the bounds are interpreted as "0am on the given date". If
+    ``pub_date`` was a ``DateTimeField``, the above expression would be turned
+    into this SQL::
+
+        SELECT ... WHERE pub_date BETWEEN '2005-01-01 00:00:00' and '2005-03-31 00:00:00';
+
+    Generally speaking, you can't mix dates and datetimes.
+
 .. fieldlookup:: year
 
 year
@@ -1988,7 +2077,7 @@ Example::
 
 SQL equivalent::
 
-    SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31 23:59:59.999999';
+    SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';
 
 (The exact SQL syntax varies for each database engine.)
 

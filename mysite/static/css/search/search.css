@@ -195,3 +195,33 @@ body#search .facet_more_options li { margin-top: 3px; }
     width: 100%;
   }
 }
+
+/* Inplace edit form stuff */
+form.inplaceeditform > button {
+    margin: 0;
+    vertical-align: top;
+}
+
+li.bug.expanded span.textareainplaceedit {
+    white-space: pre-line;
+}
+
+li.bug.expanded form.inplaceeditform {
+    white-space: normal;
+    float: none;
+    width: auto;
+}
+
+body#search.bugsets #results li.expanded .description-container .description {
+    overflow-y: visible;
+}
+
+body#search.bugsets #results li .helpers ,
+body#search.bugsets #results li .below_the_fold {
+    word-wrap: break-word;
+}
+
+span.skills > span {
+    background-color: #dcffcc;
+    padding: 1px;
+}

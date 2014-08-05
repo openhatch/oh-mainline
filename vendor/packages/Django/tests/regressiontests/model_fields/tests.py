@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 from decimal import Decimal
@@ -15,17 +15,17 @@ from django.db.models.fields import (
     TimeField, URLField)
 from django.db import models
 from django.db.models.fields.files import FileField, ImageField, FieldFile
+from django.utils import six
 from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
-    NullBooleanModel, BooleanModel, Document, RenamedField, VerboseNameField)
+    NullBooleanModel, BooleanModel, Document, RenamedField, VerboseNameField,
+    FksToBooleans)
 
-# If PIL available, do these tests.
-if Image:
-    from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-        TwoImageFieldTests, ImageFieldNoDimensionsTests,
-        ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-        ImageFieldUsingFileTests)
+from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
+    TwoImageFieldTests, ImageFieldNoDimensionsTests,
+    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
+    ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):
@@ -51,7 +51,7 @@ class BasicFieldTests(test.TestCase):
         nullboolean = NullBooleanModel(nbfield=None)
         try:
             nullboolean.full_clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
 
     def test_field_repr(self):
@@ -93,8 +93,8 @@ class DecimalFieldTests(test.TestCase):
 
     def test_format(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), u'2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), u'2.6')
+        self.assertEqual(f._format(f.to_python(2)), '2.0')
+        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
         self.assertEqual(f._format(None), None)
 
     def test_get_db_prep_lookup(self):
@@ -107,7 +107,7 @@ class DecimalFieldTests(test.TestCase):
         We should be able to filter decimal fields using strings (#8023)
         """
         Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
-        self.assertEqual(list(Foo.objects.filter(d=u'1.23')), [])
+        self.assertEqual(list(Foo.objects.filter(d='1.23')), [])
 
     def test_save_without_float_conversion(self):
         """
@@ -183,7 +183,7 @@ class BooleanFieldTests(unittest.TestCase):
         Test that BooleanField with choices and defaults doesn't generate a
         formfield with the blank option (#9640, #10549).
         """
-        choices = [(1, u'Si'), (2, 'No')]
+        choices = [(1, 'Si'), (2, 'No')]
         f = models.BooleanField(choices=choices, default=1, null=True)
         self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
 
@@ -223,8 +223,45 @@ class BooleanFieldTests(unittest.TestCase):
         # Verify that when an extra clause exists, the boolean
         # conversions are applied with an offset
         b5 = BooleanModel.objects.all().extra(
-            select={'string_length': 'LENGTH(string)'})[0]
+            select={'string_col': 'string'})[0]
         self.assertFalse(isinstance(b5.pk, bool))
+
+    def test_select_related(self):
+        """
+        Test type of boolean fields when retrieved via select_related() (MySQL,
+        #15040)
+        """
+        bmt = BooleanModel.objects.create(bfield=True)
+        bmf = BooleanModel.objects.create(bfield=False)
+        nbmt = NullBooleanModel.objects.create(nbfield=True)
+        nbmf = NullBooleanModel.objects.create(nbfield=False)
+
+        m1 = FksToBooleans.objects.create(bf=bmt, nbf=nbmt)
+        m2 = FksToBooleans.objects.create(bf=bmf, nbf=nbmf)
+
+        # Test select_related('fk_field_name')
+        ma = FksToBooleans.objects.select_related('bf').get(pk=m1.id)
+        # verify types -- should't be 0/1
+        self.assertIsInstance(ma.bf.bfield, bool)
+        self.assertIsInstance(ma.nbf.nbfield, bool)
+        # verify values
+        self.assertEqual(ma.bf.bfield, True)
+        self.assertEqual(ma.nbf.nbfield, True)
+
+        # Test select_related()
+        mb = FksToBooleans.objects.select_related().get(pk=m1.id)
+        mc = FksToBooleans.objects.select_related().get(pk=m2.id)
+        # verify types -- shouldn't be 0/1
+        self.assertIsInstance(mb.bf.bfield, bool)
+        self.assertIsInstance(mb.nbf.nbfield, bool)
+        self.assertIsInstance(mc.bf.bfield, bool)
+        self.assertIsInstance(mc.nbf.nbfield, bool)
+        # verify values
+        self.assertEqual(mb.bf.bfield, True)
+        self.assertEqual(mb.nbf.nbfield, True)
+        self.assertEqual(mc.bf.bfield, False)
+        self.assertEqual(mc.nbf.nbfield, False)
+
 
 class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
@@ -290,6 +327,10 @@ class ValidationTest(test.TestCase):
         self.assertRaises(ValidationError, f.clean, None, None)
         self.assertRaises(ValidationError, f.clean, '', None)
 
+    def test_integerfield_validates_zero_against_choices(self):
+        f = models.IntegerField(choices=((1, 1),))
+        self.assertRaises(ValidationError, f.clean, '0', None)
+
     def test_charfield_raises_error_on_empty_input(self):
         f = models.CharField(null=False)
         self.assertRaises(ValidationError, f.clean, None, None)
@@ -320,11 +361,11 @@ class BigIntegerFieldTests(test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b.save()
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, six.integer_types))
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')
@@ -386,6 +427,7 @@ class PrepValueTest(test.TestCase):
     def test_AutoField(self):
         self.assertIsInstance(AutoField(primary_key=True).get_prep_value(1), int)
 
+    @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
     def test_BigIntegerField(self):
         self.assertIsInstance(BigIntegerField().get_prep_value(long(9999999999999999999)), long)
 
@@ -393,12 +435,12 @@ class PrepValueTest(test.TestCase):
         self.assertIsInstance(BooleanField().get_prep_value(True), bool)
 
     def test_CharField(self):
-        self.assertIsInstance(CharField().get_prep_value(''), str)
-        self.assertIsInstance(CharField().get_prep_value(0), unicode)
+        self.assertIsInstance(CharField().get_prep_value(''), six.text_type)
+        self.assertIsInstance(CharField().get_prep_value(0), six.text_type)
 
     def test_CommaSeparatedIntegerField(self):
-        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value('1,2'), str)
-        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value(0), unicode)
+        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value('1,2'), six.text_type)
+        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value(0), six.text_type)
 
     def test_DateField(self):
         self.assertIsInstance(DateField().get_prep_value(datetime.date.today()), datetime.date)
@@ -410,32 +452,32 @@ class PrepValueTest(test.TestCase):
         self.assertIsInstance(DecimalField().get_prep_value(Decimal('1.2')), Decimal)
 
     def test_EmailField(self):
-        self.assertIsInstance(EmailField().get_prep_value('mailbox@domain.com'), str)
+        self.assertIsInstance(EmailField().get_prep_value('mailbox@domain.com'), six.text_type)
 
     def test_FileField(self):
-        self.assertIsInstance(FileField().get_prep_value('filename.ext'), unicode)
-        self.assertIsInstance(FileField().get_prep_value(0), unicode)
+        self.assertIsInstance(FileField().get_prep_value('filename.ext'), six.text_type)
+        self.assertIsInstance(FileField().get_prep_value(0), six.text_type)
 
     def test_FilePathField(self):
-        self.assertIsInstance(FilePathField().get_prep_value('tests.py'), unicode)
-        self.assertIsInstance(FilePathField().get_prep_value(0), unicode)
+        self.assertIsInstance(FilePathField().get_prep_value('tests.py'), six.text_type)
+        self.assertIsInstance(FilePathField().get_prep_value(0), six.text_type)
 
     def test_FloatField(self):
         self.assertIsInstance(FloatField().get_prep_value(1.2), float)
 
     def test_ImageField(self):
-        self.assertIsInstance(ImageField().get_prep_value('filename.ext'), unicode)
+        self.assertIsInstance(ImageField().get_prep_value('filename.ext'), six.text_type)
 
     def test_IntegerField(self):
         self.assertIsInstance(IntegerField().get_prep_value(1), int)
 
     def test_IPAddressField(self):
-        self.assertIsInstance(IPAddressField().get_prep_value('127.0.0.1'), unicode)
-        self.assertIsInstance(IPAddressField().get_prep_value(0), unicode)
+        self.assertIsInstance(IPAddressField().get_prep_value('127.0.0.1'), six.text_type)
+        self.assertIsInstance(IPAddressField().get_prep_value(0), six.text_type)
 
     def test_GenericIPAddressField(self):
-        self.assertIsInstance(GenericIPAddressField().get_prep_value('127.0.0.1'), unicode)
-        self.assertIsInstance(GenericIPAddressField().get_prep_value(0), unicode)
+        self.assertIsInstance(GenericIPAddressField().get_prep_value('127.0.0.1'), six.text_type)
+        self.assertIsInstance(GenericIPAddressField().get_prep_value(0), six.text_type)
 
     def test_NullBooleanField(self):
         self.assertIsInstance(NullBooleanField().get_prep_value(True), bool)
@@ -447,15 +489,15 @@ class PrepValueTest(test.TestCase):
         self.assertIsInstance(PositiveSmallIntegerField().get_prep_value(1), int)
 
     def test_SlugField(self):
-        self.assertIsInstance(SlugField().get_prep_value('slug'), str)
-        self.assertIsInstance(SlugField().get_prep_value(0), unicode)
+        self.assertIsInstance(SlugField().get_prep_value('slug'), six.text_type)
+        self.assertIsInstance(SlugField().get_prep_value(0), six.text_type)
 
     def test_SmallIntegerField(self):
         self.assertIsInstance(SmallIntegerField().get_prep_value(1), int)
 
     def test_TextField(self):
-        self.assertIsInstance(TextField().get_prep_value('Abc'), str)
-        self.assertIsInstance(TextField().get_prep_value(0), unicode)
+        self.assertIsInstance(TextField().get_prep_value('Abc'), six.text_type)
+        self.assertIsInstance(TextField().get_prep_value(0), six.text_type)
 
     def test_TimeField(self):
         self.assertIsInstance(
@@ -463,5 +505,5 @@ class PrepValueTest(test.TestCase):
             datetime.time)
 
     def test_URLField(self):
-        self.assertIsInstance(URLField().get_prep_value('http://domain.com'), str)
+        self.assertIsInstance(URLField().get_prep_value('http://domain.com'), six.text_type)
 

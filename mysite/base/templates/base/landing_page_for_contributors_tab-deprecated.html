@@ -49,7 +49,7 @@
         {% else %}
         <p>No projects listed yet.</p>
         {% endif %}
-        <p class="rabbit_hole"><a href='{% url mysite.project.views.projects %}'>Find more projects to help with &raquo;</a></p>
+        <p class="rabbit_hole"><a href='{% url "mysite.project.views.projects" %}'>Find more projects to help with &raquo;</a></p>
       </div>
 
       <h3>Recommended bugs based on your profile
@@ -89,7 +89,7 @@
           {% endif %}
           {% endif %}
 
-          <p class="rabbit_hole"><a href='{% url mysite.search.views.search_index %}'>Find more recommendations and other opportunities &raquo;</a></p>
+          <p class="rabbit_hole"><a href='{% url "mysite.search.views.search_index" %}'>Find more recommendations and other opportunities &raquo;</a></p>
         </div>
         {% endif %}
       </div>
@@ -106,30 +106,30 @@
           <ul class="missions">
             {% if completed_missions.tar or completed_missions.tar_extract %}
             {% if completed_missions.tar and completed_missions.tar_extract %}
-            <li>You have completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
+            <li>You have completed the <a href="{% url "mysite.missions.tar.views.about" %}">Tar mission.</a></li>
             {% else %}
-            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
+            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url "mysite.missions.tar.views.about" %}">Tar mission.</a></li>
             {% endif %}
             {% endif %}
             {% if completed_missions.diffpatch_diffsingle or completed_missions.diffpatch_patchsingle or completed_missions.diffpatch_diffrecursive or completed_missions.diffpatch_patchrecursive %}
             {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
-            <li>You have completed the <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
+            <li>You have completed the <a href="{% url "mysite.missions.diffpatch.views.about" %}">Diff and Patch mission.</a></li>
             {% else %}
-            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed this <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
+            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed this <a href="{% url "mysite.missions.diffpatch.views.about" %}">Diff and Patch mission.</a></li>
             {% endif %}
             {% endif %}
             {% if completed_missions.svn_checkout or completed_missions.svn_diff or completed_missions.svn_commit %}
             {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
-            <li>You have completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
+            <li>You have completed the <a href="{% "url mysite.missions.svn.views.main_page" %}">SVN mission.</a></li>
             {% else %}
-            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
+            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url "mysite.missions.svn.views.main_page" %}">SVN mission.</a></li>
             {% endif %}
             {% endif %}
             {% if completed_missions.git_checkout or completed_missions.git_diff or completed_missions.git_rebase%}
             {% if completed_missions.git_checkout and completed_missions.git_diff and completed_missions.git_rebase%}
-            <li>You have completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
+            <li>You have completed the <a href="{% url "mysite.missions.git.views.long_description" %}">Git mission.</a></li>
             {% else %}
-            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
+            <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url "mysite.missions.git.views.long_description" %}">Git mission.</a></li>
             {% endif %}
             {% endif %}
           </ul>
@@ -138,7 +138,7 @@
           {% endif %}
           {% endif %}
 
-          <p class="rabbit_hole"><a href="{% url mysite.missions.base.views.main_page %}">Learn more about missions &raquo;</a></p>
+          <p class="rabbit_hole"><a href="{% url "mysite.missions.base.views.main_page" %}">Learn more about missions &raquo;</a></p>
         </div>
 
         <h3>People</h3>
@@ -163,13 +163,13 @@
           </div>
           {% endwith %}
 
-          <p class="rabbit_hole"><a href="{% url mysite.profile.views.people %}">Find more awesome people &raquo;</a></p>
+          <p class="rabbit_hole"><a href="{% url "mysite.profile.views.people" %}">Find more awesome people &raquo;</a></p>
         </div>
 
         <h3>Syndicate your profile</h3>
         <div class="body">
           <p>Put your project list on your other web things.</p>
-          <p class="rabbit_hole"><a href='{% url mysite.account.views.widget %}'>Get your widget &raquo;</a></p>
+          <p class="rabbit_hole"><a href='{% url "mysite.account.views.widget" %}'>Get your widget &raquo;</a></p>
         </div>
       </div>
     </div>

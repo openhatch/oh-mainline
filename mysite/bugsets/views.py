@@ -26,19 +26,25 @@ from django.shortcuts import render
 # }}}
 
 
-def list_index(request):
+def main_index(request):
     bugsets = mysite.bugsets.models.BugSet.objects.all()
     context = {
         'bugsets': bugsets,
     }
-    return render(request, 'list_index.html', context)
+    return render(request, 'main_index.html', context)
 
 
-def listview_index(request, pk, slug):
+def list_index(request, pk, slug):
     bugset = mysite.bugsets.models.BugSet.objects.get(pk=pk)
     bugs = bugset.bugs.all()
     context = {
         'bugset': bugset,
         'bugs': bugs,
     }
-    return render(request, 'listview_index.html', context)
+    return render(request, 'list_index.html', context)
+
+
+def create_index(request):
+    context = {}
+    return render(request, 'create_index.html', context)
+
