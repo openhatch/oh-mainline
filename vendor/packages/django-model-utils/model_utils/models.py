@@ -1,53 +1,14 @@
-import warnings
-
-from datetime import datetime
+from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.fields import FieldDoesNotExist
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.timezone import now
 
-from model_utils.managers import manager_from, InheritanceCastMixin, \
-    QueryManager
+from model_utils.managers import QueryManager
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField, \
     StatusField, MonitorField
-
-class InheritanceCastModel(models.Model):
-    """
-    An abstract base class that provides a ``real_type`` FK to ContentType.
-
-    For use in trees of inherited models, to be able to downcast
-    parent instances to their child types.
-
-    Pending deprecation; use InheritanceManager instead.
-
-    """
-    real_type = models.ForeignKey(ContentType, editable=False, null=True)
-
-    objects = manager_from(InheritanceCastMixin)
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "InheritanceCastModel is pending deprecation. "
-            "Use InheritanceManager instead.",
-            PendingDeprecationWarning,
-            stacklevel=2)
-        super(InheritanceCastModel, self).__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.real_type = self._get_real_type()
-        super(InheritanceCastModel, self).save(*args, **kwargs)
-
-    def _get_real_type(self):
-        return ContentType.objects.get_for_model(type(self))
-
-    def cast(self):
-        return self.real_type.get_object_for_this_type(pk=self.pk)
-
-    class Meta:
-        abstract = True
 
 
 class TimeStampedModel(models.Model):
@@ -97,13 +58,13 @@ def add_status_query_managers(sender, **kwargs):
     """
     if not issubclass(sender, StatusModel):
         return
-    for value, name in getattr(sender, 'STATUS', ()):
+    for value, display in getattr(sender, 'STATUS', ()):
         try:
-            sender._meta.get_field(name)
+            sender._meta.get_field(value)
             raise ImproperlyConfigured("StatusModel: Model '%s' has a field "
                                        "named '%s' which conflicts with a "
                                        "status of the same name."
-                                       % (sender.__name__, name))
+                                       % (sender.__name__, value))
         except FieldDoesNotExist:
             pass
         sender.add_to_class(value, QueryManager(status=value))
@@ -119,13 +80,13 @@ def add_timeframed_query_manager(sender, **kwargs):
         sender._meta.get_field('timeframed')
         raise ImproperlyConfigured("Model '%s' has a field named "
                                    "'timeframed' which conflicts with "
-                                   "the TimeFramedModel manager." 
+                                   "the TimeFramedModel manager."
                                    % sender.__name__)
     except FieldDoesNotExist:
         pass
     sender.add_to_class('timeframed', QueryManager(
-        (models.Q(start__lte=datetime.now) | models.Q(start__isnull=True)) &
-        (models.Q(end__gte=datetime.now) | models.Q(end__isnull=True))
+        (models.Q(start__lte=now) | models.Q(start__isnull=True)) &
+        (models.Q(end__gte=now) | models.Q(end__isnull=True))
     ))
 
 

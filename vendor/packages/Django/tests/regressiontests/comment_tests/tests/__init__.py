@@ -6,6 +6,7 @@ from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from ..models import Article, Author
 
@@ -13,9 +14,10 @@ from ..models import Article, Author
 CT = ContentType.objects.get_for_model
 
 # Helper base class for comment tests that need data.
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',))
 class CommentTestCase(TestCase):
     fixtures = ["comment_tests"]
-    urls = 'django.contrib.comments.urls'
+    urls = 'regressiontests.comment_tests.urls_default'
 
     def createSomeComments(self):
         # Two anonymous comments on two different objects

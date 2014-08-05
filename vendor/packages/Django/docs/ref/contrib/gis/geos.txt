@@ -142,10 +142,9 @@ Geometry Objects
 
 .. class:: GEOSGeometry(geo_input[, srid=None])
 
-  :param geo_input: Geometry input value
-  :type geo_input: string or buffer
+  :param geo_input: Geometry input value (string or buffer)
   :param srid: spatial reference identifier
-  :type srid: integer
+  :type srid: int
 
 This is the base class for all GEOS geometry objects.  It initializes on the
 given ``geo_input`` argument, and then assumes the proper geometry subclass
@@ -162,6 +161,11 @@ HEX / HEXEWKB  ``str`` or ``unicode``
 WKB / EWKB     ``buffer``
 GeoJSON        ``str`` or ``unicode``
 =============  ======================
+
+.. note::
+
+    The new 3D/4D WKT notation with an intermediary Z or M (like
+    ``POINT Z (3, 4, 5)``) is only supported with GEOS 3.3.0 or later.
 
 Properties
 ~~~~~~~~~~
@@ -232,8 +236,6 @@ Returns a boolean indicating whether the geometry is valid.
 
 .. attribute:: GEOSGeometry.valid_reason
 
-.. versionadded:: 1.3
-
 Returns a string describing the reason why a geometry is invalid.
 
 .. attribute:: GEOSGeometry.srid
@@ -242,7 +244,7 @@ Property that may be used to retrieve or set the SRID associated with the
 geometry.  For example::
 
     >>> pnt = Point(5, 23)
-    >>> print pnt.srid
+    >>> print(pnt.srid)
     None
     >>> pnt.srid = 4326
     >>> pnt.srid
@@ -270,16 +272,18 @@ Essentially the SRID is prepended to the WKT representation, for example
 .. attribute:: GEOSGeometry.hex
 
 Returns the WKB of this Geometry in hexadecimal form.  Please note
-that the SRID and Z values are not included in this representation
+that the SRID value is not included in this representation
 because it is not a part of the OGC specification (use the
 :attr:`GEOSGeometry.hexewkb` property instead).
 
+.. versionchanged:: 1.5
+
+    Prior to Django 1.5, the Z value of the geometry was dropped.
+
 .. attribute:: GEOSGeometry.hexewkb
 
-.. versionadded:: 1.2
-
 Returns the EWKB of this Geometry in hexadecimal form.  This is an
-extension of the WKB specification that includes SRID and Z values
+extension of the WKB specification that includes the SRID value
 that are a part of this geometry.
 
 .. note::
@@ -307,7 +311,7 @@ geometry.  This should only be used for geometries with an SRID of
 .. attribute:: GEOSGeometry.ogr
 
 Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object
-correspondg to the GEOS geometry.
+corresponding to the GEOS geometry.
 
 .. note::
 
@@ -318,18 +322,20 @@ correspondg to the GEOS geometry.
 .. attribute:: GEOSGeometry.wkb
 
 Returns the WKB (Well-Known Binary) representation of this Geometry
-as a Python buffer.  SRID and Z values are not included, use the
+as a Python buffer.  SRID value is not included, use the
 :attr:`GEOSGeometry.ewkb` property instead.
+
+.. versionchanged:: 1.5
+
+    Prior to Django 1.5, the Z value of the geometry was dropped.
 
 .. _ewkb:
 
 .. attribute:: GEOSGeometry.ewkb
 
-.. versionadded:: 1.2
-
 Return the EWKB representation of this Geometry as a Python buffer.
 This is an extension of the WKB specification that includes any SRID
-and Z values that are a part of this geometry.
+value that are a part of this geometry.
 
 .. note::
 
@@ -417,10 +423,35 @@ quarter circle (defaults is 8).
 Returns a :class:`GEOSGeometry` representing the points making up this
 geometry that do not make up other.
 
+.. method:: GEOSGeometry.interpolate(distance)
+.. method:: GEOSGeometry.interpolate_normalized(distance)
+
+.. versionadded:: 1.5
+
+Given a distance (float), returns the point (or closest point) within the
+geometry (:class:`LineString` or :class:`MultiLineString`) at that distance.
+The normalized version takes the distance as a float between 0 (origin) and 1
+(endpoint).
+
+Reverse of :meth:`GEOSGeometry.project`.
+
 .. method:: GEOSGeometry:intersection(other)
 
 Returns a :class:`GEOSGeometry` representing the points shared by this
 geometry and other.
+
+.. method:: GEOSGeometry.project(point)
+.. method:: GEOSGeometry.project_normalized(point)
+
+.. versionadded:: 1.5
+
+Returns the distance (float) from the origin of the geometry
+(:class:`LineString` or :class:`MultiLineString`) to the point projected on the
+geometry (that is to a point of the line the closest to the given point).
+The normalized version returns the distance as a float between 0 (origin) and 1
+(endpoint).
+
+Reverse of :meth:`GEOSGeometry.interpolate`.
 
 .. method:: GEOSGeometry.relate(other)
 
@@ -534,9 +565,7 @@ corresponding to the SRID of the geometry or ``None``.
 
 .. method:: GEOSGeometry.transform(ct, clone=False)
 
-.. versionchanged:: 1.3
-
-Transforms the geometry according to the given coordinate transformation paramter
+Transforms the geometry according to the given coordinate transformation parameter
 (``ct``), which may be an integer SRID, spatial reference WKT string,
 a PROJ.4 string, a :class:`~django.contrib.gis.gdal.SpatialReference` object, or a
 :class:`~django.contrib.gis.gdal.CoordTransform` object. By default, the geometry
@@ -553,9 +582,8 @@ is returned instead.
    Prior to 1.3, this method would silently no-op if GDAL was not available.
    Now, a :class:`~django.contrib.gis.geos.GEOSException` is raised as
    application code relying on this behavior is in error. In addition,
-   use of this method when the SRID is ``None`` or less than 0 now generates
-   a warning because a :class:`~django.contrib.gis.geos.GEOSException` will
-   be raised instead in version 1.5.
+   use of this method when the SRID is ``None`` or less than 0 now also generates
+   a :class:`~django.contrib.gis.geos.GEOSException`.
 
 
 ``Point``
@@ -626,6 +654,17 @@ is returned instead.
    .. attribute:: num_interior_rings
 
    Returns the number of interior rings in this geometry.
+
+.. admonition:: Comparing Polygons
+
+    Note that it is possible to compare ``Polygon`` objects directly with ``<``
+    or ``>``, but as the comparison is made through Polygon's
+    :class:`LineString`, it does not mean much (but is consistent and quick).
+    You can always force the comparison with the :attr:`~GEOSGeometry.area`
+    property::
+
+        >>> if poly_1.area > poly_2.area:
+        >>>     pass
 
 Geometry Collections
 ====================
@@ -760,7 +799,7 @@ Example::
    :param string: string that contains spatial data
    :type string: string
    :param srid: spatial reference identifier
-   :type srid: integer
+   :type srid: int
    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
 
 Example::
@@ -801,7 +840,7 @@ Writer Objects
 All writer objects have a ``write(geom)`` method that returns either the
 WKB or WKT of the given geometry.  In addition, :class:`WKBWriter` objects
 also have properties that may be used to change the byte order, and or
-include the SRID and 3D values (in other words, EWKB).
+include the SRID value (in other words, EWKB).
 
 .. class:: WKBWriter
 
@@ -863,7 +902,7 @@ so that the Z value is included in the WKB.
 Outdim Value Description
 ============ ===========================
 2            The default, output 2D WKB.
-3            Output 3D EWKB.
+3            Output 3D WKB.
 ============ ===========================
 
 Example::
@@ -926,3 +965,10 @@ location (e.g., ``/home/bob/lib/libgeos_c.so``).
 
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
+
+Exceptions
+==========
+
+.. exception:: GEOSException
+
+The base GEOS exception, indicates a GEOS-related error.

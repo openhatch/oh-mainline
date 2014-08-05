@@ -13,7 +13,7 @@ Details
 =======
 
 On a local instance, if you visit
-http://localhost:8000/+wp-theme/index , you will see an amusing
+http://localhost:8000/+theme-stubs/wordpress/index , you will see an amusing
 absurdity: a Django template has been rendered, but the template
 blocks have been filled with placeholder strings.
 

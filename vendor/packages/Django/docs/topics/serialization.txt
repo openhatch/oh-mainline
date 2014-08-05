@@ -3,8 +3,8 @@ Serializing Django objects
 ==========================
 
 Django's serialization framework provides a mechanism for "translating" Django
-objects into other formats. Usually these other formats will be text-based and
-used for sending Django objects over a wire, but it's possible for a
+models into other formats. Usually these other formats will be text-based and
+used for sending Django data over a wire, but it's possible for a
 serializer to handle any format (text-based or not).
 
 .. seealso::
@@ -23,8 +23,10 @@ At the highest level, serializing data is a very simple operation::
 The arguments to the ``serialize`` function are the format to serialize the data
 to (see `Serialization formats`_) and a
 :class:`~django.db.models.query.QuerySet` to serialize. (Actually, the second
-argument can be any iterator that yields Django objects, but it'll almost
-always be a QuerySet).
+argument can be any iterator that yields Django model instances, but it'll
+almost always be a QuerySet).
+
+.. function:: django.core.serializers.get_serializer(format)
 
 You can also use a serializer object directly::
 
@@ -36,14 +38,14 @@ You can also use a serializer object directly::
 This is useful if you want to serialize data directly to a file-like object
 (which includes an :class:`~django.http.HttpResponse`)::
 
-    out = open("file.xml", "w")
-    xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+    with open("file.xml", "w") as out:
+        xml_serializer.serialize(SomeModel.objects.all(), stream=out)
 
 .. note::
 
     Calling :func:`~django.core.serializers.get_serializer` with an unknown
     :ref:`format <serialization-formats>` will raise a
-    :class:`~django.core.serializers.SerializerDoesNotExist` exception.
+    ``django.core.serializers.SerializerDoesNotExist`` exception.
 
 Subset of fields
 ~~~~~~~~~~~~~~~~
@@ -88,11 +90,11 @@ If you only serialize the Restaurant model::
 
     data = serializers.serialize('xml', Restaurant.objects.all())
 
-the fields on the serialized output will only contain the `serves_hot_dogs`
-attribute. The `name` attribute of the base class will be ignored.
+the fields on the serialized output will only contain the ``serves_hot_dogs``
+attribute. The ``name`` attribute of the base class will be ignored.
 
-In order to fully serialize your Restaurant instances, you will need to
-serialize the Place models as well::
+In order to fully serialize your ``Restaurant`` instances, you will need to
+serialize the ``Place`` models as well::
 
     all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
     data = serializers.serialize('xml', all_objects)
@@ -130,6 +132,14 @@ trust your data source you could just save the object and move on.
 
 The Django object itself can be inspected as ``deserialized_object.object``.
 
+.. versionadded:: 1.5
+
+If fields in the serialized data do not exist on a model,
+a ``DeserializationError`` will be raised unless the ``ignorenonexistent``
+argument is passed in as True::
+
+    serializers.deserialize("xml", data, ignorenonexistent=True)
+
 .. _serialization-formats:
 
 Serialization formats
@@ -143,15 +153,13 @@ Identifier  Information
 ==========  ==============================================================
 ``xml``     Serializes to and from a simple XML dialect.
 
-``json``    Serializes to and from JSON_ (using a version of simplejson_
-            bundled with Django).
+``json``    Serializes to and from JSON_.
 
 ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
             serializer is only available if PyYAML_ is installed.
 ==========  ==============================================================
 
 .. _json: http://json.org/
-.. _simplejson: http://undefined.org/python/#simplejson
 .. _PyYAML: http://www.pyyaml.org/
 
 Notes for specific serialization formats
@@ -160,47 +168,26 @@ Notes for specific serialization formats
 json
 ^^^^
 
-If you're using UTF-8 (or any other non-ASCII encoding) data with the JSON
-serializer, you must pass ``ensure_ascii=False`` as a parameter to the
-``serialize()`` call. Otherwise, the output won't be encoded correctly.
+Be aware that not all Django output can be passed unmodified to :mod:`json`.
+In particular, :ref:`lazy translation objects <lazy-translations>` need a
+`special encoder`_ written for them. Something like this will work::
 
-For example::
-
-    json_serializer = serializers.get_serializer("json")()
-    json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
-
-The Django source code includes the simplejson_ module. However, if you're
-using Python 2.6 or later (which includes a builtin version of the module), Django will
-use the builtin ``json`` module automatically. If you have a system installed
-version that includes the C-based speedup extension, or your system version is
-more recent than the version shipped with Django (currently, 2.0.7), the
-system version will be used instead of the version included with Django.
-
-Be aware that if you're serializing using that module directly, not all Django
-output can be passed unmodified to simplejson. In particular, :ref:`lazy
-translation objects <lazy-translations>` need a `special encoder`_ written for
-them. Something like this will work::
-
+    import json
     from django.utils.functional import Promise
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_text
 
-    class LazyEncoder(simplejson.JSONEncoder):
+    class LazyEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, Promise):
-                return force_unicode(obj)
+                return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
-.. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
+.. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
 
 .. _topics-serialization-natural-keys:
 
 Natural keys
 ------------
-
-.. versionadded:: 1.2
-
-   The ability to use natural keys when serializing/deserializing data was
-   added in the 1.2 release.
 
 The default serialization strategy for foreign keys and many-to-many relations
 is to serialize the value of the primary key(s) of the objects in the relation.
@@ -208,7 +195,7 @@ This strategy works well for most objects, but it can cause difficulty in some
 circumstances.
 
 Consider the case of a list of objects that have a foreign key referencing
-:class:`~django.contrib.conttenttypes.models.ContentType`. If you're going to
+:class:`~django.contrib.contenttypes.models.ContentType`. If you're going to
 serialize an object that refers to a content type, then you need to have a way
 to refer to that content type to begin with. Since ``ContentType`` objects are
 automatically created by Django during the database synchronization process,
@@ -356,7 +343,7 @@ When ``use_natural_keys=True`` is specified, Django will use the
 type that defines the method.
 
 If you are using :djadmin:`dumpdata` to generate serialized data, you
-use the `--natural` command line flag to generate natural keys.
+use the :djadminopt:`--natural` command line flag to generate natural keys.
 
 .. note::
 
@@ -375,7 +362,7 @@ Dependencies during serialization
 
 Since natural keys rely on database lookups to resolve references, it
 is important that the data exists before it is referenced. You can't make
-a `forward reference` with natural keys -- the data you're referencing
+a "forward reference" with natural keys -- the data you're referencing
 must exist before you include a natural key reference to that data.
 
 To accommodate this limitation, calls to :djadmin:`dumpdata` that use

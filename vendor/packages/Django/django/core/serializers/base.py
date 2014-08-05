@@ -2,10 +2,9 @@
 Module for abstract serializer/unserializer base classes.
 """
 
-from StringIO import StringIO
-
 from django.db import models
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
+from django.utils import six
 
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
@@ -34,11 +33,12 @@ class Serializer(object):
         """
         self.options = options
 
-        self.stream = options.pop("stream", StringIO())
+        self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
 
         self.start_serialization()
+        self.first = True
         for obj in queryset:
             self.start_object(obj)
             # Use the concrete parent class' _meta instead of the object's _meta
@@ -57,6 +57,8 @@ class Serializer(object):
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
+            if self.first:
+                self.first = False
         self.end_serialization()
         return self.getvalue()
 
@@ -110,7 +112,7 @@ class Serializer(object):
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
-class Deserializer(object):
+class Deserializer(six.Iterator):
     """
     Abstract base deserializer class.
     """
@@ -120,8 +122,8 @@ class Deserializer(object):
         Init this serializer given a stream or a string
         """
         self.options = options
-        if isinstance(stream_or_string, basestring):
-            self.stream = StringIO(stream_or_string)
+        if isinstance(stream_or_string, six.string_types):
+            self.stream = six.StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
         # hack to make sure that the models have all been loaded before
@@ -132,7 +134,7 @@ class Deserializer(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
         raise NotImplementedError
 
@@ -159,9 +161,7 @@ class DeserializedObject(object):
     def save(self, save_m2m=True, using=None):
         # Call save on the Model baseclass directly. This bypasses any
         # model-defined save. The save is also forced to be raw.
-        # This ensures that the data that is deserialized is literally
-        # what came from the file, not post-processed by pre_save/save
-        # methods.
+        # raw=True is passed to any pre/post_save signals.
         models.Model.save_base(self.object, using=using, raw=True)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():

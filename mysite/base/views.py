@@ -296,3 +296,8 @@ def wordpress_index(request):
     template_path = 'base/wordpress_index.html'
     data = {}
     return (request, template_path, data)
+
+def render_robots_txt(request):
+    template_path = "robots.txt"
+    return render_response(request, template_path, mimetype='text/plain')
+

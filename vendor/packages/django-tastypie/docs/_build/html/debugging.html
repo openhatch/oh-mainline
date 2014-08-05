@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Debugging Tastypie &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Debugging Tastypie &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Sites Using Tastypie" href="who_uses.html" />
     <link rel="prev" title="Tastypie Cookbook" href="cookbook.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="cookbook.html" title="Tastypie Cookbook"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -105,6 +105,17 @@ curl -H 'Content-Type: application/json' -X PUT --data @- "http://localhost:8000
 curl -H 'Content-Type: application/json' -X PUT --data @- "http://localhost:8000/api/v1/entry/"</pre>
 </div>
 </div>
+<div class="section" id="why-is-my-syncdb-with-superuser-failing-with-a-databaseerror">
+<h2>&#8220;Why is my syncdb with superuser failing with a DatabaseError?&#8221;<a class="headerlink" href="#why-is-my-syncdb-with-superuser-failing-with-a-databaseerror" title="Permalink to this headline">¶</a></h2>
+<p>More specifically, this specific <tt class="docutils literal"><span class="pre">DatabaseError</span></tt>:</p>
+<div class="highlight-python"><pre>django.db.utils.DatabaseError: no such table: tastypie_apikey</pre>
+</div>
+<p>This is a side effect of the (disabled by default) <tt class="docutils literal"><span class="pre">create_api_key</span></tt> signal
+as described in the <a class="reference internal" href="authentication.html#authentication"><em>Authentication</em></a> section of the
+documentation when used in conjunction with South.</p>
+<p>To work around this issue, you can disable the <tt class="docutils literal"><span class="pre">create_api_key</span></tt> signal
+until you have completed running <tt class="docutils literal"><span class="pre">syncdb</span> <span class="pre">--migrate</span></tt> for the first time.</p>
+</div>
 </div>
 
 
@@ -118,6 +129,7 @@ curl -H 'Content-Type: application/json' -X PUT --data @- "http://localhost:8000
 <li><a class="reference internal" href="#">Debugging Tastypie</a><ul>
 <li><a class="reference internal" href="#i-m-getting-xml-output-in-my-browser-but-i-want-json-output">&#8220;I&#8217;m getting XML output in my browser but I want JSON output!&#8221;</a></li>
 <li><a class="reference internal" href="#what-s-the-format-for-a-post-or-put">&#8220;What&#8217;s the format for a POST or PUT?&#8221;</a></li>
+<li><a class="reference internal" href="#why-is-my-syncdb-with-superuser-failing-with-a-databaseerror">&#8220;Why is my syncdb with superuser failing with a DatabaseError?&#8221;</a></li>
 </ul>
 </li>
 </ul>
@@ -165,11 +177,11 @@ curl -H 'Content-Type: application/json' -X PUT --data @- "http://localhost:8000
         <li class="right" >
           <a href="cookbook.html" title="Tastypie Cookbook"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

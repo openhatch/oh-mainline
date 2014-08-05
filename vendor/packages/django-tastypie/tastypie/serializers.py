@@ -1,28 +1,40 @@
+from __future__ import unicode_literals
 import datetime
-from StringIO import StringIO
+import re
+import django
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.serializers import json
-from django.utils import simplejson
-from django.utils.encoding import force_unicode
+from django.utils import six
+from django.utils.encoding import force_text, smart_bytes
+from django.core.serializers import json as djangojson
+
 from tastypie.bundle import Bundle
-from tastypie.exceptions import UnsupportedFormat
-from tastypie.utils import format_datetime, format_date, format_time
+from tastypie.exceptions import BadRequest, UnsupportedFormat
+from tastypie.utils import format_datetime, format_date, format_time, make_naive
+
 try:
-    import lxml
-    from lxml.etree import parse as parse_xml
-    from lxml.etree import Element, tostring
+    import defusedxml.lxml as lxml
+    from defusedxml.common import DefusedXmlException
+    from defusedxml.lxml import parse as parse_xml
+    from lxml.etree import Element, tostring, LxmlError, XMLParser
 except ImportError:
     lxml = None
+
 try:
     import yaml
     from django.core.serializers import pyyaml
 except ImportError:
     yaml = None
+
 try:
     import biplist
 except ImportError:
     biplist = None
+
+import json
+
+
+XML_ENCODING = re.compile('<\?xml.*?\?>', re.IGNORECASE)
 
 
 # Ugh & blah.
@@ -60,7 +72,7 @@ class Serializer(object):
     This handles most types of data as well as the following output formats::
 
         * json
-        * jsonp
+        * jsonp (Disabled by default)
         * xml
         * yaml
         * html
@@ -70,28 +82,37 @@ class Serializer(object):
     various format methods (i.e. ``to_json``), by changing the
     ``formats/content_types`` options or by altering the other hook methods.
     """
-    formats = ['json', 'jsonp', 'xml', 'yaml', 'html', 'plist']
-    content_types = {
-        'json': 'application/json',
-        'jsonp': 'text/javascript',
-        'xml': 'application/xml',
-        'yaml': 'text/yaml',
-        'html': 'text/html',
-        'plist': 'application/x-plist',
-    }
+
+    formats = ['json', 'xml', 'yaml', 'html', 'plist']
+
+    content_types = {'json': 'application/json',
+                     'jsonp': 'text/javascript',
+                     'xml': 'application/xml',
+                     'yaml': 'text/yaml',
+                     'html': 'text/html',
+                     'plist': 'application/x-plist'}
 
     def __init__(self, formats=None, content_types=None, datetime_formatting=None):
-        self.supported_formats = []
-        self.datetime_formatting = getattr(settings, 'TASTYPIE_DATETIME_FORMATTING', 'iso-8601')
+        if datetime_formatting is not None:
+            self.datetime_formatting = datetime_formatting
+        else:
+            self.datetime_formatting = getattr(settings, 'TASTYPIE_DATETIME_FORMATTING', 'iso-8601')
 
-        if formats is not None:
-            self.formats = formats
+        self.supported_formats = []
 
         if content_types is not None:
             self.content_types = content_types
 
-        if datetime_formatting is not None:
-            self.datetime_formatting = datetime_formatting
+        if formats is not None:
+            self.formats = formats
+
+        if self.formats is Serializer.formats and hasattr(settings, 'TASTYPIE_DEFAULT_FORMATS'):
+            # We want TASTYPIE_DEFAULT_FORMATS to override unmodified defaults but not intentational changes
+            # on Serializer subclasses:
+            self.formats = settings.TASTYPIE_DEFAULT_FORMATS
+
+        if not isinstance(self.formats, (list, tuple)):
+            raise ImproperlyConfigured('Formats should be a list or tuple, not %r' % self.formats)
 
         for format in self.formats:
             try:
@@ -120,8 +141,12 @@ class Serializer(object):
 
         Default is ``iso-8601``, which looks like "2010-12-16T03:02:14".
         """
+        data = make_naive(data)
         if self.datetime_formatting == 'rfc-2822':
             return format_datetime(data)
+        if self.datetime_formatting == 'iso-8601-strict':
+            # Remove microseconds to strictly adhere to iso-8601
+            data = data - datetime.timedelta(microseconds = data.microsecond)
 
         return data.isoformat()
 
@@ -150,15 +175,20 @@ class Serializer(object):
         """
         if self.datetime_formatting == 'rfc-2822':
             return format_time(data)
+        if self.datetime_formatting == 'iso-8601-strict':
+            # Remove microseconds to strictly adhere to iso-8601
+            data = (datetime.datetime.combine(datetime.date(1,1,1),data) - datetime.timedelta(microseconds = data.microsecond)).time()
 
         return data.isoformat()
 
-    def serialize(self, bundle, format='application/json', options={}):
+    def serialize(self, bundle, format='application/json', options=None):
         """
         Given some data and a format, calls the correct method to serialize
         the data and returns the result.
         """
         desired_format = None
+        if options is None:
+            options = {}
 
         for short_format, long_format in self.content_types.items():
             if format == long_format:
@@ -190,6 +220,9 @@ class Serializer(object):
         if desired_format is None:
             raise UnsupportedFormat("The format indicated '%s' had no available deserialization method. Please check your ``formats`` and ``content_types`` on your Serializer." % format)
 
+        if isinstance(content, six.binary_type):
+            content = force_text(content)
+
         deserialized = getattr(self, "from_%s" % desired_format)(content)
         return deserialized
 
@@ -204,9 +237,9 @@ class Serializer(object):
         if isinstance(data, (list, tuple)):
             return [self.to_simple(item, options) for item in data]
         if isinstance(data, dict):
-            return dict((key, self.to_simple(val, options)) for (key, val) in data.iteritems())
+            return dict((key, self.to_simple(val, options)) for (key, val) in data.items())
         elif isinstance(data, Bundle):
-            return dict((key, self.to_simple(val, options)) for (key, val) in data.data.iteritems())
+            return dict((key, self.to_simple(val, options)) for (key, val) in data.data.items())
         elif hasattr(data, 'dehydrated_type'):
             if getattr(data, 'dehydrated_type', None) == 'related' and data.is_m2m == False:
                 if data.full:
@@ -228,12 +261,12 @@ class Serializer(object):
             return self.format_time(data)
         elif isinstance(data, bool):
             return data
-        elif type(data) in (long, int, float):
+        elif isinstance(data, (six.integer_types, float)):
             return data
         elif data is None:
             return None
         else:
-            return force_unicode(data)
+            return force_text(data)
 
     def to_etree(self, data, options=None, name=None, depth=0):
         """
@@ -249,18 +282,21 @@ class Serializer(object):
                 element = Element('objects')
             for item in data:
                 element.append(self.to_etree(item, options, depth=depth+1))
+                element[:] = sorted(element, key=lambda x: x.tag)
         elif isinstance(data, dict):
             if depth == 0:
                 element = Element(name or 'response')
             else:
                 element = Element(name or 'object')
                 element.set('type', 'hash')
-            for (key, value) in data.iteritems():
+            for (key, value) in data.items():
                 element.append(self.to_etree(value, options, name=key, depth=depth+1))
+                element[:] = sorted(element, key=lambda x: x.tag)
         elif isinstance(data, Bundle):
             element = Element(name or 'object')
             for field_name, field_object in data.data.items():
                 element.append(self.to_etree(field_object, options, name=field_name, depth=depth+1))
+                element[:] = sorted(element, key=lambda x: x.tag)
         elif hasattr(data, 'dehydrated_type'):
             if getattr(data, 'dehydrated_type', None) == 'related' and data.is_m2m == False:
                 if data.full:
@@ -282,10 +318,16 @@ class Serializer(object):
             element = Element(name or 'value')
             simple_data = self.to_simple(data, options)
             data_type = get_type_string(simple_data)
+
             if data_type != 'string':
                 element.set('type', get_type_string(simple_data))
+
             if data_type != 'null':
-                element.text = force_unicode(simple_data)
+                if isinstance(simple_data, six.text_type):
+                    element.text = simple_data
+                else:
+                    element.text = force_text(simple_data)
+
         return element
 
     def from_etree(self, data):
@@ -328,21 +370,32 @@ class Serializer(object):
         """
         options = options or {}
         data = self.to_simple(data, options)
-        return simplejson.dumps(data, cls=json.DjangoJSONEncoder, sort_keys=True)
+
+        return djangojson.json.dumps(data, cls=djangojson.DjangoJSONEncoder, sort_keys=True, ensure_ascii=False)
 
     def from_json(self, content):
         """
         Given some JSON data, returns a Python dictionary of the decoded data.
         """
-        return simplejson.loads(content)
+        try:
+            return json.loads(content)
+        except ValueError:
+            raise BadRequest
 
     def to_jsonp(self, data, options=None):
         """
         Given some Python data, produces JSON output wrapped in the provided
         callback.
+
+        Due to a difference between JSON and Javascript, two
+        newline characters, \u2028 and \u2029, need to be escaped.
+        See http://timelessrepo.com/json-isnt-a-javascript-subset for
+        details.
         """
         options = options or {}
-        return '%s(%s)' % (options['callback'], self.to_json(data, options))
+        json = self.to_json(data, options)
+        json = json.replace(u'\u2028', u'\\u2028').replace(u'\u2029', u'\\u2029')
+        return u'%s(%s)' % (options['callback'], json)
 
     def to_xml(self, data, options=None):
         """
@@ -351,18 +404,34 @@ class Serializer(object):
         options = options or {}
 
         if lxml is None:
-            raise ImproperlyConfigured("Usage of the XML aspects requires lxml.")
+            raise ImproperlyConfigured("Usage of the XML aspects requires lxml and defusedxml.")
 
         return tostring(self.to_etree(data, options), xml_declaration=True, encoding='utf-8')
 
-    def from_xml(self, content):
+    def from_xml(self, content, forbid_dtd=True, forbid_entities=True):
         """
         Given some XML data, returns a Python dictionary of the decoded data.
+
+        By default XML entity declarations and DTDs will raise a BadRequest
+        exception content but subclasses may choose to override this if
+        necessary.
         """
         if lxml is None:
-            raise ImproperlyConfigured("Usage of the XML aspects requires lxml.")
+            raise ImproperlyConfigured("Usage of the XML aspects requires lxml and defusedxml.")
 
-        return self.from_etree(parse_xml(StringIO(content)).getroot())
+        try:
+            # Stripping the encoding declaration. Because lxml.
+            # See http://lxml.de/parsing.html, "Python unicode strings".
+            content = XML_ENCODING.sub('', content)
+            parsed = parse_xml(
+                six.StringIO(content),
+                forbid_dtd=forbid_dtd,
+                forbid_entities=forbid_entities
+            )
+        except (LxmlError, DefusedXmlException):
+            raise BadRequest()
+
+        return self.from_etree(parsed.getroot())
 
     def to_yaml(self, data, options=None):
         """
@@ -402,6 +471,9 @@ class Serializer(object):
         if biplist is None:
             raise ImproperlyConfigured("Usage of the plist aspects requires biplist.")
 
+        if isinstance(content, six.text_type):
+            content = smart_bytes(content)
+
         return biplist.readPlistFromString(content)
 
     def to_html(self, data, options=None):
@@ -431,7 +503,7 @@ def get_type_string(data):
     """
     data_type = type(data)
 
-    if data_type in (int, long):
+    if data_type in six.integer_types:
         return 'integer'
     elif data_type == float:
         return 'float'
@@ -443,5 +515,5 @@ def get_type_string(data):
         return 'hash'
     elif data is None:
         return 'null'
-    elif isinstance(data, basestring):
+    elif isinstance(data, six.string_types):
         return 'string'

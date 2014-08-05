@@ -60,7 +60,7 @@ Python class that defines one or more of the following methods:
 ``process_request``
 -------------------
 
-.. method:: process_request(self, request)
+.. method:: process_request(request)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. This method is
 called on each request, before Django decides which view to execute.
@@ -78,7 +78,7 @@ Response middleware is always called on every response.
 ``process_view``
 ----------------
 
-.. method:: process_view(self, request, view_func, view_args, view_kwargs)
+.. method:: process_view(request, view_func, view_args, view_kwargs)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is
 the Python function that Django is about to use. (It's the actual function
@@ -117,9 +117,7 @@ middleware is always called on every response.
 ``process_template_response``
 -----------------------------
 
-.. versionadded:: 1.3
-
-.. method:: process_template_response(self, request, response)
+.. method:: process_template_response(request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is a
 subclass of :class:`~django.template.response.SimpleTemplateResponse` (e.g.
@@ -148,7 +146,7 @@ includes process_template_response.
 ``process_response``
 --------------------
 
-.. method:: process_response(self, request, response)
+.. method:: process_response(request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is the
 :class:`~django.http.HttpResponse` object returned by a Django view.
@@ -166,13 +164,30 @@ an earlier middleware method returned an :class:`~django.http.HttpResponse`
 classes are applied in reverse order, from the bottom up. This means classes
 defined at the end of :setting:`MIDDLEWARE_CLASSES` will be run first.
 
+.. versionchanged:: 1.5
+    ``response`` may also be an :class:`~django.http.StreamingHttpResponse`
+    object.
+
+Unlike :class:`~django.http.HttpResponse`,
+:class:`~django.http.StreamingHttpResponse` does not have a ``content``
+attribute. As a result, middleware can no longer assume that all responses
+will have a ``content`` attribute. If they need access to the content, they
+must test for streaming responses and adjust their behavior accordingly::
+
+    if response.streaming:
+        response.streaming_content = wrap_streaming_content(response.streaming_content)
+    else:
+        response.content = wrap_content(response.content)
+
+``streaming_content`` should be assumed to be too large to hold in memory.
+Middleware may wrap it in a new generator, but must not consume it.
 
 .. _exception-middleware:
 
 ``process_exception``
 ---------------------
 
-.. method:: process_exception(self, request, exception)
+.. method:: process_exception(request, exception)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
 ``Exception`` object raised by the view function.

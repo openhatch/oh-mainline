@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tastypie Settings &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Tastypie Settings &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Using Tastypie With Non-ORM Data Sources" href="non_orm_data_sources.html" />
     <link rel="prev" title="Interacting With The API" href="interacting.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="interacting.html" title="Interacting With The API"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -106,11 +106,6 @@ unhandled exception is raised and <tt class="docutils literal"><span class="pre"
 integrating with other systems.</p>
 <p>You must also have <tt class="docutils literal"><span class="pre">settings.APPEND_SLASH</span> <span class="pre">=</span> <span class="pre">False</span></tt> so that Django does not
 emit HTTP 302 redirects.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This setting causes the <tt class="docutils literal"><span class="pre">Resource.get_multiple()</span></tt> method to fail. If you
-need this method, you will have to override the URLconf to meet your needs.</p>
-</div>
 <p>An example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_ALLOW_MISSING_SLASH</span> <span class="o">=</span> <span class="bp">True</span>
 </pre></div>
@@ -128,6 +123,17 @@ data will be formatted in. Valid options are <tt class="docutils literal"><span 
 </div>
 <p>Defaults to <tt class="docutils literal"><span class="pre">iso-8601</span></tt>.</p>
 </div>
+<div class="section" id="tastypie-default-formats">
+<span id="settings-tastypie-default-formats"></span><h2><tt class="docutils literal"><span class="pre">TASTYPIE_DEFAULT_FORMATS</span></tt><a class="headerlink" href="#tastypie-default-formats" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to globally configure the list of allowed serialization
+formats for your entire site.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_DEFAULT_FORMATS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;xml&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="docutils literal"><span class="pre">['json',</span> <span class="pre">'xml',</span> <span class="pre">'yaml',</span> <span class="pre">'html',</span> <span class="pre">'plist']</span></tt>.</p>
+</div>
 </div>
 
 
@@ -144,6 +150,7 @@ data will be formatted in. Valid options are <tt class="docutils literal"><span 
 <li><a class="reference internal" href="#tastypie-canned-error"><tt class="docutils literal"><span class="pre">TASTYPIE_CANNED_ERROR</span></tt></a></li>
 <li><a class="reference internal" href="#tastypie-allow-missing-slash"><tt class="docutils literal"><span class="pre">TASTYPIE_ALLOW_MISSING_SLASH</span></tt></a></li>
 <li><a class="reference internal" href="#tastypie-datetime-formatting"><tt class="docutils literal"><span class="pre">TASTYPIE_DATETIME_FORMATTING</span></tt></a></li>
+<li><a class="reference internal" href="#tastypie-default-formats"><tt class="docutils literal"><span class="pre">TASTYPIE_DEFAULT_FORMATS</span></tt></a></li>
 </ul>
 </li>
 </ul>
@@ -191,11 +198,11 @@ data will be formatted in. Valid options are <tt class="docutils literal"><span 
         <li class="right" >
           <a href="interacting.html" title="Interacting With The API"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

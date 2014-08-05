@@ -27,7 +27,7 @@
 {% block body_id %}mission{% endblock body_id %}
 
 {% block pagetop %}
-    <h3 class='supertitle'><a href='{% url mysite.base.views.missions %}'>Missions</a></h3>
+    <h3 class='supertitle'><a href='{% url "mysite.base.views.missions" %}'>Missions</a></h3>
     <h1 style='float: left; width: 100%; margin-top: 10px;'>Task Challenge</h1>
 {% endblock %}
 
@@ -38,7 +38,7 @@
             <h3> Steps </h3>
         </div>
         <div class='module-body' style='font-size: 1.2em;'>
-            <form method='POST' action='{% url mysite.base.views.start_solo_bug_jam_mission_do %}'>{% csrf_token %}
+            <form method='POST' action='{% url "mysite.base.views.start_solo_bug_jam_mission_do" %}'>{% csrf_token %}
                 <ol>
                     <li>
                         <p>Think of something you want done.</p>

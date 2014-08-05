@@ -46,9 +46,8 @@ We've also recorded an `audio clip of the pronunciation`_.
 Is Django stable?
 -----------------
 
-Yes. World Online has been using Django for more than three years. Sites built
-on Django have weathered traffic spikes of over one million hits an hour and a
-number of Slashdottings. Yes, it's quite stable.
+Yes, it's quite stable. World Online has been using Django for many years. Sites built on
+Django have weathered traffic spikes of over one million hits an hour.
 
 Does Django scale?
 ------------------
@@ -176,7 +175,7 @@ Technically, the docs on Django's site are generated from the latest development
 versions of those reST documents, so the docs on the Django site may offer more
 information than the docs that come with the latest Django release.
 
-.. _stored in revision control: https://code.djangoproject.com/browser/django/trunk/docs
+.. _stored in revision control: https://github.com/django/django/tree/master/docs/
 
 Where can I find Django developers for hire?
 --------------------------------------------
@@ -186,6 +185,34 @@ would be happy to help you.
 
 You might also be interested in posting a job to http://djangogigs.com/ .
 If you want to find Django-capable people in your local area, try
-http://djangopeople.net/ .
+https://people.djangoproject.com/ .
 
 .. _developers for hire page: https://code.djangoproject.com/wiki/DevelopersForHire
+
+How do I cite Django?
+---------------------
+
+It's difficult to give an official citation format, for two reasons: citation
+formats can vary wildly between publications, and citation standards for
+software are still a matter of some debate.
+
+For example, `APA style`_,  would dictate something like::
+
+    Django (Version 1.5) [Computer Software]. (2013). Retrieved from http://djangoproject.com.
+
+However, the only true guide is what your publisher will accept, so get a copy
+of those guidelines and fill in the gaps as best you can.
+
+If your referencing style guide requires a publisher name, use "Django Software
+Foundation".
+
+If you need a publishing location, use "Lawrence, Kansas".
+
+If you need a web address, use http://djangoproject.com.
+
+If you need a name, just use "Django", without any tagline.
+
+If you need a publication date, use the year of release of the version you're
+referencing (e.g., 2013 for v1.5)
+
+.. _APA style: http://www.apastyle.org

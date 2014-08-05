@@ -1,11 +1,12 @@
 # coding: utf-8
+from __future__ import unicode_literals
+
 import asyncore
 import email
 import os
 import shutil
 import smtpd
 import sys
-from StringIO import StringIO
 import tempfile
 import threading
 
@@ -16,6 +17,8 @@ from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.encoding import force_str, force_text
+from django.utils.six import PY3, StringIO
 from django.utils.translation import ugettext_lazy
 
 
@@ -27,7 +30,7 @@ class MailTests(TestCase):
     def test_ascii(self):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         message = email.message()
-        self.assertEqual(message['Subject'].encode(), 'Subject')
+        self.assertEqual(message['Subject'], 'Subject')
         self.assertEqual(message.get_payload(), 'Content')
         self.assertEqual(message['From'], 'from@example.com')
         self.assertEqual(message['To'], 'to@example.com')
@@ -35,7 +38,7 @@ class MailTests(TestCase):
     def test_multiple_recipients(self):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com', 'other@example.com'])
         message = email.message()
-        self.assertEqual(message['Subject'].encode(), 'Subject')
+        self.assertEqual(message['Subject'], 'Subject')
         self.assertEqual(message.get_payload(), 'Content')
         self.assertEqual(message['From'], 'from@example.com')
         self.assertEqual(message['To'], 'to@example.com, other@example.com')
@@ -75,9 +78,10 @@ class MailTests(TestCase):
         """
         Test for space continuation character in long (ascii) subject headers (#7747)
         """
-        email = EmailMessage('Long subject lines that get wrapped should use a space continuation character to get expected behavior in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
+        email = EmailMessage('Long subject lines that get wrapped should contain a space continuation character to get expected behavior in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
         message = email.message()
-        self.assertEqual(message['Subject'], 'Long subject lines that get wrapped should use a space continuation\n character to get expected behavior in Outlook and Thunderbird')
+        # Note that in Python 3, maximum line length has increased from 76 to 78
+        self.assertEqual(message['Subject'].encode(), b'Long subject lines that get wrapped should contain a space continuation\n character to get expected behavior in Outlook and Thunderbird')
 
     def test_message_header_overrides(self):
         """
@@ -86,7 +90,17 @@ class MailTests(TestCase):
         """
         headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
-        self.assertEqual(email.message().as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
+
+        self.assertEqual(sorted(email.message().items()), [
+            ('Content-Transfer-Encoding', '7bit'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('From', 'from@example.com'),
+            ('MIME-Version', '1.0'),
+            ('Message-ID', 'foo'),
+            ('Subject', 'subject'),
+            ('To', 'to@example.com'),
+            ('date', 'Fri, 09 Nov 2001 01:08:47 -0000'),
+        ])
 
     def test_from_header(self):
         """
@@ -137,7 +151,7 @@ class MailTests(TestCase):
         self.assertEqual(email.message()['To'], '=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com')
 
     def test_unicode_headers(self):
-        email = EmailMessage(u"Gżegżółka", "Content", "from@example.com", ["to@example.com"],
+        email = EmailMessage("Gżegżółka", "Content", "from@example.com", ["to@example.com"],
                              headers={"Sender": '"Firstname Sürname" <sender@example.com>',
                                       "Comments": 'My Sürname is non-ASCII'})
         message = email.message()
@@ -158,7 +172,7 @@ class MailTests(TestCase):
         msg.attach_alternative(html_content, "text/html")
         msg.encoding = 'iso-8859-1'
         self.assertEqual(msg.message()['To'], '=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>')
-        self.assertEqual(msg.message()['Subject'].encode(), u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=')
+        self.assertEqual(msg.message()['Subject'], '=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=')
 
     def test_encoding(self):
         """
@@ -188,7 +202,7 @@ class MailTests(TestCase):
         html_content = '<p>This is an <strong>important</strong> message.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers=headers)
         msg.attach_alternative(html_content, "text/html")
-        msg.attach("an attachment.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+        msg.attach("an attachment.pdf", b"%PDF-1.4.%...", mimetype="application/pdf")
         msg_str = msg.message().as_string()
         message = email.message_from_string(msg_str)
         self.assertTrue(message.is_multipart())
@@ -205,11 +219,11 @@ class MailTests(TestCase):
         content = 'This is the message.'
         msg = EmailMessage(subject, content, from_email, [to], headers=headers)
         # Unicode in file name
-        msg.attach(u"une pièce jointe.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+        msg.attach("une pièce jointe.pdf", b"%PDF-1.4.%...", mimetype="application/pdf")
         msg_str = msg.message().as_string()
         message = email.message_from_string(msg_str)
         payload = message.get_payload()
-        self.assertEqual(payload[1].get_filename(), u'une pièce jointe.pdf')
+        self.assertEqual(payload[1].get_filename(), 'une pièce jointe.pdf')
 
     def test_dummy_backend(self):
         """
@@ -307,13 +321,13 @@ class MailTests(TestCase):
         # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
         msg = EmailMessage('Subject', 'Body with latin characters: àáä.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         s = msg.message().as_string()
-        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
-        self.assertTrue('Content-Transfer-Encoding: 8bit' in s)
+        self.assertFalse(str('Content-Transfer-Encoding: quoted-printable') in s)
+        self.assertTrue(str('Content-Transfer-Encoding: 8bit') in s)
 
-        msg = EmailMessage('Subject', u'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        msg = EmailMessage('Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         s = msg.message().as_string()
-        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
-        self.assertTrue('Content-Transfer-Encoding: 8bit' in s)
+        self.assertFalse(str('Content-Transfer-Encoding: quoted-printable') in s)
+        self.assertTrue(str('Content-Transfer-Encoding: 8bit') in s)
 
 
 class BaseEmailBackendTests(object):
@@ -353,6 +367,14 @@ class BaseEmailBackendTests(object):
         self.assertEqual(message.get_payload(), "Content")
         self.assertEqual(message["from"], "from@example.com")
         self.assertEqual(message.get_all("to"), ["to@example.com"])
+
+    def test_send_unicode(self):
+        email = EmailMessage('Chère maman', 'Je t\'aime très fort', 'from@example.com', ['to@example.com'])
+        num_sent = mail.get_connection().send_messages([email])
+        self.assertEqual(num_sent, 1)
+        message = self.get_the_message()
+        self.assertEqual(message["subject"], '=?utf-8?q?Ch=C3=A8re_maman?=')
+        self.assertEqual(force_text(message.get_payload()), 'Je t\'aime très fort')
 
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
@@ -444,7 +466,7 @@ class BaseEmailBackendTests(object):
         """
         Regression test for #14301
         """
-        self.assertTrue(send_mail('Subject', 'Content', 'from@öäü.com', [u'to@öäü.com']))
+        self.assertTrue(send_mail('Subject', 'Content', 'from@öäü.com', ['to@öäü.com']))
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), 'from@xn--4ca9at.com')
@@ -452,7 +474,7 @@ class BaseEmailBackendTests(object):
 
         self.flush_mailbox()
         m = EmailMessage('Subject', 'Content', 'from@öäü.com',
-                     [u'to@öäü.com'], cc=[u'cc@öäü.com'])
+                     ['to@öäü.com'], cc=['cc@öäü.com'])
         m.send()
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
@@ -469,6 +491,16 @@ class BaseEmailBackendTests(object):
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), "tester")
         self.assertEqual(message.get('to'), "django")
+
+    def test_close_connection(self):
+        """
+        Test that connection can be closed (even when not explicitely opened)
+        """
+        conn = mail.get_connection(username='', password='')
+        try:
+            conn.close()
+        except Exception as e:
+            self.fail("close() unexpectedly raised an exception: %s" % e)
 
 
 class LocmemBackendTests(BaseEmailBackendTests, TestCase):
@@ -495,19 +527,24 @@ class LocmemBackendTests(BaseEmailBackendTests, TestCase):
         connection2.send_messages([email])
         self.assertEqual(len(mail.outbox), 2)
 
+    def test_validate_multiline_headers(self):
+        # Ticket #18861 - Validate emails when using the locmem backend
+        with self.assertRaises(BadHeaderError):
+            send_mail('Subject\nMultiline', 'Content', 'from@example.com', ['to@example.com'])
+
 
 class FileBackendTests(BaseEmailBackendTests, TestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
+        super(FileBackendTests, self).setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        self.settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
-        self.settings_override.enable()
-        super(FileBackendTests, self).setUp()
+        self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        self._settings_override.enable()
 
     def tearDown(self):
-        self.settings_override.disable()
+        self._settings_override.disable()
         super(FileBackendTests, self).tearDown()
 
     def flush_mailbox(self):
@@ -517,8 +554,9 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
     def get_mailbox_content(self):
         messages = []
         for filename in os.listdir(self.tmp_dir):
-            session = open(os.path.join(self.tmp_dir, filename)).read().split('\n' + ('-' * 79) + '\n')
-            messages.extend(email.message_from_string(m) for m in session if m)
+            with open(os.path.join(self.tmp_dir, filename), 'r') as fp:
+                session = force_text(fp.read()).split('\n' + ('-' * 79) + '\n')
+            messages.extend(email.message_from_string(force_str(m)) for m in session if m)
         return messages
 
     def test_file_sessions(self):
@@ -528,7 +566,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
         connection.send_messages([msg])
 
         self.assertEqual(len(os.listdir(self.tmp_dir)), 1)
-        message = email.message_from_file(open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0])))
+        with open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0])) as fp:
+            message = email.message_from_file(fp)
         self.assertEqual(message.get_content_type(), 'text/plain')
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), 'from@example.com')
@@ -547,6 +586,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
         self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
         msg.send()
         self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
+
+        connection.close()
 
 
 class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
@@ -567,8 +608,8 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         self.stream = sys.stdout = StringIO()
 
     def get_mailbox_content(self):
-        messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
-        return [email.message_from_string(m) for m in messages if m]
+        messages = force_text(self.stream.getvalue()).split('\n' + ('-' * 79) + '\n')
+        return [email.message_from_string(force_str(m)) for m in messages if m]
 
     def test_console_stream_kwarg(self):
         """
@@ -596,24 +637,22 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
 
     def process_message(self, peer, mailfrom, rcpttos, data):
         m = email.message_from_string(data)
-        maddr = email.Utils.parseaddr(m.get('from'))[1]
+        if PY3:
+            maddr = email.utils.parseaddr(m.get('from'))[1]
+        else:
+            maddr = email.Utils.parseaddr(m.get('from'))[1]
         if mailfrom != maddr:
             return "553 '%s' != '%s'" % (mailfrom, maddr)
-        self.sink_lock.acquire()
-        self._sink.append(m)
-        self.sink_lock.release()
+        with self.sink_lock:
+            self._sink.append(m)
 
     def get_sink(self):
-        self.sink_lock.acquire()
-        try:
+        with self.sink_lock:
             return self._sink[:]
-        finally:
-            self.sink_lock.release()
 
     def flush_sink(self):
-        self.sink_lock.acquire()
-        self._sink[:] = []
-        self.sink_lock.release()
+        with self.sink_lock:
+            self._sink[:] = []
 
     def start(self):
         assert not self.active
@@ -625,15 +664,14 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active = True
         self.__flag.set()
         while self.active and asyncore.socket_map:
-            self.active_lock.acquire()
-            asyncore.loop(timeout=0.1, count=1)
-            self.active_lock.release()
+            with self.active_lock:
+                asyncore.loop(timeout=0.1, count=1)
         asyncore.close_all()
 
     def stop(self):
-        assert self.active
-        self.active = False
-        self.join()
+        if self.active:
+            self.active = False
+            self.join()
 
 
 class SMTPBackendTests(BaseEmailBackendTests, TestCase):
@@ -642,15 +680,15 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
     @classmethod
     def setUpClass(cls):
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
-        cls.settings_override = override_settings(
+        cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
             EMAIL_PORT=cls.server.socket.getsockname()[1])
-        cls.settings_override.enable()
+        cls._settings_override.enable()
         cls.server.start()
 
     @classmethod
     def tearDownClass(cls):
-        cls.settings_override.disable()
+        cls._settings_override.disable()
         cls.server.stop()
 
     def setUp(self):
@@ -687,3 +725,16 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
         backend = smtp.EmailBackend(username='', password='')
         self.assertEqual(backend.username, '')
         self.assertEqual(backend.password, '')
+
+    def test_server_stopped(self):
+        """
+        Test that closing the backend while the SMTP server is stopped doesn't
+        raise an exception.
+        """
+        backend = smtp.EmailBackend(username='', password='')
+        backend.open()
+        self.server.stop()
+        try:
+            backend.close()
+        except Exception as e:
+            self.fail("close() unexpectedly raised an exception: %s" % e)

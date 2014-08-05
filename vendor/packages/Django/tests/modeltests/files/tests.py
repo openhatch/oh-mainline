@@ -1,5 +1,6 @@
-from __future__ import with_statement, absolute_import
+from __future__ import absolute_import
 
+import gzip
 import shutil
 import tempfile
 
@@ -8,11 +9,12 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.utils import unittest
 
 from .models import Storage, temp_storage, temp_storage_location
 
 
-class FileTests(TestCase):
+class FileStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
 
@@ -31,12 +33,12 @@ class FileTests(TestCase):
         obj1.normal.save("django_test.txt", ContentFile("content"))
         self.assertEqual(obj1.normal.name, "tests/django_test.txt")
         self.assertEqual(obj1.normal.size, 7)
-        self.assertEqual(obj1.normal.read(), "content")
+        self.assertEqual(obj1.normal.read(), b"content")
         obj1.normal.close()
 
         # File objects can be assigned to FileField attributes, but shouldn't
         # get committed until the model it's attached to is saved.
-        obj1.normal = SimpleUploadedFile("assignment.txt", "content")
+        obj1.normal = SimpleUploadedFile("assignment.txt", b"content")
         dirs, files = temp_storage.listdir("tests")
         self.assertEqual(dirs, [])
         self.assertEqual(sorted(files), ["default.txt", "django_test.txt"])
@@ -49,9 +51,9 @@ class FileTests(TestCase):
 
         # Files can be read in a little at a time, if necessary.
         obj1.normal.open()
-        self.assertEqual(obj1.normal.read(3), "con")
-        self.assertEqual(obj1.normal.read(), "tent")
-        self.assertEqual(list(obj1.normal.chunks(chunk_size=2)), ["co", "nt", "en", "t"])
+        self.assertEqual(obj1.normal.read(3), b"con")
+        self.assertEqual(obj1.normal.read(), b"tent")
+        self.assertEqual(list(obj1.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
         obj1.normal.close()
 
         # Save another file with the same name.
@@ -84,14 +86,14 @@ class FileTests(TestCase):
         # Default values allow an object to access a single file.
         obj3 = Storage.objects.create()
         self.assertEqual(obj3.default.name, "tests/default.txt")
-        self.assertEqual(obj3.default.read(), "default content")
+        self.assertEqual(obj3.default.read(), b"default content")
         obj3.default.close()
 
         # But it shouldn't be deleted, even if there are no more objects using
         # it.
         obj3.delete()
         obj3 = Storage()
-        self.assertEqual(obj3.default.read(), "default content")
+        self.assertEqual(obj3.default.read(), b"default content")
         obj3.default.close()
 
         # Verify the fix for #5655, making sure the directory is only
@@ -100,12 +102,8 @@ class FileTests(TestCase):
         obj4.random.save("random_file", ContentFile("random content"))
         self.assertTrue(obj4.random.name.endswith("/random_file"))
 
-        # Clean up the temporary files and dir.
-        obj1.normal.delete()
-        obj2.normal.delete()
-        obj3.default.delete()
-        obj4.random.delete()
 
+class FileTests(unittest.TestCase):
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
         base_file = File(orig_file)
@@ -114,3 +112,10 @@ class FileTests(TestCase):
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
         self.assertTrue(orig_file.closed)
+
+    def test_file_mode(self):
+        # Should not set mode to None if it is not present.
+        # See #14681, stdlib gzip module crashes if mode is set to None
+        file = SimpleUploadedFile("mode_test.txt", b"content")
+        self.assertFalse(hasattr(file, 'mode'))
+        g = gzip.GzipFile(fileobj=file)

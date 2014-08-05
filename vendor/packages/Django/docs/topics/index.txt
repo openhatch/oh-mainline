@@ -11,11 +11,10 @@ Introductions to all the key parts of Django you'll need to know:
    http/index
    forms/index
    templates
-   class-based-views
-   generic-views-migration
+   class-based-views/index
    files
-   testing
-   auth
+   testing/index
+   auth/index
    cache
    conditional-view-processing
    signing
@@ -23,15 +22,8 @@ Introductions to all the key parts of Django you'll need to know:
    i18n/index
    logging
    pagination
+   python3
    security
    serialization
    settings
    signals
-
-Deprecated features
--------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   generic-views

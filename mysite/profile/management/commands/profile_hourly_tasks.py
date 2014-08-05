@@ -47,9 +47,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         rootLogger = logging.getLogger('')
         rootLogger.setLevel(logging.WARN)
-        mysite.profile.tasks.sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache(
-        )
-        mysite.profile.tasks.fill_recommended_bugs_cache()
 
         # Every 4 hours, clear search cache
         if (datetime.datetime.utcnow().hour % 4) == 0:

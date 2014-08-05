@@ -125,7 +125,7 @@ It will NOT compress content if any of the following are true:
   not to be performed on certain content types.
 
 You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.http.gzip_page()` decorator.
+:func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
 Conditional GET middleware
 --------------------------
@@ -138,7 +138,7 @@ Conditional GET middleware
 Handles conditional GET operations. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpNotModified`.
+:class:`~django.http.HttpResponseNotModified`.
 
 Also sets the ``Date`` and ``Content-Length`` response-headers.
 
@@ -170,9 +170,6 @@ Message middleware
 
 .. class:: MessageMiddleware
 
-.. versionadded:: 1.2
-   ``MessageMiddleware`` was added.
-
 Enables cookie- and session-based message support. See the
 :doc:`messages documentation </ref/contrib/messages>`.
 
@@ -196,8 +193,8 @@ Authentication middleware
 .. class:: AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :doc:`Authentication in Web requests
-</topics/auth>`.
+every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
+<auth-web-requests>`.
 
 CSRF protection middleware
 --------------------------

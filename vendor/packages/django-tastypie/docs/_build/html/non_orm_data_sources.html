@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Tastypie With Non-ORM Data Sources &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Using Tastypie With Non-ORM Data Sources &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Tools" href="tools.html" />
     <link rel="prev" title="Tastypie Settings" href="settings.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="settings.html" title="Tastypie Settings"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -72,7 +72,7 @@ discovery views all work the same as well.</p>
 the lowest level data access methods. If you want a full read-write API, there
 are nine methods you need to implement. They are:</p>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">get_resource_uri</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">detail_uri_kwargs</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">get_object_list</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">obj_get_list</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">obj_get</span></tt></li>
@@ -135,20 +135,15 @@ non-relational datastore looks like:</p>
 
     <span class="c"># The following methods will need overriding regardless of your</span>
     <span class="c"># data source.</span>
-    <span class="k">def</span> <span class="nf">get_resource_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_or_obj</span><span class="p">):</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&#39;resource_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">resource_name</span><span class="p">,</span>
-        <span class="p">}</span>
+    <span class="k">def</span> <span class="nf">detail_uri_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_or_obj</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_or_obj</span><span class="p">,</span> <span class="n">Bundle</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;pk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_or_obj</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">uuid</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;pk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_or_obj</span><span class="o">.</span><span class="n">uuid</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">api_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;api_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">api_name</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_reverse_url</span><span class="p">(</span><span class="s">&quot;api_dispatch_detail&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kwargs</span>
 
     <span class="k">def</span> <span class="nf">get_object_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;messages&#39;</span><span class="p">)</span>
@@ -265,11 +260,11 @@ highly specific to how data access is done.</p>
         <li class="right" >
           <a href="settings.html" title="Tastypie Settings"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

@@ -92,6 +92,8 @@ class FlagViewTests(CommentTestCase):
         self.testFlagPost()
         self.assertEqual(received_signals, [signals.comment_was_flagged])
 
+        signals.comment_was_flagged.disconnect(receive)
+
 def makeModerator(username):
     u = User.objects.get(username=username)
     ct = ContentType.objects.get_for_model(Comment)
@@ -162,6 +164,8 @@ class DeleteViewTests(CommentTestCase):
         # Post a comment and check the signals
         self.testDeletePost()
         self.assertEqual(received_signals, [signals.comment_was_flagged])
+
+        signals.comment_was_flagged.disconnect(receive)
 
     def testDeletedView(self):
         comments = self.createSomeComments()
@@ -238,6 +242,8 @@ class ApproveViewTests(CommentTestCase):
         self.testApprovePost()
         self.assertEqual(received_signals, [signals.comment_was_flagged])
 
+        signals.comment_was_flagged.disconnect(receive)
+
     def testApprovedView(self):
         comments = self.createSomeComments()
         pk = comments[0].pk
@@ -265,14 +271,14 @@ class AdminActionsTests(CommentTestCase):
         comments = self.createSomeComments()
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/admin/comments/comment/")
-        self.assertEqual("approve_comments" in response.content, False)
+        self.assertNotContains(response, "approve_comments")
 
     def testActionsModerator(self):
         comments = self.createSomeComments()
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/admin/comments/comment/")
-        self.assertEqual("approve_comments" in response.content, True)
+        self.assertContains(response, "approve_comments")
 
     def testActionsDisabledDelete(self):
         "Tests a CommentAdmin where 'delete_selected' has been disabled."
@@ -280,7 +286,4 @@ class AdminActionsTests(CommentTestCase):
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get('/admin2/comments/comment/')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            '<option value="delete_selected">' not in response.content,
-            "Found an unexpected delete_selected in response"
-        )
+        self.assertNotContains(response, '<option value="delete_selected">')

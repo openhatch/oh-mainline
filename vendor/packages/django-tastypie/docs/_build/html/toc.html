@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Table Of Contents &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Table Of Contents &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Welcome to Tastypie!" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to Tastypie!"
              accesskey="N">next</a> |</li>
-        <li><a href="#">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="#">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -57,18 +57,25 @@
 <li class="toctree-l2"><a class="reference internal" href="settings.html">Tastypie Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="non_orm_data_sources.html">Using Tastypie With Non-ORM Data Sources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compatibility_notes.html">Compatibility Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html">Resources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bundles.html">Bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">Api</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fields.html">Resource Fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="caching.html">Caching</a></li>
 <li class="toctree-l2"><a class="reference internal" href="validation.html">Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="authentication_authorization.html">Authentication / Authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html">Authorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="throttling.html">Throttling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="paginator.html">Paginator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geodjango.html">GeoDjango</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content_types.html">ContentTypes and GenericForeignKeys</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html">Tastypie Cookbook</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging Tastypie</a></li>
 <li class="toctree-l2"><a class="reference internal" href="who_uses.html">Sites Using Tastypie</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="index.html#getting-help">Getting Help</a></li>
@@ -78,6 +85,10 @@
 <li class="toctree-l2"><a class="reference internal" href="index.html#optional">Optional</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#why-tastypie">Why Tastypie?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#reference-material">Reference Material</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#running-the-tests">Running The Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#commercial-support">Commercial Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Getting Started with Tastypie</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorial.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial.html#configuration">Configuration</a></li>
@@ -94,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="interacting.html#fetching-data">Fetching Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interacting.html#sending-data">Sending Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interacting.html#deleting-data">Deleting Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interacting.html#bulk-operations">Bulk Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interacting.html#you-did-it">You Did It!</a></li>
 </ul>
 </li>
@@ -103,6 +115,7 @@
 <li class="toctree-l2"><a class="reference internal" href="settings.html#tastypie-canned-error"><tt class="docutils literal"><span class="pre">TASTYPIE_CANNED_ERROR</span></tt></a></li>
 <li class="toctree-l2"><a class="reference internal" href="settings.html#tastypie-allow-missing-slash"><tt class="docutils literal"><span class="pre">TASTYPIE_ALLOW_MISSING_SLASH</span></tt></a></li>
 <li class="toctree-l2"><a class="reference internal" href="settings.html#tastypie-datetime-formatting"><tt class="docutils literal"><span class="pre">TASTYPIE_DATETIME_FORMATTING</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html#tastypie-default-formats"><tt class="docutils literal"><span class="pre">TASTYPIE_DEFAULT_FORMATS</span></tt></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="non_orm_data_sources.html">Using Tastypie With Non-ORM Data Sources</a><ul>
@@ -112,8 +125,17 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tools.html#browser">Browser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#extensions">Extensions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html#python">Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html#javascript">Javascript</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="compatibility_notes.html">Compatibility Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compatibility_notes.html#apikey-database-index"><tt class="docutils literal"><span class="pre">ApiKey</span></tt> Database Index</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a><ul>
@@ -122,11 +144,13 @@
 <li class="toctree-l2"><a class="reference internal" href="resources.html#why-resource-vs-modelresource">Why <tt class="docutils literal"><span class="pre">Resource</span></tt> vs. <tt class="docutils literal"><span class="pre">ModelResource</span></tt>?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#flow-through-the-request-response-cycle">Flow Through The Request/Response Cycle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#why-resource-uris">Why Resource URIs?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resources.html#accessing-the-current-request">Accessing The Current Request</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#advanced-data-preparation">Advanced Data Preparation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#reverse-relationships">Reverse &#8220;Relationships&#8221;</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#resource-options-aka-meta">Resource Options (AKA <tt class="docutils literal"><span class="pre">Meta</span></tt>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#basic-filtering">Basic Filtering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#advanced-filtering">Advanced Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resources.html#using-put-delete-patch-in-unsupported-places">Using PUT/DELETE/PATCH In Unsupported Places</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#resource-methods"><tt class="docutils literal"><span class="pre">Resource</span></tt> Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resources.html#modelresource-methods"><tt class="docutils literal"><span class="pre">ModelResource</span></tt> Methods</a></li>
 </ul>
@@ -147,11 +171,12 @@
 <li class="toctree-l2"><a class="reference internal" href="fields.html#relationship-fields">Relationship Fields</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="authentication_authorization.html">Authentication / Authorization</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="authentication_authorization.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="authentication_authorization.html#authentication-options">Authentication Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="authentication_authorization.html#authorization-options">Authorization Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="authentication_authorization.html#implementing-your-own-authentication-authorization">Implementing Your Own Authentication/Authorization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#caching-options">Caching Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#implementing-your-own-cache">Implementing Your Own Cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#http-cache-control">HTTP Cache-Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#http-vary">HTTP Vary</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="validation.html">Validation</a><ul>
@@ -160,14 +185,22 @@
 <li class="toctree-l2"><a class="reference internal" href="validation.html#implementing-your-own-validation">Implementing Your Own Validation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="caching.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="caching.html#caching-options">Caching Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="caching.html#implementing-your-own-cache">Implementing Your Own Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#authentication-options">Authentication Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#implementing-your-own-authentication-authorization">Implementing Your Own Authentication/Authorization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authorization.html">Authorization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html#authorization-options">Authorization Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html#the-authorization-api">The <tt class="docutils literal"><span class="pre">Authorization</span></tt> API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html#implementing-your-own-authorization">Implementing Your Own Authorization</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="serialization.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serialization.html#serialization-security">Serialization Security</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serialization.html#implementing-your-own-serializer">Implementing Your Own Serializer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serialization.html#serializer-methods"><tt class="docutils literal"><span class="pre">Serializer</span></tt> Methods</a></li>
 </ul>
@@ -178,20 +211,38 @@
 <li class="toctree-l2"><a class="reference internal" href="throttling.html#implementing-your-own-throttle">Implementing Your Own Throttle</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="paginator.html">Paginator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="paginator.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="paginator.html#implementing-your-own-paginator">Implementing Your Own Paginator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geodjango.html">GeoDjango</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="geodjango.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="content_types.html">ContentTypes and GenericForeignKeys</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="content_types.html#usage">Usage</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html">Tastypie Cookbook</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#adding-custom-values">Adding Custom Values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cookbook.html#pre-request-alterations-to-the-queryset">Pre-Request Alterations To The Queryset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#per-request-alterations-to-the-queryset">Per-Request Alterations To The Queryset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#using-your-resource-in-regular-views">Using Your <tt class="docutils literal"><span class="pre">Resource</span></tt> In Regular Views</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#using-non-pk-data-for-your-urls">Using Non-PK Data For Your URLs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#nested-resources">Nested Resources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#adding-search-functionality">Adding Search Functionality</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#creating-per-user-resources">Creating per-user resources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cookbook.html#camelcase-json-serialization">camelCase JSON Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#pretty-printed-json-serialization">Pretty-printed JSON Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#determining-format-via-url">Determining format via URL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#adding-to-the-django-admin">Adding to the Django Admin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#using-sessionauthentication">Using <tt class="docutils literal"><span class="pre">SessionAuthentication</span></tt></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Tastypie</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html#i-m-getting-xml-output-in-my-browser-but-i-want-json-output">&#8220;I&#8217;m getting XML output in my browser but I want JSON output!&#8221;</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html#what-s-the-format-for-a-post-or-put">&#8220;What&#8217;s the format for a POST or PUT?&#8221;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#why-is-my-syncdb-with-superuser-failing-with-a-databaseerror">&#8220;Why is my syncdb with superuser failing with a DatabaseError?&#8221;</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="who_uses.html">Sites Using Tastypie</a><ul>
@@ -200,6 +251,15 @@
 <li class="toctree-l2"><a class="reference internal" href="who_uses.html#read-the-docs">Read The Docs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="who_uses.html#luzme">Luzme</a></li>
 <li class="toctree-l2"><a class="reference internal" href="who_uses.html#politifact">Politifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="who_uses.html#localwiki">LocalWiki</a></li>
+<li class="toctree-l2"><a class="reference internal" href="who_uses.html#i-am-cc-org">I-Am-CC.org</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#philosophy">Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#guidelines-for-reporting-an-issue-feature">Guidelines For Reporting An Issue/Feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#guidelines-for-contributing-code">Guidelines For Contributing Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#guidelines-for-core-contributors">Guidelines For Core Contributors</a></li>
 </ul>
 </li>
 </ul>
@@ -263,11 +323,11 @@
         <li class="right" >
           <a href="index.html" title="Welcome to Tastypie!"
              >next</a> |</li>
-        <li><a href="#">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="#">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
