@@ -1,57 +1,27 @@
 """
 Tests for django test runner
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import StringIO
+import sys
 from optparse import make_option
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.test import simple, skipIfDBFeature
+from django.test import simple, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
-from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.importlib import import_module
 
 from ..admin_scripts.tests import AdminScriptTestCase
+from .models import Person
 
 
 TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
 TEST_APP_ERROR = 'regressiontests.test_runner.invalid_app.models'
 
-
-class DjangoTestRunnerTests(unittest.TestCase):
-    def setUp(self):
-        self._warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.test.simple')
-
-    def tearDown(self):
-        restore_warnings_state(self._warnings_state)
-
-    def test_failfast(self):
-        class MockTestOne(unittest.TestCase):
-            def runTest(self):
-                assert False
-        class MockTestTwo(unittest.TestCase):
-            def runTest(self):
-                assert False
-
-        suite = unittest.TestSuite([MockTestOne(), MockTestTwo()])
-        mock_stream = StringIO.StringIO()
-        dtr = simple.DjangoTestRunner(verbosity=0, failfast=False, stream=mock_stream)
-        result = dtr.run(suite)
-        self.assertEqual(2, result.testsRun)
-        self.assertEqual(2, len(result.failures))
-
-        dtr = simple.DjangoTestRunner(verbosity=0, failfast=True, stream=mock_stream)
-        result = dtr.run(suite)
-        self.assertEqual(1, result.testsRun)
-        self.assertEqual(1, len(result.failures))
 
 class DependencyOrderingTests(unittest.TestCase):
 
@@ -142,6 +112,25 @@ class DependencyOrderingTests(unittest.TestCase):
 
         self.assertRaises(ImproperlyConfigured, simple.dependency_ordered, raw, dependencies=dependencies)
 
+    def test_own_alias_dependency(self):
+        raw = [
+            ('s1', ('s1_db', ['alpha', 'bravo']))
+        ]
+        dependencies = {
+            'alpha': ['bravo']
+        }
+
+        with self.assertRaises(ImproperlyConfigured):
+            simple.dependency_ordered(raw, dependencies=dependencies)
+
+        # reordering aliases shouldn't matter
+        raw = [
+            ('s1', ('s1_db', ['bravo', 'alpha']))
+        ]
+
+        with self.assertRaises(ImproperlyConfigured):
+            simple.dependency_ordered(raw, dependencies=dependencies)
+
 
 class MockTestRunner(object):
     invoked = False
@@ -161,6 +150,11 @@ class ManageCommandTests(unittest.TestCase):
         self.assertTrue(MockTestRunner.invoked,
                         "The custom test runner has not been invoked")
 
+    def test_bad_test_runner(self):
+        with self.assertRaises(AttributeError):
+            call_command('test', 'sites',
+                testrunner='regressiontests.test_runner.NonExistentRunner')
+
 
 class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
     option_list = (
@@ -177,7 +171,7 @@ class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
         self.option_c = option_c
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
-        print "%s:%s:%s" % (self.option_a, self.option_b, self.option_c)
+        print("%s:%s:%s" % (self.option_a, self.option_b, self.option_c))
 
 
 class CustomTestRunnerOptionsTests(AdminScriptTestCase):
@@ -214,35 +208,6 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'bar:foo:31337')
-
-
-class Ticket16885RegressionTests(unittest.TestCase):
-    
-    # Skipped if empty strings are nulls because this feature causes
-    # database setup to fail on model validation for models defined
-    # with string PKs (such models are already in the AppCache), while
-    # the test cares neither about models nor about the database backend
-    # from settings.
-    @skipIfDBFeature('interprets_empty_strings_as_nulls')
-    def test_ticket_16885(self):
-        """Features are also confirmed on mirrored databases."""
-        old_db_connections = db.connections
-        try:
-            db.connections = db.ConnectionHandler({
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                },
-                'slave': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'TEST_MIRROR': 'default',
-                },
-            })
-            slave = db.connections['slave']
-            self.assertEqual(slave.features.supports_transactions, None)
-            DjangoTestSuiteRunner(verbosity=0).setup_databases()
-            self.assertNotEqual(slave.features.supports_transactions, None)
-        finally:
-            db.connections = old_db_connections
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
@@ -292,12 +257,132 @@ class Sqlite3InMemoryTestDbs(unittest.TestCase):
                     },
                 })
                 other = db.connections['other']
-                self.assertIsNone(other.features.supports_transactions)
                 DjangoTestSuiteRunner(verbosity=0).setup_databases()
                 msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option
                 # Transaction support should be properly initialised for the 'other' DB
-                self.assertIsNotNone(other.features.supports_transactions, msg)
+                self.assertTrue(other.features.supports_transactions, msg)
                 # And all the DBs should report that they support transactions
                 self.assertTrue(connections_support_transactions(), msg)
             finally:
                 db.connections = old_db_connections
+
+
+class DummyBackendTest(unittest.TestCase):
+    def test_setup_databases(self):
+        """
+        Test that setup_databases() doesn't fail with dummy database backend.
+        """
+        runner = DjangoTestSuiteRunner(verbosity=0)
+        old_db_connections = db.connections
+        try:
+            db.connections = db.ConnectionHandler({})
+            old_config = runner.setup_databases()
+            runner.teardown_databases(old_config)
+        except Exception as e:
+            self.fail("setup_databases/teardown_databases unexpectedly raised "
+                      "an error: %s" % e)
+        finally:
+            db.connections = old_db_connections
+
+
+class AliasedDefaultTestSetupTest(unittest.TestCase):
+    def test_setup_aliased_default_database(self):
+        """
+        Test that setup_datebases() doesn't fail when 'default' is aliased
+        """
+        runner = DjangoTestSuiteRunner(verbosity=0)
+        old_db_connections = db.connections
+        try:
+            db.connections = db.ConnectionHandler({
+                'default': {
+                    'NAME': 'dummy'
+                },
+                'aliased': {
+                    'NAME': 'dummy'
+                }
+            })
+            old_config = runner.setup_databases()
+            runner.teardown_databases(old_config)
+        except Exception as e:
+            self.fail("setup_databases/teardown_databases unexpectedly raised "
+                      "an error: %s" % e)
+        finally:
+            db.connections = old_db_connections
+
+
+class AliasedDatabaseTest(unittest.TestCase):
+    def test_setup_aliased_databases(self):
+        from django.db.backends.dummy.base import DatabaseCreation
+
+        runner = DjangoTestSuiteRunner(verbosity=0)
+        old_db_connections = db.connections
+        old_destroy_test_db = DatabaseCreation.destroy_test_db
+        old_create_test_db = DatabaseCreation.create_test_db
+        try:
+            destroyed_names = []
+            DatabaseCreation.destroy_test_db = lambda self, old_database_name, verbosity=1: destroyed_names.append(old_database_name)
+            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False: self._get_test_db_name()
+
+            db.connections = db.ConnectionHandler({
+                'default': {
+                    'ENGINE': 'django.db.backends.dummy',
+                    'NAME': 'dbname',
+                },
+                'other': {
+                    'ENGINE': 'django.db.backends.dummy',
+                    'NAME': 'dbname',
+                }
+            })
+
+            old_config = runner.setup_databases()
+            runner.teardown_databases(old_config)
+
+            self.assertEqual(destroyed_names.count('dbname'), 1)
+        finally:
+            DatabaseCreation.create_test_db = old_create_test_db
+            DatabaseCreation.destroy_test_db = old_destroy_test_db
+            db.connections = old_db_connections
+
+
+class DeprecationDisplayTest(AdminScriptTestCase):
+    # tests for 19546
+    def setUp(self):
+        settings = {'INSTALLED_APPS': '("regressiontests.test_runner.deprecation_app",)',
+                    'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}' }
+        self.write_settings('settings.py', sdict=settings)
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_runner_deprecation_verbosity_default(self):
+        args = ['test', '--settings=regressiontests.settings']
+        out, err = self.run_django_admin(args)
+        self.assertIn("DeprecationWarning: warning from test", err)
+        self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
+
+    @unittest.skipIf(sys.version_info[:2] == (2, 6),
+        "On Python 2.6, DeprecationWarnings are visible anyway")
+    def test_runner_deprecation_verbosity_zero(self):
+        args = ['test', '--settings=regressiontests.settings', '--verbosity=0']
+        out, err = self.run_django_admin(args)
+        self.assertFalse("DeprecationWarning: warning from test" in err)
+
+
+class AutoIncrementResetTest(TransactionTestCase):
+    """
+    Here we test creating the same model two times in different test methods,
+    and check that both times they get "1" as their PK value. That is, we test
+    that AutoField values start from 1 for each transactional test case.
+    """
+
+    reset_sequences = True
+
+    @skipUnlessDBFeature('supports_sequence_reset')
+    def test_autoincrement_reset1(self):
+        p = Person.objects.create(first_name='Jack', last_name='Smith')
+        self.assertEqual(p.pk, 1)
+
+    @skipUnlessDBFeature('supports_sequence_reset')
+    def test_autoincrement_reset2(self):
+        p = Person.objects.create(first_name='Jack', last_name='Smith')
+        self.assertEqual(p.pk, 1)

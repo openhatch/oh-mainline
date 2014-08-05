@@ -28,7 +28,7 @@
 
 {% block mission_missing_prerequisite_text %}
 <p>You can't do the committing step yet. You have to do the
-  <a href="{% url svn_diff %}">diff step first</a>!
+  <a href="{% url "svn_diff" %}">diff step first</a>!
 </p>
 {% endblock mission_missing_prerequisite_text %}
 
@@ -70,5 +70,5 @@
   
   <p>(You might be wondering -- won't Mr. Bad or his agents notice that the changes were made by you? The agents could read the output of <code>svn log</code>, but they have no reason to suspect that {{ commit_username }}'s changes are unfriendly to them. And Mr. Bad himself isn't paying attention. Many real open source projects have commit mailing lists where all changes are sent. Developers can read that to watch changes.)</p>
   
-  <p>That's all we have for Subversion training missions.  <a href="{% url mysite.missions.base.views.main_page %}">Return to the main mission page</a></p>
+  <p>That's all we have for Subversion training missions.  <a href="{% url "mysite.missions.base.views.main_page" %}">Return to the main mission page</a></p>
 {% endblock mission_main_body %}

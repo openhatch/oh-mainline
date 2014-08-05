@@ -4,24 +4,23 @@
 GeoDjango Database API
 ======================
 
-.. module:: django.contrib.gis.db.models
-   :synopsis: GeoDjango's database API.
-
 .. _spatial-backends:
 
 Spatial Backends
 ================
 
-.. versionadded:: 1.2
+.. module:: django.contrib.gis.db.backends
+   :synopsis: GeoDjango's spatial database backends.
 
-In Django 1.2, support for :doc:`multiple databases </topics/db/multi-db>` was
-introduced.  In order to support multiple databases, GeoDjango has segregated
-its functionality into full-fledged spatial database backends:
+GeoDjango currently provides the following spatial database backends:
 
-* :mod:`django.contrib.gis.db.backends.postgis`
-* :mod:`django.contrib.gis.db.backends.mysql`
-* :mod:`django.contrib.gis.db.backends.oracle`
-* :mod:`django.contrib.gis.db.backends.spatialite`
+* ``django.contrib.gis.db.backends.postgis``
+* ``django.contrib.gis.db.backends.mysql``
+* ``django.contrib.gis.db.backends.oracle``
+* ``django.contrib.gis.db.backends.spatialite``
+
+.. module:: django.contrib.gis.db.models
+   :synopsis: GeoDjango's database API.
 
 .. _mysql-spatial-limitations:
 
@@ -76,7 +75,7 @@ transform procedure::
     >>> z = Zipcode(code=78212, poly=poly_3084)
     >>> z.save()
     >>> from django.db import connection
-    >>> print connection.queries[-1]['sql'] # printing the last SQL statement executed (requires DEBUG=True)
+    >>> print(connection.queries[-1]['sql']) # printing the last SQL statement executed (requires DEBUG=True)
     INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
@@ -215,7 +214,7 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-__ https://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+__ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
 
 .. _compatibility-table:
 
@@ -286,7 +285,7 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.extent3d`          X
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X
-:meth:`GeoQuerySet.geojson`           X
+:meth:`GeoQuerySet.geojson`           X                X
 :meth:`GeoQuerySet.gml`               X        X       X
 :meth:`GeoQuerySet.intersection`      X        X       X
 :meth:`GeoQuerySet.kml`               X                X

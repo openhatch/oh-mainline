@@ -1,14 +1,18 @@
 from functools import update_wrapper
 
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 from django.db import models
+from django.http import HttpResponseRedirect
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -26,7 +30,7 @@ class ActionAdmin(admin.ModelAdmin):
         Remove all entries named 'name' from the ModelAdmin instance URL
         patterns list
         """
-        return filter(lambda e: e.name != name, super(ActionAdmin, self).get_urls())
+        return [url for url in super(ActionAdmin, self).get_urls() if url.name != name]
 
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
@@ -47,4 +51,42 @@ class ActionAdmin(admin.ModelAdmin):
         ) + self.remove_url(view_name)
 
 
+class Person(models.Model):
+    name = models.CharField(max_length=20)
+
+class PersonAdmin(admin.ModelAdmin):
+
+    def response_post_save_add(self, request, obj):
+        return HttpResponseRedirect(
+            reverse('admin:admin_custom_urls_person_history', args=[obj.pk]))
+
+    def response_post_save_change(self, request, obj):
+        return HttpResponseRedirect(
+            reverse('admin:admin_custom_urls_person_delete', args=[obj.pk]))
+
+
+class Car(models.Model):
+    name = models.CharField(max_length=20)
+
+class CarAdmin(admin.ModelAdmin):
+
+    def response_add(self, request, obj, post_url_continue=None):
+        return super(CarAdmin, self).response_add(
+            request, obj, post_url_continue=reverse('admin:admin_custom_urls_car_history', args=[obj.pk]))
+
+
+class CarDeprecated(models.Model):
+    """ This class must be removed in Django 1.6 """
+    name = models.CharField(max_length=20)
+
+class CarDeprecatedAdmin(admin.ModelAdmin):
+    """ This class must be removed in Django 1.6 """
+    def response_add(self, request, obj, post_url_continue=None):
+        return super(CarDeprecatedAdmin, self).response_add(
+            request, obj, post_url_continue='../%s/history/')
+
+
 admin.site.register(Action, ActionAdmin)
+admin.site.register(Person, PersonAdmin)
+admin.site.register(Car, CarAdmin)
+admin.site.register(CarDeprecated, CarDeprecatedAdmin)

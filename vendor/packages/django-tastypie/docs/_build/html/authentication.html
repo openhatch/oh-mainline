@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Authentication &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Authorization" href="authorization.html" />
+    <link rel="prev" title="Validation" href="validation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authorization.html" title="Authorization"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="validation.html" title="Validation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="authentication">
+<span id="id1"></span><h1>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h1>
+<p>Authentication is the component needed to verify who a
+certain user is and to validate their access to the API.</p>
+<p>Authentication answers the question &#8220;Who is this person?&#8221; This usually involves
+requiring credentials, such as an API key or username/password or oAuth tokens.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Using these classes is simple. Simply provide them (or your own class) as a
+<tt class="docutils literal"><span class="pre">Meta</span></tt> option to the <tt class="docutils literal"><span class="pre">Resource</span></tt> in question. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.authentication</span> <span class="kn">import</span> <span class="n">BasicAuthentication</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="c"># Add it here.</span>
+        <span class="n">authentication</span> <span class="o">=</span> <span class="n">BasicAuthentication</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="authentication-options">
+<h2>Authentication Options<a class="headerlink" href="#authentication-options" title="Permalink to this headline">¶</a></h2>
+<p>Tastypie ships with the following <tt class="docutils literal"><span class="pre">Authentication</span></tt> classes:</p>
+<div class="section" id="id2">
+<h3><tt class="docutils literal"><span class="pre">Authentication</span></tt><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>The no-op authentication option, the client is always allowed through. Very
+useful for development and read-only APIs.</p>
+</div>
+<div class="section" id="basicauthentication">
+<h3><tt class="docutils literal"><span class="pre">BasicAuthentication</span></tt><a class="headerlink" href="#basicauthentication" title="Permalink to this headline">¶</a></h3>
+<p>This authentication scheme uses HTTP Basic Auth to check a user&#8217;s credentials.
+The username is their <tt class="docutils literal"><span class="pre">django.contrib.auth.models.User</span></tt> username (assuming
+it is present) and their password should also correspond to that entry.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you&#8217;re using Apache &amp; <tt class="docutils literal"><span class="pre">mod_wsgi</span></tt>, you will need to enable
+<tt class="docutils literal"><span class="pre">WSGIPassAuthorization</span> <span class="pre">On</span></tt>. See <a class="reference external" href="http://www.nerdydork.com/basic-authentication-on-mod_wsgi.html">this post</a> for details.</p>
+</div>
+</div>
+<div class="section" id="apikeyauthentication">
+<h3><tt class="docutils literal"><span class="pre">ApiKeyAuthentication</span></tt><a class="headerlink" href="#apikeyauthentication" title="Permalink to this headline">¶</a></h3>
+<p>As an alternative to requiring sensitive data like a password, the
+<tt class="docutils literal"><span class="pre">ApiKeyAuthentication</span></tt> allows you to collect just username &amp; a
+machine-generated api key. Tastypie ships with a special <tt class="docutils literal"><span class="pre">Model</span></tt> just for
+this purpose, so you&#8217;ll need to ensure <tt class="docutils literal"><span class="pre">tastypie</span></tt> is in <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>.</p>
+<p>To use this mechanism, the end user can either specify an <tt class="docutils literal"><span class="pre">Authorization</span></tt>
+header or pass the <tt class="docutils literal"><span class="pre">username/api_key</span></tt> combination as <tt class="docutils literal"><span class="pre">GET/POST</span></tt> parameters.
+Examples:</p>
+<div class="highlight-python"><pre># As a header
+# Format is ``Authorization: ApiKey &lt;username&gt;:&lt;api_key&gt;
+Authorization: ApiKey daniel:204db7bcfafb2deb7506b89eb3b9b715b09905c8
+
+# As GET params
+http://127.0.0.1:8000/api/v1/entries/?username=daniel&amp;api_key=204db7bcfafb2deb7506b89eb3b9b715b09905c8</pre>
+</div>
+<p>Tastypie includes a signal function you can use to auto-create <tt class="docutils literal"><span class="pre">ApiKey</span></tt>
+objects. Hooking it up looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">tastypie.models</span> <span class="kn">import</span> <span class="n">create_api_key</span>
+
+<span class="n">models</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">post_save</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">create_api_key</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">User</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you&#8217;re using Apache &amp; <tt class="docutils literal"><span class="pre">mod_wsgi</span></tt>, you will need to enable
+<tt class="docutils literal"><span class="pre">WSGIPassAuthorization</span> <span class="pre">On</span></tt>, otherwise <tt class="docutils literal"><span class="pre">mod_wsgi</span></tt> strips out the
+<tt class="docutils literal"><span class="pre">Authorization</span></tt> header. See <a class="reference external" href="http://www.nerdydork.com/basic-authentication-on-mod_wsgi.html">this post</a> for details (even though it
+only mentions Basic auth).</p>
+</div>
+</div>
+<div class="section" id="sessionauthentication">
+<h3><tt class="docutils literal"><span class="pre">SessionAuthentication</span></tt><a class="headerlink" href="#sessionauthentication" title="Permalink to this headline">¶</a></h3>
+<p>This authentication scheme uses the built-in Django sessions to check if
+a user is logged. This is typically useful when used by Javascript on the same
+site as the API is hosted on.</p>
+<p>It requires that the user has logged in &amp; has an active session. They also must
+have a valid CSRF token.</p>
+</div>
+<div class="section" id="digestauthentication">
+<h3><tt class="docutils literal"><span class="pre">DigestAuthentication</span></tt><a class="headerlink" href="#digestauthentication" title="Permalink to this headline">¶</a></h3>
+<p>This authentication scheme uses HTTP Digest Auth to check a user&#8217;s
+credentials. The username is their <tt class="docutils literal"><span class="pre">django.contrib.auth.models.User</span></tt>
+username (assuming it is present) and their password should be their
+machine-generated api key. As with ApiKeyAuthentication, <tt class="docutils literal"><span class="pre">tastypie</span></tt>
+should be included in <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you&#8217;re using Apache &amp; <tt class="docutils literal"><span class="pre">mod_wsgi</span></tt>, you will need to enable
+<tt class="docutils literal"><span class="pre">WSGIPassAuthorization</span> <span class="pre">On</span></tt>. See <a class="reference external" href="http://www.nerdydork.com/basic-authentication-on-mod_wsgi.html">this post</a> for details (even though it
+only mentions Basic auth).</p>
+</div>
+</div>
+<div class="section" id="oauthauthentication">
+<h3><tt class="docutils literal"><span class="pre">OAuthAuthentication</span></tt><a class="headerlink" href="#oauthauthentication" title="Permalink to this headline">¶</a></h3>
+<p>Handles OAuth, which checks a user&#8217;s credentials against a separate service.
+Currently verifies against OAuth 1.0a services.</p>
+<p>This does <em>NOT</em> provide OAuth authentication in your API, strictly
+consumption.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>If you&#8217;re used to in-browser OAuth flow (click a &#8220;Sign In&#8221; button, get
+redirected, login on remote service, get redirected back), this isn&#8217;t the
+same. Most prominently, expecting that would cause API clients to have to use
+tools like <a class="reference external" href="http://pypi.python.org/pypi/mechanize/">mechanize</a> to fill in forms, which would be difficult.</p>
+<p class="last">This authentication expects that you&#8217;re already followed some sort of OAuth
+flow &amp; that the credentials (Nonce/token/etc) are simply being passed to it.
+It merely checks that the credentials are valid. No requests are made
+to remote services as part of this authentication class.</p>
+</div>
+</div>
+<div class="section" id="multiauthentication">
+<h3><tt class="docutils literal"><span class="pre">MultiAuthentication</span></tt><a class="headerlink" href="#multiauthentication" title="Permalink to this headline">¶</a></h3>
+<p>This authentication class actually wraps any number of other authentication classes,
+attempting each until successfully authenticating. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.authentication</span> <span class="kn">import</span> <span class="n">BasicAuthentication</span><span class="p">,</span> <span class="n">ApiKeyAuthentication</span><span class="p">,</span> <span class="n">MultiAuthentication</span>
+<span class="kn">from</span> <span class="nn">tastypie.authorization</span> <span class="kn">import</span> <span class="n">DjangoAuthorization</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+
+        <span class="n">authentication</span> <span class="o">=</span> <span class="n">MultiAuthentication</span><span class="p">(</span><span class="n">BasicAuthentication</span><span class="p">(),</span> <span class="n">ApiKeyAuthentication</span><span class="p">())</span>
+        <span class="n">authorization</span> <span class="o">=</span> <span class="n">DjangoAuthorization</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In the case of an authentication returning a customized HttpUnauthorized, MultiAuthentication defaults to the first returned one. Authentication schemes that need to control the response, such as the included BasicAuthentication and DigestAuthentication, should be placed first.</p>
+</div>
+</div>
+<div class="section" id="implementing-your-own-authentication-authorization">
+<h2>Implementing Your Own Authentication/Authorization<a class="headerlink" href="#implementing-your-own-authentication-authorization" title="Permalink to this headline">¶</a></h2>
+<p>Implementing your own <tt class="docutils literal"><span class="pre">Authentication</span></tt> classes is a simple
+process. <tt class="docutils literal"><span class="pre">Authentication</span></tt> has two methods to override (one of which is
+optional but recommended to be customized):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.authentication</span> <span class="kn">import</span> <span class="n">Authentication</span>
+
+
+<span class="k">class</span> <span class="nc">SillyAuthentication</span><span class="p">(</span><span class="n">Authentication</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_authenticated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;daniel&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+          <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="c"># Optional but recommended</span>
+    <span class="k">def</span> <span class="nf">get_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+</pre></div>
+</div>
+<p>Under this scheme, only users with &#8216;daniel&#8217; in their username will be allowed
+in.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Authentication</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#authentication-options">Authentication Options</a><ul>
+<li><a class="reference internal" href="#id2"><tt class="docutils literal"><span class="pre">Authentication</span></tt></a></li>
+<li><a class="reference internal" href="#basicauthentication"><tt class="docutils literal"><span class="pre">BasicAuthentication</span></tt></a></li>
+<li><a class="reference internal" href="#apikeyauthentication"><tt class="docutils literal"><span class="pre">ApiKeyAuthentication</span></tt></a></li>
+<li><a class="reference internal" href="#sessionauthentication"><tt class="docutils literal"><span class="pre">SessionAuthentication</span></tt></a></li>
+<li><a class="reference internal" href="#digestauthentication"><tt class="docutils literal"><span class="pre">DigestAuthentication</span></tt></a></li>
+<li><a class="reference internal" href="#oauthauthentication"><tt class="docutils literal"><span class="pre">OAuthAuthentication</span></tt></a></li>
+<li><a class="reference internal" href="#multiauthentication"><tt class="docutils literal"><span class="pre">MultiAuthentication</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementing-your-own-authentication-authorization">Implementing Your Own Authentication/Authorization</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="validation.html"
+                        title="previous chapter">Validation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="authorization.html"
+                        title="next chapter">Authorization</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/authentication.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authorization.html" title="Authorization"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="validation.html" title="Validation"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

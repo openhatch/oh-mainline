@@ -31,7 +31,7 @@ Settings
         <h3>Settings</h3>
 	<ul>
           <li>
-            <a href="{% url mysite.profile.views.display_person_web user.username %}">
+            <a href="{% url "mysite.profile.views.display_person_web" user.username %}">
               &laquo; Back to profile
             </a>
           </li>
@@ -47,32 +47,40 @@ Settings
                         }
                     </style>
                     <li id='link-set_location'>
-                    <a href='{% url account.views.set_location %}'>
+                    <a href='{% url "account.views.set_location" %}'>
                         Put yourself on the map
+                    </a>
+                    </li>
+                    <li id='link-edit_contact_info'>
+                    <a href='{% url "account.views.edit_contact_info" %}'>
+                        Email
+                    </a>
+                    </li>
+                    <li id='link-widget'>
+                    <a href='{% url "account.views.widget" %}'>
+                        Widgetize yourself
+                    </a>
+                    </li>
+                    <li id='link-set_location'>
+                    <a href='{% url account.views.set_location %}'>
+                        Location
                     </a>
                     </li>
                     <li id='link-edit_contact_info'>
                     <a href='{% url account.views.edit_contact_info %}'>
                         Email
-                    </a>
-                    </li>
-                    <li id='link-widget'>
-                    <a href='{% url account.views.widget %}'>
-                        Widgetize yourself
-                    </a>
-                    </li>
                     <li id='link-invite_someone'>
-                    <a href='{% url account.views.invite_someone %}'>
+                    <a href='{% url "account.views.invite_someone" %}'>
                         Tell a friend about OpenHatch
                     </a>
                     </li>
                     <li id='link-edit_name'>
-                    <a href='{% url account.views.edit_name %}'>
+                    <a href='{% url "account.views.edit_name" %}'>
                         Name
                     </a>
                     </li>
                     <li id='link-change_password'>
-                    <a href='{% url account.views.change_password %}'>
+                    <a href='{% url "account.views.change_password" %}'>
                         Password
                     </a>
                     </li>

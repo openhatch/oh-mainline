@@ -2,8 +2,10 @@ from __future__ import absolute_import
 
 from django.db import models
 from django.test import TestCase
+from django.utils import six
 
-from .models import First, Second, Third, Parent, Child, Category, Record, Relation
+from .models import (
+    First, Third, Parent, Child, Category, Record, Relation, Car, Driver)
 
 
 class ManyToOneRegressionTests(TestCase):
@@ -58,6 +60,10 @@ class ManyToOneRegressionTests(TestCase):
         self.assertRaises(ValueError, Child, name='xyzzy', parent=None)
         self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
 
+        # Trying to assign to unbound attribute raises AttributeError
+        six.assertRaisesRegex(self, AttributeError, "must be accessed via instance",
+            Child.parent.__set__, None, p)
+
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")
         c = Child(parent=p)
@@ -106,3 +112,25 @@ class ManyToOneRegressionTests(TestCase):
         # of a model, and interrogate its related field.
         cat = models.ForeignKey(Category)
         self.assertEqual('id', cat.rel.get_related_field().name)
+
+    def test_relation_unsaved(self):
+        # Test that the <field>_set manager does not join on Null value fields (#17541)
+        Third.objects.create(name='Third 1')
+        Third.objects.create(name='Third 2')
+        th = Third(name="testing")
+        # The object isn't saved an thus the relation field is null - we won't even
+        # execute a query in this case.
+        with self.assertNumQueries(0):
+            self.assertEqual(th.child_set.count(), 0)
+        th.save()
+        # Now the model is saved, so we will need to execute an query.
+        with self.assertNumQueries(1):
+            self.assertEqual(th.child_set.count(), 0)
+
+    def test_related_null_to_field(self):
+        c1 = Car.objects.create()
+        c2 = Car.objects.create()
+        d1 = Driver.objects.create()
+        self.assertIs(d1.car, None)
+        with self.assertNumQueries(0):
+            self.assertEqual(list(c1.drivers.all()), [])

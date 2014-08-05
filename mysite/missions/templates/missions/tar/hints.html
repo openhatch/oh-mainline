@@ -32,13 +32,14 @@
       <pre>tar xvzf <em>[tarball]</em></pre>
       <p>To be more specific:</p>
       <pre>tar <em>[option letters]</em>xf <em>[tarball]</em></pre>
-      <p>(The <code>x</code> stands for e<strong>x</strong>tract.)</p>
-      <p>The tarball's contents are placed into the current directory.  Option letter <code>z</code> makes tar transparently un-gzip the tarball, and <code>v</code> shows the filenames as tar unpacks them.</p>
+      <p>(The <tt>x</tt> stands for e<strong>x</strong>tract.)</p>
+      <p>The tarball's contents are placed into the current directory.  Option letter <tt>z</tt> makes tar transparently un-gzip the tarball, and <tt>v</tt> shows the filenames as tar unpacks them.</p>
 
-      <p>Listing a tarball works the same way as unpacking it, except that you use <code>tf</code> instead of <code>xf</code>.  So the command would look something like:</p>
+      <p>Listing a tarball works the same way as unpacking it, except that you use <tt>tf</tt> instead of <tt>xf</tt>.</p> 
+      <p>So the command would look something like:</p>
       <pre>tar <em>[option letters]</em>tf <em>[tarball]</em></pre>
-      <p>(The <code>t</code> stands for lis<strong>t</strong>.  Go figure.)</p>
-      <p>Option letter <code>v</code>, which would otherwise be redundant because tar is already listing the contents as it examines the tarball, shows more details (such as permissions and sizes) about the files inside.<p>
+      <p>(The <tt>t</tt> stands for lis<strong>t</strong>.  Go figure.)</p>
+      <p>Option letter <tt>v</tt>, which would otherwise be redundant because tar is already listing the contents as it examines the tarball, shows more details (such as permissions and sizes) about the files inside.</p>
 
       <p>It is generally a good idea to try unpacking or listing a tarball you are about to send out so you can verify that it really contains what you wanted.</p>
 
@@ -47,8 +48,8 @@
       <pre>tar zcvf <em>mytar.tar.gz</em> <em>dir</em></pre>
       <p>The general way to create a tarball from a set of files and directories is:</p>
       <pre>tar <em>[option letters]</em>cf <em>[tarball]</em> <em>[things to tar up]</em></pre>
-      <p>(The <code>c</code> stands for <strong>c</strong>reate, and the <code>f</code> means that the next argument is the <strong>f</strong>ile you want tar to work with.)</p>
-      <p>Common option letters are <code>v</code> (<strong>v</strong>erbose) to make tar list the things it is adding as it goes along and <code>z</code> to make tar g<strong>z</strong>ip the tarball for you rather than giving you an uncompressed one.</p>
+      <p>(The <tt>c</tt> stands for <strong>c</strong>reate, and the <tt>f</tt> means that the next argument is the <strong>f</strong>ile you want tar to work with.)</p>
+      <p>Common option letters are <tt>v</tt> (<strong>v</strong>erbose) to make tar list the things it is adding as it goes along and <tt>z</tt> to make tar g<strong>z</strong>ip the tarball for you rather than giving you an uncompressed one.</p>
       <p>If any of the things listed to include in the tarball is a directory, tar will automatically recursively add everything inside the directory too.  This is part of the reason for the convention of using a single wrapper directory, as then that is the only thing you have to explicitly list when creating the tarball.</p>
       <h3>Other resources</h3>
       <p>There are many more options to tar, which are detailed in tar's documentation.  The ones mentioned here, though, are the most commonly used ones. For further reading:</p>

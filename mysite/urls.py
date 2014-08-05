@@ -33,7 +33,8 @@ import mysite.account.forms
 import django_authopenid.views
 
 # used for the robots.txt redirection
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
+# from django.views.generic.simple import direct_to_template
 
 from voting.views import vote_on_object
 
@@ -120,14 +121,14 @@ urlpatterns = patterns('',
                         'mysite.missions.tar.views.creating'),
                        (r'^missions/tar/hints$',
                         'mysite.missions.tar.views.hints'),
-                       (r'^missions/tar/upload$',
-                        'mysite.missions.tar.views.upload'),
                        (r'^missions/tar/downloadfile/(?P<name>.*)',
                         'mysite.missions.tar.views.file_download'),
                        (r'^missions/tar/ghello-0.4.tar.gz',
                         'mysite.missions.tar.views.download_tarball_for_extract_mission'),
-                       (r'^missions/tar/extractupload',
-                        'mysite.missions.tar.views.extract_mission_upload'),
+                       (r'^missions/tar/extractsuccess',
+                        'mysite.missions.tar.views.extract_mission_success'),
+                       (r'^missions/tar/createsuccess',
+                        'mysite.missions.tar.views.create_mission_success'),
 
                        (r'^missions/diffpatch$',
                         'mysite.missions.diffpatch.views.about'),
@@ -236,9 +237,10 @@ urlpatterns = patterns('',
                         'mysite.customs.views.delete_tracker_url_do'),
 
                        # Bug set creator URLs
-                       (r'^bugsets/$', 'mysite.bugsets.views.list_index'),
+                       (r'^bugsets/$', 'mysite.bugsets.views.main_index'),
                        (r'^bugsets/(?P<pk>\d+)-(?P<slug>.*)$',
-                        'mysite.bugsets.views.listview_index'),
+                        'mysite.bugsets.views.list_index'),
+                       (r'^bugsets/create$', 'mysite.bugsets.views.create_index'),
                            # This is a view for robots, do not modify
                        (r'^inplaceeditform/', include('inplaceeditform.urls')),
 
@@ -360,12 +362,6 @@ urlpatterns = patterns('',
 
                        (r'^account/settings/location/do$',
                         'mysite.account.views.set_location_do'),
-
-                       (r'^account/settings/location/confirm_suggestion/do$',
-                        'mysite.account.views.confirm_location_suggestion_do'),
-
-                       (r'^account/settings/location/dont_guess_location/do$',
-                        'mysite.account.views.dont_guess_location_do'),
 
                        (r'^account/settings/invite_someone/$',
                         'mysite.account.views.invite_someone'),
@@ -494,27 +490,21 @@ urlpatterns = patterns('',
 
                        # regex for the robots.txt file, for search engine
                        # exclusion
-                       (r'^robots\.txt$', direct_to_template,
-                        {'template': 'robots.txt', 'mimetype': 'text/plain'}),
+                       (r'^robots\.txt$', mysite.base.views.render_robots_txt),
 
                        # the OpenHatch guide
-                       (r'^guide/$', direct_to_template,
-                        {'template': 'base/guide.html'}),
+                       (r'^guide/$', TemplateView.as_view(template_name="base/guide.html")),
 
                        # the OpenHatch events page
-                       (r'^events/$', direct_to_template,
-                        {'template': 'base/events.html'}),
+                       (r'^events/$', TemplateView.as_view(template_name="base/events.html")),
 
                        # the OpenHatch sponsors page
-                       (r'^sponsors/$', direct_to_template,
-                        {'template': 'base/sponsors.html'}),
+                       (r'^sponsors/$', TemplateView.as_view(template_name="base/sponsors.html")),
 
                        # the OpenHatch donate page
-                       (r'^donate/$', direct_to_template,
-                        {'template': 'base/donate.html'}),
+                       (r'^donate/$', TemplateView.as_view(template_name="base/donate.html")),
                        # the OpenHatch donate page
-                       (r'^donate/t-shirts/$', direct_to_template,
-                        {'template': 'base/shirts.html'}),
+                       (r'^donate/t-shirts/$', TemplateView.as_view(template_name="base/shirts.html")),
 
                        # This dangerous regex is last
                        (r'^people/(?P<user_to_display__username>[^/]+)/$',

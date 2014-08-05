@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Interacting With The API &mdash; Tastypie v1.0.0-beta documentation</title>
+    <title>Interacting With The API &mdash; Tastypie v0.9.13-beta documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.0-beta',
+        VERSION:     '0.9.13-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Tastypie v1.0.0-beta documentation" href="index.html" />
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
     <link rel="next" title="Tastypie Settings" href="settings.html" />
     <link rel="prev" title="Getting Started with Tastypie" href="tutorial.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Getting Started with Tastypie"
              accesskey="P">previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -524,6 +524,23 @@ Content-Type: text/html; charset=utf-8</pre>
 <p>We get a 204 status code, meaning our update was successful. We don&#8217;t get
 a <tt class="docutils literal"><span class="pre">Location</span></tt> header back because we did the <tt class="docutils literal"><span class="pre">PUT</span></tt> on a detail URL, which
 presumably did not change.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A <tt class="docutils literal"><span class="pre">PUT</span></tt> request requires that the entire resource representation be enclosed. Missing fields may cause errors, or be filled in by default values.</p>
+</div>
+</div>
+<div class="section" id="partially-updating-an-existing-resource-patch">
+<h3>Partially Updating An Existing Resource (PATCH)<a class="headerlink" href="#partially-updating-an-existing-resource-patch" title="Permalink to this headline">¶</a></h3>
+<p>In some cases, you may not want to send the entire resource when updating. To update just a subset of the fields, we can send a <tt class="docutils literal"><span class="pre">PATCH</span></tt> request to the detail endpoint.:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X PATCH --data '{"body": "This actually is my last post."}' http://localhost:8000/api/v1/entry/4/</pre>
+</div>
+<p>To which we should get back:</p>
+<div class="highlight-python"><pre>HTTP/1.0 202 ACCEPTED
+Date: Fri, 20 May 2011 07:13:21 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
 </div>
 <div class="section" id="updating-a-whole-collection-of-resources-put">
 <h3>Updating A Whole Collection Of Resources (PUT)<a class="headerlink" href="#updating-a-whole-collection-of-resources-put" title="Permalink to this headline">¶</a></h3>
@@ -614,6 +631,21 @@ Content-Type: text/html; charset=utf-8</pre>
 </div>
 </div>
 </div>
+<div class="section" id="bulk-operations">
+<h2>Bulk Operations<a class="headerlink" href="#bulk-operations" title="Permalink to this headline">¶</a></h2>
+<p>As an optimization, it is possible to do many creations, updates, and deletions to a collection in a single request by sending a <tt class="docutils literal"><span class="pre">PATCH</span></tt> to the list endpoint.:</p>
+<div class="highlight-python"><pre>curl --dump-header - -H "Content-Type: application/json" -X PATCH --data '{"objects": [{"body": "Surprise! Another post!.", "pub_date": "2012-02-16T00:46:38", "slug": "yet-another-post", "title": "Yet Another Post"}], "deleted_objects": ["http://localhost:8000/api/v1/entry/4/"]}'  http://localhost:8000/api/v1/entry/</pre>
+</div>
+<p>We should get back:</p>
+<div class="highlight-python"><pre>HTTP/1.0 202 ACCEPTED
+Date: Fri, 16 Feb 2012 00:46:38 GMT
+Server: WSGIServer/0.1 Python/2.7
+Content-Length: 0
+Content-Type: text/html; charset=utf-8</pre>
+</div>
+<p>The Accepted response means the server has accepted the request, but gives no details on the result. In order to see any created resources, we would need to do a get <tt class="docutils literal"><span class="pre">GET</span></tt> on the list endpoint.</p>
+<p>For detailed information on the format of a bulk request, see <a class="reference internal" href="resources.html#patch-list"><em>patch_list</em></a>.</p>
+</div>
 <div class="section" id="you-did-it">
 <h2>You Did It!<a class="headerlink" href="#you-did-it" title="Permalink to this headline">¶</a></h2>
 <p>That&#8217;s a whirlwind tour of interacting with a Tastypie API. There&#8217;s additional
@@ -649,6 +681,7 @@ functionality present, such as:</p>
 <li><a class="reference internal" href="#sending-data">Sending Data</a><ul>
 <li><a class="reference internal" href="#creating-a-new-resource-post">Creating A New Resource (POST)</a></li>
 <li><a class="reference internal" href="#updating-an-existing-resource-put">Updating An Existing Resource (PUT)</a></li>
+<li><a class="reference internal" href="#partially-updating-an-existing-resource-patch">Partially Updating An Existing Resource (PATCH)</a></li>
 <li><a class="reference internal" href="#updating-a-whole-collection-of-resources-put">Updating A Whole Collection Of Resources (PUT)</a></li>
 </ul>
 </li>
@@ -657,6 +690,7 @@ functionality present, such as:</p>
 <li><a class="reference internal" href="#deleting-a-whole-collection-of-resources">Deleting A Whole Collection Of Resources</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#bulk-operations">Bulk Operations</a></li>
 <li><a class="reference internal" href="#you-did-it">You Did It!</a></li>
 </ul>
 </li>
@@ -705,11 +739,11 @@ functionality present, such as:</p>
         <li class="right" >
           <a href="tutorial.html" title="Getting Started with Tastypie"
              >previous</a> |</li>
-        <li><a href="toc.html">Tastypie v1.0.0-beta documentation</a> &raquo;</li> 
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010-2011, Daniel Lindsley, Cody Soyland &amp; Matt Croydon.
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>

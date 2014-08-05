@@ -1,4 +1,3 @@
-# This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
 # Copyright (C) 2010 Jessica McKellar
@@ -163,88 +162,6 @@ class EditPassword(TwillTests):
             success = not success
         self.assert_(success)
 
-    def test_change_password(self):
-        self.login_with_twill()
-        oldpass = "paulproteus's unbreakable password"
-        newpass = 'new'
-        self.change_password(oldpass, newpass)
-
-    def test_change_password_should_fail(self):
-        self.login_with_twill()
-        oldpass = "wrong"
-        newpass = 'new'
-        self.change_password(oldpass, newpass,
-                             should_succeed=False)
-#}}}
-
-
-class EditContactInfo(TwillTests):
-    #{{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test_edit_email_address(self):
-        # Opt out of the periodic emails. This way, the only "checked"
-        # checkbox is the one for if the user's email address gets shown.
-        paulproteus = Person.objects.get()
-        paulproteus.email_me_re_projects = False
-        paulproteus.save()
-
-        self.login_with_twill()
-
-        _url = 'http://openhatch.org/account/settings/contact-info/'
-        url = make_twill_url(_url)
-
-        email = 'new@ema.il'
-
-        # Go to contact info form
-        tc.go(url)
-
-        # Let's first ensure that "new@ema.il" doesn't appear on the page.
-        # (We're about to add it.)
-        tc.notfind('checked="checked"')
-        tc.notfind(email)
-
-        # Edit email
-        tc.fv("a_settings_tab_form", 'edit_email-email', email)
-        # Show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '1')  # [1]
-        tc.submit()
-
-        # Form submission ought to redirect us back to the form.
-        tc.url(url)
-
-        # Was email successfully edited?
-        tc.find(email)
-
-        # Was email visibility successfully edited? [2]
-        tc.find('checked="checked"')
-
-        # And does the email address show up on the profile?
-        tc.go(make_twill_url(
-            'http://openhatch.org/people/paulproteus'))
-        tc.find(email)
-
-        # 2. And when we uncheck, does it go away?
-
-        # 2.1. Go to contact info form
-        tc.go(url)
-
-        # 2.2. Don't show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '0')  # [1]
-        tc.submit()
-
-        # 2.3. Verify it's not on profile anymore
-        tc.go(make_twill_url(
-            'http://openhatch.org/people/paulproteus'))
-        tc.notfind(email)
-
-        # [1]: This email suggests that twill only accepts
-        # *single quotes* around the '1'.
-        # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
-        #
-        # [2]: This assertion works b/c there's only one checkbox.
-    #}}}
-
 photos = [os.path.join(os.path.dirname(__file__),
                        '..', '..', 'sample-photo.' + ext)
           for ext in ('png', 'jpg')]
@@ -382,77 +299,6 @@ class EditPhotoWithOldPerson(TwillTests):
                          open(image).read())
     #}}}
 
-
-class GuessLocationOnLogin(TwillTests):
-    #{{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    mock_ip = mock.Mock()
-    # Located in Rochester, New York, U.S.A.
-    mock_ip.return_value = "128.151.2.1"
-
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
-    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
-    def test_guess_location_on_accessing_edit_location_form(self):
-        person = Person.objects.get(user__username="paulproteus")
-        self.assertFalse(person.location_confirmed)
-        self.assertEqual('Inaccessible Island',
-                         person.get_public_location_or_default())
-
-        client = self.login_with_client()
-        response = client.get(reverse(mysite.account.views.set_location))
-        self.assertContains(response, "OpenHatch")
-        self.assertContains(response, "Rochester, NY, United States")
-
-    mock_ip = mock.Mock()
-    # Located in Rochester, New York, U.S.A.
-    mock_ip.return_value = "128.151.2.1"
-
-    @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
-    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
-    def test_do_not_guess_if_have_location_set(self):
-        person = Person.objects.get(user__username="paulproteus")
-        person.location_display_name = 'The White House'
-        person.latitude = 38.898748
-        person.longitude = -77.037684
-        person.location_confirmed = True
-        person.save()
-
-        client = self.login_with_client()
-        response = client.get(reverse(mysite.account.views.set_location))
-        self.assertContains(response, "OpenHatch")
-        self.assertNotContains(response, "Rochester, NY, United States")
-        self.assertContains(response, "The White House")
-
-    def test_yes_response(self):
-        person = Person.objects.get(user__username="paulproteus")
-        # logging in
-        client = self.login_with_client()
-        # sending http request to correct page for "yes" response
-        response = client.post(
-            reverse(mysite.account.views.confirm_location_suggestion_do))
-        # asserting that we get back an http status code of 200
-        self.assertEqual(response.status_code, 200)
-        # client.post modifies person, refetching to check update...
-        person = Person.objects.get(user__username="paulproteus")
-        # asserting that database was updated
-        self.assertTrue(person.location_confirmed)
-
-    def test_dont_guess_response(self):
-        person = Person.objects.get(user__username="paulproteus")
-        # logging in
-        client = self.login_with_client()
-        # sending http request to correct page for "don't guess" response
-        response = client.post(
-            reverse(mysite.account.views.dont_guess_location_do))
-        # asserting that we get back an http status code of 200
-        self.assertEqual(response.status_code, 200)
-        # client.post modifies person, refetching to check update...
-        person = Person.objects.get(user__username="paulproteus")
-        # asserting that database was updated
-        self.assertTrue(person.dont_guess_my_location)
-
-    #}}}
 
 
 class SignupWithNoPassword(TwillTests):

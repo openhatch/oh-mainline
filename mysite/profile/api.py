@@ -4,6 +4,10 @@ import tastypie.fields
 import tastypie.resources
 import tastypie.authorization
 
+from tastypie.authorization import DjangoAuthorization
+from tastypie.authorization import Authorization
+from tastypie.exceptions import Unauthorized
+
 
 class PerPersonModelResource(tastypie.resources.ModelResource):
 
@@ -21,9 +25,12 @@ class PerPersonModelResource(tastypie.resources.ModelResource):
         return tastypie.http.HttpBadRequest(
             'You need to be logged in.')
 
-    def apply_authorization_limits(self, request, object_list):
-        if request.user.is_authenticated():
-            return object_list.filter(person=request.user.get_profile())
+
+class CustomAuthorization(Authorization):
+    def read_list(self, object_list, bundle):
+        # This assumes a ``QuerySet`` from ``ModelResource``.
+        if bundle.request.user.is_authenticated():
+            return object_list.filter(person=bundle.request.user)
         # Otherwise, just return an empty list. This is imperfect,
         # but it will do for now.
         return []
@@ -37,6 +44,7 @@ class PortfolioEntryResource(PerPersonModelResource):
         excludes = ['person', 'project', 'date_created']
         queryset = mysite.profile.models.PortfolioEntry.objects.all()
         resource_name = 'portfolio_entry'
+        authorization = CustomAuthorization()
 
     # The following read-only fields are data calculated from
     # the project. They are read-only to indicate that this is

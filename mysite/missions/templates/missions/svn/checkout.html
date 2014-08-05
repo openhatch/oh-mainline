@@ -36,9 +36,9 @@
   <p><strong>You have successfully completed this part of the mission.</strong></p>
 </div>
 <p class="next_mission_link">
-  <a href="{% url svn_diff %}">Creating a diff of your changes &raquo;</a></p>
+  <a href="{% url "svn_diff" %}">Creating a diff of your changes &raquo;</a></p>
 {% else %}
-<form method="post" action="{% url mysite.missions.svn.views.checkout_submit %}#svncheckout-form">{% csrf_token %}
+<form method="post" action="{% url "mysite.missions.svn.views.checkout_submit" %}#svncheckout-form">{% csrf_token %}
   <div class="form-row">
     <a name="svncheckout-form"></a>
     {{ svn_checkout_form.secret_word.errors }}

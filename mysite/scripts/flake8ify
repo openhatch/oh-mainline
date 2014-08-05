@@ -1,0 +1,3 @@
+#!/bin/bash
+
+git ls-files -- '*.py' | grep bugsets | grep -v migrations | xargs flake8

@@ -4,9 +4,9 @@ Models
 
 .. module:: django.db.models
 
-A model is the single, definitive source of data about your data. It contains
-the essential fields and behaviors of the data you're storing. Generally, each
-model maps to a single database table.
+A model is the single, definitive source of information about your data. It
+contains the essential fields and behaviors of the data you're storing.
+Generally, each model maps to a single database table.
 
 The basics:
 
@@ -48,7 +48,7 @@ Some technical notes:
 
 * The name of the table, ``myapp_person``, is automatically derived from
   some model metadata but can be overridden. See :ref:`table-names` for more
-  details..
+  details.
 
 * An ``id`` field is added automatically, but this behavior can be
   overridden. See :ref:`automatic-primary-key-fields`.
@@ -110,7 +110,7 @@ determine a few things:
 
 * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
 
-* The default :doc:`widget </ref/forms/widgets>` to use when rendering a form
+* The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
   field (e.g. ``<input type="text">``, ``<select>``).
 
 * The minimal validation requirements, used in Django's admin and in
@@ -158,11 +158,11 @@ ones:
     A choices list looks like this::
 
         YEAR_IN_SCHOOL_CHOICES = (
-            (u'FR', u'Freshman'),
-            (u'SO', u'Sophomore'),
-            (u'JR', u'Junior'),
-            (u'SR', u'Senior'),
-            (u'GR', u'Graduate'),
+            ('FR', 'Freshman'),
+            ('SO', 'Sophomore'),
+            ('JR', 'Junior'),
+            ('SR', 'Senior'),
+            ('GR', 'Graduate'),
         )
 
     The first element in each tuple is the value that will be stored in the
@@ -175,12 +175,12 @@ ones:
 
         class Person(models.Model):
             SHIRT_SIZES = (
-                (u'S', u'Small'),
-                (u'M', u'Medium'),
-                (u'L', u'Large'),
+                ('S', 'Small'),
+                ('M', 'Medium'),
+                ('L', 'Large'),
             )
             name = models.CharField(max_length=60)
-            shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
+            shirt_size = models.CharField(max_length=1, choices=SHIRT_SIZES)
 
     ::
 
@@ -234,7 +234,7 @@ sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 ``id`` column.
 
 Each model requires exactly one field to have :attr:`primary_key=True
-<Field.primary_key>`.
+<Field.primary_key>` (either explicitly declared or automatically added).
 
 .. _verbose-field-names:
 
@@ -324,6 +324,7 @@ whatever you want. For example::
     For sample code, see the :doc:`Many-to-one relationship model example
     </topics/db/examples/many_to_one>`.
 
+
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -383,7 +384,8 @@ Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When you're only dealing with simple many-to-many relationships such as
-mixing and matching pizzas and toppings, a standard :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
+mixing and matching pizzas and toppings, a standard
+:class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
 you may need to associate data with the relationship between two models.
 
 For example, consider the case of an application tracking the musical groups
@@ -564,8 +566,9 @@ can be made; see :ref:`the model field reference <ref-onetoone>` for details.
     See the :doc:`One-to-one relationship model example
     </topics/db/examples/one_to_one>` for a full example.
 
-:class:`~django.db.models.OneToOneField` fields also accept one optional argument
-described in the :ref:`model field reference <ref-onetoone>`.
+:class:`~django.db.models.OneToOneField` fields also accept one specific,
+optional ``parent_link`` argument described in the :ref:`model field
+reference <ref-onetoone>`.
 
 :class:`~django.db.models.OneToOneField` classes used to automatically become
 the primary key on a model. This is no longer true (although you can manually
@@ -576,8 +579,8 @@ Thus, it's now possible to have multiple fields of type
 Models across files
 -------------------
 
-It's perfectly OK to relate a model to one from another app. To do this,
-import the related model at the top of the model that holds your model. Then,
+It's perfectly OK to relate a model to one from another app. To do this, import
+the related model at the top of the file where your model is defined. Then,
 just refer to the other model class wherever needed. For example::
 
     from geography.models import ZipCode
@@ -670,11 +673,12 @@ For example, this model has a few custom methods::
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
             import datetime
-            if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
-                return "Baby boomer"
             if self.birth_date < datetime.date(1945, 8, 1):
                 return "Pre-boomer"
-            return "Post-boomer"
+            elif self.birth_date < datetime.date(1965, 1, 1):
+                return "Baby boomer"
+            else:
+                return "Post-boomer"
 
         def is_midwestern(self):
             "Returns True if this person is from the Midwest."
@@ -886,8 +890,6 @@ field. This would normally cause a problem in abstract base classes, since the
 fields on this class are included into each of the child classes, with exactly
 the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
 
-.. versionchanged:: 1.2
-
 To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
 abstract base class (only), part of the name should contain
 ``'%(app_label)s'`` and ``'%(class)s'``.
@@ -1061,52 +1063,46 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the standard
-:class:`~django.contrib.auth.models.User` model that will be used in your
-templates. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model described
+above. You can do it like this::
 
-    from django.contrib.auth.models import User
-
-    class MyUser(User):
+    class MyPerson(Person):
         class Meta:
             proxy = True
 
         def do_something(self):
             ...
 
-The ``MyUser`` class operates on the same database table as its parent
-:class:`~django.contrib.auth.models.User` class. In particular, any new
-instances of :class:`~django.contrib.auth.models.User` will also be accessible
-through ``MyUser``, and vice-versa::
+The ``MyPerson`` class operates on the same database table as its parent
+``Person`` class. In particular, any new instances of ``Person`` will also be
+accessible through ``MyPerson``, and vice-versa::
 
-    >>> u = User.objects.create(username="foobar")
-    >>> MyUser.objects.get(username="foobar")
-    <MyUser: foobar>
+    >>> p = Person.objects.create(first_name="foobar")
+    >>> MyPerson.objects.get(first_name="foobar")
+    <MyPerson: foobar>
 
-You could also use a proxy model to define a different default ordering on a
-model. The standard :class:`~django.contrib.auth.models.User` model has no
-ordering defined on it (intentionally; sorting is expensive and we don't want
-to do it all the time when we fetch users). You might want to regularly order
-by the ``username`` attribute when you use the proxy. This is easy::
+You could also use a proxy model to define a different default ordering on
+a model. You might not always want to order the ``Person`` model, but regularly
+order by the ``last_name`` attribute when you use the proxy. This is easy::
 
-    class OrderedUser(User):
+    class OrderedPerson(Person):
         class Meta:
-            ordering = ["username"]
+            ordering = ["last_name"]
             proxy = True
 
-Now normal :class:`~django.contrib.auth.models.User` queries will be unordered
-and ``OrderedUser`` queries will be ordered by ``username``.
+Now normal ``Person`` queries will be unordered
+and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
 QuerySets still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is no way to have Django return, say, a ``MyUser`` object whenever you
-query for :class:`~django.contrib.auth.models.User` objects. A queryset for
-``User`` objects will return those types of objects. The whole point of proxy
-objects is that code relying on the original ``User`` will use those and your
-own code can use the extensions you included (that no other code is relying on
-anyway). It is not a way to replace the ``User`` (or any other) model
-everywhere with something of your own creation.
+There is no way to have Django return, say, a ``MyPerson`` object whenever you
+query for ``Person`` objects. A queryset for ``Person`` objects will return
+those types of objects. The whole point of proxy objects is that code relying
+on the original ``Person`` will use those and your own code can use the
+extensions you included (that no other code is relying on anyway). It is not
+a way to replace the ``Person`` (or any other) model everywhere with something
+of your own creation.
 
 Base class restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1129,12 +1125,12 @@ it will become the default, although any managers defined on the parent
 classes will still be available.
 
 Continuing our example from above, you could change the default manager used
-when you query the ``User`` model like this::
+when you query the ``Person`` model like this::
 
     class NewManager(models.Manager):
         ...
 
-    class MyUser(User):
+    class MyPerson(Person):
         objects = NewManager()
 
         class Meta:
@@ -1152,7 +1148,7 @@ containing the new managers and inherit that after the primary base class::
         class Meta:
             abstract = True
 
-    class MyUser(User, ExtraManagers):
+    class MyPerson(Person, ExtraManagers):
         class Meta:
             proxy = True
 

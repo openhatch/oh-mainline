@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
+import datetime
 import hashlib
 from itertools import cycle, islice
 
@@ -174,6 +175,12 @@ Sincerely,
     msg.send()
 
 
+def encode_datetime(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
+    raise TypeError(repr(o) + " is not JSON serializable")
+
+
 def send_user_export_to_admins(u):
     '''You might want to call this function before deleting a user.
 
@@ -185,8 +192,7 @@ def send_user_export_to_admins(u):
     * training an antispam tool
 
     * recovering data on a user'''
-    body = simplejson.dumps(generate_user_export(u),
-                            cls=django.core.serializers.json.DjangoJSONEncoder)
+    body = simplejson.dumps(generate_user_export(u), default=encode_datetime)
     msg = django.core.mail.EmailMessage(subject="User export for %d" % u.id,
                                         body=body,
                                         to=[email

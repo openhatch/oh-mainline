@@ -44,8 +44,6 @@ setting.
 
 .. seealso::
 
-   .. versionadded:: 1.3
-
    Server error emails are sent using the logging framework, so you can
    customize this behavior by :doc:`customizing your logging configuration
    </topics/logging>`.
@@ -99,8 +97,6 @@ The best way to disable this behavior is to set
 
 .. seealso::
 
-   .. versionadded:: 1.3
-
    404 errors are logged using the logging framework. By default, these log
    records are ignored, but you can use them for error reporting by writing a
    handler and :doc:`configuring logging </topics/logging>` appropriately.
@@ -129,7 +125,7 @@ Error reports are really helpful for debugging errors, so it is generally
 useful to record as much relevant information about those errors as possible.
 For example, by default Django records the `full traceback`_ for the
 exception raised, each `traceback frame`_'s local variables, and the
-:class:`HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
+:class:`~django.http.HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
@@ -169,13 +165,27 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
         def my_function():
             ...
 
+    .. admonition:: When using mutiple decorators
+
+        If the variable you want to hide is also a function argument (e.g.
+        '``user``' in the following example), and if the decorated function has
+        mutiple decorators, then make sure to place ``@sensitive_variables`` at
+        the top of the decorator chain. This way it will also hide the function
+        argument as it gets passed through the other decorators::
+
+            @sensitive_variables('user', 'pw', 'cc')
+            @some_decorator
+            @another_decorator
+            def process_info(user):
+                ...
+
 .. function:: sensitive_post_parameters(*parameters)
 
-    If one of your views receives an :class:`HttpRequest` object with
-    :attr:`POST parameters<HttpRequest.POST>` susceptible to contain sensitive
-    information, you may prevent the values of those parameters from being
-    included in the error reports using the ``sensitive_post_parameters``
-    decorator::
+    If one of your views receives an :class:`~django.http.HttpRequest` object
+    with :attr:`POST parameters<django.http.HttpRequest.POST>` susceptible to
+    contain sensitive information, you may prevent the values of those
+    parameters from being included in the error reports using the
+    ``sensitive_post_parameters`` decorator::
 
         from django.views.decorators.debug import sensitive_post_parameters
 
@@ -204,10 +214,10 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     .. versionchanged:: 1.4
 
     Since version 1.4, all POST parameters are systematically filtered out of
-    error reports for certain :mod:`contrib.views.auth` views (``login``,
-    ``password_reset_confirm``, ``password_change``, and ``add_view`` and
-    ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
-    sensitive information such as user passwords.
+    error reports for certain :mod:`django.contrib.auth.views` views (
+    ``login``, ``password_reset_confirm``, ``password_change``, and
+    ``add_view`` and ``user_change_password`` in the ``auth`` admin) to prevent
+    the leaking of sensitive information such as user passwords.
 
 .. _custom-error-reports:
 
@@ -246,24 +256,24 @@ following methods:
 
 .. class:: SafeExceptionReporterFilter
 
-.. method:: SafeExceptionReporterFilter.is_active(self, request)
+.. method:: SafeExceptionReporterFilter.is_active(request)
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
 
-.. method:: SafeExceptionReporterFilter.get_request_repr(self, request)
+.. method:: SafeExceptionReporterFilter.get_request_repr(request)
 
     Returns the representation string of the request object, that is, the
     value that would be returned by ``repr(request)``, except it uses the
     filtered dictionary of POST parameters as determined by
     :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
-.. method:: SafeExceptionReporterFilter.get_post_parameters(self, request)
+.. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
     Returns the filtered dictionary of POST parameters. By default it replaces
     the values of sensitive parameters with stars (`**********`).
 
-.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(self, request, tb_frame)
+.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
 
     Returns the filtered dictionary of local variables for the given traceback
     frame. By default it replaces the values of sensitive variables with stars

@@ -82,6 +82,8 @@ If your form is going to be used to directly add or edit a Django model, you can
 use a :doc:`ModelForm </topics/forms/modelforms>` to avoid duplicating your model
 description.
 
+.. _using-a-form-in-a-view:
+
 Using a form in a view
 ----------------------
 
@@ -107,48 +109,58 @@ The standard pattern for processing a form in a view looks like this:
        })
 
 
-There are three code paths here:
+There are three possible code paths here:
 
-1. If the form has not been submitted, an unbound instance of ContactForm is
-   created and passed to the template.
-2. If the form has been submitted, a bound instance of the form is created
-   using ``request.POST``. If the submitted data is valid, it is processed
-   and the user is re-directed to a "thanks" page.
-3. If the form has been submitted but is invalid, the bound form instance is
-   passed on to the template.
++------------------+---------------+-----------------------------------------+
+| Form submitted?  | Data?         | What occurs                             |
++==================+===============+=========================================+
+| Unsubmitted      | None yet      | Template gets passed unbound instance   |
+|                  |               | of ContactForm.                         |
++------------------+---------------+-----------------------------------------+
+| Submitted        | Invalid data  | Template gets passed bound instance     |
+|                  |               | of ContactForm.                         |
++------------------+---------------+-----------------------------------------+
+| Submitted        | Valid data    | Valid data is processed. Redirect to a  |
+|                  |               | "thanks" page.                          |
++------------------+---------------+-----------------------------------------+
 
-The distinction between **bound** and **unbound** forms is important. An unbound
-form does not have any data associated with it; when rendered to the user, it
-will be empty or will contain default values. A bound form does have submitted
-data, and hence can be used to tell if that data is valid. If an invalid bound
-form is rendered it can include inline error messages telling the user where
-they went wrong.
+The distinction between :ref:`ref-forms-api-bound-unbound` is important:
 
-See :ref:`ref-forms-api-bound-unbound` for further information on the
-differences between bound and unbound forms.
+* An unbound form has no data associated with it. When rendered to the user,
+  it will be empty or will contain default values.
+
+* A bound form has submitted data, and hence can be used to tell if that data
+  is valid. If an invalid bound form is rendered, it can include inline error
+  messages telling the user what data to correct.
 
 Handling file uploads with a form
 ---------------------------------
 
-To see how to handle file uploads with your form see
-:ref:`binding-uploaded-files` for more information.
+To see how to handle file uploads with your form, see
+:ref:`binding-uploaded-files`.
 
 Processing the data from a form
 -------------------------------
 
-Once ``is_valid()`` returns ``True``, you can process the form submission safe
-in the knowledge that it conforms to the validation rules defined by your form.
-While you could access ``request.POST`` directly at this point, it is better to
-access ``form.cleaned_data``. This data has not only been validated but will
-also be converted in to the relevant Python types for you. In the above example,
-``cc_myself`` will be a boolean value. Likewise, fields such as ``IntegerField``
-and ``FloatField`` convert values to a Python int and float respectively. Note
-that read-only fields are not available in ``form.cleaned_data`` (and setting
-a value in a custom ``clean()`` method won't have any effect) because these
+Once ``is_valid()`` returns ``True``, the successfully validated form data
+will be in the ``form.cleaned_data`` dictionary. This data will have been
+converted nicely into Python types for you.
+
+.. note::
+
+   You can still access the unvalidated data directly from ``request.POST`` at
+   this point, but the validated data is better.
+
+In the above example, ``cc_myself`` will be a boolean value. Likewise, fields
+such as ``IntegerField`` and ``FloatField`` convert values to a Python int and
+float respectively.
+
+Read-only fields are not available in ``form.cleaned_data`` (and setting
+a value in a custom ``clean()`` method won't have any effect). These
 fields are displayed as text rather than as input elements, and thus are not
 posted back to the server.
 
-Extending the above example, here's how the form data could be processed:
+Extending the earlier example, here's how the form data could be processed:
 
 .. code-block:: python
 
@@ -166,7 +178,9 @@ Extending the above example, here's how the form data could be processed:
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
 
-For more on sending email from Django, see :doc:`/topics/email`.
+.. tip::
+
+   For more on sending email from Django, see :doc:`/topics/email`.
 
 Displaying a form using a template
 ----------------------------------
@@ -182,6 +196,14 @@ context variable ``form``. Here's a simple example template::
 
 The form only outputs its own fields; it is up to you to provide the surrounding
 ``<form>`` tags and the submit button.
+
+If your form includes uploaded files, be sure to include
+``enctype="multipart/form-data"`` in the ``form`` element. If you wish to write
+a generic template that will work whether or not the form has files, you can
+use the :meth:`~django.forms.Form.is_multipart` attribute on the form::
+
+    <form action="/contact/" method="post"
+        {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
 
 .. admonition:: Forms and Cross Site Request Forgery protection
 
@@ -286,9 +308,9 @@ loop::
         <p><input type="submit" value="Send message" /></p>
     </form>
 
-Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
-``BoundField`` also has the following attributes, which can be useful in your
-templates:
+Within this loop, ``{{ field }}`` is an instance of
+:class:`~django.forms.BoundField`. ``BoundField`` also has the following
+attributes, which can be useful in your templates:
 
 ``{{ field.label }}``
     The label of the field, e.g. ``Email address``.
@@ -297,7 +319,13 @@ templates:
     The field's label wrapped in the appropriate HTML ``<label>`` tag,
     e.g. ``<label for="id_email">Email address</label>``
 
-``{{ field.value }}`` 
+``{{ field.id_for_label }}``
+    The ID that will be used for this field (``id_email`` in the example
+    above). You may want to use this in lieu of ``label_tag`` if you are
+    constructing the label manually. It's also useful, for example, if you have
+    some inline JavaScript and want to avoid hardcoding the field's ID.
+
+``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``
 
 ``{{ field.html_name }}``
@@ -314,7 +342,7 @@ templates:
     case, each object in the loop is a simple string containing the error
     message.
 
-``field.is_hidden``
+``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
     ``False`` otherwise. It's not particularly useful as a template
     variable, but could be useful in conditional tests such as::
@@ -322,6 +350,12 @@ templates:
         {% if field.is_hidden %}
            {# Do something special #}
         {% endif %}
+
+``{{ field.field }}``
+    The :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps. You can use it to access
+    :class:`~django.forms.Field` attributes , e.g.
+    ``{{ char_field.field.max_length }}``.
 
 Looping over hidden and visible fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

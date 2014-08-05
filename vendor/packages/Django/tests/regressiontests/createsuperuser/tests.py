@@ -1,9 +1,8 @@
-from StringIO import StringIO
-
 from django.contrib.auth import models
 from django.contrib.auth.management.commands import changepassword
 from django.core.management import call_command
 from django.test import TestCase
+from django.utils.six import StringIO
 
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
@@ -28,7 +27,7 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
         command.execute("joe", database='other', stdout=self.stdout)
         command_output = self.stdout.getvalue().strip()
 
-        self.assertEquals(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
+        self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
         self.assertTrue(models.User.objects.using('other').get(username="joe").check_password("not qwerty"))
 
 

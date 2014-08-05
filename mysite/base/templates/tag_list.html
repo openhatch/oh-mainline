@@ -21,7 +21,7 @@
                 <div class='tags'>
                     {% spaceless %}
                         {% for tag in tag_list %}
-                            <a href="{% url mysite.profile.views.people %}?q={{ tag_type_prefix }}:&quot;{{tag.text|urlencode}}&quot;">
+                            <a href="{% url "mysite.profile.views.people" %}?q={{ tag_type_prefix }}:&quot;{{tag.text|urlencode}}&quot;">
                                 {{ tag.text }}</a>
                             {% if not forloop.last %}<span>, </span> {% endif %}
                         {% endfor %}

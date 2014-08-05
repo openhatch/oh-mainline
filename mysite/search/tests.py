@@ -175,10 +175,12 @@ class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
 class SearchResults(TwillTests):
     fixtures = [u'bugs-for-two-projects.json']
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_query_object_is_false_when_no_terms_or_facets(self):
         query = mysite.search.view_helpers.Query.create_from_GET_data({})
         self.assertFalse(query)
 
+    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
     def test_show_no_bugs_if_no_query(self):
         # Call up search page with no query.
         response = self.client.get(u'/search/')
@@ -279,144 +281,6 @@ class SearchResults(TwillTests):
 
         for bug in bugs:
             tc.find(bug.description)
-
-
-class RecommendationsCanBeDisabled(SearchTest):
-    fixtures = ['user-paulproteus.json',
-                'person-paulproteus.json',
-                'cchost-data-imported-from-ohloh.json',
-                'bugs-for-two-projects.json',
-                'extra-fake-cchost-related-citations.json']
-
-    def setUp(self, *args, **kwargs):
-        super(RecommendationsCanBeDisabled, self).setUp(*args, **kwargs)
-        self.old_recommend_bugs = django.conf.settings.RECOMMEND_BUGS
-        django.conf.settings.RECOMMEND_BUGS = False
-
-    def tearDown(self, *args, **kwargs):
-        super(RecommendationsCanBeDisabled, self).tearDown(*args, **kwargs)
-        django.conf.settings.RECOMMEND_BUGS = self.old_recommend_bugs
-
-    @mock.patch('mysite.profile.models.Person._get_recommended_search_terms')
-    def test(self, mock):
-        # Create the Person object
-        p = mysite.profile.models.Person.objects.get(
-            user__username='paulproteus')
-        # Call the method to get recommendations
-        terms = p.get_recommended_search_terms()
-        # Assert it is empty, but moreover, assert that the real worker function
-        # was never called.
-        self.assertFalse(terms)
-        self.assertFalse(mock.called)
-
-
-class Recommend(SearchTest):
-    fixtures = ['user-paulproteus.json',
-                'person-paulproteus.json',
-                'cchost-data-imported-from-ohloh.json',
-                'bugs-for-two-projects.json',
-                'extra-fake-cchost-related-citations.json',
-                'tags']
-
-    # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
-    # Use that to exclude 'will never understand' tags from recommended search
-    # terms.
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
-    @mock.patch('mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
-    def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
-
-        # Make all the search terms appear to return results, so
-        # that none are excluded when we try to trim away
-        # the terms that don't return results.
-        # We test this functionality separately in
-        # search.tests.DontRecommendFutileSearchTerms.
-        mocked_hit_counter.return_value = 1
-
-        person = Person.objects.get(user__username='paulproteus')
-        recommended_terms = person.get_recommended_search_terms()
-
-        # By 'source' I mean a source of recommendations.
-        source2terms = {
-            'languages in citations': ['Automake', 'C#', 'C++', 'Make',
-                                       'Python', 'shell script', 'XUL'],
-            'projects in citations': ['Mozilla Firefox'],
-            'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
-        }
-
-        for source, terms in source2terms.items():
-            for term in terms:
-                self.assert_(term in recommended_terms,
-                             "Expected %s in recommended search terms "
-                             "inspired by %s." % (term, source))
-
-    # FIXME: Include recommendations from tags.
-
-    @skipIf(django.db.connection.vendor == 'sqlite', "Skipping because using sqlite database")
-    @mock.patch('mysite.search.view_helpers.Query.get_or_create_cached_hit_count')
-    def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
-
-        # Make all the search terms appear to return results, so
-        # that none are excluded when we try to trim away
-        # the terms that don't return results.
-        # We test this functionality separately in
-        # search.tests.DontRecommendFutileSearchTerms.
-        mocked_hit_counter.return_value = 1
-
-        client = self.login_with_client()
-        response = client.get('/search/')
-
-        source2terms = {
-            'languages in citations': ['Automake', 'C#', 'C++', 'Make',
-                                       'Python', 'shell script', 'XUL'],
-            'projects in citations': ['Mozilla Firefox'],
-            'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
-        }
-
-        tags_in_template = [tup[1]
-                            for tup in response.context[0]['suggestions']]
-
-        for source, terms in source2terms.items():
-            for term in terms:
-                self.assert_(term in tags_in_template,
-                             "Expected %s in template"
-                             "inspired by %s." % (term, source))
-
-        expected_tags = sum(source2terms.values(), [])
-        self.compare_lists(expected_tags, tags_in_template)
-
-# We're not doing this one because at the moment suggestions only work in JS.
-#    def test_recommendations_with_twill(self):
-#        self.login_with_twill()
-#        tc.go(make_twill_url('http://openhatch.org/search/'))
-# tc.fv('suggested_searches', 'use_0', '0') # Automake
-# tc.fv('suggested_searches', 'use_1', '0') # C
-# tc.fv('suggested_searches', 'use_2', '0') # C++
-# tc.fv('suggested_searches', 'use_3', '0') # Firefox
-# tc.fv('suggested_searches', 'use_4', '0') # Python
-# tc.fv('suggested_searches', 'use_5', '1') # XUL
-#        tc.fv('suggested_searches', 'start', '0')
-#        tc.fv('suggested_searches', 'end', '100')
-#        tc.submit()
-#
-# Check that if you click checkboxes,
-# you get the right list of bugs.
-# Test for bugs that ought to be there
-# and bugs that ought not to be.
-#        tc.find("Yo! This is a bug in XUL but not Firefox")
-#        tc.find("Oy! This is a bug in XUL and Firefox")
-#
-# tc.fv('suggested_searches', 'use_0', '0') # Automake
-# tc.fv('suggested_searches', 'use_1', '0') # C
-# tc.fv('suggested_searches', 'use_2', '0') # C++
-# tc.fv('suggested_searches', 'use_3', '1') # Firefox
-# tc.fv('suggested_searches', 'use_4', '0') # Python
-# tc.fv('suggested_searches', 'use_5', '1') # XUL
-#        tc.fv('suggested_searches', 'start', '0')
-#        tc.fv('suggested_searches', 'end', '100')
-#        tc.submit()
-#
-#        tc.notfind("Yo! This is a bug in XUL but not Firefox")
-#        tc.find("Oy! This is a bug in XUL and Firefox")
 
 
 class SplitIntoTerms(TestCase):

@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: South
-Version: 0.7.3
+Version: 1.0
 Summary: South: Migrations for Django
 Home-page: http://south.aeracode.org/
 Author: Andrew Godwin & Andy McCurdy
@@ -17,3 +17,6 @@ Classifier: Intended Audience :: System Administrators
 Classifier: License :: OSI Approved :: Apache Software License
 Classifier: Operating System :: OS Independent
 Classifier: Topic :: Software Development
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
