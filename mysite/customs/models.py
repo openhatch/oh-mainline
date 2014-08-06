@@ -128,6 +128,7 @@ class TrackerModel(models.Model):
             mysite.customs.models.RoundupTrackerModel: 'roundup',
             mysite.customs.models.TracTrackerModel: 'trac',
             mysite.customs.models.LaunchpadTrackerModel: 'launchpad',
+            mysite.customs.models.TigrisTrackerModel: 'tigris',
         }
         out_dict['bugimporter'] = CLASS_NAME2SIMPLE_NAME[self.__class__]
 
@@ -792,3 +793,73 @@ class JiraQueryModel(TrackerQueryModel):
 
 reversion.register(JiraTrackerModel, follow=["jiraquerymodel_set"])
 reversion.register(JiraQueryModel)
+
+class TigrisTrackerModel(TrackerModel):
+
+    '''This model stores the data for individual Tigris trackers.'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False)
+    base_url = models.URLField(max_length=200, unique=True,
+                               blank=False, null=False,
+                               help_text="This is the URL to the issues page "
+                               "of the Tigris tracker instance. Remove any "
+                               "filenames such as 'xml.cgi', example: "
+                               "'http://scons.tigris.org/issues'.")
+
+    # Metadata about the TrackerModel.
+    short_name = 'tigris'
+    namestr = 'Tigris'
+    _form = 'mysite.customs.forms.TigrisTrackerForm'
+    _urlmodel = 'mysite.customs.models.TigrisQueryModel'
+    _urlform = 'mysite.customs.forms.TigrisQueryForm'
+
+    BITESIZED_TYPES = (
+        ('key', 'Keyword'),
+        ('wboard', 'Whiteboard tag'),
+    )
+    bitesized_type = models.CharField(
+        max_length=10, choices=BITESIZED_TYPES, blank=True)
+    bitesized_text = models.CharField(max_length=200, blank=True, default='',
+                                      help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+    DOCUMENTATION_TYPES = (
+        ('key', 'Keyword'),
+        ('comp', 'Component'),
+        ('subcomp', 'Subcomponent'),
+        ('prod', 'Product'),
+    )
+    documentation_type = models.CharField(
+        max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
+    documentation_text = models.CharField(
+        max_length=200, blank=True, default='',
+        help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+    def get_base_url(self):
+        return self.base_url
+
+class TigrisQueryModel(TrackerQueryModel):
+    ''' This model stores queries for TigrisTracker objects.
+        At present we allow only a startid as additional parameter.
+    '''
+    startid = models.CharField(max_length=200, blank=True, default='',
+                               help_text="The start ID (smallest number) for the "
+                               "download. Leave blank for autodetection, "
+                               "or enter an integer value.")
+    description = models.CharField(max_length=200, blank=True, default='',
+                                   help_text="Optional description of this query.")
+    tracker = models.ForeignKey(TigrisTrackerModel)
+
+    def get_query_url(self):
+        base = '/'.join([self.tracker.get_base_url(), 'xml.cgi'])
+        if self.startid:
+            extra_data = {u'id': unicode(self.startid)}
+            return base + '?' + http.urlencode(extra_data)
+        return base
+
+reversion.register(TigrisTrackerModel, follow=["tigrisquerymodel_set"])
+reversion.register(TigrisQueryModel)
+

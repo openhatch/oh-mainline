@@ -32,6 +32,7 @@ class TrackerTypesForm(django.forms.Form):
         ('launchpad', 'Launchpad'),
         ('roundup', 'Roundup'),
         ('trac', 'Trac'),
+        ('tigris', 'Tigris'),
     )
     tracker_type = django.forms.ChoiceField(choices=TRACKER_TYPES,
                                             widget=django.forms.Select(attrs={
@@ -198,3 +199,15 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
 
         # Return the "upstream" return value
         return obj
+
+class TigrisTrackerForm(TrackerFormThatHidesCreatedForProject):
+
+    class Meta:
+        model = mysite.customs.models.TigrisTrackerModel
+
+class TigrisQueryForm(django.forms.ModelForm):
+
+    class Meta:
+        model = mysite.customs.models.TigrisQueryModel
+        exclude = ('tracker', 'last_polled',)
+
