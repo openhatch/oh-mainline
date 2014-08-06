@@ -800,7 +800,7 @@ class TigrisTrackerModel(TrackerModel):
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False, verify_exists=False,
+                               blank=False, null=False,
                                help_text="This is the URL to the issues page "
                                "of the Tigris tracker instance. Remove any "
                                "filenames such as 'xml.cgi', example: "
