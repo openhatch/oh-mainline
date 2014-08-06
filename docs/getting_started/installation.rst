@@ -6,7 +6,7 @@ Installation
 Ubuntu 12.04 and Debian stable.  Last verified on Windows XP 11/7/2013 and on 
 Mac OS X 10.9.2 May 11, 2014.*
 
-OpenHatch is currently designed to run on Python 2.6 or above.
+OpenHatch is currently designed to run on Python 2.x versions Python 2.6 or above.  OpenHatch will not work on Python 3 or above.
 
 Overview
 ========
