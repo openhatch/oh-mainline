@@ -383,3 +383,49 @@ class BasicBugsetCreateFormTests(TwillTests):
         self.assertEqual(200, response.status_code)
         self.assertNotContains(response, self.removed_bug)
         self.assertContains(response, self.added_bug)
+
+    def test_create_with_smart_completion(self):
+        # Make a project
+        p = mysite.search.models.Project.objects.create(
+            name='openhatch',
+            display_name='OpenHatch DisplayName',
+            homepage='http://openhatch.org',
+            language='Python',
+        )
+        p.save()
+
+        # Make a traditional Bug
+        o = mysite.search.models.Bug.create_dummy(
+            canonical_bug_link=self.added_bug,
+            title=('django-inplaceedit probably introduces some security '
+                   'holes'),
+            description='''
+Asheesh and I are concerned about the POST handler django-inplaceedit provides.
+It is possible that it provides arbitrary edit access to the database given the
+software's authentication mechanism. See this request sequence:
+
+[19/Jul/2014 16:45:22] "GET
+/inplaceeditform/get_field/?field_name=status&module_name=annotatedbug&app_label=bugsets&can_auto_save=1&obj_id=4&font_size=12.95px&__widget_height=16px&__widget_width=71px
+HTTP/1.1" 200 1072
+[19/Jul/2014 16:45:26] "POST /inplaceeditform/save/ HTTP/1.1" 200 37
+
+We should make sure that this new egg doesn't allow an attacker to, for
+instance, change everyone's username to 'octamarine12345...'
+''',
+        )
+
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': self.event_name,
+            'buglist': self.added_bug,
+        })
+
+        self.assertTrue(f.is_valid())
+        f.save()
+
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        b = s.bugs.all()[0]  # the only bug in the set
+
+        self.assertEqual(b.title, o.title)
+        self.assertEqual(b.description, o.description)
+        self.assertEqual(b.project, o.project)
+        self.assertEqual(b.skill_list, o.project.language)

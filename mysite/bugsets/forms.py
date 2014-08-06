@@ -18,6 +18,7 @@ import mysite.bugsets.models
 
 import django.forms
 from django.core.validators import URLValidator
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class BugsForm(django.forms.Form):
@@ -91,6 +92,21 @@ class BugsForm(django.forms.Form):
 
         for url in self.cleaned_data.get('buglist').split("\n"):
             b = mysite.bugsets.models.AnnotatedBug(url=url)
+
+            try:
+                o = mysite.search.models.Bug.all_bugs.get(
+                    canonical_bug_link=url)
+
+                b.title = o.title
+                b.description = o.description
+                b.project = o.project
+
+                if o.project:
+                    b.skill_list = o.project.language
+            except ObjectDoesNotExist:
+                # No problems here, this URL wasn't cached in our main db
+                pass
+
             b.save()
             s.bugs.add(b)
 
