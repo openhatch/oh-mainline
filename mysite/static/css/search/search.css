@@ -141,7 +141,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
             body#search #results li .tags .project { padding: .3em .7em; float: left; }
 
-        body#search #results form { float: left; width: 690px; }
+        body#search.actually_search #results form { float: left; width: 690px; }
             body#search #results form#search_fulltext input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
             body#search #results form#search_fulltext input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
 
@@ -224,4 +224,8 @@ body#search.bugsets #results li .below_the_fold {
 span.skills > span {
     background-color: #dcffcc;
     padding: 1px;
+}
+
+body#search.bugsets #results li .field {
+    width: 42%;
 }

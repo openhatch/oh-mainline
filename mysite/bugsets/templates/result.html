@@ -53,7 +53,7 @@
 
   <div class='below_the_fold'>
     <h5>Mentored by</h5>
-    {% inplace_edit "bug.mentor" %}
+    {% inplace_edit "bug.mentor" edit_empty_value="No one" %}
     <a style='font-size: .9em; display: block; margin-top: 1em;' 
        href='{{ bug.url }}'>More about this bug</a>
   </div>
@@ -66,7 +66,7 @@
     <div class='top_left'>
 
       <a style='color: #000;' class='title'>
-          {% inplace_edit "bug.title" %}
+          {% inplace_edit "bug.title" edit_empty_value="Add bug title here" %}
       </a>
     </div>
     <div class='top_right'>
@@ -92,7 +92,7 @@
 
       <span class='sep separator_betw_tags_and_desc'>&middot;</span>
       <span class='description'>
-        <p>{% inplace_edit "bug.description" %}</p>
+        <p>{% inplace_edit "bug.description" edit_empty_value="Enter a description of this task here", min_width="720" %}</p>
       </span>
     </span>
   </div>
@@ -103,7 +103,7 @@
       <span class='field'>
         <label>Estimated time to address: </label>
         <span class='value'>
-          {% inplace_edit "bug.time_estimate" %}
+          {% inplace_edit "bug.time_estimate" edit_empty_value="No time at all!" %}
         </span>
       </span>
       <span class='field status'>
