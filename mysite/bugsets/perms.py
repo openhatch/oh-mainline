@@ -18,6 +18,8 @@ from __future__ import absolute_import
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import mysite.bugsets.models
+
 from django.conf import settings
 
 
@@ -27,5 +29,9 @@ class InlineEditPermissions(object):
     def can_edit(cls, adaptor_field):
         if settings.DEBUG:
             return True  # All users can edit
+
+        # Only allow django-inplaceedit to edit AnnotatedBug objects
+        if isinstance(adaptor_field.obj, mysite.bugsets.models.AnnotatedBug):
+            return True
 
         return False

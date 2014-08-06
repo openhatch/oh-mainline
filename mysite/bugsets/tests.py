@@ -185,6 +185,26 @@ class SecurityBugsetListViewTests(TwillTests):
 
         self.assertEqual(User.objects.get(pk=u.pk).username, u'paulproteus')
 
+    def test_modify_annotatedbug_object(self):
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(
+            url="http://openhatch.org/bugs/issue995",
+            mentor="Elana",
+        )
+        b.save()
+
+        self.client.post(
+            '/inplaceeditform/save/',
+            {
+                "app_label": "bugsets",
+                "module_name": "annotatedbug",
+                "field_name": "mentor",
+                "obj_id": b.pk,
+                "value": '"Asheesh"'
+            })
+
+        self.assertEqual(mysite.bugsets.models.AnnotatedBug.objects.get(
+            pk=b.pk).mentor, 'Asheesh')
+
 
 class BasicBugsetCreateViewTests(TwillTests):
     event_name = "Party at Asheesh's Place"
