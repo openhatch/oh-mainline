@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-# vim: set ai et ts=4 sw=4:
-
+{% extends 'base/one_column.html' %}
+{% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2014 Elana Hashman
 #
@@ -17,15 +15,31 @@ from __future__ import absolute_import
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 
-from django.conf import settings
+{% block title %}
+Create Bug Set
+{% endblock title %}
 
 
-class InlineEditPermissions(object):
+{% block body_id %}bugset_create{% endblock %}
 
-    @classmethod
-    def can_edit(cls, adaptor_field):
-        if settings.DEBUG:
-            return True  # All users can edit
+{% block pagetop %}
+<h1 style='margin: 10px 0 0 10px; font-weight: bold; color: #222'>
+  Edit a Bug Set
+</h1>
+{% endblock %}
 
-        return False
+{% block main %}
+<div class='module'>
+  <div class='module-body'>
+    <form action="{{ request.get_full_path }}" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div id="button-container">
+        <input type="submit" value="OK">
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock main %}

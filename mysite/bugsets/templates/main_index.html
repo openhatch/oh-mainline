@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base/one_column.html' %}
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2014 Elana Hashman
@@ -21,18 +21,27 @@
 Event Bug Sets
 {% endblock title %}
 
-{% block content %}
+{% block pagetop %}
+<h1 style='margin: 10px 0 0 10px; font-weight: bold; color: #222'>
+  OpenHatch's Bug Set Organizer
+</h1>
+{% endblock %}
+
+{% block main %}
 <div class='module'>
-  <div class='head'>
-    <h3>{% block heading %}Event Bug Sets{% endblock %}</h3>
+  <div class='module-body'>
+    <p>
+      If you'd like, you can
+      <a href="{% url "mysite.bugsets.views.create_index" %}">create a bugset</a>!
+    </p>
     <p>
       Here are some bug sets:
     </p>
-  </div>
-  <div class='body'>
+    <ul class="raquo_bullets">
     {% for set in bugsets.all %}
-    <p><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></p>
+    <li><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></li>
     {% endfor %}
+    </ul>
   </div>
 </div>
-{% endblock content %}
+{% endblock main %}

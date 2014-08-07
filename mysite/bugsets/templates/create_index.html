@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base/one_column.html' %}
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2014 Elana Hashman
@@ -21,24 +21,25 @@
 Create Bug Set
 {% endblock title %}
 
+
+{% block body_id %}bugset_create{% endblock %}
+
 {% block pagetop %}
 <h1 style='margin: 10px 0 0 10px; font-weight: bold; color: #222'>
   Create a Bug Set
 </h1>
 {% endblock %}
 
-{% block content %}
+{% block main %}
 <div class='module'>
-  <div class='head'>
-    <h3>{% block heading %}Header{% endblock %}</h3>
-    <p>
-      Here is some placeholder text.
-    </p>
-  </div>
-  <div class='body'>
-    {% for set in bugsets.all %}
-    <p><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></p>
-    {% endfor %}
+  <div class='module-body'>
+    <form action="{% url "mysite.bugsets.views.create_index" %}" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div id="button-container">
+        <input type="submit" value="OK">
+      </div>
+    </form>
   </div>
 </div>
-{% endblock content %}
+{% endblock main %}

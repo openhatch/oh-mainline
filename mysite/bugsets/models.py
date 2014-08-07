@@ -30,13 +30,6 @@ from django.core.urlresolvers import reverse
 # }}}
 
 
-class Skill(models.Model):
-    text = models.CharField(max_length=200, unique=True)
-
-    def __unicode__(self):
-        return self.text
-
-
 class AnnotatedBug(models.Model):
     url = models.URLField(max_length=200, unique=True)
     title = models.CharField(max_length=500, blank=True)
@@ -55,9 +48,6 @@ class AnnotatedBug(models.Model):
     status = models.CharField(max_length=1, default='u',
                               choices=STATUS_CHOICES)
 
-    # Putting this on hold for the MVP
-    skills = models.ManyToManyField(Skill)
-
     # Kludgey replacement field for skills
     skill_list = models.CharField(max_length=500, blank=True)
 
@@ -74,6 +64,12 @@ class BugSet(models.Model):
 
     def get_absolute_url(self):
         return reverse(mysite.bugsets.views.list_index, kwargs={
+            'pk': self.pk,
+            'slug': slugify(self.name),
+        })
+
+    def get_edit_url(self):
+        return reverse(mysite.bugsets.views.create_index, kwargs={
             'pk': self.pk,
             'slug': slugify(self.name),
         })
