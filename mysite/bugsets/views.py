@@ -27,6 +27,7 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 # }}}
 
 
@@ -88,8 +89,24 @@ def create_index(request, pk=None, slug=None):
     return render(request, 'create_index.html', context)
 
 def api_index(request):
-    return HttpResponse(json.dumps({
-        'obj_id': 6,
-        'field_name': 'mentor',
-        'new_html': 'party time',
-    }))
+    data = request.GET
+
+    try:
+        b = mysite.bugsets.models.AnnotatedBug.objects.get(
+            pk=data['obj_id'])
+
+        return HttpResponse(json.dumps({
+            'obj_id': data['obj_id'],
+            'field_name': data['field_name'],
+            'new_html': getattr(b, data['field_name']),
+        }))
+
+    except ObjectDoesNotExist:
+        return HttpResponse(json.dumps({
+            'error': 'Object does not exist!',
+        }))
+
+    except Exception:
+        return HttpResponse(json.dumps({
+            'error': 'Unknown error',
+        }))

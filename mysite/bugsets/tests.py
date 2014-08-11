@@ -28,6 +28,7 @@ from mysite.base.tests import TwillTests
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.http import urlencode
 # }}}
 
 
@@ -477,3 +478,37 @@ instance, change everyone's username to 'octamarine12345...'
         self.assertEqual(b.description, o.description)
         self.assertEqual(b.project, o.project)
         self.assertEqual(b.skill_list, o.project.language)
+
+
+class BasicAPIViewTests(TwillTests):
+    def test_return_value_in_db(self):
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(
+            url='http://openhatch.org/bugs/issue1021',
+            title='Concurrent users UX',
+        )
+
+        url = reverse(mysite.bugsets.views.api_index) + '?' + urlencode({
+            'obj_id': b.pk,
+            'field_name': 'title',
+        })
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'Concurrent users UX')
+
+    def test_handle_value_not_in_db(self):
+        url = reverse(mysite.bugsets.views.api_index) + '?' + urlencode({
+            'obj_id': '42',
+            'field_name': 'title',
+        })
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'Object does not exist!')
+
+    def test_handle_bad_api_call(self):
+        url = reverse(mysite.bugsets.views.api_index)
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'Unknown error')

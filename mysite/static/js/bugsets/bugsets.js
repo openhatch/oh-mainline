@@ -16,9 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function runOnInterval() {
-    // maybe every 15s
-}
 
 function updateFields() {
     $('inplaceeditform').each(function () {
@@ -48,11 +45,20 @@ function getNewValue(obj_id, field_name) {
 
 function updateHTML(response) {
     // stash the tag away
-    node = $('inplaceeditform[obj_id=' + response.obj_id + '][field_name=' + 
+    node = $('inplaceeditform[obj_id=' + response.obj_id + '][field_name=' +
         response.field_name + ']').parent()
     ipe_tag = node.find('inplaceeditform').detach()
     node.html(response.new_html)
     node.append(ipe_tag)
 }
+
+function runOnInterval() {
+    updateFields();
+    setTimeout(runOnInterval, 15000);  // 15s = 15000ms
+}
+
+// Delicious recursive call
+runOnInterval();
+
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
