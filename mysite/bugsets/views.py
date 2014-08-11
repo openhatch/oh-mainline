@@ -25,6 +25,7 @@ from mysite.bugsets.forms import BugsForm
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 # }}}
 
 
@@ -46,6 +47,7 @@ def list_index(request, pk, slug):
     return render(request, 'list_index.html', context)
 
 
+@login_required
 def create_index(request, pk=None, slug=None):
     context = {}
 

@@ -98,7 +98,9 @@ class BugsForm(django.forms.Form):
         s.save()
 
         for url in self.cleaned_data.get('buglist').split("\n"):
-            b = mysite.bugsets.models.AnnotatedBug(url=url)
+            # get_or_create returns a tuple (object b, bool created?)
+            b = mysite.bugsets.models.AnnotatedBug.objects.get_or_create(
+                url=url)[0]
 
             try:
                 o = mysite.search.models.Bug.all_bugs.get(
@@ -138,7 +140,6 @@ class BugsForm(django.forms.Form):
                 url=bug))
 
         for bug in new_bugs - old_bugs:
-            # get_or_create returns a tuple (object b, bool created?)
             b = mysite.bugsets.models.AnnotatedBug.objects.get_or_create(
                 url=bug)[0]
             s.bugs.add(b)
