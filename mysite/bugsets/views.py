@@ -23,7 +23,8 @@ from __future__ import absolute_import
 import mysite.bugsets.models
 from mysite.bugsets.forms import BugsForm
 
-from django.http import HttpResponseRedirect
+import json
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 # }}}
@@ -85,3 +86,10 @@ def create_index(request, pk=None, slug=None):
     if 'form' not in context:
         context['form'] = BugsForm()
     return render(request, 'create_index.html', context)
+
+def api_index(request):
+    return HttpResponse(json.dumps({
+        'obj_id': 6,
+        'field_name': 'mentor',
+        'new_html': 'party time',
+    }))
