@@ -32,16 +32,32 @@ class BugsForm(django.forms.Form):
     def bug_list_from_set(bugset):
         return [bug.url for bug in bugset.bugs.all()]
 
-    # What is happening here?!
-    # 1. Split the hunk of text on newlines
-    # 2. Strip all the strings of leading/trailing whitespace
-    # 3. Filter out all empty strings by passing the first-order function
-    #    "bool" (to see why: bool(x) == False if and only if x == "")
     @staticmethod
     def url_list_from_bugtext(bugtext):
+        """
+        Convert newline-delimited text blob into list of URLs.
+
+        What is happening here?!
+        1. Split the hunk of text on newlines
+        2. Strip all the strings of leading/trailing whitespace
+        3. Filter out all empty strings by passing the first-order function
+           "bool" (to see why: bool(x) == False if and only if x == "")
+        """
         return filter(bool, [x.strip() for x in bugtext.split("\n")])
 
+    @staticmethod
+    def is_valid_url(x):
+        u = URLValidator()
+
+        try:
+            u(x)
+        except django.forms.ValidationError:
+            return False
+        return True
+
     def __init__(self, *args, **kwargs):
+        # FIXME: Our home-baked "ModelForm" could be implemented with django
+        # ModelForms, but the m2m text blob of URLs will be tricky to work with
         self.pk = kwargs.get('pk')
         self.object = None
 
@@ -69,16 +85,7 @@ class BugsForm(django.forms.Form):
         # Turn the list into a set to filter out duplicates
         buglist = set(BugsForm.url_list_from_bugtext(bugtext))
 
-        u = URLValidator()
-
-        def is_valid_url(x):
-            try:
-                u(x)
-            except django.forms.ValidationError:
-                return False
-            return True
-
-        if not all([is_valid_url(url) for url in buglist]):
+        if not all([BugsForm.is_valid_url(url) for url in buglist]):
             raise django.forms.ValidationError(
                 "You have entered an invalid URL: " + url)  # evil
 

@@ -27,6 +27,7 @@ from mysite.base.tests import TwillTests
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 # }}}
 
 
@@ -287,7 +288,7 @@ class BasicBugsetCreateFormTests(TwillTests):
 
     def test_evil_urls(self):
         evil_urls = [
-            # 'ftp://pr1v8.warex0z.s3rv3r.net/',  Django 1.5+ only
+            # 'ftp://pr1v8.warex0z.s3rv3r.net/',  Django 1.7+ only
             'wiefjoiefoaehroaherhaevo',
             'javascript:alert("hi")',
         ]
@@ -310,10 +311,19 @@ class BasicBugsetCreateFormTests(TwillTests):
 
         s = mysite.bugsets.models.BugSet.objects.get(name=self.event_name)
         l = mysite.bugsets.models.AnnotatedBug.objects.filter(
-            url__in=self.bugset
+            url__in=[url.strip() for url in self.bugset.split("\n")]
         )
 
-        self.assertTrue(set(s.bugs.all()), set(l))
+        # Use set equality test rather than test framework's equality test
+        self.assertTrue(set(s.bugs.all()) == set(l))
+
+    def test_create_form_with_empty_name(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': '',
+            'buglist': self.bugset,
+        })
+
+        self.assertFalse(f.is_valid())
 
     def test_edit_view_modify_name(self):
         f = mysite.bugsets.forms.BugsForm({
@@ -346,6 +356,9 @@ class BasicBugsetCreateFormTests(TwillTests):
         self.assertTrue(f.is_valid())
         f.save()
 
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        self.assertTrue(s.bugs.get(url=self.removed_bug))
+
         response = self.client.post(
             f.object.get_edit_url(),
             {
@@ -368,6 +381,9 @@ class BasicBugsetCreateFormTests(TwillTests):
         self.assertTrue(f.is_valid())
         f.save()
 
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        self.assertRaises(ObjectDoesNotExist, s.bugs.get, url=self.added_bug)
+
         response = self.client.post(
             f.object.get_edit_url(),
             {
@@ -389,6 +405,10 @@ class BasicBugsetCreateFormTests(TwillTests):
 
         self.assertTrue(f.is_valid())
         f.save()
+
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        self.assertTrue(s.bugs.get(url=self.removed_bug))
+        self.assertRaises(ObjectDoesNotExist, s.bugs.get, url=self.added_bug)
 
         response = self.client.post(
             f.object.get_edit_url(),
