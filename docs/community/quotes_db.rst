@@ -48,3 +48,5 @@ http://boiling-refuge-7775.herokuapp.com/?m=userlogin
 
 * To moderate, visit http://boiling-refuge-7775.herokuapp.com/?m=panel
   and enter the 4-character short name into the *permaid* box. Choose either *do_approved* or *do_deleted* to mark it respectively as approved or deleted.
+
+
