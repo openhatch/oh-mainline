@@ -8,7 +8,8 @@ Trying to get your bearings?  Take a look at the :doc:`getting_started/project_o
 
 We've also got a `wiki <https://openhatch.org/wiki/Main_Page>`_ with a lot of informal documentation and other useful things on it.
 
-Confused or dismayed by our documentation?  Please let us know so we can improve it!  Make an issue on our `issue tracker <http://openhatch.org/bugs/>`_ or :doc:`community/contact` via email or IRC to chat with us about it.
+Confused or dismayed by our documentation?  Please let us know so we can
+improve it!  Make an issue on our `issue tracker <https://github.com/openhatch/oh-mainline/issues>`_ or :doc:`community/contact` via email or IRC to chat with us about it.
 
 
 Content
