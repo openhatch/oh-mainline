@@ -24,7 +24,7 @@ or Github.com pull requests. You can `read more about that`_.
 
 
 Community structure
-================
+===================
 
 Here are some sub-groups of the OpenHatch community:
 

@@ -22,6 +22,8 @@ Content
     tutorials/index
     community/index
     internals/index
+    CONTRIBUTING.rst
+    README.rst
 
 :ref:`search`
 

@@ -11,7 +11,7 @@ The URL to the ticket tracking site
 http://tickets.openhatch.org/rt/
 
 Our normal workflow
--------
+-------------------
 
 Somebody sends an email to hello@openhatch.org. By default, this ticket goes into the "General" queue and is not assigned to anybody.
 
@@ -90,7 +90,7 @@ If you want to reply to a hello@ mail that isn't in RT yet, try to use the follo
 That's a bit cumbersome. Sorry about that.
 
 How the ticket tracker is administered
-----------------------------
+--------------------------------------
 
 * tickets.openhatch.org points at an IP address of a VM run by Gossamer Threads.
 * They are generously donating their hosted RT service, and for this, we plan to thank them on the OpenHatch sponsors page.

@@ -14,7 +14,7 @@ reStructuredText (.rst files), and sphinx deploy commands at:
 http://sphinx.readthedocs.org/en/latest/index.html
 
 Making changes to documentation via pull request
-===========================================
+================================================
 
 To alter the documentation, you'll want to clone `the github repository <https://github.com/openhatch/oh-mainline>`_.  (Not sure what cloning 
 is?  Read our version of `Git Basics. <https://openhatch.org/wiki/Git_Basics>`_)
@@ -38,7 +38,7 @@ Once you submit your changes as a pull request and they have been merged by a ma
 The openhatch.readthedocs.org/ files will update automatically via a github web hook.
 
 Making changes to documentation via readthedocs/Github editor
-===========================================
+=============================================================
 
 If you're having trouble navigating the documentation by opening and editing files locally, you can also try paging through the readthedocs.  
 Each page should have an 'Edit on Github' link in the righthand corner.  When you click this link, Github will automatically create a fork 
