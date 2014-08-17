@@ -33,7 +33,12 @@ Event Bug Sets
     <p>
       If you'd like, you can
       <a href="{% url "mysite.bugsets.views.create_index" %}">create a
-      bugset</a>! You need to log in if you want to create or edit a bug set.
+      bugset</a>!
+      {% if not user.is_authenticated %}
+      You need to
+      <a href="{% url "mysite.account.views.login" %}?next={% url "mysite.bugsets.views.create_index" %}">log in</a> 
+      if you want to create or edit a bug set.
+      {% endif %}
     </p>
     <p>
       Here are some bug sets:
@@ -41,7 +46,10 @@ Event Bug Sets
     <ul class="raquo_bullets">
     {% for set in bugsets.all %}
     <li><a href="{{ set.get_absolute_url }}">{{ set.name }}</a>
-        (<a href="{{ set.get_edit_url }}">edit</a>)</li>
+        {% if user.is_authenticated %}
+        (<a href="{{ set.get_edit_url }}">edit</a>)
+        {% endif %}
+    </li>
     {% endfor %}
     </ul>
   </div>
