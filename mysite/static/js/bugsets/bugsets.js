@@ -44,21 +44,29 @@ function getNewValue(obj_id, field_name) {
 }
 
 function updateHTML(response) {
-    // stash the tag away
+    // Don't update fields with empty values
+    if (response.new_html == '') {
+        return;
+    }
+
     node = $('inplaceeditform[obj_id=' + response.obj_id + '][field_name=' +
         response.field_name + ']').parent()
-    ipe_tag = node.find('inplaceeditform').detach()
-    node.html(response.new_html)
-    node.append(ipe_tag)
+
+    // Two nodes match when field_name='status', so we need a 'foreach' here
+    $(node).each(function () {
+        ipe_tag = $(this).find('inplaceeditform').detach()
+        $(this).html(response.new_html)
+        $(this).append(ipe_tag)
+    })
 }
 
 function runOnInterval() {
+    setTimeout(runOnInterval, 5000);  // 5s = 5000ms
     updateFields();
-    setTimeout(runOnInterval, 15000);  // 15s = 15000ms
 }
 
 // Delicious recursive call
-runOnInterval();
+$(runOnInterval());
 
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

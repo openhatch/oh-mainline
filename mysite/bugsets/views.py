@@ -88,6 +88,7 @@ def create_index(request, pk=None, slug=None):
         context['form'] = BugsForm()
     return render(request, 'create_index.html', context)
 
+
 def api_index(request):
     data = request.GET
 
@@ -98,7 +99,9 @@ def api_index(request):
         return HttpResponse(json.dumps({
             'obj_id': data['obj_id'],
             'field_name': data['field_name'],
-            'new_html': getattr(b, data['field_name']),
+            'new_html': b.get_status_display()
+            if data['field_name'] == 'status'
+            else getattr(b, data['field_name']),
         }))
 
     except ObjectDoesNotExist:
