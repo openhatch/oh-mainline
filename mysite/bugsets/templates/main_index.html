@@ -32,14 +32,16 @@ Event Bug Sets
   <div class='module-body'>
     <p>
       If you'd like, you can
-      <a href="{% url "mysite.bugsets.views.create_index" %}">create a bugset</a>!
+      <a href="{% url "mysite.bugsets.views.create_index" %}">create a
+      bugset</a>! You need to log in if you want to create or edit a bug set.
     </p>
     <p>
       Here are some bug sets:
     </p>
     <ul class="raquo_bullets">
     {% for set in bugsets.all %}
-    <li><a href="{{ set.get_absolute_url }}">{{ set.name }}</a></li>
+    <li><a href="{{ set.get_absolute_url }}">{{ set.name }}</a>
+        (<a href="{{ set.get_edit_url }}">edit</a>)</li>
     {% endfor %}
     </ul>
   </div>
