@@ -73,23 +73,22 @@ Before you start hacking OpenHatch, we strongly advise you to watch
 
 You can find more tips about hacking OpenHatch in the Category:Hacking_OpenHatch!
 
-You can find things to work on by browsing our `bug tracker`_ or asking us!
+You can find things to work on by browsing our `issue tracker`_ or asking us!
 
 
 .. _Learning new codebase: http://pyvideo.org/video/40/djangocon-2010--learning-a-new-codebase
 .. _DjangoCon 2010: http://pyvideo.org/category/23/djangocon-2012
-.. _bug tracker: http://openhatch.org/bugs/
+.. _issue tracker: https://github.com/openhatch/oh-mainline/issues
 
 
 Start contributing!
 ===========================
 
 We mark issues that are particularly good for new contributors with the
-"bitesize" keyword on our bug tracker. You can find the open easy issues `here`_.
+"bitesize" keyword on our issue tracker. You can find the open easy issues `here`_.
 
 If you find an issue you like and it isn't assigned to anyone, assign it to
-yourself and start hacking (you'll need an OpenHatch account to log in to the
-bug tracker). If it is assigned to someone already, but it looks like they
+yourself and start hacking. If it is assigned to someone already, but it looks like they
 haven't gotten around to working on it, leave a note on the ticket saying that
 you are interested in taking it (you can also try asking on IRC).
 
@@ -102,4 +101,4 @@ or on the issue ticket. Attending the weekly development meetings on IRC is a
 great time to ask for help or recommendations on issues to work on.
 
 
-.. _here: https://openhatch.org/bugs/issue?@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@filter=status,keyword&@pagesize=50&@startwith=0&status=-1,1,2,3,4,5,6,7,9,10&keyword=1&@dispname=bitesized
+.. _here: https://github.com/openhatch/oh-mainline/issues
