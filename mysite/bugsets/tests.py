@@ -33,6 +33,8 @@ from django.utils.http import urlencode
 
 
 class BasicBugsetMainViewTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def test_bugset_names_load(self):
         mysite.bugsets.models.BugSet.objects.create(name="best event")
         mysite.bugsets.models.BugSet.objects.create(name="bestest event")
@@ -50,6 +52,28 @@ class BasicBugsetMainViewTests(TwillTests):
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, s.get_absolute_url())
+
+    def test_user_not_logged_in(self):
+        s = mysite.bugsets.models.BugSet.objects.create(name="best event")
+        url = reverse(mysite.bugsets.views.main_index)
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, s.get_edit_url())
+        self.assertContains(response,
+                            'if you want to create or edit a bug set.')
+
+    def test_user_logged_in(self):
+        client = self.login_with_client()
+
+        s = mysite.bugsets.models.BugSet.objects.create(name="best event")
+        url = reverse(mysite.bugsets.views.main_index)
+        response = client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, s.get_edit_url())
+        self.assertNotContains(response,
+                               'if you want to create or edit a bug set.')
 
 
 class BasicBugsetListViewTests(TwillTests):
