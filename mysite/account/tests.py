@@ -36,6 +36,7 @@ from django.core.urlresolvers import reverse
 from django.utils.unittest import skipIf
 
 from twill import commands as tc
+from django_webtest import WebTest
 import mysite.base.depends
 #}}}
 
@@ -135,21 +136,35 @@ class Signup(TwillTests):
     # }}}
 
 
-class EditPassword(TwillTests):
+class EditPassword(WebTest):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def change_password(self, old_pass, new_pass,
+    def change_password(self, old_pass='oldy_pw', new_pass='newy_pw',
                         should_succeed=True):
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-        tc.follow('settings')
-        tc.follow('Password')
-        tc.url('/account/settings/password')
 
-        tc.fv('a_settings_tab_form', 'old_password', old_pass)
-        tc.fv('a_settings_tab_form', 'new_password1', new_pass)
-        tc.fv('a_settings_tab_form', 'new_password2', new_pass)
-        tc.submit()
+    ## TODO: Refactor below
+        # tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
+        # tc.follow('settings')
+        # tc.follow('Password')
+        # tc.url('/account/settings/password')
+
+        # tc.fv('a_settings_tab_form', 'old_password', old_pass)
+        # tc.fv('a_settings_tab_form', 'new_password1', new_pass)
+        # tc.fv('a_settings_tab_form', 'new_password2', new_pass)
+        # tc.submit()
+    
+        ## Refactored below
+        # From a sample user profile page, go into the reset password page
+        import ipdb;ipdb.set_trace()
+        paulproteus_page = self.app.get("/people/paulproteus/")
+        settings_page = paulproteus_page.click("settings")
+        assert "settings" in settings_page
+        reset_pw_page = paulproteus_page.click("settings")
+        assert "Password" in reset_pw_page
+
+        reset_pw_form = reset_pw_page.form
+        import ipdb;ipdb.set_trace()
 
         # Try to log in with the new password now
         client = Client()
@@ -161,6 +176,88 @@ class EditPassword(TwillTests):
         else:
             success = not success
         self.assert_(success)
+
+    def test_change_password(self):
+        self.login_with_twill()
+        oldpass = "paulproteus's unbreakable password"
+        newpass = 'new'
+        self.change_password(oldpass, newpass)
+
+    def test_change_password_should_fail(self):
+        self.login_with_twill()
+        oldpass = "wrong"
+        newpass = 'new'
+        self.change_password(oldpass, newpass,
+                             should_succeed=False)
+#}}}
+
+
+class EditContactInfo(TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_edit_email_address(self):
+        # Opt out of the periodic emails. This way, the only "checked"
+        # checkbox is the one for if the user's email address gets shown.
+        paulproteus = Person.objects.get()
+        paulproteus.email_me_re_projects = False
+        paulproteus.save()
+
+        self.login_with_twill()
+
+        _url = 'http://openhatch.org/account/settings/contact-info/'
+        url = make_twill_url(_url)
+
+        email = 'new@ema.il'
+
+        # Go to contact info form
+        tc.go(url)
+
+        # Let's first ensure that "new@ema.il" doesn't appear on the page.
+        # (We're about to add it.)
+        tc.notfind('checked="checked"')
+        tc.notfind(email)
+
+        # Edit email
+        tc.fv("a_settings_tab_form", 'edit_email-email', email)
+        # Show email
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '1')  # [1]
+        tc.submit()
+
+        # Form submission ought to redirect us back to the form.
+        tc.url(url)
+
+        # Was email successfully edited?
+        tc.find(email)
+
+        # Was email visibility successfully edited? [2]
+        tc.find('checked="checked"')
+
+        # And does the email address show up on the profile?
+        tc.go(make_twill_url(
+            'http://openhatch.org/people/paulproteus'))
+        tc.find(email)
+
+        # 2. And when we uncheck, does it go away?
+
+        # 2.1. Go to contact info form
+        tc.go(url)
+
+        # 2.2. Don't show email
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '0')  # [1]
+        tc.submit()
+
+        # 2.3. Verify it's not on profile anymore
+        tc.go(make_twill_url(
+            'http://openhatch.org/people/paulproteus'))
+        tc.notfind(email)
+
+        # [1]: This email suggests that twill only accepts
+        # *single quotes* around the '1'.
+        # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
+        #
+        # [2]: This assertion works b/c there's only one checkbox.
+    #}}}
 
 photos = [os.path.join(os.path.dirname(__file__),
                        '..', '..', 'sample-photo.' + ext)
