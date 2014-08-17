@@ -708,6 +708,10 @@ class GitHubTrackerEditingViews(TwillTests):
 
         self.assertEqual(1,
                          mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        # We test for 2 GitHubQueryModel.objects since we must create
+        # QueryModels (one for 'open' bugs, another for 'closed'
+        # bugs), since GitHub's v2 API doesn't let us list all bugs
+        # regardless of status.
         self.assertEqual(2,
                          mysite.customs.models.GitHubQueryModel.objects.all().count())
 
@@ -762,7 +766,7 @@ class JiraTrackerEditingViews(TwillTests):
 
         self.assertEqual(1,
                          mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
-        self.assertEqual(2,
+        self.assertEqual(1,
                          mysite.customs.models.JiraQueryModel.objects.all().count())
 
 # Tests for importing bug data from YAML files, as emitted by oh-bugimporters
