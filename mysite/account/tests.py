@@ -21,9 +21,9 @@ import mock
 import tempfile
 import StringIO
 import logging
+from webtest import Upload
 
 from mysite.profile.models import Person
-from mysite.base.tests import make_twill_url, TwillTests
 import mysite.account.forms
 from mysite.search.models import Project, ProjectInvolvementQuestion
 import mysite.project.views
@@ -35,31 +35,52 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.unittest import skipIf
 
-from twill import commands as tc
+from django_webtest import WebTest
 import mysite.base.depends
 #}}}
 
 
-class Login(TwillTests):
+class Login(WebTest):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_login(self):
-        user = authenticate(username='paulproteus',
-                            password="paulproteus's unbreakable password")
+        user = authenticate(username='paulproteus', password="paulproteus's unbreakable password")
         self.assert_(user and user.is_active)
 
-    def test_login_web(self):
-        self.login_with_twill()
-
     def test_logout_web(self):
-        self.test_login_web()
-        url = 'http://openhatch.org/search/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.notfind('log in')
-        tc.follow('log out')
-        tc.find('log in')
+        # Test the logout feature by inspecting Django's client session. Log in first before you test the log out feature.
+        self.client = Client()
+        username = 'paulproteus'
+        password = "paulproteus's unbreakable password"
+        self.client.login(username=username, password=password)
+        # Check that the user is indeed still logged in
+        self.assertEqual(1, self.client.session.get('_auth_user_id'))
+        # Log out the user
+        self.client.logout()
+        # Test that user is indeed logged out by checking the client session object
+        self.assertNotEqual(1, self.client.session.get('_auth_user_id'))
+
+        # Test that the links are expectedly present or expectedly absent by using django web-test. Log in first before you test the log out feature.
+        search_page = self.app.get('/search/')
+        self.assertIn('log in', search_page.content)
+        login_page = search_page.click('log in')
+        self.assertNotIn('log out', login_page.content)
+        login_page_old = login_page.click('Log in with a password')
+        login_page_form = login_page_old.form
+        login_page_form['username'] = username
+        login_page_form['password'] = password
+        login_page_form.submit()
+        # Go to ANY page to confirm that 'log out' link is present and 'log in' link is absent
+        search_page = self.app.get('/search/')
+        self.assertIn('log out', search_page.content)
+        self.assertNotIn('log in', search_page.content)
+        # After the log out link is clicked, go to ANY page to confirm that the log out link is gone and log in link is present instead
+        logout_page = search_page.click('log out')
+        search_page = self.app.get('/search/')
+        self.assertIn('log in', search_page.content)
+        self.assertNotIn('log out', search_page.content)
+
 
     def test_logout_no_open_redirect(self):
         client = Client()
@@ -83,7 +104,7 @@ class Login(TwillTests):
     # }}}
 
 
-class ProfileGetsCreatedWhenUserIsCreated(TwillTests):
+class ProfileGetsCreatedWhenUserIsCreated(WebTest):
 
     """django-authopenid only creates User objects, but we need Person objects
     in all such cases. Test that creating a User will automatically create
@@ -98,78 +119,84 @@ class ProfileGetsCreatedWhenUserIsCreated(TwillTests):
         self.assert_(list(Person.objects.filter(user__username='paulproteus')))
 
 
-class Signup(TwillTests):
+class Signup(WebTest):
 
     """ Tests for signup without invite code. """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_usernames_case_sensitive(self):
-        tc.go(make_twill_url('http://openhatch.org/account/signup/'))
-        tc.notfind('already got a user in our database with that username')
-        tc.fv('signup', 'username', 'paulproteus')
-        tc.fv('signup', 'email', 'someone@somewhere.com')
-        tc.fv('signup', 'password1', 'blahblahblah')
-        tc.fv('signup', 'password2', 'blahblahblah')
-        tc.submit()
-        tc.find('already got a user in our database with that username')
+        username = 'paulproteus'
+        signup_page = self.app.get('/account/signup/')
+        signup_form = signup_page.form
+        self.assertNotIn('already got a user in our database with that username', signup_form.text)
+        signup_form['username'] = 'paulproteus'
+        signup_form['email'] = 'someone@somewhere.com'
+        signup_form['password1'] = 'blahblahblah'
+        signup_form['password2'] = 'blahblahblah'
+        response = signup_form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('already got a user in our database with that username', response.content)
 
     def test_usernames_case_insensitive(self):
-        tc.go(make_twill_url('http://openhatch.org/account/signup/'))
-        tc.notfind('already got a user in our database with that username')
-        tc.fv('signup', 'username', 'PaulProteus')
-        tc.fv('signup', 'email', 'someone@somewhere.com')
-        tc.fv('signup', 'password1', 'blahblahblah')
-        tc.fv('signup', 'password2', 'blahblahblah')
-        tc.submit()
-        tc.find('already got a user in our database with that username')
+        username = 'paulproteus'
+        signup_page = self.app.get('/account/signup/')
+        signup_form = signup_page.form
+        self.assertNotIn('already got a user in our database with that username', signup_form.text)
+        signup_form['username'] = 'PaulProteus'
+        signup_form['email'] = 'someone@somewhere.com'
+        signup_form['password1'] = 'blahblahblah'
+        signup_form['password2'] = 'blahblahblah'
+        response = signup_form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('already got a user in our database with that username', response.content)
 
     def test_reserved_username(self):
-        tc.go(make_twill_url('http://openhatch.org/account/signup/'))
-        tc.notfind('That username is reserved.')
-        tc.fv('signup', 'username', 'admin')
-        tc.fv('signup', 'email', 'someone@somewhere.com')
-        tc.fv('signup', 'password1', 'blahblahblah')
-        tc.fv('signup', 'password2', 'blahblahblah')
-        tc.submit()
-        tc.find('That username is reserved.')
-    # }}}
+        username = 'paulproteus'
+        signup_page = self.app.get('/account/signup/', user=username)
+        signup_form = signup_page.form
+        self.assertNotIn('That username is reserved.', signup_form.text)
+        signup_form['username'] = 'admin'
+        signup_form['email'] = 'someone@somewhere.com'
+        signup_form['password1'] = 'blahblahblah'
+        signup_form['password2'] = 'blahblahblah'
+        response = signup_form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('That username is reserved.', response.content)
 
 
-class EditPassword(TwillTests):
+class EditPassword(WebTest):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def change_password(self, old_pass, new_pass,
                         should_succeed=True):
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-        tc.follow('settings')
-        tc.follow('Password')
-        tc.url('/account/settings/password')
 
-        tc.fv('a_settings_tab_form', 'old_password', old_pass)
-        tc.fv('a_settings_tab_form', 'new_password1', new_pass)
-        tc.fv('a_settings_tab_form', 'new_password2', new_pass)
-        tc.submit()
+        ## Refactored below
+        # From a sample user profile page, go into the reset password page
+        user = 'paulproteus'
+        paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
+        settings_page = paulproteus_page.click("settings", index=0)
+        reset_pw_page = settings_page.click("Password", index=0)
+
+        # Change password on the password reset form
+        reset_pw_form = reset_pw_page.form
+        reset_pw_form['old_password'] = old_pass
+        reset_pw_form['new_password1'] = new_pass
+        reset_pw_form['new_password2'] = new_pass
+        form_response = reset_pw_form.submit()
 
         # Try to log in with the new password now
         client = Client()
         username = 'paulproteus'
-        success = client.login(username=username,
-                               password=new_pass)
-        if should_succeed:
-            success = success
-        else:
-            success = not success
-        self.assert_(success)
+        actual_should_succeed = client.login(username=username, password=new_pass)
+        self.assertEqual(actual_should_succeed, should_succeed)
 
     def test_change_password(self):
-        self.login_with_twill()
-        oldpass = "paulproteus's unbreakable password"
-        newpass = 'new'
-        self.change_password(oldpass, newpass)
+        old_pass = "paulproteus's unbreakable password"
+        new_pass = 'new'
+        self.change_password(old_pass=old_pass, new_pass=new_pass)
 
     def test_change_password_should_fail(self):
-        self.login_with_twill()
         oldpass = "wrong"
         newpass = 'new'
         self.change_password(oldpass, newpass,
@@ -177,72 +204,44 @@ class EditPassword(TwillTests):
 #}}}
 
 
-class EditContactInfo(TwillTests):
+class EditContactInfo(WebTest):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_edit_email_address(self):
         # Opt out of the periodic emails. This way, the only "checked"
         # checkbox is the one for if the user's email address gets shown.
+        user = "paulproteus"
         paulproteus = Person.objects.get()
         paulproteus.email_me_re_projects = False
         paulproteus.save()
 
-        self.login_with_twill()
+        contact_info_page = self.app.get("/account/settings/contact-info/", user=user)
+        current_pw = "paulproteus's unbreakable password"
+        new_email = 'new@ema.il'
 
-        _url = 'http://openhatch.org/account/settings/contact-info/'
-        url = make_twill_url(_url)
+        # Let's first ensure that "new@ema.il" doesn't appear on the page. We're about to add it.
+        # Test that the email is initially not visible on user profile page
+        paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
+        assert new_email not in paulproteus_page
 
-        email = 'new@ema.il'
+        # Change email address and make sure it's publicly visible
+        contact_info_form = contact_info_page.form
+        contact_info_form['edit_email-email'] = new_email
+        contact_info_form['show_email-show_email'].checked = True
+        contact_info_form.submit()
+        self.assertEqual(paulproteus.user.email, new_email)
+        # Test that the email is publicly visible on user profile page
+        paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
+        assert new_email in paulproteus_page
 
-        # Go to contact info form
-        tc.go(url)
-
-        # Let's first ensure that "new@ema.il" doesn't appear on the page.
-        # (We're about to add it.)
-        tc.notfind('checked="checked"')
-        tc.notfind(email)
-
-        # Edit email
-        tc.fv("a_settings_tab_form", 'edit_email-email', email)
-        # Show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '1')  # [1]
-        tc.submit()
-
-        # Form submission ought to redirect us back to the form.
-        tc.url(url)
-
-        # Was email successfully edited?
-        tc.find(email)
-
-        # Was email visibility successfully edited? [2]
-        tc.find('checked="checked"')
-
-        # And does the email address show up on the profile?
-        tc.go(make_twill_url(
-            'http://openhatch.org/people/paulproteus'))
-        tc.find(email)
-
-        # 2. And when we uncheck, does it go away?
-
-        # 2.1. Go to contact info form
-        tc.go(url)
-
-        # 2.2. Don't show email
-        tc.fv("a_settings_tab_form", 'show_email-show_email', '0')  # [1]
-        tc.submit()
-
-        # 2.3. Verify it's not on profile anymore
-        tc.go(make_twill_url(
-            'http://openhatch.org/people/paulproteus'))
-        tc.notfind(email)
-
-        # [1]: This email suggests that twill only accepts
-        # *single quotes* around the '1'.
-        # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
-        #
-        # [2]: This assertion works b/c there's only one checkbox.
-    #}}}
+        # Test that the email is not publicly displayble
+        contact_info_page = self.app.get('/account/settings/contact-info/', user=user)
+        contact_info_form['show_email-show_email'].checked = False
+        contact_info_form.submit()
+        # Test that the email is no longer visible on user profile page
+        paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
+        assert new_email not in paulproteus_page
 
 photos = [os.path.join(os.path.dirname(__file__),
                        '..', '..', 'sample-photo.' + ext)
@@ -257,24 +256,33 @@ def photo(f):
     return filename
 
 
+
 @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
-class EditPhoto(TwillTests):
+class EditPhoto(WebTest):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
+    def login_with_client(self, username='paulproteus',
+                          password="paulproteus's unbreakable password"):
+        client = Client()
+        success = client.login(username=username,
+                               password=password)
+        self.assert_(success)
+        return client
+
     def test_set_avatar(self):
-        self.login_with_twill()
+        username = 'paulproteus'
         for image in [photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')]:
-            url = 'http://openhatch.org/people/paulproteus/'
-            tc.go(make_twill_url(url))
-            tc.follow('photo')
-            tc.formfile('edit_photo', 'photo', image)
-            tc.submit()
+            paulproteus_page = self.app.get('/people/%s/' % (username,), user=username)
+            photo_page = paulproteus_page.click(href='/account/edit/photo/')
+            photo_form = photo_page.form
+            photo_form['photo'] = Upload(image)
+            photo_form.submit()
+
             # Now check that the photo == what we uploaded
-            p = Person.objects.get(user__username='paulproteus')
-            self.assert_(p.photo.read() ==
-                         open(image).read())
+            p = Person.objects.get(user__username=username)
+            self.assert_(p.photo.read() == open(image).read())
 
             response = self.login_with_client().get(
                 reverse(mysite.account.views.edit_photo))
@@ -288,16 +296,17 @@ class EditPhoto(TwillTests):
             self.assertEqual(w, 40)
 
     def test_set_avatar_too_wide(self):
-        self.login_with_twill()
+        username = 'paulproteus'
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
-            url = 'http://openhatch.org/people/paulproteus/'
-            tc.go(make_twill_url(url))
-            tc.follow('photo')
-            tc.formfile('edit_photo', 'photo', image)
-            tc.submit()
+            paulproteus_page = self.app.get('/people/%s/' % (username,), user=username)
+            photo_page = paulproteus_page.click(href='/account/edit/photo/')
+            photo_form = photo_page.form
+            photo_form['photo'] = Upload(image)
+            photo_form.submit()
+
             # Now check that the photo is 200px wide
-            p = Person.objects.get(user__username='paulproteus')
+            p = Person.objects.get(user__username=username)
             image_as_stored = mysite.base.depends.Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
@@ -307,25 +316,45 @@ class EditPhoto(TwillTests):
         If the uploaded image is detected as being invalid, report a helpful
         message to the user. The photo is not added to the user's profile.
         """
+        username = 'paulproteus'
         bad_image = tempfile.NamedTemporaryFile(delete=False)
-        self.login_with_twill()
 
         try:
             bad_image.write("garbage")
             bad_image.close()
 
-            tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-            tc.follow('photo')
-            tc.formfile('edit_photo', 'photo', bad_image.name)
-            tc.submit()
-            tc.code(200)
-            self.assert_("The file you uploaded was either not an image or a "
-                         "corrupted image" in tc.show())
+            paulproteus_page = self.app.get('/people/%s/' % (username,), user=username)
+            photo_page = paulproteus_page.click(href='/account/edit/photo/')
+            photo_form = photo_page.form
+            photo_form['photo'] = Upload(bad_image.name)
+            form_response = photo_form.submit()
+            self.assertEqual(form_response.status_code, 200)
+            self.assertIn("The file you uploaded was either not an image or a corrupted image", form_response.content)
 
-            p = Person.objects.get(user__username='paulproteus')
+            # Test that user test object has no photo attribute
+            p = Person.objects.get(user__username=username)
             self.assertFalse(p.photo.name)
         finally:
             os.unlink(bad_image.name)
+
+
+@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+class EditPhotoWithOldPerson(WebTest):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
+
+    def test_set_avatar(self):
+        username = 'paulproteus'
+        for image in (photo('static/sample-photo.png'), photo('static/sample-photo.jpg')):
+            paulproteus_page = self.app.get('/people/paulproteus/', user=username)
+            photo_page= paulproteus_page.click(href='/account/edit/photo')
+            photo_form = photo_page.form
+            photo_form['photo'] = Upload(image)
+            photo_response = photo_form.submit()
+
+            # Now check that the photo == what we uploaded
+            p = Person.objects.get(user__username=username)
+            self.assert_(p.photo.read() == open(image).read())
 
     def test_image_processing_library_error(self):
         """
@@ -358,32 +387,8 @@ class EditPhoto(TwillTests):
         self.assert_("zlib.error" in string_log.getvalue())
         logger.removeHandler(my_log)
 
-    #}}}
 
-
-@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
-class EditPhotoWithOldPerson(TwillTests):
-    #{{{
-    fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
-
-    def test_set_avatar(self):
-        self.login_with_twill()
-        for image in (photo('static/sample-photo.png'),
-                      photo('static/sample-photo.jpg')):
-            url = 'http://openhatch.org/people/paulproteus/'
-            tc.go(make_twill_url(url))
-            tc.follow('photo')
-            tc.formfile('edit_photo', 'photo', image)
-            tc.submit()
-            # Now check that the photo == what we uploaded
-            p = Person.objects.get(user__username='paulproteus')
-            self.assert_(p.photo.read() ==
-                         open(image).read())
-    #}}}
-
-
-
-class SignupWithNoPassword(TwillTests):
+class SignupWithNoPassword(WebTest):
 
     def test(self):
         POST_data = {'username': 'mister_roboto'}
@@ -394,7 +399,7 @@ class SignupWithNoPassword(TwillTests):
         self.assertEqual(User.objects.count(), 0)
 
 
-class LoginPageContainsUnsavedAnswer(TwillTests):
+class LoginPageContainsUnsavedAnswer(WebTest):
 
     def test(self):
         # Create an answer whose author isn't specified. This replicates the
@@ -424,7 +429,7 @@ class LoginPageContainsUnsavedAnswer(TwillTests):
         self.assertContains(response, POST_data['answer__text'])
 
 
-class ClearSessionsOnPasswordChange(TwillTests):
+class ClearSessionsOnPasswordChange(WebTest):
     fixtures = ['user-paulproteus']
 
     def user_logged_in(self, session):
