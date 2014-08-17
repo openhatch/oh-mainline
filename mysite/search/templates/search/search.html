@@ -270,6 +270,7 @@ Volunteer opportunities in free and open source software
                 </p>
                 <form name='alert' method='POST' 
                         action='{% url "mysite.search.views.subscribe_to_bug_alert_do" %}'>
+                    {% csrf_token %}
                     {{ subscribe_to_alert_form.as_p }}
                     <input type="submit" value="Notify me when opportunities appear">
                 </form>
