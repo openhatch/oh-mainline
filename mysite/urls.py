@@ -242,7 +242,8 @@ urlpatterns = patterns('',
                         'mysite.bugsets.views.list_index'),
                        (r'^bugsets/create$', 'mysite.bugsets.views.create_index'),
                        (r'^bugsets/edit/(?P<pk>\d+)-(?P<slug>.*)$', 'mysite.bugsets.views.create_index'),
-                           # This is a view for robots, do not modify
+                       (r'^bugsets/api/$', 'mysite.bugsets.views.api_index'),
+                       # This is a view for robots, do not modify
                        (r'^inplaceeditform/', include('inplaceeditform.urls')),
 
                        # Invitation-related URLs

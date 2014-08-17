@@ -27,6 +27,8 @@ from mysite.base.tests import TwillTests
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.http import urlencode
 # }}}
 
 
@@ -206,29 +208,55 @@ class SecurityBugsetListViewTests(TwillTests):
             pk=b.pk).mentor, 'Asheesh')
 
 
+# Constants for the Create and Edit view tests
+
+EVENT_NAME = "Party at Asheesh's Place"
+BUGSET = """
+    http://openhatch.org/bugs/issue978
+    http://openhatch.org/bugs/issue994
+    http://openhatch.org/bugs/issue995
+    http://openhatch.org/bugs/issue1003
+"""
+BUGSET_REDUCED = """
+    http://openhatch.org/bugs/issue978
+    http://openhatch.org/bugs/issue994
+    http://openhatch.org/bugs/issue995
+"""
+REMOVED_BUG = "http://openhatch.org/bugs/issue1003"
+BUGSET_EXPANDED = """
+    http://openhatch.org/bugs/issue978
+    http://openhatch.org/bugs/issue994
+    http://openhatch.org/bugs/issue995
+    http://openhatch.org/bugs/issue1003
+    http://openhatch.org/bugs/issue1020
+"""
+ADDED_BUG = "http://openhatch.org/bugs/issue1020"
+BUGSET_CHANGED = """
+    http://openhatch.org/bugs/issue978
+    http://openhatch.org/bugs/issue994
+    http://openhatch.org/bugs/issue995
+    http://openhatch.org/bugs/issue1020
+"""
+
+
 class BasicBugsetCreateViewTests(TwillTests):
-    event_name = "Party at Asheesh's Place"
-    bugset = """
-        http://openhatch.org/bugs/issue978
-        http://openhatch.org/bugs/issue994
-        http://openhatch.org/bugs/issue995
-        http://openhatch.org/bugs/issue1003
-    """
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_create_view_load(self):
         url = reverse(mysite.bugsets.views.create_index)
-        response = self.client.get(url)
+        response = self.login_with_client().get(url)
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, "Create a Bug Set")
 
     def test_create_view_redirect(self):
+        client = self.login_with_client()
         url = reverse(mysite.bugsets.views.create_index)
-        response = self.client.post(
+        response = client.post(
             url,
             {
-                'event_name': self.event_name,
-                'buglist': self.bugset,
+                'event_name': EVENT_NAME,
+                'buglist': BUGSET,
             })
 
         self.assertEqual(302, response.status_code)
@@ -238,56 +266,15 @@ class BasicBugsetCreateViewTests(TwillTests):
             'http://testserver' + s.get_edit_url(),
             response['location'])
 
-        response = self.client.get(response['location'])
+        response = client.get(response['location'])
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, 'Party at Asheesh&#39;s Place')
         self.assertContains(response, 'http://openhatch.org/bugs/issue978')
 
-
-class BasicBugsetCreateFormTests(TwillTests):
-    event_name = "Party at Asheesh's Place"
-    bugset = """
-        http://openhatch.org/bugs/issue978
-        http://openhatch.org/bugs/issue994
-        http://openhatch.org/bugs/issue995
-        http://openhatch.org/bugs/issue1003
-    """
-    bugset_reduced = """
-        http://openhatch.org/bugs/issue978
-        http://openhatch.org/bugs/issue994
-        http://openhatch.org/bugs/issue995
-    """
-    removed_bug = "http://openhatch.org/bugs/issue1003"
-    bugset_expanded = """
-        http://openhatch.org/bugs/issue978
-        http://openhatch.org/bugs/issue994
-        http://openhatch.org/bugs/issue995
-        http://openhatch.org/bugs/issue1003
-        http://openhatch.org/bugs/issue1020
-    """
-    added_bug = "http://openhatch.org/bugs/issue1020"
-    bugset_changed = """
-        http://openhatch.org/bugs/issue978
-        http://openhatch.org/bugs/issue994
-        http://openhatch.org/bugs/issue995
-        http://openhatch.org/bugs/issue1020
-    """
-
-    def test_submit_form_valid(self):
-        url = reverse(mysite.bugsets.views.create_index)
-        response = self.client.post(
-            url,
-            {
-                'event_name': self.event_name,
-                'buglist': self.bugset,
-            })
-
-        self.assertEqual(302, response.status_code)
-
     def test_evil_urls(self):
         evil_urls = [
-            # 'ftp://pr1v8.warex0z.s3rv3r.net/',  Django 1.5+ only
+            # 'ftp://pr1v8.warex0z.s3rv3r.net/',  Django 1.7+ only
             'wiefjoiefoaehroaherhaevo',
             'javascript:alert("hi")',
         ]
@@ -295,114 +282,156 @@ class BasicBugsetCreateFormTests(TwillTests):
         for url in evil_urls:
             self.assertFalse(
                 mysite.bugsets.forms.BugsForm({
-                    'event_name': self.event_name,
+                    'event_name': EVENT_NAME,
                     'buglist': url,
                 }).is_valid())
 
     def test_create_form(self):
         f = mysite.bugsets.forms.BugsForm({
-            'event_name': self.event_name,
-            'buglist': self.bugset,
+            'event_name': EVENT_NAME,
+            'buglist': BUGSET,
         })
 
         self.assertTrue(f.is_valid())
         f.save()
 
-        s = mysite.bugsets.models.BugSet.objects.get(name=self.event_name)
+        s = mysite.bugsets.models.BugSet.objects.get(name=EVENT_NAME)
         l = mysite.bugsets.models.AnnotatedBug.objects.filter(
-            url__in=self.bugset
+            url__in=[url.strip() for url in BUGSET.split("\n")]
         )
 
-        self.assertTrue(set(s.bugs.all()), set(l))
+        # Use set equality test rather than test framework's equality test
+        self.assertTrue(set(s.bugs.all()) == set(l))
+
+    def test_create_form_with_empty_name(self):
+        url = reverse(mysite.bugsets.views.create_index)
+        response = self.login_with_client().post(
+            url,
+            {
+                'event_name': '',
+                'buglist': BUGSET,
+            })
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'This field is required.')
+
+    def test_create_view_add_existing_bug(self):
+        mysite.bugsets.models.AnnotatedBug.objects.create(url=ADDED_BUG)
+
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': EVENT_NAME,
+            'buglist': ADDED_BUG,
+        })
+
+        self.assertTrue(f.is_valid())
+        f.save()
+
+
+class BasicBugsetCreateFormTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_edit_view_modify_name(self):
         f = mysite.bugsets.forms.BugsForm({
-            'event_name': self.event_name,
-            'buglist': self.bugset,
+            'event_name': EVENT_NAME,
+            'buglist': BUGSET,
         })
 
         self.assertTrue(f.is_valid())
         f.save()
 
-        response = self.client.post(
+        client = self.login_with_client()
+        response = client.post(
             f.object.get_edit_url(),
             {
                 'event_name': 'New event name',
-                'buglist': self.bugset,
+                'buglist': BUGSET,
             })
 
         self.assertEqual(302, response.status_code)
-        response = self.client.get(response['location'])
+        response = client.get(response['location'])
 
         self.assertEqual(200, response.status_code)
         self.assertContains(response, 'New event name')
 
     def test_edit_view_remove_bugs(self):
         f = mysite.bugsets.forms.BugsForm({
-            'event_name': self.event_name,
-            'buglist': self.bugset,
+            'event_name': EVENT_NAME,
+            'buglist': BUGSET,
         })
 
         self.assertTrue(f.is_valid())
         f.save()
 
-        response = self.client.post(
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        self.assertTrue(s.bugs.get(url=REMOVED_BUG))
+
+        client = self.login_with_client()
+        response = client.post(
             f.object.get_edit_url(),
             {
-                'event_name': self.event_name,
-                'buglist': self.bugset_reduced,
+                'event_name': EVENT_NAME,
+                'buglist': BUGSET_REDUCED,
             })
 
         self.assertEqual(302, response.status_code)
-        response = self.client.get(response['location'])
+        response = client.get(response['location'])
 
         self.assertEqual(200, response.status_code)
-        self.assertNotContains(response, self.removed_bug)
+        self.assertNotContains(response, REMOVED_BUG)
 
     def test_edit_view_add_bugs(self):
         f = mysite.bugsets.forms.BugsForm({
-            'event_name': self.event_name,
-            'buglist': self.bugset,
+            'event_name': EVENT_NAME,
+            'buglist': BUGSET,
         })
 
         self.assertTrue(f.is_valid())
         f.save()
 
-        response = self.client.post(
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        self.assertRaises(ObjectDoesNotExist, s.bugs.get, url=ADDED_BUG)
+
+        client = self.login_with_client()
+        response = client.post(
             f.object.get_edit_url(),
             {
-                'event_name': self.event_name,
-                'buglist': self.bugset_expanded,
+                'event_name': EVENT_NAME,
+                'buglist': BUGSET_EXPANDED,
             })
 
         self.assertEqual(302, response.status_code)
-        response = self.client.get(response['location'])
+        response = client.get(response['location'])
 
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, self.added_bug)
+        self.assertContains(response, ADDED_BUG)
 
     def test_edit_view_change_bugs(self):
         f = mysite.bugsets.forms.BugsForm({
-            'event_name': self.event_name,
-            'buglist': self.bugset,
+            'event_name': EVENT_NAME,
+            'buglist': BUGSET,
         })
 
         self.assertTrue(f.is_valid())
         f.save()
 
-        response = self.client.post(
+        s = mysite.bugsets.models.BugSet.objects.get(pk=f.object.pk)
+        self.assertTrue(s.bugs.get(url=REMOVED_BUG))
+        self.assertRaises(ObjectDoesNotExist, s.bugs.get, url=ADDED_BUG)
+
+        client = self.login_with_client()
+        response = client.post(
             f.object.get_edit_url(),
             {
-                'event_name': self.event_name,
-                'buglist': self.bugset_changed,
+                'event_name': EVENT_NAME,
+                'buglist': BUGSET_CHANGED,
             })
 
         self.assertEqual(302, response.status_code)
-        response = self.client.get(response['location'])
+        response = client.get(response['location'])
 
         self.assertEqual(200, response.status_code)
-        self.assertNotContains(response, self.removed_bug)
-        self.assertContains(response, self.added_bug)
+        self.assertNotContains(response, REMOVED_BUG)
+        self.assertContains(response, ADDED_BUG)
 
     def test_create_with_smart_completion(self):
         # Make a project
@@ -416,7 +445,7 @@ class BasicBugsetCreateFormTests(TwillTests):
 
         # Make a traditional Bug
         o = mysite.search.models.Bug.create_dummy(
-            canonical_bug_link=self.added_bug,
+            canonical_bug_link=ADDED_BUG,
             title=('django-inplaceedit probably introduces some security '
                    'holes'),
             description='''
@@ -435,8 +464,8 @@ instance, change everyone's username to 'octamarine12345...'
         )
 
         f = mysite.bugsets.forms.BugsForm({
-            'event_name': self.event_name,
-            'buglist': self.added_bug,
+            'event_name': EVENT_NAME,
+            'buglist': ADDED_BUG,
         })
 
         self.assertTrue(f.is_valid())
@@ -449,3 +478,37 @@ instance, change everyone's username to 'octamarine12345...'
         self.assertEqual(b.description, o.description)
         self.assertEqual(b.project, o.project)
         self.assertEqual(b.skill_list, o.project.language)
+
+
+class BasicAPIViewTests(TwillTests):
+    def test_return_value_in_db(self):
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(
+            url='http://openhatch.org/bugs/issue1021',
+            title='Concurrent users UX',
+        )
+
+        url = reverse(mysite.bugsets.views.api_index) + '?' + urlencode({
+            'obj_id': b.pk,
+            'field_name': 'title',
+        })
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'Concurrent users UX')
+
+    def test_handle_value_not_in_db(self):
+        url = reverse(mysite.bugsets.views.api_index) + '?' + urlencode({
+            'obj_id': '42',
+            'field_name': 'title',
+        })
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'Object does not exist!')
+
+    def test_handle_bad_api_call(self):
+        url = reverse(mysite.bugsets.views.api_index)
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'Unknown error')
