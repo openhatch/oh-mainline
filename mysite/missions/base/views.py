@@ -26,7 +26,7 @@ from mysite.missions.models import Step, StepCompletion
 from mysite.missions.base import view_helpers
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
-from django.conf.urls.defaults import (
+from django.conf.urls import (
     url,
     patterns,
 )
