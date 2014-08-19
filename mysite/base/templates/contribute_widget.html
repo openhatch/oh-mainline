@@ -27,30 +27,30 @@
         <ul style="padding-bottom: 5px;">
           <li>
             <strong>Come hang out with us!</strong>
-           </li>
 
-           <li>
-             OpenHatch needs people to greet and direct
+			 <p>OpenHatch needs people to greet and direct
              prospective contributors to projects and events,
              hack on our Python+Django codebase,
              suggest improvements to all aspects of our work,
-             and more.
-           </li>
+             and more.</p>
+
+             <p class="module-foot">
+               <a href='//openhatch.org/wiki/Get_involved'>Read more about getting involved &raquo;</a>
+             </p>
+		   </li>
            <li>
              <form method="post"
                action="http://lists.openhatch.org/mailman/subscribe/announce">
                {% csrf_token %}
-               <p><strong>Subscribe to our once-a-month newsletter!</strong></p>
+               <strong>Subscribe to our <a href="http://blog.openhatch.org/tag/newsletter/">monthly newsletter</a>!</strong>
+               <p>
+			     <label for="subscription-email">Your email address:</label>
 
-               <label for="subscription-email">Your email address:</label>
-
-               <input id="subscription-email" name="email">
-               <input name="email-button" value="Subscribe" type="submit">
-             </form>
+                 <input id="subscription-email" name="email">
+                 <input name="email-button" value="Subscribe" type="submit">
+               </p>
+			 </form>
            </li>
          </ul>
-       </div>
-       <div class="module-foot">
-         <a href='//openhatch.org/wiki/Get_involved'>Read more about getting involved &raquo;</a>
        </div>
     </div>
