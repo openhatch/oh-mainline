@@ -63,3 +63,10 @@ logger = logging.getLogger('')
 logger.setLevel(logging.WARNING)
 
 ALLOWED_HOSTS=['testserver', 'openhatch.org']
+
+# This means that, when we run 'python manage.py collectstatic'
+# on the deployment, that they go in the path below.
+#
+# This path is important because the nginx
+# configuration is consistent with it.
+STATIC_ROOT='/home/deploy/milestone-a/mysite/statik'
