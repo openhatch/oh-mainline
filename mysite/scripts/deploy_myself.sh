@@ -21,6 +21,16 @@ function update_to_latest() {
     git merge origin/master --ff-only
 }
 
+function regenerate_static_files() {
+    ### Use the Django staticfiles machinery to generate the
+    ### /statik/ URL. This is a pretty hilarious URL. It's because
+    ### we have have "static files" that we didn't make part of an
+    ### "app" occuping /static/. So to support the Django staticfiles
+    ### machinery, we map that to /statik/.
+    mkdir -p mysite/statik
+    python manage.py collectstatic --noinput
+}
+
 function update_database() {
     ### Initialize new databases, if necessary
     python manage.py syncdb
