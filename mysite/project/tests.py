@@ -38,6 +38,15 @@ from django.core.urlresolvers import reverse
 from twill import commands as tc
 
 
+class BasicHelpers(WebTest):
+    def login_with_client(self, username='paulproteus',
+                          password="paulproteus's unbreakable password"):
+        client = Client()
+        success = client.login(username=username,
+                               password=password)
+        self.assert_(success)
+        return client
+
 class ProjectNameSearch(TwillTests):
 
     def test_search_for_similar_project_names_backend(self):
