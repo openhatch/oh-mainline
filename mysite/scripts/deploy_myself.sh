@@ -60,6 +60,7 @@ cd ~/milestone-a
 
 check_for_changed_files
 update_to_latest
+regenerate_static_files
 notify_github
 update_database
 notify_web_server
