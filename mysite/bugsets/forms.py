@@ -55,6 +55,28 @@ class BugsForm(django.forms.Form):
             return False
         return True
 
+    @staticmethod
+    def create_bug(url):
+        # get_or_create returns a tuple (object b, bool created?)
+        b, _ = mysite.bugsets.models.AnnotatedBug.objects.get_or_create(url=url)
+
+        try:
+            o = mysite.search.models.Bug.all_bugs.get(
+                canonical_bug_link=url)
+
+            b.title = o.title
+            b.description = o.description
+            b.project = o.project
+
+            if o.project:
+                b.skill_list = o.project.language
+        except ObjectDoesNotExist:
+            # No problems here, this URL wasn't cached in our main db
+            pass
+
+        b.save()
+        return b
+
     def __init__(self, *args, **kwargs):
         # FIXME: Our home-baked "ModelForm" could be implemented with django
         # ModelForms, but the m2m text blob of URLs will be tricky to work with
@@ -98,25 +120,7 @@ class BugsForm(django.forms.Form):
         s.save()
 
         for url in self.cleaned_data.get('buglist').split("\n"):
-            # get_or_create returns a tuple (object b, bool created?)
-            b = mysite.bugsets.models.AnnotatedBug.objects.get_or_create(
-                url=url)[0]
-
-            try:
-                o = mysite.search.models.Bug.all_bugs.get(
-                    canonical_bug_link=url)
-
-                b.title = o.title
-                b.description = o.description
-                b.project = o.project
-
-                if o.project:
-                    b.skill_list = o.project.language
-            except ObjectDoesNotExist:
-                # No problems here, this URL wasn't cached in our main db
-                pass
-
-            b.save()
+            b = BugsForm.create_bug(url)
             s.bugs.add(b)
 
         # We need the form to return the set info
@@ -135,11 +139,10 @@ class BugsForm(django.forms.Form):
             s.name = new_name
             s.save()
 
-        for bug in old_bugs - new_bugs:
+        for url in old_bugs - new_bugs:
             s.bugs.remove(mysite.bugsets.models.AnnotatedBug.objects.get(
-                url=bug))
+                url=url))
 
-        for bug in new_bugs - old_bugs:
-            b = mysite.bugsets.models.AnnotatedBug.objects.get_or_create(
-                url=bug)[0]
+        for url in new_bugs - old_bugs:
+            b = BugsForm.create_bug(url)
             s.bugs.add(b)
