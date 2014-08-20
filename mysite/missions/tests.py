@@ -24,6 +24,8 @@ import datetime
 
 
 import django.test
+from django.utils.unittest import skipIf
+import django.db
 from mysite.missions.base.view_helpers import *
 from mysite.missions.models import Step, StepCompletion
 from mysite.profile.models import Person
@@ -63,6 +65,9 @@ class MissionCompletionTestCase(django.test.TestCase):
         self.assertTrue(mission_completed(profile, step.name))
         self.assertTrue(obj_after.is_currently_completed)
 
+    @skipIf(django.db.connection.vendor != 'sqlite',
+            'Skipping because only sqlite supports microsecond precision '
+            'with Django. At least, MySQL definitely does not.')
     def test_set_mission_completed_records_first_completed_time(self):
         now = datetime.datetime.now()
         profile = Person.objects.all()[0]
