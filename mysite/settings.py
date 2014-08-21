@@ -185,6 +185,7 @@ INSTALLED_APPS = (
     'djcelery',
     'djkombu',
     'inplaceeditform',
+    'django_webtest',
 )
 
 # testrunner allows us to control which testrunner to use
