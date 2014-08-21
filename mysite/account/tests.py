@@ -356,37 +356,6 @@ class EditPhotoWithOldPerson(WebTest):
             p = Person.objects.get(user__username=username)
             self.assert_(p.photo.read() == open(image).read())
 
-    def test_image_processing_library_error(self):
-        """
-        If the image processing library errors while preparing a photo, report a
-        helpful message to the user and log the error. The photo is not added
-        to the user's profile.
-        """
-        # Get a copy of the error log.
-        string_log = StringIO.StringIO()
-        logger = logging.getLogger()
-        my_log = logging.StreamHandler(string_log)
-        logger.addHandler(my_log)
-        logger.setLevel(logging.ERROR)
-
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        tc.follow('photo')
-        # This is a special image from issue166 that passes Django's image
-        # validation tests but causes an exception during zlib decompression.
-        tc.formfile('edit_photo', 'photo',
-                    photo('static/images/corrupted.png'))
-        tc.submit()
-        tc.code(200)
-
-        self.assert_("Something went wrong while preparing this" in tc.show())
-        p = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(p.photo.name)
-
-        # an error message was logged during photo processing.
-        self.assert_("zlib.error" in string_log.getvalue())
-        logger.removeHandler(my_log)
-
 
 class SignupWithNoPassword(WebTest):
 
