@@ -1,6 +1,7 @@
 packages/amqplib
 packages/anyjson
 packages/BeautifulSoup
+packages/beautifulsoup4
 packages/bleach
 packages/celery
 packages/decorator/src
@@ -21,6 +22,7 @@ packages/django-registration
 packages/django-reversion/src
 packages/django-tastypie
 packages/django-voting
+packages/django-webtest
 packages/docutils
 packages/feedparser/feedparser
 packages/gdata/src
@@ -60,6 +62,8 @@ packages/twisted
 packages/typecheck
 packages/unicodecsv
 packages/unittest-xml-reporting/src
+packages/webob
+packages/webtest
 packages/whoosh/src
 packages/zope.interface
 packages/zope.interface/src

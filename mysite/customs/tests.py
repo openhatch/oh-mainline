@@ -25,7 +25,6 @@ from __future__ import absolute_import
 
 
 # Imports {{{
-from mysite.base.tests import TwillTests
 from mysite.search.models import Bug, Project
 from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
@@ -46,6 +45,8 @@ import django.test
 import django.contrib.auth.models
 import django.core.serializers
 from django.conf import settings
+from django.test.client import Client
+from django_webtest import WebTest
 
 from StringIO import StringIO
 import datetime
@@ -328,8 +329,7 @@ class DataExport(django.test.TestCase):
         proj.populate_icon_from_ohloh()
         proj.save()
 
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # now delete fake Project...
@@ -498,7 +498,7 @@ class DataExport(django.test.TestCase):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class BugTrackerEditingViews(TwillTests):
+class BugTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
@@ -518,6 +518,14 @@ class BugTrackerEditingViews(TwillTests):
                 'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
             mysite.customs.models.TracQueryModel.objects.create(url=url,
                                                                 tracker=self.tm)
+
+    def login_with_client(self, username='paulproteus',
+                          password="paulproteus's unbreakable password"):
+        client = Client()
+        success = client.login(username=username,
+                               password=password)
+        self.assert_(success)
+        return client
 
     def test_slash_does_not_crash_tracker_editor(self):
         mysite.customs.models.TracTrackerModel.all_trackers.create(
@@ -564,7 +572,7 @@ class BugTrackerEditingViews(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class BugzillaTrackerEditingViews(TwillTests):
+class BugzillaTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
@@ -615,12 +623,20 @@ class BugzillaTrackerEditingViews(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class BugzillaTrackerListing(TwillTests):
+class BugzillaTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         super(BugzillaTrackerListing, self).setUp()
         self.kde = mysite.search.models.Project.create_dummy(name='KDE')
+
+    def login_with_client(self, username='paulproteus',
+                          password="paulproteus's unbreakable password"):
+        client = Client()
+        success = client.login(username=username,
+                               password=password)
+        self.assert_(success)
+        return client
 
     def test_view_url_form(self):
         self.assertEqual(0,
@@ -652,7 +668,7 @@ class BugzillaTrackerListing(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class LaunchpadTrackerEditingViews(TwillTests):
+class LaunchpadTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
@@ -683,7 +699,7 @@ class LaunchpadTrackerEditingViews(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class GitHubTrackerEditingViews(TwillTests):
+class GitHubTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
@@ -717,8 +733,16 @@ class GitHubTrackerEditingViews(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class GitHubTrackerListing(TwillTests):
+class GitHubTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def login_with_client(self, username='paulproteus',
+                          password="paulproteus's unbreakable password"):
+        client = Client()
+        success = client.login(username=username,
+                               password=password)
+        self.assert_(success)
+        return client
 
     def test_view_github_trackers(self):
         self.assertEqual(0,
@@ -739,7 +763,7 @@ class GitHubTrackerListing(TwillTests):
 
 
 @skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
-class JiraTrackerEditingViews(TwillTests):
+class JiraTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
@@ -961,7 +985,7 @@ class DuplicateNames(django.test.TestCase):
         trac.get_edit_url()
 
 
-class TrackerAPI(TwillTests):
+class TrackerAPI(WebTest):
 
     def test_trac_instance_shows_up(self):
         # Create the Twisted project object
