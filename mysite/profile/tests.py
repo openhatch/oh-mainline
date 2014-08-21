@@ -34,7 +34,6 @@ import mysite.profile.templatetags.profile_extras
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
-from django.utils.unittest import skipIf
 import pprint
 
 from django.utils import simplejson
@@ -43,7 +42,6 @@ import datetime
 import tasks
 import mock
 import os
-from twill import commands as tc
 import quopri
 
 from django.core import mail
@@ -56,16 +54,19 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-
-class StarlingTests(TwillTests):
-
-    def test_page(self):
-        url = 'http://openhatch.org/starlings'
-        place = make_twill_url(url)
-        tc.go(place)
+from django.utils.unittest import skipIf
+from django_webtest import WebTest
+from django.test.client import Client
 
 
-class ProfileTests(TwillTests):
+class BasicHelpers(WebTest):
+    def login_with_client(self, username='paulproteus', password="paulproteus's unbreakable password"):
+        client = Client()
+        success = client.login(username=username, password=password)
+        self.assertTrue(success)
+        return client
+
+class ProfileTests(WebTest):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'cchost-data-imported-from-ohloh']
@@ -121,7 +122,7 @@ class ProfileTests(TwillTests):
                          'Asheesh Laroia (paulproteus)')
 
 
-class DebTagsTests(TwillTests):
+class DebTagsTests(WebTest):
     # {{{
 
     def testAddOneDebtag(self):
@@ -136,13 +137,8 @@ class DebTagsTests(TwillTests):
                          set(['works-with::mail', 'protocol::smtp']))
     # }}}
 
-# class ExpTag(TwillTests):
 
-# If you're looking for SourceForge and FLOSSMole stuff, look in the
-# repository history.
-
-
-class Info(TwillTests):
+class Info(WebTest):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus', 'cchost-data-imported-from-ohloh']
@@ -167,43 +163,28 @@ class Info(TwillTests):
     def update_tags(self, tag_dict):
         # {{{
         url = reverse(mysite.profile.views.edit_info)
-        tc.go(make_twill_url(url))
+        edit_info_page = self.app.get(url)
+        edit_info_form = edit_info_page.form
+        all_tag_types = ""
         for tag_type_name in tag_dict:
-            tc.fv('edit-tags', 'edit-tags-' + tag_type_name,
-                  ", ".join(tag_dict[tag_type_name]))
-        tc.submit()
+           all_tag_types = all_tag_types + "," + tag_dict[tag_type_name]
+        edit_info_form['edit-tags'] = all_tag_types
 
         # Check that at least the first tag made it into the database.
         self.assert_(list(Link_Person_Tag.objects.filter(
             tag__text=tag_dict.values()[0][0], person__user__username='paulproteus')))
 
-        # Check that the output is correct.
-        soup = BeautifulSoup.BeautifulSoup(tc.show())
+        # Check that the output is correct. TODO
+        edit_info_page = self.app.get(url)
+        soup = BeautifulSoup.BeautifulSoup(edit_info_page.content)
         for tag_type_name in tag_dict:
             text = ''.join(soup(id='tags-%s' % tag_type_name)
                            [0].findAll(text=True))
             self.assert_(
                 ', '.join(tag_dict[tag_type_name]) in ' '.join(text.split()))
 
-        # Go back to the form and make sure some of these are there
-        tc.go(make_twill_url(url))
-        tc.find(tag_dict.values()[0][0])
         # }}}
 
-    def test_tag_edit_once(self):
-        # {{{
-        self.login_with_twill()
-        self.update_tags(self.tags)
-        # }}}
-
-    def test_tag_edit_twice(self):
-        # {{{
-        self.login_with_twill()
-        self.update_tags(self.tags)
-        self.update_tags(self.tags_2)
-        # }}}
-
-    # }}}
 
 # Create a mock Ohloh get_contribution_info_by_username
 mock_gcibu = mock.Mock()
@@ -255,7 +236,7 @@ stumps_project_lookup.return_value = {
     u'name': u'WinKexec', u'homepage_url': u'https://www.jstump.com/projects/kexec/'}
 
 
-class UserListTests(TwillTests):
+class UserListTests(WebTest):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'user-barry', 'person-barry']
@@ -276,7 +257,7 @@ class UserListTests(TwillTests):
     # }}}
 
 
-class Portfolio(TwillTests):
+class Portfolio(WebTest):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
@@ -415,7 +396,7 @@ class Portfolio(TwillTests):
     # }}}
 
 
-class ImporterPublishCitation(TwillTests):
+class ImporterPublishCitation(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -475,7 +456,7 @@ class ImporterPublishCitation(TwillTests):
         self.assertEqual(response.content, "0")
 
 
-class ImporterDeleteCitation(TwillTests):
+class ImporterDeleteCitation(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -548,7 +529,7 @@ mock_launchpad_debian_response.return_value = {
 }
 
 
-class PersonInfoLinksToSearch(TwillTests):
+class PersonInfoLinksToSearch(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_whatever(self):
@@ -585,7 +566,7 @@ class PersonInfoLinksToSearch(TwillTests):
         # XXX see fixme remark in top of method
 
 
-class Widget(TwillTests):
+class Widget(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_widget_display(self):
@@ -601,7 +582,7 @@ class Widget(TwillTests):
         client.get(widget_js_url)
 
 
-class PersonalData(TwillTests):
+class PersonalData(WebTest):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
@@ -636,7 +617,7 @@ class PersonalData(TwillTests):
             client.logout()
 
 
-class DeletePortfolioEntry(TwillTests):
+class DeletePortfolioEntry(BasicHelpers):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -705,16 +686,15 @@ class DeletePortfolioEntry(TwillTests):
 
         self.assertFalse(portfolio_entry_not_mine.is_deleted)
         view = mysite.profile.views.delete_portfolio_entry_do
-        response = self.login_with_client_as_barry().post(reverse(view))
+        response = self.login_with_client().post(reverse(view))
 
-        self.assertEqual(simplejson.loads(response.content),
-                         {'success': False})
+        self.assertEqual(simplejson.loads(response.content), {'success': False})
 
         # Still there betch.
         self.assertFalse(portfolio_entry_not_mine.is_deleted)
 
 
-class AddCitationManually(TwillTests):
+class AddCitationManually(BasicHelpers):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -771,12 +751,12 @@ class AddCitationManually(TwillTests):
             len(simplejson.loads(response.content)['error_msgs']) == 1)
 
 
-class SavePortfolioEntry(TwillTests):
+class SavePortfolioEntry(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
     def setUp(self):
-        TwillTests.setUp(self)
+        WebTest.setUp(self)
         self.user = "paulproteus"
         self.project = Project.objects.get_or_create(name='project name')[0]
 
@@ -859,7 +839,7 @@ class SavePortfolioEntry(TwillTests):
             self.contribution_page, "<br />".join(self.project_description))
 
 
-class GimmeJsonTellsAboutImport(TwillTests):
+class GimmeJsonTellsAboutImport(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -932,7 +912,7 @@ class GimmeJsonTellsAboutImport(TwillTests):
                          "After all DIAs are completed, expected that the JSON reports that no import is running.")
 
 
-class PortfolioEntryAdd(TwillTests):
+class PortfolioEntryAdd(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_portfolio_entry_add(self):
@@ -988,7 +968,7 @@ class PortfolioEntryAdd(TwillTests):
                          expected_response_obj)
 
 
-class OtherContributors(TwillTests):
+class OtherContributors(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -1011,7 +991,7 @@ class OtherContributors(TwillTests):
         )
 
 
-class IgnoreNewDuplicateCitations(TwillTests):
+class IgnoreNewDuplicateCitations(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_old_citations_supersede_their_new_duplicates(self):
@@ -1073,7 +1053,7 @@ class IgnoreNewDuplicateCitations(TwillTests):
             [citation, citation_of_different_project])
 
 
-class PersonGetTagsForRecommendations(TwillTests):
+class PersonGetTagsForRecommendations(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_get_tags(self):
@@ -1098,7 +1078,7 @@ class PersonGetTagsForRecommendations(TwillTests):
         self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
 
-class MapTagsRemoveDuplicates(TwillTests):
+class MapTagsRemoveDuplicates(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1130,7 +1110,7 @@ class MapTagsRemoveDuplicates(TwillTests):
                          map(lambda x: x.lower(), ['something I understand']))
 
 
-class ProjectGetMentors(TwillTests):
+class ProjectGetMentors(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -1151,7 +1131,7 @@ class ProjectGetMentors(TwillTests):
         link.save()
 
 
-class SuggestLocation(TwillTests):
+class SuggestLocation(WebTest):
     fixtures = ['user-paulproteus', 'user-barry',
                 'person-barry', 'person-paulproteus']
 
@@ -1184,7 +1164,8 @@ class SuggestLocation(TwillTests):
         self.assertEqual(data['geoip_guess'], correct_decoding)
 
 
-class EditBio(TwillTests):
+class EditBio(BasicHelpers):
+    #TODO(susan)
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1195,26 +1176,26 @@ class EditBio(TwillTests):
         * enters a string as bio
         * checks that his bio now contains string
         '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        # not so vain.. yet
-        tc.notfind('lookatme!')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        # make sure our bio is not already on the form
-        tc.notfind('lookatme!')
-        # set the bio in ze form
-        tc.fv("edit-tags", 'edit-tags-bio', 'lookatme!')
-        tc.submit()
-        # find the string we just submitted as our bio
-        tc.find('lookatme!')
-        self.assertEqual(Person.get_by_username('paulproteus')
-                         .bio, "lookatme!")
+        self.login_with_client()
+        username = 'paulproteus'
+        paulproteus_page = self.app.get('/people/paulproteus/', user=username)
+        self.assertNotIn('lookatme!', paulproteus_page.content)
+
+        edit_info_page = self.app.get('/profile/views/edit_info/',  user=username)
+        self.assertNotIn('lookatme!', edit_info_page.content)
+        edit_info_form = edit_info_page.form
+        edit_info_form['edit-tags-bio'] = 'lookatme!'
+        response = edit_info_form.submit()
+        # Find the string we just submitted as our bio
+        self.assertIn('lookatme!', response.content)
+        self.assertEqual(Person.get_by_username('paulproteus').bio, "lookatme!")
+        
         # now we should see our bio in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('lookatme!')
+        edit_info_page = self.app.get('/profile/views/edit_info')
+        self.assertIn('lookatme!', edit_info_page.content)
 
 
-class EditHomepage(TwillTests):
+class EditHomepage(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1253,7 +1234,7 @@ class EditHomepage(TwillTests):
         tc.notfind('htttp')
 
 
-class EditIrcNick(TwillTests):
+class EditIrcNick(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1282,7 +1263,7 @@ class EditIrcNick(TwillTests):
         tc.find('paulproteusnick')
 
 
-class EditContactBlurbForwarderification(TwillTests):
+class EditContactBlurbForwarderification(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1319,7 +1300,7 @@ class EditContactBlurbForwarderification(TwillTests):
         self.assertEqual(mystr_forwarderified, output)
 
 
-class EditContactBlurb(TwillTests):
+class EditContactBlurb(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1398,7 +1379,7 @@ class EditContactBlurb(TwillTests):
         tc.notfind('<a[^>]*>[^<]*irc[^<]*<\/a>')
 
 
-class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
+class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(WebTest):
 
     def test_one_valid_project(self):
         # make a project called Banana
@@ -1427,7 +1408,7 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
                          [])
 
 
-class PeopleFinderClasses(TwillTests):
+class PeopleFinderClasses(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self, *args, **kwargs):
@@ -1465,7 +1446,7 @@ class PeopleFinderClasses(TwillTests):
         self.assertEqual(self.person, pq.people[0])
 
 
-class PeopleFinderTagQueryTests(TwillTests):
+class PeopleFinderTagQueryTests(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'user-barry', 'person-barry']
 
@@ -1568,7 +1549,7 @@ class PeopleFinderTagQueryTests(TwillTests):
         self.assertEqual(atq_filter_asheesh, person_first_name_asheesh)
 
 
-class PeopleSearch(TwillTests):
+class PeopleSearch(WebTest):
 
     def test_project_queries_are_distinct_from_tag_queries(self):
         # input "project:Exaile" into the search controller, ensure that it outputs
@@ -1608,7 +1589,7 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['query_type'], 'all_tags')
 
 
-class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
+class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(WebTest):
 
     def setUp(self):
         self.original_value = django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH
@@ -1624,7 +1605,7 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(TwillTests):
         django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH = self.original_value
 
 
-class PostmapBinaryCalledIfExists(TwillTests):
+class PostmapBinaryCalledIfExists(WebTest):
 
     @mock.patch('os.system')
     def test(self, mock_update_table):
@@ -1635,7 +1616,7 @@ class PostmapBinaryCalledIfExists(TwillTests):
             self.assertTrue(os.system.called)
 
 
-class PostmapBinaryNotCalledIfDoesNotExist(TwillTests):
+class PostmapBinaryNotCalledIfDoesNotExist(WebTest):
 
     @mock.patch('os.system')
     def test(self, mock_update_table):
@@ -1646,7 +1627,7 @@ class PostmapBinaryNotCalledIfDoesNotExist(TwillTests):
             self.assertFalse(os.system.called)
 
 
-class PostFixGeneratorList(TwillTests):
+class PostFixGeneratorList(WebTest):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus']
 
@@ -1673,7 +1654,7 @@ class PostFixGeneratorList(TwillTests):
         self.assertEqual(what_we_get, what_we_want)
 
 
-class EmailForwarderGarbageCollection(TwillTests):
+class EmailForwarderGarbageCollection(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # create a bunch of forwarders
         # all possibilitied given the options: "expired," "should no longer be displayed"
@@ -1738,7 +1719,7 @@ class EmailForwarderGarbageCollection(TwillTests):
         self.assertEqual(1, forwarders.count())
 
 
-class EmailForwarderResolver(TwillTests):
+class EmailForwarderResolver(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     '''
     * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
@@ -1790,7 +1771,7 @@ class EmailForwarderResolver(TwillTests):
         test_possible_forwarder_address("oranges", True, False, False)
 
 
-class ForwarderGetsCreated(TwillTests):
+class ForwarderGetsCreated(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1812,7 +1793,7 @@ class ForwarderGetsCreated(TwillTests):
         self.assertContains(response, new_fwd.address)
 
 
-class PersonCanSetHisExpandNextStepsOption(TwillTests):
+class PersonCanSetHisExpandNextStepsOption(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_set_to_true(self):
@@ -1843,7 +1824,7 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
         self.assertFalse(p.expand_next_steps)
 
 
-class PeopleMapForNonexistentProject(TwillTests):
+class PeopleMapForNonexistentProject(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1861,7 +1842,7 @@ class PeopleMapForNonexistentProject(TwillTests):
         # Yay, no exception.
 
 
-class SaveReordering(TwillTests):
+class SaveReordering(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1899,7 +1880,7 @@ class SaveReordering(TwillTests):
         self.assertEqual(ordering_afterwards, [pfes[1].pk, pfes[0].pk])
 
 
-class ArchiveProjects(TwillTests):
+class ArchiveProjects(BasicHelpers):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1924,7 +1905,7 @@ class ArchiveProjects(TwillTests):
         self.assert_(this_should_be_archived.is_archived)
 
 
-class Notifications(TwillTests):
+class Notifications(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     @staticmethod
@@ -2389,7 +2370,7 @@ class Notifications(TwillTests):
         )
 
 
-class PeopleMapSummariesAreCheap(TwillTests):
+class PeopleMapSummariesAreCheap(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self, *args, **kwargs):
@@ -2477,7 +2458,7 @@ class PeopleMapSummariesAreCheap(TwillTests):
         self.paulproteus.get_list_of_all_published_projects()
 
 
-class PeopleLocationData(TwillTests):
+class PeopleLocationData(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'user-barry', 'person-barry']
 
@@ -2512,7 +2493,7 @@ class PeopleLocationData(TwillTests):
             self.assertEqual(1, len(openhatchy_queries))
 
 
-class ProfileApiTest(TwillTests):
+class ProfileApiTest(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
@@ -2552,7 +2533,7 @@ class ProfileApiTest(TwillTests):
         self.assertEqual(0, parsed['meta']['total_count'])
 
 
-class TestUserDeletion(TwillTests):
+class TestUserDeletion(WebTest):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus']
 
@@ -2582,7 +2563,7 @@ class TestUserDeletion(TwillTests):
             username='barry'))
         self.assertEqual(2, len(django.core.mail.outbox))
 
-class TestBreakLongWordsFilter(TwillTests):
+class TestBreakLongWordsFilter(WebTest):
     def test_too_shirt_to_break(self):
         eight_chars = 'abcdefgh'
         output = mysite.profile.templatetags.profile_extras.break_long_words(
