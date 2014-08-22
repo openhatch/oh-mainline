@@ -212,10 +212,7 @@ OHLOH_API_KEY = 'JeXHeaQhjXewhdktn4nUw'  # This key is called "Oman testing"
                                         # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
 # OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
-)
+
 
 # Invite codes last seven days
 ACCOUNT_INVITATION_DAYS = 7
@@ -340,6 +337,11 @@ LOGGING = {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'mysite': {
+            'handlers':['null'],  # Quiet for now - revisit later
+            'propagate': True,
+            'level': 'DEBUG'
         },
     }
 }
