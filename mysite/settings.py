@@ -261,7 +261,10 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=10)
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
 # at worst, we run a postfixifying celery job once every two days for each user
 
-POSTFIX_FORWARDER_TABLE_PATH = None  # Disabled by default
+# Note: POSTFIX_FORWARDER_TABLE_PATH is disabled by default in settings.py
+#       while it is enabled in the deployment_settings.py
+#       See documentation in advanced_installation.rst for more details
+POSTFIX_FORWARDER_TABLE_PATH = None
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
