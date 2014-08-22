@@ -341,7 +341,7 @@ LOGGING = {
         'mysite': {
             'handlers':['null'],  # Quiet for now - revisit later
             'propagate': True,
-            'level': 'DEBUG'
+            'level': 'CRITICAL'      # Determine level - revisit later
         },
     }
 }

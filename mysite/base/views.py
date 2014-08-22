@@ -35,8 +35,11 @@ import mysite.missions.models
 
 import random
 import datetime
+import logging
 
 from django.contrib.auth.decorators import login_required
+
+logger = logging.getLogger(__name__)
 
 
 def front_page_data():
@@ -220,13 +223,13 @@ def meta_exit_code(data=None):
 
     # Exit codes and stdout for Nagios integration
     if bug2:
-        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug)
+        logger.error("{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug))
         return 2
     elif bug1:
-        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug)
+        logger.warning("{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug))
         return 1
     else:
-        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("OK", bug1, bug2, perbug)
+        logger.info("{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("OK", bug1, bug2, perbug))
         return 0
 
 
