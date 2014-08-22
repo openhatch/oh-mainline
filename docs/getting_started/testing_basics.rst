@@ -39,6 +39,7 @@ Additional testing information
 ##############################
 
 The Internals section of this documentation contains more detailed information
-about the test suite, testing, and `continuous integration`_.
+about the test suite, `advanced testing`_, and `continuous integration`_.
 
+.. _advanced testing: ../advanced/advanced_testing.html
 .. _continuous integration: ../internals/continuous_integration.html
