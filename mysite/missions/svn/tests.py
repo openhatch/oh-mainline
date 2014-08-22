@@ -98,7 +98,7 @@ class SvnViewTests(TwillTests):
                 ['svn', 'checkout', response.context['checkout_url'], checkoutdir])
             word = open(
                 os.path.join(checkoutdir, response.context['secret_word_file'])).read().strip()
-            response = self.client.post(
+            self.client.post(
                 reverse(views.checkout_submit), {'secret_word': word})
             paulproteus = Person.objects.get(user__username='paulproteus')
             self.assert_(
