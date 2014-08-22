@@ -28,6 +28,7 @@ from mysite.search.models import Project, Bug, \
     ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import datetime
+import logging
 import mysite.project.views
 
 from django.utils.unittest import skipIf
@@ -44,6 +45,8 @@ from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 
+
+logger = logging.getLogger(__name__)
 
 class SearchTest(TwillTests):
 
@@ -951,7 +954,7 @@ class QueryGrabHitCount(SearchTest):
         hit_count_cache_key = query.get_hit_count_cache_key()
         # Get the cache value.
         stored_hit_count = django.core.cache.cache.get(hit_count_cache_key)
-        print "Stored: %s" % stored_hit_count
+        logger.debug("Stored: %s" % stored_hit_count)
         # Test that it was stored correctly.
         self.assertEqual(stored_hit_count, expected_hit_count)
 
