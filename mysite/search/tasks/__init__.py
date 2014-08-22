@@ -23,6 +23,7 @@ from celery.task import Task, task
 
 import mysite.base.view_helpers
 
+logger = logging.getLogger(__name__)
 
 class PopulateProjectIconFromOhloh(Task):
 
@@ -73,5 +74,5 @@ class PopulateProjectLanguageFromOhloh(Task):
 
 @task
 def clear_search_cache():
-    logging.info("Clearing the search cache.")
+    logger.info("Clearing the search cache.")
     mysite.base.view_helpers.clear_static_cache('search')

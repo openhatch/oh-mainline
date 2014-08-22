@@ -25,6 +25,8 @@ django.conf.settings.CELERY_ALWAYS_EAGER = True
 
 import mysite.customs.mechanize_helpers
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     args = '<ohloh>'
@@ -43,7 +45,7 @@ class Command(BaseCommand):
                         pass
                     else:
                         # aww shucks, I guess we have to remove it.
-                        logging.warning("We had to remove the url %s from the citation whose PK is %d" % (
+                        logger.warning("We had to remove the url %s from the citation whose PK is %d" % (
                             citation.url, citation.pk))
                         citation.url = None
                         citation.save()
@@ -83,6 +85,6 @@ class Command(BaseCommand):
                     try:
                         function()
                     except Exception:
-                        logging.exception("During %s, the particular importer failed. "
+                        logger.exception("During %s, the particular importer failed. "
                                           "Skipping it.", key)
                 do_it()

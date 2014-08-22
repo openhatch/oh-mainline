@@ -25,6 +25,8 @@ import mysite.profile.models
 
 MAX_ERRORS = 5
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     help = ("For all people whose latitude and longitude are the default, "
@@ -34,9 +36,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.errors_so_far = 0
         self.successes_so_far = 0
-        logging.info("Begun attempting to migrate people's locations...")
+        logger.info("Begun attempting to migrate people's locations...")
         self.migrate_people()
-        logging.info("Succeeded at geocoding %d people", self.successes_so_far)
+        logger.info("Succeeded at geocoding %d people", self.successes_so_far)
 
     def migrate_people(self):
         for person in mysite.profile.models.Person.objects.all():
@@ -70,11 +72,11 @@ class Command(BaseCommand):
                 person.longitude = as_dict['longitude']
                 person.save()
             except KeyError:
-                logging.info("FYI, we hit a KeyError. Go figure.")
-                logging.info(
+                logger.info("FYI, we hit a KeyError. Go figure.")
+                logger.info(
                     "In case you're curious, the data was: %s", as_dict)
                 self.errors_so_far += 1
                 continue
 
-            logging.info("Success with %s", address)
+            logger.info("Success with %s", address)
             self.successes_so_far += 1

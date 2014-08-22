@@ -17,9 +17,11 @@
 
 import mysite.search.models
 import logging
+
 KEY = 'answer_ids_that_are_ours'
 PROJECTS_TO_HELP_OUT_KEY = 'projects_we_want_to_help_out'
 
+logger = logging.getLogger(__name__)
 
 def similar_project_names(project_name):
     # HOPE: One day, order this by relevance.
@@ -40,7 +42,7 @@ def get_unsaved_answers_from_session(session):
             ret.append(
                 mysite.search.models.Answer.all_even_unowned.get(id=answer_id))
         except mysite.search.models.Answer.DoesNotExist:
-            logging.warn("Whoa, the answer has gone away. Session and Answer IDs: " +
+            logger.warning("Whoa, the answer has gone away. Session and Answer IDs: " +
                          str(session) + str(answer_id))
     return ret
 
