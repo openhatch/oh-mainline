@@ -1165,9 +1165,11 @@ class SuggestLocation(TwillTests):
 
     @skipIf(not mysite.profile.view_helpers.geoip_city_database_available(), "Skipping because high-resolution GeoIP data not available.")
     def test_iceland(self):
-        """We wrote this test because MaxMind gives us back a city in Iceland. That city
+        """
+        We wrote this test because MaxMind gives us back a city in Iceland. That city
         has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
-        so we verify here that we properly decode that to pure beautiful Python Unicode."""
+        so we verify here that we properly decode that to pure beautiful Python Unicode.
+        """
         data = {}
         data['geoip_has_suggestion'], data[
             'geoip_guess'] = mysite.profile.view_helpers.get_geoip_guess_for_ip("89.160.147.41")
