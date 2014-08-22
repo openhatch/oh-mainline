@@ -34,7 +34,8 @@ from mysite.profile.models import Person
 class MissionCompletionTestCase(django.test.TestCase):
     fixtures = ['user-paulproteus.json', 'person-paulproteus.json']
 
-    def test_unset_mission_completed_sets_is_currently_completed_to_false(self):
+    def test_unset_mission_completed_sets_is_currently_completed_to_false(
+            self):
         """When user unsets step completion
         'StepCompletion' object 'is_currently_completed' param becomes true"""
         profile = Person.objects.all()[0]
