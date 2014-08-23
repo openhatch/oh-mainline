@@ -340,7 +340,7 @@ class BasicBugsetCreateViewTests(TwillTests):
         self.assertContains(response, 'This field is required.')
 
     def test_create_view_add_existing_bug(self):
-        mysite.bugsets.models.AnnotatedBug.objects.create(url=ADDED_BUG)
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(url=ADDED_BUG)
 
         f = mysite.bugsets.forms.BugsForm({
             'event_name': EVENT_NAME,
@@ -350,6 +350,29 @@ class BasicBugsetCreateViewTests(TwillTests):
         self.assertTrue(f.is_valid())
         f.save()
 
+        self.assertTrue(f.object.bugs.get(pk=b.pk))
+
+    def test_edit_view_add_existing_bug(self):
+        f = mysite.bugsets.forms.BugsForm({
+            'event_name': EVENT_NAME,
+            'buglist': REMOVED_BUG,
+        })
+
+        self.assertTrue(f.is_valid())
+        f.save()
+
+        b = mysite.bugsets.models.AnnotatedBug.objects.create(url=ADDED_BUG,
+            title='title')
+        g = mysite.bugsets.forms.BugsForm(data={
+                'event_name': EVENT_NAME,
+                'buglist': REMOVED_BUG + "\n" + ADDED_BUG,
+            },
+            pk=f.object.pk)
+
+        self.assertTrue(g.is_valid())
+        g.update()
+
+        self.assertEqual(g.object.bugs.get(pk=b.pk).title, 'title')
 
 class BasicBugsetCreateFormTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
