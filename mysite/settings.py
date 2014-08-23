@@ -212,10 +212,7 @@ OHLOH_API_KEY = 'JeXHeaQhjXewhdktn4nUw'  # This key is called "Oman testing"
                                         # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
 # OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
-)
+
 
 # Invite codes last seven days
 ACCOUNT_INVITATION_DAYS = 7
@@ -264,7 +261,10 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=10)
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
 # at worst, we run a postfixifying celery job once every two days for each user
 
-POSTFIX_FORWARDER_TABLE_PATH = None  # Disabled by default
+# Note: POSTFIX_FORWARDER_TABLE_PATH is disabled by default in settings.py
+#       while it is enabled in the deployment_settings.py
+#       See documentation in advanced_installation.rst for more details
+POSTFIX_FORWARDER_TABLE_PATH = None
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
@@ -340,6 +340,11 @@ LOGGING = {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'mysite': {
+            'handlers':['null'],  # Quiet for now - revisit later
+            'propagate': True,
+            'level': 'CRITICAL'      # Determine level - revisit later
         },
     }
 }

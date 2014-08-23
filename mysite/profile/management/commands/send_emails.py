@@ -30,6 +30,8 @@ import html2text
 from django.core.urlresolvers import reverse
 import mysite.profile.views
 
+logger = logging.getLogger(__name__)
+
 
 def push_to_end_of_list(an_object, a_list):
     try:
@@ -44,9 +46,11 @@ def push_to_end_of_list(an_object, a_list):
 
 
 class Command(BaseCommand):
-    help = "Send out periodic emails to users who've requested a running summary of OpenHatch activity in their projects."
+    help = ("Send out periodic emails to users who've requested a running "
+            "summary of OpenHatch activity in their projects.")
 
-    TIMESTAMP_KEY = "What's the endpoint of the time range of the last email we sent out?"
+    TIMESTAMP_KEY = ("What's the endpoint of the time range of the last "
+                     "email we sent out?")
 
     @staticmethod
     def get_time_range_endpoint_of_last_email():
@@ -55,12 +59,13 @@ class Command(BaseCommand):
     def __init__(self):
         # At initialization time, we store the timestamp that this run is with
         # regard to
-        self.this_run_covers_things_since = Command.get_time_range_endpoint_of_last_email(
-        )
+        self.this_run_covers_things_since = (
+            Command.get_time_range_endpoint_of_last_email())
 
         self.this_run_covers_things_up_until = datetime.datetime.utcnow()
 
-        # Now all calls to filter() should include both of those dates: greater than ...since,
+        # Now all calls to filter() should include both of those dates:
+        # greater than ...since,
         # and less than up_until.
 
     def handle(self, *args, **options):
@@ -69,10 +74,11 @@ class Command(BaseCommand):
 
         # If it's been less than 24 hours since our last big email,
         # stop here and don't send any emails.
-        if ((self.this_run_covers_things_up_until - self.this_run_covers_things_since) <
-                YESTERDAY):
-            logging.warn(
-                "Not sending emails; emails were last sent within the last 24 hours.")
+        if ((self.this_run_covers_things_up_until -
+                 self.this_run_covers_things_since) < YESTERDAY):
+            logger.warning(
+                "Not sending emails; emails were last sent within the last "
+                "24 hours.")
             return
 
         # If we made it this far in the function, it's been 24 hours or more
@@ -92,7 +98,7 @@ class Command(BaseCommand):
         for person in people_who_want_email:
 
             if not person.user.email:
-                logging.warn("Uh, the person has no email address: %s" %
+                logger.warning("Uh, the person has no email address: %s" %
                              person.user.username)
                 continue  # if the user has no email address, we skip the user.
 
@@ -100,7 +106,8 @@ class Command(BaseCommand):
                 person)
             if message_in_html:
                 count += 1
-                print "Emailing %s their project activity." % person.user.email
+                # TODO: fix the logging message
+                logger.info("Emailing %s their project activity." % person.user.email)
                 email = EmailMultiAlternatives(
                     subject="News about your OpenHatch projects",
                     body=message_in_plain_text,
@@ -111,7 +118,7 @@ class Command(BaseCommand):
                     to=[person.user.email])
                 email.attach_alternative(message_in_html, "text/html")
                 email.send()
-        print "Emailed", count
+        logger.info("Emailed", count)
 
     def get_projects_email_for(self, recipient):
         context = self.get_context_for_email_to(recipient)

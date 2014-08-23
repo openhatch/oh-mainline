@@ -19,7 +19,7 @@ ADMINS = [
      'monitoring-private@lists.openhatch.org',)
 ]
 
-INVITE_MODE = False  # Suckas, invite codes are disabled everywarez
+INVITE_MODE = False  # invite codes are disabled everywhere
 INVITATIONS_PER_USER = 20
 
 TEMPLATE_DEBUG = False
@@ -37,6 +37,9 @@ CACHES = {
     }
 }
 
+# Note: POSTFIX_FORWARDER_TABLE_PATH is enabled in the deployment_settings.py
+#       while it is disabled by default in settings.py
+#       See documentation in advanced_installation.rst for more details
 POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
 CELERY_ALWAYS_EAGER = False  # srsly

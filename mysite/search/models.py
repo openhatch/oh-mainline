@@ -40,6 +40,8 @@ import mysite.base.decorators
 import django.contrib.contenttypes.models
 from django.utils import http
 
+logger = logging.getLogger(__name__)
+
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -53,7 +55,7 @@ def get_image_data_scaled(image_data, width):
     # NOTE: We refuse to scale images if we do not
     # have the Python Imaging Library.
     if not mysite.base.depends.Image:
-        logging.info(
+        logger.info(
             "NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
         return image_data
 

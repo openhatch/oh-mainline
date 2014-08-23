@@ -15,18 +15,24 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.search.models
-import mysite.search.views
-import mysite.base.decorators
+
 import re
 import hashlib
+import logging
+
 import django.core.cache
 from django.db import connection
 from django.db.models import Q, Count
-import logging
 from django.utils import http
 
+import mysite.search.models
+import mysite.search.views
+import mysite.base.decorators
+
+
 CCT = 'hit_count_cache_timestamp'
+
+logger = logging.getLogger(__name__)
 
 
 def order_bugs(query):
@@ -39,10 +45,13 @@ def order_bugs(query):
 
 class Query:
 
-    def __init__(self, terms=None, active_facet_options=None, any_facet_options=False, terms_string=None):
+    def __init__(self, terms=None, active_facet_options=None,
+                 any_facet_options=False, terms_string=None):
         self.terms = terms or []
-        self.active_facet_options = (mysite.base.decorators.no_str_in_the_dict(active_facet_options)
-                                     or {})
+        self.active_facet_options = (
+            mysite.base.decorators.no_str_in_the_dict(active_facet_options)
+            or {}
+        )
         self.any_facet_options = any_facet_options or []
         if type(terms_string) == str:
             terms_string = unicode(terms_string, 'utf-8')
@@ -59,9 +68,8 @@ class Query:
         # We're given some query terms "between quotes"
         # and some glomped on with spaces.
         # Strategy: Find the strings validly inside quotes, and remove them
-        # from the original string. Then split the remainder (and probably trim
-        # whitespace from the remaining terms).
-        # {{{
+        # from the original string. Then split the remainder (and probably
+        # trim whitespace from the remaining terms).
         ret = []
         splitted = re.split(r'(".*?")', string)
 
@@ -74,7 +82,6 @@ class Query:
                 ret.append(word[1:-1])
 
         return ret
-        # }}}
 
     @staticmethod
     def create_from_GET_data(GET):
@@ -92,8 +99,10 @@ class Query:
         terms_string = GET.get('q', u'')
         terms = Query.split_into_terms(terms_string)
 
-        return Query(terms=terms, active_facet_options=active_facet_options,
-                     any_facet_options=any_facet_options, terms_string=terms_string)
+        return Query(terms=terms,
+                     active_facet_options=active_facet_options,
+                     any_facet_options=any_facet_options,
+                     terms_string=terms_string)
 
     def get_bugs_unordered(self):
         return mysite.search.models.Bug.open_ones.filter(self.get_Q())
@@ -277,7 +286,16 @@ class Query:
             u'language', self.get_language_names())
 
         # looks something like:
-        # [{'count': 1180L, 'query_string': 'q=&language=Python', 'is_active': False, 'name': u'Python'}, {'count': 478L, 'query_string': 'q=&language=C%23', 'is_active': False, 'name': u'C#'}, {'count': 184L, 'query_string': 'q=&language=Unknown', 'is_active': False, 'name': 'Unknown'}, {'count': 532L, 'query_string': 'q=&language=C', 'is_active': False, 'name': u'C'}, {'count': 2374L, 'query_string': 'q=&language=', 'is_active': True, 'name': 'any'}]
+        # [{'count': 1180L, 'query_string': 'q=&language=Python',
+        # 'is_active': False, 'name': u'Python'},
+        # {'count': 478L, 'query_string': 'q=&language=C%23',
+        # 'is_active': False, 'name': u'C#'},
+        # {'count': 184L, 'query_string': 'q=&language=Unknown',
+        # 'is_active': False, 'name': 'Unknown'},
+        # {'count': 532L, 'query_string': 'q=&language=C',
+        # 'is_active': False, 'name': u'C'},
+        # {'count': 2374L, 'query_string': 'q=&language=',
+        # 'is_active': True, 'name': 'any'}]
 
         possible_facets = (
             # The languages facet is based on the project languages, "for
@@ -406,11 +424,12 @@ class Query:
         hit_count_cache_key = self.get_hit_count_cache_key()
         # Fetch the hit count from the cache.
         hit_count = django.core.cache.cache.get(hit_count_cache_key)
-        logging.debug("Cached hit count: " + str(hit_count))
-        # We need to be careful to check if the count is None, rather than just if the
-        # count is a false value. That's because a value of zero is still a cached value;
-        # if we just use a boolean test, we would mistake the zero value for an empty
-        # cache and regenerate the cache needlessly.
+        logger.info("Cached hit count: " + str(hit_count))
+        # We need to be careful to check if the count is None, rather than
+        # just if the count is a false value. That's because a value of zero
+        # is still a cached value; if we just use a boolean test, we would
+        # mistake the zero value for an empty cache and regenerate the cache
+        # needlessly.
         if hit_count is None:
             # There is nothing in the cache for this key. Either the
             # query has not been counted before, or the Timestamp has
@@ -418,16 +437,16 @@ class Query:
             # a new count.
             hit_count = self.get_bugs_unordered().count()
             django.core.cache.cache.set(hit_count_cache_key, hit_count)
-            logging.info("Set hit count: " + str(hit_count))
-        # TODO: Add sql query in the logging
-        logging.info("Hit Count:" + str(hit_count))
+            logger.info("Set hit count: " + str(hit_count))
+        # TODO: Add sql query in the logger
+        logger.info("Hit Count:" + str(hit_count))
 
         return hit_count
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
         query_string = http.urlencode(GET_data)
-        logging.info("Query is " + query_string)
+        logger.info("Query is " + query_string)
         return query_string
 
 

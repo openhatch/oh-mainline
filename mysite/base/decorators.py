@@ -33,6 +33,8 @@ from mysite.base.view_helpers import render_response
 from django.core.urlresolvers import reverse, resolve
 import django.contrib.auth.decorators
 
+logger = logging.getLogger(__name__)
+
 
 def as_view(request, template, data, slug, just_modify_data=False):
     # add settings to the request so that the template
@@ -144,10 +146,10 @@ def cache_function_that_takes_request(func, *args, **kwargs):
         hashlib.sha1(repr(key_data)).hexdigest()
     content = django.core.cache.cache.get(key_string, None)
     if content:
-        logging.info("Cache hot for %s", repr(key_data))
+        logger.info("Cache hot for %s", repr(key_data))
         response = HttpResponse(content)
     else:
-        logging.info("Cache cold for %s", repr(key_data))
+        logger.info("Cache cold for %s", repr(key_data))
         response = func(*args, **kwargs)
         content = response.content
         # uh, six minutes, sure
@@ -187,7 +189,7 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
         # Then cache the input/output mapping.
         django.core.cache.cache.set(cache_key, cached_json, 864000)
 
-        logging.debug('cached output of %s: %s' % (func.__name__, cached_json))
+        logger.debug('cached output of %s: %s' % (func.__name__, cached_json))
     else:
         # Sweet, no need to run the expensive method. Just use the cached
         # output.
