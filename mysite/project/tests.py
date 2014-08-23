@@ -346,9 +346,9 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
     def test(self):
         # Steps for this test
         # 1. User POSTs to the wannahelp POST handler, indicating the request
-        # came from offsite
+        #    came from offsite
         # 2. User is redirected to a login page that knows the request came
-        # from offsite
+        #    from offsite
         project_id = Project.create_dummy(name='Myproject').id
 
         # At the start, no one wants to help our project.

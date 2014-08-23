@@ -873,7 +873,7 @@ class GimmeJsonTellsAboutImport(TwillTests):
         return datetime.datetime.utcnow() - datetime.timedelta(minutes=n)
 
     def test_import_running_false(self):
-        "When there are no dias for past five minutes, import.running = False"
+        "When there are no DIAs for past five minutes, import.running = False"
         # Create a DIA for paulproteus that is from ten minutes ago (but
         # curiously is still in progress)
         my_dia_but_not_recent = DataImportAttempt(
@@ -1273,7 +1273,7 @@ class EditIrcNick(TwillTests):
         '''
         * Goes to paulproteus's profile
         * checks that they don't already have a ircnick that says
-        * "paulproteusnick"
+          "paulproteusnick"
         * clicks edit on the Info area
         * enters a string as irc nick
         * checks that his irc nick now contains string

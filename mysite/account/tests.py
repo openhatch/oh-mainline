@@ -213,7 +213,6 @@ class EditPassword(WebTest):
 
 
 class EditContactInfo(WebTest):
-
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_edit_email_address(self):
@@ -299,8 +298,8 @@ class EditPhoto(WebTest):
             response = self.login_with_client().get(
                 reverse(mysite.account.views.edit_photo))
             self.assertEqual(response.context[0]['photo_url'], p.photo.url,
-                             "Test that once you've uploaded a photo via the"
-                             " photo editor, the template's photo_url "
+                             "Test that once you've uploaded a photo via the "
+                             "photo editor, the template's photo_url "
                              "variable is correct.")
             self.assert_(p.photo_thumbnail)
             thumbnail_as_stored = mysite.base.depends.Image.open(
