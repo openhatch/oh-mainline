@@ -83,12 +83,12 @@ def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None):
     # Did Ohloh return an error?
     root = tree.getroot()
     if root.find('error') is not None:
-        raise ValueError, "Ohloh gave us back an error. Wonder why."
+        raise ValueError("Ohloh gave us back an error. Wonder why.")
 
     interestings = root.findall(selector)
     for interesting in interestings:
         this = {}
-        for child in interesting.getchildren():
+        for child in interesting:
             if child.text:
                 this[unicode(child.tag)] = uni_text(child.text)
         ret.append(this)

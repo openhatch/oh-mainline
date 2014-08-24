@@ -74,7 +74,8 @@ class MissionPageStateTests(TwillTests):
             reverse(views.reset), {'mission_parts': 'tar'})
         self.assert_('Operation successful' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(
-            step__name='tar', person=paulproteus, is_currently_completed=True)), 0)
+            step__name='tar', person=paulproteus,
+            is_currently_completed=True)), 0)
 
     def test_mission_completion_partial_reset(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -87,23 +88,27 @@ class MissionPageStateTests(TwillTests):
             reverse(views.reset), {'mission_parts': 'tar,tar_extract'})
         self.assert_('Operation successful' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(
-            step__name='tar', person=paulproteus, is_currently_completed=True)), 0)
+            step__name='tar', person=paulproteus,
+            is_currently_completed=True)), 0)
         self.assertEqual(len(StepCompletion.objects.filter(
-            step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 0)
+            step__name='tar_extract', person=paulproteus,
+            is_currently_completed=True)), 0)
 
     def get_extracted_tarball(self):
         """
-        Get and extract a tar_extract misssion tarball.
+        Get and extract a tar_extract mission tarball.
         """
         download_response = self.client.get(
             reverse(views.download_tarball_for_extract_mission))
         tfile = tarfile.open(
             fileobj=StringIO(download_response.content), mode='r:gz')
-        return tfile.extractfile(tfile.getmember(view_helpers.UntarMission.FILE_WE_WANT))
+        return tfile.extractfile(tfile.getmember(
+            view_helpers.UntarMission.FILE_WE_WANT))
 
     def test_extract_mission_reset_redo(self):
         """
-        Once the tar_extract mission has been reset, it can be completed again.
+        Once the tar_extract mission has been reset, it can be completed
+        again.
         """
         paulproteus = Person.objects.get(user__username='paulproteus')
 
@@ -133,7 +138,8 @@ class MissionPageStateTests(TwillTests):
 
     def test_upload_mission_reset_redo(self):
         """
-        Once the tar (upload) mission has been reset, it can be completed again.
+        Once the tar (upload) mission has been reset, it can be completed
+        again.
         """
         paulproteus = Person.objects.get(user__username='paulproteus')
 

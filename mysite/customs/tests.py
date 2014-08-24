@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-# vim: set ai et ts=4 sw=4:
 
 # This file is part of OpenHatch.
 # Copyright (C) 2010, 2011 Jack Grigg
@@ -24,7 +23,6 @@ from __future__ import absolute_import
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Imports {{{
 from mysite.search.models import Bug, Project
 from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
@@ -61,13 +59,14 @@ import mysite.customs.management.commands.snapshot_public_data
 
 logger = logging.getLogger(__name__)
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class OhlohIconTests(django.test.TestCase):
-
     '''Test that we can grab icons from Ohloh.'''
-    # {{{
-
-    @skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+    @skipIf(not mysite.base.depends.Image, (
+            "Skipping photo-related tests because PIL is missing. Look in "
+            "ADVANCED_INSTALLATION.mkd for information."))
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
@@ -111,10 +110,10 @@ class OhlohIconTests(django.test.TestCase):
 
         self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
-    # }}}
 
-
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class BlogCrawl(django.test.TestCase):
 
     def test_summary2html(self):
@@ -130,19 +129,19 @@ class BlogCrawl(django.test.TestCase):
                     'summary': 'Yo &eacute;'
                 }]}
         entries = mysite.customs.feed._blog_entries()
-        self.assertEqual(entries[0]['title'],
-                         u'Yo \xe9')
-        self.assertEqual(entries[0]['unicode_text'],
-                         u'Yo \xe9')
+        self.assertEqual(entries[0]['title'], u'Yo \xe9')
+        self.assertEqual(entries[0]['unicode_text'], u'Yo \xe9')
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class DataExport(django.test.TestCase):
 
     def test_snapshot_user_table_without_passwords(self):
-        # We'll pretend we're running the snapshot_public_data management command. But
-        # to avoid JSON data being splatted all over stdout, we create a fake_stdout to
-        # capture that data.
+        # We'll pretend we're running the snapshot_public_data management
+        # command. But to avoid JSON data being splatted all over stdout, we
+        # create a fake_stdout to capture that data.
         fake_stdout = StringIO()
 
         # Now, set up the test:
@@ -152,8 +151,8 @@ class DataExport(django.test.TestCase):
         u.save()
 
         # snapshot the public version of that user's data into fake stdout
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # Now, delete the user and see if we can reimport bob
@@ -164,7 +163,8 @@ class DataExport(django.test.TestCase):
         # This code re-imports from the snapshot.
         # for more in serializers.deserialize(), read
         # http://docs.djangoproject.com/en/dev/topics/serialization
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # Now the tests:
@@ -174,9 +174,9 @@ class DataExport(django.test.TestCase):
         self.assertEquals(new_u.password, '')
 
     def test_snapshot_user_table_without_all_email_addresses(self):
-        # We'll pretend we're running the snapshot_public_data management command. But
-        # to avoid JSON data being splatted all over stdout, we create a fake_stdout to
-        # capture that data.
+        # We'll pretend we're running the snapshot_public_data management
+        # command. But to avoid JSON data being splatted all over stdout, we
+        # create a fake_stdout to capture that data.
         fake_stdout = StringIO()
 
         # Now, set up the test:
@@ -190,8 +190,8 @@ class DataExport(django.test.TestCase):
         Person.create_dummy(user=u2, show_email=True)
 
         # snapshot the public version of the data into fake stdout
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # Now, delete the them all and see if they come back
@@ -201,15 +201,17 @@ class DataExport(django.test.TestCase):
         # This code re-imports from the snapshot.
         # for more in serializers.deserialize(), read
         # http://docs.djangoproject.com/en/dev/topics/serialization
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # Now the tests:
         # Django user objects really should have an email address
         # so, if we hid it, we make one up based on the user ID
         new_p1 = Person.objects.get(user__username='privateguy')
-        self.assertEquals(new_p1.user.email,
-                          'user_id_%d_has_hidden_email_address@example.com' % new_p1.user.id)
+        self.assertEquals(
+            new_p1.user.email,
+            'user_id_%d_has_hidden_email_address@example.com' % new_p1.user.id)
 
         new_p2 = Person.objects.get(user__username='publicguy')
         self.assertEquals(new_p2.user.email, 'public@example.com')
@@ -223,15 +225,16 @@ class DataExport(django.test.TestCase):
         b.save()
 
         # snapshot fake bug into fake stdout
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # now, delete bug...
         b.delete()
 
         # let's see if we can re-import fire-ant!
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # testing to see if there are ANY bugs
@@ -254,15 +257,16 @@ class DataExport(django.test.TestCase):
         t.save()
 
         # snapshot fake timestamp into fake stdout
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # now, delete the timestamp...
         t.delete()
 
         # let's see if we can re-import the timestamp
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # testing to see if there are ANY
@@ -279,15 +283,16 @@ class DataExport(django.test.TestCase):
         proj = Project.create_dummy_no_icon(
             name="karens-awesome-project", language="Python")
 
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # now delete fake Project...
         proj.delete()
 
         # let's see if we can reincarnate it!
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # test: are there ANY projects?
@@ -303,24 +308,24 @@ class DataExport(django.test.TestCase):
         Person.objects.get(user__username='x').delete()
 
         # do a snapshot...
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # delete the User
         django.contrib.auth.models.User.objects.all().delete()
 
         # let's see if we can reincarnate it!
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
-        django.contrib.auth.models.User.objects.get(
-            username='x')
+        django.contrib.auth.models.User.objects.get(username='x')
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
     def test_snapshot_project_with_icon(self, fake_icon):
-        fake_icon_data = open(os.path.join(
-            settings.MEDIA_ROOT, 'no-project-icon.png')).read()
+        fake_icon_data = open(
+            os.path.join(settings.MEDIA_ROOT, 'no-project-icon.png')).read()
         fake_icon.return_value = fake_icon_data
 
         fake_stdout = StringIO()
@@ -330,14 +335,16 @@ class DataExport(django.test.TestCase):
         proj.populate_icon_from_ohloh()
         proj.save()
 
-        command = mysite.customs.management.commands.snapshot_public_data.Command()
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # now delete fake Project...
         proj.delete()
 
         # let's see if we can reincarnate it!
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # test: are there ANY projects?
@@ -360,7 +367,7 @@ class DataExport(django.test.TestCase):
         self.assertEquals(
             zuckerberg.get_public_location_or_default(), 'Palo Alto')
 
-        # ...and make a fake Person who REALLY cares about his location being private
+        # make a fake Person who REALLY cares about location being private
         munroe = Person.create_dummy(first_name="randall",
                                      location_confirmed=False,
                                      location_display_name='Cambridge',
@@ -392,8 +399,8 @@ class DataExport(django.test.TestCase):
             person=munroe, tag=tag_something_interesting)
         link_munroe.save()
 
-        command = mysite.customs.management.commands.snapshot_public_data.Command(
-        )
+        command = (
+            mysite.customs.management.commands.snapshot_public_data.Command())
         command.handle(output=fake_stdout)
 
         # now, delete fake people
@@ -413,7 +420,8 @@ class DataExport(django.test.TestCase):
         mysite.profile.models.TagType.objects.all().delete()
         mysite.profile.models.Link_Person_Tag.objects.all().delete()
         # go go reincarnation gadget
-        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json',
+                                                       fake_stdout.getvalue()):
             obj.save()
 
         # did we snapshot/save ANY Persons?
@@ -453,10 +461,12 @@ class DataExport(django.test.TestCase):
             new_munroe.get_public_location_or_default(), 'Inaccessible Island')
 
         # get tags linked to our two dummy users...
-        new_link_zuckerberg = mysite.profile.models.Link_Person_Tag.objects.get(
-            id=new_zuckerberg.user_id)
-        new_link_munroe = mysite.profile.models.Link_Person_Tag.objects.get(
-            id=new_munroe.user_id)
+        new_link_zuckerberg = (
+            mysite.profile.models.Link_Person_Tag.objects.get(
+                id=new_zuckerberg.user_id))
+        new_link_munroe = (
+            mysite.profile.models.Link_Person_Tag.objects.get(
+                id=new_munroe.user_id))
 
         new_tag_facebook_development = mysite.profile.models.Tag.objects.get(
             link_person_tag__person=new_zuckerberg)
@@ -492,13 +502,15 @@ class DataExport(django.test.TestCase):
             settings.MEDIA_ROOT, 'sample-data', 'snapshots', snapshot_file_name
         )
         with open(snapshot_file_path) as snapshot_file:
-            for obj in django.core.serializers.deserialize('json', snapshot_file, using='default'):
+            for obj in django.core.serializers.deserialize('json',
+                                                           snapshot_file,
+                                                           using='default'):
                 obj.save()
 
-# vim: set nu:
 
-
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class BugTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -514,11 +526,15 @@ class BugTrackerEditingViews(WebTest):
             bitesized_text='easy',
             documentation_type='keywords',
             documentation_text='documentation')
-        for url in [
-            'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
-                'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
-            mysite.customs.models.TracQueryModel.objects.create(url=url,
-                                                                tracker=self.tm)
+        for url in (
+                ['http://twistedmatrix.com/trac/query?status=new&'
+                 'status=assigned&status=reopened&format=csv&keywords=%7Eeasy'
+                 '&order=priority',
+                 'http://twistedmatrix.com/trac/query?status=assigned&'
+                 'status=new&status=reopened&format=csv&order=priority&'
+                 'keywords=~documentation']):
+            mysite.customs.models.TracQueryModel.objects.create(
+                url=url, tracker=self.tm)
 
     def login_with_client(self, username='paulproteus',
                           password="paulproteus's unbreakable password"):
@@ -538,19 +554,22 @@ class BugTrackerEditingViews(WebTest):
 
     def test_bug_tracker_edit_form_fills_in_hidden_field(self):
         client = self.login_with_client()
-        url = reverse(mysite.customs.views.add_tracker,
-                      kwargs={'tracker_type': 'trac'}
-                      ) + '?project_id=%d' % (self.twisted.id, )
+        url = (reverse(
+            mysite.customs.views.add_tracker,
+            kwargs={'tracker_type': 'trac'})
+            + '?project_id=%d' % (self.twisted.id, ))
         response = client.get(url)
-        self.assertEqual(self.twisted,
-                         response.context['tracker_form'].initial['created_for_project'])
+        self.assertEqual(
+            self.twisted,
+            response.context['tracker_form'].initial['created_for_project'])
 
     def test_bug_tracker_edit_url_missing_url_id_302s(self):
         client = self.login_with_client()
-        url = reverse(mysite.customs.views.edit_tracker_url, kwargs={
-            'tracker_id': '101',
-            'tracker_type': 'trac', 'tracker_name': 'whatever',
-            'url_id': '000'})
+        url = reverse(mysite.customs.views.edit_tracker_url,
+                      kwargs={'tracker_id': '101',
+                              'tracker_type': 'trac',
+                              'tracker_name': 'whatever',
+                              'url_id': '000'})
 
         # reverse won't work without a url_id so we need to add one
         # then remove it once the url has been generated.
@@ -564,15 +583,18 @@ class BugTrackerEditingViews(WebTest):
         client = self.login_with_client()
         # get url_id
         url_id = mysite.customs.models.TracQueryModel.objects.all()[0].id
-        url = reverse(mysite.customs.views.edit_tracker_url_do, kwargs={
-            'tracker_id': self.twisted.id,
-            'tracker_type': 'trac', 'tracker_name': 'twisted',
-            'url_id': url_id})
+        url = reverse(mysite.customs.views.edit_tracker_url_do,
+                      kwargs={'tracker_id': self.twisted.id,
+                              'tracker_type': 'trac',
+                              'tracker_name': 'twisted',
+                              'url_id': url_id})
         r = client.get(url)
         self.assertEquals(r.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class BugzillaTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -582,8 +604,10 @@ class BugzillaTrackerEditingViews(WebTest):
 
     def test_form_create_bugzilla_tracker(self):
         # We start with no BugzillaTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
             'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
@@ -596,13 +620,17 @@ class BugzillaTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().count())
 
     def test_form_create_bugzilla_tracker_with_custom_parser(self):
         # We start with no BugzillaTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
             'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
@@ -616,14 +644,19 @@ class BugzillaTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
-        btm = mysite.customs.models.BugzillaTrackerModel.objects.all(
-        ).select_subclasses().get()
+        self.assertEqual(
+            1,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().count())
+        btm = (
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().get())
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class BugzillaTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -640,9 +673,10 @@ class BugzillaTrackerListing(WebTest):
         return client
 
     def test_view_url_form(self):
-        self.assertEqual(0,
-                         mysite.customs.models.BugzillaTrackerModel.objects.
-                         all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().count())
 
         client = self.login_with_client()
 
@@ -660,15 +694,18 @@ class BugzillaTrackerListing(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        btm = mysite.customs.models.BugzillaTrackerModel.objects.all(
-        ).select_subclasses().get()
+        btm = (
+            mysite.customs.models.BugzillaTrackerModel.objects.all().
+            select_subclasses().get())
 
-        resp = client.get('/customs/add/bugzilla/' +
-                          str(btm.id) + '/KDE/url/do')
+        resp = client.get(
+            '/customs/add/bugzilla/' + str(btm.id) + '/KDE/url/do')
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class LaunchpadTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -678,8 +715,10 @@ class LaunchpadTrackerEditingViews(WebTest):
 
     def test_form_create_launchpad_tracker(self):
         # We start with no LaunchpadTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.LaunchpadTrackerModel.objects.all().
+            select_subclasses().count())
         form = mysite.customs.forms.LaunchpadTrackerForm({
             'tracker_name': 'KDE Bugzill',
             'launchpad_name': 'https://bugs.kde.org/',
@@ -693,13 +732,18 @@ class LaunchpadTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
-        self.assertEqual(1,
-                         mysite.customs.models.LaunchpadQueryModel.objects.all().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.LaunchpadTrackerModel.objects.all().
+            select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.LaunchpadQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class GitHubTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -709,8 +753,10 @@ class GitHubTrackerEditingViews(WebTest):
 
     def test_form_create_github_tracker(self):
         # We start with no GitHubTrackerModel objects in the DB
-        self.assertEqual(0,
-                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.GitHubTrackerModel.objects.all().
+            select_subclasses().count())
         form = mysite.customs.forms.GitHubTrackerForm({
             'tracker_name': 'KDE Github',
             'github_url': 'https://github.com/kde/project-A',
@@ -723,17 +769,22 @@ class GitHubTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.GitHubTrackerModel.objects.all().
+            select_subclasses().count())
         # We test for 2 GitHubQueryModel.objects since we must create
         # QueryModels (one for 'open' bugs, another for 'closed'
         # bugs), since GitHub's v2 API doesn't let us list all bugs
         # regardless of status.
-        self.assertEqual(2,
-                         mysite.customs.models.GitHubQueryModel.objects.all().count())
+        self.assertEqual(
+            2,
+            mysite.customs.models.GitHubQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class GitHubTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -746,24 +797,28 @@ class GitHubTrackerListing(WebTest):
         return client
 
     def test_view_github_trackers(self):
-        self.assertEqual(0,
-                         mysite.customs.models.GitHubTrackerModel.objects.all()
-                         .select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.GitHubTrackerModel.objects.all().
+            select_subclasses().count())
         client = self.login_with_client()
         resp = client.post('/customs/', {'list_trackers-tracker_type':
                                          'github'})
         self.assertEqual(resp.status_code, 200)
 
     def test_create_github_tracker(self):
-        self.assertEqual(0,
-                         mysite.customs.models.GitHubTrackerModel.objects.all()
-                         .select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.GitHubTrackerModel.objects.all().
+            select_subclasses().count())
         client = self.login_with_client()
         resp = client.get('/customs/add/github')
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+@skipIf(mysite.base.depends.lxml.html is None, (
+        "To run these tests, you must install lxml. See "
+        "ADVANCED_INSTALLATION.mkd for more information."))
 class JiraTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -772,8 +827,10 @@ class JiraTrackerEditingViews(WebTest):
         self.kde = mysite.search.models.Project.create_dummy(name='kde')
 
     def test_form_create_jira_tracker(self):
-        self.assertEqual(0,
-                         mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(
+            0,
+            mysite.customs.models.JiraTrackerModel.objects.all().
+            select_subclasses().count())
 
         form = mysite.customs.forms.JiraTrackerForm({
             'tracker_name': 'KDE Jira',
@@ -789,10 +846,13 @@ class JiraTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(1,
-                         mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
-        self.assertEqual(1,
-                         mysite.customs.models.JiraQueryModel.objects.all().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.JiraTrackerModel.objects.all().
+            select_subclasses().count())
+        self.assertEqual(
+            1,
+            mysite.customs.models.JiraQueryModel.objects.all().count())
 
 # Tests for importing bug data from YAML files, as emitted by oh-bugimporters
 
@@ -809,18 +869,27 @@ class ExportTrackerAsDict(django.test.TestCase):
             bitesized_text='easy',
             documentation_type='keywords',
             documentation_text='documentation')
-        for url in [
-            'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
-                'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
-            mysite.customs.models.TracQueryModel.objects.create(url=url,
-                                                                tracker=self.tm)
+        for url in (
+                ['http://twistedmatrix.com/trac/query?status=new&'
+                 'status=assigned&status=reopened&format=csv&keywords=%7Eeasy'
+                 '&order=priority', 'http://twistedmatrix.com/trac/query?'
+                                    'status=assigned&status=new&'
+                                    'status=reopened&format=csv&'
+                                    'order=priority&keywords=~documentation']):
+            mysite.customs.models.TracQueryModel.objects.create(
+                url=url, tracker=self.tm)
 
     def test_export(self):
         exported = self.tm.as_dict()
         golden = {'documentation_text': 'documentation',
                   'documentation_type': 'keywords',
-                  'queries': [u'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
-                              u'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'],
+                  'queries': ([u'http://twistedmatrix.com/trac/query?'
+                               u'status=new&status=assigned&status=reopened'
+                               u'&format=csv&keywords=%7Eeasy&order=priority',
+                               u'http://twistedmatrix.com/trac/query?'
+                               u'status=assigned&status=new&status=reopened&'
+                               u'format=csv&order=priority&'
+                               u'keywords=~documentation']),
                   'base_url': 'http://twistedmatrix.com/trac/',
                   'bitesized_text': 'easy',
                   'bitesized_type': 'keywords',
@@ -920,7 +989,9 @@ class ExportOldBugDataLinks(django.test.TestCase):
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        expected_url = 'https://api.github.com/repos/twisted/mainline/issues?since=2012-09-15T00%3A00%3A00'
+        expected_url = (
+            'https://api.github.com/repos/twisted/mainline/issues?'
+            'since=2012-09-15T00%3A00%3A00')
         # If you want to sanity-check this, just replace 'twisted' in the
         # above URL with e.g. 'acm-uiuc' or some other valid Github user,
         # and 'mainline' with 'mango-django' or some other valid repo owned by
@@ -955,7 +1026,9 @@ class ExportOldBugDataLinks(django.test.TestCase):
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        expected_url = 'http://jira.twistedmatrix.com/rest/api/2/search?maxResults=1000&jql=created>=2012-09-15T00:00:00'
+        expected_url = (
+            'http://jira.twistedmatrix.com/rest/api/2/search?'
+            'maxResults=1000&jql=created>=2012-09-15T00:00:00')
 
         # If you want to sanity-check this, just replace 'twisted' in the
         # above URL with e.g. 'cyanogenmod' or some other valid Jira project.
@@ -1061,11 +1134,9 @@ class ImportBugsFromFiles(django.test.TestCase):
     def test_import_bails_if_missing_project_name(self):
         # If the sample data contains exactly one item,
         # and that item does not contain any data, do we crash?
-        sample_data = [
-            {'canonical_bug_link': 'http://example.com/ticket1',
-             'last_polled': '2013-08-02T07:47:11.307599',
-             '_tracker_name': 'Twisted'},
-        ]
+        sample_data = [{'canonical_bug_link': 'http://example.com/ticket1',
+                        'last_polled': '2013-08-02T07:47:11.307599',
+                        '_tracker_name': 'Twisted'},]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
         # Try the import, and watch us not crash
@@ -1077,15 +1148,13 @@ class ImportBugsFromFiles(django.test.TestCase):
         # If the sample data contains exactly one item,
         # and that item does not say when it was downloaded, we
         # should refuse to import the bug.
-        sample_data = [
-            {'canonical_bug_link': 'http://example.com/ticket1',
-             'last_polled': '2013-08-02T07:47:11.307599',
-             'date_reported': '2013-08-02T07:47:11.307599',
-             'last_touched': '2013-08-02T07:47:11.307599',
-             'status': 'new',
-             '_project_name': 'Twisted',
-             '_tracker_name': 'Twisted'},
-        ]
+        sample_data = [{'canonical_bug_link': 'http://example.com/ticket1',
+                        'last_polled': '2013-08-02T07:47:11.307599',
+                        'date_reported': '2013-08-02T07:47:11.307599',
+                        'last_touched': '2013-08-02T07:47:11.307599',
+                        'status': 'new',
+                        '_project_name': 'Twisted',
+                        '_tracker_name': 'Twisted'}]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
         # Try the import, and watch us succeed.
@@ -1104,7 +1173,14 @@ class ImportBugsFromFiles(django.test.TestCase):
     def test_import_from_data_dict(self):
         sample_data = [
             {'status': 'new', 'as_appears_in_distribution': '',
-             'description': "This test method sets the mode of sub1 such that it cannot be deleted in the usual way:\r\r    [Error 5] Access is denied: '_trial_temp\\\\twisted.test.test_paths\\\\FilePathTestCase\\\\test_getPermissions_Windows\\\\bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that regardless of the test outcome, this file ends up deletable, or it should delete it itself.\r",
+             'description': (
+                 "This test method sets the mode of sub1 such that it cannot "
+                 "be deleted in the usual way:\r\r    [Error 5] Access is "
+                 "denied: '_trial_temp\\\\twisted.test.test_paths\\\\"
+                 "FilePathTestCase\\\\test_getPermissions_Windows\\\\"
+                 "bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that "
+                 "regardless of the test outcome, this file ends up "
+                 "deletable, or it should delete it itself.\r"),
              'importance': 'high',
              'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
              'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34),
@@ -1112,7 +1188,9 @@ class ImportBugsFromFiles(django.test.TestCase):
              'submitter_realname': '',
              'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14),
              'people_involved': 3,
-             'title': 'twisted.test.test_paths.FilePathTestCase.test_getPermissions_Windows creates undeleteable file',
+             'title': ('twisted.test.test_paths.FilePathTestCase.'
+                       'test_getPermissions_Windows creates undeleteable '
+                       'file'),
              '_project_name': 'Twisted',
              'submitter_username': 'exarkun',
              'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068),
@@ -1137,7 +1215,14 @@ class ImportBugsFromFiles(django.test.TestCase):
         # Import one...
         sample_data = [
             {'status': 'new', 'as_appears_in_distribution': '',
-             'description': "This test method sets the mode of sub1 such that it cannot be deleted in the usual way:\r\r    [Error 5] Access is denied: '_trial_temp\\\\twisted.test.test_paths\\\\FilePathTestCase\\\\test_getPermissions_Windows\\\\bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that regardless of the test outcome, this file ends up deletable, or it should delete it itself.\r",
+             'description': (
+                 "This test method sets the mode of sub1 such that it cannot "
+                 "be deleted in the usual way:\r\r    [Error 5] Access is "
+                 "denied: '_trial_temp\\\\twisted.test.test_paths\\\\"
+                 "FilePathTestCase\\\\test_getPermissions_Windows\\\\"
+                 "bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that "
+                 "regardless of the test outcome, this file ends up "
+                 "deletable, or it should delete it itself.\r"),
              'importance': 'high',
              'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
              'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34),
@@ -1145,7 +1230,9 @@ class ImportBugsFromFiles(django.test.TestCase):
              'submitter_realname': '',
              'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14),
              'people_involved': 3,
-             'title': 'twisted.test.test_paths.FilePathTestCase.test_getPermissions_Windows creates undeleteable file',
+             'title': (
+                 'twisted.test.test_paths.FilePathTestCase.'
+                 'test_getPermissions_Windows creates undeletable file'),
              '_project_name': 'Twisted',
              'submitter_username': 'exarkun',
              'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068),
@@ -1170,18 +1257,31 @@ class ImportBugsFromFiles(django.test.TestCase):
     def test_import_from_data_dict_with_isoformat_date(self):
         sample_data = [
             {'status': 'new', 'as_appears_in_distribution': '',
-             'description': "This test method sets the mode of sub1 such that it cannot be deleted in the usual way:\r\r    [Error 5] Access is denied: '_trial_temp\\\\twisted.test.test_paths\\\\FilePathTestCase\\\\test_getPermissions_Windows\\\\bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that regardless of the test outcome, this file ends up deletable, or it should delete it itself.\r",
+             'description': (
+                 "This test method sets the mode of sub1 such that it cannot "
+                 "be deleted in the usual way:\r\r    [Error 5] Access is "
+                 "denied: '_trial_temp\\\\twisted.test.test_paths\\\\"
+                 "FilePathTestCase\\\\test_getPermissions_Windows\\\\"
+                 "bvk9lu\\\\temp\\\\sub1'\r\rThe test should ensure that "
+                 "regardless of the test outcome, this file ends up "
+                 "deletable, or it should delete it itself.\r"),
              'importance': 'high',
              'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
-             'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34).isoformat(),
+             'date_reported': (
+                 datetime.datetime(2011, 8, 9, 16, 22, 34).isoformat()),
              '_tracker_name': 'Twisted',
              'submitter_realname': '',
-             'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14).isoformat(),
+             'last_touched': (
+                 datetime.datetime(2012, 4, 12, 17, 44, 14).isoformat()),
              'people_involved': 3,
-             'title': 'twisted.test.test_paths.FilePathTestCase.test_getPermissions_Windows creates undeleteable file',
+             'title': (
+                 'twisted.test.test_paths.FilePathTestCase.'
+                 'test_getPermissions_Windows creates undeleteable file'),
              '_project_name': 'Twisted',
              'submitter_username': 'exarkun',
-             'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068).isoformat(),
+             'last_polled': (
+                 datetime.datetime(2012, 9, 2, 22, 18, 56, 240068).isoformat()
+             ),
              'looks_closed': False,
              'good_for_newcomers': True,
              'concerns_just_documentation': False}]

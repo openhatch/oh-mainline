@@ -47,7 +47,8 @@ def get_mission_test_data_path(mission_type):
 
 
 def make_testdata_filename(mission_type, filename):
-    return os.path.join(os.path.dirname(__file__), '..', mission_type, 'testdata', filename)
+    return os.path.join(os.path.dirname(__file__), '..', mission_type,
+                        'testdata', filename)
 
 
 def list_of_true_keys(d):
@@ -75,5 +76,5 @@ class MainPageTests(TwillTests):
                        step=Step.objects.get(name='tar')).save()
 
         response = self.client.get(reverse(views.main_page))
-        self.assertEqual(['tar'],
-                         list_of_true_keys(response.context['completed_missions']))
+        self.assertEqual(['tar'], list_of_true_keys(
+            response.context['completed_missions']))

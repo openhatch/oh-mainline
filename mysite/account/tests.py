@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#{{{ imports
 import os
-import mock
 import tempfile
 import StringIO
 import logging
@@ -37,19 +35,19 @@ from django.utils.unittest import skipIf
 
 from django_webtest import WebTest
 import mysite.base.depends
-#}}}
 
 
 class Login(WebTest):
-    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_login(self):
-        user = authenticate(username='paulproteus', password="paulproteus's unbreakable password")
+        user = authenticate(username='paulproteus',
+                            password="paulproteus's unbreakable password")
         self.assert_(user and user.is_active)
 
     def test_logout_web(self):
-        # Test the logout feature by inspecting Django's client session. Log in first before you test the log out feature.
+        # Test the logout feature by inspecting Django's client session.
+        # Log in first before you test the log out feature.
         self.client = Client()
         username = 'paulproteus'
         password = "paulproteus's unbreakable password"
@@ -58,10 +56,13 @@ class Login(WebTest):
         self.assertEqual(1, self.client.session.get('_auth_user_id'))
         # Log out the user
         self.client.logout()
-        # Test that user is indeed logged out by checking the client session object
+        # Test that user is indeed logged out by checking the client session
+        # object
         self.assertNotEqual(1, self.client.session.get('_auth_user_id'))
 
-        # Test that the links are expectedly present or expectedly absent by using django web-test. Log in first before you test the log out feature.
+        # Test that the links are expectedly present or expectedly absent by
+        # using django web-test. Log in first before you test the log out
+        # feature.
         search_page = self.app.get('/search/')
         self.assertIn('log in', search_page.content)
         login_page = search_page.click('log in')
@@ -71,11 +72,13 @@ class Login(WebTest):
         login_page_form['username'] = username
         login_page_form['password'] = password
         login_page_form.submit()
-        # Go to ANY page to confirm that 'log out' link is present and 'log in' link is absent
+        # Go to ANY page to confirm that 'log out' link is present and
+        # 'log in' link is absent
         search_page = self.app.get('/search/')
         self.assertIn('log out', search_page.content)
         self.assertNotIn('log in', search_page.content)
-        # After the log out link is clicked, go to ANY page to confirm that the log out link is gone and log in link is present instead
+        # After the log out link is clicked, go to ANY page to confirm that
+        # the log out link is gone and log in link is present instead
         logout_page = search_page.click('log out')
         search_page = self.app.get('/search/')
         self.assertIn('log in', search_page.content)
@@ -86,22 +89,21 @@ class Login(WebTest):
         client = Client()
         # All test cases should redirect to the OpenHatch root.
         # Verify existing logout still behaves as before:
-        response  = client.get('/account/logout/?next=/')
+        response = client.get('/account/logout/?next=/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
         # Verify appended redirect url is ignored:
         # Before the fix for issue 952, urlparse() redirected this url to
         # /account/logout/.
-        response  = client.get('/account/logout/?next=http://www.example.com')
+        response = client.get('/account/logout/?next=http://www.example.com')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
         # Verify appended redirect url is ignored
         # Before the fix for issue 952, urlparse() redirected this url to
         # example.com.
-        response  = client.get('/account/logout/?next=http:///www.example.com')
+        response = client.get('/account/logout/?next=http:///www.example.com')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
-    # }}}
 
 
 class ProfileGetsCreatedWhenUserIsCreated(WebTest):
@@ -109,7 +111,6 @@ class ProfileGetsCreatedWhenUserIsCreated(WebTest):
     """django-authopenid only creates User objects, but we need Person objects
     in all such cases. Test that creating a User will automatically create
     a Person in our project."""
-
     def test_login_creates_person_profile(self):
         # Create a user object
         u = User.objects.create(username='paulproteus')
@@ -128,27 +129,35 @@ class Signup(WebTest):
         username = 'paulproteus'
         signup_page = self.app.get('/account/signup/')
         signup_form = signup_page.form
-        self.assertNotIn('already got a user in our database with that username', signup_form.text)
+        self.assertNotIn(
+            'already got a user in our database with that username',
+            signup_form.text
+        )
         signup_form['username'] = 'paulproteus'
         signup_form['email'] = 'someone@somewhere.com'
         signup_form['password1'] = 'blahblahblah'
         signup_form['password2'] = 'blahblahblah'
         response = signup_form.submit()
         self.assertEqual(response.status_code, 200)
-        self.assertIn('already got a user in our database with that username', response.content)
+        self.assertIn('already got a user in our database with that username',
+                      response.content)
 
     def test_usernames_case_insensitive(self):
         username = 'paulproteus'
         signup_page = self.app.get('/account/signup/')
         signup_form = signup_page.form
-        self.assertNotIn('already got a user in our database with that username', signup_form.text)
+        self.assertNotIn(
+            'already got a user in our database with that username',
+            signup_form.text
+        )
         signup_form['username'] = 'PaulProteus'
         signup_form['email'] = 'someone@somewhere.com'
         signup_form['password1'] = 'blahblahblah'
         signup_form['password2'] = 'blahblahblah'
         response = signup_form.submit()
         self.assertEqual(response.status_code, 200)
-        self.assertIn('already got a user in our database with that username', response.content)
+        self.assertIn('already got a user in our database with that username',
+                      response.content)
 
     def test_reserved_username(self):
         username = 'paulproteus'
@@ -165,7 +174,6 @@ class Signup(WebTest):
 
 
 class EditPassword(WebTest):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def change_password(self, old_pass, new_pass,
@@ -188,7 +196,8 @@ class EditPassword(WebTest):
         # Try to log in with the new password now
         client = Client()
         username = 'paulproteus'
-        actual_should_succeed = client.login(username=username, password=new_pass)
+        actual_should_succeed = client.login(username=username,
+                                             password=new_pass)
         self.assertEqual(actual_should_succeed, should_succeed)
 
     def test_change_password(self):
@@ -201,11 +210,9 @@ class EditPassword(WebTest):
         newpass = 'new'
         self.change_password(oldpass, newpass,
                              should_succeed=False)
-#}}}
 
 
 class EditContactInfo(WebTest):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_edit_email_address(self):
@@ -216,11 +223,13 @@ class EditContactInfo(WebTest):
         paulproteus.email_me_re_projects = False
         paulproteus.save()
 
-        contact_info_page = self.app.get("/account/settings/contact-info/", user=user)
+        contact_info_page = self.app.get("/account/settings/contact-info/",
+                                         user=user)
         current_pw = "paulproteus's unbreakable password"
         new_email = 'new@ema.il'
 
-        # Let's first ensure that "new@ema.il" doesn't appear on the page. We're about to add it.
+        # Let's first ensure that "new@ema.il" doesn't appear on the page.
+        # We're about to add it.
         # Test that the email is initially not visible on user profile page
         paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
         assert new_email not in paulproteus_page
@@ -236,30 +245,31 @@ class EditContactInfo(WebTest):
         assert new_email in paulproteus_page
 
         # Test that the email is not publicly displayble
-        contact_info_page = self.app.get('/account/settings/contact-info/', user=user)
+        contact_info_page = self.app.get('/account/settings/contact-info/',
+                                         user=user)
         contact_info_form['show_email-show_email'].checked = False
         contact_info_form.submit()
         # Test that the email is no longer visible on user profile page
         paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
         assert new_email not in paulproteus_page
 
+
 photos = [os.path.join(os.path.dirname(__file__),
-                       '..', '..', 'sample-photo.' + ext)
+          '..', '..', 'sample-photo.' + ext)
           for ext in ('png', 'jpg')]
 
 
 def photo(f):
-    filename = os.path.join(
-        os.path.dirname(__file__),
-        '..', f)
+    filename = os.path.join(os.path.dirname(__file__), '..', f)
     assert os.path.exists(filename)
     return filename
 
 
-
-@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+@skipIf(not mysite.base.depends.Image, ("Skipping photo-related tests "
+                                        "because PIL is missing. Look in "
+                                        "ADVANCED_INSTALLATION.mkd for "
+                                        "information."))
 class EditPhoto(WebTest):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def login_with_client(self, username='paulproteus',
@@ -274,7 +284,8 @@ class EditPhoto(WebTest):
         username = 'paulproteus'
         for image in [photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')]:
-            paulproteus_page = self.app.get('/people/%s/' % (username,), user=username)
+            paulproteus_page = self.app.get('/people/%s/' % (username,),
+                                            user=username)
             photo_page = paulproteus_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
@@ -287,8 +298,9 @@ class EditPhoto(WebTest):
             response = self.login_with_client().get(
                 reverse(mysite.account.views.edit_photo))
             self.assertEqual(response.context[0]['photo_url'], p.photo.url,
-                             "Test that once you've uploaded a photo via the photo editor, "
-                             "the template's photo_url variable is correct.")
+                             "Test that once you've uploaded a photo via the "
+                             "photo editor, the template's photo_url "
+                             "variable is correct.")
             self.assert_(p.photo_thumbnail)
             thumbnail_as_stored = mysite.base.depends.Image.open(
                 p.photo_thumbnail.file)
@@ -299,7 +311,8 @@ class EditPhoto(WebTest):
         username = 'paulproteus'
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
-            paulproteus_page = self.app.get('/people/%s/' % (username,), user=username)
+            paulproteus_page = self.app.get('/people/%s/' % (username,),
+                                            user=username)
             photo_page = paulproteus_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
@@ -323,13 +336,15 @@ class EditPhoto(WebTest):
             bad_image.write("garbage")
             bad_image.close()
 
-            paulproteus_page = self.app.get('/people/%s/' % (username,), user=username)
+            paulproteus_page = self.app.get('/people/%s/' % (username,),
+                                            user=username)
             photo_page = paulproteus_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(bad_image.name)
             form_response = photo_form.submit()
             self.assertEqual(form_response.status_code, 200)
-            self.assertIn("The file you uploaded was either not an image or a corrupted image", form_response.content)
+            self.assertIn("The file you uploaded was either not an image or "
+                          "a corrupted image", form_response.content)
 
             # Test that user test object has no photo attribute
             p = Person.objects.get(user__username=username)
@@ -338,15 +353,19 @@ class EditPhoto(WebTest):
             os.unlink(bad_image.name)
 
 
-@skipIf(not mysite.base.depends.Image, "Skipping photo-related tests because PIL is missing. Look in ADVANCED_INSTALLATION.mkd for information.")
+@skipIf(not mysite.base.depends.Image, ("Skipping photo-related tests "
+                                        "because PIL is missing. Look in "
+                                        "ADVANCED_INSTALLATION.mkd for "
+                                        "information."))
 class EditPhotoWithOldPerson(WebTest):
-    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
 
     def test_set_avatar(self):
         username = 'paulproteus'
-        for image in (photo('static/sample-photo.png'), photo('static/sample-photo.jpg')):
-            paulproteus_page = self.app.get('/people/paulproteus/', user=username)
+        for image in (photo('static/sample-photo.png'),
+                      photo('static/sample-photo.jpg')):
+            paulproteus_page = self.app.get('/people/paulproteus/',
+                                            user=username)
             photo_page= paulproteus_page.click(href='/account/edit/photo')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
@@ -355,6 +374,7 @@ class EditPhotoWithOldPerson(WebTest):
             # Now check that the photo == what we uploaded
             p = Person.objects.get(user__username=username)
             self.assert_(p.photo.read() == open(image).read())
+
 
 
 class SignupWithNoPassword(WebTest):
@@ -384,15 +404,17 @@ class LoginPageContainsUnsavedAnswer(WebTest):
         POST_data = {
             'project__pk': p.pk,
             'question__pk': q.pk,
-                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
+            'answer__text': ("Help produce official documentation, share "
+                                 "the solution to a problem, or check, proof "
+                                 "and test other documents for accuracy."),
         }
         response = self.client.post(
             reverse(mysite.project.views.create_answer_do), POST_data,
             follow=True)
 
-        # Now, the session will know about the answer, but the answer will not be published.
-        # Visit the login page, assert that the page contains the text of the
-        # answer.
+        # Now, the session will know about the answer, but the answer will
+        # not be published. Visit the login page, assert that the page
+        # contains the text of the answer.
 
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
@@ -420,11 +442,9 @@ class ClearSessionsOnPasswordChange(WebTest):
 
         client1.post(reverse(mysite.account.views.change_password_do),
                      data={
-                         'old_password': password, 'new_password1': new_password,
+                         'old_password': password,
+                         'new_password1': new_password,
                          'new_password2': new_password})
 
         self.assertTrue(self.user_logged_in(client1.session))
         self.assertFalse(self.user_logged_in(client2.session))
-
-
-# vim: set nu:
