@@ -1,0 +1,86 @@
+{% extends 'missions/diffpatch/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2014 Arturo Lopez
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='submodule-head head'>
+    <h3>Quick reference</h3>
+  </div>
+    <div class="submodule-body body">
+    
+  <h3><b> Working with patch and diff</b></h3>
+  <p>When working with patch, you are dealing with a patchfile containing a difference listing produced by the <em>diff</em> program and applies those differences to               one or more original files, producing patched versions.</p>
+  
+  <p>When working with diff, it outputs the difference between two files, by comparing both files line by line.</p>
+  <p>This page is just a quick reference; see the bottom for other resources.</p>
+  <br>
+  
+  <p> To work with patch, you can use:<br><br>
+ 	<b>patch [options] [originalfile [patchfile]]</b> <br><br> but the more common method is :<br><br>  <b>patch -pnum < patchfile.patch</p></b>
+  
+  <p> -pnum is the option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
+  
+  <p> To work with diff, you can use:<br><br>
+ 	<b>diff -u original <em>updatedfile</em></b><br></p>
+ 	<p>For window users, redirect the output of your diff to a new file with this command:<br><br>
+	<b>diff -u original new > output.txt</b></p>
+	
+	<p> <b>-u</b> is the Output NUM (default 3) lines of unified context. </p>
+	<p> <b>-ur</b> is used when comparing directories of unified context by recursively comparing any subdirectories found.</p>
+  
+  
+  <h3><b>Other resources</b></h3>
+  <br>
+  <p>Patch is an efficent method to fix errors in text files. The following sites have further information about patch:</p>
+  <ul class="raquo_bullets">
+  <li><a href="http://en.wikipedia.org/wiki/Patch_(Unix)">Wikipedia has some good information about the <em>patch</em> function.</a></li>
+  <li>Patch comes with a user "manual". You can read that by typing <tt>man patch</tt> in a terminal, or by <a href="http://linux.die.net/man/1/patch">visiting this page</a>.</li>
+  </ul>
+  
+  <p>There are different options to <em>diff</em>, which are detailed in diff's documentation.The followings sites are commonly used for further reading : </p>
+  
+  <ul class="raquo_bullets">
+      <li><a href="http://en.wikipedia.org/wiki/Diff_(Unix)">Wikipedia has some good information about the <em>diff</em> function.</a></li>
+      <li>Diff comes with a user "manual". You can read that by typing <tt>man diff</tt> in a terminal, or by <a href="http://linux.die.net/man/1/diff">visiting this page</a>.</li>
+      <br>
+      </ul> 
+   
+  <h3>Working with tarballs</h3>
+
+  <ul class="raquo_bullets">
+  <li><a href="http://openhatch.org/missions/tar/hints">Tools for working with tar archives.</a></li>
+  </ul> 
+ </div>
+
+{% endblock mission_main %} 
+
+
+<!--
+<p>If you are running a GNU/Linux distribution, Mac OS X, or another Unix-like operating system, your system almost certainly has the tar program on it already, and you can run it by typing "tar" into a terminal.  If you are running Windows and prefer to try this the Unix way, you can get tar as part of <a href="http://sourceforge.net/projects/mingw/files/MSYS/BaseSystem/msys-1.0.11/MSYS-1.0.11.exe/download">MSYS</a>; many Windows archiving programs, such as <a href="http://www.7-zip.org/">7-Zip</a>, support working with tar archives as well.</p>
+
+      <h3>Unpacking (and listing)</h3>
+      <p>To unpack a tarball, you can use:</p>
+      <pre>tar xvzf <em>[tarball]</em></pre>
+      <p>To be more specific:</p>
+      <pre>tar <em>[option letters]</em>xf <em>[tarball]</em></pre>
+      <p>(The <code>x</code> stands for e<strong>x</strong>tract.)</p>
+      <p>The tarball's contents are placed into the current directory.  Option letter <code>z</code> makes tar transparently un-gzip the tarball, and <code>v</code> shows the filenames as tar unpacks them.</p>
+
+-->

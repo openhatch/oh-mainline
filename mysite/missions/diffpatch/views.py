@@ -217,3 +217,9 @@ def recursive_diff(request, passed_data={}):
     data = state.as_dict_for_template_context()
     data['diffrecursive_form'] = forms.DiffRecursiveUploadForm()
     return (request, 'missions/diffpatch/recursive_diff.html', data)
+
+@view
+def hints(request, passed_data= None):
+    state = DiffPatchMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Quick reference'
+    return (request, 'missions/diffpatch/hints.html', state.as_dict_for_template_context())
