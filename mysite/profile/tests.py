@@ -81,7 +81,6 @@ class ProfileTests(TwillTests):
                     name='project name')[0],
                 is_published=True,
                 person=paulproteus)[0],
-            distinct_months=1,
             languages='Python',
         )
         citation.save()
@@ -282,7 +281,6 @@ class Portfolio(TwillTests):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=paulproteus)[0],
-            distinct_months=1,
             languages='Python',
             data_import_attempt=DataImportAttempt.objects.get_or_create(
                 source='rs', query='paulproteus', completed=True,
@@ -367,7 +365,6 @@ class Portfolio(TwillTests):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=paulproteus)[0],
-            distinct_months=1,
             languages='Python',
             data_import_attempt=DataImportAttempt.objects.get_or_create(
                 source='rs', query='paulproteus',
@@ -1029,7 +1026,6 @@ class IgnoreNewDuplicateCitations(TwillTests):
                 project=project1,
                 is_published=True,
                 person=paulproteus)[0],
-            distinct_months=1,
             languages='Python',
             data_import_attempt=repo_search
         )
@@ -1040,7 +1036,6 @@ class IgnoreNewDuplicateCitations(TwillTests):
                 project=project2,
                 is_published=True,
                 person=paulproteus)[0],
-            distinct_months=1,
             languages='Python',
             data_import_attempt=DataImportAttempt.objects.get_or_create(
                 source='rs', query='paulproteus', completed=True,
@@ -1063,7 +1058,6 @@ class IgnoreNewDuplicateCitations(TwillTests):
         # Ohloh username search with the same results.
         citation2 = Citation(
             portfolio_entry=citation.portfolio_entry,
-            distinct_months=citation.distinct_months,
             languages=citation.languages,
             data_import_attempt=username_search
         )
@@ -2456,7 +2450,6 @@ class PeopleMapSummariesAreCheap(TwillTests):
                     name='project name')[0],
                 is_published=True,
                 person=self.paulproteus)[0],
-            distinct_months=1,
             languages='Python',
         )
         citation.save()
@@ -2467,7 +2460,6 @@ class PeopleMapSummariesAreCheap(TwillTests):
                     name='project name2')[0],
                 is_published=True,
                 person=self.paulproteus)[0],
-            distinct_months=1,
             languages='Python',
         )
         citation.save()
