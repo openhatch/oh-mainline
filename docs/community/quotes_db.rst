@@ -38,7 +38,7 @@ How to approve quotes
 ---------------------
 
 * Visit the login page at
-http://boiling-refuge-7775.herokuapp.com/?m=userlogin
+  http://boiling-refuge-7775.herokuapp.com/?m=userlogin
 
 * Log in (if you need an account, ask paulproteus)
 
