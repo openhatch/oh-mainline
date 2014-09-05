@@ -15,6 +15,7 @@ Here's more information about our project structure that may be useful.
   front_end_style_guide
   api
   pull_request_linting
+  issue_tracking
 
 Sections to add:
 
