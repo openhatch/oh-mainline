@@ -745,7 +745,6 @@ class Citation(models.Model):
     url = models.URLField(null=True, verbose_name="URL")
     contributor_role = models.CharField(max_length=200, null=True)
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
-    distinct_months = models.IntegerField(null=True)
     languages = models.CharField(max_length=200, null=True)
     first_commit_time = models.DateTimeField(null=True)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
@@ -762,11 +761,6 @@ class Citation(models.Model):
         # FIXME: Pluralize correctly.
         # FIXME: Use "since year_started"
 
-        if self.distinct_months != 1:
-            suffix = 's'
-        else:
-            suffix = ''
-
         if self.data_import_attempt:
             if self.data_import_attempt.source == 'db' and (
                     self.contributor_role == 'Maintainer'):
@@ -781,11 +775,7 @@ class Citation(models.Model):
                     return "Committed to codebase (%s)" % (
                         self.data_import_attempt.get_source_display(),
                     )
-                if self.distinct_months is None:
-                    raise ValueError, "Er, Ohloh always gives us a # of months."
-                return "Coded for %d month%s in %s (%s)" % (
-                    self.distinct_months,
-                    suffix,
+                return "Coded in %s (%s)" % (
                     self.languages,
                     self.data_import_attempt.get_source_display(),
                 )
@@ -800,12 +790,8 @@ class Citation(models.Model):
                 raise ValueError, "There's a DIA of a kind I don't know how to summarize."
         elif self.url is not None:
             return url2printably_short(self.url, CUTOFF=38)
-        elif self.distinct_months is not None and self.languages is not None:
-            return "Coded for %d month%s in %s." % (
-                self.distinct_months,
-                suffix,
-                self.languages,
-            )
+        elif self.languages is not None:
+            return "Coded in %s." % (self.languages,)
 
         raise ValueError(
             "There's no DIA and I don't know how to summarize this.")
