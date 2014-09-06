@@ -221,6 +221,12 @@ INVITATIONS_PER_USER = 100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
+# If you're testing any of the email-related features locally, make sure the 'EMAIL_*" settings here are 
+# un-commented, and then open a new terminal and type "python -m smtpd -n -c DebuggingServer localhost:1025" 
+# to run a local email server.
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_PORT = 1025
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
