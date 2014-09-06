@@ -27,8 +27,23 @@ fi
 
 URL=https://openhatch.org/+api/v1/customs/tracker_model/\?just_stale\=yes\&format\=yaml\&limit\="$MAX_TRACKERS"\&tracker_id="$TRACKER_ID"
 
+function grab_bug_tracker_list() {
+    # Try to download $URL. If curl bails on us, then
+    # we exit 1.
+    curl "$URL" > "$BUG_TRACKER_LIST" || return 1
+
+    # Sanity-check the document -- is it actually YAML, or
+    # is it a "helpful" CloudFlare error message? To do this
+    # check, we ask Python to parse this document, and if it
+    # bails out, then we also return 1.
+    python -c "import vendor; vendor.vendorify(); import yaml; yaml.safe_load(open('$BUG_TRACKER_LIST'))" || return 1
+
+    # Amazing. It is valid YAML. Exit succesfully.
+    return 0
+}
+
 # It's OK if curl has to try 4 times.
-(curl "$URL" || curl "$URL" || curl "$URL" || curl "$URL") > "$BUG_TRACKER_LIST"
+grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || exit 1
 
 pushd ../oh-bugimporters
 env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FILE"
