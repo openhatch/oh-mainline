@@ -4,3 +4,4 @@ omit =
     */migrations/*
     tests.py
     settings.py
+    deployment_settings.py
