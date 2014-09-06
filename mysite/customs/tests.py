@@ -133,9 +133,52 @@ class BlogCrawl(django.test.TestCase):
         self.assertEqual(entries[0]['unicode_text'], u'Yo \xe9')
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+class BlogCache(django.test.TestCase):
+    """Test caching of blog entries.
+
+    Because the cache is reused across tests (Effectively global) we fudge a
+    unique key prefix per test so that the key namespace is different for each
+    test method. This is pretty lame. But that's why those exist all over in
+    the tests.
+    """
+    def blog_fetcher_version_1(self):
+        return 'this-data-is-fake'
+
+    def blog_fetcher_version_2(self):
+        return 'this-data-is-also-fake'
+
+    def test_basics(self):
+        for i in range(4):
+            entries = mysite.customs.feed.cached_blog_entries(
+                self.blog_fetcher_version_1, key_prefix='a')
+            self.assertEqual(entries, self.blog_fetcher_version_1())
+
+    def test_with_lock_contention(self):
+        # Take the lock and then tell our code to go update the entries.
+        # It'll fail.
+
+        # Shove in data version 1
+        mysite.customs.feed.cached_blog_entries(
+            self.blog_fetcher_version_1, key_prefix='b')
+        # Delete the freshness key so that it looks like it expired.
+        mysite.customs.feed.cache.delete('bblog_entries-datafresh')
+
+        # Take the lock so that the code under test can't get it
+        blog_update_lock = mysite.customs.feed.CacheLock(
+            'b' + mysite.customs.feed.LOCK_KEYNAME)
+        with blog_update_lock:
+            entries = mysite.customs.feed.cached_blog_entries(
+                self.blog_fetcher_version_2, key_prefix='b')
+        # Verify that we still got stale data in return
+        self.assertEqual(entries, self.blog_fetcher_version_1())
+
+        # With the lock released, try to update again
+        entries = mysite.customs.feed.cached_blog_entries(
+            self.blog_fetcher_version_2, key_prefix='b')
+        # And ensure that we get data version 2 (Fake)
+        self.assertEqual(entries, self.blog_fetcher_version_2())
+
+@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
 class DataExport(django.test.TestCase):
 
     def test_snapshot_user_table_without_passwords(self):
