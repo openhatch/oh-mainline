@@ -17,6 +17,7 @@ Current members
 * Jessica McKellar (jesstess)
 * John Morrissey (jwm)
 * Karen Rustad (aldeka)
+* Elana Hashman (ehashman)
 
 
 How to join
