@@ -36,7 +36,7 @@ function grab_bug_tracker_list() {
     # is it a "helpful" CloudFlare error message? To do this
     # check, we ask Python to parse this document, and if it
     # bails out, then we also return 1.
-    python -c "import vendor; vendor.vendorify(); import yaml; yaml.safe_load(open('$BUG_TRACKER_LIST'))" || return 1
+    python -c "import vendor; vendor.vendorify(); import yaml; yaml.load(open('$BUG_TRACKER_LIST'))" || return 1
 
     # Amazing. It is valid YAML. Exit succesfully.
     return 0
