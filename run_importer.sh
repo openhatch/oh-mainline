@@ -17,12 +17,12 @@ exec >>"$SCRAPY_LOG" 2>&1
 chmod 644 "$SCRAPY_LOG"
 
 MAX_TRACKERS="500"
-if [ ! -z "$1" ] ; then
-    MAX_TRACKERS="$1"
+if [ ! -z "$2" ] ; then
+    MAX_TRACKERS="$2"
 fi
 
-if [ ! -z "$2" ] ; then
-    TRACKER_ID="$2"
+if [ ! -z "$3" ] ; then
+    TRACKER_ID="$3"
 fi
 
 URL=https://openhatch.org/+api/v1/customs/tracker_model/\?just_stale\=yes\&format\=yaml\&limit\="$MAX_TRACKERS"\&tracker_id="$TRACKER_ID"
