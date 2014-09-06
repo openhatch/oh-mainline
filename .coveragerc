@@ -5,3 +5,6 @@ omit =
     tests.py
     settings.py
     deployment_settings.py
+    _profiling.py
+    manage.py
+    sqlite_settings.py
