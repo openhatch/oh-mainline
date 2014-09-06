@@ -73,3 +73,11 @@ ALLOWED_HOSTS=['testserver', 'openhatch.org']
 # This path is important because the nginx
 # configuration is consistent with it.
 STATIC_ROOT='/home/deploy/milestone-a/mysite/statik'
+
+# In production, we use localhost port 25 SMTP.
+#
+# settings.py explains how to get email working in
+# development via a debugging-oriented SMTP server.
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = '127.0.0.1'
+EMAIL_PORT = 25
