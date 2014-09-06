@@ -2,14 +2,12 @@
 import os
 import sys
 
-if __name__ == '__main__':
-    if not os.path.exists('mysite/manage.py'):
-        # Try one more thing -- chdir() into the path of this file
-        # and try to find mysite/manage.py. Note that chdir()ing is
-        # a somewhat intense strategy here.
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        if not os.path.exists('mysite/manage.py'):   
-            print "Eek, where is the real manage.py? Quitting."
-            sys.exit(1)
+# Use the modules in vendor/
+import vendor
+vendor.vendorify()
 
-    execfile('mysite/manage.py', globals(), locals())
+if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+
+    from django.core.management import execute_from_command_line
+    execute_from_command_line(sys.argv)

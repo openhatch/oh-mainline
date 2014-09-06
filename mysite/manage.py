@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-import os, sys
+import os
+import sys
 
-THIS_FILE = os.path.abspath(__file__)
-THIS_DIR = os.path.dirname(THIS_FILE)
-UP_ONE_DIR = os.path.join(THIS_DIR, '..')
-sys.path.append(UP_ONE_DIR)
+if __name__ == '__main__':
+    # The real manage.py is one directory up. So we switch to that directory, which
+    # is admittedly a little odd. It means that we get consistent paths for things
+    # like static assets no matter if you run manage.py or mysite/manage.py.
+    os.chdir('..')
 
-# Use the modules in vendor/
-import vendor
-vendor.vendorify()
+    # We have to add the new current working directory to sys.path, because
+    # Python's sys.path was calculcated when this file (mysite/manage.py) was
+    # started initially. We only really needs this for the vendor/ directory.
+    sys.path.append(os.getcwd())
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-
-    from django.core.management import execute_from_command_line
-    execute_from_command_line(sys.argv)
+    # Now, act as though nothing is wrong.
+    execfile('manage.py', globals(), locals())
