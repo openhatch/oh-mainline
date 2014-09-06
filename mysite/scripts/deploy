@@ -2,12 +2,7 @@
 set -x
 set -e
 
-### First, make sure that origin/master
-### contains the current git repo contents.
-
-git push origin HEAD:master
-
-### Then, ssh to deploy@linode.openhatch.org
+### ssh to deploy@linode.openhatch.org
 ### and update the site.
 ssh -t deploy@linode.openhatch.org milestone-a/mysite/scripts/deploy_myself.sh
 
