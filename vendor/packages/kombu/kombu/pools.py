@@ -4,69 +4,84 @@ kombu.pools
 
 Public resource pools.
 
-:copyright: (c) 2009 - 2011 by Ask Solem.
-:license: BSD, see LICENSE for more details.
-
 """
+from __future__ import absolute_import
+
 import os
 
 from itertools import chain
 
-from kombu.connection import Resource
-from kombu.messaging import Producer
-from kombu.utils import HashingDict
+from .connection import Resource
+from .five import range, values
+from .messaging import Producer
+from .utils import EqualityDict
+from .utils.functional import lazy
 
-__all__ = ["ProducerPool", "PoolGroup", "register_group",
-           "connections", "producers", "get_limit", "set_limit", "reset"]
+__all__ = ['ProducerPool', 'PoolGroup', 'register_group',
+           'connections', 'producers', 'get_limit', 'set_limit', 'reset']
 _limit = [200]
 _used = [False]
 _groups = []
 use_global_limit = object()
-disable_limit_protection = os.environ.get("KOMBU_DISABLE_LIMIT_PROTECTION")
+disable_limit_protection = os.environ.get('KOMBU_DISABLE_LIMIT_PROTECTION')
 
 
 class ProducerPool(Resource):
+    Producer = Producer
 
     def __init__(self, connections, *args, **kwargs):
         self.connections = connections
+        self.Producer = kwargs.pop('Producer', None) or self.Producer
         super(ProducerPool, self).__init__(*args, **kwargs)
 
-    def Producer(self, connection):
-        return Producer(connection)
+    def _acquire_connection(self):
+        return self.connections.acquire(block=True)
 
     def create_producer(self):
-        connection = self.connections.acquire(block=True)
-        return self.Producer(connection)
+        conn = self._acquire_connection()
+        try:
+            return self.Producer(conn)
+        except BaseException:
+            conn.release()
+            raise
 
     def new(self):
-        return lambda: self.create_producer()
+        return lazy(self.create_producer)
 
     def setup(self):
         if self.limit:
-            for _ in xrange(self.limit):
+            for _ in range(self.limit):
                 self._resource.put_nowait(self.new())
+
+    def close_resource(self, resource):
+        pass
 
     def prepare(self, p):
         if callable(p):
             p = p()
-        if not p.channel:
-            p.connection = self.connections.acquire(block=True)
-            p.revive(p.connection.default_channel)
+        if p._channel is None:
+            conn = self._acquire_connection()
+            try:
+                p.revive(conn)
+            except BaseException:
+                conn.release()
+                raise
         return p
 
     def release(self, resource):
-        resource.connection.release()
-        resource.connection = resource.channel = None
+        if resource.__connection__:
+            resource.__connection__.release()
+        resource.channel = None
         super(ProducerPool, self).release(resource)
 
 
-class PoolGroup(HashingDict):
+class PoolGroup(EqualityDict):
 
     def __init__(self, limit=None):
         self.limit = limit
 
     def create(self, resource, limit):
-        raise NotImplementedError("PoolGroups must define ``create``")
+        raise NotImplementedError('PoolGroups must define ``create``')
 
     def __missing__(self, resource):
         limit = self.limit
@@ -98,7 +113,7 @@ producers = register_group(Producers(limit=use_global_limit))
 
 
 def _all_pools():
-    return chain(*[(g.itervalues() if g else iter([])) for g in _groups])
+    return chain(*[(values(g) if g else iter([])) for g in _groups])
 
 
 def get_limit():
@@ -108,7 +123,7 @@ def get_limit():
 def set_limit(limit, force=False, reset_after=False):
     limit = limit or 0
     glimit = _limit[0] or 0
-    if limit or 0 < glimit:
+    if limit < glimit:
         if not disable_limit_protection and (_used[0] and not force):
             raise RuntimeError("Can't lower limit after pool in use.")
         reset_after = True
@@ -134,5 +149,5 @@ def reset(*args, **kwargs):
 try:
     from multiprocessing.util import register_after_fork
     register_after_fork(connections, reset)
-except ImportError:
+except ImportError:  # pragma: no cover
     pass

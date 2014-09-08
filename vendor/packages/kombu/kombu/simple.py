@@ -4,21 +4,23 @@ kombu.simple
 
 Simple interface.
 
-:copyright: (c) 2009 - 2011 by Ask Solem.
-:license: BSD, see LICENSE for more details.
-
 """
+from __future__ import absolute_import
+
 import socket
 
 from collections import deque
-from time import time
-from Queue import Empty
 
-from kombu import entity
-from kombu import messaging
+from . import entity
+from . import messaging
+from .connection import maybe_channel
+from .five import Empty, monotonic
+
+__all__ = ['SimpleQueue', 'SimpleBuffer']
 
 
 class SimpleBase(object):
+    Empty = Empty
     _consuming = False
 
     def __enter__(self):
@@ -27,13 +29,11 @@ class SimpleBase(object):
     def __exit__(self, *exc_info):
         self.close()
 
-    def __init__(self, channel, producer, consumer, no_ack=False,
-            channel_autoclose=False):
-        self.channel = channel
+    def __init__(self, channel, producer, consumer, no_ack=False):
+        self.channel = maybe_channel(channel)
         self.producer = producer
         self.consumer = consumer
         self.no_ack = no_ack
-        self.channel_autoclose = channel_autoclose
         self.queue = self.consumer.queues[0]
         self.buffer = deque()
         self.consumer.register_callback(self._receive)
@@ -45,21 +45,21 @@ class SimpleBase(object):
         elapsed = 0.0
         remaining = timeout
         while True:
-            time_start = time()
+            time_start = monotonic()
             if self.buffer:
-                return self.buffer.pop()
+                return self.buffer.popleft()
             try:
                 self.channel.connection.client.drain_events(
-                            timeout=timeout and remaining)
+                    timeout=timeout and remaining)
             except socket.timeout:
-                raise Empty()
-            elapsed += time() - time_start
+                raise self.Empty()
+            elapsed += monotonic() - time_start
             remaining = timeout and timeout - elapsed or None
 
     def get_nowait(self):
         m = self.queue.get(no_ack=self.no_ack)
         if not m:
-            raise Empty()
+            raise self.Empty()
         return m
 
     def put(self, message, serializer=None, headers=None, compression=None,
@@ -79,8 +79,6 @@ class SimpleBase(object):
         return size
 
     def close(self):
-        if self.channel_autoclose:
-            self.channel.close()
         self.consumer.cancel()
 
     def _receive(self, message_data, message):
@@ -95,31 +93,35 @@ class SimpleBase(object):
         """`len(self) -> self.qsize()`"""
         return self.qsize()
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
+    __nonzero__ = __bool__
 
 
 class SimpleQueue(SimpleBase):
     no_ack = False
     queue_opts = {}
-    exchange_opts = {}
+    exchange_opts = {'type': 'direct'}
 
     def __init__(self, channel, name, no_ack=None, queue_opts=None,
-            exchange_opts=None, serializer=None, compression=None, **kwargs):
+                 exchange_opts=None, serializer=None,
+                 compression=None, **kwargs):
         queue = name
         queue_opts = dict(self.queue_opts, **queue_opts or {})
         exchange_opts = dict(self.exchange_opts, **exchange_opts or {})
         if no_ack is None:
             no_ack = self.no_ack
         if not isinstance(queue, entity.Queue):
-            exchange = entity.Exchange(name, "direct", **exchange_opts)
+            exchange = entity.Exchange(name, **exchange_opts)
             queue = entity.Queue(name, exchange, name, **queue_opts)
+            routing_key = name
         else:
             name = queue.name
             exchange = queue.exchange
+            routing_key = queue.routing_key
         producer = messaging.Producer(channel, exchange,
                                       serializer=serializer,
-                                      routing_key=name,
+                                      routing_key=routing_key,
                                       compression=compression)
         consumer = messaging.Consumer(channel, queue)
         super(SimpleQueue, self).__init__(channel, producer,
@@ -131,5 +133,5 @@ class SimpleBuffer(SimpleQueue):
     queue_opts = dict(durable=False,
                       auto_delete=True)
     exchange_opts = dict(durable=False,
-                         delivery_mode="transient",
+                         delivery_mode='transient',
                          auto_delete=True)

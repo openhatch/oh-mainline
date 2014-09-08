@@ -4,22 +4,29 @@ kombu.transport.beanstalk
 
 Beanstalk transport.
 
-:copyright: (c) 2010 - 2011 by David Ziegler.
+:copyright: (c) 2010 - 2013 by David Ziegler.
 :license: BSD, see LICENSE for more details.
 
 """
+from __future__ import absolute_import
+
 import socket
 
-from Queue import Empty
+from anyjson import loads, dumps
 
-from anyjson import serialize, deserialize
-from beanstalkc import Connection, BeanstalkcException, SocketError
+from kombu.five import Empty
+from kombu.utils.encoding import bytes_to_str
 
-from kombu.transport import virtual
+from . import virtual
+
+try:
+    import beanstalkc
+except ImportError:  # pragma: no cover
+    beanstalkc = None  # noqa
 
 DEFAULT_PORT = 11300
 
-__author__ = "David Ziegler <david.ziegler@gmail.com>"
+__author__ = 'David Ziegler <david.ziegler@gmail.com>'
 
 
 class Channel(virtual.Channel):
@@ -29,8 +36,8 @@ class Channel(virtual.Channel):
         item, dest = None, None
         if job:
             try:
-                item = deserialize(job.body)
-                dest = job.stats()["tube"]
+                item = loads(bytes_to_str(job.body))
+                dest = job.stats()['tube']
             except Exception:
                 job.bury()
             else:
@@ -40,17 +47,21 @@ class Channel(virtual.Channel):
         return item, dest
 
     def _put(self, queue, message, **kwargs):
-        priority = message["properties"]["delivery_info"]["priority"]
+        extra = {}
+        priority = message['properties']['delivery_info']['priority']
+        ttr = message['properties'].get('ttr')
+        if ttr is not None:
+            extra['ttr'] = ttr
+
         self.client.use(queue)
-        self.client.put(serialize(message), priority=priority)
+        self.client.put(dumps(message), priority=priority, **extra)
 
     def _get(self, queue):
         if queue not in self.client.watching():
             self.client.watch(queue)
 
-        [self.client.ignore(active)
-            for active in self.client.watching()
-                if active != queue]
+        [self.client.ignore(active) for active in self.client.watching()
+         if active != queue]
 
         job = self.client.reserve(timeout=1)
         item, dest = self._parse_job(job)
@@ -63,9 +74,12 @@ class Channel(virtual.Channel):
             timeout = 1
 
         watching = self.client.watching()
-        [self.client.watch(active)
-            for active in queues
-                if active not in watching]
+
+        [self.client.watch(active) for active in queues
+         if active not in watching]
+
+        [self.client.ignore(active) for active in watching
+         if active not in queues]
 
         job = self.client.reserve(timeout=timeout)
         return self._parse_job(job)
@@ -75,8 +89,8 @@ class Channel(virtual.Channel):
             self.client.watch(queue)
 
         [self.client.ignore(active)
-                for active in self.client.watching()
-                    if active != queue]
+         for active in self.client.watching()
+         if active != queue]
         count = 0
         while 1:
             job = self.client.reserve(timeout=1)
@@ -92,8 +106,9 @@ class Channel(virtual.Channel):
 
     def _open(self):
         conninfo = self.connection.client
+        host = conninfo.hostname or 'localhost'
         port = conninfo.port or DEFAULT_PORT
-        conn = Connection(host=conninfo.hostname, port=port)
+        conn = beanstalkc.Connection(host=host, port=port)
         conn.connect()
         return conn
 
@@ -112,12 +127,29 @@ class Channel(virtual.Channel):
 class Transport(virtual.Transport):
     Channel = Channel
 
-    interval = 1
+    polling_interval = 1
     default_port = DEFAULT_PORT
-    connection_errors = (socket.error,
-                         SocketError,
-                         IOError)
-    channel_errors = (socket.error,
-                      IOError,
-                      SocketError,
-                      BeanstalkcException)
+    connection_errors = (
+        virtual.Transport.connection_errors + (
+            socket.error, IOError,
+            getattr(beanstalkc, 'SocketError', None),
+        )
+    )
+    channel_errors = (
+        virtual.Transport.channel_errors + (
+            socket.error, IOError,
+            getattr(beanstalkc, 'SocketError', None),
+            getattr(beanstalkc, 'BeanstalkcException', None),
+        )
+    )
+    driver_type = 'beanstalk'
+    driver_name = 'beanstalkc'
+
+    def __init__(self, *args, **kwargs):
+        if beanstalkc is None:
+            raise ImportError(
+                'Missing beanstalkc library (pip install beanstalkc)')
+        super(Transport, self).__init__(*args, **kwargs)
+
+    def driver_version(self):
+        return beanstalkc.__version__

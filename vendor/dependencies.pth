@@ -1,4 +1,4 @@
-packages/amqplib
+packages/amqp
 packages/anyjson
 packages/BeautifulSoup
 packages/beautifulsoup4

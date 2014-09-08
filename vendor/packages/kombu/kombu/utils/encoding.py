@@ -1,18 +1,48 @@
+# -*- coding: utf-8 -*-
 """
 kombu.utils.encoding
-====================
+~~~~~~~~~~~~~~~~~~~~~
 
-Unicode utilities.
-
-:copyright: (c) 2009 - 2011 by Ask Solem.
-:license: BSD, see LICENSE for more details.
+Utilities to encode text, and to safely emit text from running
+applications without crashing with the infamous :exc:`UnicodeDecodeError`
+exception.
 
 """
+from __future__ import absolute_import
+
 import sys
 import traceback
 
+from kombu.five import text_t
 
-if sys.version_info >= (3, 0):
+is_py3k = sys.version_info >= (3, 0)
+
+#: safe_str takes encoding from this file by default.
+#: :func:`set_default_encoding_file` can used to set the
+#: default output file.
+default_encoding_file = None
+
+
+def set_default_encoding_file(file):
+    global default_encoding_file
+    default_encoding_file = file
+
+
+def get_default_encoding_file():
+    return default_encoding_file
+
+
+if sys.platform.startswith('java'):     # pragma: no cover
+
+    def default_encoding(file=None):
+        return 'utf-8'
+else:
+
+    def default_encoding(file=None):  # noqa
+        file = file or get_default_encoding_file()
+        return getattr(file, 'encoding', None) or sys.getfilesystemencoding()
+
+if is_py3k:  # pragma: no cover
 
     def str_to_bytes(s):
         if isinstance(s, str):
@@ -24,46 +54,75 @@ if sys.version_info >= (3, 0):
             return s.decode()
         return s
 
+    def from_utf8(s, *args, **kwargs):
+        return s
+
+    def ensure_bytes(s):
+        if not isinstance(s, bytes):
+            return str_to_bytes(s)
+        return s
+
+    def default_encode(obj):
+        return obj
+
+    str_t = str
+
 else:
 
-    def str_to_bytes(s):  # noqa
+    def str_to_bytes(s):                # noqa
         if isinstance(s, unicode):
             return s.encode()
         return s
 
-    def bytes_to_str(s):  # noqa
+    def bytes_to_str(s):                # noqa
         return s
 
+    def from_utf8(s, *args, **kwargs):  # noqa
+        return s.encode('utf-8', *args, **kwargs)
 
-if sys.platform.startswith("java"):
+    def default_encode(obj, file=None):            # noqa
+        return unicode(obj, default_encoding(file))
 
-    def default_encoding():
-        return "utf-8"
-
-else:
-
-    def default_encoding():  # noqa
-        return sys.getfilesystemencoding()
+    str_t = unicode
+    ensure_bytes = str_to_bytes
 
 
-def safe_str(s, errors="replace"):
-    if not isinstance(s, basestring):
+try:
+    bytes_t = bytes
+except NameError:  # pragma: no cover
+    bytes_t = str  # noqa
+
+
+def safe_str(s, errors='replace'):
+    s = bytes_to_str(s)
+    if not isinstance(s, (text_t, bytes)):
         return safe_repr(s, errors)
     return _safe_str(s, errors)
 
 
-def _safe_str(s, errors="replace"):
-    encoding = default_encoding()
-    try:
-        if isinstance(s, unicode):
-            return s.encode(encoding, errors)
-        return unicode(s, encoding, errors)
-    except Exception, exc:
-        return "<Unrepresentable %r: %r %r>" % (
-                type(s), exc, "\n".join(traceback.format_stack()))
+if is_py3k:
+
+    def _safe_str(s, errors='replace', file=None):
+        if isinstance(s, str):
+            return s
+        try:
+            return str(s)
+        except Exception as exc:
+            return '<Unrepresentable {0!r}: {1!r} {2!r}>'.format(
+                type(s), exc, '\n'.join(traceback.format_stack()))
+else:
+    def _safe_str(s, errors='replace', file=None):  # noqa
+        encoding = default_encoding(file)
+        try:
+            if isinstance(s, unicode):
+                return s.encode(encoding, errors)
+            return unicode(s, encoding, errors)
+        except Exception as exc:
+            return '<Unrepresentable {0!r}: {1!r} {2!r}>'.format(
+                type(s), exc, '\n'.join(traceback.format_stack()))
 
 
-def safe_repr(o, errors="replace"):
+def safe_repr(o, errors='replace'):
     try:
         return repr(o)
     except Exception:

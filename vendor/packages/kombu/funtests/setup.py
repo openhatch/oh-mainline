@@ -8,7 +8,7 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup  # noqa
-    from setuptools.command.install import install # noqa
+    from setuptools.command.install import install  # noqa
 
 
 class no_install(install):
@@ -31,38 +31,37 @@ But you can execute the tests by running the command:
 
 setup(
     name='kombu-funtests',
-    version="DEV",
-    description="Functional test suite for Kombu",
-    author="Ask Solem",
-    author_email="ask@celeryproject.org",
-    url="http://github.com/ask/kombu",
-    platforms=["any"],
+    version='DEV',
+    description='Functional test suite for Kombu',
+    author='Ask Solem',
+    author_email='ask@celeryproject.org',
+    url='http://github.com/celery/kombu',
+    platforms=['any'],
     packages=[],
     data_files=[],
     zip_safe=False,
-    cmdclass={"install": no_install},
-    test_suite="nose.collector",
+    cmdclass={'install': no_install},
+    test_suite='nose.collector',
     build_requires=[
-        "nose",
-        "nose-cover3",
-        "unittest2",
-        "coverage>=3.0",
-        "simplejson",
-        "PyYAML",
-        "msgpack-python",
-        "pymongo",
-        "couchdb",
-        "pika",
-        "beanstalkc",
-        "kombu-sqlalchemy",
-        "django",
-        "django-kombu",
+        'nose',
+        'unittest2',
+        'coverage>=3.0',
+        'simplejson',
+        'PyYAML',
+        'msgpack-python',
+        'pymongo',
+        'couchdb',
+        'kazoo',
+        'beanstalkc',
+        'kombu-sqlalchemy',
+        'django',
+        'django-kombu',
     ],
     classifiers=[
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "License :: OSI Approved :: BSD License",
-        "Intended Audience :: Developers",
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'License :: OSI Approved :: BSD License',
+        'Intended Audience :: Developers',
     ],
-    long_description="Do not install this package",
+    long_description='Do not install this package',
 )

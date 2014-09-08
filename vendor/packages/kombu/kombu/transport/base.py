@@ -4,16 +4,24 @@ kombu.transport.base
 
 Base transport interface.
 
-:copyright: (c) 2009 - 2011 by Ask Solem.
-:license: BSD, see LICENSE for more details.
-
 """
+from __future__ import absolute_import
 
-from kombu import serialization
-from kombu.compression import decompress
-from kombu.exceptions import MessageStateError
+import errno
+import socket
 
-ACKNOWLEDGED_STATES = frozenset(["ACK", "REJECTED", "REQUEUED"])
+from kombu.exceptions import ChannelError, ConnectionError
+from kombu.message import Message
+from kombu.utils import cached_property
+from kombu.utils.compat import get_errno
+
+__all__ = ['Message', 'StdChannel', 'Management', 'Transport']
+
+
+def _LeftBlank(obj, method):
+    return NotImplementedError(
+        'Transport {0.__module__}.{0.__name__} does not implement {1}'.format(
+            obj.__class__, method))
 
 
 class StdChannel(object):
@@ -27,175 +35,139 @@ class StdChannel(object):
         from kombu.messaging import Producer
         return Producer(self, *args, **kwargs)
 
-    def list_bindings(self):
-        raise NotImplementedError("%r does not implement list_bindings" % (
-            self.__class__, ))
+    def get_bindings(self):
+        raise _LeftBlank(self, 'get_bindings')
 
     def after_reply_message_received(self, queue):
         """reply queue semantics: can be used to delete the queue
            after transient reply message received."""
         pass
 
+    def __enter__(self):
+        return self
 
-class Message(object):
-    """Base class for received messages."""
-    _state = None
+    def __exit__(self, *exc_info):
+        self.close()
 
-    MessageStateError = MessageStateError
 
-    #: The channel the message was received on.
-    channel = None
+class Management(object):
 
-    #: Delivery tag used to identify the message in this channel.
-    delivery_tag = None
+    def __init__(self, transport):
+        self.transport = transport
 
-    #: Content type used to identify the type of content.
-    content_type = None
-
-    #: Content encoding used to identify the text encoding of the body.
-    content_encoding = None
-
-    #: Additional delivery information.
-    delivery_info = None
-
-    #: Message headers
-    headers = None
-
-    #: Application properties
-    properties = None
-
-    #: Raw message body (may be serialized), see :attr:`payload` instead.
-    body = None
-
-    def __init__(self, channel, body=None, delivery_tag=None,
-            content_type=None, content_encoding=None, delivery_info={},
-            properties=None, headers=None, postencode=None,
-            **kwargs):
-        self.channel = channel
-        self.body = body
-        self.delivery_tag = delivery_tag
-        self.content_type = content_type
-        self.content_encoding = content_encoding
-        self.delivery_info = delivery_info
-        self.headers = headers or {}
-        self.properties = properties or {}
-        self._decoded_cache = None
-        self._state = "RECEIVED"
-
-        compression = self.headers.get("compression")
-        if compression:
-            self.body = decompress(self.body, compression)
-        if postencode and isinstance(self.body, unicode):
-            self.body = self.body.encode(postencode)
-
-    def ack(self):
-        """Acknowledge this message as being processed.,
-        This will remove the message from the queue.
-
-        :raises MessageStateError: If the message has already been
-            acknowledged/requeued/rejected.
-
-        """
-        if self.channel.no_ack_consumers is not None:
-            try:
-                consumer_tag = self.delivery_info["consumer_tag"]
-            except KeyError:
-                pass
-            else:
-                if consumer_tag in self.channel.no_ack_consumers:
-                    return
-        if self.acknowledged:
-            raise self.MessageStateError(
-                "Message already acknowledged with state: %s" % self._state)
-        self.channel.basic_ack(self.delivery_tag)
-        self._state = "ACK"
-
-    def reject(self):
-        """Reject this message.
-
-        The message will be discarded by the server.
-
-        :raises MessageStateError: If the message has already been
-            acknowledged/requeued/rejected.
-
-        """
-        if self.acknowledged:
-            raise self.MessageStateError(
-                "Message already acknowledged with state: %s" % self._state)
-        self.channel.basic_reject(self.delivery_tag, requeue=False)
-        self._state = "REJECTED"
-
-    def requeue(self):
-        """Reject this message and put it back on the queue.
-
-        You must not use this method as a means of selecting messages
-        to process.
-
-        :raises MessageStateError: If the message has already been
-            acknowledged/requeued/rejected.
-
-        """
-        if self.acknowledged:
-            raise self.MessageStateError(
-                "Message already acknowledged with state: %s" % self._state)
-        self.channel.basic_reject(self.delivery_tag, requeue=True)
-        self._state = "REQUEUED"
-
-    def decode(self):
-        """Deserialize the message body, returning the original
-        python structure sent by the publisher."""
-        return serialization.decode(self.body, self.content_type,
-                                    self.content_encoding)
-
-    @property
-    def acknowledged(self):
-        """Set to true if the message has been acknowledged."""
-        return self._state in ACKNOWLEDGED_STATES
-
-    @property
-    def payload(self):
-        """The decoded message body."""
-        if not self._decoded_cache:
-            self._decoded_cache = self.decode()
-        return self._decoded_cache
+    def get_bindings(self):
+        raise _LeftBlank(self, 'get_bindings')
 
 
 class Transport(object):
     """Base class for transports."""
+    Management = Management
 
-    #: The :class:`~kombu.connection.BrokerConnection` owning this instance.
+    #: The :class:`~kombu.Connection` owning this instance.
     client = None
+
+    #: Set to True if :class:`~kombu.Connection` should pass the URL
+    #: unmodified.
+    can_parse_url = False
 
     #: Default port used when no port has been specified.
     default_port = None
 
     #: Tuple of errors that can happen due to connection failure.
-    connection_errors = ()
+    connection_errors = (ConnectionError, )
 
     #: Tuple of errors that can happen due to channel/method failure.
-    channel_errors = ()
+    channel_errors = (ChannelError, )
+
+    #: Type of driver, can be used to separate transports
+    #: using the AMQP protocol (driver_type: 'amqp'),
+    #: Redis (driver_type: 'redis'), etc...
+    driver_type = 'N/A'
+
+    #: Name of driver library (e.g. 'py-amqp', 'redis', 'beanstalkc').
+    driver_name = 'N/A'
+
+    #: Whether this transports support heartbeats,
+    #: and that the :meth:`heartbeat_check` method has any effect.
+    supports_heartbeats = False
+
+    #: Set to true if the transport supports the AIO interface.
+    supports_ev = False
+
+    __reader = None
 
     def __init__(self, client, **kwargs):
         self.client = client
 
     def establish_connection(self):
-        raise NotImplementedError("Subclass responsibility")
+        raise _LeftBlank(self, 'establish_connection')
 
     def close_connection(self, connection):
-        raise NotImplementedError("Subclass responsibility")
+        raise _LeftBlank(self, 'close_connection')
 
     def create_channel(self, connection):
-        raise NotImplementedError("Subclass responsibility")
+        raise _LeftBlank(self, 'create_channel')
 
     def close_channel(self, connection):
-        raise NotImplementedError("Subclass responsibility")
+        raise _LeftBlank(self, 'close_channel')
 
     def drain_events(self, connection, **kwargs):
-        raise NotImplementedError("Subclass responsibility")
+        raise _LeftBlank(self, 'drain_events')
+
+    def heartbeat_check(self, connection, rate=2):
+        pass
+
+    def driver_version(self):
+        return 'N/A'
+
+    def get_heartbeat_interval(self, connection):
+        return 0
+
+    def register_with_event_loop(self, loop):
+        pass
+
+    def unregister_from_event_loop(self, loop):
+        pass
 
     def verify_connection(self, connection):
         return True
 
+    def _make_reader(self, connection, timeout=socket.timeout,
+                     error=socket.error, get_errno=get_errno,
+                     _unavail=(errno.EAGAIN, errno.EINTR)):
+        drain_events = connection.drain_events
+
+        def _read(loop):
+            if not connection.connected:
+                raise ConnectionError('Socket was disconnected')
+            try:
+                drain_events(timeout=0)
+            except timeout:
+                return
+            except error as exc:
+                if get_errno(exc) in _unavail:
+                    return
+                raise
+            loop.call_soon(_read, loop)
+
+        return _read
+
+    def qos_semantics_matches_spec(self, connection):
+        return True
+
+    def on_readable(self, connection, loop):
+        reader = self.__reader
+        if reader is None:
+            reader = self.__reader = self._make_reader(connection)
+        reader(loop)
+
     @property
     def default_connection_params(self):
         return {}
+
+    def get_manager(self, *args, **kwargs):
+        return self.Management(self)
+
+    @cached_property
+    def manager(self):
+        return self.get_manager()

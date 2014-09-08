@@ -4,28 +4,51 @@ kombu.exceptions
 
 Exceptions.
 
-:copyright: (c) 2009 - 2011 by Ask Solem.
-:license: BSD, see LICENSE for more details.
-
 """
+from __future__ import absolute_import
+
+import socket
+
+from amqp import ChannelError, ConnectionError, ResourceError
+
+__all__ = ['NotBoundError', 'MessageStateError', 'TimeoutError',
+           'LimitExceeded', 'ConnectionLimitExceeded',
+           'ChannelLimitExceeded', 'ConnectionError', 'ChannelError',
+           'VersionMismatch', 'SerializerNotInstalled', 'ResourceError',
+           'SerializationError', 'EncodeError', 'DecodeError']
+
+TimeoutError = socket.timeout
 
 
-class NotBoundError(Exception):
+class KombuError(Exception):
+    """Common subclass for all Kombu exceptions."""
+    pass
+
+
+class SerializationError(KombuError):
+    """Failed to serialize/deserialize content."""
+
+
+class EncodeError(SerializationError):
+    """Cannot encode object."""
+    pass
+
+
+class DecodeError(SerializationError):
+    """Cannot decode object."""
+
+
+class NotBoundError(KombuError):
     """Trying to call channel dependent method on unbound entity."""
     pass
 
 
-class MessageStateError(Exception):
+class MessageStateError(KombuError):
     """The message has already been acknowledged."""
     pass
 
 
-class TimeoutError(Exception):
-    """Operation timed out."""
-    pass
-
-
-class LimitExceeded(Exception):
+class LimitExceeded(KombuError):
     """Limit exceeded."""
     pass
 
@@ -36,13 +59,25 @@ class ConnectionLimitExceeded(LimitExceeded):
 
 
 class ChannelLimitExceeded(LimitExceeded):
-    """Maximum number of simultaenous channels exceeded."""
+    """Maximum number of simultaneous channels exceeded."""
     pass
 
 
-class StdChannelError(Exception):
+class VersionMismatch(KombuError):
     pass
 
 
-class VersionMismatch(Exception):
+class SerializerNotInstalled(KombuError):
+    """Support for the requested serialization type is not installed"""
+    pass
+
+
+class ContentDisallowed(SerializerNotInstalled):
+    """Consumer does not allow this content-type."""
+    pass
+
+
+class InconsistencyError(ConnectionError):
+    """Data or environment has been found to be inconsistent,
+    depending on the cause it may be possible to retry the operation."""
     pass
