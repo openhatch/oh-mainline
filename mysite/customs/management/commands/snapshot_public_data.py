@@ -151,6 +151,6 @@ class Command(BaseCommand):
             query_set=Link_Person_Tag.objects.all())
         data.extend(public_persons_tags_links)
 
-        # anyway, now we stream all this data out using simplejson
+        # anyway, now we stream all this data out using json
         json.dump(data, output,
                         cls=django.core.serializers.json.DjangoJSONEncoder)
