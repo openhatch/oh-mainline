@@ -183,7 +183,7 @@ class EditPassword(WebTest):
         # From a sample user profile page, go into the reset password page
         user = 'paulproteus'
         paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
-        settings_page = paulproteus_page.click("settings", index=0)
+        settings_page = paulproteus_page.click(href="/account/settings/location/")
         reset_pw_page = settings_page.click("Password", index=0)
 
         # Change password on the password reset form
