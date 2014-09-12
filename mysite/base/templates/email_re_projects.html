@@ -63,11 +63,11 @@
             <dt style='font-weight: bold; margin-top: 1em;'>
 
             {% if rich_text %}
-            <a href='http://openhatch.org/+projects/{{ project.name|urlencode }}'>
+            <a href='http://openhatch.org/projects/{{ project.name|urlencode }}'>
                 {{ project.display_name }}</a>
             {% else %}
             ## {{ project.display_name }} ##<br>
-            &lt;http://openhatch.org/+projects/{{ project.name|urlencode }}&gt;
+            &lt;http://openhatch.org/projects/{{ project.name|urlencode }}&gt;
             {% endif %}
             </dt>
 

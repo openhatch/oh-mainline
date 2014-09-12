@@ -102,7 +102,7 @@ def main(argv=None):
 
         description = "A website",
 
-        author = 'The OpenHatch team <http://openhatch.org/about/> <http://openhatch.org/+projects/OpenHatch>',
+        author = 'The OpenHatch team <http://openhatch.org/about/> <http://openhatch.org/projects/OpenHatch>',
         author_email = 'all@openhatch.org',
 
         package_dir = {'': '.'},

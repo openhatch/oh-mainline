@@ -412,7 +412,7 @@ function updatePortfolio(response) {
         var $addto = $pname;
         var $link = $('a', $pname);
         if ($link && $link.length) {
-            $link.attrSmart('href', '/+projects/' + project_we_refer_to.fields.name);
+            $link.attrSmart('href', '/projects/' + project_we_refer_to.fields.name);
             $addto = $link;
         }
         $addto.textSmart(project_we_refer_to.fields.name);

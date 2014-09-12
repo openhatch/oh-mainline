@@ -5,7 +5,7 @@ THANKS
 * The Free Software projects that we depend on - see the vendor/ directory for
   a list.
 * Our contributors and consultants are listed at
-  http://openhatch.org/+projects/OpenHatch. If you've helped to create
+  http://openhatch.org/projects/OpenHatch. If you've helped to create
   OpenHatch, you deserve to be listed there!
 * The fantastic people who have helped us:
 

@@ -79,13 +79,13 @@ urlpatterns = patterns('',
                        (r'^-profile.views.unsubscribe_do',
                         'mysite.profile.views.unsubscribe_do'),
 
-                       (r'^\+projects/suggest_question/',
+                       (r'^\projects/suggest_question/',
                         'mysite.project.views.suggest_question'),
 
                        (r'^\+projedit/(?P<project__name>.+)',
                         'mysite.project.views.edit_project'),
 
-                       (r'^\+projects/suggest_question_do/',
+                       (r'^\projects/suggest_question_do/',
                         'mysite.project.views.suggest_question_do'),
 
                        (r'^\+do/project.views.wanna_help_do',
@@ -97,7 +97,7 @@ urlpatterns = patterns('',
                        (r'^\+do/project.views.unlist_self_from_wanna_help_do',
                         'mysite.project.views.unlist_self_from_wanna_help_do'),
 
-                       (r'^\+projects/create_project_page_do',
+                       (r'^\projects/create_project_page_do',
                         'mysite.project.views.create_project_page_do'),
                        # Generic view to vote on Link objects
                        (r'^\+answer/vote/(?P<object_id>\d+)/(?P<direction>up|down|clear)vote/?$',
@@ -461,10 +461,10 @@ urlpatterns = patterns('',
 
                        (r'^projects/', include('mysite.project.urls')),
 
-                       (r'^\+projects/$', lambda x:
+                       (r'^\projects/$', lambda x:
                         HttpResponsePermanentRedirect('/projects/')),
 
-                       (r'^\+projects/(.+)$', lambda request, path:
+                       (r'^\projects/(.+)$', lambda request, path:
                         HttpResponsePermanentRedirect('/projects/' + path)),
 
                        (r'^ projects/', lambda x:
