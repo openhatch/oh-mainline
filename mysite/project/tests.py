@@ -99,19 +99,6 @@ class ProjectList(TwillTests):
     def test_it_generally_works(self):
         self.client.get('/projects/')
 
-    def test_plus_projects_redirects_to_projects(self):
-        response = self.client.get("/+projects/")
-        self.assertEqual(response.status_code, 301)
-        parsed = urlparse.urlparse(response['location'])
-        self.assertEqual('/projects/', parsed.path)
-
-    def test_plus_projects_for_specific_project(self):
-        mysite.search.models.Project.create_dummy(name='sample')
-        response = self.client.get("/+projects/sample")
-        self.assertEqual(response.status_code, 301)
-        parsed = urlparse.urlparse(response['location'])
-        self.assertEqual('/projects/sample', parsed.path)
-
     def test_space_projects_redirects_to_projects(self):
         response = self.client.get("/ projects/")
         self.assertEqual(response.status_code, 301)

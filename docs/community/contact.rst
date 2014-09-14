@@ -22,7 +22,7 @@ If you don't know how to use IRC, you can `use our installation guide <https://o
 chat interface <http://webchat.freenode.net/?channels=#openhatch>`_.
 
 Are you trying to figure out who everybody is? Many of the people are part of
-the `OpenHatch project <http://openhatch.org/+projects/OpenHatch>`_.
+the `OpenHatch project <http://openhatch.org/projects/OpenHatch>`_.
 
 
 Quick start
