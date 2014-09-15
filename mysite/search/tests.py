@@ -1082,8 +1082,8 @@ class TestPotentialMentors(TwillTests):
                 'person-barry', 'person-paulproteus']
 
     def test(self):
-        '''Create a Banshee mentor and verify that Banshee thinks has one 
-        potential mentors.'''
+        '''Create a Banshee mentor and verify that Banshee thinks it 
+        has one potential mentor.'''
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
         can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(
