@@ -1078,12 +1078,11 @@ class PublicizeBugTrackerIndex(SearchTest):
 
 
 class TestPotentialMentors(TwillTests):
-    fixtures = ['user-paulproteus', 'user-barry',
-                'person-barry', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
-        '''Create a Banshee mentor and verify that Banshee thinks it 
-        has one potential mentor.'''
+        '''Create a Banshee project mentor and verify that the Banshee project
+         has one potential mentor.'''
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
         can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(

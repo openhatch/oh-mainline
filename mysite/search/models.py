@@ -123,7 +123,7 @@ class Project(OpenHatchModel):
         '''
         import mysite.profile.view_helpers
         tq = mysite.profile.view_helpers.TagQuery('can_mentor', self.name)
-        return len(tq.people.values_list('id', flat=True))
+        return tq.people.values_list('id', flat=True).count()
 
     @staticmethod
     def create_dummy(**kwargs):
