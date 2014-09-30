@@ -42,9 +42,6 @@
                     {{ person.user.last_name }}
                     <span class='username' style="font-size: .7em;">
                         ({{ person.user.username }})
-                        {% if editable %}
-                            (<a href='{% url "account.views.edit_name" %}'>edit name</a>)
-                        {% endif %}
                     </span>
             </h1>
             {% else %}
@@ -68,12 +65,9 @@
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
               {{ person.location_display_name }}
-          </a>
 	      {% endif %}
           {% if editable %}
-          {% if person.location_display_name and person.location_confirmed %}
-          (<a href="{% url "mysite.account.views.set_location" %}">edit</a>)
-          {% else %}
+          {% if not person.location_display_name or not person.location_confirmed %}
           <a href="{% url "mysite.account.views.set_location" %}">Set your location</a>
           {% endif %}
           {% endif %}
@@ -88,6 +82,10 @@
 			
     </div><!-- /.nameplate -->
 
+    <div id="editsettings">
+        <a href="/account/settings">Edit Your Settings</a>
+    </div>
+
 {% endblock pagetop %}
 
 {% block left %}
@@ -95,7 +93,6 @@
     {% if editable %}
     {% if person.photo %}
     <img src={% version photo_url %}>
-    <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
     {% else %}
     {# Haven't uploaded a photo yet #}
     <style>
@@ -244,24 +241,12 @@
         </div>
         {% endif %}
     </div>
-    <div class="module-foot">
-        {% if editable and not info_edit_mode %}
-        <ul>
-            <li><a class='edit' href='{% url "mysite.profile.views.edit_info" %}'>Edit</a></li>
-        </ul>
-        {% endif %}
-    </div>
 </div> <!-- end of person info module -->
 
 {% if person.contact_blurb %}
 <div id='contact_blurb' class='module'>
 
     <div class='module-head'>
-        {% if editable and not info_edit_mode %}
-        <ul>
-            <li><a class='edit' href='{% url "mysite.profile.views.edit_info" %}#contact_blurb'>Edit</a></li>
-        </ul>
-        {% endif %}
 
         <h3>How to contact me</h3>
 
