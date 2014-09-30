@@ -244,13 +244,6 @@
         </div>
         {% endif %}
     </div>
-    <div class="module-foot">
-        {% if editable and not info_edit_mode %}
-        <ul>
-            <li><a class='edit' href='{% url "mysite.profile.views.edit_info" %}'>Edit</a></li>
-        </ul>
-        {% endif %}
-    </div>
 </div> <!-- end of person info module -->
 
 {% if person.contact_blurb %}
