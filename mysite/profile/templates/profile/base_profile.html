@@ -42,9 +42,6 @@
                     {{ person.user.last_name }}
                     <span class='username' style="font-size: .7em;">
                         ({{ person.user.username }})
-                        {% if editable %}
-                            (<a href='{% url "account.views.edit_name" %}'>edit name</a>)
-                        {% endif %}
                     </span>
             </h1>
             {% else %}
