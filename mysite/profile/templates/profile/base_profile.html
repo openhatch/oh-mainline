@@ -65,12 +65,9 @@
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
               {{ person.location_display_name }}
-          </a>
 	      {% endif %}
           {% if editable %}
-          {% if person.location_display_name and person.location_confirmed %}
-          (<a href="{% url "mysite.account.views.set_location" %}">edit</a>)
-          {% else %}
+          {% if not person.location_display_name or not person.location_confirmed %}
           <a href="{% url "mysite.account.views.set_location" %}">Set your location</a>
           {% endif %}
           {% endif %}
