@@ -48,7 +48,7 @@ Settings
                     </style>
                     <li id='link-set_location'>
                     <a href='{% url "account.views.set_location" %}'>
-                        Put yourself on the map
+                        Location
                     </a>
                     </li>
                     <li id='link-edit_name'>
@@ -76,6 +76,15 @@ Settings
                         Tell a friend about OpenHatch
                     </a>
                     </li>
+                    <li id='link-edit_photo'>
+                    <a href='{% url "account.views.edit_photo" %}'>
+                        Change your photo
+                    </a>
+                    </li>
+                    <li id='link-edit_contact_info'>
+                    <a href='{% url "profile.views.edit_info" %}'>
+                        Edit contact info
+                    </a>
                     </li>
                 </ul>
             </div>
