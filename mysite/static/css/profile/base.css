@@ -18,6 +18,7 @@ body#profile #nameplate { float: left; width: 940px; margin-top: 20px; padding: 
 	body#profile #nameplate form,
 body#profile #nameplate form .section,
 body#profile #nameplate form h3 { width: 280px; }
+	body#profile #editsettings { padding: 3px; }
 	body#profile #nameplate form h3 {  }
 	body#profile #nameplate form h4 { padding: 8px 0; }
 	body#profile #nameplate .another-identifier { float: right; margin-left: 20px; margin-bottom: 10px; clear: right; }
