@@ -36,7 +36,7 @@ function getNewValue(obj_id, field_name) {
 
         // FIXME: This pops up an alert for all the fields, which is bad
         error: function () {
-            alert("You might need to check your internet connection and reload the page.\n (Could not reach server when refreshing page data.)");
+            $("div#error-notification").html("You might need to check your internet connection and reload the page.\n (Could not reach server when refreshing page data.)");
         },
 
         success: updateHTML
@@ -45,6 +45,7 @@ function getNewValue(obj_id, field_name) {
 
 function updateHTML(response) {
     // Don't update fields with empty values
+    $("div#error-notification").html("");
     if (response.new_html == '') {
         return;
     }
