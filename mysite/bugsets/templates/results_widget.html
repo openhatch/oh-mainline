@@ -19,7 +19,7 @@
 {% load base_extras %}
 
 <div class='results-widget'>
-  <span id='results-summary'>
+  <div id='results-summary'>
 
     {% if bugs %}
       {% ifequal bugs.count 1 %}
@@ -33,8 +33,8 @@
       No bugs!
     {% endif %}
 
-  </span>
-
+  </div>
+  <div id="error-notification"></div>
 
   <span id='expand-collapse-all' style='float: right'>
     <a href='#' id='expand-all-link'><img src={% version '/static/images/icons/zoom-in.png' %}>Expand all</a>
