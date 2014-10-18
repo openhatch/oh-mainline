@@ -25,7 +25,7 @@ if [ ! -z "$3" ] ; then
     TRACKER_ID="$3"
 fi
 
-URL=https://openhatch.org/+api/v1/customs/tracker_model/\?include_empty\=yes\&just_stale\=yes\&format\=yaml\&limit\="$MAX_TRACKERS"\&tracker_id="$TRACKER_ID"
+URL=https://openhatch.org/+api/v1/customs/tracker_model/\?just_stale\=yes\&format\=yaml\&limit\="$MAX_TRACKERS"\&tracker_id="$TRACKER_ID"
 
 function grab_bug_tracker_list() {
     # Try to download $URL. If curl bails on us, then

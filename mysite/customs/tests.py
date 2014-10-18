@@ -1157,6 +1157,66 @@ class TrackerAPI(WebTest):
         obj = objs[0]
         self.assertEqual(self.tm, obj)
 
+    def test_get_stale_trac_instances_empty(self):
+        # Create the Twisted project object
+        mysite.search.models.Project.objects.create(name='Twisted')
+
+        # Set up an empty Tracker (no bugs).
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+            tracker_name='Twisted',
+            base_url='http://twistedmatrix.com/trac/',
+            bug_project_name_format='{tracker_name}',
+            bitesized_type='keywords',
+            bitesized_text='easy',
+            documentation_type='keywords',
+            documentation_text='documentation')
+
+        # Query for all stale entries
+        api = mysite.customs.api.TrackerModelResource()
+        request = django.test.client.RequestFactory().get(
+            '/+api/v1/customs/tracker_model/?just_stale=yes')
+        objs = api.get_object_list(request)
+        # There should be a return value, because our bug list
+        # is empty (it could be a new project)
+        self.assertEqual(1, len(objs))
+        obj = objs[0]
+        self.assertEqual(self.tm, obj)
+
+    def test_get_stale_trac_instances_with_bugs(self):
+        # Create the Twisted project object
+        mysite.search.models.Project.objects.create(name='Twisted')
+
+        # Set up a Tracker with bugs
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+            tracker_name='Twisted',
+            base_url='http://twistedmatrix.com/trac/',
+            bug_project_name_format='{tracker_name}',
+            bitesized_type='keywords',
+            bitesized_text='easy',
+            documentation_type='keywords',
+            documentation_text='documentation')
+        for url in (
+                ['http://twistedmatrix.com/trac/query?status=new&'
+                 'status=assigned&status=reopened&format=csv&keywords=%7Eeasy'
+                 '&order=priority',
+                 'http://twistedmatrix.com/trac/query?status=assigned&'
+                 'status=new&status=reopened&format=csv&order=priority&'
+                 'keywords=~documentation']):
+            mysite.customs.models.TracQueryModel.objects.create(
+                url=url, tracker=self.tm)
+
+        # Query for all stale entries
+        api = mysite.customs.api.TrackerModelResource()
+        request = django.test.client.RequestFactory().get(
+            '/+api/v1/customs/tracker_model/?just_stale=yes')
+        objs = api.get_object_list(request)
+
+        # There should be a return value, because our bug list
+        # has entries and needs to be updated (no last_polled)
+        self.assertEqual(1, len(objs))
+        obj = objs[0]
+        self.assertEqual(self.tm, obj)
+
 
 class ImportBugsFromFiles(django.test.TestCase):
 

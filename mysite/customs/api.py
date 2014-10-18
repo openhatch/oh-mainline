@@ -24,7 +24,6 @@ class TrackerModelResource(tastypie.resources.ModelResource):
     def get_object_list(self, request):
         all_objects = super(TrackerModelResource,
                             self).get_object_list(request)
-        include_empty_trackers = False
         skip_these_ids = []
         tracker_type = request.GET.get('tracker_type', '')
         # Sanitize tracker_type.
@@ -53,24 +52,17 @@ class TrackerModelResource(tastypie.resources.ModelResource):
             else:
                 all_objects = all_objects.filter(id=as_int)
 
-        if request.GET.get('include_empty', '').lower() == 'yes':
-            # In combination with the following 'just_stale' attribute, this
-            # switch also exports all trackers that have an empty bug list,
-            # such that new projects/trackers get kicked off properly.
-            include_empty_trackers = True
-
         if request.GET.get('just_stale', '').lower() == 'yes':
             # Note: This code is of low quality.
             for obj in all_objects:
                 relevant_bugs = mysite.search.models.Bug.all_bugs.filter(
                     tracker_id=obj.id)
 
-                # Check for empty bug trackers, if they should get included
-                # to the results...
-                if include_empty_trackers:
-                    if len(relevant_bugs) == 0:
-                        # Empty bug list found, so don't exclude this tracker
-                        continue
+                # Check for empty bug trackers.
+                if len(relevant_bugs) == 0:
+                    # Empty bug list found, so don't exclude this tracker.
+                    # This ensures that new trackers get crawled initially.
+                    continue
 
                 # Find the minimum last_polled value
                 # HACK. Because we currently leave old bugs sitting around,
