@@ -1,0 +1,104 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+{% block title %}
+Community tools for free and open source software
+{% endblock title %}
+
+{% block body_id %}landing{% endblock body_id %}
+
+{% block js_in_head %}
+{{ block.super }}
+<script type="text/javascript">
+document.documentElement.className = 'javascript_is_enabled';
+</script>
+{% endblock %}
+
+{% block content %}
+
+    {# Remember, this page is only shown to non-logged-in users. #}
+    {% cache 60 homepage_content %}
+
+    <div class="module" id="landing-module">
+        <div class="module-body">
+            <p id="landing-message">
+                <img class="penguin" src="/static/images/penguin.png" /><a href="/about/" title="Community for free and open source software">OpenHatch</a> is a <a href="/about/">non-profit</a> dedicated to matching prospective free software contributors with communities, tools, and education.
+	</p>
+
+            </br><p id="landing-message">We provide online tools for new contributors</p>
+            <div class="submodule-container">
+                <div class="submodule">
+                    <h4><a href='{% url "mysite.missions.base.views.main_page" %}'>Build skills</a></h4>
+                    <p>practice with common <abbr title="Free, open source software">FOSS</abbr> technologies with our 
+                    <a href='{% url "mysite.missions.base.views.main_page" %}'>training missions &raquo;</a></p>
+                </div>
+                <div class="submodule">
+                    <h4><a href='{% url "mysite.search.views.search_index" %}'>Find a project</a></h4>
+                    <p>browse tasks across open source <a href='{% url "mysite.search.views.search_index" %}'>by skill, difficulty, or project &raquo;</a></p>
+                </div>
+                <div class="submodule">
+                    <h4><a href="/wiki/Contact">Get help</a></h4>
+                    <p>ask us questions about <a href="/wiki/Contact">finding projects and contributing  &raquo;</a></p>
+                </div>
+                <div class="submodule">
+                    <h4><a href='/guide/'>Add your project</a></h4>
+                    <p>use this site to <a href='/guide/'>make your favorite project more welcoming &raquo;</a></p>
+                </div>
+            </div>
+             {% include 'outreach.html' %}
+        </div>
+    </div>
+
+    <div class='column three-column'>
+    {% include 'feed_widget.html' %}
+    </div>
+
+    <div class='column three-column'>
+    {% include 'blog_widget.html' %}
+    </div>
+    
+    <div class='column three-column three-column-last'>
+    {% include 'contribute_widget.html' %}
+    </div>
+
+{% endcache %}
+{% endblock content %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+$(function(){
+        $('.people-list li').hoverClass('hover');
+        $('#tabbed_container_of_big_links').tabs({
+            cookie: {
+                // keeps tab choice for one day
+                expires: 1
+            }
+        });
+        $('.invisible_if_js').removeClass('invisible_if_js');
+});
+</script>
+{% endblock js %}
