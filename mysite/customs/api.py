@@ -24,6 +24,7 @@ class TrackerModelResource(tastypie.resources.ModelResource):
     def get_object_list(self, request):
         all_objects = super(TrackerModelResource,
                             self).get_object_list(request)
+        include_empty_trackers = False
         skip_these_ids = []
         tracker_type = request.GET.get('tracker_type', '')
         # Sanitize tracker_type.
@@ -52,20 +53,34 @@ class TrackerModelResource(tastypie.resources.ModelResource):
             else:
                 all_objects = all_objects.filter(id=as_int)
 
+        if request.GET.get('include_empty', '').lower() == 'yes':
+            # In combination with the following 'just_stale' attribute, this
+            # switch also exports all trackers that have an empty bug list,
+            # such that new projects/trackers get kicked off properly.
+            include_empty_trackers = True
+
         if request.GET.get('just_stale', '').lower() == 'yes':
             # Note: This code is of low quality.
             for obj in all_objects:
                 relevant_bugs = mysite.search.models.Bug.all_bugs.filter(
                     tracker_id=obj.id)
+
+                # Check for empty bug trackers, if they should get included
+                # to the results...
+                if include_empty_trackers:
+                    if len(relevant_bugs) == 0:
+                        # Empty bug list found, so don't exclude this tracker
+                        continue
+
                 # Find the minimum last_polled value
                 # HACK. Because we currently leave old bugs sitting around,
                 # if no query would refresh them, we know that the oldest bugs
-                # will have very old last_polled values. What we're trying to get
-                # at is if the bug importer has run for this tracker. So for now,
-                # we use django.db.models.Max() instead.
+                # will have very old last_polled values. What we're trying to
+                # get at is if the bug importer has run for this tracker. So
+                # for now, we use django.db.models.Max() instead.
                 #
-                # This should be changed back to Min() when https://openhatch.org/bugs/issue772
-                # is resolved.
+                # This should be changed back to Min() when
+                # https://openhatch.org/bugs/issue772 is resolved.
                 oldest_last_polled_data = relevant_bugs.aggregate(
                     django.db.models.Min('last_polled'))
                 oldest_last_polled = oldest_last_polled_data[
