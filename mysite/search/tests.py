@@ -1082,7 +1082,7 @@ class TestPotentialMentors(TwillTests):
 
     def test(self):
         '''Create a Banshee project mentor and verify that the Banshee project
-         has one potential mentor.'''
+         has one mentor.'''
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
         can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(
@@ -1097,7 +1097,7 @@ class TestPotentialMentors(TwillTests):
             tag=willing_to_mentor_banshee)
         link.save()
 
-        banshee_mentor_count = banshee.potential_mentor_count
+        banshee_mentor_count = banshee.mentor_count
         self.assertEqual(1, banshee_mentor_count)
 
 
