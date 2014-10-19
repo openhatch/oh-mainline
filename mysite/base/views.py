@@ -64,7 +64,7 @@ def home(request):
     data['random_profiles'] = everybody[0:5]
 
     if request.user.is_authenticated():
-        template_path = 'base/landing.html'
+        template_path = 'base/index.html'
         # figure oout which nudges we want to show them
         person = request.user.get_profile()
 
@@ -116,7 +116,7 @@ def home(request):
             (not any([pfe.project.bug_set.all()
                       for pfe in person.get_published_portfolio_entries()])))
     else:  # no user logged in. Show front-page
-        template_path = 'base/landing.html'
+        template_path = 'base/index.html'
 
     return (request, template_path, data)
 
