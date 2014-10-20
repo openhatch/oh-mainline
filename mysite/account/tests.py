@@ -286,7 +286,8 @@ class EditPhoto(WebTest):
                       photo('static/sample-photo.jpg')]:
             paulproteus_page = self.app.get('/people/%s/' % (username,),
                                             user=username)
-            photo_page = paulproteus_page.click(href='/account/edit/photo/')
+            settings_page = paulproteus_page.click(href='/account/settings/')
+            photo_page = settings_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
             photo_form.submit()
@@ -313,7 +314,8 @@ class EditPhoto(WebTest):
                       photo('static/images/too-wide.png')]:
             paulproteus_page = self.app.get('/people/%s/' % (username,),
                                             user=username)
-            photo_page = paulproteus_page.click(href='/account/edit/photo/')
+            settings_page = paulproteus_page.click(href='/account/settings/')
+            photo_page = settings_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
             photo_form.submit()
@@ -366,7 +368,8 @@ class EditPhotoWithOldPerson(WebTest):
                       photo('static/sample-photo.jpg')):
             paulproteus_page = self.app.get('/people/paulproteus/',
                                             user=username)
-            photo_page= paulproteus_page.click(href='/account/edit/photo')
+            settings_page= paulproteus_page.click(href='/account/settings/')
+            photo_page = settings_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
             photo_response = photo_form.submit()
