@@ -42,8 +42,6 @@ CACHES = {
 #       See documentation in advanced_installation.rst for more details
 POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
-CELERY_ALWAYS_EAGER = False  # srsly
-
 # always use memcached on linode-one, also
 CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
