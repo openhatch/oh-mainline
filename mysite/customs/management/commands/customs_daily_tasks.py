@@ -21,7 +21,6 @@ import urllib2
 from django.core.management.base import BaseCommand
 
 import django.conf
-django.conf.settings.CELERY_ALWAYS_EAGER = True
 
 import mysite.customs.mechanize_helpers
 

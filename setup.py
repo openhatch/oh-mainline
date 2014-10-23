@@ -53,7 +53,6 @@ def main(argv=None):
                             'twill==0.9.1-cc',
                             'invitation',
                             'django-authopenid==1.0.1-openhatch2',
-                            'celery==2.2.7',
                             'launchpadlib',
                             'django-assets==0.2.1',
                             'django-kombu==0.9.4',

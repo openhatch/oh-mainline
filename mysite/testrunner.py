@@ -36,7 +36,6 @@ def generate_safe_temp_file_name():
 
 
 def override_settings_for_testing():
-    settings.CELERY_ALWAYS_EAGER = True
     settings.SVN_REPO_PATH = tempfile.mkdtemp(
         prefix='svn_repo_path_' +
         datetime.datetime.now().isoformat().replace(':', '.'))
