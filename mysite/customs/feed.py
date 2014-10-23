@@ -50,8 +50,9 @@ def summary2html(html_string):
 
 def _blog_entries():
     try:
+        headers = {'User-Agent': 'OpenHatch oh-mainline blog feed fetcher'}
         text = requests.get(
-            OPENHATCH_BLOG_FEED_URL, timeout=REQUEST_TIMEOUT).text
+            OPENHATCH_BLOG_FEED_URL, timeout=REQUEST_TIMEOUT, headers=headers).text
         content = text.encode('utf-8', 'ignore')
     except requests.exceptions.Timeout:
         content = ''
