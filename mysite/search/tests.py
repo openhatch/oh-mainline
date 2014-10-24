@@ -1078,13 +1078,11 @@ class PublicizeBugTrackerIndex(SearchTest):
 
 
 class TestPotentialMentors(TwillTests):
-    fixtures = ['user-paulproteus', 'user-barry',
-                'person-barry', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
-        '''Create a Banshee mentor who can do C#
-        and a separate C# mentor, and verify that Banshee thinks it has
-        two potential mentors.'''
+        '''Create a Banshee project mentor and verify that the Banshee project
+         has one mentor.'''
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
         can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(
@@ -1094,27 +1092,13 @@ class TestPotentialMentors(TwillTests):
             mysite.profile.models.Tag.objects.
             get_or_create(tag_type=can_mentor, text=u'Banshee'))
 
-        willing_to_mentor_c_sharp, _ = (
-            mysite.profile.models.Tag.objects.get_or_create(
-                tag_type=can_mentor, text=u'C#'))
-
         link = mysite.profile.models.Link_Person_Tag(
             person=Person.objects.get(user__username=u'paulproteus'),
             tag=willing_to_mentor_banshee)
         link.save()
 
-        link = mysite.profile.models.Link_Person_Tag(
-            person=Person.objects.get(user__username=u'paulproteus'),
-            tag=willing_to_mentor_c_sharp)
-        link.save()
-
-        link = mysite.profile.models.Link_Person_Tag(
-            person=Person.objects.get(user__username=u'barry'),
-            tag=willing_to_mentor_c_sharp)
-        link.save()
-
-        banshee_mentor_count = banshee.potential_mentor_count
-        self.assertEqual(2, banshee_mentor_count)
+        banshee_mentor_count = banshee.mentor_count
+        self.assertEqual(1, banshee_mentor_count)
 
 
 class SuggestAlertOnLastResultsPage(TwillTests):

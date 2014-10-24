@@ -117,18 +117,13 @@ class Project(OpenHatchModel):
         return self.name
 
     @mysite.base.decorators.cached_property
-    def potential_mentor_count(self):
-        '''Return a number of potential mentors, counted as the
-        number of people who can mentor in the project by name unioned
-        with those who can mentor in the project's language.'''
-        all_mentor_person_ids = set()
+    def mentor_count(self):
+        '''Return a number of potential mentors, counted as the number of
+         people who can mentor in the project
+        '''
         import mysite.profile.view_helpers
-        for way_a_mentor_can_help in (self.name, self.language):
-            tq = mysite.profile.view_helpers.TagQuery('can_mentor',
-                                                      way_a_mentor_can_help)
-            all_mentor_person_ids.update(
-                tq.people.values_list('id', flat=True))
-        return len(all_mentor_person_ids)
+        tq = mysite.profile.view_helpers.TagQuery('can_mentor', self.name)
+        return tq.people.count()
 
     @staticmethod
     def create_dummy(**kwargs):
