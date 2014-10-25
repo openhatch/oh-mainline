@@ -159,7 +159,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
         github_url = self.cleaned_data['github_url']
 
         github_name_repo = re.match(
-            r'^https?:\/\/github.com\/([\_\-\w]+)\/([\_\-\w]+)$',
+            r'^https?:\/\/github.com\/([\_\-\w]+)\/([\_\-\w.]+)$',
             github_url
         )
 
