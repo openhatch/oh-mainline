@@ -115,6 +115,26 @@ Open source training missions
     {% include 'missions/mission_card.html' %}
     {% endwith %}
     {% endwith %}
+
+    <div class="clearer">&nbsp;</div>
+    </div>
+
+    <h2>Setup your Python environment</h2>
+
+    <p>These missions teach you how to install Python packages and create
+    virtual environments.</p>
+
+    <div class="submodule-container">
+    {% with fully_completed_missions.pipvirtualenv as mission_completed %}
+    {% with "Using pip and virtualenv" as mission_title %}
+    {% with "Learn how to install Python packages and how to work with virtual environments." as mission_description %}
+    {% with "/missions/pipvirtualenv" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
     <div class="clearer">&nbsp;</div>
     </div>
 

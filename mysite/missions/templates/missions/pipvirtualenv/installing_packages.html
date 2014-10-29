@@ -1,0 +1,114 @@
+{% extends 'missions/pipvirtualenv/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Installing packages and creating virtualenvs</h3>
+  </div>
+  <div class="body">
+
+  <h3>Creating virtualenvs</h3>
+  <p>At the terminal, you can create a new virtual environment by typing
+  <kbd>mkvirtualenv</kbd>, followed by a name of your choice for the new
+  virtualenv.</p>
+
+  <p>Now, open up the terminal, type the following command and press Enter:</p>
+  <kbd>mkvirtualenv TestEnv</kbd>
+
+  <p>The above command will create a new virtual environment called <kbd>
+  TestEnv</kbd>. The name of the virtual environment can be anything you like.
+  The output of the above command should look something like this:</p>
+  <pre>
+    New python executable in TestEnv/bin/python
+    Installing setuptools, pip...done.
+  </pre>
+
+  <p>After running the <kbd>mkvirtualenv</kbd> command above, the name of the
+  virtualenv you created, surrounded by parenthesis, <kbd>(TestEnv)</kbd> in
+  this case, will appear before your terminal prompt, which will look somewhat
+  similar to:</p>
+
+  <p><kbd>(TestEnv)C:\Users\username></kbd> on Windows or,</p>
+
+  <p><kbd>(TestEnv)user@hostname:~ $</kbd> on Linux/Mac OS X.</p>
+
+  <p>This means that we are inside our virtualenv <kbd>TestEnv</kbd>, and we
+  can now install packages in it, which brings us neatly to our next topic.</p>
+
+  <h3>Installing packages</h3>
+  <p>You can install a new package by typing <kbd>pip install</kbd>,
+  followed by the name of the package you want to install.</p>
+
+  <p>For this part of the mission, we are going to install a package
+  called <a href="http://docs.python-requests.org/en/latest/">Requests</a>,
+  which is an HTTP library written in Python.</p>
+
+  <p>Now, to install Requests, at the terminal, type the following command
+  and press Enter:</p>
+
+  <kbd>pip install requests</kbd>
+
+  <p>After Requests has installed successfully, type <kbd>pip freeze</kbd>
+  at the terminal and press Enter. The <kbd>pip freeze</kbd> command lists
+  all Python packages installed in our environment.</p>
+ 
+  <p>To complete this part of the mission, select the output of the
+  <kbd>pip freeze</kbd> command with your mouse and use your terminal program's
+  copy-paste functionality to copy it to the clipboard. Paste it into the form
+  below. Then, submit!</p>
+
+  <br>
+
+  <form method="post" action="{% url "mysite.missions.pipvirtualenv.views.pip_freeze_submit" %}#pipfreeze-form">{% csrf_token %}
+    <div class="form-row">
+      <a name="pipfreeze-form"></a>
+        Paste the output of the <kbd>pip freeze</kbd> command here:
+      {% if pipfreeze_success %}
+        <div class="successmsg">
+          <p><strong>You have successfully completed this part of the mission.</strong></p>
+        </div>
+      {% endif %}
+        
+      {% if pipfreeze_error_message %}
+        <ul class="errorlist"><li>{{ pipfreeze_error_message }}</li></ul>
+      {% endif %}
+      
+      {{ pipfreeze_form.pipfreeze_output.errors }}
+      <br style="clear: left;" />
+      {{ pipfreeze_form.pipfreeze_output }}
+      <input type="submit" value="Submit" style="float: none;" />
+        
+      {% if not pipfreeze_success and pipfreeze_done %}
+        <br style="clear: left;" />
+        <em>You have already completed this part of the mission.</em>
+      {% endif %}
+    </div>
+  </form>
+    
+    {% if pipfreeze_done %}
+      <p class="next_mission_link">
+        <a href='{% url "mysite.missions.pipvirtualenv.views.removing_packages" %}'>
+        On to removing packages and deactivating virtualenvs &raquo;</a></p>
+    {% endif %}
+
+
+  </div>
+</div>
+{% endblock %}
+

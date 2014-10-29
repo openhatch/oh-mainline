@@ -50,5 +50,13 @@
   {"model": "missions.Step",
    "pk": 13,
    "fields": {"name": "git_config"}
+   },
+  {"model": "missions.Step",
+   "pk": 14,
+   "fields": {"name": "pipvirtualenv_pipfreeze"}
+   },
+  {"model": "missions.Step",
+   "pk": 15,
+   "fields": {"name": "pipvirtualenv_piplist"}
    }
 ]
