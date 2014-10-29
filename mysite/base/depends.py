@@ -25,17 +25,14 @@
 # This is so that new contributors can run the OpenHatch site without
 # installing these hard-to-install dependencies.
 
-# Used within this file
 import os
 import logging
-
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 
 # Wrap lxml and the modules that are part of it
-
-
 class nothing(object):
     pass
 
@@ -53,15 +50,11 @@ if lxml.html is None:
                 "lxml library is not installed. Look in "
                 "ADVANCED_INSTALLATION.mkd for information about lxml.")
 
-# Provide a helper to check if svnadmin is available. If not,
-# we can skip running code (and tests) that require it.
 
-
+# Helper to check if svnadmin is available. If not,
+# we can skip running 'missions' code (and tests) that require it.
 def svnadmin_available():
-    # FIXME: This should move to a variable controlled
-    # by settings.py.
-    SVNADMIN_PATH = '/usr/bin/svnadmin'
-    return os.path.exists(SVNADMIN_PATH)
+      return os.path.exists(settings.SVNADMIN_PATH)
 
 # Here we try to import "Image", from the Python Imaging Library.
 # If we fail, Image is None.

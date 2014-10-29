@@ -44,6 +44,7 @@ def override_settings_for_testing():
     settings.POSTFIX_FORWARDER_TABLE_PATH = generate_safe_temp_file_name()
 
     svnserve_port = random.randint(50000, 50100)
+
     if mysite.base.depends.svnadmin_available():
         subprocess.check_call(['svnserve',
                                '--listen-port', str(svnserve_port),

@@ -123,6 +123,15 @@ following convenience methods:
     * `login_with_client`
     * `login_with_twill`
 
+The subversion missions test cases
+**********************************
+When running or testing the subversion mission locally, subversion (svn
+and svnadmin) must be installed on the local system. If subversion is
+not installed, the tests will not be run. 
+
+Settings information related to subversion, such as path locations, can
+be found in the `settings.py`.
+
 About fixtures
 ##############
 .. note:: Twill is going away in the OpenHatch code base and is being
