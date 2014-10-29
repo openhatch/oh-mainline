@@ -198,8 +198,6 @@ TEST_OUTPUT_DESCRIPTIONS = True
 TEST_OUTPUT_DIR = "test_output"
 
 # AMQP, Rabbit Queue
-BROKER_BACKEND = 'django'
-
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
