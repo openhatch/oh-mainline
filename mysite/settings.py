@@ -287,6 +287,9 @@ SVN_REPO_PATH = os.path.abspath(
 # For local sites, this is what you checkout
 SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/'
 
+# This path is used when determining whether to run svn mission tests
+SVNADMIN_PATH = '/usr/bin/svnadmin'
+
 # The script to invoke for management commands in this environment.
 PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(
     os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
