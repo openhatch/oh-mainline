@@ -186,4 +186,3 @@ Here is a sample output from python manage.py syncdb --migrate --noinput ::
    - mysite.base
    - mysite.project
    - mysite.missions
-   - djcelery

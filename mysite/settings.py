@@ -167,7 +167,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'django_assets',
-    'celery',
     'invitation',
     'mysite.search',
     'mysite.profile',
@@ -182,7 +181,6 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'sessionprofile',
     'model_utils',
-    'djcelery',
     'djkombu',
     'inplaceeditform',
     'django_webtest',
@@ -199,9 +197,7 @@ TEST_OUTPUT_DESCRIPTIONS = True
 
 TEST_OUTPUT_DIR = "test_output"
 
-# AMQP, Rabbit Queue, Celery
-BROKER_BACKEND = 'django'
-
+# AMQP, Rabbit Queue
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
@@ -265,7 +261,6 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=10)
 # note about the above: for 3 days, 2 forwarders for the same user work.
 # at worst, you visit someone's profile and find a forwarder that works for 3 more days
 # at best, you visit someone's profile and find a forwarder that works for 5 more days
-# at worst, we run a postfixifying celery job once every two days for each user
 
 # Note: POSTFIX_FORWARDER_TABLE_PATH is disabled by default in settings.py
 #       while it is enabled in the deployment_settings.py
@@ -273,8 +268,6 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=10)
 POSTFIX_FORWARDER_TABLE_PATH = None
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
-
-# CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.
 
 WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
 
@@ -290,7 +283,6 @@ SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/'
 # The script to invoke for management commands in this environment.
 PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(
     os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
-CELERY_ALWAYS_EAGER = True
 SOUTH_TESTS_MIGRATE = False
 
 GIT_REPO_PATH = os.path.join(
@@ -303,10 +295,6 @@ TRACKER_POLL_INTERVAL = 1  # Days
 
 # Inline edit permissions
 ADAPTOR_INPLACEEDIT_EDIT = 'mysite.bugsets.perms.InlineEditPermissions'
-
-# Initialize celery
-import djcelery
-djcelery.setup_loader()
 
 # By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
 # that off.  If you want to see all SQL queries (e.g., when running a

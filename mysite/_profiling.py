@@ -9,7 +9,6 @@ except ImportError:
 
 
 def profile_tests(*args, **kwargs):
-    settings.CELERY_ALWAYS_EAGER = True
     profile.runctx('run_tests(*args, **kwargs)',
                    {'run_tests': run_tests, 'args': args, 'kwargs': kwargs},
                    {},

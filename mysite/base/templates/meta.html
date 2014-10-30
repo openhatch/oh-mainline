@@ -55,26 +55,14 @@ become stale.</p>
 
 <p>These diagnostics explain how well we are handling "DIAs".
 A DataImportAttempt is created whenever a user submits a username
-or email address to the profile importer. When that happens, we create
-a DataImportAttempt object and save it to the database. We also enqueue
-a job to the background job daemon (celeryd).
+or email address to the profile importer.
 </p>
-
-<p>
-If we're lucky, the background jobs get handled quickly. The imports
-from Ohloh can take <em>minutes</em>, whereas faster services like
-Bitbucket and Github respond within seconds.
-</p>
-
-<p>We run some number (typically 4) of celeryd workers to execute
-these jobs. That means can run that many (typically 4) tasks at once,
-or so. If users are submitting jobs faster than we're processing them,
-then their experience will suck.</p>
 
 <p>Really, at any given time, the goal is 0 uncompleted DataImportAttempts.
 As <em>soon</em> as someone hits submit to start the importer, there will
 be a few uncompleted DIAs. Hopefully we'll finish them within one minute.
-If we take more than 5 minutes, then something is <em>definitely</em> wrong!</p>
+If we take more than 5 minutes, then something is <em>definitely</em> wrong!
+</p>
 
 <h3>Data</h3>
 
