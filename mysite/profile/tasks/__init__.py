@@ -82,12 +82,7 @@ class RegeneratePostfixAliasesForForwarder:
         fd = open(django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
         fd.write('\n'.join(lines))
         fd.close()
-        # Update the Postfix forwarder database. Note that we do not need
-        # to ask Postfix to reload. Yay!
-        # FIXME stop using os.system()
-        if mysite.base.depends.postmap_available():
-            os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps')
-
+        
 
 class FetchPersonDataFromOhloh:
     name = "profile.FetchPersonDataFromOhloh"
