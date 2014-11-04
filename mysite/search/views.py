@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
+from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect,Http404
 from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
@@ -67,8 +67,15 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     suggestions = [(i, k, False) for i, k in enumerate(suggestion_keys)]
 
     format = request.GET.get('format', None)
-    start = int(request.GET.get('start', 1))
-    end = int(request.GET.get('end', 10))
+
+    # check if the query dont give (server error 500) exception
+    try:
+        start = int(request.GET.get('start', 1))
+        end = int(request.GET.get('end', 10))
+    except (ValueError,AssertionError):
+        raise Http404
+    if start < 1 or end < 1:
+        raise Http404
 
     total_bug_count = 0
 
