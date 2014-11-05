@@ -2477,29 +2477,28 @@ class PeopleMapSummariesAreCheap(WebTest):
         now_query_count = len(django.db.connection.queries)
         settings.DEBUG = self.old_settings_debug
 
-        # # If we did 1 or fewer queries, then stop here.
-        # if now_query_count - self.query_count <= 1:
-        #     return
+        # If we did 1 or fewer queries, then stop here.
+        if now_query_count - self.query_count <= 1:
+            return
 
-        # # Otherwise, let us examine all queries against OpenHatch models
-        # all_queries = django.db.connection.queries[self.query_count:]
+        # Otherwise, let us examine all queries against OpenHatch models
+        all_queries = django.db.connection.queries[self.query_count:]
 
-        # def is_openhatchy(query):
-        #     if 'raw_sql' in query:
-        #         sql = query['raw_sql']
-        #     elif 'sql' in query:
-        #         sql = query['sql']
-        #     else:
-        #         return False  # Odd, no SQL data here.
+        def is_openhatchy(query):
+            if 'raw_sql' in query:
+                sql = query['raw_sql']
+            elif 'sql' in query:
+                sql = query['sql']
+            else:
+                return False  # Odd, no SQL data here.
+            if sql.startswith("SELECT") or sql.startswith("SELECT"):
+                return False
+            return True
 
-        #     if (sql.startswith('SELECT "django_') or sql.startswith('SELECT `django_')):
-        #         return False
-        #     return True
-
-        # openhatchy_queries = filter(is_openhatchy, all_queries)
-        # if len(openhatchy_queries) > 1:
-        #     pprint.pprint(openhatchy_queries)
-        #     self.assertEqual(1, len(openhatchy_queries))
+        openhatchy_queries = filter(is_openhatchy, all_queries)
+        if len(openhatchy_queries) > 1:
+            pprint.pprint(openhatchy_queries)
+            self.assertEqual(1, len(openhatchy_queries))
 
     def test_map_tag_texts(self):
         self.paulproteus.get_tag_texts_for_map()
@@ -2530,17 +2529,17 @@ class PeopleLocationData(WebTest):
         # Otherwise, let us examine all queries against OpenHatch models
         all_queries = django.db.connection.queries[self.query_count:]
 
-        # def is_openhatchy(query):
-        #     if 'raw_sql' not in query:
-        #         return False
-        #     if (query['raw_sql'].startswith('SELECT "django_') or
-        #             query['raw_sql'].startswith('SELECT `django_')):
-        #         return False
-        #     return True
-        # openhatchy_queries = filter(is_openhatchy, all_queries)
-        # if len(openhatchy_queries) > 1:
-        #     pprint.pprint(openhatchy_queries)
-        #     self.assertEqual(1, len(openhatchy_queries))
+        def is_openhatchy(query):
+            if 'raw_sql' not in query:
+                return False
+            if query['raw_sql'].startswith("SELECT") or query['raw_sql'].startswith("SELECT"):
+                return False
+            return True
+
+        openhatchy_queries = filter(is_openhatchy, all_queries)
+        if len(openhatchy_queries) > 1:
+            pprint.pprint(openhatchy_queries)
+            self.assertEqual(1, len(openhatchy_queries))
 
 
 class ProfileApiTest(BasicHelpers):
