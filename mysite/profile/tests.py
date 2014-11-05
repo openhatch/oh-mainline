@@ -20,6 +20,27 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import json
+import BeautifulSoup
+import datetime
+import tasks
+import mock
+import os
+import quopri
+
+from django.core import mail
+from django.conf import settings
+import django.test
+import django.conf
+import django.db
+from django.core import serializers
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from django.utils.unittest import skipIf
+from django.utils.unittest import skip
+from django_webtest import WebTest
+from django.test.client import Client
+
 from mysite.base.view_helpers import ObjectFromDict
 from mysite.base.models import Timestamp
 import mysite.account.tests
@@ -37,31 +58,11 @@ from mysite.profile import views
 from mysite.customs.models import WebResponse
 import pprint
 
-from django.utils import simplejson
-import BeautifulSoup
-import datetime
-import tasks
-import mock
-import os
-import quopri
-
-from django.core import mail
-from django.conf import settings
-import django.test
-import django.conf
-import django.db
-from django.core import serializers
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
-
-from django.utils.unittest import skipIf
-from django.utils.unittest import skip
-from django_webtest import WebTest
-from django.test.client import Client
-
 
 class BasicHelpers(WebTest):
-    def login_with_client(self, username='paulproteus', password="paulproteus's unbreakable password"):
+    def login_with_client(self,
+                          username='paulproteus',
+                          password="paulproteus's unbreakable password"):
         client = Client()
         success = client.login(username=username, password=password)
         self.assertTrue(success)
@@ -69,6 +70,7 @@ class BasicHelpers(WebTest):
 
     def login_with_client_as_barry(self):
         return self.login_with_client(username='barry', password='parallelism')
+
 
 class ProfileTests(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus',
@@ -135,7 +137,7 @@ class DebTagsTests(BasicHelpers):
 
 
 class Info(BasicHelpers):
-#TODO
+    # TODO
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
@@ -292,7 +294,7 @@ class Portfolio(BasicHelpers):
 
         # Response consists of JSON like:
         # {'dias': ..., 'citations': ..., 'summaries': ...}
-        response = simplejson.loads(response.content)
+        response = json.loads(response.content)
 
         # Check we got a summary for each Citation.
         for citation_in_response in response['citations']:
@@ -376,10 +378,9 @@ class Portfolio(BasicHelpers):
             portfolio_entry.save()
 
         # Get the JSON
-
         response = self.login_with_client().get(
             reverse(mysite.profile.views.gimme_json_for_portfolio))
-        response_decoded = simplejson.loads(response.content)
+        response_decoded = json.loads(response.content)
 
         self.assertEqual(len(response_decoded['projects']), 0,
                          "Expected no projects back.")
@@ -600,7 +601,8 @@ class PersonalData(BasicHelpers):
             self.client.logout()
 
         for view in navelgazing_view2args:
-            self.client.login(username='paulproteus', password="paulproteus's unbreakable password")
+            self.client.login(username='paulproteus',
+                              password="paulproteus's unbreakable password")
             kwargs = navelgazing_view2args[view]
             url = reverse(view, kwargs=kwargs)
             response = self.client.get(url)
@@ -634,7 +636,7 @@ class DeletePortfolioEntry(BasicHelpers):
             reverse(view),
             {'portfolio_entry__pk': portfolio_entry.pk})
 
-        response_decoded = simplejson.loads(response.content)
+        response_decoded = json.loads(response.content)
 
         expected_output = {
             'success': True,
@@ -654,13 +656,12 @@ class DeletePortfolioEntry(BasicHelpers):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(
             reverse(view), {'portfolio_entry__pk': failing_pk})
-        self.assertEqual(simplejson.loads(response.content),
-                         {'success': False})
+        self.assertEqual(json.loads(response.content), {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_given(self):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(reverse(view))
-        self.assertEqual(simplejson.loads(response.content),
+        self.assertEqual(json.loads(response.content),
                          {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_yours(self):
@@ -682,7 +683,7 @@ class DeletePortfolioEntry(BasicHelpers):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(reverse(view))
 
-        self.assertEqual(simplejson.loads(response.content), {'success': False})
+        self.assertEqual(json.loads(response.content), {'success': False})
 
         # Still there
         self.assertFalse(portfolio_entry_not_mine.is_deleted)
@@ -742,7 +743,7 @@ class AddCitationManually(BasicHelpers):
 
         # Check that an error is reported in the response.
         self.assert_(
-            len(simplejson.loads(response.content)['error_msgs']) == 1)
+            len(json.loads(response.content)['error_msgs']) == 1)
 
 
 class SavePortfolioEntry(BasicHelpers):
@@ -799,7 +800,7 @@ class SavePortfolioEntry(BasicHelpers):
 
         # check output
         self.assertEqual(
-            simplejson.loads(self.post_result.content), expected_output)
+            json.loads(self.post_result.content), expected_output)
 
         # postcondition
         portfolio_entry = PortfolioEntry.objects.get(
@@ -840,7 +841,7 @@ class GimmeJsonTellsAboutImport(BasicHelpers):
     def gimme_json(self):
         url = reverse(mysite.profile.views.gimme_json_for_portfolio)
         response = self.login_with_client().get(url)
-        return simplejson.loads(response.content)
+        return json.loads(response.content)
 
     def get_paulproteus(self):
         return mysite.profile.models.Person.objects.get(
@@ -967,7 +968,7 @@ class PortfolioEntryAdd(BasicHelpers):
             'project__pk': new_project_id,
             'portfolio_entry__pk': new_pk,
         }
-        self.assertEqual(simplejson.loads(response.content),
+        self.assertEqual(json.loads(response.content),
                          expected_response_obj)
 
 
@@ -1189,7 +1190,7 @@ class EditBio(BasicHelpers):
         paulproteus_page = self.app.get('/people/paulproteus/', user=username)
         self.assertNotIn('lookatme!', paulproteus_page.content)
 
-        edit_info_page = self.app.get('/profile/views/edit_info',  user=username)
+        edit_info_page = self.app.get('/profile/views/edit_info', user=username)
         self.assertNotIn('lookatme!', edit_info_page.content)
         edit_info_form = edit_info_page.form
         edit_info_form['edit-tags-bio'] = 'lookatme!'
@@ -1197,7 +1198,6 @@ class EditBio(BasicHelpers):
         # Find the string we just submitted as our bio
         self.assertIn('lookatme!', response.content)
         self.assertEqual(Person.get_by_username('paulproteus').bio, "lookatme!")
-        
         # now we should see our bio in the edit form
         edit_info_page = self.app.get('/profile/views/edit_info')
         self.assertIn('lookatme!', edit_info_page.content)
@@ -1259,7 +1259,7 @@ class EditIRCNick(WebTest):
         paulproteus_page = self.app.get('/people/paulproteus/', user=username)
         self.assertNotIn('paulproteusnick', paulproteus_page.content)
 
-        edit_info_page = self.app.get('/profile/views/edit_info',  user=username)
+        edit_info_page = self.app.get('/profile/views/edit_info', user=username)
         # make sure our irc nick is not already on the form
         self.assertNotIn('paulproteusnick', edit_info_page.content)
         # set the irc nick in the form
@@ -1274,7 +1274,7 @@ class EditIRCNick(WebTest):
                          .irc_nick, "paulproteusnick")
 
         # now we should see our irc nick in the edit form
-        edit_info_page = self.app.get('/profile/views/edit_info',  user=username)
+        edit_info_page = self.app.get('/profile/views/edit_info', user=username)
         self.assertIn('paulproteusnick', edit_info_page.content)
 
 
@@ -1356,7 +1356,8 @@ class EditContactBlurb(BasicHelpers):
         # find the string we just submitted as our contact info
         self.assertIn('bananas', response.content)
 
-        # Confirm that the person object's attribute has been saved properly in db
+        # Confirm that the person object's attribute has been saved properly
+        # in db
         asheesh = Person.get_by_username('paulproteus')
         self.assertEqual(asheesh.contact_blurb, "bananas")
 
@@ -1377,8 +1378,8 @@ class EditContactBlurb(BasicHelpers):
         # despite our error with the forwarder stuff
         edit_info_form = edit_info_page.form
         edit_info_form['edit-tags-contact_blurb'] = contact_blurb
-        edit_info_form['edit-tags-homepage_url']= homepage_url
-        response = edit_info_form.submit() 
+        edit_info_form['edit-tags-homepage_url'] = homepage_url
+        response = edit_info_form.submit()
         # make sure that they got an error message
         self.assertIn('contact_blurb_error', response.content)
         # make sure the form remembered the contact blurb that the user posted
@@ -1646,8 +1647,8 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(WebTest):
 
 class PostmapBinaryCalledIfExists(WebTest):
 
-    # If a function to test if postmap binary works reliably, the skip
-    # generator for this test may be removed
+    # If a function to test if postmap binary exists and works reliably, the
+    # skip generator for this test may be removed
     @skip("Skip while postmap binary is unavailable on local test system")
     @mock.patch('os.system')
     def test(self, mock_update_table):
@@ -1909,7 +1910,7 @@ class SaveReordering(BasicHelpers):
         def get_ordering():
             response = client.get(
                 reverse(mysite.profile.views.gimme_json_for_portfolio))
-            obj = simplejson.loads(response.content)
+            obj = json.loads(response.content)
             return [pfe['pk'] for pfe in obj['portfolio_entries']]
 
         ordering_beforehand = get_ordering()
@@ -2361,9 +2362,7 @@ class Notifications(WebTest):
         Notifications.add_contributor_with_maintainer_status(
             person, project_i_maintain, True)
 
-        maintainer_projects = (mysite.profile.management.commands.
-                                   send_emails.Command.
-                                   get_maintainer_projects(person))
+        maintainer_projects = mysite.profile.management.commands.send_emails.Command.get_maintainer_projects(person)
         self.assertEqual(maintainer_projects, [project_i_maintain])
 
     def test_dont_tell_me_about_projects_where_i_am_the_only_participant(self):
@@ -2478,29 +2477,29 @@ class PeopleMapSummariesAreCheap(WebTest):
         now_query_count = len(django.db.connection.queries)
         settings.DEBUG = self.old_settings_debug
 
-        # If we did 1 or fewer queries, then stop here.
-        if now_query_count - self.query_count <= 1:
-            return
+        # # If we did 1 or fewer queries, then stop here.
+        # if now_query_count - self.query_count <= 1:
+        #     return
 
-        # Otherwise, let us examine all queries against OpenHatch models
-        all_queries = django.db.connection.queries[self.query_count:]
+        # # Otherwise, let us examine all queries against OpenHatch models
+        # all_queries = django.db.connection.queries[self.query_count:]
 
-        def is_openhatchy(query):
-            if 'raw_sql' in query:
-                sql = query['raw_sql']
-            elif 'sql' in query:
-                sql = query['sql']
-            else:
-                return False  # Odd, no SQL data here.
+        # def is_openhatchy(query):
+        #     if 'raw_sql' in query:
+        #         sql = query['raw_sql']
+        #     elif 'sql' in query:
+        #         sql = query['sql']
+        #     else:
+        #         return False  # Odd, no SQL data here.
 
-            if (sql.startswith('SELECT "django_') or
-                    sql.startswith('SELECT `django_')):
-                return False
-            return True
-        openhatchy_queries = filter(is_openhatchy, all_queries)
-        if len(openhatchy_queries) > 1:
-            pprint.pprint(openhatchy_queries)
-            self.assertEqual(1, len(openhatchy_queries))
+        #     if (sql.startswith('SELECT "django_') or sql.startswith('SELECT `django_')):
+        #         return False
+        #     return True
+
+        # openhatchy_queries = filter(is_openhatchy, all_queries)
+        # if len(openhatchy_queries) > 1:
+        #     pprint.pprint(openhatchy_queries)
+        #     self.assertEqual(1, len(openhatchy_queries))
 
     def test_map_tag_texts(self):
         self.paulproteus.get_tag_texts_for_map()
@@ -2531,17 +2530,17 @@ class PeopleLocationData(WebTest):
         # Otherwise, let us examine all queries against OpenHatch models
         all_queries = django.db.connection.queries[self.query_count:]
 
-        def is_openhatchy(query):
-            if 'raw_sql' not in query:
-                return False
-            if (query['raw_sql'].startswith('SELECT "django_') or
-                    query['raw_sql'].startswith('SELECT `django_')):
-                return False
-            return True
-        openhatchy_queries = filter(is_openhatchy, all_queries)
-        if len(openhatchy_queries) > 1:
-            pprint.pprint(openhatchy_queries)
-            self.assertEqual(1, len(openhatchy_queries))
+        # def is_openhatchy(query):
+        #     if 'raw_sql' not in query:
+        #         return False
+        #     if (query['raw_sql'].startswith('SELECT "django_') or
+        #             query['raw_sql'].startswith('SELECT `django_')):
+        #         return False
+        #     return True
+        # openhatchy_queries = filter(is_openhatchy, all_queries)
+        # if len(openhatchy_queries) > 1:
+        #     pprint.pprint(openhatchy_queries)
+        #     self.assertEqual(1, len(openhatchy_queries))
 
 
 class ProfileApiTest(BasicHelpers):
@@ -2569,7 +2568,7 @@ class ProfileApiTest(BasicHelpers):
         self.client = self.login_with_client()
         response = self.client.get(
             '/+api/v1/profile/portfolio_entry/?format=json')
-        parsed = simplejson.loads(response.content)
+        parsed = json.loads(response.content)
         self.assertEqual(1, parsed['meta']['total_count'])
 
     def test_api_view_when_logged_out(self):
@@ -2580,7 +2579,7 @@ class ProfileApiTest(BasicHelpers):
 
         response = self.client.get(
             '/+api/v1/profile/portfolio_entry/?format=json')
-        parsed = simplejson.loads(response.content)
+        parsed = json.loads(response.content)
         self.assertEqual(0, parsed['meta']['total_count'])
 
 
@@ -2613,6 +2612,7 @@ class TestUserDeletion(BasicHelpers):
         self.assertFalse(django.contrib.auth.models.User.objects.filter(
             username='barry'))
         self.assertEqual(2, len(django.core.mail.outbox))
+
 
 class TestBreakLongWordsFilter(WebTest):
     def test_too_shirt_to_break(self):
