@@ -71,7 +71,6 @@ class BasicHelpers(WebTest):
         return self.login_with_client(username='barry', password='parallelism')
 
 class ProfileTests(WebTest):
-    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'cchost-data-imported-from-ohloh']
 
@@ -136,7 +135,6 @@ class DebTagsTests(BasicHelpers):
 
 
 class Info(BasicHelpers):
-    # {{{
 #TODO
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
                 'person-paulproteus', 'cchost-data-imported-from-ohloh']
