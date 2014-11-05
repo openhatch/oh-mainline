@@ -1648,6 +1648,8 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(WebTest):
 
 class PostmapBinaryCalledIfExists(WebTest):
 
+    # If a function to test if postmap binary works reliably, the skip
+    # generator for this test may be removed
     @skip("Skip while postmap binary is unavailable on local test system")
     @mock.patch('os.system')
     def test(self, mock_update_table):
