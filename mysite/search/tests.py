@@ -764,8 +764,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
 
 class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def setUp(self, do_nothing):
+    def setUp(self):
         SearchTest.setUp(self)
         python_project = Project.create_dummy(language=u'Python')
         perl_project = Project.create_dummy(language=u'Perl')
@@ -835,8 +834,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
 class QueryGetPossibleProjectFacetOptions(SearchTest):
 
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def setUp(self, do_nothing):
+    def setUp(self):
         SearchTest.setUp(self)
         projects = [
             Project.create_dummy(name=u'Miro'),

@@ -111,9 +111,7 @@ class ProjectList(TwillTests):
 class ProjectPageCreation(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_post_handler(self, mock_populate_icon, mock_populate_language):
+    def test_post_handler(self):
         # Show that it works
         project_name = 'Something novel'
         self.assertFalse(
@@ -137,10 +135,7 @@ class ProjectPageCreation(TwillTests):
         # of this Project.
         # This could easily be a log for edits.
 
-    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_project_creator_simply_redirects_to_project_if_it_exists(
-            self, mock_populate_icon, mock_populate_language):
+    def test_project_creator_simply_redirects_to_project_if_it_exists(self):
         # Show that it works
         project_name = 'Something novel'
         Project.create_dummy(name=project_name.lower())

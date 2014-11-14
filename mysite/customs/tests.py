@@ -319,8 +319,7 @@ class DataExport(django.test.TestCase):
             key=TIMESTAMP_KEY_TO_USE)
         self.assertEquals(reincarnated_t.timestamp, TIMESTAMP_DATE_TO_USE)
 
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    def test_snapshot_project(self, fake_icon):
+    def test_snapshot_project(self):
         fake_stdout = StringIO()
         # make fake Project
         proj = Project.create_dummy_no_icon(
