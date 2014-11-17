@@ -41,5 +41,10 @@ Additional testing information
 The Internals section of this documentation contains more detailed information
 about the test suite, `advanced testing`_, and `continuous integration`_.
 
+If you'd like to learn more about testing, we strongly recommend going through
+`Ned Batchelder's`_ blog post `Getting Started Testing`_.
+
 .. _advanced testing: ../advanced/advanced_testing.html
 .. _continuous integration: ../internals/continuous_integration.html
+.. _Ned Batchelder's: http://nedbatchelder.com/
+.. _Getting Started Testing: http://nedbatchelder.com/text/test0.html
