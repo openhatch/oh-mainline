@@ -289,12 +289,12 @@ Volunteer opportunities in free and open source software
 {% block js %}
 <script type='text/javascript'>
     $(function () {
-            $('#define-bite-size').click(function () {
+            $('#define-bite-size').one("click",function () {
                 var definition = (
                     '<dt><strong>Bite-size</strong> [\ˈbaɪtˌsaɪz\], adj.</dt>' + 
                     '<dd>Good for newcomers; ' +
                     'relatively easy and rewarding to fix.</dd>');
-                $.jGrowl(definition, { life: 10000 });
+                $.jGrowl(definition, { life: 100000 });
                 });
 
             $(SearchResults.bindEventHandlers);
