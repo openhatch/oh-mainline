@@ -33,7 +33,7 @@ def get_module_path(module_name):
     else:
         source_path = inspect.getsourcefile(module)
         # Note that source_path is a byte string in the default
-        # encoding for the filesystem, which meands that
+        # encoding for the filesystem, which means that
         # calling .endswith() will attempt to convert it to
         # ASCII.
         #
