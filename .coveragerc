@@ -2,21 +2,17 @@
 # For more info, https://nedbatchelder.com/code/coverage/
 
 [run]
-omit =
-    */migrations/*
-    tests.py
-    settings.py
-    deployment_settings.py
-    _profiling.py
-    manage.py
-    sqlite_settings.py
+# Include files for coverage
+source = mysite
 
-[report]
-# List of filename prefixes
-omit = eggs
-omit = parts
-omit = /usr
-omit = /var
-# This stuff just for the Hudson job, "Test all apps except search and customs"
-omit = search
-omit = customs
+# Exclude from coverage
+omit = *migrations*
+       *_profiling*
+       *manage*
+       *settings*
+       *tests*
+       *__init__*
+
+[html]
+directory = coverage_html_report
+title = Coverage report for OpenHatch oh-mainline

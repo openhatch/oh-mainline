@@ -40,4 +40,5 @@ tags
 .DS_Store
 *.sublime-workspace
 *.sublime-project
+coverage_html_report/
 
