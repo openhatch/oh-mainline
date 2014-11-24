@@ -60,7 +60,7 @@ but we'll all be happier if you do)
   2. :doc:`the #openhatch IRC channel in freenode </community/contact>`.
 
 
-OpenHatch holds development meetings on IRC; our goal is to hold these meetings weekly. The meetings are announced on `devel@lists.openhatch.org`. Please join us on IRC and share your ideas or ask questions.
+OpenHatch holds development meetings on IRC; our goal is to hold these meetings weekly. The meetings are announced on `devel@openhatch.org`. Please join us on IRC and share your ideas or ask questions.
 
 .. _Devel mailing list: http://lists.openhatch.org/mailman/listinfo/devel
 
