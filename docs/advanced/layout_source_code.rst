@@ -127,9 +127,6 @@ dotfiles
 ========
 In general, dotfiles provide configuration details.
 
-    .coverage
-        coverage testing
-
     .coveragerc
         coverage testing configuration
 
@@ -145,8 +142,6 @@ In general, dotfiles provide configuration details.
 
 Other files and executable files
 ================================
-coveragerc
-
 manage.py
     This is the well-known and widely-loved Django management script.
 
