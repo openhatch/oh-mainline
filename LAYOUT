@@ -30,7 +30,6 @@ dotfiles
 --------
 In general, dotfiles provide configuration details.
 
-    .coverage          coverage testing
     .coveragerc        coverage testing configuration
     .gitattributes     Git
     .gitignore         Files ignored by git 
@@ -39,8 +38,6 @@ In general, dotfiles provide configuration details.
 --------------------------
 files and executable files
 --------------------------
-coveragerc
-
 manage.py
     This is the well-known and widely-loved Django management script.
 
@@ -143,5 +140,3 @@ vendor/
     This directory contains code from other projects that we rely on.
     (For more information, look at
     http://kitsune.readthedocs.org/en/latest/vendor.html .)
-
-
