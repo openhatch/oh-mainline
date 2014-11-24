@@ -1,5 +1,7 @@
-[run]
+# Configuration file for code coverage tool
+# For more info, https://nedbatchelder.com/code/coverage/
 
+[run]
 omit =
     */migrations/*
     tests.py
@@ -8,3 +10,13 @@ omit =
     _profiling.py
     manage.py
     sqlite_settings.py
+
+[report]
+# List of filename prefixes
+omit = eggs
+omit = parts
+omit = /usr
+omit = /var
+# This stuff just for the Hudson job, "Test all apps except search and customs"
+omit = search
+omit = customs
