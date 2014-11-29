@@ -20,6 +20,18 @@ The test suite begin running all of the tests and will display the test
 progress in the console window.
 
 
+Running the test suite without warnings
+#######################################
+
+You may run the test suite and turn off warnings, such as Deprecation Warnings, 
+being output to your screen. To run the test suite without warnings,::
+
+    python -Wignore manage.py test
+
+The test suite will display its progress on the console but will not display
+any warnings.
+
+
 Running a subset of tests
 #########################
 
