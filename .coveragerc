@@ -1,10 +1,18 @@
-[run]
+# Configuration file for code coverage tool
+# For more info, https://nedbatchelder.com/code/coverage/
 
-omit =
-    */migrations/*
-    tests.py
-    settings.py
-    deployment_settings.py
-    _profiling.py
-    manage.py
-    sqlite_settings.py
+[run]
+# Include files for coverage
+source = mysite
+
+# Exclude from coverage
+omit = *migrations*
+       *_profiling*
+       *manage*
+       *settings*
+       *tests*
+       *__init__*
+
+[html]
+directory = coverage_html_report
+title = Coverage report for OpenHatch oh-mainline
