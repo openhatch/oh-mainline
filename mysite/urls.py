@@ -47,8 +47,23 @@ import mysite.missions.setup.views
 
 from mysite.base.feeds import RecentActivityFeed
 
-
-urlpatterns = patterns('',
+# Return a robots.txt that disallows all spiders when DEBUG is True  
+if getattr(settings, "DEBUG", True):
+    urlpatterns = patterns('', 
+                    (r'^robots.txt$', 
+                     lambda x: HttpResponse("User-agent: *\nDisallow: /", 
+                                            content_type = "text/plain")
+                     )
+                    )
+else:
+    urlpatterns = patterns('', 
+                    (r'^robots.txt$', 
+                    lambda x: HttpResponse("User-agent: *\nDisallow: ", 
+                                           content_type = "text/plain")
+                     )
+                    )
+    
+urlpatterns += patterns('',
                        # Okay, sometimes people link /, or /) because of bad linkification
                        # if so, just permit it as a redirect.
                        (r'^,$', lambda x: HttpResponsePermanentRedirect('/')),
