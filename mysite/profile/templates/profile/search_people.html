@@ -44,21 +44,12 @@ People Search
                 <label for='search_profiles'>Search for</label>
                 <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
             </div>
-            <div class='location field'>
-              <div class="input-and-labels">
-                <label for='location_for_map_centering'>Near</label>
-                <p class="map-error">We couldn't find that location.</p>
-                <input id="location_for_map_centering" name="center"
-                       type="text" value="{{ center_name }}"/>
-          </div>
-            </div>
-            <div class='stubmit field'>
+            <div class='submit field'>
               <div class="input-and-labels">
                 <label for='search_locations'>&nbsp;</label>
-                <input id="center_the_map" type="submit" value="Search"/>
-          </div>
+                <input type="submit" value="Search"/> 
+              </div>
             </div>
-            
         </div>
     </form>
 
