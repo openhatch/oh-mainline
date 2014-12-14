@@ -47,6 +47,8 @@ CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
 GOOGLE_ANALYTICS_CODE = 'UA-15096810-1'
 
+# svn mission requires a subdomain svn-mission for cloudflare to
+# work properly
 SVN_REPO_URL_PREFIX = 'svn://svn-mission.openhatch.org/'
 GIT_REPO_URL_PREFIX = 'https://openhatch.org/git-mission-data/git/'
 # Share cookies with subdomain (necessary for Vanilla)
@@ -63,7 +65,8 @@ import logging
 logger = logging.getLogger('')
 logger.setLevel(logging.WARNING)
 
-ALLOWED_HOSTS=['testserver', 'openhatch.org']
+# svn-mission subdomain needed in ALLOWED_HOSTS due to cloudflare
+ALLOWED_HOSTS=['testserver', 'openhatch.org', 'svn-mission.openhatch.org']
 
 # This means that, when we run 'python manage.py collectstatic'
 # on the deployment, that they go in the path below.
