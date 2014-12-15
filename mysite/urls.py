@@ -54,8 +54,6 @@ urlpatterns = patterns('',
                        (r'^,$', lambda x: HttpResponsePermanentRedirect('/')),
                        (r'^\)$', lambda x: HttpResponsePermanentRedirect('/')),
 
-                       (r'^\+meta/', 'mysite.base.views.meta'),
-
                        (r'^\+api/v1/profile/',
                         include(
                             mysite.profile.api.PortfolioEntryResource().urls)),
@@ -412,29 +410,20 @@ urlpatterns = patterns('',
                        (r'^profile/views/delete_citation_do$',
                         'mysite.profile.views.delete_citation_do'),
 
+                       (r'^people/portfolio/import/$',
+                        'mysite.profile.views.importer'),
+
+                      (r'^\+portfolio/editor/$',
+                        'mysite.profile.views.portfolio_editor'),
+
                        (r'^profile/views/save_portfolio_entry_do$',
                         'mysite.profile.views.save_portfolio_entry_do'),
 
                        (r'^profile/views/delete_portfolio_entry_do$',
                         'mysite.profile.views.delete_portfolio_entry_do'),
 
-                       (r'^people/portfolio/import/$',
-                        'mysite.profile.views.importer'),
-
-                       (r'^\+portfolio/editor/$',
-                        'mysite.profile.views.portfolio_editor'),
-
-                       (r'^\+portfolio/editor/test$',
-                        'mysite.profile.views.portfolio_editor_test'),
-
                        (r'^profile/views/edit_info$',
                         'mysite.profile.views.edit_info'),
-
-                       (r'^profile/views/prepare_data_import_attempts_do$',
-                        'mysite.profile.views.prepare_data_import_attempts_do'),
-
-                       (r'^people/user_selected_these_dia_checkboxes$',
-                        'mysite.profile.views.user_selected_these_dia_checkboxes'),
 
                        (r'^test_404$', handler404),
 

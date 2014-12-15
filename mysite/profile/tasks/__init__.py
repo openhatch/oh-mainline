@@ -88,37 +88,19 @@ class FetchPersonDataFromOhloh:
     name = "profile.FetchPersonDataFromOhloh"
 
     def run(self, dia_id, **kwargs):
-        dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
-        try:
-            logger.info("Starting job for <%s>" % dia)
-            if dia.completed:
-                logger.info("Bailing out job for <%s>" % dia)
-                return
-            results = source2actual_action[dia.source](dia)
-            source2result_handler[dia.source](dia.id, results)
-            logger.info("Results: %s" % repr(results))
-
-        except Exception, e:
-            # if the task is in debugging mode, bubble-up the exception
-            if getattr(self, 'debugging', None):
-                raise
-            logger.error("Traceback: ")
-            logger.error(traceback.format_exc())
-
-            # else let the exception be logged but not bubble up
-            dia.completed = True
-            dia.failed = True
-            dia.save()
-            if hasattr(e, 'code'):
-                code = str(e.code)
-            else:
-                code = 'UNKNOWN'
-            if hasattr(e, 'geturl'):
-                url = str(e.geturl())
-            else:
-                raise
-            logger.error('Dying: ' + code + ' getting ' + url)
-            raise ValueError, {'code': code, 'url': url}
+        # if the task is in debugging mode, bubble-up the exception
+        if getattr(self, 'debugging', None):
+            raise
+        if hasattr(e, 'code'):
+            code = str(e.code)
+        else:
+            code = 'UNKNOWN'
+        if hasattr(e, 'geturl'):
+            url = str(e.geturl())
+        else:
+            raise
+        logger.error('Dying: ' + code + ' getting ' + url)
+        raise ValueError, {'code': code, 'url': url}
 
 
 def clear_people_page_cache(*args, **kwargs):

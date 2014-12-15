@@ -84,16 +84,6 @@ class RepositoryCommitter(models.Model):
     'Don't give me any more data from Ohloh pertaining to this dude named
     mickey.mouse@strange.ly checking code into F-Spot.'"""
     project = models.ForeignKey(Project)
-    data_import_attempt = models.ForeignKey('DataImportAttempt')
-
-    def committer_identifier(self):
-        return self.data_import_attempt.committer_identifier
-
-    def source(self):
-        return self.data_import_attempt.source
-
-    class Meta:
-        unique_together = ('project', 'data_import_attempt')
 
 
 class Person(models.Model):
@@ -498,66 +488,9 @@ def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
 models.signals.post_save.connect(create_profile_when_user_created, User)
 
 
-class DataImportAttempt(models.Model):
-    # {{{
-    SOURCE_CHOICES = (
-        ('rs', "Ohloh"),
-        ('ou', "Ohloh"),
-        ('lp', "Launchpad"),
-        ('gh', "Github"),
-        ('ga', "Github"),
-        ('db', "Debian"),
-        ('bb', "Bitbucket")
-    )
-    completed = models.BooleanField(default=False)
-    failed = models.BooleanField(default=False)
-    source = models.CharField(max_length=2,
-                              choices=SOURCE_CHOICES)
-    person = models.ForeignKey(Person)
-    query = models.CharField(max_length=200)
-    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    web_response = models.ForeignKey(mysite.customs.models.WebResponse,
-                                     null=True)  # null=True for
-    # now, so the migration doesn't cause data validation errors
-
-    def get_formatted_source_description(self):
-        return self.get_source_display() % self.query
-
-    def __unicode__(self):
-        return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.get_source_display(), self.person, self.query)
-
-    # }}}
-
-'''
-Scenario A.
-* Dia creates background job.
-* User marks Dia "I want it"
-* Background job finishes.
-* Background job asks, Does anybody want this?
-* Background job realizes, "yes, User wants this"
-* Background job attaches the projects to the user
-
-Scenario B.
-* Dia creates background job.
-* Background job finishes.
-* Background job asks, Does anybody want this?
-* Background job realizes, "Nobody has claimed this yet. I'll just sit tight."
-* User marks Dia "I want it"
-* The marking method attaches the projects to the user
-'''
-
-
-def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
-    if not instance.query.strip():
-        raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
-
 
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
     instance.project.update_cached_contributor_count_and_save()
-
-models.signals.pre_save.connect(
-    reject_when_query_is_only_whitespace, sender=DataImportAttempt)
-
 
 class TagType(models.Model):
     # {{{
@@ -721,8 +654,6 @@ class PortfolioEntry(models.Model):
     class Meta:
         ordering = ('-sort_order', '-id')
 
-# FIXME: Add a DataSource class to DataImportAttempt.
-
 
 class UntrashedCitationManager(models.Manager):
 
@@ -744,7 +675,6 @@ class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry)  # [0]
     url = models.URLField(null=True, verbose_name="URL")
     contributor_role = models.CharField(max_length=200, null=True)
-    data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     languages = models.CharField(max_length=200, null=True)
     first_commit_time = models.DateTimeField(null=True)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
@@ -761,40 +691,10 @@ class Citation(models.Model):
         # FIXME: Pluralize correctly.
         # FIXME: Use "since year_started"
 
-        if self.data_import_attempt:
-            if self.data_import_attempt.source == 'db' and (
-                    self.contributor_role == 'Maintainer'):
-                return 'Maintain a package in Debian.'
-            if self.data_import_attempt.source == 'db' and (
-                    self.contributor_role.startswith('Maintainer of')):
-                return self.contributor_role
-            if self.data_import_attempt.source in ('gh', 'ga'):
-                return '%s a repository on Github.' % self.contributor_role
-            if self.data_import_attempt.source in ['rs', 'ou']:
-                if not self.languages:
-                    return "Committed to codebase (%s)" % (
-                        self.data_import_attempt.get_source_display(),
-                    )
-                return "Coded in %s (%s)" % (
-                    self.languages,
-                    self.data_import_attempt.get_source_display(),
-                )
-            elif self.data_import_attempt.source == 'lp':
-                return "Participated in %s (%s)" % (
-                    self.contributor_role,
-                    self.data_import_attempt.get_source_display()
-                )
-            elif self.data_import_attempt.source == 'bb':
-                    return "Created a repository on Bitbucket."
-            else:
-                raise ValueError, "There's a DIA of a kind I don't know how to summarize."
-        elif self.url is not None:
+        if self.url is not None:
             return url2printably_short(self.url, CUTOFF=38)
         elif self.languages is not None:
             return "Coded in %s." % (self.languages,)
-
-        raise ValueError(
-            "There's no DIA and I don't know how to summarize this.")
 
     def get_languages_as_list(self):
         if self.languages is None:
@@ -804,22 +704,6 @@ class Citation(models.Model):
     def get_url_or_guess(self):
         if self.url:
             return self.url
-        else:
-            if self.data_import_attempt:
-                if self.data_import_attempt.source in ['rs', 'ou']:
-                    try:
-                        project_name = unicode(
-                            self.portfolio_entry.project.name, 'utf-8')
-                        return "http://www.ohloh.net/search?%s" % http.urlencode({u'q': project_name})
-                    except:
-                        logger.warning(
-                            "During Citation.get_url_or_guess, we failed to encode the project name correctly.")
-                        # This is just a temporary workaround since the above
-                        # line was causing errors.
-                        return "http://www.ohloh.net/search?q=%s" % self.portfolio_entry.project.name
-                elif self.data_import_attempt.source == 'lp':
-                    return "https://launchpad.net/~%s" % urllib.quote(
-                        self.data_import_attempt.query)
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.

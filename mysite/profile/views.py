@@ -49,7 +49,7 @@ import mysite.profile.view_helpers
 from mysite.profile.models import \
     Person, Tag, TagType, \
     Link_Project_Tag, Link_Person_Tag, \
-    DataImportAttempt, PortfolioEntry, Citation
+    PortfolioEntry, Citation
 from mysite.search.models import Project
 from mysite.base.decorators import view, as_view
 import mysite.profile.forms
@@ -473,7 +473,6 @@ def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
     """JSON includes:
         * The person's data.
-        * DataImportAttempts.
         * other stuff"""
 
     # Since this view is meant to be accessed asynchronously, it doesn't make
@@ -507,10 +506,6 @@ def gimme_json_for_portfolio(request):
 
     five_minutes_ago = datetime.datetime.utcnow() - \
         datetime.timedelta(minutes=5)
-    recent_dias = DataImportAttempt.objects.filter(
-        person=person, date_created__gt=five_minutes_ago)
-    recent_dias_json = simplejson.loads(
-        serializers.serialize('json', recent_dias))
     portfolio_entries = simplejson.loads(serializers.serialize('json',
                                                                portfolio_entries_unserialized))
     projects = simplejson.loads(
@@ -518,21 +513,7 @@ def gimme_json_for_portfolio(request):
     # FIXME: Don't send like all the flippin projects down the tubes.
     citations = simplejson.loads(serializers.serialize('json', citations))
 
-    recent_dias_that_are_completed = recent_dias.filter(completed=True)
-    import_running = recent_dias.count() > 0 and (
-        recent_dias_that_are_completed.count() != recent_dias.count())
-    progress_percentage = 100
-    if import_running:
-        progress_percentage = int(
-            recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
-    import_data = {
-        'running': import_running,
-        'progress_percentage': progress_percentage,
-    }
-
     json = simplejson.dumps({
-        'dias': recent_dias_json,
-        'import': import_data,
         'citations': citations,
         'portfolio_entries': portfolio_entries,
         'projects': projects,
@@ -578,51 +559,6 @@ def replace_icon_with_default(request):
     data['portfolio_entry__pk'] = portfolio_entry.pk
     return mysite.base.view_helpers.json_response(data)
 
-
-@login_required
-@csrf_exempt
-def prepare_data_import_attempts_do(request):
-    """
-    Input: request.POST contains a list of usernames or email addresses.
-    These are identifiers under which the authorized user has committed code
-    to an open-source repository, or at least so says the user.
-
-    Side-effects: Create DataImportAttempts that a user might want to execute.
-
-    Not yet implemented: This means, don't show the user DIAs that relate to
-    non-existent accounts on remote networks. And what *that* means is,
-    before bothering the user, ask those networks beforehand if they even
-    have accounts named identifiers[0], etc."""
-    # {{{
-
-    # For each commit identifier, prepare some DataImportAttempts.
-    prepare_data_import_attempts(
-        identifiers=request.POST.values(), user=request.user)
-
-    return HttpResponse('1')
-    # }}}
-
-
-def prepare_data_import_attempts(identifiers, user):
-    "Enqueue and track importation tasks."
-    """Expected input: A list of committer identifiers, e.g.:
-    ['paulproteus', 'asheesh@asheesh.org']
-
-    For each data source, enqueue a background task.
-    Keep track of information about the task in an object
-    called a DataImportAttempt."""
-
-    # Side-effects: Create DIAs that a user might want to execute.
-    for identifier in identifiers:
-        if identifier.strip():  # Skip blanks or whitespace
-            for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
-                dia = DataImportAttempt(
-                    query=identifier,
-                    source=source_key,
-                    person=user.get_profile())
-                dia.save()
-
-
 @login_required
 @view
 def importer(request, test_js=False):
@@ -647,11 +583,6 @@ def importer(request, test_js=False):
 # FIXME: Rename importer
 portfolio_editor = importer
 
-
-def portfolio_editor_test(request):
-    return portfolio_editor(request, test_js=True)
-
-
 def filter_by_key_prefix(dict, prefix):
     """Return those and only those items in a dictionary whose keys have the given prefix."""
     out_dict = {}
@@ -659,41 +590,6 @@ def filter_by_key_prefix(dict, prefix):
         if key.startswith(prefix):
             out_dict[key] = value
     return out_dict
-
-
-@login_required
-def user_selected_these_dia_checkboxes(request):
-    """ Input: Request POST contains a list of checkbox IDs corresponding to DIAs.
-    Side-effect: Make a note on the DIA that its affiliated person wants it.
-    Output: Success?
-    """
-    # {{{
-
-    prepare_data_import_attempts(request.POST, request.user)
-
-    checkboxes = filter_by_key_prefix(request.POST, "person_wants_")
-    identifiers = filter_by_key_prefix(request.POST, "identifier_")
-
-    for checkbox_id, value in checkboxes.items():
-        if value == 'on':
-            x, y, identifier_index, source_key = checkbox_id.split('_')
-            identifier = identifiers["identifier_%s" % identifier_index]
-            if identifier:
-                # FIXME: For security, ought this filter include only dias
-                # associated with the logged-in user's profile?
-                dia = DataImportAttempt(
-                    identifier, source_key,
-                    request.user.get_profile())
-                dia.person_wants_data = True
-                dia.save()
-
-                # There may be data waiting or not,
-                # but no matter; this function may
-                # run unconditionally.
-                dia.give_data_to_person()
-
-    return HttpResponse('1')
-    # }}}
 
 
 @login_required
