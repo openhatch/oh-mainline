@@ -7,8 +7,8 @@ OpenHatch site does not currently support Python 3 or above. We hope to do
 so in the future.
 
 .. note:: These installation instructions are tested nightly on Ubuntu 12.04
-          and Debian stable. Last verified on Windows XP 11/7/2013 and on 
-          Mac OS X 10.9.5 October 29, 2014.
+          and Debian stable. Last verified on Windows XP 11/7/2013,
+          Mac OS X 10.9.5 October 29, 2014, and Mac OS X 10.10 December 15, 2014.
 
 Overview
 ========
@@ -91,9 +91,13 @@ Step 3: Change to the new directory::
 
   cd localhatch
   
-Step 4: Clone the repository from GitHub to your local computer::
+Step 4: On your personal Github account, fork the OpenHatch repository at
+https://github.com/openhatch by clicking on the "Fork" button on the right-hand side.
+Github now takes you to your forked repository of the OpenHatch upstream repository.
 
-  git clone https://github.com/openhatch/oh-mainline.git
+Step 5: On the command prompt, clone the repository from your fork of the GitHub OpenHatch code to your local computer::
+
+  git clone https://github.com/<YOUR_GITHUB_USERNAME>/oh-mainline.git
 
 If your commands are executed successfully, you may continue to the next
 step.
@@ -111,7 +115,9 @@ Set up the database
 ~~~~~~~~~~~~~~~~~~~
 
 Before you run the commands in the this section, make sure you have
-changed your **present working directory** to the `oh-mainline` directory.
+changed your **present working directory** to the `oh-mainline` directory.::
+
+  cd oh-mainline
 
 Your local OpenHatch site will store data in a SQLite database. 
 
