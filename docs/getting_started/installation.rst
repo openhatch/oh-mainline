@@ -7,8 +7,8 @@ OpenHatch site does not currently support Python 3 or above. We hope to do
 so in the future.
 
 .. note:: These installation instructions are tested nightly on Ubuntu 12.04
-          and Debian stable. Last verified on Windows XP 11/7/2013 and on 
-          Mac OS X 10.9.5 October 29, 2014.
+          and Debian stable. Last verified on Windows XP 11/7/2013,
+          Mac OS X 10.9.5 October 29, 2014, and Mac OS X 10.10 December 15, 2014.
 
 Overview
 ========
