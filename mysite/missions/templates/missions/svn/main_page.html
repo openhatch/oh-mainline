@@ -54,7 +54,7 @@
 {% endif %}
 
 {% else %}
-<p>If you were logged in, you could create a repository that you could use to do these missions.</p>
+<p>If you were <a href="{% url "oh_login" %}?next={{request.path}}">logged in</a>, you could create a repository that you could use to do these missions.</p>
 {% endif %}
 
 {% endblock mission_main_body %}
