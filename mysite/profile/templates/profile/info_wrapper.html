@@ -116,15 +116,15 @@
                                 We preserve linebreaks and turn URLs into links.
                                 We provide a Craigslist-style email forwarding
                                 service.  To use it, include the string
-                                <tt>$fwd</tt> in the text area above.
-                                For example, 
+                                <tt>$fwd</tt> in the text area below.
+                                For example,
                                 &ldquo;<tt>Email me at $fwd</tt>&rdquo;
-                                will appear on your profile as "Email me at 
+                                will appear on your profile as "Email me at
                                 {{ forwarder_sample|urlizetrunc:'23' }}".
                                 Keep in mind: This information will be public and
                                 crawlable by search engines. Your email forwarding
                                 address will change every few days to thwart
-                                spammers.  
+                                spammers.
                             </p>
                              {{ contact_blurb_form.contact_blurb }}
                         </div>
@@ -132,5 +132,5 @@
                         <input class='save-button' type='submit' style='clear: left; float: left;' value='Save' />
                         <a style="float: left; font-size: 1.1em; margin: 1px 0 0 10px" href="{{ user.get_profile.profile_url }} ">Cancel</a>
                     </form>
-                </div>      
+                </div>
         {% endblock %}
