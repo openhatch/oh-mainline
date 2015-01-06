@@ -113,6 +113,17 @@ Things to think about:
        "in-progress", re-assign the issue to the pull request submitter if
        it isn't already, and leave your review feedback on the pull request.
 
+    4. After leaving the revisions in the comments, you may optionally leave a note
+        to the author regarding expectations on when or if the pull request willl be worked
+        on further. You may use the below example::
+
+        "To add an arbitrary (but perhaps useful for planning) time bounded-ness, is
+        this addressing the above something you'd be interested in doing over the next 3
+        days? If not, I can take care of it after that. If you're interested in being
+        the one to do so, but you know you need more than 3 days is not long enough,
+        that is fine; just say so, and we're happy to wait for you to perfect these
+        changes."
+
 
 Push and deploy
 ~~~~~~~~~~~~~~~
