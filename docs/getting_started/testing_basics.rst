@@ -9,7 +9,7 @@ the feature's source code.
 
 
 Running the OpenHatch test suite
-################################
+================================
 
 You may run the test suite to see if all tests pass before you begin
 making changes to the code. To run the test suite,::
@@ -21,7 +21,7 @@ progress in the console window.
 
 
 Running the test suite without warnings
-#######################################
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You may run the test suite and turn off warnings, such as "deprecation
 warnings", being output to your screen. To run the test suite without
@@ -34,7 +34,7 @@ any warnings.
 
 
 Running a subset of tests
-#########################
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you are working on a particular area of the source code, you may find
 it helpful to run a subset of the tests. You may pass an argument after
@@ -49,7 +49,7 @@ will run all the tests related to the OpenHatch missions.
 
 
 Additional testing information
-##############################
+==============================
 
 The Internals section of this documentation contains more detailed information
 about the test suite, `advanced testing`_, and `continuous integration`_.
