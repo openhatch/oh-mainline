@@ -105,5 +105,5 @@ Related
 =======
 
 * See also :doc:`/internals/emergency_operations`
-* See also the page about the :doc:`/contributor/login_team`
+* See also the page about the :doc:`/community/login_team`
 

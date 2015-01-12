@@ -9,7 +9,7 @@ OpenHatch code.
 Prerequisites
 =============
 
-* You must be part of the :doc:`/contributor/login_team` (so your SSH key is available in Github
+* You must be part of the :doc:`/community/login_team` (so your SSH key is available in Github
   and you're in the openhatch-committers group, and also that your SSH key is in
   the deploy@linode.openhatch.org account's .ssh/authorized_keys)
 * You must be at a computer with that SSH key

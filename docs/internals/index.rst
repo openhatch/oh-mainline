@@ -1,6 +1,6 @@
-=========
-Internals
-=========
+================
+Operations Guide
+================
 
 Here's more information about our project structure that may be useful.
 

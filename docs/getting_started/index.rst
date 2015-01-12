@@ -1,5 +1,5 @@
 ==================
-Contribution Guide
+Contributors Guide
 ==================
 
 Confused?  `Contact us <http://openhatch.readthedocs.org/en/latest/community/contact.html>`_.

@@ -28,7 +28,7 @@ to make missions (how meta!), cunningly named "Make a Mission".
 To begin developing a new mission, we need to create two directories:
 one for the mission code, and one for the mission templates. Both are
 stored in sub-directories of the OpenHatch repository
-(``oh-mainline``; see :ref:`oh-getting-started` for more information).
+(``oh-mainline``; see :doc:`/getting_started/getting_started` for more information).
 
 To create the new directories::
 

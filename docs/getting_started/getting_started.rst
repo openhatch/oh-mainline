@@ -12,6 +12,7 @@ able to get hacking pretty quickly even if you don't know Django or testing.
 
 First steps
 ===========
+
 Getting the source code
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -26,7 +27,9 @@ order:
     #. Install git the version control system. If you have already done so, skip to the next step.
     #. Clone your personal copy of the oh-mainline repository to your computer by typing this command into your terminal
     
-      git clone https://github.com/<YOUR_GITHUB_USERNAME>/oh-mainline.git
+       .. code-block:: rest
+
+           $ git clone https://github.com/<YOUR_GITHUB_USERNAME>/oh-mainline.git
 
 It will take up to five minutes, depending on your Internet connection. it's
 kind of a big repository. (90 megabytes, or so.)
@@ -36,7 +39,7 @@ Installing and running a local development site
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you have the repository, read the :doc:`installation` documentation
-or open up the `oh-mainline\docs\getting_started\installation.rst` file
+or open up the `oh-mainline/docs/getting_started/installation.rst` file
 in any text editor and follow the instructions.
 
 Read it, and follow the few short steps to getting your local site going. It
@@ -53,7 +56,7 @@ We really recommend that you get in touch with us. (It's not quite mandatory,
 but we'll all be happier if you do)
 
   1. Join the `Devel mailing list`_ and say hello.
-  2. :doc:`the #openhatch IRC channel in freenode </community/contact>`.
+  2. Visit :doc:`the #openhatch IRC channel in freenode </community/contact>`.
 
 
 OpenHatch holds development meetings on IRC; our goal is to hold these meetings weekly. The meetings are announced on `devel@lists.openhatch.org`. Please join us on IRC and share your ideas or ask questions.
