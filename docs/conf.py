@@ -15,13 +15,13 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'OpenHatch'
-copyright = '2012, OpenHatch contributors. Permission to re-use granted under the terms of CC Zero 1.0'
+copyright = '2012-2015, OpenHatch contributors. Permission to re-use granted under the terms of CC Zero 1.0'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-version = __version__
-release = __version__
+version = '01.01.01'
+release = '2015.01.01'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'

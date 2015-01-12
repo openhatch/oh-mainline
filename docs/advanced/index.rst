@@ -1,17 +1,18 @@
-=====================
-Getting More Involved
-=====================
+================================================
+Technical Guide to Development and Documentation
+================================================
 
 If you've made it this far without `saying hello <http://openhatch.readthedocs.org/en/latest/community/contact.html>`_
 you should definitely do so!
 
 .. toctree::
-    :maxdepth: 2
+   :maxdepth: 2
 
-    advanced_installation
-    layout_source_code
-    deployment
-    heroku
-    maintenance
-    adding_new_bug_tracker_git
-    advanced_testing
+   styleguide
+   layout_source_code
+   advanced_installation
+   advanced_testing
+   deployment
+   heroku
+   maintenance
+   adding_new_bug_tracker_git

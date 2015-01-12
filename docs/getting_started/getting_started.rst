@@ -1,8 +1,6 @@
-.. _oh-getting-started:
-
-=======================================
-Contributor Guide
-=======================================
+===============
+Getting Started
+===============
 
 To get your own instance of OpenHatch running, follow these steps and then get
 in touch with us.
@@ -12,8 +10,11 @@ good software testing practices. If you have Python experience, you should be
 able to get hacking pretty quickly even if you don't know Django or testing.
 
 
-Getting the source
-==================
+First steps
+===========
+
+Getting the source code
+~~~~~~~~~~~~~~~~~~~~~~~
 
 OpenHatch source code can be seen through a web interface at
 https://github.com/openhatch/oh-mainline
@@ -24,24 +25,22 @@ order:
     #. Make a new Github account on https://www.github.com if you don't already have one.
     #. Fork the oh-mainline Github repository located here at https://github.com/openhatch/oh-mainline. Click on the fork button located on the upper  right corner of the project page. Now you have your own personal copy of the oh-mainline repository.
     #. Install git the version control system. If you have already done so, skip to the next step.
-    #. Clone your personal copy of the oh-mainline repository to your computer by typing this command into your terminal::
+    #. Clone your personal copy of the oh-mainline repository to your computer by typing this command into your terminal
+    
+       .. code-block:: rest
 
-        $ git clone https://github.com/<YOUR_GITHUB_USERNAME>/oh-mainline.git
+           $ git clone https://github.com/<YOUR_GITHUB_USERNAME>/oh-mainline.git
 
 It will take up to five minutes, depending on your Internet connection. it's
 kind of a big repository. (90 megabytes, or so.)
 
 
-How to run a local site
-=======================
+Installing and running a local development site
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Read installation.rst inside docs/getting_started directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once you have the repository, open up the installation.rst file in any
-text viewer (like gedit, or your favorite web browser).
-(This is the same file as :doc:`installation`.)
-
+Once you have the repository, read the :doc:`installation` documentation
+or open up the `oh-mainline/docs/getting_started/installation.rst` file
+in any text editor and follow the instructions.
 
 Read it, and follow the few short steps to getting your local site going. It
 should take about 5 minutes.
@@ -57,7 +56,7 @@ We really recommend that you get in touch with us. (It's not quite mandatory,
 but we'll all be happier if you do)
 
   1. Join the `Devel mailing list`_ and say hello.
-  2. :doc:`the #openhatch IRC channel in freenode </community/contact>`.
+  2. Visit :doc:`the #openhatch IRC channel in freenode </community/contact>`.
 
 
 OpenHatch holds development meetings on IRC; our goal is to hold these meetings weekly. The meetings are announced on `devel@lists.openhatch.org`. Please join us on IRC and share your ideas or ask questions.
@@ -66,7 +65,7 @@ OpenHatch holds development meetings on IRC; our goal is to hold these meetings 
 
 
 Read more documentation
-=======================
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Before you start hacking OpenHatch, we strongly advise you to watch
 `Learning new codebase`_ talk by Justin Lilly given during `DjangoCon 2010`_.
@@ -82,7 +81,7 @@ You can find things to work on by browsing our `issue tracker`_ or asking us!
 
 
 Start contributing!
-===========================
+~~~~~~~~~~~~~~~~~~~
 
 We mark issues that are particularly good for new contributors with the
 "bitesize" keyword on our issue tracker. You can find the open easy issues `here`_.

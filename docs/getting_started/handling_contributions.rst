@@ -5,8 +5,8 @@ How we handle contributions
 We use git/Github to handle contributions.  If you're new to git, you may
 appreciate `this guide <https://openhatch.org/wiki/Git_Basics#Create_pull_request>`_.
 
-As a pull request submitter
-===========================
+As a contributor
+================
 
 Creating a pull request
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,8 +83,8 @@ Permit us to share your work
         can be shared under the terms of CC Zero 1.0.
 
 
-As a contribution reviewer
-==========================
+As a reviewer
+=============
 
 Apply the pull request to your local repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,16 +113,16 @@ Things to think about:
        "in-progress", re-assign the issue to the pull request submitter if
        it isn't already, and leave your review feedback on the pull request.
 
-    4. After leaving the revisions in the comments, you may optionally leave a note
-        to the author regarding expectations on when or if the pull request willl be worked
-        on further. You may use the below example::
+    4. After leaving the revisions in the comments, you may optionally leave a
+       note to the author regarding expectations on when or if the pull request
+       will be worked on further. You may use the below example::
 
-        "To add an arbitrary (but perhaps useful for planning) time bounded-ness, is
-        this addressing the above something you'd be interested in doing over the next 3
-        days? If not, I can take care of it after that. If you're interested in being
-        the one to do so, but you know you need more than 3 days is not long enough,
-        that is fine; just say so, and we're happy to wait for you to perfect these
-        changes."
+        To add an arbitrary (but perhaps useful for planning) time
+        bounded-ness, is this addressing the above something you'd be
+        interested in doing over the next 3 days? If not, I can take care of
+        it after that. If you're interested in being the one to do so, but you
+        know you need more than 3 days is not long enough, that is fine; just
+        say so, and we're happy to wait for you to perfect these changes.
 
 
 Push and deploy
@@ -151,5 +151,4 @@ Things to know:
 For more details on how we use Jenkins and how to force a Jenkins build, see
 `Continuous integration with Jenkins and Travis CI`_.
 
-.. _Login team: https://openhatch.org/wiki/Login_team
 .. _Continuous integration with Jenkins and Travis CI: ../internals/continuous_integration.html

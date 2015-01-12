@@ -120,5 +120,5 @@ If you get stuck, please email the list or ping paulproteus or others in IRC!
 Submit a patch
 ==============
 
-This is the easiest part. See :doc:`/getting_started/handling_patches`!
+This is the easiest part. See :doc:`/getting_started/handling_contributions`!
 
