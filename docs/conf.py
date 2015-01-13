@@ -20,7 +20,7 @@ copyright = '2012-2015, OpenHatch contributors. Permission to re-use granted und
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-version = '01.01.01'
+version = '01.01.02'
 release = '2015.01.01'
 
 # The name of the Pygments (syntax highlighting) style to use.
