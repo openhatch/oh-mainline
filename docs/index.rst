@@ -1,9 +1,11 @@
-====================
-Welcome to OpenHatch
-====================
+====================================
+Welcome to OpenHatch's Documentation
+====================================
 
 `OpenHatch <http://openhatch.org/>`_ values open communication. We believe
-documentation is an important part of a welcoming community.
+documentation is an important part of a welcoming community. If you would
+like to see some of the projects that we are currently working on, please
+visit the OpenHatch website <http://openhatch.org>.
 
 Trying to get your bearings with our documentation?  Take a look at the
 :doc:`getting_started/project_overview` or :doc:`community/contact` to ask
@@ -30,10 +32,10 @@ Contents
     community/index
 
 
-Contributors Guide
-------------------
+Contributor's Guide
+-------------------
 
-The Contributors Guide provides an introduction to contributing to the
+The Contributor's Guide provides an introduction to contributing to the
 OpenHatch project.
 
 .. toctree::
@@ -121,18 +123,6 @@ that support our goal of being a welcoming and helpful community.
    community/ticket_tracking
    community/sprints
    community/thanks
-
-
-Administrivia
--------------
-
-This section refers to other files that may be useful.
-
-.. toctree::
-   :maxdepth: 1
-
-   CONTRIBUTING
-   README
 
 
 Indices and tables
