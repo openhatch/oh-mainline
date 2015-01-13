@@ -123,18 +123,6 @@ that support our goal of being a welcoming and helpful community.
    community/thanks
 
 
-Administrivia
--------------
-
-This section refers to other files that may be useful.
-
-.. toctree::
-   :maxdepth: 1
-
-   CONTRIBUTING
-   README
-
-
 Indices and tables
 ==================
 
