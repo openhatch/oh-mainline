@@ -59,6 +59,7 @@ developing software or writing documentation for OpenHatch projects.
    advanced/styleguide
    advanced/layout_source_code
    advanced/advanced_installation
+   advanced/working_with_git
    advanced/advanced_testing
    advanced/deployment
    advanced/heroku

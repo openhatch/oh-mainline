@@ -11,6 +11,7 @@ you should definitely do so!
    styleguide
    layout_source_code
    advanced_installation
+   working_with_git
    advanced_testing
    deployment
    heroku
