@@ -2,6 +2,13 @@
 
 body#landing {
 
+    /* The columns on the front page take up about one-third
+       of the width. Later rules for responding to browser
+       width changes will adjust these rules further. */
+    .column {
+        margin-left: -1px;
+        width:32%;
+    }
     #landing-module {
         background: @emphasized-module-interior;
         #landing-message {
