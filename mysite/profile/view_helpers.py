@@ -28,7 +28,7 @@ from django.core.cache import cache
 from django.db.models import Q
 import django.core.mail
 import django.core.serializers
-from django.utils import simplejson
+import json
 
 import logging
 import mysite.search.view_helpers
@@ -192,7 +192,7 @@ def send_user_export_to_admins(u):
     * training an antispam tool
 
     * recovering data on a user'''
-    body = simplejson.dumps(generate_user_export(u), default=encode_datetime)
+    body = json.dumps(generate_user_export(u), default=encode_datetime)
     msg = django.core.mail.EmailMessage(subject="User export for %d" % u.id,
                                         body=body,
                                         to=[email

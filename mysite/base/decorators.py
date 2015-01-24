@@ -22,7 +22,7 @@ from django.http import HttpResponse
 import re
 import collections
 import mysite.base.view_helpers
-from django.utils import simplejson
+import json
 import django.core.cache
 import hashlib
 from functools import partial
@@ -184,7 +184,7 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
         # First transform certain objects into a cachable format.
         if type(value) == django.db.models.query.ValuesListQuerySet:
             value = list(value)
-        cached_json = simplejson.dumps({'value': value})
+        cached_json = json.dumps({'value': value})
 
         # Then cache the input/output mapping.
         django.core.cache.cache.set(cache_key, cached_json, 864000)
@@ -193,7 +193,7 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
     else:
         # Sweet, no need to run the expensive method. Just use the cached
         # output.
-        value = simplejson.loads(cached_json)['value']
+        value = json.loads(cached_json)['value']
 
     return value
 

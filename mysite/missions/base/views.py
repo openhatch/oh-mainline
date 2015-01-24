@@ -38,7 +38,7 @@ import django.views.generic.edit
 import django.conf
 
 import os
-from django.utils import simplejson
+import json
 import collections
 
 # Other missions use this helper.
