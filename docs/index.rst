@@ -68,6 +68,7 @@ developing software or writing documentation for OpenHatch projects.
    advanced/heroku
    advanced/maintenance
    advanced/adding_new_bug_tracker_git
+   advanced/developer_notes
 
 
 Operations Guide
