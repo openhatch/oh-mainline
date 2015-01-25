@@ -42,6 +42,7 @@ OpenHatch project.
    :maxdepth: 1
 
    getting_started/project_overview
+   getting_started/key_features_openhatch_site
    getting_started/getting_started
    getting_started/installation
    getting_started/testing_basics
@@ -67,6 +68,7 @@ developing software or writing documentation for OpenHatch projects.
    advanced/heroku
    advanced/maintenance
    advanced/adding_new_bug_tracker_git
+   advanced/developer_notes
 
 
 Operations Guide
