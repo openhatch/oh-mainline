@@ -42,6 +42,7 @@ OpenHatch project.
    :maxdepth: 1
 
    getting_started/project_overview
+   getting_started/key_features_openhatch_site
    getting_started/getting_started
    getting_started/installation
    getting_started/testing_basics
