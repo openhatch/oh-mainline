@@ -46,7 +46,7 @@ from mysite.base.models import Timestamp
 import mysite.account.tests
 from mysite.search.models import Project, WannaHelperNote
 from mysite.profile.models import (Person, Tag, TagType, Link_Person_Tag,
-                                   DataImportAttempt, PortfolioEntry,
+                                   PortfolioEntry,
                                    Citation, Forwarder)
 import mysite.project.views
 import mysite.profile.views
@@ -272,19 +272,9 @@ class Portfolio(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=paulproteus)[0],
-            languages='Python',
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=paulproteus)[0]
+            languages='Python'
         )
         citation.save()
-
-        finished_dia = citation.data_import_attempt
-        unfinished_dia = DataImportAttempt(source='rs',
-                                           query='foo',
-                                           completed=False,
-                                           person=paulproteus)
-        unfinished_dia.save()
 
         if but_first is not None:
             but_first()
@@ -293,7 +283,7 @@ class Portfolio(BasicHelpers):
             reverse(mysite.profile.views.gimme_json_for_portfolio))
 
         # Response consists of JSON like:
-        # {'dias': ..., 'citations': ..., 'summaries': ...}
+        # {''citations': ..., 'summaries': ...}
         response = json.loads(response.content)
 
         # Check we got a summary for each Citation.
@@ -304,24 +294,23 @@ class Portfolio(BasicHelpers):
                 "Expected that this Citation's pk would have a summary.")
 
         #
-        # Are the DIAs and citations in the response
+        # Are the citations in the response
         # exactly what we expected?
         #
 
         # What we expect:
         expected_list = serializers.serialize(
-            'python', [finished_dia, unfinished_dia, citation])
+            'python', [citation])
 
         # What we got:
-        dias_and_citations_in_response = response[
-            'dias'] + response['citations']
+        citations_in_response = response['citations']
 
         # We don't care about the "fields" in either, just the pk and model.
-        for object in (dias_and_citations_in_response + expected_list):
+        for object in (citations_in_response + expected_list):
             del object['fields']
 
         # Check that each thing we got was expected.
-        for object in dias_and_citations_in_response:
+        for object in citations_in_response:
             object_is_expected = (object in expected_list)
             if must_find_nothing:
                 self.assertFalse(object_is_expected)
@@ -330,7 +319,7 @@ class Portfolio(BasicHelpers):
 
         # Check the reverse: that each thing we expected we got.
         for object in expected_list:
-            object_is_expected = (object in dias_and_citations_in_response)
+            object_is_expected = (object in citations_in_response)
             if must_find_nothing:
                 self.assertFalse(object_is_expected)
             else:
@@ -356,20 +345,9 @@ class Portfolio(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=paulproteus)[0],
-            languages='Python',
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus',
-                completed=True, person=paulproteus)[0]
+            languages='Python'
         )
         citation.save()
-
-        # finished dia
-        citation.data_import_attempt
-        unfinished_dia = DataImportAttempt(source='rs',
-                                           query='foo',
-                                           completed=False,
-                                           person=paulproteus)
-        unfinished_dia.save()
 
         # Delete the projects
         portfolio_entries = PortfolioEntry.objects.all()
@@ -387,7 +365,6 @@ class Portfolio(BasicHelpers):
 
         self.assertEqual(len(response_decoded['citations']), 0,
                          "Expected no citations back.")
-        # Who cares about DIAS.
 
 
 class ImporterPublishCitation(BasicHelpers):
@@ -400,10 +377,7 @@ class ImporterPublishCitation(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=Person.objects.get(
-                    user__username='paulproteus'))[0],
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+                    user__username='paulproteus'))[0]
         )
         citation.save()
 
@@ -436,10 +410,7 @@ class ImporterPublishCitation(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=Person.objects.get(
-                    user__username='paulproteus'))[0],
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+                    user__username='paulproteus'))[0]
         )
         citation.save()
 
@@ -460,10 +431,7 @@ class ImporterDeleteCitation(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=Person.objects.get(
-                    user__username='paulproteus'))[0],
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+                    user__username='paulproteus'))[0]
         )
         citation.save()
 
@@ -496,10 +464,7 @@ class ImporterDeleteCitation(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=Person.objects.get(
-                    user__username='paulproteus'))[0],
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+                    user__username='paulproteus'))[0]
         )
         citation.save()
         self.assertFalse(citation.is_deleted)
@@ -622,10 +587,7 @@ class DeletePortfolioEntry(BasicHelpers):
             person=Person.objects.get(user__username='paulproteus'))[0]
 
         citation = Citation(
-            portfolio_entry=portfolio_entry,
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+            portfolio_entry=portfolio_entry
         )
         citation.save()
 
@@ -670,10 +632,7 @@ class DeletePortfolioEntry(BasicHelpers):
                 project=Project.objects.get_or_create(
                     name='project name')[0],
                 person=Person.objects.get(
-                    user__username='paulproteus'))[0],
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+                    user__username='paulproteus'))[0]
         )
         citation.save()
 
@@ -759,10 +718,7 @@ class SavePortfolioEntry(BasicHelpers):
             project=self.project,
             person=Person.objects.get(user__username=self.user))[0]
         citation = Citation(
-            portfolio_entry=self.portfolio_entry,
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query=self.user, completed=True,
-                person=Person.objects.get(user__username=self.user))[0]
+            portfolio_entry=self.portfolio_entry
         )
         citation.is_published = False
         citation.save()
@@ -852,64 +808,6 @@ class GimmeJsonTellsAboutImport(BasicHelpers):
 
     def get_n_min_ago(self, n):
         return datetime.datetime.utcnow() - datetime.timedelta(minutes=n)
-
-    def test_import_running_false(self):
-        "When there are no DIAs for past five minutes, import.running = False"
-        # Create a DIA for paulproteus that is from ten minutes ago (but
-        # curiously is still in progress)
-        my_dia_but_not_recent = DataImportAttempt(
-            date_created=self.get_n_min_ago(10),
-            query="bananas", person=self.get_paulproteus())
-        my_dia_but_not_recent.save()
-
-        # Create a DIA for Barry that is in progress, but ought not be
-        # included in the calculation by gimme_json_for_portfolio
-        not_my_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
-                                       query="banans",
-                                       person=self.get_barry())
-        not_my_dia.save()
-
-        # Verify that the JSON reports import running is False
-        self.assertFalse(self.gimme_json()['import']['running'])
-
-    def test_for_running_import(self):
-        '''When there are dias for the past five minutes, import.running =
-        True and progress percentage is accurate'''
-        # Create a DIA for paulproteus that is from one minutes ago (but
-        # curiously is still in progress)
-        my_incomplete_recent_dia = DataImportAttempt(
-            date_created=self.get_n_min_ago(1),
-            query="bananas", person=self.get_paulproteus(), completed=False)
-        my_incomplete_recent_dia.save()
-
-        my_completed_recent_dia = DataImportAttempt(
-            date_created=self.get_n_min_ago(1),
-            query="bananas", person=self.get_paulproteus(), completed=True)
-        my_completed_recent_dia.save()
-
-        # Create a DIA that is in progress, but ought not be
-        # included in the calculation by gimme_json_for_portfolio
-        # because it doesn't belong to the logged-in user
-        not_my_dia = DataImportAttempt(
-            date_created=self.get_n_min_ago(1), person=self.get_barry(),
-            query="bananas")
-        not_my_dia.save()
-
-        self.assert_(
-            self.gimme_json()['import']['running'],
-            "JSON reflects that an import is running")
-        self.assertEqual(
-            self.gimme_json()['import']['progress_percentage'], 50,
-            "JSON reflects that import is at 50% progress")
-
-        # Now let's make them all completed
-        my_incomplete_recent_dia.completed = True
-        my_incomplete_recent_dia.save()
-
-        self.assertFalse(
-            self.gimme_json()['import']['running'],
-            "After all DIAs are completed, JSON reflects that no import is "
-            "running.")
 
 
 class PortfolioEntryAdd(BasicHelpers):
@@ -1002,16 +900,12 @@ class IgnoreNewDuplicateCitations(WebTest):
         paulproteus = Person.objects.get(user__username='paulproteus')
         project1 = Project.create_dummy(name='1')
         project2 = Project.create_dummy(name='2')
-        repo_search = DataImportAttempt.objects.get_or_create(
-            source='rs', query='paulproteus', completed=True,
-            person=paulproteus)[0]
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
                 project=project1,
                 is_published=True,
                 person=paulproteus)[0],
-            languages='Python',
-            data_import_attempt=repo_search
+            languages='Python'
         )
         citation.save_and_check_for_duplicates()
 
@@ -1020,10 +914,7 @@ class IgnoreNewDuplicateCitations(WebTest):
                 project=project2,
                 is_published=True,
                 person=paulproteus)[0],
-            languages='Python',
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=paulproteus)[0]
+            languages='Python'
         )
         citation_of_different_project.save_and_check_for_duplicates()
 
@@ -1035,15 +926,12 @@ class IgnoreNewDuplicateCitations(WebTest):
 
         # Create a second citation with all the same attributes as the first.
         # We will test that this one is superseded by its predecessor.
-        username_search = DataImportAttempt.objects.get_or_create(
-            source='ou', query='paulproteus', completed=True,
-            person=paulproteus)[0]
+
         # As is realistic, this citation comes from an
         # Ohloh username search with the same results.
         citation2 = Citation(
             portfolio_entry=citation.portfolio_entry,
-            languages=citation.languages,
-            data_import_attempt=username_search
+            languages=citation.languages
         )
         citation2.save_and_check_for_duplicates()
 
@@ -2556,10 +2444,7 @@ class ProfileApiTest(BasicHelpers):
         citation = Citation(
             contributor_role='Did stuff',
             url='http://example.com/',
-            portfolio_entry=portfolio_entry,
-            data_import_attempt=DataImportAttempt.objects.get_or_create(
-                source='rs', query='paulproteus', completed=True,
-                person=Person.objects.get(user__username='paulproteus'))[0]
+            portfolio_entry=portfolio_entry
         )
         citation.save()
 

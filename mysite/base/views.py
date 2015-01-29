@@ -73,22 +73,15 @@ def home(request):
         data['nudge_missions'] = not mysite.missions.models.StepCompletion.objects.filter(
             person=person)
 
-        # Project editor nudging. Note:
-        # If the person has some dias, then no nudge!
-        if person.dataimportattempt_set.all():
-            # whee, no nudge. the user has already seen the project editor.
-            pass
+
+        if person.get_published_portfolio_entries():
+            data['nudge_importer_when_user_has_some_projects'
+                 ] = True  # just nudge about the importer...
         else:
-            # So, either the person has some projects listed publicly, in which case,
-            # we should remind the person just to use the importer...
-            if person.get_published_portfolio_entries():
-                data['nudge_importer_when_user_has_some_projects'
-                     ] = True  # just nudge about the importer...
-            else:
-                # the person has entered zero projects and hasn't touched the importer
-                # so introduce him or her to use the importer!
-                data['nudge_importer_when_user_has_no_projects'
-                     ] = True  # give the general project editing nudge
+            # the person has entered zero projects and hasn't touched the importer
+            # so introduce him or her to use the importer!
+            data['nudge_importer_when_user_has_no_projects'
+                 ] = True  # give the general project editing nudge
 
         data['show_nudge_box'] = (data['nudge_location'] or
                                   'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
@@ -166,21 +159,6 @@ def meta_data():
 
     # temp variable for shortness
     my = data['dia_diagnostics']
-
-    my['Uncompleted DIAs'] = mysite.profile.models.DataImportAttempt.objects.filter(
-        completed=False).count()
-
-    one_minute_ago = (datetime.datetime.now() -
-                      datetime.timedelta(minutes=1))
-
-    my['Uncompleted DIAs older than 1 minute'] = mysite.profile.models.DataImportAttempt.objects.filter(
-        completed=False, date_created__lt=one_minute_ago).count()
-
-    five_minute_ago = (datetime.datetime.now() -
-                       datetime.timedelta(minutes=5))
-
-    my['Uncompleted DIAs older than 5 minutes'] = mysite.profile.models.DataImportAttempt.objects.filter(
-        completed=False, date_created__lt=one_minute_ago).count()
 
     data['bug_diagnostics'] = {}
     # local name for shortness

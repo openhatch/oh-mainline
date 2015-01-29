@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.profile.models import Person, DataImportAttempt, Tag, TagType, PortfolioEntry, Citation
+from mysite.profile.models import Person, Tag, TagType, PortfolioEntry, Citation
 from django.contrib import admin
 
 admin.site.register(Person)
-admin.site.register(DataImportAttempt)
 admin.site.register(Tag)
 admin.site.register(TagType)
 admin.site.register(PortfolioEntry)

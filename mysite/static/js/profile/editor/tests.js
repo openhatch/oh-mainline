@@ -69,9 +69,6 @@ $(testBuildingBlocks);
 // FIXME: Come up with a suitable response, matching the description above.
 mockedPortfolioResponse = {
 
-    // DataImportAttempts
-    'dias': [{'pk': 0}],
-
     // the progress of an import
     'import': {
         'running': false,

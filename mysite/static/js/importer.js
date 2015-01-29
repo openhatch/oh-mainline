@@ -30,10 +30,7 @@
  *
  *  6.  On each ping the server responds with a JSONified Python list comprising:
  *      - the Citations we've found so far
- *      - the DataImportAttempts used to find them
  *  
- *  7.  If all the DataImportAttempts read 'I'm done!',
- *      we tell the user "We're done!"
  */
 
 if (typeof want_importer == 'undefined') {
@@ -182,7 +179,6 @@ Preparation = {
         fireunit.ok(typeof query != 'undefined', "query: " + query);
 
         var data = {'format': 'success_code'};
-
         // About the below; the old POST handler used to expect
         // a digit instead of "x", but I don't think it will matter.
         data['commit_username_x'] = query;
@@ -196,6 +192,7 @@ Preparation = {
     }
     // }}}
 };
+
 
 Submission = {
     // {{{
@@ -309,7 +306,7 @@ $.fn.htmlSmart = function(html) {
 function updatePortfolio(response) {
     /* Input: A whole bunch of (decoded) JSON data containing
      * all of the user's Citations, PortfolioEntries, and Projects,
-     * summaries for those Citations, and DataImportAttempts.
+     * summaries for those Citations,
      
      * Output: Nothing.
 
