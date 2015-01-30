@@ -18,7 +18,7 @@
 from decorator import decorator
 from odict import odict
 import logging
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import re
 import collections
 import mysite.base.view_helpers
@@ -26,6 +26,7 @@ from django.utils import simplejson
 import django.core.cache
 import hashlib
 from functools import partial
+from urlparse import urlparse
 
 from django.template.loader import render_to_string
 import django.db.models.query
@@ -213,3 +214,17 @@ def cached_property(f):
             return x
 
     return property(get)
+
+def authenticated(func):
+    """ decorator that redirect user to next page if
+    he is already logged."""
+    def decorated(request, *args, **kwargs):
+        if request.user.is_authenticated():
+            next = request.GET.get("next", "/")
+            parsed_url = urlparse(next)
+            if parsed_url.scheme == '':
+                return HttpResponseRedirect(next)
+            else:
+                return HttpResponseRedirect("/")
+        return func(request, *args, **kwargs)
+    return decorated
