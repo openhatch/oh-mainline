@@ -453,9 +453,14 @@ class ClearSessionsOnPasswordChange(WebTest):
         self.assertFalse(self.user_logged_in(client2.session))
 
 class UrlRedirect(WebTest):
+    """ Test to check open redirection in register URL """
     fixtures = ['user-paulproteus']
 
     def test_appended_url_redirect(self):
+        """
+        If the next url is of different website, the test should refuse to
+        redirect the user there, rather it should redirect to OpenHatch root
+        """
         client = Client()
         username = 'paulproteus'
         password = "paulproteus's unbreakable password"
