@@ -217,7 +217,7 @@ def cached_property(f):
 
 def authenticated(func):
     """ decorator that redirect user to next page if
-    he is already logged."""
+    the user is already logged."""
     def decorated(request, *args, **kwargs):
         if request.user.is_authenticated():
             next = request.GET.get("next", "/")
