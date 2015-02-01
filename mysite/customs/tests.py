@@ -87,30 +87,6 @@ class OhlohIconTests(django.test.TestCase):
         self.assertRaises(ValueError, oh.get_icon_for_project,
                           'surely nothing is called this name')
 
-    def test_populate_icon_from_ohloh(self):
-
-        project = Project()
-        project.name = 'Mozilla Firefox'
-        project.populate_icon_from_ohloh()
-
-        self.assert_(project.icon_raw)
-        self.assertEqual(project.icon_raw.width, 64)
-        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
-
-    def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
-
-        project = Project()
-        project.name = 'lolnomatchiawergh'
-
-        project.populate_icon_from_ohloh()
-
-        self.assertFalse(project.icon_raw)
-        # We don't know how to compare this against None,
-        # but this seems to work.
-
-        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
-
-
 @skipIf(mysite.base.depends.lxml.html is None, (
         "To run these tests, you must install lxml. See "
         "ADVANCED_INSTALLATION.mkd for more information."))
@@ -374,7 +350,6 @@ class DataExport(django.test.TestCase):
         # make fake Project
         proj = Project.create_dummy(
             name="karens-awesome-project", language="Python")
-        proj.populate_icon_from_ohloh()
         proj.save()
 
         command = (

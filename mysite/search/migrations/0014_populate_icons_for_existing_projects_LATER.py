@@ -29,11 +29,6 @@ class Migration:
         # Populate icons for all existing projects.
         for orm_project in orm['search.project'].objects.all():
             model_project = Project.objects.get(pk=orm_project.pk)
-            print "Populating icon for", model_project
-            model_project.populate_icon_from_ohloh()
-            # We know this is unsafe.
-            # If this fails, it might be because
-            # populate_icon_from_ohloh doesn't exist anymore.
             model_project.save()
     
     def backwards(self, orm):
