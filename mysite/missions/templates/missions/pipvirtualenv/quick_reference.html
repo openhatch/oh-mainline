@@ -1,0 +1,96 @@
+{% extends 'missions/pipvirtualenv/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Quick Reference</h3>
+  </div>
+  <div class="body">
+    <h3>Installation instructions</h3>
+    <p>Installing pip and virtualenv along with all of what they depend on
+    can be hard at times, so we recommend that you follow the installation
+    instructions given <a href='{% url "mysite.missions.pipvirtualenv.views.setup_pipvirtualenv" %}'>
+    here</a>.</p>
+
+    <h3>pip commands</h3>
+    <p>To install a package, type <kbd>pip install <em>foo</em></kbd> where
+    <kbd><em>foo</em></kbd> is the name of the package you want to install.</p>
+
+    <p>To uninstall a package, type <kbd>pip uninstall <em>foo</em></kbd> where
+    <kbd><em>foo</em></kbd> is the name of the package you want to uninstall.</p>
+
+    <p>To get a list of all of the Python packages currently installed in your
+    environment, use the <kbd>pip freeze</kbd> or <kbd>pip list</kbd> commands.</p>
+
+    <p>You can also search the <a href="https://pypi.python.org/pypi">PyPI</a> for
+    packages. For instance, to search for all packages that contain the string "http"
+    in their name(or description), type:
+
+    <kbd>pip search http</kbd>
+
+    <p>If you find yourself installing the same packages frequently in virtualenvs
+    and don't want to wait for pip to download the package again for each separate
+    install, type <kbd>pip wheel <em>foo</em></kbd> before <kbd>pip install <em>foo
+    </em></kbd> to get extra-fast installs.</p>
+
+    <h3>virtualenv/virtualenvwrapper commands</h3>
+    <p>You can use the <kbd>mkvirtualenv</kbd> command to create a virtualenv, like
+    so:</p>
+
+    <kbd>mkvirtualenv <em>FooEnv</em></kbd>
+
+    <p>where <kbd><em>FooEnv</em></kbd> is the name of the virtualenv(which can be
+    anything you like).</p>
+
+    <p>To get out of a virtualenv, simply type <kbd>deactivate</kbd> at the terminal.</p>
+
+    <p>To activate a virtualenv that has already been created, type <kbd>workon</kbd>
+    followed by the name of the virtualenv that you wish to activate, like so:</p>
+
+    <kbd>mkvirtualenv TestEnv</kbd>
+
+    <p>You can delete a virtualenv by typing <kbd>rmvirtualenv <em>FooEnv</em></kbd>
+    at the terminal, where <kbd><em>FooEnv</em></kbd> is the name of the virtualenv
+    that you wish to delete.</p>
+
+    <p>To list all of the virtualenvs that you have created so far, simply type
+    <kbd>lsvirtualenv</kbd> at the terminal.</p>
+
+    <h3>Other resources</h3>
+    <p>If you wish to learn more about the tools covered in this mission, we recommend
+    that you take a look at the following additional resources:
+
+    <ul class='raquo_bullets'>
+        <li><a href='http://docs.python-guide.org/en/latest/'>The Hitchhiker's Guide to
+        Python!</a> book contains a chapter called <a href='http://docs.python-guide.org/en/latest/dev/virtualenvs/'>
+        Virtual Environments</a></li>
+        <li><a href='https://pip.pypa.io/en/latest/'>The official pip documentation</li>
+        <li><a href='https://virtualenv.pypa.io/en/latest/'>The official virtualenv
+        documentation</a></li>
+        <li><a href='https://virtualenvwrapper.readthedocs.org/en/latest/'>The official
+        virtualenvwrapper documentation</a></li>
+        <li><a href='https://packaging.python.org/en/latest/'>The Python Packaging User
+        Guide</a></li>
+        <li><a href='http://asheesh.org/'>Asheesh Laroia</a> has given an amazing talk
+        about packaging titled <a href='http://pyvideo.org/video/2631/python-packaging-simplified-for-end-users-app-d'>
+        Python packaging simplified, for end users, app developers</a> which covers
+        the practical use of Python packaging tools.</li>
+  </div>
+</div>
+{% endblock %}

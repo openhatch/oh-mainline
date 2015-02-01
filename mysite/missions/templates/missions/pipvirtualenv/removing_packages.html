@@ -1,0 +1,107 @@
+{% extends 'missions/pipvirtualenv/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Removing packages and deactivating virtualenvs</h3>
+  </div>
+  <div class="body">
+
+  <h3>Deactivating virtualenvs</h3>
+  <p>To deactivate a virtualenv, simply type <kbd>deactivate</kbd> at the
+  terminal and press Enter.</p>
+  
+  <p>You'll notice that after running the <kbd>deactivate</kbd> command,
+  your terminal prompt (something like <kbd>C:\Users\username></kbd> on
+  Windows or <kbd>user@hostname:~ $</kbd> on Linux/Mac OS X) will no longer
+  be prefixed by the name of a virtualenv. This means that no virtualenv is
+  active at the moment.</p>
+
+  <p>To activate a virtualenv, at the terminal, type <kbd>workon</kbd>,
+  followed by the name of the virtualenv that you'd like to <q>work on</q>
+  like so:</p>
+
+  <kbd>workon TestEnv</kbd>
+
+  <p>Go ahead and run the above command to activate the virtualenv <kbd>
+  TestEnv</kbd> that we created earlier before moving on to the next section
+  about removing packages.</p>
+
+  <h3>Removing packages</h3>
+  <p>To uninstall a package, type <kbd>pip uninstall</kbd> followed by
+  the name of the package that you'd like to remove.</p>
+
+  <p>Now, let's uninstall the Requests library that we installed earlier.
+  At the terminal, type the following command and press Enter:</p>
+
+  <kbd>pip uninstall requests</kbd>
+
+  <p>After Requests has been removed successfully, type <kbd>pip list</kbd>
+  at the terminal and press Enter. Just like the <kbd>pip freeze</kbd>
+  command, the <kbd>pip list</kbd> command also lists all Python packages
+  installed in our environment. The most significant difference between the
+  two commands is how they format their output. You can learn more about the subtle
+  differences between the <kbd>pip list</kbd> and <kbd>pip freeze</kbd> commands
+  <a href="http://stackoverflow.com/questions/18966564/pip-freeze-vs-pip-list">
+  here</a>.</p>
+  
+  <p>To complete this part of the mission, select the output of the
+  <kbd>pip list</kbd> command with your mouse and use your terminal program's
+  copy-paste functionality to copy it to the clipboard. Paste it into the form
+  below. Then, submit!</p>
+
+  <br>
+
+  <form method="post" action="{% url "mysite.missions.pipvirtualenv.views.pip_list_submit" %}#piplist-form">{% csrf_token %}
+    <div class="form-row">
+      <a name="piplist-form"></a>
+        Paste the output of the <kbd>pip list</kbd> command here:
+      {% if piplist_success %}
+        <div class="successmsg">
+          <p><strong>You have successfully completed this part of the mission.</strong></p>
+        </div>
+      {% endif %}
+        
+      {% if piplist_error_message %}
+        <ul class="errorlist"><li>{{ piplist_error_message }}</li></ul>
+      {% endif %}
+      
+      {{ piplist_form.piplist_output.errors }}
+      <br style="clear: left;" />
+      {{ piplist_form.piplist_output }}
+      <input type="submit" value="Submit" style="float: none;" />
+        
+      {% if not piplist_success and piplist_done %}
+        <br style="clear: left;" />
+        <em>You have already completed this part of the mission.</em>
+      {% endif %}
+    </div>
+  </form>
+    
+    {% if piplist_done %}
+      <p class="next_mission_link">
+        <a href='{% url "mysite.missions.pipvirtualenv.views.learning_more" %}'>
+        More about pip and virtualenv &raquo;</a></p>
+    {% endif %}
+
+
+  </div>
+</div>
+{% endblock %}
+

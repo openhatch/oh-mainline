@@ -1,0 +1,87 @@
+{% extends 'missions/pipvirtualenv/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using pip and virtualenv</h3>
+  </div>
+  <div class="body">
+    <h3>About pip</h3>
+    <p>Python code that is not a part of the
+    <a href="https://docs.python.org/2/library/">Python Standard Library</a>
+    is commonly released in the form of packages. As these packages are
+    not a part of the standard library, we use tools like pip to download
+    and install these 'third-party' packages. Using pip, we can install
+    code other developers have written and use it in our own projects.</p>
+
+    <p><a href="https://pip.pypa.io/en/latest/index.html">pip</a> is
+    a package management system used to install and manage third-party
+    software packages written in Python. pip stands for "python install python".
+    Many packages can be found in the <a href="https://pypi.python.org/pypi">
+    Python Package Index (PyPI)</a>.</p>
+
+    <h3>About virtualenv/virtualenvwrapper</h3>
+    <p><a href="http://docs.python-guide.org/en/latest/">
+    The Hitchhiker’s Guide to Python!</a> gives a good explanation
+    of what a Virtual Environment actually is, in 
+    <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">
+    its section about virtual environments</a>:</p>
+
+    <blockquote>A Virtual Environment, put simply, is an isolated working
+    copy of Python which allows you to work on a specific project without
+    worry of affecting other projects.</blockquote>
+
+    <blockquote> For example, you can work on a project which requires
+    Django 1.3 while also maintaining a project which requires Django 1.0.
+    </blockquote>
+
+    <p><a href="http://virtualenv.readthedocs.org/en/latest/">virtualenv</a>
+    is a tool that allows you to create isolated Python environments.
+    <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">
+    virtualenvwrapper</a> is simply a wrapper around virtualenv and it
+    provides a set of intuitive commands that make it easier to work with
+    virtual environments. It also does the job of putting all of your
+    virtual environments in one place.</p>
+
+    <p>To summarize, virtual environments are responsible for preventing
+    different versions of the same software from interfering with each other,
+    thus, leaving you free to work on more than one project at a time without 
+    worrying about any kind of conflicts.</p>
+
+    <h3>What you'll learn</h3>
+    <p>After completing this mission, you will be able to install, 
+    manage and remove third-party Python packages using pip and create
+    and work with isolated Python environments using virtualenv and     
+    virtualenvwrapper.</p>
+
+    <h3>Getting started</h3>
+    <p>This mission consists of five parts: setting up pip and
+    virtualenv, creating virtual environments and installing packages,
+    removing packages and deactivating virtual environments, learning
+    more about pip and virtualenv, and a quick reference at the end.</p>
+
+    <p class="next_mission_link">
+    <a href='{% url "mysite.missions.pipvirtualenv.views.setup_pipvirtualenv" %}'>
+      Setup pip and virtualenv &raquo;
+    </a></p>
+
+  </div>
+</div>
+{% endblock %}
+
