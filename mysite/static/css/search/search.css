@@ -58,14 +58,15 @@ body#search #textual_search input[type='submit'] { width: 20%; padding: 5px; }
  *---------------------- */
 body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; float: left; width: 97%; font-size: .75em; margin-bottom: 15px; border: 0px dashed #dedede; border-bottom-width: 1px; }
     body#search .results-widget:last-child { border-bottom-width: 0; border-top-width: 1px; }
-    body#search .results-widget > span { float: left; } 
-    body#search #results-summary { width: 50%; margin-right: 2%; } 
+    body#search .results-widget > span { float: left; }
+    body#search #results-summary { width: 50%; margin-right: 2%; }
     body#search #error-notification { color: red; font-size: 32px;}
-    body#search #expand-collapse-all { width: 25%; } 
+    body#search #expand-collapse-all { width: 25%; }
     body#search #expand-collapse-all img { float: left; margin-right: 5px; }
     body#search #expand-collapse-all a { float: left; margin-right: 1em; }
-    body#search span.navigation { font-weight: bold; float: right; width: 120px; } 
+    body#search span.navigation { font-weight: bold; float: right; width: 200px; }
     body#search .link-wrapper { float: right; width: 50px; height: 1em; }
+    body#search #item-limit { float: left; width: 50px; height: 2em; }
 
 
 
@@ -78,7 +79,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results .body { background-color: #fff; }
 
         /*      Project data
-         *----------------- */ 
+         *----------------- */
         body#search #results li .project_data { text-align: right; margin-right: 2%; padding-top: 2px; width: 13%; float: left; }
         body#search #results li .project__name { color: #a3a3a3; cursor: pointer; cursor: hand; white-space: normal; }
         body#search #results li .project__name:hover { color: #000; text-decoration: underline; }
@@ -92,7 +93,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li:hover .helpers a, body#search #results li.expanded .helpers a { color: #ff6d3d; }
 
         /*      Bug data
-         *----------------- */ 
+         *----------------- */
         body#search #results li .opp_data { border-left: 1px dashed #dedede; padding-left: 1%; width: 83%; float: left; }
 
         body#search #results li .details { padding: .3em .7em; padding-top: 0; float: left; font-size: 11px; display: none; }

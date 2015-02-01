@@ -39,7 +39,6 @@ import mysite.base.decorators
 
 # Via http://www.djangosnippets.org/snippets/1435/
 
-
 def encode_datetime(obj):
     if isinstance(obj, datetime.date):
         fixed = datetime.datetime(
@@ -68,7 +67,15 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 1))
-    end = int(request.GET.get('end', 10))
+
+    # If user selects number of bugs from drop-down list then 'limit' is the
+    # number of bugs to display obtained by POST otherwise display 10 bugs
+    if request.method == 'POST':
+        limit =  int(request.POST.get('items'))
+        end = start + limit
+    else:
+        limit = int(request.GET.get('items', 10))
+        end = int(request.GET.get('end', limit))
 
     total_bug_count = 0
 
@@ -112,6 +119,9 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     next_page_query_str['start'] = end + 1
     next_page_query_str['end'] = end + diff + 1
 
+    data['items'] = limit
+    data['options'] = [10,20,30,40]
+    data['query_str'] = request.GET.urlencode()
     data['start'] = start
     data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
@@ -184,7 +194,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
-    """ The search results page accesses this view via jQuery's getJSON method, 
+    """ The search results page accesses this view via jQuery's getJSON method,
     and loads its results into the DOM."""
     # Purpose of this code: Serialize the list of bugs
     # Step 1: Pull the bugs out of the database, getting them back

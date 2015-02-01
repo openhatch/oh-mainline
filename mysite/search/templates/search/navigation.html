@@ -19,14 +19,29 @@
     {% if show_prev_page_link or show_next_page_link %}
 
         <span class='navigation'>
+            <span id='item-limit'>
+                <form action="/search/?{{ query_str }}" method="post">
+                {% csrf_token %}
+                View:
+                <select name="items" onchange="this.form.submit()">
+                        {% for option in options %}
+                            {% if option == items %}
+                                <option selected='selected' disabled='disabled'>{{ option }}</option>
+                            {% else %}
+                                <option value='{{ option }}'>{{ option }}</option>
+                            {% endif %}
+                        {% endfor %}
+                </select>
+                </form>
+            </span>
             <span class='link-wrapper'>
                 {% if show_next_page_link %}
-                    <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+                    <a href='{{ next_page_url }}&items={{ items }}' id='next-page'>Next&nbsp;&raquo;</a>
                 {% endif %}
             </span>
             <span class='link-wrapper'>
                 {% if show_prev_page_link %}
-                    <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+                    <a href='{{ prev_page_url }}&items={{ items }}' id='prev-page'>&laquo; Prev</a>
                     <span class='separator'>&nbsp;</span>
                 {% endif %}
             </span>
