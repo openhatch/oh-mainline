@@ -39,6 +39,7 @@ import mysite.base.decorators
 
 # Via http://www.djangosnippets.org/snippets/1435/
 
+
 def encode_datetime(obj):
     if isinstance(obj, datetime.date):
         fixed = datetime.datetime(
@@ -71,8 +72,8 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     # If user selects number of bugs from drop-down list then 'limit' is the
     # number of bugs to display obtained by POST otherwise display 10 bugs
     if request.method == 'POST':
-        limit =  int(request.POST.get('items'))
-        end = start + limit
+        limit = int(request.POST.get('items'))
+        end = start + limit - 1
     else:
         limit = int(request.GET.get('items', 10))
         end = int(request.GET.get('end', limit))
@@ -120,7 +121,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     next_page_query_str['end'] = end + diff + 1
 
     data['items'] = limit
-    data['options'] = [10,20,30,40]
+    data['options'] = [10, 20, 30, 40]
     data['query_str'] = request.GET.urlencode()
     data['start'] = start
     data['end'] = min(end, total_bug_count)
