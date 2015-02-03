@@ -21,7 +21,7 @@
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from mysite.base.view_helpers import render_response
-from django.utils import simplejson
+import json
 from django.template import loader, Context
 
 import mysite.account
@@ -119,7 +119,7 @@ def page_to_js(request):
     # from django.template.loader import render_to_string
     # to generate html_doc
     html_doc = "<strong>zomg</strong>"
-    encoded_for_js = simplejson.dumps(html_doc)
+    encoded_for_js = json.dumps(html_doc)
     # Note: using application/javascript as suggested by
     # http://www.ietf.org/rfc/rfc4329.txt
     return render_response(request, 'base/append_ourselves.js',

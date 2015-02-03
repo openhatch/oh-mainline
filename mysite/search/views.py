@@ -33,7 +33,8 @@ from mysite.base.view_helpers import render_response
 import datetime
 from dateutil import tz
 import pytz
-from django.utils import simplejson, http
+from django.utils import http
+import json
 import mysite.search.forms
 import mysite.base.decorators
 
@@ -204,7 +205,7 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     data_list = [{'bugs': bugs}]
 
     # Step 4: Create the string form of the JSON
-    json_as_string = simplejson.dumps(data_list, default=encode_datetime)
+    json_as_string = json.dumps(data_list, default=encode_datetime)
 
     # Step 5: Prefix it with the desired callback function name
     json_string_with_callback = callback_function_name + \

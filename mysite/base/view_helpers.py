@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.utils import simplejson, http
+from django.utils import http
 import urllib
 import os
 import os.path
@@ -34,8 +34,8 @@ import django.conf
 
 
 def json_response(python_object):
-    json = simplejson.dumps(python_object)
-    return HttpResponse(json, mimetype="application/json")
+    json_from_object = json.dumps(python_object)
+    return HttpResponse(json_from_object, mimetype="application/json")
 
 
 class ObjectFromDict(object):
@@ -176,7 +176,7 @@ def get_object_or_none(klass, *args, **kwargs):
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import mysite.base.disk_cache
-from django.utils import simplejson
+import json
 from django.core.cache import cache
 from django.conf import settings
 import hashlib
@@ -305,7 +305,7 @@ def _geocode(address=None, response_data=None):
 
 
 def object_to_key(python_thing):
-    as_string = simplejson.dumps(python_thing)
+    as_string = json.dumps(python_thing)
     return hashlib.sha1(as_string).hexdigest()
 
 
@@ -331,7 +331,7 @@ def cached_geocoding_in_json(address):
         geocoded = _geocode(address) or {}
         geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
         geocoded_and_inaccessible.update(geocoded)
-        geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
+        geocoded_in_json = json.dumps(geocoded_and_inaccessible)
         if geocoded:
             # cache for a week, which should be plenty
             cache_duration = A_LONG_TIME_IN_SECONDS + \

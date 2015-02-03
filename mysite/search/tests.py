@@ -35,7 +35,8 @@ from django.utils.unittest import skipIf
 import django.db
 import django.conf
 
-from django.utils import simplejson, http
+from django.utils import http
+import json
 import mock
 from twill import commands as tc
 
@@ -203,7 +204,7 @@ class SearchResults(TwillTests):
         self.assert_(json_string_with_parens[0] == u'(')
         self.assert_(json_string_with_parens[-1] == u')')
         json_string = json_string_with_parens[1:-1]
-        objects = simplejson.loads(json_string)
+        objects = json.loads(json_string)
         self.assert_(u'pk' in objects[0][u'bugs'][0])
 
     @skipIf(django.db.connection.vendor == 'sqlite',

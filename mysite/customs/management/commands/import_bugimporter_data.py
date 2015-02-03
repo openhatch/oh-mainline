@@ -17,7 +17,7 @@
 from django.core.management.base import BaseCommand
 import mysite.customs.core_bugimporters
 import yaml
-from django.utils import simplejson
+import json
 import logging
 
 
@@ -26,9 +26,9 @@ def jsonlines_decoder(f):
         if line.endswith('\n'):
             line = line[:-1]
         try:
-            yield simplejson.loads(line)
+            yield json.loads(line)
         except Exception:
-            logging.exception("simplejson decode failed")
+            logging.exception("json decode failed")
             logging.error("repr(line) was: %s", repr(line))
             continue
 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         for filename in args:
             with open(filename) as f:
                 if filename.endswith('.json'):
-                    bug_dicts = simplejson.load(f)
+                    bug_dicts = json.load(f)
                 elif filename.endswith('.jsonlines'):
                     bug_dicts = jsonlines_decoder(f)
                 else:

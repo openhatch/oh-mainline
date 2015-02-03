@@ -22,6 +22,7 @@ from mysite.missions.svn import forms, view_helpers
 import mysite.missions.base.views
 import shutil
 import tempfile
+import json
 from django.shortcuts import render
 
 # POST handlers
@@ -177,4 +178,4 @@ class Commit(SvnBaseView):
 
 @login_required
 def commit_poll(request):
-    return HttpResponse(simplejson.dumps(view_helpers.mission_completed(request.user.get_profile(), 'svn_commit')))
+    return HttpResponse(json.dumps(view_helpers.mission_completed(request.user.get_profile(), 'svn_commit')))

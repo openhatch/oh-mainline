@@ -24,7 +24,7 @@
 import StringIO
 import datetime
 import urllib
-from django.utils import simplejson
+import json
 import re
 import collections
 import logging
@@ -102,8 +102,8 @@ def add_citation_manually_do(request):
         citation.is_published = True
         citation.save()
 
-        json = simplejson.dumps(output)
-        return HttpResponse(json, mimetype='application/json')
+        json_from_object = json.dumps(output)
+        return HttpResponse(json_from_object, mimetype='application/json')
 
     else:
         error_msgs = []
@@ -111,8 +111,8 @@ def add_citation_manually_do(request):
             error_msgs.extend(eval(error.__repr__()))  # don't ask questions.
 
         output['error_msgs'] = error_msgs
-        json = simplejson.dumps(output)
-        return HttpResponseServerError(json, mimetype='application/json')
+        json_from_object = json.dumps(output)
+        return HttpResponseServerError(json_from_object, mimetype='application/json')
 
     #}}}
 
@@ -208,7 +208,7 @@ def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
     html_doc = widget_display_string(request, user_to_display__username)
     # to generate html_doc
-    encoded_for_js = simplejson.dumps(html_doc)
+    encoded_for_js = json.dumps(html_doc)
     # Note: using application/javascript as suggested by
     # http://www.ietf.org/rfc/rfc4329.txt
     return render_response(request, 'base/append_ourselves.js',
@@ -506,21 +506,21 @@ def gimme_json_for_portfolio(request):
 
     five_minutes_ago = datetime.datetime.utcnow() - \
         datetime.timedelta(minutes=5)
-    portfolio_entries = simplejson.loads(serializers.serialize('json',
+    portfolio_entries = json.loads(serializers.serialize('json',
                                                                portfolio_entries_unserialized))
-    projects = simplejson.loads(
+    projects = json.loads(
         serializers.serialize('json', projects_unserialized))
     # FIXME: Don't send like all the flippin projects down the tubes.
-    citations = simplejson.loads(serializers.serialize('json', citations))
+    citations = json.loads(serializers.serialize('json', citations))
 
-    json = simplejson.dumps({
+    portfolio_json = json.dumps({
         'citations': citations,
         'portfolio_entries': portfolio_entries,
         'projects': projects,
         'summaries': summaries,
     })
 
-    return HttpResponse(json, mimetype='application/json')
+    return HttpResponse(portfolio_json, mimetype='application/json')
 
 
 def replace_icon_with_default(request):
