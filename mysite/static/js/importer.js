@@ -104,67 +104,6 @@ $.fn.setThrobberStatus = function(theStatus) {
     // }}}
 };
 
-enableThrobbersThenPollForStatusForever = function() {
-    // {{{
-
-    // Ask server for a list of dias, which will tell us
-    // which importation background jobs have finished,
-    // and if they finished successfully.
-    var are_they_done_url = "/people/gimme_json_that_says_that_commit_importer_is_done";
-    var allDone = undefined;
-    var ask_if_done = function () {
-        console.log('Asking if done yet.');
-        var callback = function(dias) {
-            var allSeemsDone = true;
-            /*console.log(dias);*/
-            for (var d = 0; d < dias.length; d++) {
-                var dia = dias[d];
-                /*console.debug("while polling for status, server returned this dia", dia);*/
-                var $throbber = $('');
-                /*console.debug("while polling for status, attempted to set status of throbber for checkbox: ", $checkbox.get(0));*/
-                var diaStatus = null;
-                if (dia.fields.completed) {
-                    diaStatus = dia.fields.failed ? "failed" : "succeeded";
-                }
-                else {
-                    diaStatus = 'working';
-                }
-                $(findThrobbersForDia(dia)).each(function () {
-                        $(this).setThrobberStatus(diaStatus);
-                        });
-                if (diaStatus == 'working') {
-                    allSeemsDone = false;
-                }
-            }
-            allDone = allSeemsDone;
-        };
-        $.getJSON(are_they_done_url, callback);
-
-        // Stop asking when all the data imports have finished,
-        // successfully or not.
-        if (allDone) {
-            console.log('All the jobs have finished!');
-            window.clearInterval(window.askIfDoneInterval);
-            $('#jobs-are-done').show();
-        }
-    }
-    window.askIfDoneInterval = window.setInterval(ask_if_done, 1000);
-    // }}}
-};
-
-findThrobbersForDia = function(dia) {
-    var $throbbers = $('.throbber');
-    var matching = [];
-    var pushIfMatch = function () {
-        $throbber = $(this);
-        if ($throbber.data('query') == dia.fields.query
-                && $throbber.data('source') == dia.fields.source) {
-            matching.push($throbber);
-        }
-    };
-    $throbbers.each(pushIfMatch);
-    return matching;
-};
 
 Preparation = {
     // {{{
@@ -209,7 +148,6 @@ Submission = {
         Submission.$form.submit(Submission.handler);
     },
     'callback': function (response) {
-        enableThrobbersThenPollForStatusForever();
         $('input', Submission.$form).attr('disabled', 'disabled');
     }
     // }}}
@@ -236,17 +174,6 @@ runTests = function () {
         tests[t](); 
     }
 };
-//$(runTests);
-
-/* Probably remove this.
-diaCheckboxChangeHandler = function() {
-    // {{{
-    var $checkbox = $(this);
-    var checked = $checkbox.is(':checked')
-    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
-    // }}}
-};
-*/
 
 mockedPortfolioResponse = null;
 askServerForPortfolio_wasCalled = false;

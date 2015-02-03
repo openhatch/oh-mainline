@@ -155,10 +155,6 @@ def geocode(request):
 
 def meta_data():
     data = {}
-    data['dia_diagnostics'] = {}
-
-    # temp variable for shortness
-    my = data['dia_diagnostics']
 
     data['bug_diagnostics'] = {}
     # local name for shortness
