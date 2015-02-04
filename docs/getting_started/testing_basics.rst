@@ -48,6 +48,24 @@ Currently, you may pass one or more of the following arguments: `account`,
 will run all the tests related to the OpenHatch missions.
 
 
+Controlling detail of test output
+#################################
+
+You can use ``--verbosity`` or ``-v`` to specify the amount of notification and
+debug information that should be printed to the console.
+
+* 0 means minimal output.
+* 1 means normal output (default).
+* 2 means verbose output.
+* 3 means very verbose output.
+
+For example,::
+
+    python manage.py test -v2
+
+will run all the tests and display a more verbose output.
+
+
 Additional testing information
 ##############################
 
