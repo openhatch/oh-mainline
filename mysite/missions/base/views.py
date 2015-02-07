@@ -298,6 +298,10 @@ def main_page(request):
 
         # FIXME: Below is a hack. It should be easier to find out if a
         # training mission is fully completed.
+        if (completed_missions['command_cd'] and completed_missions['command_ls']
+                and completed_missions['command_mkdir_rm']
+                and completed_missions['command_cp_mv']):
+            fully_completed_missions['shell'] = True
         if (completed_missions['pipvirtualenv_pipfreeze'] and
                 completed_missions['pipvirtualenv_piplist']):
             fully_completed_missions['pipvirtualenv'] = True

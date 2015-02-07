@@ -42,6 +42,25 @@ Open source training missions
     perform. Interact with this web-based robot here, and it will tell
     you if you succeeded.”</p>
 
+    <h2>Get to know about: "The Shell"</h2>
+
+    <p>These missions teach you about how to use the command line tool called as the "shell" and few basic commands which will help you in other missions.
+    </p>
+
+    <div class="submodule-container">
+    {% with fully_completed_missions.shell as mission_completed %}
+    {% with "Using the shell" as mission_title %}
+    {% with "Learn how to use the shell and play with commands." as mission_description %}
+    {% with "/missions/shell/about" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    <div class="clearer">&nbsp;</div>
+    </div>
+
     <h2>Before the missions: Prepare your command line</h2>
 
     <p>Contributing to free, open source software frequently
