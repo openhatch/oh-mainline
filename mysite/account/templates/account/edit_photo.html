@@ -25,6 +25,14 @@
 {% block body_class%}{{ block.super }} auth{% endblock %}
 
 {% block main %}
+<!--Include script for Ajax image upload-->
+    <script type="text/javascript" src="/static/js/account/edit_photo.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            set_callback_for_image_upload("{{ csrf_token }}"); 
+        });
+
+    </script>
     <div class='module'>
         <div class='module-head'>
             <ul>
@@ -40,12 +48,20 @@
                     <h3>Current profile photo</h3>
                 </div>
                 <div class='submodule-body'>
-                    <img src="{{ photo_url }}" />
+                    <img id="profileimage" src="{{ photo_url }}" />
                 </div>
             </div>
             <div class="submodule photo-wide">
+            <div class="notification" id="notification">
+                <div id="notification_message"></div>
+                <div class="clearbutton">
+                    <a id="clear_message" href="?">(clear this message)</a>
+                </div>
+            </div>
+
             <form method='POST'
                     name='edit_photo'
+                    id='edit_photo' 
                     action='/account/edit/photo/do'
                     enctype="multipart/form-data">{% csrf_token %}
                 <div class='head'>
@@ -53,6 +69,7 @@
                 </div>
                 <div class='body'>
 		    {% if non_validation_error %}
+
 		    <ul class="errorlist">
 		      <li>
 			Oops! Something went wrong while preparing this
@@ -74,6 +91,7 @@
                     <input type="submit" value="Upload">
                 </div>
             </form>
+            <div id="progressBar" class="default" style="display:none;"><div></div></div>
             </div>
     </div>
     <div class="module-foot">

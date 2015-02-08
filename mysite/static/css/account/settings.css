@@ -2,3 +2,24 @@ body.settings,body.missions .submodule.skinny { padding: 0 ! important; border: 
 body.settings,body.missions .submodule.skinny .body { padding: 10px ! important; background-color: transparent ! important; }
 body.settings,body.missions .submodule.skinny ul li { margin-bottom: 10px; font-size: 11pt; }
 body.settings,body.missions #main .submodule .body { background-color: #fff; padding: 3% 5%; }
+.default {
+    background: #292929;
+    border: 1px solid #111; 
+    border-radius: 5px; 
+    overflow: hidden;
+    width: 20%;
+    box-shadow: 0 0 5px #333;               
+}
+.default div {
+    background-color: #FF6D3D;
+    width: 0%
+}
+
+#notification {
+	display: none;
+}
+
+.clearbutton {
+	float: right;
+	display: inline;
+}

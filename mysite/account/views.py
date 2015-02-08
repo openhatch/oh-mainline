@@ -123,12 +123,9 @@ def edit_photo_do(request, mock=None):
     if valid:
         person = form.save()
         person.generate_thumbnail_from_photo()
-
-        return HttpResponseRedirect(
-            reverse(mysite.profile.views.display_person_web,
-                    kwargs={'user_to_display__username': request.user.username
-                    })
-        )
+        url = person.get_photo_url_or_default()
+        # Removing the Redirect since it doesn't make sense in an AJAX context
+        return HttpResponse(url, mimetype="text/plain")
     else:
         return edit_photo(request, form)
 
