@@ -1,0 +1,71 @@
+{% extends 'missions/shell/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using command line shell</h3>
+  </div>
+  <div class="body">
+
+      <h3>What is "the shell"?</h3>
+      <p>In simple words, the shell is a program that takes your commands from the
+      keyboard and gives them to the operating system to perform. In the old
+      days, it was the only user interface available on a computer.
+      Nowadays, we have graphical user interfaces (GUIs) in addition to command
+      line interfaces (CLIs) such as the shell.</p>
+
+      <p>On most Linux systems a program called
+      <a href="http://www.gnu.org/software/bash/#content">bash</a> acts as the
+      shell program. There are several additional shell programs available on a
+      typical Linux system. These include: <a href="http://www.kornshell.com/info/">ksh</a>,
+      <a href="http://www.tcsh.org/Welcome">tcsh</a> and
+      <a href="http://zsh.sourceforge.net/">zsh</a>.</p>
+
+      <h3>How to start the shell?</h3>
+      <p>Most window managers have a way to launch programs from a menu. Look
+      through the list of programs to see if anything looks like a terminal
+      emulator program. In KDE, you can find <a href="https://konsole.kde.org">"konsole"</a>
+      and "terminal" on the Utilities menu. In Gnome, you can find "color xterm,"
+      "regular xterm," and <a href="https://help.gnome.org/users/gnome-terminal/stable/overview.html.en">"gnome-terminal"</a>
+      on the Utilities menu. You can start up as many of these as you want and
+      play with them. While there are a number of different terminal emulators,
+      they all do the same thing. They give you access to a shell session. You
+      may develop a preference for one, depending on different features each one
+      provides. Ubuntu users may see <a href="https://help.ubuntu.com/community/UsingTheTerminal#Starting_a_Terminal">here</a>
+      for a detailed description about how to start a terminal.</p>
+
+      <p>For the rest of the mission we recommend you to start your shell and
+      play with the commands as we present them before you.</p>
+
+      <h3>What you'll learn</h3>
+      <p>After completing this mission, you will have a basic understanding of
+      the shell and some basic commands, which will help you in understanding
+      other missions.</p>
+
+      <h3>Getting started</h3>
+      <p>This mission will provide you information about few of the most frequently
+      used commands in the shell. This mission also consist of a "Challenge",
+      which will be a question at the end of the tutorial of every command.</p>
+      <p class="next_mission_link">
+      <a href='{% url "mysite.missions.shell.views.file_and_directory" %}'>Get started with the shell &raquo;</a></p>
+
+  </div>
+</div>
+{% endblock %}
+

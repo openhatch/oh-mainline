@@ -58,5 +58,21 @@
   {"model": "missions.Step",
    "pk": 15,
    "fields": {"name": "pipvirtualenv_piplist"}
+   },
+  {"model": "missions.Step",
+    "pk": 16,
+    "fields": {"name": "command_cd"}
+   },
+  {"model": "missions.Step",
+    "pk": 17,
+    "fields": {"name": "command_ls"}
+   },
+  {"model": "missions.Step",
+    "pk": 18,
+    "fields": {"name": "command_mkdir_rm"}
+   },
+  {"model": "missions.Step",
+    "pk": 19,
+    "fields": {"name": "command_cp_mv"}
    }
 ]

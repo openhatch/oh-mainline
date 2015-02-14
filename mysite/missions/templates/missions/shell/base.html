@@ -1,0 +1,61 @@
+{% extends 'missions/mission_base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block side_nav_links %}
+<li id='link-about'>
+    <a href='{% url "mysite.missions.shell.views.about" %}'>
+      About this mission
+    </a>
+</li>
+
+<li>
+    <a href='{% url "mysite.missions.shell.views.file_and_directory" %}'>
+      Files and directories
+    </a>
+</li>
+
+<li {% if command_ls_done %} class='tick-progress' {% else %} class='cross-progress' {% endif %}>
+    <a href='{% url "mysite.missions.shell.views.command_ls" %}'>
+        List directory contents
+    </a>
+</li>
+
+<li {% if command_cd_done %} class='tick-progress' {% else %} class='cross-progress' {% endif %}>
+    <a href='{% url "mysite.missions.shell.views.command_cd" %}'>
+        Changing directories
+    </a>
+</li>
+
+<li {% if command_mkdir_rm_done %} class='tick-progress' {% else %} class='cross-progress' {% endif %}>
+    <a href='{% url "mysite.missions.shell.views.command_mkdir_rm" %}'>
+        Creating and removing
+    </a>
+</li>
+
+<li {% if command_cp_mv_done %} class='tick-progress' {% else %} class='cross-progress' {% endif %}>
+    <a href='{% url "mysite.missions.shell.views.command_cp_mv" %}'>
+        Copying and moving
+    </a>
+</li>
+
+<li id='link-quick_reference'>
+    <a href='{% url "mysite.missions.shell.views.more_info" %}'>
+      More about shell
+    </a>
+</li>
+{% endblock side_nav_links %}
