@@ -485,7 +485,6 @@ class NagiosTests(django.test.TestCase):
     # Test for OK Nagios meta data return (0)
     def test_nagios_meta_return_ok(self):
         data = {}
-        data['dia_diagnostics'] = {}
         data['bug_diagnostics'] = {}
 
         my = data['bug_diagnostics']
@@ -499,7 +498,6 @@ class NagiosTests(django.test.TestCase):
     # Test for WARNING Nagios meta data return (1)
     def test_nagios_meta_return_warning(self):
         data = {}
-        data['dia_diagnostics'] = {}
         data['bug_diagnostics'] = {}
 
         my = data['bug_diagnostics']
@@ -513,7 +511,6 @@ class NagiosTests(django.test.TestCase):
     # Test for CRITICAL Nagios meta data return (2)
     def test_nagios_meta_return_critical(self):
         data = {}
-        data['dia_diagnostics'] = {}
         data['bug_diagnostics'] = {}
 
         my = data['bug_diagnostics']

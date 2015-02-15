@@ -562,8 +562,7 @@ def replace_icon_with_default(request):
 @login_required
 @view
 def importer(request, test_js=False):
-    """Get the DIAs for the logged-in user's profile. Pass them to the template."""
-    # {{{
+    """Get the logged-in user's profile. Pass them to the template."""
 
     person = request.user.get_profile()
     data = get_personal_data(person)
