@@ -23,10 +23,6 @@ class Migration:
     
     def forwards(self, orm):
         "Write your forwards migration here"
-        try:
-            db.execute('ALTER TABLE search_project add unique (name);')
-        except:
-            pass
     
     
     def backwards(self, orm):
@@ -75,16 +71,6 @@ class Migration:
             'text': ('django.db.models.fields.TextField', [], {}),
             'url': ('django.db.models.fields.TextField', [], {})
         },
-        'profile.dataimportattempt': {
-            'completed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2010, 3, 29, 18, 27, 50, 893624)'}),
-            'failed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.Person']"}),
-            'query': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'source': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'web_response': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['customs.WebResponse']", 'null': 'True'})
-        },
         'profile.person': {
             'bio': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'blacklisted_repository_committers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['profile.RepositoryCommitter']"}),
@@ -105,8 +91,6 @@ class Migration:
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'profile.repositorycommitter': {
-            'Meta': {'unique_together': "(('project', 'data_import_attempt'),)"},
-            'data_import_attempt': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.DataImportAttempt']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'project': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['search.Project']"})
         },
