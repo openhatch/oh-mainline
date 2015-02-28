@@ -87,7 +87,7 @@ class RegeneratePostfixAliasesForForwarder:
 class FetchPersonDataFromOhloh:
     name = "profile.FetchPersonDataFromOhloh"
 
-    def run(self, dia_id, **kwargs):
+    def run(self, **kwargs):
         # if the task is in debugging mode, bubble-up the exception
         if getattr(self, 'debugging', None):
             raise

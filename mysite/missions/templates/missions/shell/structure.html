@@ -1,0 +1,52 @@
+{% extends 'missions/shell/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+    <div class='head'>
+        <h3>File vs Directory</h3>
+    </div>
+    <div class="body">
+        <p>Before learning about shell commands you should know about files
+        and directories</p>
+
+        <h3>File:</h3>
+        <p>A file is a collection of data that is stored on disk and that can be
+        manipulated as a single unit by its name.</p>
+
+        <h3>Directory:</h3>
+        <p>A directory is a file that acts as a folder for other files. A
+        directory can also contain other directories (subdirectories); a directory
+        that contains another directory is called the parent directory of the
+        directory it contains.</p>
+
+        <p>A directory tree includes a directory and all of its files, including
+        the contents of all subdirectories. (Each directory is a "branch" in the
+        "tree.") A slash character alone ('/') is the name of the root directory
+        at the base of the directory tree hierarchy; it is the trunk from which
+        all other files or directories branch.</p>
+
+        <p>Visit <a href="http://www.linuxnix.com/2012/07/abslute-path-vs-relative-path-in-linuxunix.html">here</a>
+        to know about what are paths and what is the difference between absolute and relative paths</p>
+
+      <p class="next_mission_link">
+      <a href='{% url "mysite.missions.shell.views.command_ls" %}'>Get started with the shell &raquo;</a></p>
+  </div>
+</div>
+{% endblock %}
+

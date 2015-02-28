@@ -1,0 +1,91 @@
+{% extends 'missions/shell/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% block mission_main %}
+<div class='submodule fat'>
+    <div class='head'>
+      <h3>Using ls for listing directory contents</h3>
+    </div>
+    <div class="body">
+
+    <h3>ls: List directory contents</h3>
+    <p><b>1. List files using <kbd class="kbd">ls</kbd> with no options:</b></p>
+
+    <code class="code">$ ls</code>
+
+    <p><kbd class="kbd">ls</kbd> command with no option will list files and
+    directories in bare format and you won't be able to view details like file
+    types, size, modification date, permission etc.</p>
+
+    <p><b>2. List files using <kbd class="kbd">-l</kbd> option:</b></p>
+
+    <code class="code">$ ls -l</code>
+
+    <p><kbd class="kbd">ls</kbd> command with option <kbd class="kbd">-l</kbd> i.e.
+    <kbd class="kbd">ls -a</kbd> will list files and directories along with their
+    size, modified date and time, owner of the file and it's permission.
+    Something like:</p>
+    <pre>
+    <kbd class="kbd">drwxr-xr-x   2 root root  4096 Oct 11 00:20 bin</kbd>
+    </pre>
+
+    <p><b>3. View hidden files:</b></p>
+
+    <code class="code">$ ls -a</code>
+
+    <p><kbd class="kbd">ls</kbd> command with option <kbd class="kbd">-a</kbd>
+    i.e. <kbd class="kbd">ls -a</kbd> will list all the files including hidden
+    files starting with '.' (hidden file's name starts with '.')</p>
+
+    <p>There are many other options available. For more options, type
+    <kbd class="kbd">ls --help</kbd> in your shell and you'll get a list of
+    available options along with a short description for each option.
+    (if you are on zsh type <kbd class="kbd">man ls</kbd>)</p>
+    <h3>Challenge:</h3>
+    <p>What does the command <kbd class="kbd">ls</kbd> do when used with the
+    <kbd class="kbd">-s</kbd> argument?</p>
+
+    <code class="code">$ ls -s</code>
+
+    <form method="post" action="{% url "mysite.missions.shell.views.command_ls_submit" %}#ls-form">{% csrf_token %}
+        <div class="form-row">
+            {% if command_ls_success %}
+            <div class="successmsg">
+              <p><strong>You have successfully completed this part of the mission.</strong></p>
+            </div>
+            {% endif %}
+            <input type="radio" name="option" value="1"> print the allocated size of each file, in blocks.<br>
+            <input type="radio" name="option" value="2"> list subdirectories recursively.<br>
+            <input type="radio" name="option" value="3"> reverse order while sorting.<br>
+            <input type="radio" name="option" value="4"> It produces an error message.<br>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+
+    {% if command_ls_error_message %}
+        <ul class="errorlist"><li>{{ command_ls_error_message }}</li></ul>
+    {% endif %}
+    {% if command_ls_done %}
+        <p class="next_mission_link">
+            <a href='{% url "mysite.missions.shell.views.command_cd" %}'>
+        On to next &raquo;</a></p>
+    {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+

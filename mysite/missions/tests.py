@@ -20,6 +20,8 @@ from mysite.missions.tar.tests import *
 from mysite.missions.diffpatch.tests import *
 from mysite.missions.svn.tests import *
 from mysite.missions.git.tests import *
+from mysite.missions.pipvirtualenv.tests import *
+from mysite.missions.shell.tests import *
 import datetime
 
 
