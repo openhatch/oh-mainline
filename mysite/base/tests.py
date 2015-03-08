@@ -50,6 +50,7 @@ import mysite.project.views
 
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
+from boto.dynamodb.condition import CONTAINS
 
 logger = logging.getLogger(__name__)
 
@@ -610,3 +611,28 @@ class GoogleApiTests(unittest.TestCase):
         # Check that latitude and longitude are returned and status is 'OK'
         geocode = mysite.base.view_helpers._geocode(response_data=response)
         self.assertNotEqual(geocode, None)
+
+
+# Test cases for robots generation
+class RenderRobotsTest(django.test.TestCase):
+    def test_robots_with_debug_true(self):
+        '''Set DEBUG to True in settings.py and verify that robots.txt contains
+         text identical to that seen in render_robots_for_dev_env.txt
+        '''
+        setattr(settings, "DEBUG", True)
+        response = self.client.get('/robots.txt')
+        robots_text = ""
+        with open('mysite/base/templates/robots_for_dev_env.txt') as f:
+            robots_text += f.read()
+        self.assertEqual(response.content, robots_text)
+        
+    def test_robots_with_debug_false(self):
+        '''Set DEBUG to False in settings.py and verify that robots.txt contains
+         text identical to that seen in render_robots_live_site.txt
+        '''
+        setattr(settings, "DEBUG", False)
+        response = self.client.get('/robots.txt')
+        robots_text = ""
+        with open('mysite/base/templates/robots_for_live_site.txt') as f:
+            robots_text += f.read()
+        self.assertEqual(response.content, robots_text)
