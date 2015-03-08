@@ -32,6 +32,7 @@ import mysite.customs.feed
 import mysite.search.view_helpers
 import mysite.search.models
 import mysite.missions.models
+import mysite.settings
 
 import random
 import datetime
@@ -277,9 +278,9 @@ def wordpress_index(request):
     return (request, template_path, data)
 
 def render_robots_txt(request):
-    if getattr(settings, "DEBUG", True):
+    if mysite.settings.DEBUG == True:
         template_path = "robots_for_dev_env.txt"
     else:
         template_path = "robots_for_live_site.txt"
-    return render_response(request, template_path, mimetype='text/plain')
 
+    return render_response(request, template_path, mimetype='text/plain')
