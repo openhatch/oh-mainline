@@ -51,7 +51,6 @@ import mysite.settings
 
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
-from boto.dynamodb.condition import CONTAINS
 
 logger = logging.getLogger(__name__)
 
