@@ -32,13 +32,13 @@ import mysite.customs.feed
 import mysite.search.view_helpers
 import mysite.search.models
 import mysite.missions.models
-import mysite.settings
 
 import random
 import datetime
 import logging
 
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -276,9 +276,11 @@ def wordpress_index(request):
     return (request, template_path, data)
 
 def render_robots_txt(request):
-    if mysite.settings.DEBUG == True:
+    if getattr(settings, "DEBUG", True) == True:
+        logger.info("mysite settings is True")
         template_path = "robots_for_dev_env.txt"
     else:
+        logger.info("mysite settings is False")
         template_path = "robots_for_live_site.txt"
 
     return render_response(request, template_path, mimetype='text/plain')
