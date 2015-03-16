@@ -38,6 +38,7 @@ import datetime
 import logging
 
 from django.contrib.auth.decorators import login_required
+from __builtin__ import getattr
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -277,10 +278,8 @@ def wordpress_index(request):
 
 def render_robots_txt(request):
     if getattr(settings, "DEBUG", True) == True:
-        logger.info("mysite settings is True")
         template_path = "robots_for_dev_env.txt"
     else:
-        logger.info("mysite settings is False")
         template_path = "robots_for_live_site.txt"
 
     return render_response(request, template_path, mimetype='text/plain')
