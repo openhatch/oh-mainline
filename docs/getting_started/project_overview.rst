@@ -11,7 +11,7 @@ can be found at `readthedocs.org <http://openhatch.readthedocs.org/>`_.
 
 The website is a Python+Django app with jQuery and CSS and HTML on the frontend, and aims for high test coverage (mostly succeeding) and high usability (though it is not there yet).  You can read more details about how the code is structured in `this document <https://github.com/openhatch/oh-mainline/blob/master/LAYOUT>`_, which we're working to improve.
 
-The best way to contact us about the website is to send an email to `our contributors list <http://lists.openhatch.org/mailman/listinfo/devel>`_ or find us at #openhatch on irc.freenode.net.  (`Other ways to contact us <http://openhatch.readthedocs.org/en/latest/contributor/contact.html>`_.)
+The best way to contact us about the website is to send an email to `our contributors list <http://lists.openhatch.org/mailman/listinfo/devel>`_ or find us at #openhatch on irc.freenode.net.  (`Other ways to contact us <http://openhatch.readthedocs.org/en/latest/community/contact.html>`_.)
 
 Other elements of the OpenHatch project:
 
