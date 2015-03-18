@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
-import xmlrunner.extra.djangotestrunner
 import django.test.simple
 import tempfile
 import os
@@ -81,24 +80,6 @@ class OpenHatchTestRunner(django.test.simple.DjangoTestSuiteRunner):
         n = 1
         try:
             n = super(OpenHatchTestRunner, self).run_tests(*args, **kwargs)
-        finally:
-            cleanup_after_tests()
-            sys.exit(n)
-
-
-class OpenHatchXMLTestRunner(xmlrunner.extra.djangotestrunner.XMLTestRunner):
-
-    def run_tests(self, *args, **kwargs):
-        if not args or not args[0]:
-            logging.info(
-                "You did not specify which tests to run. I will run all the OpenHatch-related ones.")
-            args = (['base', 'profile', 'account', 'project',
-                    'missions', 'search', 'customs', 'bugsets'],)
-
-        override_settings_for_testing()
-        n = 1
-        try:
-            n = super(OpenHatchXMLTestRunner, self).run_tests(*args, **kwargs)
         finally:
             cleanup_after_tests()
             sys.exit(n)
