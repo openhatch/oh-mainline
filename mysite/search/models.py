@@ -210,23 +210,6 @@ class Project(OpenHatchModel):
     # project.
     cached_contributor_count = models.IntegerField(default=0, null=True)
 
-    def populate_icon_from_ohloh(self):
-
-        oh = mysite.customs.ohloh.get_ohloh()
-        try:
-            icon_data = oh.get_icon_for_project(self.name)
-            self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
-        except ValueError:
-            self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
-            return False
-
-        # if you want to scale, use get_image_data_scaled(icon_data)
-        self.icon_raw.save('', ContentFile(icon_data))
-
-        # Since we are saving an icon, also update our scaled-down version of
-        # that icon for the badge.
-        self.update_scaled_icons_from_self_icon()
-        return True
 
     def get_url_of_icon_or_generic(self):
         # Recycle icon_smaller_for_badge since it's the same size as
