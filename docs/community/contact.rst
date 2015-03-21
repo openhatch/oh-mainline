@@ -2,7 +2,7 @@
 Contact Us
 =============
 
-Talk to us on IRC (#openhatch on irc.freenode.net).  Not familiar with IRC? See below!
+Talk to us on IRC (#openhatch on irc.freenode.net).  Not familiar with IRC? See **Chat with us on IRC** below!
 
 Join our `contributors mailing list <http://lists.openhatch.org/mailman/listinfo/devel>`_.
 
