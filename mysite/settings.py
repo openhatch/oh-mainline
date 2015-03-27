@@ -63,9 +63,10 @@ OTHER_DATABASES = {
 
 if os.environ.get('USE_MYSQL', 'true'):
     DATABASES['default'] = OTHER_DATABASES['mysql']
-    if os.environ.get('TRAVIS'):
-        DATABASES['default']['USER'] = 'travis'
-        DATABASES['default']['PASSWORD'] = ''
+    
+if os.environ.get('TRAVIS'):
+    DATABASES['default']['USER'] = 'travis'
+    DATABASES['default']['PASSWORD'] = ''
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
