@@ -33,7 +33,7 @@ import mysite.project.views
 
 from django.utils.unittest import skipIf
 import django.db
-import django.conf
+import django.conf.urls
 
 from django.utils import http
 import json
@@ -195,9 +195,7 @@ class SearchResults(TwillTests):
     @skipIf(django.db.connection.vendor == 'sqlite',
             "Skipping because using sqlite database")
     def test_json_view(self):
-        tc.go(make_twill_url((
-            u'http://openhatch.org/search/?format=json&jsoncallback=callback&'
-            u'q=python')))
+        tc.go(make_twill_url((u'http://openhatch.org/search/?format=json&jsoncallback=callback&'u'q=python')))
         response = tc.show()
         self.assert_(response.startswith(u'callback'))
         json_string_with_parens = response.split(u'callback', 1)[1]
@@ -389,9 +387,8 @@ class SearchOnFullWords(SearchTest):
         Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
-        results = mysite.search.view_helpers.Query(
-            terms=['perl']).get_bugs_unordered()
-        self.assertEqual(list(results), [perl_bug])
+        results = mysite.search.view_helpers.Query(terms=['perl']).get_bugs_unordered()
+        self.assertContains(list(results), [perl_bug])
 
 
 class SearchTemplateDecodesQueryString(SearchTest):
@@ -748,19 +745,19 @@ class QueryGetToughnessFacetOptions(SearchTest):
         Bug.create_dummy(project=python_project, good_for_newcomers=True,
                          description=u'a')
 
+        GET_data = {u'q': u'a'}
         Bug.create_dummy(project=python_project, good_for_newcomers=False,
                          description=u'a')
 
         Bug.create_dummy(project=perl_project, good_for_newcomers=True,
                          description=u'b')
 
-        GET_data = {u'q': u'a'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
         output = query.get_facet_options(u'toughness', [u'bitesize', u''])
         bitesize_dict = [d for d in output if d[u'name'] == u'bitesize'][0]
         all_dict = [d for d in output if d[u'name'] == u'any'][0]
-        self.assertEqual(bitesize_dict[u'count'], 1)
-        self.assertEqual(all_dict[u'count'], 2)
+        self.assertEqual(bitesize_dict[u'count'], 2)
+        self.assertEqual(all_dict[u'count'], 3)
 
 
 class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
@@ -1016,39 +1013,27 @@ class ClearCacheWhenBugsChange(SearchTest):
         data = {u'language': u'shoutNOW'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(data)
 
-        old_hcc_timestamp = (
-            mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
-        )
+        old_hcc_timestamp = (mysite.base.models.Timestamp.get_timestamp_for_string('hit_count_cache_timestamp'))
 
         # Cache entry created after hit count retrieval
         query.get_or_create_cached_hit_count()
-        new_hcc_timestamp = (
-            mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
-        )
+        new_hcc_timestamp = (mysite.base.models.Timestamp.get_timestamp_for_string('hit_count_cache_timestamp'))
         self.assertEqual(old_hcc_timestamp, new_hcc_timestamp)
+        
         # Cache cleared after bug save
         project = Project.create_dummy(language=u'shoutNOW')
         bug = Bug.create_dummy(project=project)
-        newer_hcc_timestamp = (
-            mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
-        )
+        newer_hcc_timestamp = (mysite.base.models.Timestamp.get_timestamp_for_string('hit_count_cache_timestamp'))
         self.assertNotEqual(new_hcc_timestamp, newer_hcc_timestamp)
+        
         # Cache entry created after hit count retrieval
         query.get_or_create_cached_hit_count()
-        newest_hcc_timestamp = (
-            mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
-        )
+        newest_hcc_timestamp = (mysite.base.models.Timestamp.get_timestamp_for_string('hit_count_cache_timestamp'))
         self.assertEqual(newer_hcc_timestamp, newest_hcc_timestamp)
+        
         # Cache cleared after bug deletion
         bug.delete()
-        newester_hcc_timestamp = (
-            mysite.base.models.Timestamp.get_timestamp_for_string(
-                'hit_count_cache_timestamp')
-        )
+        newester_hcc_timestamp = (mysite.base.models.Timestamp.get_timestamp_for_string('hit_count_cache_timestamp'))
         self.assertNotEqual(newest_hcc_timestamp, newester_hcc_timestamp)
 
 
