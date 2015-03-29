@@ -53,16 +53,20 @@ OTHER_DATABASES = {
         'HOST': 'localhost',
         'USER': 'oh_milestone_a',
         'PASSWORD': 'ahmaC0Th',
+         # Uncomment and enter local username and password
+         #'USER': 'testuser',
+         #'PASSWORD': 'testpass',
         'OPTIONS': {'read_default_file': os.path.join(os.path.dirname(__file__), 'my.cnf')},
         'CHARSET': 'utf8',
     },
 }
 
-if os.environ.get('USE_MYSQL', ''):
+if os.environ.get('USE_MYSQL', 'true'):
     DATABASES['default'] = OTHER_DATABASES['mysql']
-    if os.environ.get('TRAVIS'):
-        DATABASES['default']['USER'] = 'travis'
-        DATABASES['default']['PASSWORD'] = ''
+    
+if os.environ.get('TRAVIS'):
+    DATABASES['default']['USER'] = 'travis'
+    DATABASES['default']['PASSWORD'] = ''
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
