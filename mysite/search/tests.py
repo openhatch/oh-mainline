@@ -160,7 +160,7 @@ class AutoCompleteTests(SearchTest):
 
 class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
 
-    def test(self):
+    def test_respect_quotes(self):
         difficult = "With spaces (and parens)"
         query = mysite.search.view_helpers.Query.create_from_GET_data(
             {u'q': u'"%s"' % difficult})
@@ -777,16 +777,18 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
     @skipIf(django.db.connection.vendor == 'sqlite',
             "Skipping because using sqlite database")
     def test_with_term(self):
-        # In the setUp we create three bugs, but only two of them would match
-        # a search for 'a'. They are in two different languages, so let's make
+        # In the setUp we create four bugs, but only two of them would match
+        # a search for 'a'. They are in three different languages, so let's make
         # sure that we show only those two languages.
         GET_data = {u'q': u'a'}
-
+        print("Test with term")
+        print(GET_data)
         query = mysite.search.view_helpers.Query.create_from_GET_data(GET_data)
+        print(query)
         language_names = query.get_language_names()
-        self.assertEqual(
-            sorted(language_names),
-            sorted([u'Python', u'Perl']))
+        print("language names")
+        print(sorted(language_names))
+        self.assertEqual(sorted(language_names), sorted([u'Python', u'Perl']))
 
     def test_with_active_language_facet(self):
         # In the setUp we create bugs in three languages.
@@ -1378,15 +1380,8 @@ class CreateAnonymousAnswer(TwillTests):
             'question__pk': q.pk,
             'answer__text': answer_text,
         }
-        response = self.client.post(
-            reverse(mysite.project.views.create_answer_do),
-            POST_data, follow=True)
-        self.assertEqual((
-            response.redirect_chain,
-            ['http://testserver/account/login/?next='
-             '%2F%2Bprojects%2FMyproject',
-             302])
-        )
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data, follow=True)
+        self.assertEqual(response.redirect_chain,[('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
 
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like
@@ -1532,8 +1527,7 @@ class BugKnowsItsFreshness(TestCase):
         b = mysite.search.models.Bug.create_dummy_with_project()
         b.last_polled = datetime.datetime.now()
         self.assertTrue(b.data_is_more_fresh_than_one_day())
-        b.last_polled -= datetime.timedelta(
-            days=1, hours=1)
+        b.last_polled -= datetime.timedelta(days=1, hours=1)
         self.assertFalse(b.data_is_more_fresh_than_one_day())
 
 
