@@ -24,8 +24,7 @@ import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.profile.models
 import mysite.search.view_helpers
-from mysite.search.models import (Project, Bug, ProjectInvolvementQuestion,
-                                  Answer, BugAlert)
+from mysite.search.models import Project, Bug, ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import datetime
 import logging
@@ -384,11 +383,12 @@ class SearchOnFullWords(SearchTest):
             "Skipping because using sqlite database")
     def test_find_perl_not_properly(self):
         Project.create_dummy()
-        Bug.create_dummy(description='properly')
+        properly_bug = Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
+        
         results = mysite.search.view_helpers.Query(terms=['perl']).get_bugs_unordered()
-        self.assertContains(list(results), [perl_bug])
+        self.assertEqual(list(results), perl_bug)
 
 
 class SearchTemplateDecodesQueryString(SearchTest):
@@ -1212,7 +1212,7 @@ class DeleteAnswer(TwillTests):
     def test_delete_paragraph_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
-        question__pk = 0
+        question__pk = 1
         q = ProjectInvolvementQuestion.create_dummy(
             pk=question__pk, is_bug_style=False)
         # create our dummy answer
@@ -1381,7 +1381,7 @@ class CreateAnonymousAnswer(TwillTests):
             'answer__text': answer_text,
         }
         response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data, follow=True)
-        self.assertEqual(response.redirect_chain,[('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
+        self.assertEqual(response.redirect_chain,[('http://testserver/account/login/?next=%2Fprojects%2FMyproject', 302)])
 
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like
