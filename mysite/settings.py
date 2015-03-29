@@ -1,4 +1,4 @@
-# Django settings for the basic OpenHatch 'mysite' project
+#Django settings for the basic OpenHatch 'mysite' project
 
 # Imports
 import os
@@ -7,13 +7,55 @@ import datetime
 import sys
 import dj_database_url
 
+LOGGING_CONFIG = None
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'verbose': {
+            'format': '\n%(levelname)08s %(asctime)25s - %(name)25s - %(message)15s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'null': {
+            'class': 'django.utils.log.NullHandler',
+        },
+        'console':{
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['null'],
+            'propagate': False,
+            'level': 'INFO',
+        },
+        'django.request': {
+            'handlers': ['null'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'mysite': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        }
+    }
+}
+
+import logging.config
+logging.config.dictConfig(LOGGING)
+
 # Figure out where in the filesystem we are.
 DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
 # This is needed for {% version %}
 MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY
 
 # Now, actual settings
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -217,8 +259,8 @@ INVITATIONS_PER_USER = 100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
-# If you're testing any of the email-related features locally, make sure the 'EMAIL_*" settings here are 
-# un-commented, and then open a new terminal and type "python -m smtpd -n -c DebuggingServer localhost:1025" 
+# If you're testing any of the email-related features locally, make sure the 'EMAIL_*" settings here are
+# un-commented, and then open a new terminal and type "python -m smtpd -n -c DebuggingServer localhost:1025"
 # to run a local email server.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_PORT = 1025
@@ -273,8 +315,7 @@ WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
 
 SERVER_NAME = 'openhatch.org'
 
-SVN_REPO_PATH = os.path.abspath(
-    os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn'))
+SVN_REPO_PATH = os.path.abspath(os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn'))
 
 # This should include a trailing slash.
 # For local sites, this is what you checkout
@@ -288,8 +329,7 @@ PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(
     os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
 SOUTH_TESTS_MIGRATE = False
 
-GIT_REPO_PATH = os.path.join(
-    MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
+GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
 # For local sites, this is what you clone
 GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/'
 
@@ -298,53 +338,6 @@ TRACKER_POLL_INTERVAL = 1  # Days
 
 # Inline edit permissions
 ADAPTOR_INPLACEEDIT_EDIT = 'mysite.bugsets.perms.InlineEditPermissions'
-
-# By default, Django logs all SQL queries to stderr when DEBUG=True. This turns
-# that off.  If you want to see all SQL queries (e.g., when running a
-# management command locally), remove the stanza related to django.db.backends.
-#
-# Also, this setup sends an email to the site admins on every HTTP 500 error
-# when DEBUG=False.
-#
-# The lines relating to 'require_debug_false' should be enabled when the
-# project is upgraded to use Django 1.4.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        #        'require_debug_false': {
-        #            '()': 'django.utils.log.RequireDebugFalse'
-        #        },
-    },
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': [],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'handlers': ['null'],  # Quiet by default!
-            'propagate': False,
-            'level': 'DEBUG',
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'mysite': {
-            'handlers':['null'],  # Quiet for now - revisit later
-            'propagate': True,
-            'level': 'CRITICAL'      # Determine level - revisit later
-        },
-    }
-}
 
 DOWNLOADED_GEOLITECITY_PATH = os.path.join(MEDIA_ROOT,
                                            '../../downloads/GeoLiteCity.dat')

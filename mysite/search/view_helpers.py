@@ -424,7 +424,7 @@ class Query:
         hit_count_cache_key = self.get_hit_count_cache_key()
         # Fetch the hit count from the cache.
         hit_count = django.core.cache.cache.get(hit_count_cache_key)
-        logger.info("Cached hit count: " + str(hit_count))
+        logger.debug("Cached hit count: " + str(hit_count))
         # We need to be careful to check if the count is None, rather than
         # just if the count is a false value. That's because a value of zero
         # is still a cached value; if we just use a boolean test, we would
@@ -437,16 +437,16 @@ class Query:
             # a new count.
             hit_count = self.get_bugs_unordered().count()
             django.core.cache.cache.set(hit_count_cache_key, hit_count)
-            logger.info("Set hit count: " + str(hit_count))
+            logger.debug("Set hit count: " + str(hit_count))
         # TODO: Add sql query in the logger
-        logger.info("Hit Count:" + str(hit_count))
+        logger.debug("Hit Count:" + str(hit_count))
 
         return hit_count
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
         query_string = http.urlencode(GET_data)
-        logger.info("Query is " + query_string)
+        logger.debug("Query is " + query_string)
         return query_string
 
 

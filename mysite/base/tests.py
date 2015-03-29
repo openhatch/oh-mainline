@@ -122,7 +122,7 @@ class TwillTests(django.test.TestCase):
         client = Client()
         success = client.login(username=username,
                                password=password)
-        self.assert_(success)
+        self.assertTrue(success)
         return client
 
     def login_with_client_as_barry(self):
@@ -210,13 +210,13 @@ class GeocoderCanCache(django.test.TestCase):
         different_json = (
             "{'key': 'if caching works we should never get this value'}")
         self.mock_geocoder.return_value = eval(original_json)
-        self.assert_(
+        self.assertTrue(
             'original value' in
             self.get_geocoding_in_json_for_unicode_string())
         self.mock_geocoder.return_value = eval(different_json)
         try:
             json = self.get_geocoding_in_json_for_unicode_string()
-            self.assert_('original value' in json)
+            self.assertTrue('original value' in json)
         except AssertionError:
             raise AssertionError(
                 "Geocoded location in json was not cached; it now equals "
@@ -279,7 +279,7 @@ class Feed(TwillTests):
         note_we_want_to_see = (
             mysite.search.models.WannaHelperNote.objects.get(
                 person=person, project=p_before))
-        self.assert_(note_we_want_to_see in items)
+        self.assertTrue(note_we_want_to_see in items)
 
 
 class CacheMethod(TwillTests):
@@ -345,82 +345,67 @@ class Unsubscribe(TwillTests):
     def test_verify_unsubscribe_token(self):
         """Generate a valid unsubscribe token. Use it. See that it works. Use
         an invalid one. See that it doesn't work."""
-        dude = mysite.profile.models.Person.objects.get(
-            user__username='paulproteus')
+        dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
 
         # Generate an invalid token (easiest to do this first)
-        plausible_but_invalid_token_string = (
-            dude.generate_new_unsubscribe_token().string)
+        plausible_but_invalid_token_string = dude.generate_new_unsubscribe_token().string
         # Make that token invalid by nuking the UnsubscribeToken table
         mysite.profile.models.UnsubscribeToken.objects.all().delete()
 
         # Generate a once-valid but now-expired token
         expired_token = dude.generate_new_unsubscribe_token()
-        just_over_three_months_ago = (
-            datetime.datetime.utcnow() - datetime.timedelta(days=91))
+        just_over_three_months_ago = datetime.datetime.utcnow() - datetime.timedelta(days=91)
         expired_token.created_date = just_over_three_months_ago
         expired_token.save()
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
-        owner = (
-            mysite.profile.models.UnsubscribeToken.
-            whose_token_string_is_this(valid_token_string)
-        )
+        owner = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(valid_token_string)
         self.assertEqual(owner, dude)
 
         # This should definitely be false
-        self.assertNotEqual(valid_token_string,
-                            plausible_but_invalid_token_string)
+        self.assertNotEqual(valid_token_string, plausible_but_invalid_token_string)
 
         # The invalid token should fail
-        self.assertFalse(
-            mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-                plausible_but_invalid_token_string)
-        )
+        self.assertFalse(mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(plausible_but_invalid_token_string))
 
-        self.assertFalse(
-            mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-                expired_token.string)
-        )
+        self.assertFalse(mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(expired_token.string))
 
     def test_unsubscribe_view(self):
-        dude = mysite.profile.models.Person.objects.get(
-            user__username='paulproteus')
+        dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
         # Test that the unsubscribe view's context contains the owner
-        url = reverse(mysite.profile.views.unsubscribe,
-                      kwargs={'token_string': valid_token_string})
+        url = reverse(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
+        logger.debug("url %s", url)
         response = self.client.get(url)
+        logger.debug("response %s", response)
         self.assertEqual(
             mysite.profile.models.Person.objects.get(),
             response.context['unsubscribe_this_user'])
 
     def test_unsubscribe_post_handler(self):
         def get_dude():
-            return mysite.profile.models.Person.objects.get(
-                user__username='paulproteus')
+            return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+
         dude = get_dude()
-        self.assert_(get_dude().email_me_re_projects)
+        self.assertTrue(get_dude().email_me_re_projects)
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
-        self.client.post(reverse(mysite.profile.views.unsubscribe_do),
-                         {'token_string': valid_token_string})
+        self.client.post(reverse(mysite.profile.views.unsubscribe_do), {'token_string': valid_token_string})
         self.assertFalse(get_dude().email_me_re_projects)
 
     def test_submit_form(self):
         def get_dude():
-            return mysite.profile.models.Person.objects.get(
-                user__username='paulproteus')
+            return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+            
         dude = get_dude()
-        self.assert_(get_dude().email_me_re_projects)
+        self.assertTrue(get_dude().email_me_re_projects)
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
-        twill_goto_view(mysite.profile.views.unsubscribe,
-                        kwargs={'token_string': valid_token_string})
+        twill_goto_view(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
         tc.submit()
         self.assertFalse(get_dude().email_me_re_projects)
 

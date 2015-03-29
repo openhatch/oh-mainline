@@ -726,15 +726,13 @@ class Forwarder(models.Model):
 
 
 class UnsubscribeToken(mysite.search.models.OpenHatchModel):
-    string = models.CharField(
-        null=False, blank=False, unique=True, max_length=255)
+    string = models.CharField(null=False, blank=False, unique=True, max_length=255)
     owner = models.ForeignKey(Person)
 
     @staticmethod
     def whose_token_string_is_this(string):
         try:
-            expiry_date = datetime.datetime.utcnow() - \
-                datetime.timedelta(days=90)
+            expiry_date = datetime.datetime.utcnow() - datetime.timedelta(days=90)
             return UnsubscribeToken.objects.get(string=string, created_date__gte=expiry_date).owner
         except UnsubscribeToken.DoesNotExist:
             return None

@@ -633,7 +633,7 @@ class BugzillaTrackerEditingViews(WebTest):
             'max_connections': '8',
             'bug_project_name_format': 'format'})
         if form.errors:
-            logger.info(form.errors)
+            logger.debug(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -657,7 +657,7 @@ class BugzillaTrackerEditingViews(WebTest):
             'custom_parser': 'bugzilla.KDEBugzilla',
             'bug_project_name_format': 'format'})
         if form.errors:
-            logger.info(form.errors)
+            logger.debug(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -707,7 +707,7 @@ class BugzillaTrackerListing(WebTest):
             'bug_project_name_format': 'format'})
 
         if form.errors:
-            logger.info(form.errors)
+            logger.debug(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -745,7 +745,7 @@ class LaunchpadTrackerEditingViews(WebTest):
             'documentation_tag': 'doc',
             'bug_project_name_format': 'format'})
         if form.errors:
-            logger.info(form.errors)
+            logger.debug(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -782,7 +782,7 @@ class GitHubTrackerEditingViews(WebTest):
             'max_connections': '8',
             'documentation_tag': 'doc'})
         if form.errors:
-            logger.info(form.errors)
+            logger.debug(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -859,7 +859,7 @@ class JiraTrackerEditingViews(WebTest):
             'bug_project_name_format': 'KDE',
             'documentation_tag': 'doc'})
         if form.errors:
-            logger.info(form.errors)
+            logger.debug(form.errors)
         self.assertTrue(form.is_valid())
         form.save()
 
