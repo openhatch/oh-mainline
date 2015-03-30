@@ -9,7 +9,7 @@
 {"icon_raw": "/static/no-project-icon.png", "name": "Mozilla Firefox", "language": "XUL"}}, 
 {"pk": 4, "model": "search.project", "fields": 
 {"icon_raw": "/static/no-project-icon.png", "name": "Iceweasel", "language": "XUL"}}, 
-{"pk": 0, "model": "search.bug", "fields": 
+{"pk": 54, "model": "search.bug", "fields":
 {"status": "New", "last_polled": "2009-06-08 23:04:31", "tracker_id": 1, "submitter_realname": "Mister 0", "description": "Description #0", "title": "Title #0", "importance": "Importance #0", "people_involved": 9, "last_touched": "2009-06-06 06:20:39", "submitter_username": "username 0", "project": 2, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/0", "date_reported": "2009-06-08 23:02:07"}}, 
 {"pk": 1, "model": "search.bug", "fields": 
 {"status": "New", "last_polled": "2009-06-08 23:04:31", "tracker_id": 1, "submitter_realname": "Miss 1", "description": "Description #1", "title": "Title #1", "importance": "Importance #1", "people_involved": 2, "last_touched": "2009-06-06 18:11:36", "submitter_username": "username 1", "project": 2, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1", "date_reported": "2009-06-07 23:02:07"}}, 
