@@ -25,6 +25,11 @@ class ConfigForm(django.forms.Form):
 
     user_email = django.forms.EmailField()
 
+    def __init__(self, *args, **kwargs):    
+        super(ConfigForm, self).__init__(*args, **kwargs)
+        self.fields['user_email'].widget.attrs.update({'class' : 'auth_email', 
+            'placeholder': 'name@domain.com'})
+
     def clean_user_email(self):
         for ending in ConfigForm.BAD_ENDINGS:
             if self.cleaned_data['user_email'].endswith(ending):
