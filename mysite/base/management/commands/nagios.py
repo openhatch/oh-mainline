@@ -49,5 +49,5 @@ class Command(BaseCommand):
             logger.info("OK - Last email sent less than 8 days ago")
             return 0
         else:
-            logger.warning("CRITICAL - Last email sent more than 8 days ago")
+            logger.warn("CRITICAL - Last email sent more than 8 days ago")
             return 2
