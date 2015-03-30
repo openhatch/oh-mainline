@@ -67,10 +67,9 @@ def checkout_submit(request):
 def long_description_submit(request):
     # Initialize data array and some default values.
     data = {}
-    data['git_config_form'] = forms.ConfigForm()
+    form = forms.ConfigForm(request.POST or None)
     data['git_config_error_message'] = ''
     if request.method == 'POST':
-        form = forms.ConfigForm(request.POST)
         if form.is_valid():
             view_helpers.set_mission_completed(
                 request.user.get_profile(), 'git_config')
