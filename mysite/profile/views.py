@@ -57,7 +57,7 @@ import mysite.profile.tasks
 from mysite.base.view_helpers import render_response
 from django.views.decorators.csrf import csrf_protect
 
-# }}}
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -780,28 +780,23 @@ def set_pfentries_dot_use_my_description_do(request):
                     prefix=str(pfe_pk))
         if form.is_valid():
             pfe_after_save = form.save()
-            logging.info("Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" % (
+            logger.info("Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" % (
                 request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
     return HttpResponseRedirect(project.get_url())
 
 
 @view
 def unsubscribe(request, token_string):
-    context = {'unsubscribe_this_user':
-               mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-                   token_string),
+    context = {'unsubscribe_this_user': mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string),
                'token_string': token_string}
     return (request, 'unsubscribe.html', context)
 
 
 def unsubscribe_do(request):
     token_string = request.POST.get('token_string', None)
-    person = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
-        token_string)
+    logger.debug("token_string is %s", token_string)
+    person = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string)
+    logger.debug("person is %s", person)
     person.email_me_re_projects = False
     person.save()
     return HttpResponseRedirect(reverse(unsubscribe, kwargs={'token_string': token_string}))
-
-# API-y views go below here
-
-# vim: ai ts=3 sts=4 et sw=4 nu

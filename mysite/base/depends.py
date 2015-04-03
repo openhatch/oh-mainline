@@ -27,15 +27,14 @@
 
 import os
 import logging
-from django.conf import settings
-
-logger = logging.getLogger(__name__)
+import django.conf
 
 
-# Wrap lxml and the modules that are part of it
+# class used if module does not exist
 class nothing(object):
     pass
 
+# lxml - Wrap lxml and the modules that are part of it
 try:
     import lxml
     import lxml.etree
@@ -46,17 +45,12 @@ except:
     lxml.html = None
 
 if lxml.html is None:
-    logger.info("Some parts of the OpenHatch site may fail because the "
+    logging.info("Some parts of the OpenHatch site may fail because the "
                 "lxml library is not installed. Look in "
                 "ADVANCED_INSTALLATION.mkd for information about lxml.")
 
 
-# Helper to check if svnadmin is available. If not,
-# we can skip running 'missions' code (and tests) that require it.
-def svnadmin_available():
-      return os.path.exists(settings.SVNADMIN_PATH)
-
-# Here we try to import "Image", from the Python Imaging Library.
+# Pillow, PIL, Images - Here we try to import "Image", from the Python Imaging Library.
 # If we fail, Image is None.
 Image = None
 try:
@@ -72,6 +66,12 @@ except:
         sys.modules['Image'] = sys.modules['sys']
 
 
+# Subversion svnadmin - Helper to check if svnadmin is available. If not,
+# we can skip running 'missions' code (and tests) that require it.
+def svnadmin_available():
+      return os.path.exists(django.conf.settings.SVNADMIN_PATH)
+
+# Postmap email - Check if available
 def postmap_available(already_emitted_warning=[]):
     # Module-level state is used to track if we already emitted the warning.
     # It is not thread-safe, but it sure is convenient.
@@ -81,8 +81,8 @@ def postmap_available(already_emitted_warning=[]):
             pass
         else:
             already_emitted_warning.append(True)
-            logger.warning('postmap binary not found at {0}. Look in '
-                           'ADVANCED_INSTALLATION for the section about '
-                           'postfix for more information.'.format(POSTMAP_PATH))
+            logging.warn('postmap binary not found at {0}. Look in '
+                        'ADVANCED_INSTALLATION for the section about '
+                        'postfix for more information.'.format(POSTMAP_PATH))
         return False
     return True

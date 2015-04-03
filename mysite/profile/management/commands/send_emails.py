@@ -118,7 +118,7 @@ class Command(BaseCommand):
                     to=[person.user.email])
                 email.attach_alternative(message_in_html, "text/html")
                 email.send()
-        logger.info("Emailed", count)
+        logger.debug("Emailed %d", count)
 
     def get_projects_email_for(self, recipient):
         context = self.get_context_for_email_to(recipient)
