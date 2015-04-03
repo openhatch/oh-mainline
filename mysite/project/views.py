@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import logging
 from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
@@ -35,6 +36,7 @@ from django.template.loader import render_to_string
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils import http
 
+logger = logging.getLogger(__name__)
 
 def create_project_page_do(request):
     project_name = request.POST.get('project_name', None)
@@ -385,36 +387,36 @@ def edit_project(request, project__name):
     if request.POST or request.FILES:
         form = mysite.project.forms.ProjectForm(
             request.POST, request.FILES, instance=project)
+
         if form.is_valid():
             project = form.save()
             project.update_scaled_icons_from_self_icon()
 
-            import logging
-
-            # This is a good time to make a little note pertaining to the fact
-            # that someone has edited the project info.
-            logging.info("Project edit: %s just edited a project.  The project's data originally read as follows: %s.  Its data now read as follows: %s" % (
-                request.user.username, old_project.__dict__, project.__dict__))
-
+            # Log that someone has edited the project info.
+            logger.info("Project edit: %s just edited a project. The "
+                        "project's data originally read as follows: %s. Its"
+                        "data now reads as follows: %s" % (request.user.username,
+                                                          old_project.__dict__,
+                                                          project.__dict__))
             return HttpResponseRedirect(project.get_url())
     else:
         form = mysite.project.forms.ProjectForm(instance=project)
 
+    logger.info("Edit project: setting context and form data")
     context = {'project': project, 'form': form}
 
     person = request.user.get_profile()
     context['i_am_a_contributor'] = (person in project.get_contributors())
-    context['i_described_this_project'] = bool(project.get_pfentries_with_descriptions(
-        person=person))
+    context['i_described_this_project'] = bool(project.get_pfentries_with_descriptions(person=person))
 
     pfes = project.get_pfentries_with_descriptions()
     context['pfentries_with_descriptions'] = pfes
 
     Form = mysite.profile.forms.UseDescriptionFromThisPortfolioEntryForm
-    context['pfentry_forms'] = [Form(instance=pfe, prefix=str(pfe.pk))
-                                for pfe in pfes]
-
+    context['pfentry_forms'] = [Form(instance=pfe, prefix=str(pfe.pk)) for pfe in pfes]
     context['trackers'] = project.get_corresponding_bug_trackers()
 
-    return mysite.base.decorators.as_view(
-        request, 'edit_project.html', context, slug=__name__)
+    return mysite.base.decorators.as_view(request,
+                                          template="edit_project.html",
+                                          data=context,
+                                          slug=__name__)
