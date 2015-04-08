@@ -441,7 +441,6 @@ class BugTrackersOnProjectEditPage(WebTest):
     def test_trackers_created_for_project_show_up(self):
         # Create a Roundup model
         bug_tracker = mysite.customs.models.RoundupTrackerModel(
-            tracker_name='dummy',
             base_url='http://example.com/',
             closed_status='resolved')
         bug_tracker.created_for_project = self.twisted

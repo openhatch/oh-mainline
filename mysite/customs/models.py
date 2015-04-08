@@ -25,7 +25,6 @@ import importlib
 from django.db import models
 from django.db.models import Q
 from django.core.urlresolvers import reverse
-from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
 
 import django.forms.models
@@ -180,8 +179,7 @@ class TrackerModel(models.Model):
 
         return reverse('mysite.customs.views.edit_tracker', kwargs={
             'tracker_id': self.id,
-            'tracker_type': self.short_name,
-            'tracker_name': self.tracker_name})
+            'tracker_type': self.short_name})
 
     def get_base_url(self):
         # Implement this in a subclass
@@ -199,17 +197,17 @@ class TrackerModel(models.Model):
             tracker_model_name,))
 
     @classmethod
-    def get_instance_by_name(cls, tracker_name):
+    def get_instance_by_name(cls, description):
         '''This returns the instance of a subclass of TrackerModel,
-        if any, that has its tracker_name field set to the provided
+        if any, that has its description field set to the provided
         value.
 
-        This is necessary because tracker_name is defined by each of
+        This is necessary because description is defined by each of
         the subclasses, rather than by this class in particular.'''
         query_parts = []
         for subclass in cls.__subclasses__():
             name = subclass.__name__.lower()
-            query_as_dict = {name + '__tracker_name': tracker_name}
+            query_as_dict = {name + '__description': description}
             query_parts.append(Q(**query_as_dict))
 
         def _pipe_things(a, b):
@@ -218,11 +216,11 @@ class TrackerModel(models.Model):
         return cls.objects.select_subclasses().get(joined)
 
     @classmethod
-    def get_instance_by_id(cls, tracker_name):
+    def get_instance_by_id(cls, tracker_id):
         query_parts = []
         for subclass in cls.__subclasses__():
             name = subclass.__name__.lower()
-            query_as_dict = {name + '__pk': tracker_name}
+            query_as_dict = {name + '__pk': tracker_id}
             query_parts.append(Q(**query_as_dict))
 
         def _pipe_things(a, b):
@@ -246,13 +244,11 @@ class TrackerQueryModel(models.Model):
 class BugzillaTrackerModel(TrackerModel):
 
     '''This model stores the data for individual Bugzilla trackers.'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False,
                                help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{component}' and '{product}', which are replaced with the relevant data from each individual bug respectively.")
 
     # Metadata about the TrackerModel.
     short_name = 'bugzilla'
@@ -291,9 +287,6 @@ class BugzillaTrackerModel(TrackerModel):
 
     all_trackers = models.Manager()
 
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
-
     def get_base_url(self):
         return self.base_url
 
@@ -323,9 +316,6 @@ reversion.register(BugzillaQueryModel)
 class GoogleTrackerModel(TrackerModel):
 
     '''This model stores the data for individual Google trackers.'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False,
-                                    help_text="This is the name that OpenHatch will use to identify the project.")
     google_name = models.CharField(max_length=200, unique=True,
                                    blank=False, null=False,
                                    help_text="This is the name that Google uses to identify the project.")
@@ -356,9 +346,6 @@ class GoogleTrackerModel(TrackerModel):
 
     BUG_STATUS_OPEN = 2
     BUG_STATUS_ALL = 1
-
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
 
     def as_dict(self):
         out = super(GoogleTrackerModel, self).as_dict()
@@ -453,13 +440,11 @@ class TracBugTimes(models.Model):
 class TracTrackerModel(TrackerModel):
 
     '''This model stores the data for individual Trac trackers.'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False,
                                help_text="This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the key '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     BITESIZED_TYPES = (
         ('keywords', 'Keyword'),
         ('priority', 'Priority'),
@@ -491,9 +476,6 @@ class TracTrackerModel(TrackerModel):
 
     all_trackers = models.Manager()
 
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
-
     def get_base_url(self):
         return self.base_url
 
@@ -517,9 +499,6 @@ reversion.register(TracQueryModel)
 class RoundupTrackerModel(TrackerModel):
 
     '''This model stores the data for individual Roundup trackers.'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False,
-                                    help_text="This is the name that OpenHatch will use to identify the project.")
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False,
                                help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
@@ -547,9 +526,6 @@ class RoundupTrackerModel(TrackerModel):
 
     all_trackers = models.Manager()
 
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
-
     def get_base_url(self):
         return self.base_url
 
@@ -573,9 +549,6 @@ reversion.register(RoundupQueryModel)
 class LaunchpadTrackerModel(TrackerModel):
 
     '''This model stores the data for individual launchpad tracker'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False,
-                                    help_text="This is the name that OpenHatch will use to identify the project.")
     launchpad_name = models.CharField(max_length=200, unique=True,
                                       blank=False, null=False,
                                       help_text="This is the name that Launchpad.net uses to identify the project.")
@@ -592,9 +565,6 @@ class LaunchpadTrackerModel(TrackerModel):
     _urlform = None
 
     all_trackers = models.Manager()
-
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
 
     def get_base_url(self):
         return '__impossible_to_use_with_launchpad'
@@ -633,9 +603,6 @@ reversion.register(LaunchpadQueryModel)
 class GitHubTrackerModel(TrackerModel):
 
     '''This model stores the data for individual GitHub repositories'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False,
-                                    help_text="This is the name that OpenHatch will use to identify the project.")
     github_name = models.CharField(max_length=100, blank=False, null=False,
                                    help_text="This is the user or project name on GitHub that owns the project.")
     github_repo = models.CharField(max_length=100, blank=False, null=False,
@@ -658,9 +625,6 @@ class GitHubTrackerModel(TrackerModel):
     _urlform = None
 
     all_trackers = models.Manager()
-
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
 
     def as_dict(self):
         out = super(GitHubTrackerModel, self).as_dict()
@@ -721,13 +685,11 @@ def jira_query_url(base_url, params):
 class JiraTrackerModel(TrackerModel):
 
     '''This model stores the data for individual Jira trackers.'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False,
                                help_text="This is the URL to the homepage of the Jira instance, i.e http://jira.cyanogenmod.org")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
+                                               help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
 
     BITESIZED_TYPES = (
         ('label', 'Label'),
@@ -753,9 +715,6 @@ class JiraTrackerModel(TrackerModel):
     _urlform = None
 
     all_trackers = models.Manager()
-
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
 
     def as_dict(self):
         out = super(JiraTrackerModel, self).as_dict()
@@ -797,8 +756,6 @@ reversion.register(JiraQueryModel)
 class TigrisTrackerModel(TrackerModel):
 
     '''This model stores the data for individual Tigris trackers.'''
-    tracker_name = models.CharField(max_length=200, unique=True,
-                                    blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False,
                                help_text="This is the URL to the issues page "
@@ -834,9 +791,6 @@ class TigrisTrackerModel(TrackerModel):
         help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
 
     all_trackers = models.Manager()
-
-    def __str__(self):
-        return smart_str('%s' % (self.tracker_name))
 
     def get_base_url(self):
         return self.base_url

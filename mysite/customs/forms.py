@@ -152,7 +152,7 @@ class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
 
     class Meta:
         model = mysite.customs.models.GitHubTrackerModel
-        fields = ('tracker_name', 'github_url',
+        fields = ('github_url',
                   'bitesized_tag', 'documentation_tag')
 
     def clean_github_url(self):
