@@ -47,6 +47,7 @@ import mysite.base.unicode_sanity
 import mysite.profile.views
 import mysite.base.views
 import mysite.project.views
+import mysite.settings
 
 import mysite.base.management.commands.nagios
 import mysite.profile.management.commands.send_emails
@@ -90,7 +91,6 @@ class TwillTests(django.test.TestCase):
     def setUp(self):
         self.real_get = django.core.cache.cache.get
         django.core.cache.cache.get = mock_get
-        from django.conf import settings
         self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
         settings.DEBUG_PROPAGATE_EXCEPTIONS = True
         TwillTests._twill_setup()
@@ -99,7 +99,6 @@ class TwillTests(django.test.TestCase):
     def tearDown(self):
         # If you get an error on one of these lines,
         # maybe you didn't run base.TwillTests.setUp?
-        from django.conf import settings
         settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
         twill.remove_wsgi_intercept('127.0.0.1', 8080)
         tc.reset_browser()
@@ -595,3 +594,35 @@ class GoogleApiTests(unittest.TestCase):
         # Check that latitude and longitude are returned and status is 'OK'
         geocode = mysite.base.view_helpers._geocode(response_data=response)
         self.assertNotEqual(geocode, None)
+
+
+# Test cases for robots generation
+class RenderLiveRobotsTest(django.test.TestCase):
+    def test_robots_with_debug_false(self):
+        '''DEBUG is set to False by default, verify that robots.txt returns
+        render_robots_live_site.txt
+        '''
+        response = self.client.get('/robots.txt')
+        robots_text = ""
+        with open('mysite/base/templates/robots_for_live_site.txt') as f:
+            robots_text += f.read()
+        self.assertEqual(response.content, robots_text)
+
+class RenderDevRobotsTest(django.test.TestCase):
+    def setUp(self):
+        self.original_value = settings.DEBUG
+        settings.DEBUG = True
+
+    def test_robots_with_debug_true(self):
+        '''Set DEBUG to True in settings.py and verify that robots.txt contains
+         text identical to that seen in render_robots_for_dev_env.txt
+        '''
+        response = self.client.get('/robots.txt')
+        robots_text = ""
+        with open('mysite/base/templates/robots_for_dev_env.txt') as f:
+            robots_text += f.read()
+        settings.DEBUG = False
+        self.assertEqual(response.content, robots_text)
+
+    def tearDown(self):
+        settings.DEBUG = self.original_value
