@@ -38,7 +38,6 @@ import datetime
 import logging
 
 from django.contrib.auth.decorators import login_required
-from __builtin__ import getattr
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
