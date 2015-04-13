@@ -65,9 +65,11 @@ def signup_do(request):
             password=password)
         django.contrib.auth.login(request, user)
 
-        # redirect to profile
-        return HttpResponseRedirect(
-            '/people/%s/' % urllib.quote(username))
+        # redirect to profile or the page that brought the user to signup page
+        next = '/people/%s/' % urllib.quote(username)
+        if request.POST.get('next'):
+            next = request.POST['next']
+        return HttpResponseRedirect(next)
 
     else:
         return mysite.account.views.signup(request, signup_form=signup_form)
