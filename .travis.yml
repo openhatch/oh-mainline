@@ -2,11 +2,15 @@ language: python
 python:
   - 2.7
 env:
-  - USE_MYSQL=true
-  - USE_MYSQL=
+  - USE_POSTGRES=true
+  - USE_POSTGRES=
 
 services:
-  - mysql
+  - postgres
+
+matrix:
+  allow_failures:
+    - env: USE_POSTGRES=true
 
 install:
  - sudo pip install --upgrade pip
@@ -20,13 +24,13 @@ before_install:
  - deactivate
  - sudo apt-get update -qq
  - sudo apt-get build-dep -qq python-imaging
- - sudo apt-get install libjpeg-dev python-mysqldb
+ - sudo apt-get install libjpeg-dev python-psycopg2
  - git config --global user.name TravisDummy
  - git config --global user.email dummy@travis-ci.org
 
 
 before_script:
-  - mysql -uroot < ./mysite/scripts/database_01_create.sql
+  - psql -c 'create database openhatch' -U postgres
 
 after_success:
   - coveralls

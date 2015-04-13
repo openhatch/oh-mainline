@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.conf import settings
+
 from mysite.missions.base.view_helpers import *
 
 class SvnRepository(object):
@@ -30,6 +32,13 @@ class SvnRepository(object):
         self.public_url = settings.SVN_REPO_URL_PREFIX + username
 
     def reset(self):
+        if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
+            subprocess.check_call([
+                'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
+                'milestone-a/manage.py', 'missions', 'svn_reset', self.username
+            ])
+            return
+
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
         subprocess.check_call(

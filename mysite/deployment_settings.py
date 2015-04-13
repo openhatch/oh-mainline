@@ -7,10 +7,8 @@
 from settings import *
 # ...and then we override some values.
 
-# Use MySQL in production
-DATABASES['default'] = OTHER_DATABASES['mysql']
-# But use the linode as our MySQL server
-DATABASES['default']['HOST'] = 'linode.openhatch.org'
+# Use Postgres in production
+DATABASES['default'] = OTHER_DATABASES['postgres']
 
 OHLOH_API_KEY = 'SXvLaGPJFaKXQC0VOocAg'
 DEBUG = False
@@ -50,7 +48,10 @@ GOOGLE_ANALYTICS_CODE = 'UA-15096810-1'
 # svn mission requires a subdomain svn-mission for cloudflare to
 # work properly
 SVN_REPO_URL_PREFIX = 'svn://svn-mission.openhatch.org/'
-GIT_REPO_URL_PREFIX = 'https://openhatch.org/git-mission-data/git/'
+GIT_REPO_URL_PREFIX = 'https://git-mission.openhatch.org/git-mission-data/git/'
+# user@host spec to use when SSHing into the remote node that contains
+# git and svn mission repositories.
+REMOTE_REPO_SETUP_ACCESS_SPEC = 'deploy@linode.openhatch.org'
 # Share cookies with subdomain (necessary for Vanilla)
 SESSION_COOKIE_DOMAIN = '.openhatch.org'
 URL_PREFIX = 'https://openhatch.org'

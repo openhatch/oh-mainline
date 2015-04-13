@@ -33,7 +33,9 @@ import os.path
 import subprocess
 
 from django.core.cache import cache
+from django.core.management import CommandError
 from django.conf import settings
+from django.contrib.auth.models import User
 
 import mock
 import datetime
@@ -52,6 +54,7 @@ import mysite.project.views
 import mysite.settings
 
 import mysite.base.management.commands.nagios
+import mysite.base.management.commands.remote_command_check
 import mysite.profile.management.commands.send_emails
 
 logger = logging.getLogger(__name__)
@@ -542,6 +545,61 @@ class NagiosTests(django.test.TestCase):
     def test_nagios_weeklymail_return_critical_newdb(self):
         self.assertEqual(2, mysite.base.management.commands.nagios.Command.
                          send_weekly_exit_code())
+
+# Test cases for remote command sanity checking
+class RemoteCommandCheckTests(django.test.TestCase):
+    @mock.patch.dict('os.environ')
+    @mock.patch('django.contrib.auth.models.User.objects.get')
+    @mock.patch('subprocess.check_call')
+    def test_remote_command_allows_git_reset(self, mock_call, mock_user):
+        os.environ['SSH_ORIGINAL_COMMAND'] = (
+            'milestone-a/manage.py missions git_reset someuser')
+        mock_user.return_value = User(username='someuser')
+
+        self.assertEqual(
+            None,
+            mysite.base.management.commands.remote_command_check.Command().handle()
+        )
+        mock_call.assert_called_once_with([
+            'milestone-a/manage.py', 'missions', 'git_reset', 'someuser'])
+
+    @mock.patch.dict('os.environ')
+    @mock.patch('django.contrib.auth.models.User.objects.get')
+    @mock.patch('subprocess.check_call')
+    def test_remote_command_allows_svn_reset(self, mock_call, mock_user):
+        os.environ['SSH_ORIGINAL_COMMAND'] = (
+            'milestone-a/manage.py missions svn_reset someuser')
+        mock_user.return_value = User(username='someuser')
+
+        self.assertEqual(
+            None,
+            mysite.base.management.commands.remote_command_check.Command().handle()
+        )
+        mock_call.assert_called_once_with([
+            'milestone-a/manage.py', 'missions', 'svn_reset', 'someuser'])
+
+    @mock.patch.dict('os.environ')
+    @mock.patch('django.contrib.auth.models.User.objects.get')
+    @mock.patch('subprocess.check_call')
+    def test_remote_command_blocks_nonexistent_user(self, mock_call, mock_user):
+        os.environ['SSH_ORIGINAL_COMMAND'] = (
+            'milestone-a/manage.py missions svn_reset nonexistent')
+
+        def invalid_user(*args, **kwargs):
+            raise User.DoesNotExist
+        mock_user.side_effect = invalid_user
+
+        with self.assertRaises(User.DoesNotExist):
+            mysite.base.management.commands.remote_command_check.Command().handle()
+
+    @mock.patch.dict('os.environ')
+    @mock.patch('subprocess.check_call')
+    def test_remote_command_blocks_invalid_command(self, mock_call):
+        os.environ['SSH_ORIGINAL_COMMAND'] = 'echo pwned'
+
+        with self.assertRaises(CommandError):
+            mysite.base.management.commands.remote_command_check.Command().handle()
+        self.assertEqual(0, mock_call.call_count)
 
 
 # Test cases for meta data generation

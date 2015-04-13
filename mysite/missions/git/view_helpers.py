@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.conf import settings
+
 import mysite.base.unicode_sanity
 from mysite.missions.base.view_helpers import *
 
@@ -29,6 +31,12 @@ class GitRepository(object):
         self.public_url = settings.GIT_REPO_URL_PREFIX + username
 
     def reset(self):
+        if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
+            subprocess.check_call([
+                'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
+                'milestone-a/manage.py', 'missions', 'git_reset', self.username
+            ])
+
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
         subprocess.check_call(['git', 'init', self.repo_path])

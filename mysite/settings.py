@@ -91,22 +91,18 @@ if 'DATABASE_URL' in os.environ:
     DATABASES = {'default': dj_database_url.config()}
 
 OTHER_DATABASES = {
-    'mysql': {
-        'NAME': 'oh_milestone_a',
-        'ENGINE': 'django.db.backends.mysql',
+    'postgres': {
+        'NAME': 'openhatch',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'HOST': 'localhost',
-        'USER': 'oh_milestone_a',
-        'PASSWORD': 'ahmaC0Th',
-        'OPTIONS': {'read_default_file': os.path.join(os.path.dirname(__file__), 'my.cnf')},
+        'USER': 'postgres',
+        'PASSWORD': '',
         'CHARSET': 'utf8',
     },
 }
 
-if os.environ.get('USE_MYSQL', ''):
-    DATABASES['default'] = OTHER_DATABASES['mysql']
-    if os.environ.get('TRAVIS'):
-        DATABASES['default']['USER'] = 'travis'
-        DATABASES['default']['PASSWORD'] = ''
+if os.environ.get('USE_POSTGRES'):
+    DATABASES['default'] = OTHER_DATABASES['postgres']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -337,6 +333,8 @@ SOUTH_TESTS_MIGRATE = False
 GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
 # For local sites, this is what you clone
 GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/'
+
+REMOTE_REPO_SETUP_ACCESS_SPEC = None
 
 # This setting is used by the customs bug importers.
 TRACKER_POLL_INTERVAL = 1  # Days

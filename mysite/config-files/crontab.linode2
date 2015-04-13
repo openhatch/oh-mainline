@@ -1,10 +1,8 @@
-### This is for linode2.openhatch.org, the spare VM that doesn't have as much going on with it.
-
-### Some tasks that we run can run on linode2, the spare virtual machine!
-### Those tasks are in crontab.linode2. They include bug crawling.
-OPENHATCH_HOME="$HOME/milestone-a/"
-
+### This is for linode2.openhatch.org.
 MAILTO=asheesh@asheesh.org
 
-@daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./manage.py customs_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' > customs.log.$(date -I)
-
+@daily cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py customs_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' > customs.log.$(date -I)
+@daily cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py profile_daily_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+@daily cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py clearsessions
+@hourly cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py profile_hourly_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+*/10 * * * * cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning | grep -v 'import '
