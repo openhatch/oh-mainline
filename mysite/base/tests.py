@@ -91,7 +91,6 @@ class TwillTests(django.test.TestCase):
     def setUp(self):
         self.real_get = django.core.cache.cache.get
         django.core.cache.cache.get = mock_get
-        from django.conf import settings
         self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
         settings.DEBUG_PROPAGATE_EXCEPTIONS = True
         TwillTests._twill_setup()
@@ -100,7 +99,6 @@ class TwillTests(django.test.TestCase):
     def tearDown(self):
         # If you get an error on one of these lines,
         # maybe you didn't run base.TwillTests.setUp?
-        from django.conf import settings
         settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
         twill.remove_wsgi_intercept('127.0.0.1', 8080)
         tc.reset_browser()
