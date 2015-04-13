@@ -172,6 +172,39 @@ class Signup(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertIn('That username is reserved.', response.content)
 
+    def test_signup_redirect_to_profile(self):
+        signup_page = self.app.get('/account/signup/')
+        signup_form = signup_page.form
+        self.assertNotIn(
+            'already got a user in our database with that username',
+            signup_form.text
+        )
+        username = 'test_test'
+        signup_form['username'] = username
+        signup_form['email'] = 'someone@somewhere.com'
+        signup_form['password1'] = 'blahblahblah'
+        signup_form['password2'] = 'blahblahblah'
+        response = signup_form.submit()
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/people/{}'.format(username), response.location)
+
+    def test_signup_redirect_to_referer_page(self):
+        next_page = '/missions/tar/unpacking'
+        signup_page = self.app.get('/account/signup/?next={}'.format(next_page))
+        signup_form = signup_page.form
+        self.assertNotIn(
+            'already got a user in our database with that username',
+            signup_form.text
+        )
+        username = 'test_test'
+        signup_form['username'] = username
+        signup_form['email'] = 'someone@somewhere.com'
+        signup_form['password1'] = 'blahblahblah'
+        signup_form['password2'] = 'blahblahblah'
+        response = signup_form.submit()
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(next_page, response.location)
+
 
 class EditPassword(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
