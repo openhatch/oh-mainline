@@ -16,6 +16,7 @@ Here's more information about our project structure that may be useful.
   api
   pull_request_linting
   issue_tracking
+  security
 
 Sections to add:
 
