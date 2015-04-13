@@ -70,6 +70,7 @@ def create_index(request, pk=None, slug=None):
         context = {
             'form': form,
             'bugs': bugs,
+            'bugset': s,
         }
 
         return render(request, 'edit_index.html', context)
