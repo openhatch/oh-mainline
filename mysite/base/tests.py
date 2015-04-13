@@ -597,25 +597,32 @@ class GoogleApiTests(unittest.TestCase):
 
 
 # Test cases for robots generation
-class RenderRobotsTest(django.test.TestCase):
-    def test_robots_with_debug_true(self):
-        '''Set DEBUG to True in settings.py and verify that robots.txt contains
-         text identical to that seen in render_robots_for_dev_env.txt
-        '''
-        mysite.settings.DEBUG = True
-        response = self.client.get('/robots.txt')
-        robots_text = ""
-        with open('mysite/base/templates/robots_for_dev_env.txt') as f:
-            robots_text += f.read()
-        self.assertEqual(response.content, robots_text)
-        
+class RenderLiveRobotsTest(django.test.TestCase):
     def test_robots_with_debug_false(self):
-        '''Set DEBUG to False in settings.py and verify that robots.txt contains
-         text identical to that seen in render_robots_live_site.txt
+        '''DEBUG is set to False by default, verify that robots.txt returns
+        render_robots_live_site.txt
         '''
-        mysite.settings.DEBUG = False
         response = self.client.get('/robots.txt')
         robots_text = ""
         with open('mysite/base/templates/robots_for_live_site.txt') as f:
             robots_text += f.read()
         self.assertEqual(response.content, robots_text)
+
+class RenderDevRobotsTest(django.test.TestCase):
+    def setUp(self):
+        self.original_value = settings.DEBUG
+        settings.DEBUG = True
+
+    def test_robots_with_debug_true(self):
+        '''Set DEBUG to True in settings.py and verify that robots.txt contains
+         text identical to that seen in render_robots_for_dev_env.txt
+        '''
+        response = self.client.get('/robots.txt')
+        robots_text = ""
+        with open('mysite/base/templates/robots_for_dev_env.txt') as f:
+            robots_text += f.read()
+        settings.DEBUG = False
+        self.assertEqual(response.content, robots_text)
+
+    def tearDown(self):
+        settings.DEBUG = self.original_value
