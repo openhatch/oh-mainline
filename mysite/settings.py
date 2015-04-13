@@ -55,6 +55,7 @@ DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
 MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY
 
 # Now, actual settings
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
