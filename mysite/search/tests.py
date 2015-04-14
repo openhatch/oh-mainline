@@ -873,7 +873,7 @@ class QueryContributionType(SearchTest):
         starting_query = mysite.search.view_helpers.Query.create_from_GET_data(
             GET_data)
         self.assert_(
-            u'contribution type' in dict(starting_query.get_possible_facets()))
+            u'contribution_type' in dict(starting_query.get_possible_facets()))
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}
