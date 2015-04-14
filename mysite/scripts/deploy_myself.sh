@@ -42,6 +42,11 @@ function update_database() {
 function notify_web_server() {
     ### Update the WSGI file so that Apache reloads the app.
     touch mysite/scripts/app.wsgi
+
+    ### Actually restart uwsgi since this doesn't seem to work.
+    ###
+    ### I hope the switch to Heroku makes this go away.
+    SUDO_ASKPASS=/bin/true sudo -A /etc/init.d/uwsgi restart || true
 }
 
 function notify_github() {
