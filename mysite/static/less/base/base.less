@@ -46,7 +46,9 @@
     padding-right: @padding;
     width: @parent-width - @padding * 2;
 }
-    
+
+@footer-height: 250px;
+
 /* CSSTODO -- do we use these actually?*/
 .enormous {
     font-size: 3em;
@@ -83,8 +85,18 @@
 .centered { margin: 0 auto; }
 
 /* styles */
+html { 
+    position: relative; min-height: 100%;
+}
 
-body { font: @normal-size Tuffy, Helvetica, sans-serif; background: @lightest-grey url('/static/images/light-hatch.png') repeat; color: @default-text-color; width: 100%; .centered; padding: 0; }
+body {
+    font: @normal-size Tuffy, Helvetica, sans-serif;
+    background: @lightest-grey url('/static/images/light-hatch.png') repeat; color: @default-text-color;
+    width: 100%;
+    .centered;
+    padding: 0;
+    margin-bottom: @footer-height;
+}
 
 code {
     overflow-x: auto;
@@ -223,14 +235,21 @@ ul#links { margin-left: 20px; }
 
 #content { padding: 10px 0 30px 0; clear: both; .width-and-padding(@total-width, @standard-padding); }
 
-#footer-wrapper { width: 100%; clear: both; padding-top: 40px;}
+#footer-wrapper {
+    width: 100%;
+    clear: both;
+    padding-top: 40px;
+    position: absolute;
+    bottom: 0;
+}
 
-#footer { 
-    width: 100%;  
-    bottom: 0; 
-    padding: 10px 0px; 
-    text-align: right; 
-    .centered; 
+#footer {
+    width: 100%;
+    height: @footer-height;
+    bottom: 0;
+    padding: 10px 0px;
+    text-align: right;
+    .centered;
     .nav-bg;
 
     ul { display: inline; list-style-type: none; max-width: 108em; padding: 0 20px; }
