@@ -48,16 +48,15 @@ To see the changes rendered locally, you can run the render_docs.py script found
 
   python tools/render_docs.py
 
-(If you've create a new file or edited/deleted a "toctree", you may get an error "WARNING: document isn't included in any toctree".  This means 
-a file is not referenced by a table of contents anywhere.  Consider adding it to one.  See `Sphinx guide <http://sphinx-doc.org/markup/toctree.html>`_ 
-for reference.)
-
 You will find the documentation rendered into html format inside the docs/html folder of the oh-mainline repository.  You can view it in your 
 browser and check that you like your changes before submitting them.  (Again, see `Git Basics <https://openhatch.org/wiki/Git_Basics>`_ for 
 help submitting your changes.)
 
 Once you submit your changes as a pull request and they have been merged by a maintainer, they will appear in the openhatch/oh-mainline repository.  
 The openhatch.readthedocs.org/ files will update automatically via a github web hook.
+
+.. note:: If you've create a new file or edited/deleted a "toctree", you may get an error "WARNING: document isn't included in any toctree".  This means 
+            a file is not referenced by a table of contents anywhere.  Consider adding it to one.  See `Sphinx guide <http://sphinx-doc.org/markup/toctree.html>`_ or reference.)
 
 Making changes to documentation via readthedocs/Github editor
 -------------------------------------------------------------
