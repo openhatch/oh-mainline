@@ -30,16 +30,37 @@ cd "$PREFIX"
 
 ## Create a path to store the JSON in
 TEMPFILE="$(mktemp --suffix -snapshot.json.gz)"
+TEMPDB="$(mktemp --suffix -snapshot.db)"
+SNAPSHOT_SETTINGS_PATH="$(mktemp --suffix -snapshot_settings.py)"
 
 ## Do the slooow thing of snapshotting the database
 ./manage.py snapshot_public_data | gzip > "$TEMPFILE"
 
+## Create a new settings to specify the name of the temporary snapshot db
+echo "from mysite.settings import *; DATABASES = {
+    'default': {
+        'NAME': os.path.join(MEDIA_ROOT_BEFORE_STATIC, "$TEMPDB"),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'CHARSET': 'utf8',
+    },
+}" > "$SNAPSHOT_SETTINGS_PATH"
+
+# Load in the snapshot data, which automagically generates the temporary db in root directory
+echo "TEMPFILE VARIABLE: " $TEMPFILE
+./manage.py syncdb --noinput --migrate --settings="$SNAPSHOT_SETTINGS_PATH"
+./manage.py migrate --settings="$SNAPSHOT_SETTINGS_PATH"
+./manage.py loaddata "$TEMPFILE" --settings="$SNAPSHOT_SETTINGS_PATH"
+
 # Set the permissions so that, after the file gets pushed to the web,
 # the web server permits people to download these snapshots.
 chmod 644 "$TEMPFILE"
+chmod 644 "$TEMPDIR"
 
-## push this somewhere so that we save it
+## push this somewhere so that we save it. Do the same thing for the db file.
 rsync -q "$TEMPFILE" inside@"$HOST":/var/web/inside.openhatch.org/snapshots/$(date -I).json.gz
+rsync -q "$TEMPDB" inside@"$HOST":/var/web/inside.openhatch.org/snapshots/$(date -I).db
 
-## finally, delete the local temporary file.
+## finally, delete the local temporary file, the local temporary db, and the local snapshot settings
 rm "$TEMPFILE"
+rm "$TEMPDB"
+rm "$SNAPSHOT_SETTINGS_PATH"
