@@ -109,16 +109,21 @@ Getting unstuck
 Doing searches:
 ~~~~~~~~~~~~~~~
 
-When doing searches for particular keywords in the Github repository, the "vendor" directory will most likely return lots of hits, making your search more difficult.  
+When doing searches for particular keywords in the GitHub repository, the "vendor" directory will most likely return lots of hits, making your search more difficult.  
 
-Github provides a little known method for excluding specific directories from the search. In the Search textfield, enter:
+GitHub provides a little known method for excluding specific directories from the search. In the Search textfield, enter:
 
-$serch_term -path:vendor
+    .. code-block:: rest
+
+        YOUR_SEARCH_WORD -path:vendor
 
 The -path:vendor parameter will exclude the vendor directory from your search and will maximize the probability of getting meaningful hits.
 
-It is also possible to do a search locally from the command line, by going to your /mysite directory and using 
-git grep $search_term
+It is also possible to do a search locally from the command line, by going to the mysite/ directory and using: 
+    
+    .. code-block:: rest
+
+        git grep YOUR_SEARCH_WORD
 
 That will limit the search to your local code.
 
