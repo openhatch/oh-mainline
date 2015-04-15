@@ -80,7 +80,7 @@ class EditInfoForm(django.forms.Form):
         widget=django.forms.TextInput(
             attrs=
                 {
-                    'placeholder':'ArcTanSusan',
+                    'placeholder':'your_irc_nick',
                     'size':'40',
                 }
         )
