@@ -34,6 +34,7 @@ Create Bug Set
     <form action="{{ request.get_full_path }}" method="post">
       {% csrf_token %}
       {{ form.as_p }}
+      <a href="{% url "mysite.bugsets.views.list_index" bugset.id bugset.name %}">View Live Bugset</a>
       <div id="button-container">
         <input type="submit" value="OK">
       </div>
