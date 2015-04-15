@@ -101,3 +101,24 @@ great time to ask for help or recommendations on issues to work on.
 
 
 .. _here: https://github.com/openhatch/oh-mainline/issues
+
+
+Getting unstuck
+===============
+
+Doing searches:
+~~~~~~~~~~~~~~~
+
+When doing searches for particular keywords in the Github repository, the "vendor" directory will most likely return lots of hits, making your search more difficult.  
+
+Github provides a little known method for excluding specific directories from the search. In the Search textfield, enter:
+
+$serch_term -path:vendor
+
+The -path:vendor parameter will exclude the vendor directory from your search and will maximize the probability of getting meaningful hits.
+
+It is also possible to do a search locally from the command line, by going to your /mysite directory and using 
+git grep $search_term
+
+That will limit the search to your local code.
+
