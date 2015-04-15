@@ -439,8 +439,6 @@ urlpatterns = patterns('',
                        # Get a list of suggestions for the search input,
                        # formatted the way that the jQuery autocomplete plugin
                        # wants it.
-                       (r'^search/get_suggestions$',
-                        'mysite.search.views.request_jquery_autocompletion_suggestions'),
 
                        (r'^profile/views/gimme_json_for_portfolio$',
                         'mysite.profile.views.gimme_json_for_portfolio'),
