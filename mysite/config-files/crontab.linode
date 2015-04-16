@@ -10,6 +10,7 @@
 MAILTO=asheesh@asheesh.org
 
 @daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./manage.py profile_daily_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+@daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./manage.py clearsessions
 @hourly cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./manage.py profile_hourly_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
 */10 * * * * cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./manage.py profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning | grep -v 'import '
 
