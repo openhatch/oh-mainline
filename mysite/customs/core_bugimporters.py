@@ -51,8 +51,7 @@ def import_one_bug_item(d):
             ('_project_name' in d) and
             d.get('last_polled', None)):
         logger.error(
-            "Your data needs a _tracker_name and _project_name and " +
-            "a last_polled.")
+            "Data needs a _tracker_name and _project_name and last_polled.")
         logger.error(repr(d))
         return
 
@@ -116,13 +115,11 @@ class AddTrackerForeignKeysToBugs(object):
         bug_urls = [bug_url for (bug_url, bug_data) in list_of_url_data_pairs]
         # Fetch a list of all Bugs that are stale.
         bugs = Bug.all_bugs.filter(canonical_bug_link__in=bug_urls)
-        tms = mysite.customs.models.TrackerModel.objects.all(
-        ).select_subclasses()
+        tms = mysite.customs.models.TrackerModel.objects.all().select_subclasses()
         # For each TrackerModel, process its stale Bugs.
         bugs_to_retry = []
         for bug in bugs:
-            tms_shortlist = [
-                tm for tm in tms if tm.get_base_url() in bug.canonical_bug_link]
+            tms_shortlist = [tm for tm in tms if tm.get_base_url() in bug.canonical_bug_link]
             # Check that we actually got something back, otherwise bug.tracker would get
             # set to None, and self.rm.update_bugs would send it right back here, causing
             # infinite recursion.
