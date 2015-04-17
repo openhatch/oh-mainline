@@ -606,12 +606,12 @@ class GoogleApiTests(unittest.TestCase):
 # Test cases for robots generation
 class RenderLiveRobotsTest(django.test.TestCase):
     def test_robots_with_debug_false(self):
-        '''DEBUG is set to False by default, verify that robots.txt returns
-        render_robots_live_site.txt
+        '''Verify that robots.txt returns render_robots_live_site.txt with
+        DEBUG set to False
         '''
         response = self.client.get('/robots.txt')
         robots_text = ""
-        with open('mysite/base/templates/robots_for_live_site.txt') as f:
+        with open('mysite/base/templates/robots_for_live_site.txt', 'rU') as f:
             robots_text += f.read()
         self.assertEqual(response.content, robots_text)
 
@@ -621,12 +621,12 @@ class RenderDevRobotsTest(django.test.TestCase):
         settings.DEBUG = True
 
     def test_robots_with_debug_true(self):
-        '''Set DEBUG to True in settings.py and verify that robots.txt contains
-         text identical to that seen in render_robots_for_dev_env.txt
+        '''Verify that robots.txt contains text identical to that seen in
+         render_robots_for_dev_env.txt with DEBUG set to True
         '''
         response = self.client.get('/robots.txt')
         robots_text = ""
-        with open('mysite/base/templates/robots_for_dev_env.txt') as f:
+        with open('mysite/base/templates/robots_for_dev_env.txt', 'rU') as f:
             robots_text += f.read()
         settings.DEBUG = False
         self.assertEqual(response.content, robots_text)
