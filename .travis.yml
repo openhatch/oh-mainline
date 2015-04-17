@@ -8,10 +8,6 @@ env:
 services:
   - mysql
 
-matrix:
-  allow_failures:
-    - env: USE_MYSQL=true
-
 install:
 # Install coveralls to test code coverage
  - sudo pip install coveralls
