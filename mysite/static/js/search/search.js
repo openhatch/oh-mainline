@@ -62,7 +62,12 @@ SearchResults.bindEventHandlers = function () {
             $('#results li').removeClass('expanded');
             return false;
             });
+    console.log("Chums");
 
 }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
+
+$(document).ready(function() {
+    console.log("Chums");
+});

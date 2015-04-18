@@ -297,8 +297,9 @@ Volunteer opportunities in free and open source software
                 $.jGrowl(definition, { life: 100000 });
                 });
 
-            $(SearchResults.bindEventHandlers);
+            $(SearchResults.bindEventHandlers());
 
             });
 </script>
+<script src='static/js/search/apiWrapper.js' type='text/javascript'/>
 {% endblock js %}
