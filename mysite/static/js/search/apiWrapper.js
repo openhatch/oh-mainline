@@ -19,5 +19,6 @@ GithubWrapper.prototype = new APIWrapper();
 
 //Attach listeners to button
 $('.project_data_button').click(function() {
-	alert("hey");
+	console.log(this);
+	alert(this);
 });

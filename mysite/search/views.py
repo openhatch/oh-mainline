@@ -180,7 +180,6 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
         data['total_bug_count'] = total_bug_count
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.view_helpers.get_project_count()
-        print data 
 
         return mysite.base.decorators.as_view(request, 'search/search.html', data, slug=None)
 
