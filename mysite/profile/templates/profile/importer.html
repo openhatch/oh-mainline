@@ -110,17 +110,27 @@ var want_importer = true;
     $(function() {
         $("#progressbar").progressbar(); 
         AutoSaucepan.init();
+        var jactive1=false;
         $('.explain_citations').live('click', function () {
-            $.jGrowl("<strong style='color: yellow;'>Web pages that talk about your involvement</strong><p> Your involvement could include patches, translations, design ideas, leadership roles, or any other kind of contribution. Some things you could link to: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>bug report</li> <li>archived post to a mailing list</li> <li>staff page</li> <li>WebSVN</li> </ul></p> <p style='margin-bottom: 0'>(Cue some tactical Googling!)</p>", {'life': 14000});
-            return false;
+            if(!jactive1){
+                jactive1=true;
+            $.jGrowl("<strong style='color: yellow;'>Web pages that talk about your involvement</strong><p> Your involvement could include patches, translations, design ideas, leadership roles, or any other kind of contribution. Some things you could link to: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>bug report</li> <li>archived post to a mailing list</li> <li>staff page</li> <li>WebSVN</li> </ul></p> <p style='margin-bottom: 0'>(Cue some tactical Googling!)</p>", {'life': 14000,'close':function(){
+                    jactive1=false;
+                }});
+            return false;}
         });
+        var jactive2=false;
         $('.explain_maintainer_updates').live('click', function () {
-            $.jGrowl("<strong style='color: yellow;'>Maintainer updates</strong><p>Check this box to receive updates geared towards project maintainers, including: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>new contributors</li> <li>people who click the 'I want to help' button</li> </ul></p>", {'life': 14000});
-            return false;
+            if(!jactive2){
+                jactive2=true;
+            $.jGrowl("<strong style='color: yellow;'>Maintainer updates</strong><p>Check this box to receive updates geared towards project maintainers, including: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>new contributors</li> <li>people who click the 'I want to help' button</li> </ul></p>", {'life': 14000,
+                'close':function(){
+                    jactive2=false;
+                }});
+            return false;}
         });
     });
 </script>
-
 
 {% if test_js %}<script type='text/javascript'>testJS = true;</script>{% endif %}
 {% endblock js %}

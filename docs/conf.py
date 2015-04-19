@@ -33,3 +33,5 @@ html_theme = 'default'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'OpenHatchdoc'
 
+# Stop converting quotes and dashes to typographically correct entities. Useful for placing code into notes, ie.
+html_use_smartypants = False

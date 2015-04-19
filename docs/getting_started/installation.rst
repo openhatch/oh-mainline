@@ -126,16 +126,14 @@ Run this command to create the database and add tables for our dependencies::
   python manage.py syncdb --migrate --noinput
 
 
-(We have to pass "--noinput" to request that Django not ask you
-questions. This is due to a bad interaction between Django's superuser
-creation system and our custom profiles.)
-
-(--migrate creates an empty database, with zero users and zero
-projects, ready for you to fill with data as you use your local
-version of the site. If you want your site to have a database filled
-with data like what is on the main OpenHatch.org site, you can import
-a data snapshot. See `Importing data snapshots`_ for more info about
-that.)
+.. note:: We have to pass `--noinput` to request that Django not ask you
+          questions. This is due to a bad interaction between Django's superuser
+          creation system and our custom profiles. `--migrate` creates an empty
+          database, with zero users and zero projects, ready for you to fill with data 
+          as you use your local version of the site. If you want your site to have a database filled
+          with data like what is on the main OpenHatch.org site, you can import
+          a data snapshot. See `Importing data snapshots`_ for more info about
+          that.)
 
 This will print out *lots* of text. Once all of the text is printed, you
 should see something like the output listed in `Output Samples`_ below.

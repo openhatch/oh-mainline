@@ -216,29 +216,6 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     return HttpResponse(json_string_with_callback)
 
 
-def request_jquery_autocompletion_suggestions(request):
-    """
-    Wraps get_autocompletion_suggestions and
-    list_to_jquery_autocompletion_format in an
-    HttpRequest -> HttpResponse loop.
-    Validates GET parameters. Expected:
-        ?q=[suggestion fodder]
-    If q is absent or empty, this function
-    returns an HttpResponseServerError.
-    """
-    partial_query = request.GET.get('q', None)
-    if (partial_query is None) or (partial_query == ''):
-        return HttpResponseServerError("Need partial_query in GET")
-
-    # jQuery autocomplete also gives us this variable:
-    # timestamp = request.GET.get('timestamp', None)
-
-    suggestions_list = get_autocompletion_suggestions(partial_query)
-    suggestions_string = list_to_jquery_autocompletion_format(
-        suggestions_list)
-    return HttpResponse(suggestions_string)
-
-
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
     jQuery's autocomplete plugin."""
@@ -254,87 +231,6 @@ class SearchableField:
         self.prefix = _prefix
         self.is_queried = False
         self.fields_by_prefix[self.prefix] = self
-
-
-def get_autocompletion_suggestions(input):
-    """
-    This method returns a list of suggested queries.
-    It checks the query substring against a number of
-    fields in the database:
-      - project.display_name
-      - project.language
-
-    Not yet implemented:
-      - libraries (frameworks? toolkits?) like Django
-      - search by date
-    """
-    sf_project = SearchableField('project')
-    sf_language = SearchableField('lang')
-    sf_dependency = SearchableField('dep')
-    sf_library = SearchableField('lib')
-    sf_date_before = SearchableField('before')
-    sf_date_after = SearchableField('after')
-
-    separator = ":"
-    prefix = ''
-    partial_query = ''
-
-    if separator in input[1:-1]:
-        prefix = input.split(separator)[0]
-        partial_query = input.split(separator)[1]
-        sf = SearchableField.fields_by_prefix.get(prefix, None)
-        if sf is not None:
-            sf.is_queried = True
-            # FIXME: What happens when
-            # the user enters a bad prefix?
-    else:
-        for p in SearchableField.fields_by_prefix:
-            SearchableField.fields_by_prefix[
-                p].is_queried = True
-        partial_query = input
-
-    project_max = 5
-    lang_max = 5
-
-    suggestions = []
-
-    if sf_project.is_queried:
-
-        # Compile list of projects
-        # XXX: This searches on display_name, as that is what the user is more
-        # likely to be trying to type. And also because it is display_name that
-        # search uses to query projects.
-        projects_by_name = Project.objects.filter(
-            display_name__istartswith=partial_query)
-        # FIXME: Is __istartswith faster than
-        # lowercasing and using startswith?
-
-        # Produce a list of names like ['Exaile', 'GNOME-DO', ...]
-        project_names = projects_by_name.values_list('display_name', flat=True)
-
-        # Limit
-        project_names = project_names[:project_max]
-
-        suggestions += [sf_project.prefix + separator + name
-                        for name in project_names]
-
-    if sf_language.is_queried:
-
-        # For languages, get projects first
-        projects_by_lang = Project.objects.filter(
-            language__istartswith=partial_query)
-
-        # Then use bugs to compile a list of languages.
-        langs = projects_by_lang.values_list(
-            'language', flat=True).order_by(
-            'language')[:lang_max]
-
-        if langs:
-
-            suggestions += [sf_language.prefix + separator + lang
-                            for lang in langs]
-
-    return suggestions
 
 
 def subscribe_to_bug_alert_do(request):
