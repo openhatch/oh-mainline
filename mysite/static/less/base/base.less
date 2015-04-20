@@ -48,6 +48,7 @@
 }
 
 @footer-height: 250px;
+@footer-padding: 40px;
 
 /* CSSTODO -- do we use these actually?*/
 .enormous {
@@ -95,7 +96,7 @@ body {
     width: 100%;
     .centered;
     padding: 0;
-    margin-bottom: @footer-height;
+    margin-bottom: @footer-height + @footer-padding;
 }
 
 code {
@@ -139,7 +140,16 @@ abbr.foss { border: 0; font-variant: small-caps;}
 
 h1 a, h1 a:hover { text-decoration: none; }
 
-#container { width: @total-width; padding-bottom: 30px; .centered;}
+#container {
+    width: @total-width;
+    padding-bottom: 30px;
+    &::after {
+        content: ' ';
+        clear: both;
+        display: block;
+    }
+    .centered;
+}
 
 .module { 
     width: 100%; 
@@ -238,7 +248,9 @@ ul#links { margin-left: 20px; }
 #footer-wrapper {
     width: 100%;
     clear: both;
-    padding-top: 40px;
+    padding-top: @footer-padding;
+    position: absolute;
+    bottom: 0;
 }
 
 #footer {
