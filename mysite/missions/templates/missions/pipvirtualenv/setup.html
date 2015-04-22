@@ -58,8 +58,9 @@
     command-line) after restarting the terminal, the shell replies with
     <q>command not found</q> or something similar.</p>
 
-    <p>If this is the case, the following command should fix it:</p>
-    <pre>source ~/.bash_profile</pre>
+    <p>If this is the case, the following commands should fix it:</p>
+    <pre>echo source "${HOME}/.pip_bootstrap_profile.sh" >> ~/.bashrc</pre>
+    <pre>source ~/.bashrc</pre>
 
     <h3>Mac OS X</h3>
     <p>Before you can work with pip and virtualenvs, you'll need to check if
