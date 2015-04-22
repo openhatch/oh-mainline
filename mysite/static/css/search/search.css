@@ -87,6 +87,8 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .project_data img { vertical-align: middle; opacity: 0.5; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */  }
         body#search #results li .below_the_fold { color: #555; display: none; }
         body#search #results li .below_the_fold a {font-size: .9em; display: block; margin-top: 1em;}
+        body#search #results li .below_the_fold button {background:none!important; border:none; padding:0!important; font: inherit; color: #ff6d3d; cursor: pointer; outline: none;}
+        body#search #results li .below_the_fold button:hover {border-bottom:1px solid #ff6d3d;}
         body#search #results li .helpers { font-size: .8em; margin-top: 5px; }
         body#search #results li .helpers a { color: #ffa588; white-space: pre-wrap;}
         body#search #results li .helpers .no_mentors { color: #555;  }

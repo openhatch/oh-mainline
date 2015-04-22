@@ -1,24 +1,55 @@
 //API Wrapper for Client
-var APIWrapper = function(id) {
-	this.id = id;
+var APIWrapper = function(id, link) {
+	this._id = Number(id);
+	this.link = link;
 };
 
 APIWrapper.prototype.toString = function() {
-	return this.id;
+	return this._id;
 };
 
 //Github Wrapper
-var GithubWrapper = function(id) {
-	APIWrapper.call(id);
+var GithubWrapper = function(id, link) {
+	APIWrapper.call(this, id, link);
+
+	var linkArray = link.split("/");
+
+	this.endpoint = 'https://api.github.com/repos/';
+	this.user = linkArray[3];
+	this.repo = linkArray[4];
+	this.issue = linkArray[6];
+
+	this.executeAPI = function(cb) {
+		var URL = this.endpoint+this.user+"/"+this.repo;
+		$.get(URL, function(data){
+			cb(data);
+		});
+	};
 };
 
 GithubWrapper.prototype = new APIWrapper();
 
+//ID-Api Mapping
+var mapping = {
+	89: GithubWrapper
+};
 
-
+//Function to create APIWrapper
+var createAPIWrapper = function(tracker_type, link) {
+	var currentWrapper = new mapping[tracker_type](tracker_type, link);
+	currentWrapper.executeAPI(function(data) {
+		console.log(data);
+	});
+};
 
 //Attach listeners to button
 $('.project_data_button').click(function() {
-	console.log(this);
-	alert(this);
+	var tracker_type = $(this).data("tracker");
+	var	link = $(this).data("link");
+	if (mapping.hasOwnProperty(tracker_type)) {
+		createAPIWrapper(tracker_type, link);
+	}
+	else {
+		console.log("Tracker_type not in mapping yet");
+	}
 });
