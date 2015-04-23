@@ -5,20 +5,20 @@ Documentation: Adding a User and Project
 Adding a User
 =============
 
-OpenHatch community welcomes its users to initiate an active participation in various 
-activities such as contributing to a project, Finding a bug and Adding your own Project.
+OpenHatch community welcomes its users to actively participate in various 
+activities such as contributing to a project, finding a bug and adding your own project.
 
 In order to do so you have to add yourself as a user.
-The basic steps that you will require to add yourself as a User are:
+The basic steps that are required to add yourself as a User are:
 
-- Log on to OpenHatch website: http://openhatch.org/
+- Go to the OpenHatch website: http://openhatch.org/
 - On the Front page you will see a log in/sign up link in the menu.
-- Click on the link. You will be directed to a login page.
-- OpenHatch saves your time by allowing you to use your existing 
-  account from any one of the networking sites.
-- Choose an account from which you want to sign up.
-- Once the verification process is done for a valid account you are redirected to register page. 
-  Type in your username and click on ok.
+- Click on the link. You will be redirected to a login page.
+- OpenHatch saves you time by allowing you to use your existing 
+  account from one of many networking sites.
+- Choose the account that you want to sign up with or click "Sign up without OpenID" on the right hand side.
+- Once the verification process is complete you will be redirected to the registration page. 
+- Type in your username and click on ok.
  
 Adding your Project
 ===================
