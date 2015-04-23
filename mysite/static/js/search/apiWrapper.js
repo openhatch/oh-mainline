@@ -13,17 +13,22 @@ var GithubWrapper = function(id, link) {
 	APIWrapper.call(this, id, link);
 
 	var linkArray = link.split("/");
+	var _this = this;
 
 	this.endpoint = 'https://api.github.com/repos/';
 	this.user = linkArray[3];
 	this.repo = linkArray[4];
 	this.issue = linkArray[6];
 
-	this.executeAPI = function(cb) {
+	this.executeAPI = function() {
 		var URL = this.endpoint+this.user+"/"+this.repo;
 		$.get(URL, function(data){
-			cb(data);
+			_this.populateModal(data);
 		});
+	};
+
+	this.populateModal = function(data) {
+		$("#projectModal").dialog("open");
 	};
 };
 
@@ -34,15 +39,10 @@ var mapping = {
 	89: GithubWrapper
 };
 
-//Use data to populate modal
-var populateModal = function(data) {
-	$("#projectModal").dialog("open");
-};
-
 //Function to create APIWrapper
 var createAPIWrapper = function(tracker_type, link) {
 	var currentWrapper = new mapping[tracker_type](tracker_type, link);
-	currentWrapper.executeAPI(populateModal);
+	currentWrapper.executeAPI();
 };
 
 $(function() {
