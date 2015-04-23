@@ -5,7 +5,7 @@ Documentation: Adding a User and Project
 Adding a User
 =============
 
-the OpenHatch community welcomes its users to actively participate in various 
+The OpenHatch community welcomes its users to actively participate in various 
 activities such as contributing to a project, finding a bug and adding your own project.
 
 In order to do so you have to sign up for a user account.
