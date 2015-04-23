@@ -5,7 +5,7 @@ Documentation: Adding a User and Project
 Adding a User
 =============
 
-The OpenHatch community welcomes its users to actively participate in various 
+the OpenHatch community welcomes its users to actively participate in various 
 activities such as contributing to a project, finding a bug and adding your own project.
 
 In order to do so you have to sign up for a user account.
@@ -36,23 +36,24 @@ you can do so by following these simple steps:
   Click on 'Add a project' in the 'Manage projects' section.
 - A form will be displayed then fill it out as follows:
 
-  Type a project name: A suitable name for your project.
+  Type a project name: 
+    - A suitable name for your project.
   
-  Describe this project: A short description about your project.
+  Describe this project: 
+    - A short description about your project.
   
-  Check the 'receive maintainer updates' Box if you want to receive updates 
-  geared towards project maintainers, including:
-   -	new contributors
-   -	people who click the 'I want to help' button
-   
-  Describe your involvement: Your involvement could include patches, translations, design ideas,
-   leadership roles, or any other kind of contribution.
+  Check the 'receive maintainer updates' Box if you want to receive updates geared towards project maintainers, including:
+    - New contributors
+    - People who click the 'I want to help' button
+ 
+  Describe your involvement: 
+    - Your involvement could include patches, translations, design ideas, leadership roles, or any other kind of contribution.
   
   Some things you could link to: 
-   - bug report
-   - archived post to a mailing list
-   - staff page
-   - WebSVN
+    - bug report
+    - archived post to a mailing list
+    - staff page
+    - WebSVN
 
 - Once you are done, click on 'Save and Publish'.
 
