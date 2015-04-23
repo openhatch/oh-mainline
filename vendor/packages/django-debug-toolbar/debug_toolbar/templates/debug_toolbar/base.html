@@ -7,6 +7,7 @@
 <!-- Prevent our copy of jQuery from registering as an AMD module on sites that use RequireJS. -->
 <script>var _djdt_define_backup = window.define; window.define = undefined;</script>
 <script src="{{ toolbar.config.JQUERY_URL }}"></script>
+<script src="{{ toolbar.config.JQUERY_UI_URL }}"></script>
 <script>var djdt = {jQuery: jQuery.noConflict(true)}; window.define = _djdt_define_backup;</script>
 {% else %}
 <script>var djdt = {jQuery: jQuery};</script>
