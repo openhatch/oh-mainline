@@ -53,7 +53,7 @@ you can do so by following these simple steps:
     - bug report
     - archived post to a mailing list
     - staff page
-    - WebSVN
+    - source code repository 
 
 - Once you are done, click on 'Save and Publish'.
 
