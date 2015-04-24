@@ -6,7 +6,7 @@ Yay! Its great that you want to contribute to the OpenHatch.org website. We look
 OpenHatch.org has created good documentation for anyone who may want to hack on the website and to help new developers get up to speed. This contributor's guide is available [Here](https://openhatch.readthedocs.org/en/latest)
 
 ## Pull Requests
-How we handle code contributions is well explained in this [this](https://openhatch.readthedocs.org/en/latest/getting_started/handling_contributions.html) page. The steps to be followed by both Contributors and Reviewers are nicely documented.
+How we handle code contributions is well explained in [this](https://openhatch.readthedocs.org/en/latest/getting_started/handling_contributions.html) page. The steps to be followed by both Contributors and Reviewers are nicely documented.
 
 ## Feature Requests And Bug Reports
 All feature requests and bug reports are created as new issues on the [issue tracker](https://github.com/openhatch/oh-mainline/issues). Before creating a new issue, please consider reading through the list of open issues to be sure they haven't already been raised. In case you find that one has already been raised, feel free to add a comment to it.
@@ -14,7 +14,7 @@ All feature requests and bug reports are created as new issues on the [issue tra
 ### Creating Bug Reports
 You've found an error on the site? The community is here to help. Go ahead and create a new bug report if it there isn't one for it already. We'd love it if you would also:
 
- - Label the issue with priority <b>pri:bug</b> (see the section on [Issue Labels]())
+ - Label the issue with priority <b>pri:bug</b> (see the section on [Issue Labels]()) or mention it as a bug in the issue comments.
  - Add a screenshot of your browser
  - Tell us what web browser you were using  and the version of the browser (You would find this under the "About" section of your browser's Help e.g. Help->About Firefox)
  - Tell us what OS you're using
@@ -27,7 +27,7 @@ If there's a feature you'd like to see in the [OpenHatch.org](https://openhatch.
 
  - Click on the [New Issue button](https://github.com/openhatch/oh-mainline/issues/new)
  - Detail the feature in the new issue
- - Label the issue with priority a <b>pri:feature</b>  
+ - Label the issue with priority a <b>pri:feature</b> (or mention that it is a feature request in the issue comments).
 
 The community will work and take things forward.
 
