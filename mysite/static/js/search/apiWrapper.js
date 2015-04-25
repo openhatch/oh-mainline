@@ -1,4 +1,4 @@
-//API Wrapper for Client
+//Parent API Wrapper for Client
 var APIWrapper = function(id, link) {
 	this._id = Number(id);
 	this.link = link;
@@ -28,6 +28,7 @@ var GithubWrapper = function(id, link) {
 	};
 
 	this.populateModal = function(data) {
+		$("#projectModal").attr('title', this.repo);
 		$("#projectModal").dialog("open");
 	};
 };
@@ -46,13 +47,20 @@ var createAPIWrapper = function(tracker_type, link) {
 };
 
 $(function() {
-	//Don't open project modal right away
+	//Define Project Modal
 	$("#projectModal").dialog({
 		autoOpen: false,
 		modal: true,
+		zIndex: 9999,
 		open: function(){
-            jQuery('.ui-widget-overlay').bind('click',function(){
-                jQuery('#projectModal').dialog('close');
+			$(".ui-widget-overlay").css({
+            	opacity: .3,
+            	filter: "Alpha(Opacity=30)",
+            	background: "black",
+            	position: "fixed",
+        	});
+            $('.ui-widget-overlay').bind('click',function(){
+                $('#projectModal').dialog('close');
             });
         }
 	});
@@ -68,4 +76,9 @@ $(function() {
 			console.log("Tracker_type not in mapping yet");
 		}
 	});
+});
+
+//When window resizes, keep modal in the middle
+$(window).resize(function() {
+    $("#projectModal").dialog("option", "position", {my: "center", at: "center", of: window});
 });
