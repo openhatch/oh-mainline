@@ -51,13 +51,11 @@ $(function() {
 	$("#projectModal").dialog({
 		autoOpen: false,
 		modal: true,
-		zIndex: 9999,
 		open: function(){
 			$(".ui-widget-overlay").css({
             	opacity: .3,
             	filter: "Alpha(Opacity=30)",
             	background: "black",
-            	position: "fixed",
         	});
             $('.ui-widget-overlay').bind('click',function(){
                 $('#projectModal').dialog('close');
