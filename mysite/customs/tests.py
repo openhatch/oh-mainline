@@ -55,6 +55,7 @@ from django.utils.unittest import skipIf
 
 import mysite.customs.models
 import mysite.customs.management.commands.customs_daily_tasks
+import mysite.customs.management.commands.import_bugimporter_data
 import mysite.customs.management.commands.snapshot_public_data
 
 logger = logging.getLogger(__name__)
@@ -1160,6 +1161,32 @@ class ImportBugsFromFiles(django.test.TestCase):
         mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
         # but also import no data.
         self.assertFalse(Bug.all_bugs.all())
+
+    @mock.patch('mysite.customs.core_bugimporters.import_one_bug_item')
+    def test_mgmt_command_doesnt_crash_if_import_one_crashes(self, mock_import_one):
+        # This test simulates a situation where import_one_bug_item crashes.
+        #
+        # Given that situation, does the management command called
+        # import_bugimporter_data crash with it? The idea is that it
+        # shouldn't crash.
+        #
+        # Given _that_, the management command calls a helper
+        # function, _import_one(), which calls import_one_bug_item()
+        # but logs exceptions rather than crashing outright.  This
+        # allows the nightly bug crawl to mostly work even in the face
+        # of crashy code or crazy inputs.
+
+        # Rig up the import_one_bug_item to crash.
+        mock_import_one.side_effect = Exception("Sample error from test suite.")
+
+        # Call the handler from the management command, and make sure
+        # that it doesn't actually crash.
+        #
+        # (You'll see some logging.error() stuff printed out on the
+        # command line when running the tests; that's not a big deal.)
+        mysite.customs.management.commands.import_bugimporter_data._import_one(
+            {}  # dummy input
+        )
 
     def test_import_bails_if_missing_last_polled(self):
         # If the sample data contains exactly one item,
