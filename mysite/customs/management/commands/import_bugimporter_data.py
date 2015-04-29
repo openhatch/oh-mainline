@@ -33,6 +33,18 @@ def jsonlines_decoder(f):
             continue
 
 
+# It may seem a little weird to have this function when
+# import_one_bug_item() exists just fine. See the test called
+# test_mgmt_command_doesnt_crash_if_import_one_crashes() to understand
+# why this function exists.
+def _import_one(bug_dict):
+    try:
+        mysite.customs.core_bugimporters.import_one_bug_item(
+            bug_dict)
+    except Exception:
+        logging.exception("Failed to process one bug_dict %s", bug_dict)
+
+
 class Command(BaseCommand):
     args = '<yaml/json_file yaml/json_file ...>'
     help = "Call this command with YAML/JSON files to load into the Bug table"
@@ -49,5 +61,4 @@ class Command(BaseCommand):
                     s = f.read()
                     bug_dicts = yaml.loads(s)
                 for bug_dict in bug_dicts:
-                    mysite.customs.core_bugimporters.import_one_bug_item(
-                        bug_dict)
+                    _import_one(bug_dict)
