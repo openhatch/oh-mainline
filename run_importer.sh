@@ -42,8 +42,8 @@ function grab_bug_tracker_list() {
     return 0
 }
 
-# It's OK if curl has to try 4 times.
-grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || exit 1
+# It's OK if curl has to try 40 times.
+grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || exit 1
 
 pushd ../oh-bugimporters
 env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FILE"
