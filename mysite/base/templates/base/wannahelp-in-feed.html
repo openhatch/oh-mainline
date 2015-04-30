@@ -27,7 +27,7 @@
 {% cache 86400 recent_activity_wannahelp_v4 answer.pk %}
 <li style='font-size: .9em; float: left; width: 100%;'>
   <a href='{{ person.profile_url }}'>
-    <img style='width: 30px; float: left; margin-right: 10px;' alt="Profile Picture for User" src='{{ feed_item.person.get_photo_thumbnail_30px_wide_url_or_default }}' />
+    <img style='width: 30px; float: left; margin-right: 10px;' alt="Profile Picture for {{ feed_item.person.get_full_name_and_username }}" src='{{ feed_item.person.get_photo_thumbnail_30px_wide_url_or_default }}' />
   </a>
   <div style='float: left; width: 80%;'>
     <span>
