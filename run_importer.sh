@@ -36,14 +36,14 @@ function grab_bug_tracker_list() {
     # is it a "helpful" CloudFlare error message? To do this
     # check, we ask Python to parse this document, and if it
     # bails out, then we also return 1.
-    DJANGO_SETTINGS_MODULE='mysite.settings' python -c "import vendor; vendor.vendorify(); import tastypie.serializers; import yaml; yaml.load(open('$BUG_TRACKER_LIST'), Loader=tastypie.serializers.TastypieLoader)" || return 1
+    DJANGO_SETTINGS_MODULE='mysite.settings' python -c "import vendor; vendor.vendorify(); import tastypie.serializers; import yaml; yaml.load(open('$BUG_TRACKER_LIST'), Loader=tastypie.serializers.TastypieLoader)" || { echo 'sleeping for 20 sec'; sleep 20; return 1}
 
     # Amazing. It is valid YAML. Exit succesfully.
     return 0
 }
 
-# It's OK if curl has to try 4 times.
-grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || exit 1
+# It's OK if curl has to try 40 times.
+grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || grab_bug_tracker_list || exit 1
 
 pushd ../oh-bugimporters
 env/bin/python bugimporters/main.py -i "$BUG_TRACKER_LIST" -o "$SCRAPY_RESULT_FILE"

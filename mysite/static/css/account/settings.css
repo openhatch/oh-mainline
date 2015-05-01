@@ -1,6 +1,6 @@
 body.settings,body.missions .submodule.skinny { padding: 0 ! important; border: 0; background-color: transparent ! important; }
-body.settings,body.missions .submodule.skinny .body { padding: 10px ! important; background-color: transparent ! important; }
-body.settings,body.missions .submodule.skinny ul li { margin-bottom: 10px; font-size: 11pt; }
+body.settings,body.missions .submodule.skinny .body { padding: 0 ! important; background-color: transparent ! important; }
+body.settings,body.missions .submodule.skinny ul li { font-size: 11pt; }
 body.settings,body.missions #main .submodule .body { background-color: #fff; padding: 3% 5%; }
 .default {
     background: #292929;
