@@ -148,3 +148,6 @@ body#bugset_create #button-container {
     display: inline;
     float: right;
 }
+body#landing #subscription-email {
+    display: block;
+}
