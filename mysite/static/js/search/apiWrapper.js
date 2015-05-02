@@ -23,7 +23,7 @@ var GithubWrapper = function(type, id, link) {
 
 	this.executeAPI = function() {
 		var URL = this.endpoint+this.user+"/"+this.repo;
-		$.get(URL, function(data){
+		$.get(URL, function(data) {
 			_this.populateModal(data);
 		});
 	};
@@ -36,7 +36,7 @@ var GithubWrapper = function(type, id, link) {
 		$('#projectModal').dialog('option', 'title', data['name']);
 		var innerDialog = '<p><b>Description:</b> '+description+'</p>'+
 						  '<p><b>Homepage:</b> '+homepage+'</p>'+
-						  '<p><b>Age:</b> '+timeSinceCreation[0]+' years, '+timeSinceCreation[1]+' months, '+timeSinceCreation[2]+' days'+'</p>'+
+						  '<p><b>Project Age:</b> '+timeSinceCreation[0]+' years, '+timeSinceCreation[1]+' months, '+timeSinceCreation[2]+' days'+'</p>'+
 						  '<p><b>Last Updated:</b> '+timeSinceUpdate[0]+' years, '+timeSinceUpdate[1]+' months, '+timeSinceUpdate[2]+' days'+'</p>';
 		$("#projectModal").append(innerDialog);
 		$("#projectModal").dialog("open");
@@ -45,12 +45,41 @@ var GithubWrapper = function(type, id, link) {
 
 GithubWrapper.prototype = new APIWrapper();
 
-//Google Code Wrapper
-var GoogleWrapper = function(type, id, link) {
 
+//Jira Wrapper
+var JiraMifos = function(type, id, link) {
+	APIWrapper.call(this, type, id, link);
+	var _this = this;
+	this.endpoint = 'https://mifosforge.jira.com/rest/api/latest/issue/';
+
+	var linkArray = this._link.split("/");
+	this.issue = linkArray[4];
+
+	this.executeAPI = function() {
+		var URL = this.endpoint+this.issue;
+		$.get(URL, function(data) {
+			_this.executeProjectAPI(data, data['fields']['project']['self']);
+		});
+	};
+
+	this.executeProjectAPI = function(issueData, URL) {
+		$.get(URL, function(data) {
+			_this.populateModal(issueData, data)
+		});
+	};
+
+	this.populateModal = function(issueData, projectData) {
+		var projectName = projectData['name'];
+		$('#projectModal').dialog('option', 'title', projectName);
+		var startDate = projectData['versions'][0]['releaseDate'];
+		var timeSinceCreation = getAge(startDate);
+		var innerDialog = '<p><b>Project Age:</b> '+timeSinceCreation[0]+' years, '+timeSinceCreation[1]+' months, '+timeSinceCreation[2]+' days'+'</p>';
+		$('#projectModal').append(innerDialog);
+		$('#projectModal').dialog("open");
+	};
 };
 
-GoogleWrapper.prototype = new APIWrapper();
+JiraMifos.prototype = new APIWrapper();
 
 //Bugzilla.Mozilla Wrapper
 var BugzillaMozilla = function(type, id, link) {
@@ -104,9 +133,13 @@ var mapping = {
 	//Bugzilla Trackers
 	66: {
 		103: BugzillaMozilla
-		//92: Gnome
+	},
+	//Jira
+	91: {
+		264: JiraMifos
 	}
-	//TODO Google Code, ScourgeForce
+	//64: GoogleWrapper - Doesn't exist?
+	//Trac
 };
 
 //Function to create APIWrapper
@@ -168,7 +201,17 @@ $(function() {
 		var tracker_id = $(this).data("id");
 		var	link = $(this).data("link");
 		if (mapping.hasOwnProperty(tracker_type)) {
-			createAPIWrapper(tracker_type, tracker_id, link);
+			if (typeof mapping[tracker_type] != 'object') {
+				createAPIWrapper(tracker_type, tracker_id, link);
+			} else {
+				if (mapping[tracker_type].hasOwnProperty(tracker_id)) {
+					createAPIWrapper(tracker_type, tracker_id, link);
+				} else {
+					console.log(tracker_id);
+					console.log("Tracker_id not in mapping yet");
+					populateEmptyModal();
+				}
+			}
 		}
 		else {
 			console.log(tracker_type);
