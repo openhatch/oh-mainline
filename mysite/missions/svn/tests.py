@@ -219,6 +219,34 @@ class SvnViewTests(TwillTests):
         self.assertTrue(response.context[0]
                         ['mission_step_prerequisites_passed'])
 
+    def test_do_diff_mission_with_invalid_form(self):
+        self.client.post(reverse(views.resetrepo))
+        response = self.client.get(reverse('svn_checkout'))
+        checkoutdirpath = tempfile.mkdtemp()
+        try:
+            # Check the repository out and make the required change.
+            subprocess.check_call(
+                ['svn', 'checkout', response.context['checkout_url'],
+                 checkoutdirpath])
+            new_contents = open(
+                os.path.join(view_helpers.get_mission_data_path('svn'),
+                             DiffForm.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdirpath, DiffForm.FILE_TO_BE_PATCHED),
+                 'w').write(new_contents)
+
+            # Make the diff invalid
+            diff = 'invalid'
+
+            # Submit the diff.
+            response = self.client.post(
+                reverse(views.diff_submit), {'diff': diff})
+            paulproteus = Person.objects.get(user__username='paulproteus')
+            self.assertFalse(
+                view_helpers.mission_completed(paulproteus, 'svn_diff'))
+
+        finally:
+            shutil.rmtree(checkoutdirpath)
+
 
 @skipIf(not mysite.base.depends.svnadmin_available(), (
         "Skipping tests for Subversion training mission for now. To run "
