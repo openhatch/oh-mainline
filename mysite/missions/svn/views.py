@@ -174,8 +174,3 @@ class Commit(SvnBaseView):
     this_mission_page_short_name = 'Committing your changes'
     mission_step_prerequisite = 'svn_diff'
     template_name = 'missions/svn/commit.html'
-
-
-@login_required
-def commit_poll(request):
-    return HttpResponse(json.dumps(view_helpers.mission_completed(request.user.get_profile(), 'svn_commit')))

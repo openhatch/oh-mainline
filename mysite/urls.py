@@ -196,8 +196,6 @@ urlpatterns = patterns('',
                         'mysite.missions.svn.views.checkout_submit'),
                        (r'^missions/svn/diff/submit$',
                         'mysite.missions.svn.views.diff_submit'),
-                       (r'^missions/svn/commit/poll$',
-                        'mysite.missions.svn.views.commit_poll'),
 
                        (r'^missions/git$',
                         'mysite.missions.git.views.main_page'),
