@@ -17,71 +17,72 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base.views import *
-from mysite.missions.svn import forms, view_helpers
-import mysite.missions.base.views
 import shutil
 import tempfile
 import json
 from django.shortcuts import render
+from mysite.missions.base.views import *
+from mysite.missions.svn import forms, view_helpers
 
 # POST handlers
-#
-# Forms submit to this, and we use these to validate input and/or
-# modify the information stored about the user, such as recording
-# that a mission was successfully completed.
-
-
+# Helper functions for form submissions. These functions are used to validate
+# input and/or modify the stored user information about missions, such as
+# recording that a mission was successfully completed.
 @login_required
 def resetrepo(request):
+    """ Reset a user's mission repository and mark steps as uncompleted. """
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     view_helpers.SvnRepository(request.user.username).reset()
-    view_helpers.unset_mission_completed(
-        request.user.get_profile(), 'svn_checkout')
-    view_helpers.unset_mission_completed(
-        request.user.get_profile(), 'svn_diff')
-    view_helpers.unset_mission_completed(
-        request.user.get_profile(), 'svn_commit')
+    view_helpers.unset_mission_completed(request.user.get_profile(),
+        'svn_checkout')
+    view_helpers.unset_mission_completed(request.user.get_profile(),
+        'svn_diff')
+    view_helpers.unset_mission_completed(request.user.get_profile(),
+        'svn_commit')
+
     if 'stay_on_this_page' in request.GET:
         return HttpResponseRedirect(reverse('svn_main_page'))
     else:
         return HttpResponseRedirect(reverse('svn_checkout'))
 
-
 @login_required
 def diff_submit(request):
-    # Initialize data array and some default values.
+    """ Handle submitting the results of an svn diff to the mission """
     data = {}
     data['svn_diff_form'] = forms.DiffForm(request.user.username)
     data['svn_diff_error_message'] = ''
     if request.method == 'POST':
-        wcdir = tempfile.mkdtemp()
-        try:
-            form = forms.DiffForm(request.user.username, wcdir, request.POST)
-            if form.is_valid():
+        temp_svn_directory = tempfile.mkdtemp()
+        form = forms.DiffForm(request.user.username, temp_svn_directory,
+                              request.POST)
+        if form.is_valid():
+            try:
                 form.commit_diff()
-                view_helpers.set_mission_completed(
-                    request.user.get_profile(), 'svn_diff')
+                view_helpers.set_mission_completed(request.user.get_profile(),
+                'svn_diff')
                 return HttpResponseRedirect(reverse('svn_diff'))
-        finally:
-            shutil.rmtree(wcdir)
+            finally:
+                shutil.rmtree(temp_svn_directory)
+        shutil.rmtree(temp_svn_directory)
         data['svn_diff_form'] = form
+
+    # If we get here, just hack up the request object to pretend it is a GET
+    # so the dispatch system in the class-based view can use the GET handler.
     request.method = 'GET'
     return Diff.as_view()(request, extra_context_data=data)
 
-
 @login_required
 def checkout_submit(request):
-    # Initialize data array and some default values.
+    """ Handle svn checkout mission step form and completion """
     data = {}
     data['svn_checkout_form'] = forms.CheckoutForm(request.user.username)
     data['svn_checkout_error_message'] = ''
     if request.method == 'POST':
         form = forms.CheckoutForm(request.user.username, request.POST)
         if form.is_valid():
-            view_helpers.set_mission_completed(
-                request.user.get_profile(), 'svn_checkout')
+            view_helpers.set_mission_completed(request.user.get_profile(),
+                'svn_checkout')
             return HttpResponseRedirect(reverse('svn_checkout'))
         data['svn_checkout_form'] = form
 
@@ -91,11 +92,14 @@ def checkout_submit(request):
 
     return Checkout.as_view()(request, extra_context_data=data)
 
-# All GET handlers are subclasses of this so that tedious template
-# context variable generation is handled elsewhere.
-
 
 class SvnBaseView(mysite.missions.base.views.MissionBaseView):
+    """
+    A base class for a view of an SVN mission step.
+
+    SVNBaseView is subclassed to provide GET handler classes to help with
+    views of each mission step.
+    """
     mission_name = 'Using Subversion'
 
     def get_context_data(self, *args, **kwargs):
@@ -129,18 +133,20 @@ class SvnBaseView(mysite.missions.base.views.MissionBaseView):
 # Normal GET handlers. These are usually pretty short. They are based on
 # SvnBaseView.
 
-
 class MainPage(SvnBaseView):
+    """ Main start page of the SVN mission """
     this_mission_page_short_name = 'Start page'
     template_name = 'missions/svn/main_page.html'
 
 
 class LongDescription(SvnBaseView):
+    """ Page with detailed information on SVN """
     this_mission_page_short_name = 'About Subversion'
     template_name = 'missions/svn/about_svn.html'
 
 
 class Checkout(SvnBaseView):
+    """ Checkout step of SVN mission """
     login_required = True
     this_mission_page_short_name = 'Checking out'
     template_name = 'missions/svn/checkout.html'
@@ -155,6 +161,7 @@ class Checkout(SvnBaseView):
 
 
 class Diff(SvnBaseView):
+    """ Diff step of the SVN mission """
     login_required = True
     this_mission_page_short_name = 'Diffing your changes'
     mission_step_prerequisite = 'svn_checkout'
@@ -164,12 +171,11 @@ class Diff(SvnBaseView):
         data = super(Diff, self).get_context_data(*args, **kwargs)
         if kwargs.has_key('extra_context_data'):
             data.update(kwargs['extra_context_data'])
-        else:
-            data['svn_diff_form'] = forms.DiffForm()
         return data
 
 
 class Commit(SvnBaseView):
+    """ Committing changes step of SVN mission"""
     login_required = True
     this_mission_page_short_name = 'Committing your changes'
     mission_step_prerequisite = 'svn_diff'
@@ -178,4 +184,5 @@ class Commit(SvnBaseView):
 
 @login_required
 def commit_poll(request):
+    """ Determines if entire mission is completed """
     return HttpResponse(json.dumps(view_helpers.mission_completed(request.user.get_profile(), 'svn_commit')))
