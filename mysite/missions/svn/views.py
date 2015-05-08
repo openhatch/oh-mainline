@@ -171,6 +171,7 @@ class Diff(SvnBaseView):
         data = super(Diff, self).get_context_data(*args, **kwargs)
         if kwargs.has_key('extra_context_data'):
             data.update(kwargs['extra_context_data'])
+        data['svn_diff_form'] = forms.DiffForm()
         return data
 
 
