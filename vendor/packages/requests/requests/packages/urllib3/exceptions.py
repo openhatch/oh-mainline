@@ -1,15 +1,14 @@
-# urllib3/exceptions.py
-# Copyright 2008-2012 Andrey Petrov and contributors (see CONTRIBUTORS.txt)
-#
-# This module is part of urllib3 and is released under
-# the MIT License: http://www.opensource.org/licenses/mit-license.php
-
 
 ## Base Exceptions
 
 class HTTPError(Exception):
     "Base exception used by this module."
     pass
+
+class HTTPWarning(Warning):
+    "Base warning used by this module."
+    pass
+
 
 
 class PoolError(HTTPError):
@@ -20,11 +19,27 @@ class PoolError(HTTPError):
 
     def __reduce__(self):
         # For pickling purposes.
-        return self.__class__, (None, self.url)
+        return self.__class__, (None, None)
+
+
+class RequestError(PoolError):
+    "Base exception for PoolErrors that have associated URLs."
+    def __init__(self, pool, url, message):
+        self.url = url
+        PoolError.__init__(self, pool, message)
+
+    def __reduce__(self):
+        # For pickling purposes.
+        return self.__class__, (None, self.url, None)
 
 
 class SSLError(HTTPError):
     "Raised when SSL certificate fails in an HTTPS connection."
+    pass
+
+
+class ProxyError(HTTPError):
+    "Raised when the connection to a proxy fails."
     pass
 
 
@@ -33,37 +48,68 @@ class DecodeError(HTTPError):
     pass
 
 
+class ProtocolError(HTTPError):
+    "Raised when something unexpected happens mid-request/response."
+    pass
+
+
+#: Renamed to ProtocolError but aliased for backwards compatibility.
+ConnectionError = ProtocolError
+
+
 ## Leaf Exceptions
 
-class MaxRetryError(PoolError):
-    "Raised when the maximum number of retries is exceeded."
+class MaxRetryError(RequestError):
+    """Raised when the maximum number of retries is exceeded.
+
+    :param pool: The connection pool
+    :type pool: :class:`~urllib3.connectionpool.HTTPConnectionPool`
+    :param string url: The requested Url
+    :param exceptions.Exception reason: The underlying error
+
+    """
 
     def __init__(self, pool, url, reason=None):
         self.reason = reason
 
-        message = "Max retries exceeded with url: %s" % url
-        if reason:
-            message += " (Caused by %s: %s)" % (type(reason), reason)
-        else:
-            message += " (Caused by redirect)"
+        message = "Max retries exceeded with url: %s (Caused by %r)" % (
+            url, reason)
 
-        PoolError.__init__(self, pool, message)
-        self.url = url
+        RequestError.__init__(self, pool, url, message)
 
 
-class HostChangedError(PoolError):
+class HostChangedError(RequestError):
     "Raised when an existing pool gets a request for a foreign host."
 
     def __init__(self, pool, url, retries=3):
         message = "Tried to open a foreign host with url: %s" % url
-        PoolError.__init__(self, pool, message)
-
-        self.url = url
+        RequestError.__init__(self, pool, url, message)
         self.retries = retries
 
 
-class TimeoutError(PoolError):
-    "Raised when a socket timeout occurs."
+class TimeoutStateError(HTTPError):
+    """ Raised when passing an invalid state to a timeout """
+    pass
+
+
+class TimeoutError(HTTPError):
+    """ Raised when a socket timeout error occurs.
+
+    Catching this error will catch both :exc:`ReadTimeoutErrors
+    <ReadTimeoutError>` and :exc:`ConnectTimeoutErrors <ConnectTimeoutError>`.
+    """
+    pass
+
+
+class ReadTimeoutError(TimeoutError, RequestError):
+    "Raised when a socket timeout occurs while receiving data from a server"
+    pass
+
+
+# This timeout error does not have a URL attached and needs to inherit from the
+# base HTTPError
+class ConnectTimeoutError(TimeoutError):
+    "Raised when a socket timeout occurs while connecting to a server"
     pass
 
 
@@ -77,7 +123,12 @@ class ClosedPoolError(PoolError):
     pass
 
 
-class LocationParseError(ValueError, HTTPError):
+class LocationValueError(ValueError, HTTPError):
+    "Raised when there is something wrong with a given URL input."
+    pass
+
+
+class LocationParseError(LocationValueError):
     "Raised when get_host or similar fails to parse the URL input."
 
     def __init__(self, location):
@@ -85,3 +136,34 @@ class LocationParseError(ValueError, HTTPError):
         HTTPError.__init__(self, message)
 
         self.location = location
+
+
+class ResponseError(HTTPError):
+    "Used as a container for an error reason supplied in a MaxRetryError."
+    GENERIC_ERROR = 'too many error responses'
+    SPECIFIC_ERROR = 'too many {status_code} error responses'
+
+
+class SecurityWarning(HTTPWarning):
+    "Warned when perfoming security reducing actions"
+    pass
+
+
+class InsecureRequestWarning(SecurityWarning):
+    "Warned when making an unverified HTTPS request."
+    pass
+
+
+class SystemTimeWarning(SecurityWarning):
+    "Warned when system time is suspected to be wrong"
+    pass
+
+
+class InsecurePlatformWarning(SecurityWarning):
+    "Warned when certain SSL configuration is not available on a platform."
+    pass
+
+
+class ResponseNotChunked(ProtocolError, ValueError):
+    "Response needs to be chunked in order to read it as chunks."
+    pass

@@ -148,6 +148,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.request',
     'django_authopenid.context_processors.authopenid',
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -227,6 +229,7 @@ INSTALLED_APPS = (
     'djkombu',
     'inplaceeditform',
     'django_webtest',
+    'social.apps.django_app.default',
 )
 
 # testrunner allows us to control which testrunner to use
@@ -369,3 +372,30 @@ except ImportError:
     except ImportError:
         # meh.
         pass
+
+AUTHENTICATION_BACKENDS = (
+    'social.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.social_auth.associate_by_email',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details'
+)
+
+# These secrets correspond to a gmail account that Asheesh created
+# called ohdevlogin at gmail.com. If you want the password for that
+# account, or need to log in to it for some reason, ask Asheesh for
+# it.
+#
+# Google OAuth2 login, unlike OpenID login before it,
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '905249420634-7ii10lj0dcglujqo89hlnro3oncmq27k.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'qA3pxSEa_ctja22wVNOtGBbr'

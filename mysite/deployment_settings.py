@@ -82,3 +82,8 @@ STATIC_ROOT='/home/deploy/milestone-a/mysite/statik'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = '127.0.0.1'
 EMAIL_PORT = 25
+
+# This OAuth 2.0 key is controlled by Asheesh, who also
+# stores its corresponding secret in the production instance.
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1083745569348-o11asa1kur096enaq5pt8tq0rff3golt.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'overridden-in-production'
