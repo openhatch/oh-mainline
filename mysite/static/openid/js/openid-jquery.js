@@ -8,7 +8,8 @@ This code is licenced under the New BSD License.
 var providers_large = {
   google: {
     name: 'Google',
-    url: 'https://www.google.com/accounts/o8/id'
+    url: null,
+    click_selector: '#js-google-oauth2'
   },
   yahoo: {
     name: 'Yahoo',      
@@ -192,6 +193,22 @@ var openid = {
 
     this.highlight(box_id);
     this.setCookie(box_id);
+
+    // Although this file is called OpenID-JQuery.js, in the OpenHatch codebase,
+    // it is the way we integrate _all_ third-party login systems.
+    //
+    // We recently added the Django app called python-social-auth,
+    // which generates URLs server-side. To integrate that into this
+    // flow, some of the providers have a 'click_selector' key in the
+    // provider object, which is the jQuery selector for an element
+    // that, when we click it, will do the right thing.
+    //
+    // We do things this way in order to make sure we properly store
+    // the ?next= parameter in the URL via the Django template.
+    if (provider['click_selector']) {
+      $(provider['click_selector'])[0].click();
+      return;
+    }
 
     // prompt user for input?
     if (provider['label']) {

@@ -538,6 +538,8 @@ urlpatterns = patterns('',
                        # the OpenHatch donate page
                        (r'^donate/t-shirts/$', TemplateView.as_view(template_name="base/shirts.html")),
 
+                       url('social/', include('social.apps.django_app.urls', namespace='social')),
+
                        # This dangerous regex is last
                        (r'^people/(?P<user_to_display__username>[^/]+)/$',
                         'mysite.profile.views.display_person_web'),

@@ -1767,14 +1767,16 @@ class PeopleMapForNonexistentProject(WebTest):
     def test(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
-             u'user': User.objects.get(username='paulproteus')})
+             u'user': User.objects.get(username='paulproteus'),
+             u'method': u'GET'})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
     def test_icanhelp(self):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'icanhelp:Phorum'},
-             u'user': User.objects.get(username='paulproteus')})
+             u'user': User.objects.get(username='paulproteus'),
+             u'method': u'GET'})
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
