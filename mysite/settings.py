@@ -357,11 +357,6 @@ if sys.platform.startswith('win'):
 RECOMMEND_BUGS = True
 
 ENABLE_NEW_IWH_HANDLER = False
-# Include a user's customizations
-try:
-    from local_settings import *
-except ImportError:
-    pass
 
 try:
     import bugimporters
@@ -399,3 +394,9 @@ SOCIAL_AUTH_PIPELINE = (
 # Google OAuth2 login, unlike OpenID login before it,
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '905249420634-7ii10lj0dcglujqo89hlnro3oncmq27k.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'qA3pxSEa_ctja22wVNOtGBbr'
+
+# Include a user's customizations
+try:
+    from local_settings import *
+except ImportError:
+    pass
