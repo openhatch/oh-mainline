@@ -22,16 +22,18 @@
     <h3>Setup pip and virtualenv</h3>
   </div>
   <div class="body">
-    <p>We are going to use a shell script(for Linux) and a Mac application
-    which will automatically download and install pip and virtualenv on our
-    system. The shell script and the Mac application are part of a project
-    called <a href="http://pip2014.com/">pip2014</a>, a project by 
-    <a href="https://glyph.twistedmatrix.com/">Glyph</a>.</p>
 
     <h3>Linux</h3>
 
-    <p>Open up the terminal, type the following command and press Enter:</p>
-    <pre>curl https://glyph.im/pip/bootstrap.sh | bash</pre>
+    <p>To install pip, virtualenv, virtualenvwrapper and wheel execute the
+    following commands at the terminal for your Linux distro:</p>
+
+    <p>On Debian or Ubuntu (this includes Debian/Ubuntu derivative distros
+    like Linux Mint, Xubuntu, Kubuntu, etc.):</p>
+    <kbd>sudo apt-get install python-pip python-virtualenv virtualenvwrapper python-wheel</kbd>
+
+    <p>On Fedora (or Fedora derivative distros):</p>
+    <kbd>sudo yum install python-pip python-virtualenv python-virtualenvwrapper python-wheel</kbd>
 
     <p>Some Python packages that have C extensions also require a C compiler
     so that the C extensions can be compiled. A good example of a package
@@ -45,22 +47,6 @@
     <p>To install a C compiler on Fedora, at the terminal, type the
     following command and press Enter:</p>
     <pre>sudo yum install python-devel</pre>
-
-    <h3>Running into problems</h3>
-
-    <p>Once the shell script/Mac application has finished running, it will
-    output the following:</p>
-    <samp>Start a new terminal now to use pip, or hit enter to keep using this
-    one. (Pip won't work yet in this one, though.)</samp>
-    <p>After you press Enter and restart the terminal, pip as well as the other
-    tools that were installed should work. However, on some Linux distributions, 
-    when you try and run pip(for instance, by typing <kbd>pip</kbd> at the
-    command-line) after restarting the terminal, the shell replies with
-    <q>command not found</q> or something similar.</p>
-
-    <p>If this is the case, the following commands should fix it:</p>
-    <pre>echo source "${HOME}/.pip_bootstrap_profile.sh" >> ~/.bashrc</pre>
-    <pre>source ~/.bashrc</pre>
 
     <h3>Mac OS X</h3>
     <p>Before you can work with pip and virtualenvs, you'll need to check if
