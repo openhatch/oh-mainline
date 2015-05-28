@@ -36,10 +36,15 @@ function grab_bug_tracker_list() {
     # is it a "helpful" CloudFlare error message? To do this
     # check, we ask Python to parse this document, and if it
     # bails out, then we also return 1.
-    DJANGO_SETTINGS_MODULE='mysite.settings' python -c "import vendor; vendor.vendorify(); import tastypie.serializers; import yaml; yaml.load(open('$BUG_TRACKER_LIST'), Loader=tastypie.serializers.TastypieLoader)" || { echo 'sleeping for 20 sec'; sleep 20; return 1}
-
+    if DJANGO_SETTINGS_MODULE='mysite.settings' python -c "import vendor; vendor.vendorify(); import tastypie.serializers; import yaml; yaml.load(open('$BUG_TRACKER_LIST'), Loader=tastypie.serializers.TastypieLoader)"
+    then
     # Amazing. It is valid YAML. Exit succesfully.
-    return 0
+        return 0
+    else
+        echo 'sleeping for 20 sec'
+        sleep 20
+        return 1
+    fi
 }
 
 # It's OK if curl has to try 40 times.
