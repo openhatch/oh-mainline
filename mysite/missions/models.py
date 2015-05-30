@@ -30,3 +30,8 @@ class StepCompletion(mysite.search.models.OpenHatchModel):
 
     class Meta:
         unique_together = ('person', 'step')
+
+class IrcMissionSession(models.Model):
+    person = models.ForeignKey('profile.Person', null=True)
+    nick = models.CharField(max_length=255, unique=True)
+    password = models.CharField(max_length=255)

@@ -1,0 +1,10 @@
+{% extends 'missions/mission_base.html' %}
+
+{% block side_nav_links %}
+<li id='link-irc_mission'>
+  <a href='{% url mysite.missions.irc.views.irc_mission %}'>
+    About this mission
+  </a>
+</li>
+{% endblock side_nav_links %}
+
