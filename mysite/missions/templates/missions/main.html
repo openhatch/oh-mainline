@@ -157,6 +157,24 @@ Open source training missions
     <div class="clearer">&nbsp;</div>
     </div>
 
+    <h2>Communicate with IRC</h2>
+
+    <p>This mission teaches you how to use IRC for communications.</p>
+
+    <div class="submodule-container">
+    {% with fully_completed_missions.irc as mission_completed %}
+    {% with "Communicate with IRC" as mission_title %}
+    {% with "Learn how to use IRC to communicate in open source projects." as mission_description %}
+    {% with "/missions/irc" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    <div class="clearer">&nbsp;</div>
+    </div>
+
     <h2>Where they came from, and where they're going</h2>
     <p>You can read about
       <a href="https://openhatch.org/blog/2010/the-thinking-behind-the-training-missions/">vision behind the training missions</a> on the OpenHatch blog.

@@ -1,12 +1,25 @@
-{% extends 'missions/irc/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 
 {% block mission_main %}
-<div class='submodule fat'>
-  <div class='head'>
     <h3>Using IRC</h3>
-  </div>
-  <div class="body">
-      <p><acronym title="Internet Relay Chat">IRC</acronym> is a text-based chat system.  Open source projects commonly use IRC channels for live communication among developers, users, and other interested people.  For many projects, IRC is the main method of project coordination, so you will often be asked to take part in IRC discussions if you contribute to a project.</p>
+
+      <p>Internet Relay Chat is a text-based chat system.  Open source projects commonly use IRC channels for live communication among developers, users, and other interested people.  For many projects, IRC is the main method of project coordination, so you will often be asked to take part in IRC discussions if you contribute to a project.</p>
 
       <p>The first step toward participating in IRC is connecting to a server for the IRC network the project uses.  An IRC client is used to connect to an IRC server.  Many clients have lists of popular networks built-in; if the network you want is not in the list, you can also manually input the server name.</p>
       <p>You also need to choose a nickname (commonly shortened to <em>nick</em>).  This is the name that other people on IRC will see.  Some networks allow you to register your nick so you can reclaim it from other people who may try to use it.  Generally, any nick that is not in use may be freely used if it is not registered or if the network does not have nick registration.</p>
@@ -46,5 +59,4 @@
         </div>
       </form>
       {% endif %}
-
 {% endblock mission_main %}
