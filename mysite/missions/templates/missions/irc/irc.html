@@ -40,7 +40,7 @@
       {% if active_session %}
       <p>You have an active session with nick <code>{{ active_session.nick }}</code>.</p>
       {% else %}
-      <form method="post" action="{% url mysite.missions.irc.views.irc_session_password_submit %}">
+      <form method="post" action="{% url "mysite.missions.irc.views.irc_session_password_submit" %}#form-row">{% csrf_token %}
         <div class="form-row">
       {% if session_password_error_message %}
           <ul class="errorlist"><li>{{ session_password_error_message }}</li></ul>
