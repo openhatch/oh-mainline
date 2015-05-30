@@ -1,0 +1,50 @@
+{% extends 'missions/irc/base.html' %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using IRC</h3>
+  </div>
+  <div class="body">
+      <p><acronym title="Internet Relay Chat">IRC</acronym> is a text-based chat system.  Open source projects commonly use IRC channels for live communication among developers, users, and other interested people.  For many projects, IRC is the main method of project coordination, so you will often be asked to take part in IRC discussions if you contribute to a project.</p>
+
+      <p>The first step toward participating in IRC is connecting to a server for the IRC network the project uses.  An IRC client is used to connect to an IRC server.  Many clients have lists of popular networks built-in; if the network you want is not in the list, you can also manually input the server name.</p>
+      <p>You also need to choose a nickname (commonly shortened to <em>nick</em>).  This is the name that other people on IRC will see.  Some networks allow you to register your nick so you can reclaim it from other people who may try to use it.  Generally, any nick that is not in use may be freely used if it is not registered or if the network does not have nick registration.</p>
+      <p>Once you are connected, you can join channels.  Channels have names starting with a <code>#</code> symbol.  For example, OpenHatch's IRC channel is called <code>#openhatch</code>.  When you are joined a channel, you receive any messages sent to the channel, you can see when others join and leave, and you can in most cases send messages of your own to a channel.  To join a channel, type:</p>
+      <p><code>/join <em>#channelname</em></code></p>
+
+      <h2>Your mission</h2>
+      <p>All but one part of this mission will occur by interacting with a bot over IRC.  When you join the mission channel, the bot will give you all of the rest of this mission's instructions.  Here's how to get up to that point:</p>
+      <ul class="raquo_bullets">
+      <li>Connect to {{ irc_netname }} (if it's not in your client's list, try server <code>{{ irc_server }}</code>, port <code>{{ irc_port }}</code>)</li>
+      <li>Join the <code>{{ irc_channel }}</code> channel.</li>
+      <li>When you join, the mission bot (<code>{{ irc_botnick }}</code>) will send you a private message containing some secret words.  Enter your nick and the secret words in the form below to associate your session with your OpenHatch account.</li>
+      <li>In the channel, say hello to the bot after you have associated your session.  If the association is properly in place, the bot will respond, giving you further instructions.</li>
+      <li>All of the rest of the mission will take place over IRC.</li>
+      <li>The association between your nick and your OpenHatch account lasts only for as long as you are in the channel with that nick.  (This means that if you do not complete the entire mission in one shot, you will need to start over next time.  Don't worry - it won't take long.)</li>
+      </ul>
+
+      {% if active_session %}
+      <p>You have an active session with nick <code>{{ active_session.nick }}</code>.</p>
+      {% else %}
+      <form method="post" action="{% url mysite.missions.irc.views.irc_session_password_submit %}">
+        <div class="form-row">
+      {% if session_password_error_message %}
+          <ul class="errorlist"><li>{{ session_password_error_message }}</li></ul>
+      {% endif %}
+          {{ session_password_form.nick.errors }}
+          <br style="clear: left;" />
+          Your nick: <br style="clear: left;" />
+          {{ session_password_form.nick }}
+          <br style="clear: left;" />
+          {{ session_password_form.password.errors }}
+          <br style="clear: left;" />
+          Secret words: <br style="clear: left;" />
+          {{ session_password_form.password }}
+          <br style="clear: left;" />
+          <input type="submit" value="Submit" style="float: none;" />
+        </div>
+      </form>
+      {% endif %}
+
+{% endblock mission_main %}

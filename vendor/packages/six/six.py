@@ -29,6 +29,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
+
 __version__ = "1.9.0"
 
 
@@ -301,7 +302,6 @@ for attr in _moved_attributes:
 del attr
 
 _MovedItems._moved_attributes = _moved_attributes
-
 moves = _MovedItems(__name__ + ".moves")
 _importer._add_module(moves, "moves")
 
@@ -514,13 +514,12 @@ except NameError:
     def callable(obj):
         return any("__call__" in klass.__dict__ for klass in type(obj).__mro__)
 
-
-if PY3:
-    def get_unbound_function(unbound):
-        return unbound
+    _iterkeys = "iterkeys"
+    _itervalues = "itervalues"
+    _iteritems = "iteritems"
+    _iterlists = "iterlists"
 
     create_bound_method = types.MethodType
-
     Iterator = object
 else:
     def get_unbound_function(unbound):

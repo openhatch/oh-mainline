@@ -400,3 +400,10 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+# Settings for the IRC bot powering the IRC missions.
+IRC_MISSION_SERVER = ('chat.freenode.net', 6667)
+IRC_MISSION_SERVER_PRETTYNAME = 'Freenode'
+IRC_MISSION_CHANNEL = '#oh-ircmission-test'
+IRC_MISSIONBOT_NICK = 'oh_bottest'
+IRC_MISSIONBOT_REALNAME = 'OpenHatch Mission Bot'
