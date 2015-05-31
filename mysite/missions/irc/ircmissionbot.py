@@ -2,18 +2,18 @@ from django.conf import settings
 from mysite.missions.models import IrcMissionSession
 from mysite.missions.base import view_helpers
 
-from irc.bot import SingleServerIRCBot
+import irc.bot
 
 TOPIC_ANSWER = '42'
 TOPIC_PREFIX = "OpenHatch IRC mission channel || The question: What is the answer to life, the universe, and everything? || "
 
-class IrcMissionBot(SingleServerIRCBot):
+class IrcMissionBot(irc.bot.SingleServerIRCBot):
     # States in which a session can be
     STATE_SAID_HI = 1
     STATE_ANSWERED_TOPIC = 2
 
     def __init__(self):
-        SingleServerIRCBot.__init__(self, [settings.IRC_MISSION_SERVER],
+        irc.bot.SingleServerIRCBot.__init__(self, [settings.IRC_MISSION_SERVER],
             settings.IRC_MISSIONBOT_NICK, settings.IRC_MISSIONBOT_REALNAME)
         self.channel = settings.IRC_MISSION_CHANNEL
         self.active_sessions = {}

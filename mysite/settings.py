@@ -213,6 +213,7 @@ INSTALLED_APPS = (
     'south',
     'django_assets',
     'invitation',
+    'irc',
     'mysite.search',
     'mysite.profile',
     'mysite.customs',
@@ -402,7 +403,7 @@ except ImportError:
     pass
 
 # Settings for the IRC bot powering the IRC missions.
-IRC_MISSION_SERVER = ('chat.freenode.net', 6667)
+IRC_MISSION_SERVER = ('irc.freenode.net', 6667)
 IRC_MISSION_SERVER_PRETTYNAME = 'Freenode'
 IRC_MISSION_CHANNEL = '#oh-ircmission-test'
 IRC_MISSIONBOT_NICK = 'oh_bottest'
