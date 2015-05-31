@@ -1,6 +1,12 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import re
+import textwrap
+import logging
+
+
+log = logging.getLogger(__name__)
+
 
 class LineBuffer(object):
     r"""
@@ -25,11 +31,13 @@ class LineBuffer(object):
     0
 
     The buffer will not perform any decoding.
+
     >>> b.feed(b'Ol\xe9\n')
     >>> list(b.lines()) == [b'Ol\xe9']
     True
 
     The LineBuffer should also act as an iterable.
+
     >>> b.feed(b'iterate\nthis\n')
     >>> for line, expected in zip(b, [b'iterate', b'this']):
     ...    assert line == expected
@@ -70,15 +78,53 @@ class DecodingLineBuffer(LineBuffer):
     support docoding from these clients (and not raise a UnicodeDecodeError),
     set errors='replace':
 
-    >>> rb = DecodingLineBuffer()
+    >>> b = DecodingLineBuffer()
     >>> b.errors = 'replace'
     >>> b.feed(b'Ol\xe9\n')
     >>> list(b.lines()) == ['Ol\ufffd']
     True
+
+    >>> b = DecodingLineBuffer()
+    >>> b.feed(b'Ol\xe9\n')
+    >>> list(b.lines())
+    Traceback (most recent call last):
+    ...
+    UnicodeDecodeError: ...
     """
     encoding = 'utf-8'
     errors = 'strict'
 
     def lines(self):
-        return (line.decode(self.encoding, self.errors)
-            for line in super(DecodingLineBuffer, self).lines())
+        for line in super(DecodingLineBuffer, self).lines():
+            try:
+                yield line.decode(self.encoding, self.errors)
+            except UnicodeDecodeError:
+                self.handle_exception()
+
+    def handle_exception(self):
+        msg = textwrap.dedent("""
+            Unknown encoding encountered. See 'Decoding Input'
+            in https://pypi.python.org/pypi/irc for details.
+            """)
+        log.warning(msg)
+        raise
+
+class LenientDecodingLineBuffer(LineBuffer):
+    r"""
+    Like LineBuffer, but decode the output. First try UTF-8 and if that
+    fails, use latin-1, which decodes all byte strings.
+
+    >>> b = LenientDecodingLineBuffer()
+    >>> utf8_word = b'Ol\xc3\xa9'
+    >>> b.feed(utf8_word + b'\n')
+    >>> b.feed(b'Ol\xe9\n')
+    >>> list(b.lines()) == [utf8_word.decode('utf-8')]*2
+    True
+    """
+
+    def lines(self):
+        for line in super(LenientDecodingLineBuffer, self).lines():
+            try:
+                yield line.decode('utf-8', 'strict')
+            except UnicodeDecodeError:
+                yield line.decode('latin-1')

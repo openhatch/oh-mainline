@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 1999-2002  Joel Rosdahl
-# Portions Copyright © 2011-2012 Jason R. Coombs
-
 """
 Simple IRC bot library.
 
@@ -153,11 +150,13 @@ class SingleServerIRCBot(irc.client.SimpleIRCClient):
             pass
 
     def _on_namreply(self, c, e):
-        # e.arguments[0] == "@" for secret channels,
-        #                     "*" for private channels,
-        #                     "=" for others (public channels)
-        # e.arguments[1] == channel
-        # e.arguments[2] == nick list
+        """
+        e.arguments[0] == "@" for secret channels,
+                          "*" for private channels,
+                          "=" for others (public channels)
+        e.arguments[1] == channel
+        e.arguments[2] == nick list
+        """
 
         ch_type, channel, nick_list = e.arguments
 
@@ -267,9 +266,8 @@ class SingleServerIRCBot(irc.client.SimpleIRCClient):
 
 
 class Channel(object):
-    """A class for keeping information about an IRC channel.
-
-    This class can be improved a lot.
+    """
+    A class for keeping information about an IRC channel.
     """
 
     def __init__(self):

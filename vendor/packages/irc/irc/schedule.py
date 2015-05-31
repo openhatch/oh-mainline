@@ -2,8 +2,11 @@
 Classes for calling functions a schedule.
 """
 
+from __future__ import absolute_import
+
 import datetime
 import numbers
+
 
 class DelayedCommand(datetime.datetime):
     """
@@ -13,7 +16,7 @@ class DelayedCommand(datetime.datetime):
     manner, such as to use UTC or to have timezone-aware times.
     """
     @classmethod
-    def now(self, tzinfo=None):
+    def now(cls, tzinfo=None):
         return datetime.datetime.now(tzinfo)
 
     @classmethod
@@ -49,6 +52,7 @@ class DelayedCommand(datetime.datetime):
     def due(self):
         return self.now() >= self
 
+
 class PeriodicCommand(DelayedCommand):
     """
     Like a delayed command, but expect this command to run every delay
@@ -65,6 +69,7 @@ class PeriodicCommand(DelayedCommand):
             raise ValueError("A PeriodicCommand must have a positive, "
                 "non-zero delay.")
         super(PeriodicCommand, self).__setattr__(key, value)
+
 
 class PeriodicCommandFixedDelay(PeriodicCommand):
     """
