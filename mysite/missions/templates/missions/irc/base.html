@@ -19,10 +19,24 @@
 {% endcomment %}
 
 {% block side_nav_links %}
-<li id='link-irc_mission'>
-  <a href='{% url mysite.missions.irc.views.irc_mission %}'>
+<li id='link-about'>
+  <a href='{% url "mysite.missions.irc.views.about" %}'>
     About this mission
   </a>
 </li>
+
+
+<li {% if irc_joining %} class='tick-progress' {% else %} class='cross-progress' {% endif %}>
+    <a href='{% url "mysite.missions.irc.views.joining" %}'>
+        IRC joining practice
+    </a>
+</li>
+
+<li {% if irc_session_password %} class='tick-progress' {% else %} class='cross-progress' {% endif %}>
+    <a href='{% url "mysite.missions.irc.views.irc_secrets" %}'>
+        IRC secret words
+    </a>
+</li>
+
 {% endblock side_nav_links %}
 

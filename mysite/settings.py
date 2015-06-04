@@ -31,16 +31,16 @@ LOGGING = {
         'django': {
             'handlers': ['null'],
             'propagate': False,
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'django.request': {
             'handlers': ['null'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         },
         'mysite': {
             'handlers': ['console'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         }
     }

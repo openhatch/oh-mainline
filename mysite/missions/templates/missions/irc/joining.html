@@ -1,0 +1,37 @@
+{% extends 'missions/irc/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using IRC</h3>
+  </div>
+  <div class="body">
+      <h3>Your mission</h3>
+      <p>All but one part of this mission will occur by interacting with a bot over IRC.  When you join the mission channel, the bot will give you all of the rest of this mission's instructions.  Here's how to get up to that point:</p>
+      <ul class="raquo_bullets">
+      <li>Connect to {{ irc_netname }} (if it's not in your client's list, try server <code>{{ irc_server }}</code>, port <code>{{ irc_port }}</code>)</li>
+      <li>Join the <code>{{ irc_channel }}</code> channel.</li>
+      </ul>
+
+      <p class="next_mission_link">
+      <a href='{% url "mysite.missions.irc.views.irc_secrets" %}'>Checking the secret password&raquo;</a></p>
+  </div>
+</div>
+{% endblock mission_main %}
