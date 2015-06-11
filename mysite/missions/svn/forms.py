@@ -34,39 +34,41 @@ class CheckoutForm(django.forms.Form):
         self.username = username
 
     def clean_secret_word(self):
-        cat_trunk = view_helpers.SvnRepository(self.username).cat('/trunk/' +
-                                                                  self.SECRET_WORD_FILE).strip()
+        cat_trunk = view_helpers.SvnRepository(self.username).cat('/trunk/' + self.SECRET_WORD_FILE).strip()
         if self.cleaned_data['secret_word'] != cat_trunk:
             raise ValidationError, 'The secret word is incorrect.'
 
 
 class DiffForm(django.forms.Form):
     diff = django.forms.CharField(
-        error_messages={'required': 'No svn diff output was given.'}, widget=django.forms.Textarea())
+        error_messages={'required': 'No svn diff output was given.'},
+        widget=django.forms.Textarea())
     FILE_TO_BE_PATCHED = 'README'
-    NEW_CONTENT = os.path.join(
-        get_mission_data_path('svn'), 'README-new-for-svn-diff')
+    NEW_CONTENT = os.path.join(get_mission_data_path('svn'),
+                               'README-new-for-svn-diff')
 
     def __init__(self, username=None, wcdir=None, request=None, *args, **kwargs):
         super(DiffForm, self).__init__(request, *args, **kwargs)
         self.username = username
         self.wcdir = wcdir
-        if not wcdir == None:
+        if wcdir:
             self.file_to_patch = os.path.join(wcdir, self.FILE_TO_BE_PATCHED)
+        self.the_patch = None
+        self.new_content = None
 
     def clean_diff(self):
-        """Validate the diff form. 
-        This function will be invoked by django.form.Forms.is_valid(), and will raise the exception
-        ValidationError
-
+        """
+        Validate the diff form.
+        This function will be invoked by django.form.Forms.is_valid(), and
+        will raise the exception ValidationError
         """
         self.the_patch = patch.fromstring(self.cleaned_data['diff'])
-        # Check that it only patches one file.
+        # Check that the submitted diff patches the correct number of files
         if len(self.the_patch.hunks) != 1:
             raise ValidationError, 'The patch affects more than one file.'
 
         # Check that the filename it patches is correct.
-        if self.the_patch.source[0] != self.FILE_TO_BE_PATCHED or self.the_patch.target[0] != self.FILE_TO_BE_PATCHED:
+        if self.FILE_TO_BE_PATCHED not in self.cleaned_data['diff']:
             raise ValidationError, 'The patch affects the wrong file.'
 
         # Now we need to generate a working copy to apply the patch to.
@@ -86,11 +88,7 @@ class DiffForm(django.forms.Form):
             raise ValidationError, 'The file resulting from patching does not have the correct contents.'
 
     def commit_diff(self):
-        '''Commit the diff form.'''
-        # Commit the patch.
+        """Commit the diff form and the patch."""
         open(self.file_to_patch, 'w').write(self.new_content)
-        commit_message = '''Fix a typo in %s.
-
-Thanks for reporting this, %s!''' % (self.FILE_TO_BE_PATCHED, self.username)
-        view_helpers.subproc_check_output(
-            ['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.wcdir])
+        commit_message = '''Fix a typo in %s. Thanks for reporting this, %s!''' % (self.FILE_TO_BE_PATCHED, self.username)
+        view_helpers.subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.wcdir])
