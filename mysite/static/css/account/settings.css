@@ -15,6 +15,11 @@ body.settings,body.missions #main .submodule .body { background-color: #fff; pad
     width: 0%
 }
 
+div.message {
+    background-color: #000;
+    width: 100%;
+}
+
 #notification {
 	display: none;
 }
