@@ -179,6 +179,9 @@
 		  <li><a href="https://github.com/openhatch/oh-mainline">Github (source code)</a></li>
 		  <li><a href="http://lists.openhatch.org/mailman/listinfo/devel">Devel mailing list</a></li>
 		  <li><a href="https://openhatch.org/bugs/">Bug tracker</a></li>
+		  {% if current_commit_hash %}
+		  <li><a href="https://github.com/openhatch/oh-mainline/commit/{{ current_commit_hash }}">SHA-1: {{ current_commit_hash }}</a></li>
+		  {% endif %}
 		</ul>
 	      </div>
 
