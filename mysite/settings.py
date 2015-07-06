@@ -409,7 +409,10 @@ IRC_MISSION_CHANNEL = '#oh-ircmission-test'
 IRC_MISSIONBOT_NICK = 'oh_bottest'
 IRC_MISSIONBOT_REALNAME = 'OpenHatch Mission Bot'
 
-# the most recent commit hash, included in the main page footer for bug
+# the most recent git commit hash, included in the main page footer for bug
 # reporting/debugging
-COMMIT_HASH = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'],
+try:
+    COMMIT_HASH = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'],
                               stdout=subprocess.PIPE).stdout.read().strip()
+except OSError: # git not found on system path
+    COMMIT_HASH = None
