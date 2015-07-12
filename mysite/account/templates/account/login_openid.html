@@ -21,7 +21,7 @@
     {% if next and not answers and not request.GET.from_offsite %}
         <p>Please log in to proceed.</p>
     {% endif %}
-    <p id='please_click'>Which account would you like to use?</p>
+    <p id='please_click'>Choose an account below to log in with OpenID. (<a href='/blog/2009/why-we-support-openid'>What is OpenID?</a>)</p>
     <input type="hidden" name="action" value="verify" />
     <input type="hidden" name="next" value="{{ next }}" />
     <div id="openid_choice">
