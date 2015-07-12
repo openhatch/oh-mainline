@@ -52,6 +52,7 @@ def front_page_data():
         mysite.search.models.WannaHelperNote.objects.order_by('-created_date')[:5])
     feed_items.sort(key=lambda x: x.modified_date, reverse=True)
     data['recent_feed_items'] = feed_items[:5]
+    data['current_commit_hash'] = settings.COMMIT_HASH
     return data
 
 

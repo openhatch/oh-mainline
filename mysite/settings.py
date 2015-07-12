@@ -1,6 +1,7 @@
 #Django settings for the basic OpenHatch 'mysite' project
 
 # Imports
+import subprocess
 import os
 import logging
 import datetime
@@ -407,3 +408,11 @@ IRC_MISSION_SERVER_PRETTYNAME = 'Freenode'
 IRC_MISSION_CHANNEL = '#oh-ircmission-test'
 IRC_MISSIONBOT_NICK = 'oh_bottest'
 IRC_MISSIONBOT_REALNAME = 'OpenHatch Mission Bot'
+
+# the most recent git commit hash, included in the main page footer for bug
+# reporting/debugging
+try:
+    COMMIT_HASH = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'],
+                              stdout=subprocess.PIPE).stdout.read().strip()
+except OSError: # git not found on system path
+    COMMIT_HASH = None
