@@ -42,7 +42,6 @@ packages/oauthlib
 packages/odict/src
 packages/openid
 packages/ordereddict
-packages/pygeoip
 packages/Pygments
 packages/PyJWT
 packages/python-dateutil

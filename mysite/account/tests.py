@@ -406,6 +406,9 @@ class EditPhotoWithOldPerson(WebTest):
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
             photo_response = photo_form.submit()
+        self.assertEqual(
+            response.context['edit_location_form'].initial['location_display_name'],
+            "The White House")
 
             # Now check that the photo == what we uploaded
             p = Person.objects.get(user__username=username)
