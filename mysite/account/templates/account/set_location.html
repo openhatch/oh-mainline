@@ -47,6 +47,103 @@ If you want us to forget your location, empty out the text field and hit save.</
 
 {% block js %}
 <script type="text/javascript">
-$(initialize);
+/***
+	This code does a reverse geocode based on the user's ip address. It uses HTML5, which will require the user to click allow for this code
+	to get the latitude and longitude based on their ip address. The latitude and longitude is then passed to the google api to get a more human
+	readable location. When this location is found, it is put in the form for the user's convenience, and the on page map is asked to refresh.
+
+	This code only runs through if the location text field is blank (like it would be for a new user).
+***/
+	var geoTimeout = null;
+	var GEO_TIMEOUT_DURATION_MS = 4000;
+	var GEO_REVERSE_TIMEOUT_DURATION_MS = 3000;
+
+    function setLocationTextFormField(text) {
+        $('#id_edit_location-location_display_name').val(text);
+    }
+
+    function setLocationFormData(locationText, latitude, longitude) {
+    	setLocationTextFormField(locationText);
+    }
+
+    function addressForLatLongFound(latitude, longitude, data) {
+        if('results' in data && data.results && data.results.length > 0) {
+            for(var i = 0; i < data.results.length; i++) {
+                var result = data.results[i];
+                if('types' in result && result.types && result.types.length > 0) {
+                    var locality_index = $.inArray('locality', result.types);
+                    if(locality_index > -1) { // this is the reverse geocoded location we want
+                    	if('formatted_address' in result && result.formatted_address) {
+                    		var address_string = result.formatted_address;
+	                        setLocationFormData(address_string, latitude, longitude);
+	                        $(initialize); // will make map load and put marker in location based on what is in text field
+	                        $('#id_edit_location-location_display_name').removeAttr('disabled');
+	                        //$('#map_canvas').parent('div').slideDown();
+	                        $('#map_canvas').parent('div').show();
+	                        return;
+                    	}
+                    }
+                }
+            }
+        }
+        geoLocationUnavailable('Could not reverse geocode from lat and long.');
+    }
+
+    function geoLatLongFound(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+	    if(geoTimeout) { clearTimeout(geoTimeout); geoTimeout == null; }
+        $.ajax({
+            dataType: 'json',
+            url: 'https://maps.googleapis.com/maps/api/geocode/json',
+            data: {
+                latlng: latitude + ',' + longitude,
+                sensor: false,
+                //result_type: 'locality', // requires API KEY. instead we get everything and iterate through for locality type
+            },
+            success: function(data) { addressForLatLongFound(latitude, longitude, data) },
+            error: function(jqXHR, textStatus, errorThrown) { geoLocationUnavailable('async request to google reverse geocding api failed. Reason: ' + textStatus); },
+            timeout: GEO_REVERSE_TIMEOUT_DURATION_MS,
+        });
+    }
+
+    function findAddressOnload() {
+    	if($('#id_edit_location-location_display_name').val() !== '') { $(initialize); return; }
+
+    	geoTimeout = setTimeout(function() {
+    		geoLocationUnavailable('Failed to complete geo location stuff before timeout. User probably didn\'t authorize browser for gelocation.');
+    	}, GEO_TIMEOUT_DURATION_MS);
+
+        showGeoLoadingMessage();
+
+        function geoError() {
+            geoLocationUnavailable('There was a problem getting your current location from your browser.');
+        }
+
+        if ('geolocation' in navigator && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(geoLatLongFound, geoError);
+        } else{
+            geoLocationUnavailable("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showGeoLoadingMessage() {
+    	setLocationTextFormField('Loading...');
+    	$('#id_edit_location-location_display_name').attr('disabled', 'disabled');
+    }
+
+    /***
+    	If any part of the location is unable to be found, we clear the Loading text from the form and hide the map since it would be blank
+    ***/
+    function geoLocationUnavailable(message) {
+        //console.debug(message);
+        setLocationTextFormField('');
+        $('#id_edit_location-location_display_name').removeAttr('disabled');
+        $('#map_canvas').parent('div').hide();
+        if(geoTimeout) { clearTimeout(geoTimeout); geoTimeout == null; }
+    }
+
+    $(document).ready(findAddressOnload);
 </script>
 {% endblock js %}

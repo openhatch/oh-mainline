@@ -57,7 +57,6 @@ def main(argv=None):
                             'django-assets==0.2.1',
                             'django-kombu==0.9.4',
                             'python-github2==0.1.1',
-                            'pygeoip==0.1.3',
                             'django-debug-toolbar==0.8.4',
                             'mechanize',
                             'keyring==0.5.0.1',
@@ -90,7 +89,6 @@ def main(argv=None):
         # can override their download URL.
         dependency_links = [dependency_path,
                             'http://pylockfile.googlecode.com/files/lockfile-0.9.tar.gz#egg=lockfile',
-                            'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
                             'http://linode.openhatch.org/~paulproteus/django-debug-toolbar-0.8.4.tar.gz#egg=django-debug-toolbar',
                             'http://pypi.python.org/packages/source/d/django-model-utils/django-model-utils-0.6.0.tar.gz#egg=django-model-utils',
                            ],
