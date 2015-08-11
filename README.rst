@@ -6,7 +6,10 @@ README
    :target: http://travis-ci.org/openhatch/oh-mainline
 
 .. image:: https://coveralls.io/repos/openhatch/oh-mainline/badge.png?branch=master
-  :target: https://coveralls.io/r/openhatch/oh-mainline?branch=master
+   :target: https://coveralls.io/r/openhatch/oh-mainline?branch=master
+
+.. image:: http://codecov.io/github/openhatch/oh-mainline/coverage.svg?branch=master
+   :target: http://codecov.io/github/openhatch/oh-mainline?branch=master
 
 
 Thanks for checking out our repository. We love this project; hope you do too.
