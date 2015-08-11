@@ -1,6 +1,6 @@
 language: python
 python:
-  - "2.7"
+  - 2.7
 env:
   - USE_MYSQL=true
   - USE_MYSQL=
@@ -9,22 +9,25 @@ services:
   - mysql
 
 install:
-# Install coveralls to test code coverage
+ - sudo pip install --upgrade pip
  - sudo pip install coveralls
-# Copy libz.so into the virtualenv so that PIL can build PNG support
+ - sudo pip install codecov
  - sudo cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
-# command to run tests
+
 script: coverage run --source="mysite" manage.py test
-# Get development headers for PIL
+
 before_install:
- - deactivate # We are having problems with using Pillow in a virtualenv
+ - deactivate
  - sudo apt-get update -qq
  - sudo apt-get build-dep -qq python-imaging
  - sudo apt-get install libjpeg-dev python-mysqldb
  - git config --global user.name TravisDummy
- - git config --global user.email dummy@travis-ci.orgo
+ - git config --global user.email dummy@travis-ci.org
+
 
 before_script:
   - mysql -uroot < ./mysite/scripts/database_01_create.sql
 
-after_success: coveralls
+after_success:
+  - coveralls
+  - codecov
