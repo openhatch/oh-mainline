@@ -7,7 +7,7 @@ beautifulsoup4
 bleach
 celery
 decorator
-Django
+Django==1.5.8
 dj-database-url
 django-assets
 django-authopenid
