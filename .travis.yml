@@ -13,6 +13,7 @@ install:
  - sudo pip install coveralls
  - sudo pip install codecov
  - sudo cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
+ - sudo pip install Django==1.5.8
 
 script: coverage run --source="mysite" manage.py test
 
