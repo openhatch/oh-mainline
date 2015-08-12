@@ -1,2 +1,0 @@
-recursive-include otp *.py
-include test.py README MANIFEST.in rfc2289.txt otp.moin
