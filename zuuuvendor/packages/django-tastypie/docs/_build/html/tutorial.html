@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started with Tastypie &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Interacting With The API" href="interacting.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="interacting.html" title="Interacting With The API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="Contributing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-started-with-tastypie">
+<span id="ref-tutorial"></span><h1>Getting Started with Tastypie<a class="headerlink" href="#getting-started-with-tastypie" title="Permalink to this headline">¶</a></h1>
+<p>Tastypie is a reusable app (that is, it relies only on it&#8217;s own code and
+focuses on providing just a REST-style API) and is suitable for providing an
+API to any application without having to modify the sources of that app.</p>
+<p>Not everyone&#8217;s needs are the same, so Tastypie goes out of its way to provide
+plenty of hooks for overriding or extending how it works.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you hit a stumbling block, you can join
+<a class="reference external" href="irc://irc.freenode.net/tastypie">#tastypie on irc.freenode.net</a> to get help.</p>
+</div>
+<p>This tutorial assumes that you have a basic understanding of Django as well as
+how proper REST-style APIs ought to work. We will only explain the portions
+of the code that are Tastypie-specific in any kind of depth.</p>
+<p>For example purposes, we&#8217;ll be adding an API to a simple blog application.
+Here is <tt class="docutils literal"><span class="pre">myapp/models.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.utils.timezone</span> <span class="kn">import</span> <span class="n">now</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.template.defaultfilters</span> <span class="kn">import</span> <span class="n">slugify</span>
+
+
+<span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">slug</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">SlugField</span><span class="p">()</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># For automatic slug generation.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">slug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slug</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)[:</span><span class="mi">50</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Entry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With that, we&#8217;ll move on to installing and configuring Tastypie.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Installing Tastypie is as simple as checking out the source and adding it to
+your project or <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt>.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Download the dependencies:</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>Python 2.4+</li>
+<li>Django 1.0+ (tested on Django 1.1+)</li>
+<li><tt class="docutils literal"><span class="pre">mimeparse</span></tt> 0.1.3+ (<a class="reference external" href="http://code.google.com/p/mimeparse/">http://code.google.com/p/mimeparse/</a>)<ul>
+<li>Older versions will work, but their behavior on JSON/JSONP is a touch wonky.</li>
+</ul>
+</li>
+<li><tt class="docutils literal"><span class="pre">dateutil</span></tt> (<a class="reference external" href="http://labix.org/python-dateutil">http://labix.org/python-dateutil</a>)</li>
+<li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">lxml</span></tt> (<a class="reference external" href="http://lxml.de/">http://lxml.de/</a>) if using the XML serializer</li>
+<li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">pyyaml</span></tt> (<a class="reference external" href="http://pyyaml.org/">http://pyyaml.org/</a>) if using the YAML serializer</li>
+<li><strong>OPTIONAL</strong> - <tt class="docutils literal"><span class="pre">uuid</span></tt> (present in 2.5+, downloadable from
+<a class="reference external" href="http://pypi.python.org/pypi/uuid/">http://pypi.python.org/pypi/uuid/</a>) if using the <tt class="docutils literal"><span class="pre">ApiKey</span></tt> authentication</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>Either check out tastypie from <a class="reference external" href="http://github.com/toastdriven/django-tastypie">GitHub</a> or to pull a release off <a class="reference external" href="http://pypi.python.org/">PyPI</a>.
+Doing <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">django-tastypie</span></tt> or
+<tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">easy_install</span> <span class="pre">django-tastypie</span></tt> is all that should be required.</li>
+<li>Either symlink the <tt class="docutils literal"><span class="pre">tastypie</span></tt> directory into your project or copy the
+directory in. What ever works best for you.</li>
+</ol>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Once tastypie reaches version 1.0, it will become officially available on
+<a class="reference external" href="http://pypi.python.org/">PyPI</a>. Once that is the case, a <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">tastypie</span></tt> or <tt class="docutils literal"><span class="pre">sudo</span>
+<span class="pre">easy_install</span> <span class="pre">tastypie</span></tt> should be available.</p>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>The only mandatory configuration is adding <tt class="docutils literal"><span class="pre">'tastypie'</span></tt> to your
+<tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>. This isn&#8217;t strictly necessary, as Tastypie has only two
+non-required models, but may ease usage.</p>
+<p>You have the option to set up a number of settings (see <a class="reference internal" href="settings.html"><em>Tastypie Settings</em></a>) but
+they all have sane defaults and are not required unless you need to tweak their
+values.</p>
+</div>
+<div class="section" id="creating-resources">
+<h2>Creating Resources<a class="headerlink" href="#creating-resources" title="Permalink to this headline">¶</a></h2>
+<p>REST-style architecture talks about resources, so unsurprisingly integrating
+with Tastypie involves creating <tt class="xref py py-class docutils literal"><span class="pre">Resource</span></tt> classes.
+For our simple application, we&#8217;ll create a file for these in <tt class="docutils literal"><span class="pre">myapp/api.py</span></tt>,
+though they can live anywhere in your application:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># myapp/api.py</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span> <span class="nc">EntryResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;entry&#39;</span>
+</pre></div>
+</div>
+<p>This class, by virtue of being a <tt class="xref py py-class docutils literal"><span class="pre">ModelResource</span></tt>
+subclass, will introspect all non-relational fields on the <tt class="docutils literal"><span class="pre">Entry</span></tt> model and
+create it&#8217;s own <a class="reference internal" href="fields.html#module-tastypie.fields" title="tastypie.fields"><tt class="xref py py-mod docutils literal"><span class="pre">ApiFields</span></tt></a> that map to those fields,
+much like the way Django&#8217;s <tt class="docutils literal"><span class="pre">ModelForm</span></tt> class introspects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <tt class="docutils literal"><span class="pre">resource_name</span></tt> within the <tt class="docutils literal"><span class="pre">Meta</span></tt> class is optional. If not
+provided, it is automatically generated off the classname, removing any
+instances of <tt class="xref py py-class docutils literal"><span class="pre">Resource</span></tt> and lowercasing the
+string. So <tt class="docutils literal"><span class="pre">EntryResource</span></tt> would become just <tt class="docutils literal"><span class="pre">entry</span></tt>.</p>
+<p class="last">We&#8217;ve included the <tt class="docutils literal"><span class="pre">resource_name</span></tt> attribute in this example for clarity,
+especially when looking at the URLs, but you should feel free to omit it if
+you&#8217;re comfortable with the automatic behavior.</p>
+</div>
+</div>
+<div class="section" id="hooking-up-the-resource-s">
+<h2>Hooking Up The Resource(s)<a class="headerlink" href="#hooking-up-the-resource-s" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have our <tt class="docutils literal"><span class="pre">EntryResource</span></tt>, we can hook it up in our URLconf. To
+do this, we simply instantiate the resource in our URLconf and hook up its
+<tt class="docutils literal"><span class="pre">urls</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># urls.py</span>
+<span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">myapp.api</span> <span class="kn">import</span> <span class="n">EntryResource</span>
+
+<span class="n">entry_resource</span> <span class="o">=</span> <span class="n">EntryResource</span><span class="p">()</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># The normal jazz here...</span>
+    <span class="p">(</span><span class="s">r&#39;^blog/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;myapp.urls&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s">r&#39;^api/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">entry_resource</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Now it&#8217;s just a matter of firing up server (<tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">runserver</span></tt>) and
+going to <a class="reference external" href="http://127.0.0.1:8000/api/entry/?format=json">http://127.0.0.1:8000/api/entry/?format=json</a>. You should get back a
+list of <tt class="docutils literal"><span class="pre">Entry</span></tt>-like objects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <tt class="docutils literal"><span class="pre">?format=json</span></tt> is an override required to make things look decent
+in the browser (accept headers vary between browsers). Tastypie properly
+handles the <tt class="docutils literal"><span class="pre">Accept</span></tt> header. So the following will work properly:</p>
+<div class="highlight-python"><pre>curl -H "Accept: application/json" http://127.0.0.1:8000/api/entry/</pre>
+</div>
+<p class="last">But if you&#8217;re sure you want something else (or want to test in a browser),
+Tastypie lets you specify <tt class="docutils literal"><span class="pre">?format=...</span></tt> when you really want to force
+a certain type.</p>
+</div>
+<p>At this point, a bunch of other URLs are also available. Try out any/all of
+the following (assuming you have at least three records in the database):</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://127.0.0.1:8000/api/entry/?format=json">http://127.0.0.1:8000/api/entry/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/entry/1/?format=json">http://127.0.0.1:8000/api/entry/1/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/entry/schema/?format=json">http://127.0.0.1:8000/api/entry/schema/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/entry/set/1;3/?format=json">http://127.0.0.1:8000/api/entry/set/1;3/?format=json</a></li>
+</ul>
+</div></blockquote>
+<p>However, if you try sending a POST/PUT/DELETE to the resource, you find yourself
+getting &#8220;401 Unauthorized&#8221; errors. For safety, Tastypie ships with the
+<tt class="docutils literal"><span class="pre">authorization</span></tt> class (&#8220;what are you allowed to do&#8221;) set to
+<tt class="docutils literal"><span class="pre">ReadOnlyAuthorization</span></tt>. This makes it safe to expose on the web, but prevents
+us from doing POST/PUT/DELETE. Let&#8217;s enable those:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># myapp/api.py</span>
+<span class="kn">from</span> <span class="nn">tastypie.authorization</span> <span class="kn">import</span> <span class="n">Authorization</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span> <span class="nc">EntryResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;entry&#39;</span>
+        <span class="n">authorization</span><span class="o">=</span> <span class="n">Authorization</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is now great for testing in development but <strong>VERY INSECURE</strong>. You
+should never put a <tt class="docutils literal"><span class="pre">Resource</span></tt> like this out on the internet. Please spend
+some time looking at the authentication/authorization classes available in
+Tastypie.</p>
+</div>
+<p>With just nine lines of code, we have a full working REST interface to our
+<tt class="docutils literal"><span class="pre">Entry</span></tt> model. In addition, full GET/POST/PUT/DELETE support is already
+there, so it&#8217;s possible to really work with all of the data. Well, <em>almost</em>.</p>
+<p>You see, you&#8217;ll note that not quite all of our data is there. Markedly absent
+is the <tt class="docutils literal"><span class="pre">user</span></tt> field, which is a <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> to Django&#8217;s <tt class="docutils literal"><span class="pre">User</span></tt> model.
+Tastypie does <strong>NOT</strong> introspect related data because it has no way to know
+how you want to represent that data.</p>
+<p>And since that relation isn&#8217;t there, any attempt to POST/PUT new data will
+fail, because no <tt class="docutils literal"><span class="pre">user</span></tt> is present, which is a required field on the model.</p>
+<p>This is easy to fix, but we&#8217;ll need to flesh out our API a little more.</p>
+</div>
+<div class="section" id="creating-more-resources">
+<h2>Creating More Resources<a class="headerlink" href="#creating-more-resources" title="Permalink to this headline">¶</a></h2>
+<p>In order to handle our <tt class="docutils literal"><span class="pre">user</span></tt> relation, we&#8217;ll need to create a
+<tt class="docutils literal"><span class="pre">UserResource</span></tt> and tell the <tt class="docutils literal"><span class="pre">EntryResource</span></tt> to use it. So we&#8217;ll modify
+<tt class="docutils literal"><span class="pre">myapp/api.py</span></tt> to match the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># myapp/api.py</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie</span> <span class="kn">import</span> <span class="n">fields</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;user&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">EntryResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">UserResource</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;entry&#39;</span>
+</pre></div>
+</div>
+<p>We simply created a new <tt class="xref py py-class docutils literal"><span class="pre">ModelResource</span></tt> subclass
+called <tt class="docutils literal"><span class="pre">UserResource</span></tt>.  Then we added a field to <tt class="docutils literal"><span class="pre">EntryResource</span></tt> that
+specified that the <tt class="docutils literal"><span class="pre">user</span></tt> field points to a <tt class="docutils literal"><span class="pre">UserResource</span></tt> for that data.</p>
+<p>Now we should be able to get all of the fields back in our response. But since
+we have another full, working resource on our hands, we should hook that up
+to our API as well. And there&#8217;s a better way to do it.</p>
+</div>
+<div class="section" id="adding-to-the-api">
+<h2>Adding To The Api<a class="headerlink" href="#adding-to-the-api" title="Permalink to this headline">¶</a></h2>
+<p>Tastypie ships with an <tt class="xref py py-class docutils literal"><span class="pre">Api</span></tt> class, which lets you bind
+multiple <tt class="xref py py-class docutils literal"><span class="pre">Resources</span></tt> together to form a
+coherent API. Adding it to the mix is simple.</p>
+<p>We&#8217;ll go back to our URLconf (<tt class="docutils literal"><span class="pre">urls.py</span></tt>) and change it to match the
+following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># urls.py</span>
+<span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tastypie.api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">from</span> <span class="nn">myapp.api</span> <span class="kn">import</span> <span class="n">EntryResource</span><span class="p">,</span> <span class="n">UserResource</span>
+
+<span class="n">v1_api</span> <span class="o">=</span> <span class="n">Api</span><span class="p">(</span><span class="n">api_name</span><span class="o">=</span><span class="s">&#39;v1&#39;</span><span class="p">)</span>
+<span class="n">v1_api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">UserResource</span><span class="p">())</span>
+<span class="n">v1_api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">EntryResource</span><span class="p">())</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># The normal jazz here...</span>
+    <span class="p">(</span><span class="s">r&#39;^blog/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;myapp.urls&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s">r&#39;^api/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">v1_api</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that we&#8217;re now creating an <tt class="xref py py-class docutils literal"><span class="pre">Api</span></tt> instance,
+registering our <tt class="docutils literal"><span class="pre">EntryResource</span></tt> and <tt class="docutils literal"><span class="pre">UserResource</span></tt> instances with it and
+that we&#8217;ve modified the urls to now point to <tt class="docutils literal"><span class="pre">v1_api.urls</span></tt>.</p>
+<p>This makes even more data accessible, so if we start up the <tt class="docutils literal"><span class="pre">runserver</span></tt>
+again, the following URLs should work:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/?format=json">http://127.0.0.1:8000/api/v1/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/user/?format=json">http://127.0.0.1:8000/api/v1/user/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/user/1/?format=json">http://127.0.0.1:8000/api/v1/user/1/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/user/schema/?format=json">http://127.0.0.1:8000/api/v1/user/schema/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/user/set/1;3/?format=json">http://127.0.0.1:8000/api/v1/user/set/1;3/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/entry/?format=json">http://127.0.0.1:8000/api/v1/entry/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/entry/1/?format=json">http://127.0.0.1:8000/api/v1/entry/1/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/entry/schema/?format=json">http://127.0.0.1:8000/api/v1/entry/schema/?format=json</a></li>
+<li><a class="reference external" href="http://127.0.0.1:8000/api/v1/entry/set/1;3/?format=json">http://127.0.0.1:8000/api/v1/entry/set/1;3/?format=json</a></li>
+</ul>
+</div></blockquote>
+<p>Additionally, the representations out of <tt class="docutils literal"><span class="pre">EntryResource</span></tt> will now include
+the <tt class="docutils literal"><span class="pre">user</span></tt> field and point to an endpoint like <tt class="docutils literal"><span class="pre">/api/v1/users/1/</span></tt> to access
+that user&#8217;s data. And full POST/PUT delete support should now work.</p>
+<p>But there&#8217;s several new problems. One is that our new <tt class="docutils literal"><span class="pre">UserResource</span></tt> leaks
+too much data, including fields like <tt class="docutils literal"><span class="pre">email</span></tt>, <tt class="docutils literal"><span class="pre">password</span></tt>, <tt class="docutils literal"><span class="pre">is_active</span></tt> and
+<tt class="docutils literal"><span class="pre">is_staff</span></tt>. Another is that we may not want to allow end users to alter
+<tt class="docutils literal"><span class="pre">User</span></tt> data. Both of these problems are easily fixed as well.</p>
+</div>
+<div class="section" id="limiting-data-and-access">
+<h2>Limiting Data And Access<a class="headerlink" href="#limiting-data-and-access" title="Permalink to this headline">¶</a></h2>
+<p>Cutting out the <tt class="docutils literal"><span class="pre">email</span></tt>, <tt class="docutils literal"><span class="pre">password</span></tt>, <tt class="docutils literal"><span class="pre">is_active</span></tt> and <tt class="docutils literal"><span class="pre">is_staff</span></tt> fields
+is easy to do. We simply modify our <tt class="docutils literal"><span class="pre">UserResource</span></tt> code to match the
+following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_active&#39;</span><span class="p">,</span> <span class="s">&#39;is_staff&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">excludes</span></tt> directive tells <tt class="docutils literal"><span class="pre">UserResource</span></tt> which fields not to include
+in the output. If you&#8217;d rather whitelist fields, you could do:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;user&#39;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">,</span> <span class="s">&#39;first_name&#39;</span><span class="p">,</span> <span class="s">&#39;last_name&#39;</span><span class="p">,</span> <span class="s">&#39;last_login&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now that the undesirable fields are no longer included, we can look at limiting
+access. This is also easy and involves making our <tt class="docutils literal"><span class="pre">UserResource</span></tt> look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_active&#39;</span><span class="p">,</span> <span class="s">&#39;is_staff&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="n">allowed_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;get&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now only HTTP GET requests will be allowed on <tt class="docutils literal"><span class="pre">/api/v1/user/</span></tt> endpoints. If
+you require more granular control, both <tt class="docutils literal"><span class="pre">list_allowed_methods</span></tt> and
+<tt class="docutils literal"><span class="pre">detail_allowed_methods</span></tt> options are supported.</p>
+</div>
+<div class="section" id="beyond-the-basics">
+<h2>Beyond The Basics<a class="headerlink" href="#beyond-the-basics" title="Permalink to this headline">¶</a></h2>
+<p>We now have a full working API for our application. But Tastypie supports many
+more features, like:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="authentication.html"><em>Authentication</em></a></li>
+<li><a class="reference internal" href="authorization.html"><em>Authorization</em></a></li>
+<li><a class="reference internal" href="caching.html"><em>Caching</em></a></li>
+<li><a class="reference internal" href="throttling.html"><em>Throttling</em></a></li>
+<li><a class="reference internal" href="resources.html"><em>Resources</em></a> (filtering &amp; sorting)</li>
+<li><a class="reference internal" href="serialization.html"><em>Serialization</em></a></li>
+</ul>
+</div></blockquote>
+<p>Tastypie is also very easy to override and extend. For some common patterns and
+approaches, you should refer to the <a class="reference internal" href="cookbook.html"><em>Tastypie Cookbook</em></a> documentation.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting Started with Tastypie</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#creating-resources">Creating Resources</a></li>
+<li><a class="reference internal" href="#hooking-up-the-resource-s">Hooking Up The Resource(s)</a></li>
+<li><a class="reference internal" href="#creating-more-resources">Creating More Resources</a></li>
+<li><a class="reference internal" href="#adding-to-the-api">Adding To The Api</a></li>
+<li><a class="reference internal" href="#limiting-data-and-access">Limiting Data And Access</a></li>
+<li><a class="reference internal" href="#beyond-the-basics">Beyond The Basics</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="contributing.html"
+                        title="previous chapter">Contributing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="interacting.html"
+                        title="next chapter">Interacting With The API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tutorial.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="interacting.html" title="Interacting With The API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="Contributing"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

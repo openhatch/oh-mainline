@@ -1,0 +1,9 @@
+/* min-/max-width work-alike */
+#content {
+  padding:10px;
+  width: expression(document.documentElement.clientWidth < 398 ? "400px" : document.documentElement.clientWidth > 752 ? "750px" : "auto");/*novalidate*/
+  margin: 0 50px;
+  padding-left: 40px;
+  background-color:#FFF;
+/*  background: #fff url('/images/gridbg.gif');*/
+}

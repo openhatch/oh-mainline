@@ -1,0 +1,49 @@
+.. django_authopenid documentation master file, created by sphinx-quickstart on Fri Mar 27 19:15:59 2009.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to django-authopenid's documentation!
+=============================================
+
+.. rubric:: Everything you need to know about django-authopenid
+
+**django-authopenid** is a Django_ application that allow you to authenticate your users while using the django auth contrib.
+
+This application allow a user to connect to you website with :
+
+ * legacy account : username/password
+ * openid url
+
+Idee is having workflow to integrate openid and _legacy_ authentification.
+
+If the user connect with an openid he could associate it with its legaccy account or just create a new django account. When the user is connected you could manage him like you usually do with `auth contrib <http://www.djangoproject.com/documentation/authentication/>`_ or `django-registration <http://bitbucket.org/ubernostrum/django-registration/>`_ which is the default.
+
+
+Made by `Enki Multimedia <http://www.e-engura.org>`_ for one of our project and we decided to make it public.
+
+.. _Django: http://www.djangoproject.com/
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+ 
+   installation
+   gettingstarted
+   views
+   models
+   forms
+
+   changes
+
+* Follow development on `Bitbucket <http://hg.e-engura.org/django-authopenid/>`_.
+* Report bugs, report features and browse the source through `Tracker <http://hg.e-engura.org/django-authopenid/issues/>`_.
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

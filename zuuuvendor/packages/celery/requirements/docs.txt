@@ -1,0 +1,4 @@
+Sphinx
+sphinxcontrib-issuetracker>=0.9
+Sphinx-PyPI-upload
+SQLAlchemy

@@ -1,0 +1,14 @@
+django-authopenid THANKS
+========================
+
+django-authopenid was originally developed by Benoît Chesneau <bchesneau@gmail.com>
+and a number of other contributors. Many people further contributed to django-authopenid
+by reporting problems, suggesting various improvements or submitting
+changes. A list of these people is included below.
+
+* David Larlet <http://david.larlet.fr> 
+* Ross Poulton <http://www.rossp.org>
+* Rajeev Sebastian, ax extension.
+* Anthony Jawad, ax extension.
+
+and many other anonymous.

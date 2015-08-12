@@ -1,0 +1,1 @@
+{% load inplace_edit %}<a href="{{ value_link }}" {% if classes %}class="{{ classes }}"{% endif %}>{% eval %}{% if title %}{{ title }}{% else %}{{ value }}{% endif %}{% endeval %}</a>

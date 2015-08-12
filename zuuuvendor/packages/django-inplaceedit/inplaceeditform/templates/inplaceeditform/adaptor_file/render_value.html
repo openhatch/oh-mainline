@@ -1,0 +1,2 @@
+{% load inplace_edit %}
+<a href="{{ value.url }}" {% if classes %}class="{{ classes }}"{% endif %}>{% if inner_html %}{% eval %}{{ inner_html }}{% endeval %}{% else %}{{ value.url }}{% endif %}</a>

@@ -1,0 +1,24 @@
+Metadata-Version: 1.1
+Name: twill
+Version: 0.9.1-cc
+Summary: twill Web browsing language
+Home-page: http://twill.idyll.org/
+Author: C. Titus Brown
+Author-email: titus@caltech.edu
+License: MIT
+Download-URL: http://darcs.idyll.org/~t/projects/twill-0.9.tar.gz
+Description: A scripting system for automating Web browsing.  Useful for testing
+        Web pages or grabbing data from password-protected sites automatically.
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Other Scripting Engines
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Testing

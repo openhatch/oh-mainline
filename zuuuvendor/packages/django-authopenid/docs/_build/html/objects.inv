@@ -1,0 +1,23 @@
+# Sphinx inventory version 1
+# Project: django-authopenid
+# Version: 1.0
+django_authopenid.models.Association class models.html
+django_authopenid.forms.OpenidRegisterForm class forms.html
+django_authopenid.forms.OpenidSigninForm class forms.html
+django_authopenid.views.password_change function views.html
+django_authopenid.models.Nonce class models.html
+django_authopenid.views.associate_success function views.html
+django_authopenid.views.signin_success function views.html
+django_authopenid.forms.AssociateOpenID class forms.html
+django_authopenid.forms.OpenidDissociateForm class forms.html
+django_authopenid.views.dissociate function views.html
+django_authopenid.views.signin_failure function views.html
+django_authopenid.models.UserAssociation class models.html
+django_authopenid.views.register function views.html
+django_authopenid.views.associate function views.html
+django_authopenid.views.signin function views.html
+django_authopenid.views.complete_signin function views.html
+django_authopenid.views.signout function views.html
+django_authopenid.views.complete_associate function views.html
+django_authopenid.views.xrdf function views.html
+django_authopenid.views.associate_failure function views.html

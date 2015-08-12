@@ -1,0 +1,34 @@
+Metadata-Version: 1.1
+Name: WebTest
+Version: 2.0.15
+Summary: Helper to test WSGI applications
+Home-page: http://webtest.pythonpaste.org/
+Author: Gael Pasgrimaud
+Author-email: gael@gawel.org
+License: MIT
+Description: =======
+        WebTest
+        =======
+        
+        This wraps any WSGI application and makes it easy to send test
+        requests to that application, without starting up an HTTP server.
+        
+        This provides convenient full-stack testing of applications written
+        with any WSGI-compatible framework.
+        
+        Full docs can be found at https://webtest.readthedocs.org/en/latest/
+        
+Keywords: wsgi test unit tests web
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Paste
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI :: Server
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3

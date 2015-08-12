@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Resource Fields &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Caching" href="caching.html" />
+    <link rel="prev" title="Api" href="api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="Api"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="resource-fields">
+<span id="ref-fields"></span><h1>Resource Fields<a class="headerlink" href="#resource-fields" title="Permalink to this headline">¶</a></h1>
+<p>When designing an API, an important component is defining the representation
+of the data you&#8217;re presenting. Like Django models, you can control the
+representation of a <tt class="docutils literal"><span class="pre">Resource</span></tt> using fields. There are a variety of fields
+for various types of data.</p>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>For the impatient:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie</span> <span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">Resource</span>
+<span class="kn">from</span> <span class="nn">myapp.api.resources</span> <span class="kn">import</span> <span class="n">ProfileResource</span><span class="p">,</span> <span class="n">NoteResource</span>
+
+
+<span class="k">class</span> <span class="nc">PersonResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">age</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s">&#39;years_old&#39;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">created</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;When the person was created&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToOneField</span><span class="p">(</span><span class="n">ProfileResource</span><span class="p">,</span> <span class="s">&#39;profile&#39;</span><span class="p">)</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToManyField</span><span class="p">(</span><span class="n">NoteResource</span><span class="p">,</span> <span class="s">&#39;notes&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="standard-data-fields">
+<h2>Standard Data Fields<a class="headerlink" href="#standard-data-fields" title="Permalink to this headline">¶</a></h2>
+<p>All standard data fields have a common base class <tt class="docutils literal"><span class="pre">ApiField</span></tt> which handles
+the basic implementation details.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You should not use the <tt class="docutils literal"><span class="pre">ApiField</span></tt> class directly. Please use one of the
+subclasses that is more correct for your data.</p>
+</div>
+<div class="section" id="common-field-options">
+<h3>Common Field Options<a class="headerlink" href="#common-field-options" title="Permalink to this headline">¶</a></h3>
+<p>All <tt class="docutils literal"><span class="pre">ApiField</span></tt> objects accept the following options.</p>
+<div class="section" id="attribute">
+<h4><tt class="docutils literal"><span class="pre">attribute</span></tt><a class="headerlink" href="#attribute" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.attribute">
+<tt class="descclassname">ApiField.</tt><tt class="descname">attribute</tt><a class="headerlink" href="#ApiField.attribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A string naming an instance attribute of the object wrapped by the Resource. The
+attribute will be accessed during the <tt class="docutils literal"><span class="pre">dehydrate</span></tt> or or written during the <tt class="docutils literal"><span class="pre">hydrate</span></tt>.</p>
+<p>Defaults to <tt class="xref docutils literal"><span class="pre">None</span></tt>, meaning data will be manually accessed.</p>
+</div>
+<div class="section" id="default">
+<h4><tt class="docutils literal"><span class="pre">default</span></tt><a class="headerlink" href="#default" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.default">
+<tt class="descclassname">ApiField.</tt><tt class="descname">default</tt><a class="headerlink" href="#ApiField.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Provides default data when the object being <tt class="docutils literal"><span class="pre">dehydrated</span></tt>/<tt class="docutils literal"><span class="pre">hydrated</span></tt> has no data on
+the field.</p>
+<p>Defaults to <tt class="docutils literal"><span class="pre">tastypie.fields.NOT_PROVIDED</span></tt>.</p>
+</div>
+<div class="section" id="null">
+<h4><tt class="docutils literal"><span class="pre">null</span></tt><a class="headerlink" href="#null" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.null">
+<tt class="descclassname">ApiField.</tt><tt class="descname">null</tt><a class="headerlink" href="#ApiField.null" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates whether or not a <tt class="xref docutils literal"><span class="pre">None</span></tt> is allowable data on the field. Defaults to
+<tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</div>
+<div class="section" id="blank">
+<h4><tt class="docutils literal"><span class="pre">blank</span></tt><a class="headerlink" href="#blank" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.blank">
+<tt class="descclassname">ApiField.</tt><tt class="descname">blank</tt><a class="headerlink" href="#ApiField.blank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates whether or not data may be omitted on the field. Defaults to <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>This is useful for allowing the user to omit data that you can populate based
+on the request, such as the <tt class="docutils literal"><span class="pre">user</span></tt> or <tt class="docutils literal"><span class="pre">site</span></tt> to associate a record with.</p>
+</div>
+<div class="section" id="readonly">
+<h4><tt class="docutils literal"><span class="pre">readonly</span></tt><a class="headerlink" href="#readonly" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.readonly">
+<tt class="descclassname">ApiField.</tt><tt class="descname">readonly</tt><a class="headerlink" href="#ApiField.readonly" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates whether the field is used during the <tt class="docutils literal"><span class="pre">hydrate</span></tt> or not. Defaults to <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</div>
+<div class="section" id="unique">
+<h4><tt class="docutils literal"><span class="pre">unique</span></tt><a class="headerlink" href="#unique" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.unique">
+<tt class="descclassname">ApiField.</tt><tt class="descname">unique</tt><a class="headerlink" href="#ApiField.unique" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates whether the field is a unique identifier for the object.</p>
+</div>
+<div class="section" id="help-text">
+<h4><tt class="docutils literal"><span class="pre">help_text</span></tt><a class="headerlink" href="#help-text" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.help_text">
+<tt class="descclassname">ApiField.</tt><tt class="descname">help_text</tt><a class="headerlink" href="#ApiField.help_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A human-readable description of the field exposed at the schema level.
+Defaults to the per-Field definition.</p>
+</div>
+<div class="section" id="use-in">
+<h4><tt class="docutils literal"><span class="pre">use_in</span></tt><a class="headerlink" href="#use-in" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="ApiField.use_in">
+<tt class="descclassname">ApiField.</tt><tt class="descname">use_in</tt><a class="headerlink" href="#ApiField.use_in" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Optionally omit this field in list or detail views.  It can be either &#8216;all&#8217;,
+&#8216;list&#8217;, or &#8216;detail&#8217; or a callable which accepts a bundle and returns a boolean
+value.</p>
+</div>
+</div>
+<div class="section" id="module-tastypie.fields">
+<span id="field-types"></span><h3>Field Types<a class="headerlink" href="#module-tastypie.fields" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="booleanfield">
+<h3><tt class="docutils literal"><span class="pre">BooleanField</span></tt><a class="headerlink" href="#booleanfield" title="Permalink to this headline">¶</a></h3>
+<p>A boolean field.</p>
+<p>Covers both <tt class="docutils literal"><span class="pre">models.BooleanField</span></tt> and <tt class="docutils literal"><span class="pre">models.NullBooleanField</span></tt>.</p>
+</div>
+<div class="section" id="charfield">
+<h3><tt class="docutils literal"><span class="pre">CharField</span></tt><a class="headerlink" href="#charfield" title="Permalink to this headline">¶</a></h3>
+<p>A text field of arbitrary length.</p>
+<p>Covers both <tt class="docutils literal"><span class="pre">models.CharField</span></tt> and <tt class="docutils literal"><span class="pre">models.TextField</span></tt>.</p>
+</div>
+<div class="section" id="datefield">
+<h3><tt class="docutils literal"><span class="pre">DateField</span></tt><a class="headerlink" href="#datefield" title="Permalink to this headline">¶</a></h3>
+<p>A date field.</p>
+</div>
+<div class="section" id="datetimefield">
+<h3><tt class="docutils literal"><span class="pre">DateTimeField</span></tt><a class="headerlink" href="#datetimefield" title="Permalink to this headline">¶</a></h3>
+<p>A datetime field.</p>
+</div>
+<div class="section" id="decimalfield">
+<h3><tt class="docutils literal"><span class="pre">DecimalField</span></tt><a class="headerlink" href="#decimalfield" title="Permalink to this headline">¶</a></h3>
+<p>A decimal field.</p>
+</div>
+<div class="section" id="dictfield">
+<h3><tt class="docutils literal"><span class="pre">DictField</span></tt><a class="headerlink" href="#dictfield" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary field.</p>
+</div>
+<div class="section" id="filefield">
+<h3><tt class="docutils literal"><span class="pre">FileField</span></tt><a class="headerlink" href="#filefield" title="Permalink to this headline">¶</a></h3>
+<p>A file-related field.</p>
+<p>Covers both <tt class="docutils literal"><span class="pre">models.FileField</span></tt> and <tt class="docutils literal"><span class="pre">models.ImageField</span></tt>.</p>
+</div>
+<div class="section" id="floatfield">
+<h3><tt class="docutils literal"><span class="pre">FloatField</span></tt><a class="headerlink" href="#floatfield" title="Permalink to this headline">¶</a></h3>
+<p>A floating point field.</p>
+</div>
+<div class="section" id="integerfield">
+<h3><tt class="docutils literal"><span class="pre">IntegerField</span></tt><a class="headerlink" href="#integerfield" title="Permalink to this headline">¶</a></h3>
+<p>An integer field.</p>
+<p>Covers <tt class="docutils literal"><span class="pre">models.IntegerField</span></tt>, <tt class="docutils literal"><span class="pre">models.PositiveIntegerField</span></tt>,
+<tt class="docutils literal"><span class="pre">models.PositiveSmallIntegerField</span></tt> and <tt class="docutils literal"><span class="pre">models.SmallIntegerField</span></tt>.</p>
+</div>
+<div class="section" id="listfield">
+<h3><tt class="docutils literal"><span class="pre">ListField</span></tt><a class="headerlink" href="#listfield" title="Permalink to this headline">¶</a></h3>
+<p>A list field.</p>
+</div>
+<div class="section" id="timefield">
+<h3><tt class="docutils literal"><span class="pre">TimeField</span></tt><a class="headerlink" href="#timefield" title="Permalink to this headline">¶</a></h3>
+<p>A time field.</p>
+</div>
+</div>
+<div class="section" id="relationship-fields">
+<h2>Relationship Fields<a class="headerlink" href="#relationship-fields" title="Permalink to this headline">¶</a></h2>
+<p>Provides access to data that is related within the database.</p>
+<p>The <tt class="docutils literal"><span class="pre">RelatedField</span></tt> base class is not intended for direct use but provides
+functionality that <tt class="docutils literal"><span class="pre">ToOneField</span></tt> and <tt class="docutils literal"><span class="pre">ToManyField</span></tt> build upon.</p>
+<p>The contents of this field actually point to another <tt class="docutils literal"><span class="pre">Resource</span></tt>,
+rather than the related object. This allows the field to represent its data
+in different ways.</p>
+<p>The abstractions based around this are &#8220;leaky&#8221; in that, unlike the other
+fields provided by <tt class="docutils literal"><span class="pre">tastypie</span></tt>, these fields don&#8217;t handle arbitrary objects
+very well. The subclasses use Django&#8217;s ORM layer to make things go, though
+there is no ORM-specific code at this level.</p>
+<div class="section" id="id1">
+<h3>Common Field Options<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the common attributes for all <cite>ApiField</cite>, relationship fields
+accept the following.</p>
+<div class="section" id="to">
+<h4><tt class="docutils literal"><span class="pre">to</span></tt><a class="headerlink" href="#to" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.to">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">to</tt><a class="headerlink" href="#tastypie.fields.RelatedField.to" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">to</span></tt> argument should point to a <tt class="docutils literal"><span class="pre">Resource</span></tt> class, NOT to a <tt class="docutils literal"><span class="pre">Model</span></tt>.
+Required.</p>
+</div>
+<div class="section" id="full">
+<h4><tt class="docutils literal"><span class="pre">full</span></tt><a class="headerlink" href="#full" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.full">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">full</tt><a class="headerlink" href="#tastypie.fields.RelatedField.full" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates how the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt>. If
+<tt class="xref docutils literal"><span class="pre">False</span></tt>, the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear as a URL to the endpoint of
+that resource. If <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result of the sub-resource&#8217;s <tt class="docutils literal"><span class="pre">dehydrate</span></tt> will
+be included in full. You can further control post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt> behaviour when
+requesting a resource or a list of resources by setting <tt class="docutils literal"><span class="pre">full_list</span></tt> and <tt class="docutils literal"><span class="pre">full_detail</span></tt>.</p>
+</div>
+<div class="section" id="full-list">
+<h4><tt class="docutils literal"><span class="pre">full_list</span></tt><a class="headerlink" href="#full-list" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.full_list">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">full_list</tt><a class="headerlink" href="#tastypie.fields.RelatedField.full_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates how the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt> when requesting a
+list of resources. The value is one of <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt> or a callable that accepts a
+bundle and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>. If <tt class="xref docutils literal"><span class="pre">False</span></tt>, the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear
+as a URL to the endpoint of that resource if accessing a list of resources.  If <tt class="xref docutils literal"><span class="pre">True</span></tt> and <tt class="docutils literal"><span class="pre">full</span></tt>
+is also <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result of thesub-resource&#8217;s <tt class="docutils literal"><span class="pre">dehydrate</span></tt> will be included in
+full. Default is <tt class="xref docutils literal"><span class="pre">True</span></tt></p>
+</div>
+<div class="section" id="full-detail">
+<h4><tt class="docutils literal"><span class="pre">full_detail</span></tt><a class="headerlink" href="#full-detail" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.full_detail">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">full_detail</tt><a class="headerlink" href="#tastypie.fields.RelatedField.full_detail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Indicates how the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear post-<tt class="docutils literal"><span class="pre">dehydrate</span></tt> when requesting a
+single resource. The value is one of <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt> or a callable that accepts a
+bundle and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>. If <tt class="xref docutils literal"><span class="pre">False</span></tt>, the related <tt class="docutils literal"><span class="pre">Resource</span></tt> will appear
+as a URL to the endpoint of that resource if accessing a specific resources. If <tt class="xref docutils literal"><span class="pre">True</span></tt> and <tt class="docutils literal"><span class="pre">full</span></tt>
+is also <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result of thesub-resource&#8217;s <tt class="docutils literal"><span class="pre">dehydrate</span></tt> will be included
+in full. Default is <tt class="xref docutils literal"><span class="pre">True</span></tt></p>
+</div>
+<div class="section" id="related-name">
+<h4><tt class="docutils literal"><span class="pre">related_name</span></tt><a class="headerlink" href="#related-name" title="Permalink to this headline">¶</a></h4>
+<dl class="attribute">
+<dt id="tastypie.fields.RelatedField.related_name">
+<tt class="descclassname">RelatedField.</tt><tt class="descname">related_name</tt><a class="headerlink" href="#tastypie.fields.RelatedField.related_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Used to help automatically populate reverse relations when creating data.
+Defaults to <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
+<p>In order for this option to work correctly, there must be a field on the
+other <tt class="docutils literal"><span class="pre">Resource</span></tt> with this as an <tt class="docutils literal"><span class="pre">attribute/instance_name</span></tt>. Usually this
+just means adding a reflecting <tt class="docutils literal"><span class="pre">ToOneField</span></tt> pointing back.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">EntryResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToManyField</span><span class="p">(</span><span class="s">&#39;path.to.api.resources.AuthorResource&#39;</span><span class="p">,</span> <span class="s">&#39;author_set&#39;</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;entry&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;entry&#39;</span>
+
+<span class="k">class</span> <span class="nc">AuthorResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToOneField</span><span class="p">(</span><span class="n">EntryResource</span><span class="p">,</span> <span class="s">&#39;entry&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Author</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;author&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>Field Types<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="toonefield">
+<h4><tt class="docutils literal"><span class="pre">ToOneField</span></tt><a class="headerlink" href="#toonefield" title="Permalink to this headline">¶</a></h4>
+<p>Provides access to related data via foreign key.</p>
+<p>This subclass requires Django&#8217;s ORM layer to work properly.</p>
+</div>
+<div class="section" id="onetoonefield">
+<h4><tt class="docutils literal"><span class="pre">OneToOneField</span></tt><a class="headerlink" href="#onetoonefield" title="Permalink to this headline">¶</a></h4>
+<p>An alias to <tt class="docutils literal"><span class="pre">ToOneField</span></tt> for those who prefer to mirror <tt class="docutils literal"><span class="pre">django.db.models</span></tt>.</p>
+</div>
+<div class="section" id="foreignkey">
+<h4><tt class="docutils literal"><span class="pre">ForeignKey</span></tt><a class="headerlink" href="#foreignkey" title="Permalink to this headline">¶</a></h4>
+<p>An alias to <tt class="docutils literal"><span class="pre">ToOneField</span></tt> for those who prefer to mirror <tt class="docutils literal"><span class="pre">django.db.models</span></tt>.</p>
+</div>
+<div class="section" id="tomanyfield">
+<h4><tt class="docutils literal"><span class="pre">ToManyField</span></tt><a class="headerlink" href="#tomanyfield" title="Permalink to this headline">¶</a></h4>
+<p>Provides access to related data via a join table.</p>
+<p>This subclass requires Django&#8217;s ORM layer to work properly.</p>
+<p>This field also has special behavior when dealing with <tt class="docutils literal"><span class="pre">attribute</span></tt> in that
+it can take a callable. For instance, if you need to filter the reverse
+relation, you can do something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">subjects</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">ToManyField</span><span class="p">(</span><span class="n">SubjectResource</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="k">lambda</span> <span class="n">bundle</span><span class="p">:</span> <span class="n">Subject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">notes</span><span class="o">=</span><span class="n">bundle</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">name__startswith</span><span class="o">=</span><span class="s">&#39;Personal&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Note that the <tt class="docutils literal"><span class="pre">hydrate</span></tt> portions of this field are quite different than
+any other field. <tt class="docutils literal"><span class="pre">hydrate_m2m</span></tt> actually handles the data and relations.
+This is due to the way Django implements M2M relationships.</p>
+</div>
+<div class="section" id="manytomanyfield">
+<h4><tt class="docutils literal"><span class="pre">ManyToManyField</span></tt><a class="headerlink" href="#manytomanyfield" title="Permalink to this headline">¶</a></h4>
+<p>An alias to <tt class="docutils literal"><span class="pre">ToManyField</span></tt> for those who prefer to mirror <tt class="docutils literal"><span class="pre">django.db.models</span></tt>.</p>
+</div>
+<div class="section" id="onetomanyfield">
+<h4><tt class="docutils literal"><span class="pre">OneToManyField</span></tt><a class="headerlink" href="#onetomanyfield" title="Permalink to this headline">¶</a></h4>
+<p>An alias to <tt class="docutils literal"><span class="pre">ToManyField</span></tt> for those who prefer to mirror <tt class="docutils literal"><span class="pre">django.db.models</span></tt>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Resource Fields</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#standard-data-fields">Standard Data Fields</a><ul>
+<li><a class="reference internal" href="#common-field-options">Common Field Options</a><ul>
+<li><a class="reference internal" href="#attribute"><tt class="docutils literal"><span class="pre">attribute</span></tt></a></li>
+<li><a class="reference internal" href="#default"><tt class="docutils literal"><span class="pre">default</span></tt></a></li>
+<li><a class="reference internal" href="#null"><tt class="docutils literal"><span class="pre">null</span></tt></a></li>
+<li><a class="reference internal" href="#blank"><tt class="docutils literal"><span class="pre">blank</span></tt></a></li>
+<li><a class="reference internal" href="#readonly"><tt class="docutils literal"><span class="pre">readonly</span></tt></a></li>
+<li><a class="reference internal" href="#unique"><tt class="docutils literal"><span class="pre">unique</span></tt></a></li>
+<li><a class="reference internal" href="#help-text"><tt class="docutils literal"><span class="pre">help_text</span></tt></a></li>
+<li><a class="reference internal" href="#use-in"><tt class="docutils literal"><span class="pre">use_in</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-tastypie.fields">Field Types</a></li>
+<li><a class="reference internal" href="#booleanfield"><tt class="docutils literal"><span class="pre">BooleanField</span></tt></a></li>
+<li><a class="reference internal" href="#charfield"><tt class="docutils literal"><span class="pre">CharField</span></tt></a></li>
+<li><a class="reference internal" href="#datefield"><tt class="docutils literal"><span class="pre">DateField</span></tt></a></li>
+<li><a class="reference internal" href="#datetimefield"><tt class="docutils literal"><span class="pre">DateTimeField</span></tt></a></li>
+<li><a class="reference internal" href="#decimalfield"><tt class="docutils literal"><span class="pre">DecimalField</span></tt></a></li>
+<li><a class="reference internal" href="#dictfield"><tt class="docutils literal"><span class="pre">DictField</span></tt></a></li>
+<li><a class="reference internal" href="#filefield"><tt class="docutils literal"><span class="pre">FileField</span></tt></a></li>
+<li><a class="reference internal" href="#floatfield"><tt class="docutils literal"><span class="pre">FloatField</span></tt></a></li>
+<li><a class="reference internal" href="#integerfield"><tt class="docutils literal"><span class="pre">IntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#listfield"><tt class="docutils literal"><span class="pre">ListField</span></tt></a></li>
+<li><a class="reference internal" href="#timefield"><tt class="docutils literal"><span class="pre">TimeField</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relationship-fields">Relationship Fields</a><ul>
+<li><a class="reference internal" href="#id1">Common Field Options</a><ul>
+<li><a class="reference internal" href="#to"><tt class="docutils literal"><span class="pre">to</span></tt></a></li>
+<li><a class="reference internal" href="#full"><tt class="docutils literal"><span class="pre">full</span></tt></a></li>
+<li><a class="reference internal" href="#full-list"><tt class="docutils literal"><span class="pre">full_list</span></tt></a></li>
+<li><a class="reference internal" href="#full-detail"><tt class="docutils literal"><span class="pre">full_detail</span></tt></a></li>
+<li><a class="reference internal" href="#related-name"><tt class="docutils literal"><span class="pre">related_name</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">Field Types</a><ul>
+<li><a class="reference internal" href="#toonefield"><tt class="docutils literal"><span class="pre">ToOneField</span></tt></a></li>
+<li><a class="reference internal" href="#onetoonefield"><tt class="docutils literal"><span class="pre">OneToOneField</span></tt></a></li>
+<li><a class="reference internal" href="#foreignkey"><tt class="docutils literal"><span class="pre">ForeignKey</span></tt></a></li>
+<li><a class="reference internal" href="#tomanyfield"><tt class="docutils literal"><span class="pre">ToManyField</span></tt></a></li>
+<li><a class="reference internal" href="#manytomanyfield"><tt class="docutils literal"><span class="pre">ManyToManyField</span></tt></a></li>
+<li><a class="reference internal" href="#onetomanyfield"><tt class="docutils literal"><span class="pre">OneToManyField</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="previous chapter">Api</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="caching.html"
+                        title="next chapter">Caching</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fields.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="Api"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

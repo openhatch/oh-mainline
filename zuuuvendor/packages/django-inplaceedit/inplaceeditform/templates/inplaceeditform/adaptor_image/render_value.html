@@ -1,0 +1,1 @@
+{% load inplace_edit %}<img src="{{ value.url }}" {% eval %}{% if title %}title="{{ title }}"{% endif %} {% if alt %}alt="{{ alt }}"{% endif %}{% endeval %} {% if classes %}class="{{ classes }}"{% endif %} {% if height %}height="{{ height }}"{% endif %} {% if width %}width="{{ width }}"{% endif %}"/>

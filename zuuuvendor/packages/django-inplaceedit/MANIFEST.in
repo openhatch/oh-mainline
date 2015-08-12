@@ -1,0 +1,11 @@
+include README.rst
+include AUTHORS.rst
+include CHANGES.rst
+include COPYING.LGPLv3
+include inplaceeditform/locale/*/LC_MESSAGES/*.*
+include inplaceeditform/templates/inplaceeditform/*.*
+include inplaceeditform/templates/inplaceeditform/*/*.*
+include inplaceeditform/static/*/*.*
+prune   testing/
+exclude *~
+exclude *.pyc

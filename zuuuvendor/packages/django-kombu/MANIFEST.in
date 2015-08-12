@@ -1,0 +1,11 @@
+include AUTHORS
+include Changelog
+include INSTALL
+include LICENSE
+include MANIFEST.in
+include README
+include README.rst
+include THANKS
+include TODO
+include setup.cfg
+recursive-include djkombu *

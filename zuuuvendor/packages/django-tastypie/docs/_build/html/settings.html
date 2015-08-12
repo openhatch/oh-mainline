@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tastypie Settings &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Using Tastypie With Non-ORM Data Sources" href="non_orm_data_sources.html" />
+    <link rel="prev" title="Interacting With The API" href="interacting.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="non_orm_data_sources.html" title="Using Tastypie With Non-ORM Data Sources"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="interacting.html" title="Interacting With The API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tastypie-settings">
+<span id="ref-settings"></span><h1>Tastypie Settings<a class="headerlink" href="#tastypie-settings" title="Permalink to this headline">¶</a></h1>
+<p>This is a comprehensive list of the settings Tastypie recognizes.</p>
+<div class="section" id="api-limit-per-page">
+<h2><tt class="docutils literal"><span class="pre">API_LIMIT_PER_PAGE</span></tt><a class="headerlink" href="#api-limit-per-page" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls the default number of records Tastypie will show
+in a list view.</p>
+<p>This is only used when a user does not specify a <tt class="docutils literal"><span class="pre">limit</span></tt> GET parameter and
+the <tt class="docutils literal"><span class="pre">Resource</span></tt> subclass has not overridden the number to be shown.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">API_LIMIT_PER_PAGE</span> <span class="o">=</span> <span class="mi">50</span>
+</pre></div>
+</div>
+<p>If you don&#8217;t want to limit the number of records by default, you can set this setting to 0:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">API_LIMIT_PER_PAGE</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>Defaults to 20.</p>
+</div>
+<div class="section" id="tastypie-full-debug">
+<h2><tt class="docutils literal"><span class="pre">TASTYPIE_FULL_DEBUG</span></tt><a class="headerlink" href="#tastypie-full-debug" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting controls what the behavior is when an unhandled exception occurs.</p>
+<p>If set to <tt class="xref docutils literal"><span class="pre">True</span></tt> and <tt class="docutils literal"><span class="pre">settings.DEBUG</span> <span class="pre">=</span> <span class="pre">True</span></tt>, the standard Django
+technical 500 is displayed.</p>
+<p>If not set or set to <tt class="xref docutils literal"><span class="pre">False</span></tt>, Tastypie will return a serialized response.
+If <tt class="docutils literal"><span class="pre">settings.DEBUG</span></tt> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, you&#8217;ll get the actual exception message plus
+a traceback. If <tt class="docutils literal"><span class="pre">settings.DEBUG</span></tt> is <tt class="xref docutils literal"><span class="pre">False</span></tt>, Tastypie will call
+<tt class="docutils literal"><span class="pre">mail_admins()</span></tt> and provide a canned error message (which you can override
+with <tt class="docutils literal"><span class="pre">TASTYPIE_CANNED_ERROR</span></tt>) in the response.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_FULL_DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</div>
+<div class="section" id="tastypie-canned-error">
+<h2><tt class="docutils literal"><span class="pre">TASTYPIE_CANNED_ERROR</span></tt><a class="headerlink" href="#tastypie-canned-error" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to override the canned error response when an
+unhandled exception is raised and <tt class="docutils literal"><span class="pre">settings.DEBUG</span></tt> is <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_CANNED_ERROR</span> <span class="o">=</span> <span class="s">&quot;Oops, we broke it!&quot;</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="docutils literal"><span class="pre">&quot;Sorry,</span> <span class="pre">this</span> <span class="pre">request</span> <span class="pre">could</span> <span class="pre">not</span> <span class="pre">be</span> <span class="pre">processed.</span> <span class="pre">Please</span> <span class="pre">try</span> <span class="pre">again</span> <span class="pre">later.&quot;</span></tt>.</p>
+</div>
+<div class="section" id="tastypie-allow-missing-slash">
+<h2><tt class="docutils literal"><span class="pre">TASTYPIE_ALLOW_MISSING_SLASH</span></tt><a class="headerlink" href="#tastypie-allow-missing-slash" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows your URLs to be missing the final slash. Useful for
+integrating with other systems.</p>
+<p>You must also have <tt class="docutils literal"><span class="pre">settings.APPEND_SLASH</span> <span class="pre">=</span> <span class="pre">False</span></tt> so that Django does not
+emit HTTP 302 redirects.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_ALLOW_MISSING_SLASH</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</div>
+<div class="section" id="tastypie-datetime-formatting">
+<h2><tt class="docutils literal"><span class="pre">TASTYPIE_DATETIME_FORMATTING</span></tt><a class="headerlink" href="#tastypie-datetime-formatting" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to globally choose what format your datetime/date/time
+data will be formatted in. Valid options are <tt class="docutils literal"><span class="pre">iso-8601</span></tt> &amp; <tt class="docutils literal"><span class="pre">rfc-2822</span></tt>.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_DATETIME_FORMATTING</span> <span class="o">=</span> <span class="s">&#39;rfc-2822&#39;</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="docutils literal"><span class="pre">iso-8601</span></tt>.</p>
+</div>
+<div class="section" id="tastypie-default-formats">
+<span id="settings-tastypie-default-formats"></span><h2><tt class="docutils literal"><span class="pre">TASTYPIE_DEFAULT_FORMATS</span></tt><a class="headerlink" href="#tastypie-default-formats" title="Permalink to this headline">¶</a></h2>
+<p><strong>Optional</strong></p>
+<p>This setting allows you to globally configure the list of allowed serialization
+formats for your entire site.</p>
+<p>An example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TASTYPIE_DEFAULT_FORMATS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;xml&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Defaults to <tt class="docutils literal"><span class="pre">['json',</span> <span class="pre">'xml',</span> <span class="pre">'yaml',</span> <span class="pre">'html',</span> <span class="pre">'plist']</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tastypie Settings</a><ul>
+<li><a class="reference internal" href="#api-limit-per-page"><tt class="docutils literal"><span class="pre">API_LIMIT_PER_PAGE</span></tt></a></li>
+<li><a class="reference internal" href="#tastypie-full-debug"><tt class="docutils literal"><span class="pre">TASTYPIE_FULL_DEBUG</span></tt></a></li>
+<li><a class="reference internal" href="#tastypie-canned-error"><tt class="docutils literal"><span class="pre">TASTYPIE_CANNED_ERROR</span></tt></a></li>
+<li><a class="reference internal" href="#tastypie-allow-missing-slash"><tt class="docutils literal"><span class="pre">TASTYPIE_ALLOW_MISSING_SLASH</span></tt></a></li>
+<li><a class="reference internal" href="#tastypie-datetime-formatting"><tt class="docutils literal"><span class="pre">TASTYPIE_DATETIME_FORMATTING</span></tt></a></li>
+<li><a class="reference internal" href="#tastypie-default-formats"><tt class="docutils literal"><span class="pre">TASTYPIE_DEFAULT_FORMATS</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="interacting.html"
+                        title="previous chapter">Interacting With The API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="non_orm_data_sources.html"
+                        title="next chapter">Using Tastypie With Non-ORM Data Sources</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/settings.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="non_orm_data_sources.html" title="Using Tastypie With Non-ORM Data Sources"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="interacting.html" title="Interacting With The API"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

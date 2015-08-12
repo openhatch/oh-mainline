@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Validation &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Authentication" href="authentication.html" />
+    <link rel="prev" title="Caching" href="caching.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="validation">
+<span id="ref-validation"></span><h1>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h1>
+<p>Validation allows you to ensure that the data being submitted by the user
+is appropriate for storage. This can range from simple type checking on up
+to complex validation that compares different fields together.</p>
+<p>If the data is valid, an empty dictionary is returned and processing continues
+as normal. If the data is invalid, a dictionary of error messages (keys being
+the field names, values being a list of error messages) is immediately
+returned to the user, serialized in the format they requested.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Using these classes is simple. Simply provide them (or your own class) as a
+<tt class="docutils literal"><span class="pre">Meta</span></tt> option to the <tt class="docutils literal"><span class="pre">Resource</span></tt> in question. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.validation</span> <span class="kn">import</span> <span class="n">Validation</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="c"># Add it here.</span>
+        <span class="n">validation</span> <span class="o">=</span> <span class="n">Validation</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="validation-options">
+<h2>Validation Options<a class="headerlink" href="#validation-options" title="Permalink to this headline">¶</a></h2>
+<p>Tastypie ships with the following <tt class="docutils literal"><span class="pre">Validation</span></tt> classes:</p>
+<div class="section" id="id1">
+<h3><tt class="docutils literal"><span class="pre">Validation</span></tt><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The no-op validation option, the data submitted is always considered to be
+valid.</p>
+<p>This is the default class hooked up to <tt class="docutils literal"><span class="pre">Resource/ModelResource</span></tt>.</p>
+</div>
+<div class="section" id="formvalidation">
+<h3><tt class="docutils literal"><span class="pre">FormValidation</span></tt><a class="headerlink" href="#formvalidation" title="Permalink to this headline">¶</a></h3>
+<p>A more complex form of validation, this class accepts a <tt class="docutils literal"><span class="pre">form_class</span></tt> argument
+to its constructor. You supply a Django <tt class="docutils literal"><span class="pre">Form</span></tt> (or <tt class="docutils literal"><span class="pre">ModelForm</span></tt>, though
+<tt class="docutils literal"><span class="pre">save</span></tt> will never get called) and Tastypie will verify the <tt class="docutils literal"><span class="pre">data</span></tt> in the
+<tt class="docutils literal"><span class="pre">Bundle</span></tt> against the form.</p>
+<p>This class <strong>DOES NOT</strong> alter the data sent, only verifies it. If you
+want to alter the data, please use the <tt class="docutils literal"><span class="pre">CleanDataFormValidation</span></tt> class
+instead.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Data in the bundle must line up with the fieldnames in the <tt class="docutils literal"><span class="pre">Form</span></tt>. If they
+do not, you&#8217;ll need to either munge the data or change your form.</p>
+</div>
+<p>Usage looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">NoteForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">slug</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">()</span>
+
+<span class="n">form</span> <span class="o">=</span> <span class="n">FormValidation</span><span class="p">(</span><span class="n">form_class</span><span class="o">=</span><span class="n">NoteForm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cleaneddataformvalidation">
+<h3><tt class="docutils literal"><span class="pre">CleanedDataFormValidation</span></tt><a class="headerlink" href="#cleaneddataformvalidation" title="Permalink to this headline">¶</a></h3>
+<p>Similar to the <tt class="docutils literal"><span class="pre">FormValidation</span></tt> class, this uses a Django <tt class="docutils literal"><span class="pre">Form</span></tt> to handle
+validation. <strong>However</strong>, it will use the <tt class="docutils literal"><span class="pre">form.cleaned_data</span></tt> to replace the
+<tt class="docutils literal"><span class="pre">bundle</span></tt> data sent by user! Usage is identical to <tt class="docutils literal"><span class="pre">FormValidation</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="implementing-your-own-validation">
+<h2>Implementing Your Own Validation<a class="headerlink" href="#implementing-your-own-validation" title="Permalink to this headline">¶</a></h2>
+<p>Implementing your own <tt class="docutils literal"><span class="pre">Validation</span></tt> classes is a simple process. The
+constructor can take whatever <tt class="docutils literal"><span class="pre">**kwargs</span></tt> it needs (if any). The only other
+method to implement is the <tt class="docutils literal"><span class="pre">is_valid</span></tt> method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.validation</span> <span class="kn">import</span> <span class="n">Validation</span>
+
+
+<span class="k">class</span> <span class="nc">AwesomeValidation</span><span class="p">(</span><span class="n">Validation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bundle</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;__all__&#39;</span><span class="p">:</span> <span class="s">&#39;Not quite what I had in mind.&#39;</span><span class="p">}</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">bundle</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;awesome&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">errors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;NOT ENOUGH AWESOME. NEEDS MORE.&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">errors</span>
+</pre></div>
+</div>
+<p>Under this validation, every field that&#8217;s a string is checked for the word
+&#8216;awesome&#8217;. If it&#8217;s not in the string, it&#8217;s an error.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Validation</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#validation-options">Validation Options</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">Validation</span></tt></a></li>
+<li><a class="reference internal" href="#formvalidation"><tt class="docutils literal"><span class="pre">FormValidation</span></tt></a></li>
+<li><a class="reference internal" href="#cleaneddataformvalidation"><tt class="docutils literal"><span class="pre">CleanedDataFormValidation</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementing-your-own-validation">Implementing Your Own Validation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="caching.html"
+                        title="previous chapter">Caching</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="next chapter">Authentication</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/validation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="caching.html" title="Caching"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

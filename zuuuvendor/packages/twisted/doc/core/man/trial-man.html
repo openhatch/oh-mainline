@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html  PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'><html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+<title>Twisted Documentation: TRIAL.1</title>
+<link href="../howto/stylesheet.css" rel="stylesheet" type="text/css"/>
+  </head>
+
+  <body bgcolor="white">
+    <h1 class="title">TRIAL.1</h1>
+    <div class="toc"><ol><li><a href="#auto0">NAME</a></li><li><a href="#auto1">SYNOPSIS</a></li><li><a href="#auto2">DESCRIPTION</a></li><li><a href="#auto3">OPTIONS</a></li><li><a href="#auto4">SEE ALSO</a></li><li><a href="#auto5">AUTHOR</a></li><li><a href="#auto6">REPORTING BUGS</a></li><li><a href="#auto7">COPYRIGHT</a></li></ol></div>
+    <div class="content">
+
+<span/>
+
+<h2>NAME<a name="auto0"/></h2>
+
+<p>trial - run unit tests
+</p>
+
+<h2>SYNOPSIS<a name="auto1"/></h2>
+
+<p><strong>trial</strong> [ <em>options</em> ] [ <em>file</em> | <em>package</em> | <em>module</em> | <em>TestCase</em> | <em>testmethod</em> ] ... 
+</p>
+
+<p><strong>trial --help</strong> | <strong>-h</strong>
+</p>
+
+<h2>DESCRIPTION<a name="auto2"/></h2>
+
+<p>trial loads and executes a suite of unit tests, obtained from modules,
+packages and files listed on the command line.
+</p>
+
+<p>trial will take either filenames or fully qualified Python names as
+arguments.  Thus `trial myproject/foo.py', `trial myproject.foo' and
+`trial myproject.foo.SomeTestCase.test_method' are all valid ways to
+invoke trial.
+</p>
+
+<p>After running the given test suite, the default test reporter prints a summary
+of the test run. This consists of the word <q>PASSED</q> (if all tests ran as
+expected) or <q>FAILED</q> (if any test behaved unexpectedly) followed by a count of
+the different kinds of test results encountered. The possible kinds of test
+results includes:
+<dl><dt>successes
+</dt><dd>Tests that passed all their assertions and completed without error.
+These are marked <q>PASSED</q> in the normal test output.
+</dd>
+
+<dt>failures
+</dt><dd>Tests that failed an assertion, called self.fail() or explicitly raised
+self.failureException for some reason. These are marked <q>FAILED</q> in the
+normal test output.
+</dd>
+
+<dt>errors
+</dt><dd>Tests that raised an unexpected exception (including AssertionError),
+tests that caused the tearDown() method to raise an exception, tests
+that run for longer than the timeout interval, tests that caused
+something to call twisted.python.log.err() without subsequently calling
+self.flushLoggedErrors(), tests that leave the reactor in an unclean
+state, etc. These are marked <q>ERROR</q> in the normal test output.
+Note that because errors can be caused after the actual test method
+returns, it is possible for a single test to be reported as both an
+error and a failure, and hence the total number of test results can be
+greater than the total number of tests executed.
+</dd>
+
+<dt>skips
+</dt><dd>Tests that were skipped, usually because of missing dependencies. These
+are marked <q>SKIPPED</q> in the normal test output.
+</dd>
+
+<dt>expectedFailures
+</dt><dd>Tests that failed, but were expected to fail, usually because the test
+is for a feature that hasn't been implemented yet. These are marked
+<q>TODO</q> in the normal test output.
+</dd>
+
+<dt>unexpectedSuccesses
+</dt><dd>Tests that should have been listed under expectedFailures, except that
+for some reason the test succeeded. These are marked <q>SUCCESS!?!</q> in
+the normal test output.
+</dd>
+
+</dl>
+
+</p>
+
+<h2>OPTIONS<a name="auto3"/></h2>
+
+<dl><dt><strong>-b</strong>, <strong>--debug</strong>
+</dt><dd>Run the tests in the Python debugger. Also does post-mortem
+debugging on exceptions. Will load `.pdbrc' from current directory if
+it exists.
+</dd>
+
+<dt><strong>-B</strong>, <strong>--debug-stacktraces</strong>
+</dt><dd>Report Deferred creation and callback stack traces
+</dd>
+
+<dt><strong>--coverage</strong>
+</dt><dd>Generate coverage information in the `coverage' subdirectory of the trial temp
+directory (`_trial_temp' by default). For each Python module touched by the
+execution of the given tests, a file will be created in the coverage directory
+named for the module's fully-qualified name with the suffix `.cover'.  For
+example, because the trial test runner is written in Python, the coverage
+directory will almost always contain a file named `twisted.trial.runner.cover'.
+
+Each `.cover' file contains a copy of the Python source of the module in
+question, with a prefix at the beginning of each line containing coverage
+information.  For lines that are not executable (blank lines, comments, etc.)
+the prefix is blank.  For executable lines that were run in the course of the
+test suite, the prefix is a number indicating the number of times that line was
+executed.  The string `&gt;&gt;&gt;&gt;&gt;&gt;' prefixes executable lines that were not executed
+in the course of the test suite.
+
+Note that this functionality uses Python's sys.settrace() function, so tests
+that call sys.settrace() themselves are likely to break trial's coverage
+functionality.
+</dd>
+
+<dt><strong>--disablegc</strong>
+</dt><dd>Disable the garbage collector for the duration of the test run. As each test is
+run, trial saves the TestResult objects, which means that Python's garbage
+collector has more non-garbage objects to wade through, making each
+garbage-collection run slightly slower. Disabling garbage collection entirely
+will make some test suites complete faster (contrast --force-gc, below), at the
+cost of increasing (possibly greatly) memory consumption. This option also makes
+tests slightly more deterministic, which might help debugging in extreme
+circumstances.
+</dd>
+
+<dt><strong>-e</strong>, <strong>--rterrors</strong>
+</dt><dd>Print tracebacks to standard output as soon as they occur
+</dd>
+
+<dt><strong>--force-gc</strong>
+</dt><dd>Run gc.collect() before and after each test case. This can be used to
+isolate errors that occur when objects get collected.  This option would be
+the default, except it makes tests run about ten times slower.
+</dd>
+
+<dt><strong>-h</strong>, <strong>--help</strong>
+</dt><dd>Print a usage message to standard output, then exit.
+</dd>
+
+<dt><strong>--help-reporters</strong>
+</dt><dd>Print a list of valid reporters to standard output, then exit. Reporters can
+be selected with the --reporter option described below.
+</dd>
+
+<dt><strong>--help-reactors</strong>
+</dt><dd>Print a list of possible reactors to standard output, then exit. Not all listed
+reactors are available on every platform. Reactors can be selected with the
+--reactor option described below.
+</dd>
+
+<dt><strong>-l</strong>, <strong>--logfile</strong> <em>logfile</em>
+</dt><dd>Direct the log to a different file. The default file is `test.log'.
+<em>logfile</em> is relative to _trial_temp.
+</dd>
+
+<dt><strong>-n</strong>, <strong>--dry-run</strong>
+</dt><dd>Go through all the tests and make them pass without running.
+</dd>
+
+<dt><strong>-N</strong>, <strong>--no-recurse</strong>
+</dt><dd>By default, trial recurses through packages to find every module inside
+every subpackage.  Unless, that is, you specify this option.
+</dd>
+
+<dt><strong>--nopm</strong>
+</dt><dd>Don't automatically jump into debugger for post-mortem analysis of
+exceptions.  Only usable in conjunction with --debug.
+</dd>
+
+<dt><strong>--profile</strong>
+</dt><dd>Run tests under the Python profiler.
+</dd>
+
+<dt><strong>-r</strong>, <strong>--reactor</strong> <em>reactor</em>
+</dt><dd>Choose which reactor to use.  See --help-reactors for a list.
+</dd>
+
+<dt><strong>--recursionlimit</strong>
+</dt><dd>Set Python's recursion limit. See sys.setrecursionlimit()
+</dd>
+
+<dt><strong>--reporter</strong>
+</dt><dd>Select the reporter to use for trial's output.  Use the --help-reporters
+option to see a list of valid reporters.
+</dd>
+
+<dt><strong>--spew</strong>
+</dt><dd>Print an insanely verbose log of everything that happens. Useful when
+debugging freezes or locks in complex code.
+</dd>
+
+<dt><strong>--tbformat</strong> <em>format</em>
+</dt><dd>Format to display tracebacks with. Acceptable values are `default', `brief'
+and `verbose'. `brief' produces tracebacks that play nicely with Emacs' GUD.
+</dd>
+
+<dt><strong>--temp-directory</strong> <em>directory</em>
+</dt><dd>WARNING: Do not use this options unless you know what you are doing. 
+By default, trial creates a directory called _trial_temp under the current
+working directory.  When trial runs, it first <em>deletes</em> this directory,
+then creates it, then changes into the directory to run the tests. The log
+file and any coverage files are stored here. Use this option if you wish to
+have trial run in a directory other than _trial_temp. Be warned, trial
+will <em>delete</em> the directory before re-creating it.
+</dd>
+
+<dt><strong>--testmodule</strong> <em>filename</em>
+</dt><dd>Ask trial to look into <em>filename</em> and run any tests specified using the
+Emacs-style buffer variable `test-case-name'.
+</dd>
+
+<dt><strong>--unclean-warnings</strong>
+</dt><dd>As of Twisted 8.0, trial will report an error if the reactor is left unclean
+at the end of the test. This option is provided to assist in migrating from
+Twisted 2.5 to Twisted 8.0 and later. Enabling this option will turn the errors
+into warnings.
+</dd>
+
+<dt><strong>-u</strong>, <strong>--until-failure</strong>
+</dt><dd>Keep looping the tests until one of them raises an error or a failure.
+This is particularly useful for reproducing intermittent failures.
+</dd>
+
+<dt><strong>--version</strong>
+</dt><dd>Prints the Twisted version number and exit.
+</dd>
+
+<dt><strong>--without-module</strong> <em>modulenames</em>
+</dt><dd>Simulate the lack of the specified comma-separated list of modules. This makes
+it look like the modules are not present in the system, causing tests to check
+the behavior for that configuration.
+</dd>
+
+<dt><strong>-z</strong>, <strong>--random</strong> [<em>seed</em>]
+</dt><dd>Run the tests in random order using the specified seed.
+</dd>
+
+</dl>
+
+<h2>SEE ALSO<a name="auto4"/></h2>
+
+<p>The latest version of the trial documentation can be found at
+http://twistedmatrix.com/documents/current/core/howto/testing.html
+</p>
+
+<h2>AUTHOR<a name="auto5"/></h2>
+
+<p>Written by Jonathan M. Lange
+</p>
+
+<h2>REPORTING BUGS<a name="auto6"/></h2>
+
+<p>To report a bug, visit http://twistedmatrix.com/trac/newticket
+</p>
+
+<h2>COPYRIGHT<a name="auto7"/></h2>
+
+<p>Copyright © 2003-2011 Twisted Matrix Laboratories
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</p>
+
+</div>
+
+    <p><a href="../howto/index.html">Index</a></p>
+    <span class="version">Version: 11.0.0</span>
+  </body>
+</html>
