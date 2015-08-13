@@ -5,15 +5,12 @@ packages/beautifulsoup4
 packages/bleach
 packages/celery
 packages/decorator/src
-packages/Django
 packages/dj-database-url
 packages/django-assets
 packages/django-authopenid
 packages/django-celery
 packages/django-debug-toolbar
-packages/django-extensions
 packages/django-inplaceedit
-packages/django-invitation
 packages/django-kombu
 packages/django-model-utils
 packages/django-picklefield
@@ -57,7 +54,6 @@ packages/requests-oauthlib
 packages/scrapy
 packages/sessionprofile
 packages/six
-packages/south
 packages/sphinx
 packages/sqlparse
 packages/staticgenerator

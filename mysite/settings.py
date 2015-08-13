@@ -213,7 +213,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'django_assets',
-    'invitation',
     'mysite.search',
     'mysite.profile',
     'mysite.customs',
@@ -255,12 +254,6 @@ OHLOH_API_KEY = 'JeXHeaQhjXewhdktn4nUw'  # This key is called "Oman testing"
                                         # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
 # OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
-
-
-# Invite codes last seven days
-ACCOUNT_INVITATION_DAYS = 7
-INVITE_MODE = False  # Enable this on production site ...?
-INVITATIONS_PER_USER = 100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
