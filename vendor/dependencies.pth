@@ -32,7 +32,6 @@ packages/Jinja2
 packages/jsmin
 packages/kombu
 packages/markupsafe
-packages/mechanize
 packages/mimeparse
 packages/mock
 packages/oauthlib
@@ -57,7 +56,6 @@ packages/six
 packages/sphinx
 packages/sqlparse
 packages/staticgenerator
-packages/twill
 packages/twisted
 packages/typecheck
 packages/unicodecsv

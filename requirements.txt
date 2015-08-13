@@ -4,3 +4,5 @@ psycopg2
 pillow
 django-extensions
 south
+twill
+mechanize
