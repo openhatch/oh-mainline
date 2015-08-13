@@ -6,3 +6,4 @@ django-extensions
 south
 twill
 mechanize
+django-reversion

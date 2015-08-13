@@ -16,7 +16,6 @@ packages/django-model-utils
 packages/django-picklefield
 packages/django-picklefield/src
 packages/django-registration
-packages/django-reversion/src
 packages/django-tastypie
 packages/django-voting
 packages/django-webtest
