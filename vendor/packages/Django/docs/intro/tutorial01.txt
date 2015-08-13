@@ -23,7 +23,8 @@ If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
 This tutorial is written for Django |version| and Python 2.x. If the Django
-version doesn't match, you can refer to the tutorial for your version of Django
+version doesn't match, you can refer to the tutorial for your version of
+Django by using the version switcher at the bottom right corner of this page,
 or update Django to the newest version. If you are using Python 3.x, be aware
 that your code may need to differ from what is in the tutorial and you should
 continue using the tutorial only if you know what you are doing with Python
@@ -35,11 +36,9 @@ older versions of Django and install a newer one.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to `django-users`__ or drop by `#django on irc.freenode.net`__ to chat
-    with other Django users who might be able to help.
-
-__ http://groups.google.com/group/django-users
-__ irc://irc.freenode.net/django
+    to |django-users| or drop by `#django on irc.freenode.net
+    <irc://irc.freenode.net/django>`_ to chat with other Django users who might
+    be able to help.
 
 Creating a project
 ==================
@@ -122,7 +121,7 @@ These files are:
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
 
-* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible webservers to
+* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
@@ -141,7 +140,7 @@ see the following output on the command line:
     0 errors found
     |today| - 15:50:53
     Django version |version|, using settings 'mysite.settings'
-    Development server is running at http://127.0.0.1:8000/
+    Starting development server at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
 You've started the Django development server, a lightweight Web server written
@@ -168,7 +167,7 @@ It worked!
 
     .. code-block:: bash
 
-        python manage.py runserver 8080
+        $ python manage.py runserver 8080
 
     If you want to change the server's IP, pass it along with the port. So to
     listen on all public IPs (useful if you want to show off your work on other
@@ -176,7 +175,7 @@ It worked!
 
     .. code-block:: bash
 
-        python manage.py runserver 0.0.0.0:8000
+        $ python manage.py runserver 0.0.0.0:8000
 
     Full docs for the development server can be found in the
     :djadmin:`runserver` reference.
@@ -193,40 +192,33 @@ Database setup
 --------------
 
 Now, edit :file:`mysite/settings.py`. It's a normal Python module with
-module-level variables representing Django settings. Change the
-following keys in the :setting:`DATABASES` ``'default'`` item to match
-your database connection settings.
+module-level variables representing Django settings.
+
+By default, the configuration uses SQLite. If you're new to databases, or
+you're just interested in trying Django, this is the easiest choice. SQLite is
+included in Python, so you won't need to install anything else to support your
+database.
+
+If you wish to use another database, install the appropriate :ref:`database
+bindings <database-installation>`, and change the following keys in the
+:setting:`DATABASES` ``'default'`` item to match your database connection
+settings:
 
 * :setting:`ENGINE <DATABASE-ENGINE>` -- Either
+  ``'django.db.backends.sqlite3'``,
   ``'django.db.backends.postgresql_psycopg2'``,
-  ``'django.db.backends.mysql'``, ``'django.db.backends.sqlite3'`` or
+  ``'django.db.backends.mysql'``, or
   ``'django.db.backends.oracle'``. Other backends are :setting:`also available
   <DATABASE-ENGINE>`.
 
-* :setting:`NAME` -- The name of your database. If you're using
-  SQLite, the database will be a file on your computer; in that
-  case, :setting:`NAME` should be the full absolute path,
-  including filename, of that file. If the file doesn't exist, it
-  will automatically be created when you synchronize the database
-  for the first time (see below).
+* :setting:`NAME` -- The name of your database. If you're using SQLite, the
+  database will be a file on your computer; in that case, :setting:`NAME`
+  should be the full absolute path, including filename, of that file. The
+  default value, ``os.path.join(BASE_DIR, 'db.sqlite3')``, will store the file
+  in your project directory.
 
-  When specifying the path, always use forward slashes, even on
-  Windows (e.g. ``C:/homes/user/mysite/sqlite3.db``).
-
-* :setting:`USER` -- Your database username (not used for SQLite).
-
-* :setting:`PASSWORD` -- Your database password (not used for
-  SQLite).
-
-* :setting:`HOST` -- The host your database is on. Leave this as
-  an empty string (or possibly ``127.0.0.1``) if your database server is on the
-  same physical machine (not used for SQLite). See :setting:`HOST` for details.
-
-If you're new to databases, we recommend simply using SQLite by setting
-:setting:`ENGINE <DATABASE-ENGINE>` to ``'django.db.backends.sqlite3'`` and
-:setting:`NAME` to the place where you'd like to store the database. SQLite is
-included in Python, so you won't need to install anything else to support your
-database.
+If you are not using SQLite as your database, additional settings such as :setting:`USER`, :setting:`PASSWORD`, :setting:`HOST` must be added.
+For more details, see the reference documentation for :setting:`DATABASES`.
 
 .. note::
 
@@ -237,25 +229,25 @@ database.
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.
 
-While you're editing :file:`settings.py`, set :setting:`TIME_ZONE` to your
-time zone. The default value is the Central time zone in the U.S. (Chicago).
+While you're editing :file:`mysite/settings.py`, set :setting:`TIME_ZONE` to
+your time zone.
 
-Also, note the :setting:`INSTALLED_APPS` setting toward the bottom of
-the file. That holds the names of all Django applications that are
-activated in this Django instance. Apps can be used in multiple projects, and
-you can package and distribute them for use by others in their projects.
+Also, note the :setting:`INSTALLED_APPS` setting at the top of the file. That
+holds the names of all Django applications that are activated in this Django
+instance. Apps can be used in multiple projects, and you can package and
+distribute them for use by others in their projects.
 
 By default, :setting:`INSTALLED_APPS` contains the following apps, all of which
 come with Django:
+
+* :mod:`django.contrib.admin` -- The admin site. You'll use it in :doc:`part 2
+  of this tutorial </intro/tutorial02>`.
 
 * :mod:`django.contrib.auth` -- An authentication system.
 
 * :mod:`django.contrib.contenttypes` -- A framework for content types.
 
 * :mod:`django.contrib.sessions` -- A session framework.
-
-* :mod:`django.contrib.sites` -- A framework for managing multiple sites
-  with one Django installation.
 
 * :mod:`django.contrib.messages` -- A messaging framework.
 
@@ -264,13 +256,13 @@ come with Django:
 
 These applications are included by default as a convenience for the common case.
 
-Each of these applications makes use of at least one database table, though,
+Some of these applications makes use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
 .. code-block:: bash
 
-    python manage.py syncdb
+    $ python manage.py syncdb
 
 The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
@@ -300,10 +292,10 @@ Creating models
 Now that your environment -- a "project" -- is set up, you're set to start
 doing work.
 
-Each application you write in Django consists of a Python package, somewhere
-on your `Python path`_, that follows a certain convention. Django comes with a
-utility that automatically generates the basic directory structure of an app,
-so you can focus on writing code rather than creating directories.
+Each application you write in Django consists of a Python package that follows
+a certain convention. Django comes with a utility that automatically generates
+the basic directory structure of an app, so you can focus on writing code
+rather than creating directories.
 
 .. admonition:: Projects vs. apps
 
@@ -322,12 +314,13 @@ and type this command:
 
 .. code-block:: bash
 
-    python manage.py startapp polls
+    $ python manage.py startapp polls
 
 That'll create a directory :file:`polls`, which is laid out like this::
 
     polls/
         __init__.py
+        admin.py
         models.py
         tests.py
         views.py
@@ -373,7 +366,7 @@ class -- e.g., :class:`~django.db.models.CharField` for character fields and
 type of data each field holds.
 
 The name of each :class:`~django.db.models.Field` instance (e.g. ``question`` or
-``pub_date`` ) is the field's name, in machine-friendly format. You'll use this
+``pub_date``) is the field's name, in machine-friendly format. You'll use this
 value in your Python code, and your database will use it as the column name.
 
 You can use an optional first positional argument to a
@@ -417,30 +410,25 @@ But first we need to tell our project that the ``polls`` app is installed.
     you can distribute apps, because they don't have to be tied to a given
     Django installation.
 
-Edit the :file:`settings.py` file again, and change the
-:setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So
-it'll look like this::
+Edit the :file:`mysite/settings.py` file again, and change the
+:setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So it'll
+look like this::
 
     INSTALLED_APPS = (
+        'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.sites',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        # Uncomment the next line to enable the admin:
-        # 'django.contrib.admin',
-        # Uncomment the next line to enable admin documentation:
-        # 'django.contrib.admindocs',
         'polls',
     )
 
-Now Django knows to include the ``polls`` app. Let's run another
-command:
+Now Django knows to include the ``polls`` app. Let's run another command:
 
 .. code-block:: bash
 
-    python manage.py sql polls
+    $ python manage.py sql polls
 
 You should see something similar to the following (the ``CREATE TABLE`` SQL
 statements for the polls app):
@@ -449,13 +437,13 @@ statements for the polls app):
 
     BEGIN;
     CREATE TABLE "polls_poll" (
-        "id" serial NOT NULL PRIMARY KEY,
+        "id" integer NOT NULL PRIMARY KEY,
         "question" varchar(200) NOT NULL,
-        "pub_date" timestamp with time zone NOT NULL
+        "pub_date" datetime NOT NULL
     );
     CREATE TABLE "polls_choice" (
-        "id" serial NOT NULL PRIMARY KEY,
-        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id") DEFERRABLE INITIALLY DEFERRED,
+        "id" integer NOT NULL PRIMARY KEY,
+        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
@@ -463,7 +451,8 @@ statements for the polls app):
 
 Note the following:
 
-* The exact output will vary depending on the database you are using.
+* The exact output will vary depending on the database you are using. The
+  example above is generated for SQLite.
 
 * Table names are automatically generated by combining the name of the app
   (``polls``) and the lowercase name of the model -- ``poll`` and
@@ -481,8 +470,7 @@ Note the following:
   types such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or
   ``integer primary key`` (SQLite) are handled for you automatically. Same
   goes for quoting of field names -- e.g., using double quotes or single
-  quotes. The author of this tutorial runs PostgreSQL, so the example
-  output is in PostgreSQL syntax.
+  quotes.
 
 * The :djadmin:`sql` command doesn't actually run the SQL in your database -
   it just prints it to the screen so that you can see what SQL Django thinks
@@ -517,7 +505,7 @@ Now, run :djadmin:`syncdb` again to create those model tables in your database:
 
 .. code-block:: bash
 
-    python manage.py syncdb
+    $ python manage.py syncdb
 
 The :djadmin:`syncdb` command runs the SQL from :djadmin:`sqlall` on your
 database for all apps in :setting:`INSTALLED_APPS` that don't already exist in
@@ -537,7 +525,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
 .. code-block:: bash
 
-    python manage.py shell
+    $ python manage.py shell
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
@@ -600,6 +588,8 @@ of this object. Let's fix that by editing the polls model (in the
 ``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
 following example::
 
+    from django.db import models
+
     class Poll(models.Model):
         # ...
         def __unicode__(self):  # Python 3: def __str__(self):
@@ -616,8 +606,7 @@ for your own sanity when dealing with the interactive prompt, but also because
 objects' representations are used throughout Django's automatically-generated
 admin.
 
-.. admonition:: :meth:`~django.db.models.Model.__unicode__` or
-                :meth:`~django.db.models.Model.__str__`?
+.. admonition:: `__unicode__` or `__str__`?
 
     On Python 3, things are simpler, just use
     :meth:`~django.db.models.Model.__str__` and forget about
@@ -683,7 +672,7 @@ Save these changes and start a new Python interactive shell by running
     >>> Poll.objects.get(id=2)
     Traceback (most recent call last):
         ...
-    DoesNotExist: Poll matching query does not exist. Lookup parameters were {'id': 2}
+    DoesNotExist: Poll matching query does not exist.
 
     # Lookup by a primary key is the most common case, so Django provides a
     # shortcut for primary-key exact lookups.

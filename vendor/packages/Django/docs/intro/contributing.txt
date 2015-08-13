@@ -20,8 +20,8 @@ For this tutorial, we expect that you have at least a basic understanding of
 how Django works. This means you should be comfortable going through the
 existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
 In addition, you should have a good understanding of Python itself. But if you
-don't, `Dive Into Python`__ is a fantastic (and free) online book for beginning
-Python programmers.
+don't, "Dive Into Python" (for `Python 2`__, for `Python 3`__) is a fantastic
+(and free) online book for beginning Python programmers.
 
 Those of you who are unfamiliar with version control systems and Trac will find
 that this tutorial and its links include just enough information to get started.
@@ -34,11 +34,11 @@ so that it can be of use to the widest audience.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to `django-developers`__ or drop by `#django-dev on irc.freenode.net`__ to
+    to |django-developers| or drop by `#django-dev on irc.freenode.net`__ to
     chat with other Django users who might be able to help.
 
-__ http://diveintopython.net/toc/index.html
-__ http://groups.google.com/group/django-developers
+__ http://www.diveintopython.net/toc/index.html
+__ http://www.diveintopython3.net/
 __ irc://irc.freenode.net/django-dev
 
 What does this tutorial cover?
@@ -71,7 +71,7 @@ development version of Django and to generate patch files for the changes you
 make.
 
 To check whether or not you have Git installed, enter ``git`` into the command
-line. If you get messages saying that this command could be found, you'll have
+line. If you get messages saying that this command could not be found, you'll have
 to download and install it, see `Git's download page`__.
 
 If you're not that familiar with Git, you can always find out more about its
@@ -190,7 +190,7 @@ present in Django's official builds. If you click to view a particular build,
 you can view the "Configuration Matrix" which shows failures broken down by
 Python version and database backend.
 
-__ http://ci.djangoproject.com/
+__ http://djangoci.com
 
 .. note::
 
@@ -282,14 +282,14 @@ correctly in a couple different situations.
     computer programming, so there's lots of information out there:
 
     * A good first look at writing tests for Django can be found in the
-      documentation on :doc:`Testing Django applications </topics/testing/overview>`.
+      documentation on :doc:`/topics/testing/overview`.
     * Dive Into Python (a free online book for beginning Python developers)
       includes a great `introduction to Unit Testing`__.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the `Python unittest documentation`__.
 
 __ https://code.djangoproject.com/ticket/17549
-__ http://diveintopython.net/unit_testing/index.html
+__ http://www.diveintopython.net/unit_testing/index.html
 __ http://docs.python.org/library/unittest.html
 
 Running your new test
@@ -388,8 +388,8 @@ This is a new feature, so it should be documented.  Add the following on line
 
     .. versionadded:: 1.5
 
-    The current value of the field will be displayed as a clickable link above the
-    input widget.
+        The current value of the field will be displayed as a clickable link above the
+        input widget.
 
 For more information on writing documentation, including an explanation of what
 the ``versionadded`` bit is all about, see
@@ -472,6 +472,7 @@ This patch file contains all your changes and should look this:
     index 4b11543..94acc6d 100644
     --- a/tests/regressiontests/admin_widgets/tests.py
     +++ b/tests/regressiontests/admin_widgets/tests.py
+
     @@ -265,6 +265,35 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
                          '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
                      )

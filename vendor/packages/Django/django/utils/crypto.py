@@ -28,10 +28,6 @@ from django.utils import six
 from django.utils.six.moves import xrange
 
 
-_trans_5c = bytearray([(x ^ 0x5C) for x in xrange(256)])
-_trans_36 = bytearray([(x ^ 0x36) for x in xrange(256)])
-
-
 def salted_hmac(key_salt, value, secret=None):
     """
     Returns the HMAC-SHA1 of 'value', using a key generated from key_salt and a
@@ -85,6 +81,11 @@ def constant_time_compare(val1, val2):
     Returns True if the two strings are equal, False otherwise.
 
     The time taken is independent of the number of characters that match.
+
+    For the sake of simplicity, this function executes in constant time only
+    when the two strings have the same length. It short-circuits when they
+    have different lengths. Since Django only uses it to compare hashes of
+    known expected length, this is acceptable.
     """
     if len(val1) != len(val2):
         return False
@@ -121,11 +122,12 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
 
     HMAC+SHA256 is used as the default pseudo random function.
 
-    Right now 10,000 iterations is the recommended default which takes
-    100ms on a 2.2Ghz Core 2 Duo.  This is probably the bare minimum
-    for security given 1000 iterations was recommended in 2001. This
-    code is very well optimized for CPython and is only four times
-    slower than openssl's implementation.
+    As of 2011, 10,000 iterations was the recommended default which
+    took 100ms on a 2.2Ghz Core 2 Duo. This is probably the bare
+    minimum for security given 1000 iterations was recommended in
+    2001. This code is very well optimized for CPython and is only
+    four times slower than openssl's implementation. Look in
+    django.contrib.auth.hashers for the present default.
     """
     assert iterations > 0
     if not digest:

@@ -7,94 +7,6 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
-1.5
----
-
-See the :doc:`Django 1.3 release notes</releases/1.3>` for more details on
-these changes.
-
-* Starting Django without a :setting:`SECRET_KEY` will result in an exception
-  rather than a ``DeprecationWarning``. (This is accelerated from the usual
-  deprecation path; see the :doc:`Django 1.4 release notes</releases/1.4>`.)
-
-* The ``mod_python`` request handler will be removed. The ``mod_wsgi``
-  handler should be used instead.
-
-* The ``template`` attribute on :class:`~django.test.client.Response`
-  objects returned by the :ref:`test client <test-client>` will be removed.
-  The :attr:`~django.test.client.Response.templates` attribute should be
-  used instead.
-
-* The ``django.test.simple.DjangoTestRunner`` will be removed.
-  Instead use a unittest-native class.  The features of the
-  ``django.test.simple.DjangoTestRunner`` (including fail-fast and
-  Ctrl-C test termination) can currently be provided by the unittest-native
-  :class:`~unittest.TextTestRunner`.
-
-* The undocumented function
-  ``django.contrib.formtools.utils.security_hash`` will be removed,
-  instead use ``django.contrib.formtools.utils.form_hmac``
-
-* The function-based generic view modules will be removed in favor of their
-  class-based equivalents, outlined :doc:`here
-  </topics/class-based-views/index>`.
-
-* The ``django.core.servers.basehttp.AdminMediaHandler`` will be
-  removed.  In its place use
-  ``django.contrib.staticfiles.handlers.StaticFilesHandler``.
-
-* The template tags library ``adminmedia`` and the template tag ``{%
-  admin_media_prefix %}`` will be removed in favor of the generic static files
-  handling. (This is faster than the usual deprecation path; see the
-  :doc:`Django 1.4 release notes</releases/1.4>`.)
-
-* The :ttag:`url` and :ttag:`ssi` template tags will be
-  modified so that the first argument to each tag is a template variable, not
-  an implied string. In 1.4, this behavior is provided by a version of the tag
-  in the ``future`` template tag library.
-
-* The ``reset`` and ``sqlreset`` management commands will be removed.
-
-* Authentication backends will need to support an inactive user
-  being passed to all methods dealing with permissions.
-  The ``supports_inactive_user`` attribute will no longer be checked
-  and can be removed from custom backends.
-
-* :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` will raise
-  a :class:`~django.contrib.gis.geos.GEOSException` when called
-  on a geometry with no SRID value.
-
-* ``django.http.CompatCookie`` will be removed in favor of
-  ``django.http.SimpleCookie``.
-
-* ``django.core.context_processors.PermWrapper`` and
-  ``django.core.context_processors.PermLookupDict`` will be removed in
-  favor of the corresponding
-  ``django.contrib.auth.context_processors.PermWrapper`` and
-  ``django.contrib.auth.context_processors.PermLookupDict``, respectively.
-
-* The :setting:`MEDIA_URL` or :setting:`STATIC_URL` settings will be
-  required to end with a trailing slash to ensure there is a consistent
-  way to combine paths in templates.
-
-* ``django.db.models.fields.URLField.verify_exists`` will be removed. The
-  feature was deprecated in 1.3.1 due to intractable security and
-  performance issues and will follow a slightly accelerated deprecation
-  timeframe.
-
-* Translations located under the so-called *project path* will be ignored during
-  the translation building process performed at runtime. The
-  :setting:`LOCALE_PATHS` setting can be used for the same task by including the
-  filesystem path to a ``locale`` directory containing non-app-specific
-  translations in its value.
-
-* The Markup contrib app will no longer support versions of Python-Markdown
-  library earlier than 2.1. An accelerated timeline was used as this was
-  a security related deprecation.
-
-* The ``CACHE_BACKEND`` setting will be removed. The cache backend(s) should be
-  specified in the :setting:`CACHES` setting.
-
 1.6
 ---
 
@@ -129,9 +41,9 @@ these changes.
   be accessible through their GB-prefixed names (GB is the correct
   ISO 3166 code for United Kingdom).
 
-* The :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`
-  settings have been superseded by :setting:`IGNORABLE_404_URLS` in
-  the 1.4 release. They will be removed.
+* The ``IGNORABLE_404_STARTS`` and ``IGNORABLE_404_ENDS`` settings have been
+  superseded by :setting:`IGNORABLE_404_URLS` in the 1.4 release. They will be
+  removed.
 
 * The :doc:`form wizard </ref/contrib/formtools/form-wizard>` has been
   refactored to use class-based views with pluggable backends in 1.4.
@@ -169,7 +81,6 @@ these changes.
 * The attribute ``HttpRequest.raw_post_data`` was renamed to ``HttpRequest.body``
   in 1.4. The backward compatibility will be removed --
   ``HttpRequest.raw_post_data`` will no longer work.
-
 
 * The value for the ``post_url_continue`` parameter in
   ``ModelAdmin.response_add()`` will have to be either ``None`` (to redirect
@@ -217,14 +128,108 @@ these changes.
 * The ``depth`` keyword argument will be removed from
   :meth:`~django.db.models.query.QuerySet.select_related`.
 
-2.0
+* The undocumented ``get_warnings_state()``/``restore_warnings_state()``
+  functions from :mod:`django.test.utils` and the ``save_warnings_state()``/
+  ``restore_warnings_state()``
+  :ref:`django.test.*TestCase <django-testcase-subclasses>` methods are
+  deprecated. Use the :class:`warnings.catch_warnings` context manager
+  available starting with Python 2.6 instead.
+
+* The undocumented ``check_for_test_cookie`` method in
+  :class:`~django.contrib.auth.forms.AuthenticationForm` will be removed
+  following an accelerated deprecation. Users subclassing this form should
+  remove calls to this method, and instead ensure that their auth related views
+  are CSRF protected, which ensures that cookies are enabled.
+
+* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+  supports base36 encoded user IDs
+  (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
+  removed. If your site has been running Django 1.6 for more than
+  :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
+  not, then any password reset links generated before you upgrade to Django 1.7
+  won't work after the upgrade.
+
+1.8
 ---
 
-* ``django.views.defaults.shortcut()``. This function has been moved
-  to ``django.contrib.contenttypes.views.shortcut()`` as part of the
+* ``django.contrib.comments`` will be removed.
+
+* The following transaction management APIs will be removed:
+
+  - ``TransactionMiddleware``,
+  - the decorators and context managers ``autocommit``, ``commit_on_success``,
+    and ``commit_manually``, defined in ``django.db.transaction``,
+  - the functions ``commit_unless_managed`` and ``rollback_unless_managed``,
+    also defined in ``django.db.transaction``,
+  - the ``TRANSACTIONS_MANAGED`` setting.
+
+  Upgrade paths are described in the :ref:`transaction management docs
+  <transactions-upgrading-from-1.5>`.
+
+* The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
+  arguments. In 1.6 and 1.7, this behavior is provided by the version of these
+  tags in the ``future`` template tag library.
+
+* The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
+  :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
+  your :setting:`MIDDLEWARE_CLASSES` setting instead.
+
+* ``django.middleware.doc.XViewMiddleware`` will be removed. Use
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.
+
+* ``Model._meta.module_name`` was renamed to ``model_name``.
+
+* Remove the backward compatible shims introduced to rename ``get_query_set``
+  and similar queryset methods. This affects the following classes:
+  ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
+  ``GenericForeignKey``, ``Manager``, ``SingleRelatedObjectDescriptor`` and
+  ``ReverseSingleRelatedObjectDescriptor``.
+
+* Remove the backward compatible shims introduced to rename the attributes
+  ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
+
+* ``django.views.defaults.shortcut`` will be removed, as part of the
   goal of removing all ``django.contrib`` references from the core
-  Django codebase. The old shortcut will be removed in the 2.0
-  release.
+  Django codebase. Instead use
+  ``django.contrib.contenttypes.views.shortcut``. ``django.conf.urls.shortcut``
+  will also be removed.
+
+* Support for the Python Imaging Library (PIL) module will be removed, as it
+  no longer appears to be actively maintained & does not work on Python 3.
+  You are advised to install `Pillow`_, which should be used instead.
+
+.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+
+* The following private APIs will be removed:
+
+  - ``django.db.backend``
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.is_managed()``
+  - ``django.db.transaction.managed()``
+
+* ``django.forms.widgets.RadioInput`` will be removed in favor of
+  ``django.forms.widgets.RadioChoiceInput``.
+
+* The module ``django.test.simple`` and the class
+  ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
+  ``django.test.runner.DiscoverRunner``.
+
+* The module ``django.test._doctest`` will be removed. Instead use the doctest
+  module from the Python standard library.
+
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
+
+* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+  more than one.* string to override or append to user-provided ``help_text`` in
+  forms for ManyToMany model fields will not be performed by Django anymore
+  either at the model or forms layer.
+
+* The ``Model._meta.get_(add|change|delete)_permission`` methods will
+  be removed.
+
+2.0
+---
 
 * ``ssi`` and ``url`` template tags will be removed from the ``future`` template
   tag library (used during the 1.3/1.4 deprecation period).

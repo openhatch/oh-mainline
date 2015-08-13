@@ -55,7 +55,7 @@ View
 
         Default::
 
-            ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+            ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
 
     **Methods**
 
@@ -101,6 +101,7 @@ TemplateView
     in the URL.
 
     .. versionchanged:: 1.5
+
         The context used to be populated with a ``{{ params }}`` dictionary of
         the parameters captured in the URL. Now those parameters are first-level
         context variables.
@@ -179,7 +180,6 @@ RedirectView
 
     **Example views.py**::
 
-        from django.core.urlresolvers import reverse
         from django.shortcuts import get_object_or_404
         from django.views.generic.base import RedirectView
 
@@ -189,22 +189,24 @@ RedirectView
 
             permanent = False
             query_string = True
+            pattern_name = 'article-detail'
 
-            def get_redirect_url(self, pk):
-                article = get_object_or_404(Article, pk=pk)
+            def get_redirect_url(self, *args, **kwargs):
+                article = get_object_or_404(Article, pk=kwargs['pk'])
                 article.update_counter()
-                return reverse('product_detail', args=(pk,))
+                return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView
+        from article.views import ArticleCounterRedirectView, ArticleDetail
 
         urlpatterns = patterns('',
 
-            url(r'^(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
         )
 
@@ -214,6 +216,13 @@ RedirectView
 
         The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
         HTTP error.
+
+    .. attribute:: pattern_name
+
+        .. versionadded:: 1.6
+
+        The name of the URL pattern to redirect to. Reversing will be done
+        using the same args and kwargs as are passed in for this view.
 
     .. attribute:: permanent
 
@@ -231,12 +240,23 @@ RedirectView
 
     **Methods**
 
-    .. method:: get_redirect_url(**kwargs)
+    .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
 
+        .. versionchanged:: 1.6
+
+            The signature of this method was changed to include ``*args``.
+
         The default implementation uses :attr:`url` as a starting
-        string, performs expansion of ``%`` parameters in that string, as well
-        as the appending of query string if requested by :attr:`query_string`.
+        string and performs expansion of ``%`` named parameters in that string
+        using the named groups captured in the URL.
+
+        If :attr:`url` is not set, ``get_redirect_url()`` tries to reverse the
+        :attr:`pattern_name` using what was captured in the URL (both named and
+        unnamed groups are used).
+
+        If requested by :attr:`query_string`, it will also append the query
+        string to the generated URL.
         Subclasses may implement any behavior they wish, as long as the method
         returns a redirect-ready URL string.

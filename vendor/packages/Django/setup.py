@@ -9,9 +9,12 @@ from distutils.sysconfig import get_python_lib
 # still present in site-packages. See #18115.
 overlay_warning = False
 if "install" in sys.argv:
-    # We have to try also with an explicit prefix of /usr/local in order to
-    # catch Debian's custom user site-packages directory.
-    for lib_path in get_python_lib(), get_python_lib(prefix="/usr/local"):
+    lib_paths = [get_python_lib()]
+    if lib_paths[0].startswith("/usr/lib/"):
+        # We have to try also with an explicit prefix of /usr/local in order to
+        # catch Debian's custom user site-packages directory.
+        lib_paths.append(get_python_lib(prefix="/usr/local"))
+    for lib_path in lib_paths:
         existing_path = os.path.abspath(os.path.join(lib_path, "django"))
         if os.path.exists(existing_path):
             # We note the need for the warning here, but present it after the
@@ -85,7 +88,6 @@ setup(
     author_email='foundation@djangoproject.com',
     description=('A high-level Python Web framework that encourages '
                  'rapid development and clean, pragmatic design.'),
-    download_url='https://www.djangoproject.com/m/releases/1.5/Django-1.5.8.tar.gz',
     license='BSD',
     packages=packages,
     package_data=package_data,

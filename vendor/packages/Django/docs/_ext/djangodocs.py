@@ -5,9 +5,7 @@ import json
 import os
 import re
 
-from docutils import nodes, transforms
-
-from sphinx import addnodes, roles, __version__ as sphinx_ver
+from sphinx import addnodes, __version__ as sphinx_ver
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
@@ -64,21 +62,25 @@ class VersionDirective(Directive):
     option_spec = {}
 
     def run(self):
+        if len(self.arguments) > 1:
+            msg = """Only one argument accepted for directive '{directive_name}::'.
+            Comments should be provided as content,
+            not as an extra argument.""".format(directive_name=self.name)
+            raise self.error(msg)
+
         env = self.state.document.settings.env
         ret = []
         node = addnodes.versionmodified()
         ret.append(node)
+
         if self.arguments[0] == env.config.django_next_version:
             node['version'] = "Development version"
         else:
             node['version'] = self.arguments[0]
+
         node['type'] = self.name
-        if len(self.arguments) == 2:
-            inodes, messages = self.state.inline_text(self.arguments[1], self.lineno+1)
-            node.extend(inodes)
-            if self.content:
-                self.state.nested_parse(self.content, self.content_offset, node)
-            ret = ret + messages
+        if self.content:
+            self.state.nested_parse(self.content, self.content_offset, node)
         env.note_versionchange(node['type'], node['version'], node, self.lineno)
         return ret
 
@@ -132,20 +134,21 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # that work.
     #
     version_text = {
-        'deprecated':       'Deprecated in Django %s',
-        'versionchanged':   'Changed in Django %s',
-        'versionadded':     'New in Django %s',
+        'versionchanged': 'Changed in Django %s',
+        'versionadded': 'New in Django %s',
     }
 
     def visit_versionmodified(self, node):
         self.body.append(
             self.starttag(node, 'div', CLASS=node['type'])
         )
-        title = "%s%s" % (
-            self.version_text[node['type']] % node['version'],
-            len(node) and ":" or "."
-        )
-        self.body.append('<span class="title">%s</span> ' % title)
+        version_text = self.version_text.get(node['type'])
+        if version_text:
+            title = "%s%s" % (
+                version_text % node['version'],
+                ":" if len(node) else "."
+            )
+            self.body.append('<span class="title">%s</span> ' % title)
 
     def depart_versionmodified(self, node):
         self.body.append("</div>\n")
@@ -212,7 +215,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
                         if t == "templatefilter" and l == "ref/templates/builtins"],
         }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
-        with open(outfilename, 'wb') as fp:
+        with open(outfilename, 'w') as fp:
             fp.write('var django_template_builtins = ')
             json.dump(templatebuiltins, fp)
             fp.write(';\n')

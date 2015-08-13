@@ -3,11 +3,6 @@ import hashlib
 import os
 import posixpath
 import re
-try:
-    from urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-except ImportError:     # Python 2
-    from urllib import unquote
-    from urlparse import urlsplit, urlunsplit, urldefrag
 
 from django.conf import settings
 from django.core.cache import (get_cache, InvalidCacheBackendError,
@@ -19,6 +14,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
+from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
 from django.utils._os import upath
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
@@ -39,6 +35,11 @@ class StaticFilesStorage(FileSystemStorage):
         check_settings(base_url)
         super(StaticFilesStorage, self).__init__(location, base_url,
                                                  *args, **kwargs)
+        # FileSystemStorage fallbacks to MEDIA_ROOT when location
+        # is empty, so we restore the empty value.
+        if not location:
+            self.base_location = None
+            self.location = None
 
     def path(self, name):
         if not self.location:
@@ -71,7 +72,7 @@ class CachedFilesMixin(object):
                     pattern, template = pattern
                 else:
                     template = self.default_template
-                compiled = re.compile(pattern)
+                compiled = re.compile(pattern, re.IGNORECASE)
                 self._patterns.setdefault(extension, []).append((compiled, template))
 
     def file_hash(self, name, content=None):
@@ -251,7 +252,10 @@ class CachedFilesMixin(object):
                     for patterns in self._patterns.values():
                         for pattern, template in patterns:
                             converter = self.url_converter(name, template)
-                            content = pattern.sub(converter, content)
+                            try:
+                                content = pattern.sub(converter, content)
+                            except ValueError as exc:
+                                yield name, None, exc
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result

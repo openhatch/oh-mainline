@@ -1,23 +1,21 @@
 from __future__ import unicode_literals
 
+import base64
 import calendar
 import datetime
 import re
 import sys
-try:
-    from urllib import parse as urllib_parse
-except ImportError:     # Python 2
-    import urllib as urllib_parse
-    import urlparse
-    urllib_parse.urlparse = urlparse.urlparse
-
-
+import unicodedata
+from binascii import Error as BinasciiError
 from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
+from django.utils.six.moves.urllib.parse import (
+        quote, quote_plus, unquote, unquote_plus, urlparse,
+        urlencode as original_urlencode)
 
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
@@ -39,7 +37,7 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_text(urllib_parse.quote(force_str(url), force_str(safe)))
+    return force_text(quote(force_str(url), force_str(safe)))
 urlquote = allow_lazy(urlquote, six.text_type)
 
 def urlquote_plus(url, safe=''):
@@ -49,7 +47,7 @@ def urlquote_plus(url, safe=''):
     returned string can safely be used as part of an argument to a subsequent
     iri_to_uri() call without double-quoting occurring.
     """
-    return force_text(urllib_parse.quote_plus(force_str(url), force_str(safe)))
+    return force_text(quote_plus(force_str(url), force_str(safe)))
 urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 def urlunquote(quoted_url):
@@ -57,7 +55,7 @@ def urlunquote(quoted_url):
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
-    return force_text(urllib_parse.unquote(force_str(quoted_url)))
+    return force_text(unquote(force_str(quoted_url)))
 urlunquote = allow_lazy(urlunquote, six.text_type)
 
 def urlunquote_plus(quoted_url):
@@ -65,20 +63,20 @@ def urlunquote_plus(quoted_url):
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
-    return force_text(urllib_parse.unquote_plus(force_str(quoted_url)))
+    return force_text(unquote_plus(force_str(quoted_url)))
 urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 def urlencode(query, doseq=0):
     """
     A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first case to UTF-8 encoded strings and
+    unicode strings. The parameters are first cast to UTF-8 encoded strings and
     then encoded as per normal.
     """
     if isinstance(query, MultiValueDict):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
-    return urllib_parse.urlencode(
+    return original_urlencode(
         [(force_str(k),
          [force_str(i) for i in v] if isinstance(v, (list,tuple)) else force_str(v))
             for k, v in query],
@@ -144,7 +142,7 @@ def parse_http_date(date):
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception:
-        raise ValueError("%r is not a valid date" % date)
+        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
 
 def parse_http_date_safe(date):
     """
@@ -170,7 +168,7 @@ def base36_to_int(s):
     value = int(s, 36)
     # ... then do a final check that the value will fit into an int to avoid
     # returning a long (#15067). The long type was removed in Python 3.
-    if not six.PY3 and value > sys.maxint:
+    if six.PY2 and value > sys.maxint:
         raise ValueError("Base36 input too large")
     return value
 
@@ -182,7 +180,7 @@ def int_to_base36(i):
     factor = 0
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
-    if not six.PY3:
+    if six.PY2:
         if not isinstance(i, six.integer_types):
             raise TypeError("Non-integer base36 conversion input.")
         if i > sys.maxint:
@@ -201,6 +199,24 @@ def int_to_base36(i):
         i = i % j
         factor -= 1
     return ''.join(base36)
+
+def urlsafe_base64_encode(s):
+    """
+    Encodes a bytestring in base64 for use in URLs, stripping any trailing
+    equal signs.
+    """
+    return base64.urlsafe_b64encode(s).rstrip(b'\n=')
+
+def urlsafe_base64_decode(s):
+    """
+    Decodes a base64 encoded string, adding back any trailing equal signs that
+    might have been stripped.
+    """
+    s = s.encode('utf-8') # base64encode should only return ASCII.
+    try:
+        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
+    except (LookupError, BinasciiError) as e:
+        raise ValueError(e)
 
 def parse_etags(etag_str):
     """
@@ -225,8 +241,11 @@ def same_origin(url1, url2):
     """
     Checks if two URLs are 'same-origin'
     """
-    p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
-    return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+    p1, p2 = urlparse(url1), urlparse(url2)
+    try:
+        return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+    except ValueError:
+        return False
 
 def is_safe_url(url, host=None):
     """
@@ -235,6 +254,8 @@ def is_safe_url(url, host=None):
 
     Always returns ``False`` on an empty url.
     """
+    if url is not None:
+        url = url.strip()
     if not url:
         return False
     # Chrome treats \ completely as /
@@ -243,12 +264,17 @@ def is_safe_url(url, host=None):
     # urlaprse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
         return False
-    url_info = urllib_parse.urlparse(url)
+    url_info = urlparse(url)
     # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
     # In that URL, example.com is not the hostname but, a path component. However,
     # Chrome will still consider example.com to be the hostname, so we must not
     # allow this syntax.
     if not url_info.netloc and url_info.scheme:
         return False
-    return (not url_info.netloc or url_info.netloc == host) and \
-        (not url_info.scheme or url_info.scheme in ['http', 'https'])
+    # Forbid URLs that start with control characters. Some browsers (like
+    # Chrome) ignore quite a few control characters at the start of a
+    # URL and might consider the URL as scheme relative.
+    if unicodedata.category(url[0])[0] == 'C':
+        return False
+    return ((not url_info.netloc or url_info.netloc == host) and
+            (not url_info.scheme or url_info.scheme in ['http', 'https']))

@@ -42,7 +42,7 @@ The library deals with these concepts:
         A collection of fields that knows how to validate itself and
         display itself as HTML.
 
-    Form Media
+    Form Assets (the ``Media`` class)
         The CSS and JavaScript resources that are required to render a form.
 
 The library is decoupled from the other Django components, such as the database
@@ -96,6 +96,7 @@ The standard pattern for processing a form in a view looks like this:
 
    def contact(request):
        if request.method == 'POST': # If the form has been submitted...
+           # ContactForm was defined in the previous section
            form = ContactForm(request.POST) # A form bound to the POST data
            if form.is_valid(): # All validation rules pass
                # Process the data in form.cleaned_data
@@ -223,7 +224,7 @@ wrapped in a paragraph. Here's the output for our example template::
    <p><label for="id_message">Message:</label>
        <input type="text" name="message" id="id_message" /></p>
    <p><label for="id_sender">Sender:</label>
-       <input type="text" name="sender" id="id_sender" /></p>
+       <input type="email" name="sender" id="id_sender" /></p>
    <p><label for="id_cc_myself">Cc myself:</label>
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
    <input type="submit" value="Submit" />
@@ -302,7 +303,7 @@ loop::
         {% for field in form %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -316,8 +317,14 @@ attributes, which can be useful in your templates:
     The label of the field, e.g. ``Email address``.
 
 ``{{ field.label_tag }}``
-    The field's label wrapped in the appropriate HTML ``<label>`` tag,
-    e.g. ``<label for="id_email">Email address</label>``
+    The field's label wrapped in the appropriate HTML ``<label>`` tag.
+
+    .. versionchanged:: 1.6
+
+        This includes the form's :attr:`~django.forms.Form.label_suffix`. For
+        example, the default ``label_suffix`` is a colon::
+
+            <label for="id_email">Email address:</label>
 
 ``{{ field.id_for_label }}``
     The ID that will be used for this field (``id_email`` in the example
@@ -381,7 +388,7 @@ these two methods::
         {% for field in form.visible_fields %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -409,7 +416,7 @@ using the :ttag:`include` tag to reuse it in other templates::
     {% for field in form %}
         <div class="fieldWrapper">
             {{ field.errors }}
-            {{ field.label_tag }}: {{ field }}
+            {{ field.label_tag }} {{ field }}
         </div>
     {% endfor %}
 

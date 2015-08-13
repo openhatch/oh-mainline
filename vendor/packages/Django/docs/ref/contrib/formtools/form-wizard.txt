@@ -106,7 +106,7 @@ respectively).
     in the :doc:`sessions documentation </topics/http/sessions>` on
     how to enable sessions.
 
-We will use the :class:`SessionWizardView` in all examples but is is completely
+We will use the :class:`SessionWizardView` in all examples but is completely
 fine to use the :class:`CookieWizardView` instead. As with your
 :class:`~django.forms.Form` classes, this :class:`WizardView` class can live
 anywhere in your codebase, but convention is to put it in :file:`views.py`.
@@ -245,6 +245,13 @@ wizard's ``as_view()`` method takes a list of your
         (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
     )
 
+.. versionchanged:: 1.6
+
+You can also pass the form list as a class attribute named ``form_list``::
+
+    class ContactWizard(WizardView):
+        form_list = [ContactForm1, ContactForm2]
+
 .. _wizard-template-for-each-form:
 
 Using a different template for each form
@@ -294,6 +301,14 @@ The ``urls.py`` file would contain something like::
     urlpatterns = patterns('',
         (r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
     )
+
+.. versionchanged:: 1.6
+
+The ``condition_dict`` can be passed as attribute for the ``as_view()``
+method or as a class attribute named ``condition_dict``::
+
+    class OrderWizard(WizardView):
+        condition_dict = {'cc': pay_by_credit_card}
 
 Note that the ``OrderWizard`` object is initialized with a list of pairs.
 The first element in the pair is a string that corresponds to the name of the
@@ -375,8 +390,13 @@ Advanced ``WizardView`` methods
     The default template context variables are:
 
     * Any extra data the storage backend has stored
-    * ``form`` -- form instance of the current step
-    * ``wizard`` -- the wizard instance itself
+    * ``wizard`` -- a dictionary representation of the wizard instance with the
+      following key/values:
+
+      * ``form`` -- :class:`~django.forms.Form` or
+        :class:`~django.forms.formsets.BaseFormSet` instance for the current step
+      * ``steps`` -- A helper object to access the various steps related data
+      * ``management_form`` -- all the management data for the current step
 
     Example to add extra variables for a specific step::
 
@@ -460,6 +480,17 @@ Advanced ``WizardView`` methods
 
         def process_step_files(self, form):
             return self.get_form_step_files(form)
+
+.. method:: WizardView.render_goto_step(step, goto_step, **kwargs)
+
+    .. versionadded:: 1.6
+
+    This method is called when the step should be changed to something else
+    than the next step. By default, this method just stores the requested
+    step ``goto_step`` in the storage and then renders the new step.
+
+    If you want to store the entered data of the current step before rendering
+    the next step, you can overwrite this method.
 
 .. method:: WizardView.render_revalidation_failure(step, form, **kwargs)
 
@@ -556,6 +587,11 @@ Providing initial data for the forms
 
     The ``initial_dict`` can also take a list of dictionaries for a specific
     step if the step is a ``FormSet``.
+
+    .. versionchanged:: 1.6
+
+    The ``initial_dict`` can also be added as a class attribute named
+    ``initial_dict`` to avoid having the initial data in the ``urls.py``.
 
 .. _wizard-files:
 
@@ -671,24 +707,22 @@ Usage of ``NamedUrlWizardView``
 .. class:: NamedUrlSessionWizardView
 .. class:: NamedUrlCookieWizardView
 
-There is a :class:`WizardView` subclass which adds named-urls support to the
-wizard. By doing this, you can have single urls for every step. You can also
-use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
-classes which preselect the backend used for storing information (server-side
-sessions and browser cookies respectively).
+``NamedUrlWizardView`` is a :class:`WizardView` subclass which adds named-urls
+support to the wizard. This allows you to have separate URLs for every step.
+You can also use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
+classes which preselect the backend used for storing information (Django sessions and
+browser cookies respectively).
 
-To use the named urls, you have to change the ``urls.py``.
+To use the named URLs, you should not only use the :class:`NamedUrlWizardView` instead of
+:class:`WizardView`, but you will also have to change your ``urls.py``.
 
-Below you will see an example of a contact wizard with two steps, step 1 with
-"contactdata" as its name and step 2 with "leavemessage" as its name.
+The :meth:`~WizardView.as_view` method takes two additional arguments:
 
-Additionally you have to pass two more arguments to the
-:meth:`~WizardView.as_view` method:
+* a required ``url_name`` -- the name of the url (as provided in the ``urls.py``)
+* an optional ``done_step_name`` -- the name of the done step, to be used in the URL
 
-* ``url_name`` -- the name of the url (as provided in the urls.py)
-* ``done_step_name`` -- the name in the url for the done step
-
-Example code for the changed ``urls.py`` file::
+This is an example of a ``urls.py`` for a contact wizard with two steps, step 1 named
+``contactdata`` and step 2 named ``leavemessage``::
 
     from django.conf.urls import url, patterns
 
@@ -713,9 +747,9 @@ Advanced ``NamedUrlWizardView`` methods
 
 .. method:: NamedUrlWizardView.get_step_url(step)
 
-    This method returns the URL for a specific step.
+This method returns the URL for a specific step.
 
-    Default implementation::
+Default implementation::
 
-        def get_step_url(self, step):
-            return reverse(self.url_name, kwargs={'step': step})
+    def get_step_url(self, step):
+        return reverse(self.url_name, kwargs={'step': step})

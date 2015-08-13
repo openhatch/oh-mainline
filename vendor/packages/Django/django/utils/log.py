@@ -3,6 +3,7 @@ import traceback
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail import get_connection
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
 
@@ -39,7 +40,7 @@ DEFAULT_LOGGING = {
         },
     },
     'handlers': {
-        'console':{
+        'console': {
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
@@ -62,6 +63,11 @@ DEFAULT_LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'django.security': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
         'py.warnings': {
             'handlers': ['console'],
         },
@@ -76,17 +82,18 @@ class AdminEmailHandler(logging.Handler):
     request data will be provided in the email report.
     """
 
-    def __init__(self, include_html=False):
+    def __init__(self, include_html=False, email_backend=None):
         logging.Handler.__init__(self)
         self.include_html = include_html
+        self.email_backend = email_backend
 
     def emit(self, record):
         try:
             request = record.request
             subject = '%s (%s IP): %s' % (
                 record.levelname,
-                (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
-                 and 'internal' or 'EXTERNAL'),
+                ('internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
+                 else 'EXTERNAL'),
                 record.getMessage()
             )
             filter = get_exception_reporter_filter(request)
@@ -109,8 +116,13 @@ class AdminEmailHandler(logging.Handler):
 
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
-        html_message = self.include_html and reporter.get_traceback_html() or None
-        mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)
+        html_message = reporter.get_traceback_html() if self.include_html else None
+        mail.mail_admins(subject, message, fail_silently=True,
+                         html_message=html_message,
+                         connection=self.connection())
+
+    def connection(self):
+        return get_connection(backend=self.email_backend, fail_silently=True)
 
     def format_subject(self, subject):
         """
@@ -145,4 +157,4 @@ class RequireDebugFalse(logging.Filter):
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
-       return settings.DEBUG
+        return settings.DEBUG

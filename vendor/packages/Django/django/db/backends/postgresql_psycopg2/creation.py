@@ -1,5 +1,3 @@
-import psycopg2.extensions
-
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 
@@ -11,6 +9,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # If a column type is set to None, it won't be included in the output.
     data_types = {
         'AutoField':         'serial',
+        'BinaryField':       'bytea',
         'BooleanField':      'boolean',
         'CharField':         'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
@@ -42,7 +41,8 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def sql_indexes_for_field(self, model, f, style):
         output = []
-        if f.db_index or f.unique:
+        db_type = f.db_type(connection=self.connection)
+        if db_type is not None and (f.db_index or f.unique):
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
@@ -68,7 +68,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
             # C locale. See #12234.
-            db_type = f.db_type(connection=self.connection)
             if db_type.startswith('varchar'):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' varchar_pattern_ops'))
@@ -76,12 +75,3 @@ class DatabaseCreation(BaseDatabaseCreation):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' text_pattern_ops'))
         return output
-
-    def set_autocommit(self):
-        self._prepare_for_test_db_ddl()
-
-    def _prepare_for_test_db_ddl(self):
-        """Rollback and close the active transaction."""
-        self.connection.connection.rollback()
-        self.connection.connection.set_isolation_level(
-                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)

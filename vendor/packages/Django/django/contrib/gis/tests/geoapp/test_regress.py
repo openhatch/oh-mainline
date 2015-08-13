@@ -3,14 +3,19 @@ from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
+from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, no_oracle
 from django.db.models import Count, Min
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 
-from .models import City, PennsylvaniaCity, State, Truth
+if HAS_GEOS:
+    from .models import City, PennsylvaniaCity, State, Truth
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoRegressionTests(TestCase):
 
     def test_update(self):
@@ -49,7 +54,7 @@ class GeoRegressionTests(TestCase):
         founded = datetime(1857, 5, 23)
         mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                                     founded=founded)
-        self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])
+        self.assertEqual(founded, PennsylvaniaCity.objects.datetimes('founded', 'day')[0])
         self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 
     def test_empty_count(self):
@@ -62,6 +67,10 @@ class GeoRegressionTests(TestCase):
          # .count() should not throw TypeError in __eq__
          self.assertEqual(cities_within_state.count(), 1)
 
+    # TODO: fix on Oracle -- get the following error because the SQL is ordered
+    # by a geometry object, which Oracle apparently doesn't like:
+    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
+    @no_oracle
     def test_defer_or_only_with_annotate(self):
         "Regression for #16409. Make sure defer() and only() work with annotate()"
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
@@ -72,8 +81,8 @@ class GeoRegressionTests(TestCase):
         t1 = Truth.objects.create(val=True)
         t2 = Truth.objects.create(val=False)
 
-        val1 = Truth.objects.get(pk=1).val
-        val2 = Truth.objects.get(pk=2).val
+        val1 = Truth.objects.get(pk=t1.pk).val
+        val2 = Truth.objects.get(pk=t2.pk).val
         # verify types -- should't be 0/1
         self.assertIsInstance(val1, bool)
         self.assertIsInstance(val2, bool)

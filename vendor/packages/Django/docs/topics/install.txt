@@ -7,10 +7,8 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python.
-
-It works with any Python version from 2.6.5 to 2.7. It also features
-experimental support for versions from 3.2.3 to 3.3.
+Being a Python Web framework, Django requires Python. It works with Python 2.6,
+2.7, 3.2 or 3.3.
 
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
 probably already have it installed.
@@ -24,12 +22,8 @@ probably already have it installed.
 
 .. admonition:: Python on Windows
 
-    On Windows, you might need to adjust your ``PATH`` environment variable
-    to include paths to Python executable and additional scripts. For example,
-    if your Python is installed in ``C:\Python27\``, the following paths need
-    to be added to ``PATH``::
-
-        C:\Python27\;C:\Python27\Scripts;
+    If you are just starting with Django and using Windows, you may find
+    :doc:`/howto/windows` useful.
 
 Install Apache and mod_wsgi
 =============================
@@ -89,19 +83,9 @@ from other databases, so if you are working on something substantial, it's
 recommended to develop with the same database as you plan on using in
 production.
 
-In addition to the officially supported databases, there are backends provided
-by 3rd parties that allow you to use other databases with Django:
-
-* `Sybase SQL Anywhere`_
-* `IBM DB2`_
-* `Microsoft SQL Server 2005`_
-* Firebird_
-* ODBC_
-
-The Django versions and ORM features supported by these unofficial backends
-vary considerably. Queries regarding the specific capabilities of these
-unofficial backends, along with any support queries, should be directed to the
-support channels provided by each 3rd party project.
+In addition to the officially supported databases, there are :ref:`backends
+provided by 3rd parties <third-party-notes>` that allow you to use other
+databases with Django.
 
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
@@ -115,6 +99,9 @@ database bindings are installed.
 * If you're using MySQL, you'll need the ``MySQL-python`` package, version
   1.2.1p2 or higher. You will also want to read the database-specific
   :ref:`notes for the MySQL backend <mysql-notes>`.
+
+* If you're using SQLite you might want to read the :ref:`SQLite backend notes
+  <sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`
@@ -148,7 +135,7 @@ database queries, Django will need permission to create a test database.
 .. _Oracle: http://www.oracle.com/
 .. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
 .. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Microsoft SQL Server 2005: https://bitbucket.org/Manfre/django-mssql/
 .. _Firebird: http://code.google.com/p/django-firebird/
 .. _ODBC: http://code.google.com/p/django-pyodbc/
 .. _removing-old-versions-of-django:
@@ -185,14 +172,6 @@ release, or fetching the latest development version.
 
 It's easy, no matter which way you choose.
 
-Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Check the :doc:`distribution specific notes </misc/distributions>` to see if
-your platform/distribution provides official Django packages/installers.
-Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths.
-
 .. _installing-official-release:
 
 Installing an official release with ``pip``
@@ -223,7 +202,7 @@ This is the recommended way to install Django.
 
 .. _pip: http://www.pip-installer.org/
 .. _virtualenv: http://www.virtualenv.org/
-.. _virtualenvwrapper: http://www.doughellmann.com/docs/virtualenvwrapper/
+.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
 .. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#using-the-installer
 
 Installing an official release manually
@@ -256,6 +235,15 @@ Installing an official release manually
 .. _download page: https://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
+
+Installing a distribution-specific package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the :doc:`distribution specific notes </misc/distributions>` to see if
+your platform/distribution provides official Django packages/installers.
+Distribution-provided packages will typically allow for automatic installation
+of dependencies and easy upgrade paths; however, these packages will rarely
+contain the latest release of Django.
 
 .. _installing-development-version:
 

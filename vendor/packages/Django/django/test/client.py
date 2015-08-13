@@ -6,19 +6,14 @@ import re
 import mimetypes
 from copy import copy
 from io import BytesIO
-try:
-    from urllib.parse import unquote, urlparse, urlsplit
-except ImportError:     # Python 2
-    from urllib import unquote
-    from urlparse import urlparse, urlsplit
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
     got_request_exception)
-from django.db import close_connection
+from django.db import close_old_connections
 from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
@@ -28,6 +23,7 @@ from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils import six
+from django.utils.six.moves.urllib.parse import unquote, urlparse, urlsplit
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
@@ -78,9 +74,9 @@ def closing_iterator_wrapper(iterable, close):
         for item in iterable:
             yield item
     finally:
-        request_finished.disconnect(close_connection)
+        request_finished.disconnect(close_old_connections)
         close()                                 # will fire request_finished
-        request_finished.connect(close_connection)
+        request_finished.connect(close_old_connections)
 
 
 class ClientHandler(BaseHandler):
@@ -101,7 +97,9 @@ class ClientHandler(BaseHandler):
         if self._request_middleware is None:
             self.load_middleware()
 
+        request_started.disconnect(close_old_connections)
         request_started.send(sender=self.__class__)
+        request_started.connect(close_old_connections)
         request = WSGIRequest(environ)
         # sneaky little hack so that we can easily get round
         # CsrfViewMiddleware.  This makes life easier, and is probably
@@ -115,9 +113,9 @@ class ClientHandler(BaseHandler):
             response.streaming_content = closing_iterator_wrapper(
                 response.streaming_content, response.close)
         else:
-            request_finished.disconnect(close_connection)
+            request_finished.disconnect(close_old_connections)
             response.close()                    # will fire request_finished
-            request_finished.connect(close_connection)
+            request_finished.connect(close_old_connections)
 
         return response
 
@@ -269,10 +267,13 @@ class RequestFactory(object):
         "Construct a GET request."
 
         parsed = urlparse(path)
+        query_string = urlencode(data, doseq=True) or force_str(parsed[4])
+        if six.PY3:
+            query_string = query_string.encode('utf-8').decode('iso-8859-1')
+
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
             'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
+            'QUERY_STRING':    query_string,
             'REQUEST_METHOD':  str('GET'),
         }
         r.update(extra)
@@ -285,11 +286,15 @@ class RequestFactory(object):
         post_data = self._encode_data(data, content_type)
 
         parsed = urlparse(path)
+        query_string = force_str(parsed[4])
+        if six.PY3:
+            query_string = query_string.encode('utf-8').decode('iso-8859-1')
+
         r = {
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
             'PATH_INFO':      self._get_path(parsed),
-            'QUERY_STRING':   force_str(parsed[4]),
+            'QUERY_STRING':   query_string,
             'REQUEST_METHOD': str('POST'),
             'wsgi.input':     FakePayload(post_data),
         }
@@ -300,10 +305,13 @@ class RequestFactory(object):
         "Construct a HEAD request."
 
         parsed = urlparse(path)
+        query_string = urlencode(data, doseq=True) or force_str(parsed[4])
+        if six.PY3:
+            query_string = query_string.encode('utf-8').decode('iso-8859-1')
+
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
             'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
+            'QUERY_STRING':    query_string,
             'REQUEST_METHOD':  str('HEAD'),
         }
         r.update(extra)
@@ -319,6 +327,11 @@ class RequestFactory(object):
         "Construct a PUT request."
         return self.generic('PUT', path, data, content_type, **extra)
 
+    def patch(self, path, data='', content_type='application/octet-stream',
+            **extra):
+        "Construct a PATCH request."
+        return self.generic('PATCH', path, data, content_type, **extra)
+
     def delete(self, path, data='', content_type='application/octet-stream',
             **extra):
         "Construct a DELETE request."
@@ -330,7 +343,6 @@ class RequestFactory(object):
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO':      self._get_path(parsed),
-            'QUERY_STRING':   force_str(parsed[4]),
             'REQUEST_METHOD': str(method),
         }
         if data:
@@ -340,7 +352,15 @@ class RequestFactory(object):
                 'wsgi.input':     FakePayload(data),
             })
         r.update(extra)
+        # If QUERY_STRING is absent or empty, we want to extract it from the URL.
+        if not r.get('QUERY_STRING'):
+            query_string = force_bytes(parsed[4])
+            # WSGI requires latin-1 encoded strings. See get_path_info().
+            if six.PY3:
+                query_string = query_string.decode('iso-8859-1')
+            r['QUERY_STRING'] = query_string
         return self.request(**r)
+
 
 class Client(RequestFactory):
     """
@@ -496,6 +516,17 @@ class Client(RequestFactory):
             response = self._handle_redirects(response, **extra)
         return response
 
+    def patch(self, path, data='', content_type='application/octet-stream',
+            follow=False, **extra):
+        """
+        Send a resource to the server using PATCH.
+        """
+        response = super(Client, self).patch(
+            path, data=data, content_type=content_type, **extra)
+        if follow:
+            response = self._handle_redirects(response, **extra)
+        return response
+
     def delete(self, path, data='', content_type='application/octet-stream',
             follow=False, **extra):
         """
@@ -553,10 +584,17 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
-        session = import_module(settings.SESSION_ENGINE).SessionStore()
-        session_cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-        if session_cookie:
-            session.delete(session_key=session_cookie.value)
+        request = HttpRequest()
+        engine = import_module(settings.SESSION_ENGINE)
+        UserModel = get_user_model()
+        if self.session:
+            request.session = self.session
+            uid = self.session.get("_auth_user_id")
+            if uid:
+                request.user = UserModel._default_manager.get(pk=uid)
+        else:
+            request.session = engine.SessionStore()
+        logout(request)
         self.cookies = SimpleCookie()
 
     def _handle_redirects(self, response, **extra):
@@ -564,7 +602,7 @@ class Client(RequestFactory):
 
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):
-            url = response['Location']
+            url = response.url
             redirect_chain = response.redirect_chain
             redirect_chain.append((url, response.status_code))
 

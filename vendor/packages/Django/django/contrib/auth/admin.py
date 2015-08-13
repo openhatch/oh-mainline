@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth.forms import (UserCreationForm, UserChangeForm,
     AdminPasswordChangeForm)
 from django.contrib.auth.models import User, Group
@@ -92,7 +93,7 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters_m
     @csrf_protect_m
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
         # It's an error for a user to have add permission but NOT change
         # permission for users. If we allowed such users to add users, they
@@ -125,11 +126,13 @@ class UserAdmin(admin.ModelAdmin):
     def user_change_password(self, request, id, form_url=''):
         if not self.has_change_permission(request):
             raise PermissionDenied
-        user = get_object_or_404(self.queryset(request), pk=id)
+        user = get_object_or_404(self.get_queryset(request), pk=id)
         if request.method == 'POST':
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
                 form.save()
+                change_message = self.construct_change_message(request, form, None)
+                self.log_change(request, user, change_message)
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
                 return HttpResponseRedirect('..')
@@ -144,7 +147,7 @@ class UserAdmin(admin.ModelAdmin):
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
-            'is_popup': '_popup' in request.REQUEST,
+            'is_popup': IS_POPUP_VAR in request.REQUEST,
             'add': True,
             'change': False,
             'has_delete_permission': False,
@@ -171,7 +174,7 @@ class UserAdmin(admin.ModelAdmin):
         # button except in two scenarios:
         # * The user has pressed the 'Save and add another' button
         # * We are adding a user in a popup
-        if '_addanother' not in request.POST and '_popup' not in request.POST:
+        if '_addanother' not in request.POST and IS_POPUP_VAR not in request.POST:
             request.POST['_continue'] = 1
         return super(UserAdmin, self).response_add(request, obj,
                                                    post_url_continue)

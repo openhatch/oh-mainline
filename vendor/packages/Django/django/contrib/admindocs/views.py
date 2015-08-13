@@ -17,7 +17,6 @@ from django.utils.importlib import import_module
 from django.utils._os import upath
 from django.utils import six
 from django.utils.translation import ugettext as _
-from django.utils.safestring import mark_safe
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
@@ -39,7 +38,7 @@ def bookmarklets(request):
     admin_root = urlresolvers.reverse('admin:index')
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
-        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root),
+        'admin_url': "%s://%s%s" % ('https' if request.is_secure() else 'http', request.get_host(), admin_root),
     }, context_instance=RequestContext(request))
 
 @staff_member_required
@@ -189,7 +188,7 @@ def model_detail(request, app_label, model_name):
         raise Http404(_("App %r not found") % app_label)
     model = None
     for m in models.get_models(app_mod):
-        if m._meta.object_name.lower() == model_name:
+        if m._meta.model_name == model_name:
             model = m
             break
     if model is None:
@@ -224,12 +223,12 @@ def model_detail(request, app_label, model_name):
         fields.append({
             'name': "%s.all" % field.name,
             "data_type": 'List',
-            'verbose': utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.module_name),
+            'verbose': utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.model_name),
         })
         fields.append({
             'name'      : "%s.count" % field.name,
             'data_type' : 'Integer',
-            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
+            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.model_name),
         })
 
     # Gather model methods.
@@ -243,7 +242,7 @@ def model_detail(request, app_label, model_name):
                 continue
             verbose = func.__doc__
             if verbose:
-                verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.module_name)
+                verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
             fields.append({
                 'name': func_name,
                 'data_type': get_return_data_type(func_name),
@@ -257,17 +256,18 @@ def model_detail(request, app_label, model_name):
         fields.append({
             'name'      : "%s.all" % accessor,
             'data_type' : 'List',
-            'verbose'   : utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.module_name),
+            'verbose'   : utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.model_name),
         })
         fields.append({
             'name'      : "%s.count" % accessor,
             'data_type' : 'Integer',
-            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
+            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.model_name),
         })
     return render_to_response('admin_doc/model_detail.html', {
         'root_path': urlresolvers.reverse('admin:index'),
         'name': '%s.%s' % (opts.app_label, opts.object_name),
-        'summary': _("Fields on %s objects") % opts.object_name,
+        # Translators: %s is an object type name
+        'summary': _("Attributes on %s objects") % opts.object_name,
         'description': model.__doc__,
         'fields': fields,
     }, context_instance=RequestContext(request))
@@ -286,7 +286,7 @@ def template_detail(request, template):
             templates.append({
                 'file': template_file,
                 'exists': os.path.exists(template_file),
-                'contents': lambda: os.path.exists(template_file) and open(template_file).read() or '',
+                'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
                 'site_id': settings_mod.SITE_ID,
                 'site': site_obj,
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),

@@ -16,7 +16,8 @@ SingleObjectMixin
 
         The model that this view will display data for. Specifying ``model
         = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``.
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
 
     .. attribute:: queryset
 
@@ -30,14 +31,10 @@ SingleObjectMixin
 
     .. attribute:: slug_url_kwarg
 
-        .. versionadded:: 1.4
-
         The name of the URLConf keyword argument that contains the slug. By
         default, ``slug_url_kwarg`` is ``'slug'``.
 
     .. attribute:: pk_url_kwarg
-
-        .. versionadded:: 1.4
 
         The name of the URLConf keyword argument that contains the primary key.
         By default, ``pk_url_kwarg`` is ``'pk'``.
@@ -69,13 +66,17 @@ SingleObjectMixin
 
         Return the context variable name that will be used to contain the
         data that this view is manipulating. If :attr:`context_object_name` is
-        not set, the context name will be constructed from the ``object_name``
+        not set, the context name will be constructed from the ``model_name``
         of the model that the queryset is composed from. For example, the model
         ``Article`` would have context object named ``'article'``.
 
     .. method:: get_context_data(**kwargs)
 
         Returns context data for displaying the list of objects.
+
+        The base implementation of this method requires that the ``object``
+        attribute be set by the view (even if ``None``). Be sure to do this if
+        you are using this mixin without one of the built-in views that does so.
 
     .. method:: get_slug_field()
 
@@ -126,4 +127,4 @@ SingleObjectTemplateResponseMixin
         * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
-        * ``<app_label>/<object_name><template_name_suffix>.html``
+        * ``<app_label>/<model_name><template_name_suffix>.html``

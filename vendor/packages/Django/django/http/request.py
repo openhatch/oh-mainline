@@ -4,23 +4,18 @@ import copy
 import os
 import re
 import sys
-import warnings
 from io import BytesIO
 from pprint import pformat
-try:
-    from urllib.parse import parse_qsl, urlencode, quote, urljoin
-except ImportError:
-    from urllib import urlencode, quote
-    from urlparse import parse_qsl, urljoin
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
+from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin
 
 
 RAISE_ERROR = object()
@@ -40,10 +35,15 @@ class HttpRequest(object):
     _upload_handlers = []
 
     def __init__(self):
+        # WARNING: The `WSGIRequest` subclass doesn't call `super`.
+        # Any variable assignment made here should also happen in
+        # `WSGIRequest.__init__()`.
+
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
         self.path_info = ''
         self.method = None
+        self.resolver_match = None
         self._post_parse_error = False
 
     def __repr__(self):
@@ -65,11 +65,14 @@ class HttpRequest(object):
                 host = '%s:%s' % (host, server_port)
 
         allowed_hosts = ['*'] if settings.DEBUG else settings.ALLOWED_HOSTS
-        if validate_host(host, allowed_hosts):
+        domain, port = split_domain_port(host)
+        if domain and validate_host(domain, allowed_hosts):
             return host
         else:
-            raise SuspiciousOperation(
-                "Invalid HTTP_HOST header (you may need to set ALLOWED_HOSTS): %s" % host)
+            msg = "Invalid HTTP_HOST header: %r." % host
+            if domain:
+                msg += "You may need to add %r to ALLOWED_HOSTS." % domain
+            raise DisallowedHost(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -188,11 +191,6 @@ class HttpRequest(object):
             self._stream = BytesIO(self._body)
         return self._body
 
-    @property
-    def raw_post_data(self):
-        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', DeprecationWarning)
-        return self.body
-
     def _mark_post_parse_error(self):
         self._post = QueryDict('')
         self._files = MultiValueDict()
@@ -240,11 +238,17 @@ class HttpRequest(object):
 
     def read(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.read(*args, **kwargs)
+        try:
+            return self._stream.read(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def readline(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.readline(*args, **kwargs)
+        try:
+            return self._stream.readline(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def xreadlines(self):
         while True:
@@ -261,12 +265,19 @@ class HttpRequest(object):
 
 class QueryDict(MultiValueDict):
     """
-    A specialized MultiValueDict that takes a query string when initialized.
-    This is immutable unless you create a copy of it.
+    A specialized MultiValueDict which represents a query string.
 
-    Values retrieved from this class are converted from the given encoding
+    A QueryDict can be used to represent GET or POST data. It subclasses
+    MultiValueDict since keys in such data can be repeated, for instance
+    in the data from a form with a <select multiple> field.
+
+    By default QueryDicts are immutable, though the copy() method
+    will always return a mutable copy.
+
+    Both keys and values set on this class are converted from the given encoding
     (DEFAULT_CHARSET by default) to unicode.
     """
+
     # These are both reset in __init__, but is specified here at the class
     # level so that unpickling will have valid values
     _mutable = True
@@ -279,8 +290,12 @@ class QueryDict(MultiValueDict):
         self.encoding = encoding
         if six.PY3:
             if isinstance(query_string, bytes):
-                # query_string contains URL-encoded data, a subset of ASCII.
-                query_string = query_string.decode()
+                # query_string normally contains URL-encoded data, a subset of ASCII.
+                try:
+                    query_string = query_string.decode(encoding)
+                except UnicodeDecodeError:
+                    # ... but some user agents are misbehaving :-(
+                    query_string = query_string.decode('iso-8859-1')
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True,
                                         encoding=encoding):
@@ -458,9 +473,30 @@ def bytes_to_text(s, encoding):
         return s
 
 
+def split_domain_port(host):
+    """
+    Return a (domain, port) tuple from a given host.
+
+    Returned domain is lower-cased. If the host is invalid, the domain will be
+    empty.
+    """
+    host = host.lower()
+
+    if not host_validation_re.match(host):
+        return '', ''
+
+    if host[-1] == ']':
+        # It's an IPv6 address without a port.
+        return host, ''
+    bits = host.rsplit(':', 1)
+    if len(bits) == 2:
+        return tuple(bits)
+    return bits[0], ''
+
+
 def validate_host(host, allowed_hosts):
     """
-    Validate the given host header value for this site.
+    Validate the given host for this site.
 
     Check that the host looks valid and matches a host or host pattern in the
     given list of ``allowed_hosts``. Any pattern beginning with a period
@@ -468,31 +504,20 @@ def validate_host(host, allowed_hosts):
     ``example.com`` and any subdomain), ``*`` matches anything, and anything
     else must match exactly.
 
+    Note: This function assumes that the given host is lower-cased and has
+    already had the port, if any, stripped off.
+
     Return ``True`` for a valid host, ``False`` otherwise.
 
     """
-    # All validation is case-insensitive
-    host = host.lower()
-
-    # Basic sanity check
-    if not host_validation_re.match(host):
-        return False
-
-    # Validate only the domain part.
-    if host[-1] == ']':
-        # It's an IPv6 address without a port.
-        domain = host
-    else:
-        domain = host.rsplit(':', 1)[0]
-
     for pattern in allowed_hosts:
         pattern = pattern.lower()
         match = (
             pattern == '*' or
             pattern.startswith('.') and (
-                domain.endswith(pattern) or domain == pattern[1:]
+                host.endswith(pattern) or host == pattern[1:]
                 ) or
-            pattern == domain
+            pattern == host
             )
         if match:
             return True

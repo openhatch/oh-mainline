@@ -10,11 +10,18 @@ When Django handles a file upload, the file data ends up placed in
 </ref/request-response>`). This document explains how files are stored on disk
 and in memory, and how to customize the default behavior.
 
+.. warning::
+
+    There are security risks if you are accepting uploaded content from
+    untrusted users! See the security guide's topic on
+    :ref:`user-uploaded-content-security` for mitigation details.
+
 Basic file uploads
 ==================
 
 Consider a simple form containing a :class:`~django.forms.FileField`::
 
+    # In forms.py...
     from django import forms
 
     class UploadFileForm(forms.Form):
@@ -39,6 +46,7 @@ something like::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render_to_response
+    from .forms import UploadFileForm
 
     # Imaginary function to handle an uploaded file.
     from somewhere import handle_uploaded_file
@@ -147,14 +155,17 @@ Three settings control Django's file upload behavior:
     most Unix-like systems).
 
 :setting:`FILE_UPLOAD_PERMISSIONS`
-    The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
+    The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
     more information about what these modes mean, see the documentation for
     :func:`os.chmod`.
 
     If this isn't given or is ``None``, you'll get operating-system
     dependent behavior. On most platforms, temporary files will have a mode
-    of ``0600``, and files saved from memory will be saved using the
+    of ``0o600``, and files saved from memory will be saved using the
     system's standard umask.
+
+    For security reasons, these permissions aren't applied to the temporary
+    files that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
 
     .. warning::
 

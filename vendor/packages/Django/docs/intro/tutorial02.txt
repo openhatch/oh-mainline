@@ -21,61 +21,27 @@ automatically-generated admin site.
     The admin isn't intended to be used by site visitors. It's for site
     managers.
 
-Activate the admin site
-=======================
-
-The Django admin site is not activated by default -- it's an opt-in thing. To
-activate the admin site for your installation, do these three things:
-
-* Uncomment ``"django.contrib.admin"`` in the :setting:`INSTALLED_APPS` setting.
-
-* Run ``python manage.py syncdb``. Since you have added a new application
-  to :setting:`INSTALLED_APPS`, the database tables need to be updated.
-
-* Edit your ``mysite/urls.py`` file and uncomment the lines that reference
-  the admin -- there are three lines in total to uncomment. This file is a
-  URLconf; we'll dig into URLconfs in the next tutorial. For now, all you
-  need to know is that it maps URL roots to applications. In the end, you
-  should have a ``urls.py`` file that looks like this:
-
-  .. parsed-literal::
-
-      from django.conf.urls import patterns, include, url
-
-      # Uncomment the next two lines to enable the admin:
-      **from django.contrib import admin**
-      **admin.autodiscover()**
-
-      urlpatterns = patterns('',
-          # Examples:
-          # url(r'^$', '{{ project_name }}.views.home', name='home'),
-          # url(r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
-
-          # Uncomment the admin/doc line below to enable admin documentation:
-          # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-          # Uncomment the next line to enable the admin:
-          **url(r'^admin/', include(admin.site.urls)),**
-      )
-
-  (The bold lines are the ones that needed to be uncommented.)
-
 Start the development server
 ============================
 
-Let's start the development server and explore the admin site.
+The Django admin site is activated by default. Let's start the development
+server and explore it.
 
 Recall from Tutorial 1 that you start the development server like so:
 
 .. code-block:: bash
 
-    python manage.py runserver
+    $ python manage.py runserver
 
 Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
 http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 .. image:: _images/admin01.png
    :alt: Django admin login screen
+
+Since :doc:`translation </topics/i18n/translation>` is turned on by default,
+the login screen may be displayed in your own language, depending on your
+browser's settings and on whether Django has a translation for this language.
 
 .. admonition:: Doesn't match what you see?
 
@@ -93,16 +59,18 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 Enter the admin site
 ====================
 
-Now, try logging in. (You created a superuser account in the first part of this
+Now, try logging in. You created a superuser account in the first part of this
 tutorial, remember?  If you didn't create one or forgot the password you can
-:ref:`create another one <topics-auth-creating-superusers>`.) You should see
-the Django admin index page:
+:ref:`create another one <topics-auth-creating-superusers>`.
+
+You should see the Django admin index page:
 
 .. image:: _images/admin02t.png
    :alt: Django admin index page
 
-You should see a few types of editable content, including groups, users
-and sites. These are core features Django ships with by default.
+You should see a few types of editable content: groups and users. They are
+provided by :mod:`django.contrib.auth`, the authentication framework shipped
+by Django.
 
 Make the poll app modifiable in the admin
 =========================================
@@ -110,17 +78,13 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: we need to tell the admin that ``Poll``
-objects have an admin interface. To do this, create a file called
-:file:`admin.py` in your ``polls`` directory, and edit it to look like this::
+objects have an admin interface. To do this, open the :file:`polls/admin.py`
+file, and edit it to look like this::
 
     from django.contrib import admin
     from polls.models import Poll
 
     admin.site.register(Poll)
-
-You'll need to restart the development server to see your changes. Normally,
-the server auto-reloads code every time you modify a file, but the action of
-creating a new file doesn't trigger the auto-reloading logic.
 
 Explore the free admin functionality
 ====================================
@@ -145,7 +109,7 @@ Click the "What's up?" poll to edit it:
 
 Things to note here:
 
-* The form is automatically generated from the Poll model.
+* The form is automatically generated from the ``Poll`` model.
 
 * The different model field types (:class:`~django.db.models.DateTimeField`,
   :class:`~django.db.models.CharField`) correspond to the appropriate HTML
@@ -194,6 +158,9 @@ you want when you register the object.
 Let's see how this works by re-ordering the fields on the edit form. Replace
 the ``admin.site.register(Poll)`` line with::
 
+    from django.contrib import admin
+    from polls.models import Poll
+
     class PollAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question']
 
@@ -215,6 +182,9 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets::
 
+    from django.contrib import admin
+    from polls.models import Poll
+
     class PollAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question']}),
@@ -223,7 +193,8 @@ up into fieldsets::
 
     admin.site.register(Poll, PollAdmin)
 
-The first element of each tuple in ``fieldsets`` is the title of the fieldset.
+The first element of each tuple in
+:attr:`~django.contrib.admin.ModelAdmin.fieldsets` is the title of the fieldset.
 Here's what our form looks like now:
 
 .. image:: _images/admin08t.png
@@ -233,6 +204,9 @@ You can assign arbitrary HTML classes to each fieldset. Django provides a
 ``"collapse"`` class that displays a particular fieldset initially collapsed.
 This is useful when you have a long form that contains a number of fields that
 aren't commonly used::
+
+        from django.contrib import admin
+        from polls.models import Poll
 
         class PollAdmin(admin.ModelAdmin):
             fieldsets = [
@@ -254,6 +228,7 @@ Yet.
 There are two ways to solve this problem. The first is to register ``Choice``
 with the admin just as we did with ``Poll``. That's easy::
 
+    from django.contrib import admin
     from polls.models import Choice
 
     admin.site.register(Choice)
@@ -302,7 +277,7 @@ registration code to read::
 This tells Django: "``Choice`` objects are edited on the ``Poll`` admin page. By
 default, provide enough fields for 3 choices."
 
-Load the "Add poll" page to see how that looks, you may need to restart your development server:
+Load the "Add poll" page to see how that looks:
 
 .. image:: _images/admin11t.png
    :alt: Add poll page now has choices on it
@@ -349,8 +324,9 @@ Here's what it looks like at this point:
 
 By default, Django displays the ``str()`` of each object. But sometimes it'd be
 more helpful if we could display individual fields. To do that, use the
-``list_display`` admin option, which is a tuple of field names to display, as
-columns, on the change list page for the object::
+:attr:`~django.contrib.admin.ModelAdmin.list_display` admin option, which is a
+tuple of field names to display, as columns, on the change list page for the
+object::
 
     class PollAdmin(admin.ModelAdmin):
         # ...
@@ -387,7 +363,9 @@ attributes, as follows::
         was_published_recently.short_description = 'Published recently?'
 
 Edit your :file:`polls/admin.py` file again and add an improvement to the Poll
-change list page: Filters. Add the following line to ``PollAdmin``::
+change list page: filters using the
+:attr:`~django.contrib.admin.ModelAdmin.list_filter` attribute. Add the
+following line to ``PollAdmin``::
 
     list_filter = ['pub_date']
 
@@ -409,21 +387,17 @@ This is shaping up well. Let's add some search capability::
 That adds a search box at the top of the change list. When somebody enters
 search terms, Django will search the ``question`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
-scenes, keep it reasonable, to keep your database happy.
-
-Finally, because ``Poll`` objects have dates, it'd be convenient to be able to
-drill down by date. Add this line::
-
-    date_hierarchy = 'pub_date'
-
-That adds hierarchical navigation, by date, to the top of the change list page.
-At top level, it displays all available years. Then it drills down to months
-and, ultimately, days.
+scenes, limiting the number of search fields to a reasonable number will make
+it easier for your database to do the search.
 
 Now's also a good time to note that change lists give you free pagination. The
-default is to display 100 items per page. Change-list pagination, search boxes,
-filters, date-hierarchies and column-header-ordering all work together like you
-think they should.
+default is to display 100 items per page. :attr:`Change-list pagination
+<django.contrib.admin.ModelAdmin.list_per_page>`, :attr:`search boxes
+<django.contrib.admin.ModelAdmin.search_fields>`, :attr:`filters
+<django.contrib.admin.ModelAdmin.list_filter>`, :attr:`date-hierarchies
+<django.contrib.admin.ModelAdmin.date_hierarchy>`, and
+:attr:`column-header-ordering <django.contrib.admin.ModelAdmin.list_display>`
+all work together like you think they should.
 
 Customize the admin look and feel
 =================================
@@ -448,18 +422,15 @@ project is a good convention to follow.
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`TEMPLATE_DIRS` setting::
 
-    TEMPLATE_DIRS = (
-        '/path/to/mysite/templates', # Change this to your own directory.
-    )
+    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-Now copy the template ``admin/base_site.html`` from within the default Django
-admin template directory in the source code of Django itself
-(``django/contrib/admin/templates``) into an ``admin`` subdirectory of
-whichever directory you're using in :setting:`TEMPLATE_DIRS`. For example, if
-your :setting:`TEMPLATE_DIRS` includes ``'/path/to/mysite/templates'``, as
-above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
-``/path/to/mysite/templates/admin/base_site.html``. Don't forget that
-``admin`` subdirectory.
+:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
+loading Django templates; it's a search path.
+
+Now create a directory called ``admin`` inside ``templates``, and copy the
+template ``admin/base_site.html`` from within the default Django admin
+template directory in the source code of Django itself
+(``django/contrib/admin/templates``) into that directory.
 
 .. admonition:: Where are the Django source files?
 

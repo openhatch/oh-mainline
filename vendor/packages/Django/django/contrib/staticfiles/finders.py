@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
 from django.utils.datastructures import SortedDict
 from django.utils.functional import empty, memoize, LazyObject
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 from django.utils._os import safe_join
 from django.utils import six
 
@@ -57,7 +57,7 @@ class FileSystemFinder(BaseFinder):
                 prefix, root = root
             else:
                 prefix = ''
-            if os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
+            if settings.STATIC_ROOT and os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
                 raise ImproperlyConfigured(
                     "The STATICFILES_DIRS setting should "
                     "not contain the STATIC_ROOT setting")
@@ -245,7 +245,7 @@ def find(path, all=False):
     if matches:
         return matches
     # No match.
-    return all and [] or None
+    return [] if all else None
 
 
 def get_finders():
@@ -258,17 +258,7 @@ def _get_finder(import_path):
     Imports the staticfiles finder class described by import_path, where
     import_path is the full Python path to the class.
     """
-    module, attr = import_path.rsplit('.', 1)
-    try:
-        mod = import_module(module)
-    except ImportError as e:
-        raise ImproperlyConfigured('Error importing module %s: "%s"' %
-                                   (module, e))
-    try:
-        Finder = getattr(mod, attr)
-    except AttributeError:
-        raise ImproperlyConfigured('Module "%s" does not define a "%s" '
-                                   'class.' % (module, attr))
+    Finder = import_by_path(import_path)
     if not issubclass(Finder, BaseFinder):
         raise ImproperlyConfigured('Finder "%s" is not a subclass of "%s"' %
                                    (Finder, BaseFinder))

@@ -1,15 +1,12 @@
-try:
-    from urllib.parse import urlparse, urlunparse
-except ImportError:     # Python 2
-    from urlparse import urlparse, urlunparse
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import base36_to_int, is_safe_url
+from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
+from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.shortcuts import resolve_url
+from django.utils.encoding import force_bytes, force_text
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -35,7 +32,7 @@ def login(request, template_name='registration/login.html',
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
     if request.method == "POST":
-        form = authentication_form(data=request.POST)
+        form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
             # Ensure the user-originating redirection url is safe.
@@ -45,14 +42,9 @@ def login(request, template_name='registration/login.html',
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
-            if request.session.test_cookie_worked():
-                request.session.delete_test_cookie()
-
             return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
-
-    request.session.set_test_cookie()
 
     current_site = get_current_site(request)
 
@@ -76,6 +68,9 @@ def logout(request, next_page=None,
     Logs out the user and displays 'You are logged out' message.
     """
     auth_logout(request)
+
+    if next_page is not None:
+        next_page = resolve_url(next_page)
 
     if redirect_field_name in request.REQUEST:
         next_page = request.REQUEST[redirect_field_name]
@@ -144,7 +139,9 @@ def password_reset(request, is_admin_site=False,
                    current_app=None,
                    extra_context=None):
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('django.contrib.auth.views.password_reset_done')
+        post_reset_redirect = reverse('password_reset_done')
+    else:
+        post_reset_redirect = resolve_url(post_reset_redirect)
     if request.method == "POST":
         form = password_reset_form(request.POST)
         if form.is_valid():
@@ -184,7 +181,7 @@ def password_reset_done(request,
 # Doesn't need csrf_protect since no-one can guess the URL
 @sensitive_post_parameters()
 @never_cache
-def password_reset_confirm(request, uidb36=None, token=None,
+def password_reset_confirm(request, uidb64=None, token=None,
                            template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator,
                            set_password_form=SetPasswordForm,
@@ -195,13 +192,15 @@ def password_reset_confirm(request, uidb36=None, token=None,
     form for entering a new password.
     """
     UserModel = get_user_model()
-    assert uidb36 is not None and token is not None  # checked by URLconf
+    assert uidb64 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
+        post_reset_redirect = reverse('password_reset_complete')
+    else:
+        post_reset_redirect = resolve_url(post_reset_redirect)
     try:
-        uid_int = base36_to_int(uidb36)
-        user = UserModel._default_manager.get(pk=uid_int)
-    except (ValueError, OverflowError, UserModel.DoesNotExist):
+        uid = urlsafe_base64_decode(uidb64)
+        user = UserModel._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
 
     if user is not None and token_generator.check_token(user, token):
@@ -225,6 +224,14 @@ def password_reset_confirm(request, uidb36=None, token=None,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+def password_reset_confirm_uidb36(request, uidb36=None, **kwargs):
+    # Support old password reset URLs that used base36 encoded user IDs.
+    # Remove in Django 1.7
+    try:
+      uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
+    except ValueError:
+      uidb64 = '1' # dummy invalid ID (incorrect padding for base64)
+    return password_reset_confirm(request, uidb64=uidb64, **kwargs)
 
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
@@ -247,7 +254,9 @@ def password_change(request,
                     password_change_form=PasswordChangeForm,
                     current_app=None, extra_context=None):
     if post_change_redirect is None:
-        post_change_redirect = reverse('django.contrib.auth.views.password_change_done')
+        post_change_redirect = reverse('password_change_done')
+    else:
+        post_change_redirect = resolve_url(post_change_redirect)
     if request.method == "POST":
         form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():

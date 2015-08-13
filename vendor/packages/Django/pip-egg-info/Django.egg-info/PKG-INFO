@@ -1,12 +1,11 @@
 Metadata-Version: 1.1
 Name: Django
-Version: 1.5.8
+Version: 1.6.11
 Summary: A high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 Home-page: http://www.djangoproject.com/
 Author: Django Software Foundation
 Author-email: foundation@djangoproject.com
 License: BSD
-Download-URL: https://www.djangoproject.com/m/releases/1.5/Django-1.5.8.tar.gz
 Description: UNKNOWN
 Platform: UNKNOWN
 Classifier: Development Status :: 5 - Production/Stable

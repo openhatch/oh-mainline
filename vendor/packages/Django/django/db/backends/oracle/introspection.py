@@ -1,4 +1,5 @@
-from django.db.backends import BaseDatabaseIntrospection
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 import cx_Oracle
 import re
 
@@ -7,6 +8,7 @@ foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REF
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type objects to Django Field types.
     data_types_reverse = {
+        cx_Oracle.BLOB: 'BinaryField',
         cx_Oracle.CLOB: 'TextField',
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
@@ -28,14 +30,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         # If it's a NUMBER with scale == 0, consider it an IntegerField
-        if data_type == cx_Oracle.NUMBER and description[5] == 0:
-            if description[4] > 11:
-                return 'BigIntegerField'
-            else:
-                return 'IntegerField'
-        else:
-            return super(DatabaseIntrospection, self).get_field_type(
-                data_type, description)
+        if data_type == cx_Oracle.NUMBER:
+            precision, scale = description[4:6]
+            if scale == 0:
+                if precision > 11:
+                    return 'BigIntegerField'
+                elif precision == 1:
+                    return 'BooleanField'
+                else:
+                    return 'IntegerField'
+            elif scale == -127:
+                return 'FloatField'
+
+        return super(DatabaseIntrospection, self).get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
@@ -47,7 +54,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            description.append((desc[0].lower(),) + desc[1:])
+            name = force_text(desc[0]) # cx_Oracle always returns a 'str' on both Python 2 and 3
+            name = name % {} # cx_Oracle, for some reason, doubles percent signs.
+            description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 
     def table_name_converter(self, name):
@@ -85,6 +94,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for row in cursor.fetchall():
             relations[row[0]] = (row[2], row[1].lower())
         return relations
+
+    def get_key_columns(self, cursor, table_name):
+        cursor.execute("""
+            SELECT ccol.column_name, rcol.table_name AS referenced_table, rcol.column_name AS referenced_column
+            FROM user_constraints c
+            JOIN user_cons_columns ccol
+              ON ccol.constraint_name = c.constraint_name 
+            JOIN user_cons_columns rcol
+              ON rcol.constraint_name = c.r_constraint_name 
+            WHERE c.table_name = %s AND c.constraint_type = 'R'""" , [table_name.upper()])
+        return [tuple(cell.lower() for cell in row) 
+                for row in cursor.fetchall()]
 
     def get_indexes(self, cursor, table_name):
         sql = """

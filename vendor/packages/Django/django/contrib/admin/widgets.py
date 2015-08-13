@@ -116,6 +116,8 @@ def url_params_from_lookup_dict(lookups):
     if lookups and hasattr(lookups, 'items'):
         items = []
         for k, v in lookups.items():
+            if callable(v):
+                v = v()
             if isinstance(v, (tuple, list)):
                 v = ','.join([str(x) for x in v])
             elif isinstance(v, bool):
@@ -147,7 +149,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             # The related object is registered with the same AdminSite
             related_url = reverse('admin:%s_%s_changelist' %
                                     (rel_to._meta.app_label,
-                                    rel_to._meta.module_name),
+                                    rel_to._meta.model_name),
                                     current_app=self.admin_site.name)
 
             params = self.url_parameters()
@@ -213,17 +215,6 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         if value:
             return value.split(',')
 
-    def _has_changed(self, initial, data):
-        if initial is None:
-            initial = []
-        if data is None:
-            data = []
-        if len(initial) != len(data):
-            return True
-        for pk1, pk2 in zip(initial, data):
-            if force_text(pk1) != force_text(pk2):
-                return True
-        return False
 
 class RelatedFieldWidgetWrapper(forms.Widget):
     """
@@ -258,7 +249,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def render(self, name, value, *args, **kwargs):
         rel_to = self.rel.to
-        info = (rel_to._meta.app_label, rel_to._meta.object_name.lower())
+        info = (rel_to._meta.app_label, rel_to._meta.model_name)
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if self.can_add_related:
@@ -279,9 +270,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def value_from_datadict(self, data, files, name):
         return self.widget.value_from_datadict(data, files, name)
 
-    def _has_changed(self, initial, data):
-        return self.widget._has_changed(initial, data)
-
     def id_for_label(self, id_):
         return self.widget.id_for_label(id_)
 
@@ -299,7 +287,14 @@ class AdminTextInputWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
-class AdminURLFieldWidget(forms.TextInput):
+class AdminEmailInputWidget(forms.EmailInput):
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vTextField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminEmailInputWidget, self).__init__(attrs=final_attrs)
+
+class AdminURLFieldWidget(forms.URLInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vURLField'}
         if attrs is not None:

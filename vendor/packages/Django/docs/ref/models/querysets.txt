@@ -39,7 +39,12 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
   will execute the database query if you use the "step" parameter of slice
   syntax, and will return a list. Slicing a ``QuerySet`` that has been
-  evaluated (partially or fully) also returns a list.
+  evaluated also returns a list.
+
+  Also note that even though slicing an unevaluated ``QuerySet`` returns
+  another unevaluated ``QuerySet``, modifying it further (e.g., adding
+  more filters, or modifying ordering) is not allowed, since that does not
+  translate well into SQL and it would not have a clear meaning either.
 
 * **Pickling/Caching.** See the following section for details of what
   is involved when `pickling QuerySets`_. The important thing for the
@@ -62,11 +67,6 @@ You can evaluate a ``QuerySet`` in the following ways:
   it. For example::
 
       entry_list = list(Entry.objects.all())
-
-  Be warned, though, that this could have a large memory overhead, because
-  Django will load each element of the list into memory. In contrast,
-  iterating over a ``QuerySet`` will take advantage of your database to
-  load data and instantiate objects only as you need them.
 
 * **bool().** Testing a ``QuerySet`` in a boolean context, such as using
   ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
@@ -232,6 +232,7 @@ the model field that is being aggregated.
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
     >>> q[0].name
@@ -283,9 +284,10 @@ and so on for as many models as you want to join. For example::
     Entry.objects.order_by('blog__name', 'headline')
 
 If you try to order by a field that is a relation to another model, Django will
-use the default ordering on the related model (or order by the related model's
+use the default ordering on the related model, or order by the related model's
 primary key if there is no :attr:`Meta.ordering
-<django.db.models.Options.ordering>` specified. For example::
+<django.db.models.Options.ordering>` specified. For example, since the ``Blog``
+model has no default ordering specified::
 
     Entry.objects.order_by('blog')
 
@@ -293,7 +295,10 @@ primary key if there is no :attr:`Meta.ordering
 
     Entry.objects.order_by('blog__id')
 
-...since the ``Blog`` model has no default ordering specified.
+If ``Blog`` had ``ordering = ['name']``, then the first queryset would be
+identical to::
+
+    Entry.objects.order_by('blog__name')
 
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
@@ -334,6 +339,12 @@ ordering, call :meth:`order_by()` with no parameters.
 You can tell if a query is ordered or not by checking the
 :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
+
+.. warning::
+
+    Ordering is not a free operation. Each field you add to the ordering
+    incurs a cost to your database. Each foreign key you add will
+    implicitly include all of its default orderings as well.
 
 reverse
 ~~~~~~~
@@ -394,19 +405,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
-.. versionadded:: 1.4
-
-As of Django 1.4, you can pass positional arguments (``*fields``) in order to
+On PostgreSQL only, you can pass positional arguments (``*fields``) in order to
 specify the names of fields to which the ``DISTINCT`` should apply. This
-translates to a ``SELECT DISTINCT ON`` SQL query.
-
-Here's the difference. For a normal ``distinct()`` call, the database compares
-*each* field in each row when determining which rows are distinct. For a
-``distinct()`` call with specified field names, the database will only compare
-the specified field names.
-
-.. note::
-    This ability to specify field names is only available in PostgreSQL.
+translates to a ``SELECT DISTINCT ON`` SQL query. Here's the difference. For a
+normal ``distinct()`` call, the database compares *each* field in each row when
+determining which rows are distinct. For a ``distinct()`` call with specified
+field names, the database will only compare the specified field names.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
@@ -417,7 +421,7 @@ the specified field names.
     value in column ``a``. If you don't specify an order, you'll get some
     arbitrary row.
 
-Examples::
+Examples (those after the first will only work on PostgreSQL)::
 
     >>> Author.objects.distinct()
     [...]
@@ -539,7 +543,7 @@ You can also refer to fields on related models with reverse relations through
 values_list
 ~~~~~~~~~~~
 
-.. method:: values_list(*fields)
+.. method:: values_list(*fields, flat=False)
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
@@ -564,20 +568,32 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+Note that this method returns a ``ValuesListQuerySet``. This class behaves
+like a list. Most of the time this is enough, but if you require an actual
+Python list object, you can simply call ``list()`` on it, which will evaluate
+the queryset.
+
 dates
 ~~~~~
 
 .. method:: dates(field, kind, order='ASC')
 
 Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
-``datetime.datetime`` objects representing all available dates of a particular
-kind within the contents of the ``QuerySet``.
+:class:`datetime.date` objects representing all available dates of a
+particular kind within the contents of the ``QuerySet``.
 
-``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
-model.
+.. versionchanged:: 1.6
+
+    ``dates`` used to return a list of :class:`datetime.datetime` objects.
+
+``field`` should be the name of a ``DateField`` of your model.
+
+.. versionchanged:: 1.6
+
+    ``dates`` used to accept operating on a ``DateTimeField``.
 
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
-``datetime.datetime`` object in the result list is "truncated" to the given
+``datetime.date`` object in the result list is "truncated" to the given
 ``type``.
 
 * ``"year"`` returns a list of all distinct year values for the field.
@@ -592,36 +608,78 @@ model.
 Examples::
 
     >>> Entry.objects.dates('pub_date', 'year')
-    [datetime.datetime(2005, 1, 1)]
+    [datetime.date(2005, 1, 1)]
     >>> Entry.objects.dates('pub_date', 'month')
-    [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
+    [datetime.date(2005, 2, 1), datetime.date(2005, 3, 1)]
     >>> Entry.objects.dates('pub_date', 'day')
-    [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
+    [datetime.date(2005, 2, 20), datetime.date(2005, 3, 20)]
     >>> Entry.objects.dates('pub_date', 'day', order='DESC')
-    [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
+    [datetime.date(2005, 3, 20), datetime.date(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
-    [datetime.datetime(2005, 3, 20)]
+    [datetime.date(2005, 3, 20)]
 
-.. warning::
+datetimes
+~~~~~~~~~
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the aggregation is
-    performed in UTC. This is a known limitation of the current implementation.
+.. versionadded:: 1.6
+
+.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
+
+Returns a ``DateTimeQuerySet`` — a ``QuerySet`` that evaluates to a list of
+:class:`datetime.datetime` objects representing all available dates of a
+particular kind within the contents of the ``QuerySet``.
+
+``field_name`` should be the name of a ``DateTimeField`` of your model.
+
+``kind`` should be either ``"year"``, ``"month"``, ``"day"``, ``"hour"``,
+``"minute"`` or ``"second"``. Each ``datetime.datetime`` object in the result
+list is "truncated" to the given ``type``.
+
+``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
+``'DESC'``. This specifies how to order the results.
+
+``tzinfo`` defines the time zone to which datetimes are converted prior to
+truncation. Indeed, a given datetime has different representations depending
+on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
+object. If it's ``None``, Django uses the :ref:`current time zone
+<default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
+``False``.
+
+.. _database-time-zone-definitions:
+
+.. note::
+
+    This function performs time zone conversions directly in the database.
+    As a consequence, your database must be able to interpret the value of
+    ``tzinfo.tzname(None)``. This translates into the following requirements:
+
+    - SQLite: install pytz_ — conversions are actually performed in Python.
+    - PostgreSQL: no requirements (see `Time Zones`_).
+    - Oracle: no requirements (see `Choosing a Time Zone File`_).
+    - MySQL: install pytz_ and load the time zone tables with
+      `mysql_tzinfo_to_sql`_.
+
+    .. _pytz: http://pytz.sourceforge.net/
+    .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
+    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#i1006667
+    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 none
 ~~~~
 
 .. method:: none()
 
-Returns an ``EmptyQuerySet`` — a ``QuerySet`` subclass that always evaluates to
-an empty list. This can be used in cases where you know that you should return
-an empty result set and your caller is expecting a ``QuerySet`` object (instead
-of returning an empty list, for example.)
+Calling none() will create a queryset that never returns any objects and no
+query will be executed when accessing the results. A qs.none() queryset
+is an instance of ``EmptyQuerySet``.
 
 Examples::
 
     >>> Entry.objects.none()
     []
+    >>> from django.db.models.query import EmptyQuerySet
+    >>> isinstance(Entry.objects.none(), EmptyQuerySet)
+    True
 
 all
 ~~~
@@ -632,6 +690,11 @@ Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass).  This
 can be useful in situations where you might want to pass in either a model
 manager or a ``QuerySet`` and do further filtering on the result. After calling
 ``all()`` on either object, you'll definitely have a ``QuerySet`` to work with.
+
+When a ``QuerySet`` is :ref:`evaluated <when-querysets-are-evaluated>`, it
+typically caches its results. If the data in the database might have changed
+since a ``QuerySet`` was evaluated, you can get updated results for the same
+query by calling ``all()`` on a previously evaluated ``QuerySet``.
 
 select_related
 ~~~~~~~~~~~~~~
@@ -664,6 +727,8 @@ And here's ``select_related`` lookup::
 
 ``select_related()`` follows foreign keys as far as possible. If you have the
 following models::
+
+    from django.db import models
 
     class City(models.Model):
         # ...
@@ -737,6 +802,13 @@ You can also refer to the reverse direction of a
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
+.. versionadded:: 1.6
+
+If you need to clear the list of related fields added by past calls of
+``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
+
+   >>> without_relations = queryset.select_related(None)
+
 .. deprecated:: 1.5
     The ``depth`` parameter to ``select_related()`` has been deprecated. You
     should replace it with the use of the ``(*fields)`` listing specific
@@ -756,8 +828,6 @@ prefetch_related
 
 .. method:: prefetch_related(*lookups)
 
-.. versionadded:: 1.4
-
 Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
 related objects for each of the specified lookups.
 
@@ -765,7 +835,7 @@ This has a similar purpose to ``select_related``, in that both are designed to
 stop the deluge of database queries that is caused by accessing related objects,
 but the strategy is quite different.
 
-``select_related`` works by creating a SQL join and including the fields of the
+``select_related`` works by creating an SQL join and including the fields of the
 related object in the ``SELECT`` statement. For this reason, ``select_related``
 gets the related objects in the same database query. However, to avoid the much
 larger result set that would result from joining across a 'many' relationship,
@@ -782,6 +852,8 @@ that are supported by ``select_related``. It also supports prefetching of
 
 For example, suppose you have these models::
 
+    from django.db import models
+
     class Topping(models.Model):
         name = models.CharField(max_length=30)
 
@@ -789,6 +861,7 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s (%s)" % (self.name, u", ".join([topping.name
                                                         for topping in self.toppings.all()]))
@@ -892,7 +965,7 @@ referenced is needed, rather than one query for all the items. There could be
 additional queries on the ``ContentType`` table if the relevant rows have not
 already been fetched.
 
-``prefetch_related`` in most cases will be implemented using a SQL query that
+``prefetch_related`` in most cases will be implemented using an SQL query that
 uses the 'IN' operator. This means that for a large ``QuerySet`` a large 'IN' clause
 could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
@@ -910,6 +983,13 @@ Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
 ``QuerySet`` modifier — a hook for injecting specific clauses into the SQL
 generated by a ``QuerySet``.
+
+.. warning::
+
+    You should be very careful whenever you use ``extra()``. Every time you use
+    it, you should escape any parameters that the user can control by using
+    ``params`` in order to protect against SQL injection attacks . Please
+    read more about :ref:`SQL injection protection <sql-injection-protection>`.
 
 By definition, these extra lookups may not be portable to different database
 engines (because you're explicitly writing SQL code) and violate the DRY
@@ -1122,11 +1202,11 @@ to ``defer()``::
 
 .. versionchanged:: 1.5
 
-Some fields in a model won't be deferred, even if you ask for them. You can
-never defer the loading of the primary key. If you are using
-:meth:`select_related()` to retrieve related models, you shouldn't defer the
-loading of the field that connects from the primary model to the related
-one, doing so will result in an error.
+    Some fields in a model won't be deferred, even if you ask for them. You can
+    never defer the loading of the primary key. If you are using
+    :meth:`select_related()` to retrieve related models, you shouldn't defer the
+    loading of the field that connects from the primary model to the related
+    one, doing so will result in an error.
 
 .. note::
 
@@ -1194,20 +1274,20 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
-.. versionchanged:: 1.5
-
 All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
-options. Also note that using :meth:`only` and omitting a field requested
-using :meth:`select_related` is an error as well.
+options.
 
 .. versionchanged:: 1.5
 
-.. note::
+    Using :meth:`only` and omitting a field requested using
+    :meth:`select_related` is an error as well.
 
-    When calling :meth:`~django.db.models.Model.save()` for instances with
-    deferred fields, only the loaded fields will be saved. See
-    :meth:`~django.db.models.Model.save()` for more details.
+    .. note::
+
+        When calling :meth:`~django.db.models.Model.save()` for instances with
+        deferred fields, only the loaded fields will be saved. See
+        :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
@@ -1232,8 +1312,6 @@ select_for_update
 
 .. method:: select_for_update(nowait=False)
 
-.. versionadded:: 1.4
-
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
 
@@ -1252,23 +1330,39 @@ make the call non-blocking. If a conflicting lock is already acquired by
 another transaction, :exc:`~django.db.DatabaseError` will be raised when the
 queryset is evaluated.
 
-Note that using ``select_for_update()`` will cause the current transaction to be
-considered dirty, if under transaction management. This is to ensure that
-Django issues a ``COMMIT`` or ``ROLLBACK``, releasing any locks held by the
-``SELECT FOR UPDATE``.
-
 Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL has no support for the
 ``nowait`` argument. Obviously, users of external third-party backends should
 check with their backend's documentation for specifics in those cases.
 
-Passing ``nowait=True`` to ``select_for_update`` using database backends that
+Passing ``nowait=True`` to ``select_for_update()`` using database backends that
 do not support ``nowait``, such as MySQL, will cause a
 :exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
 unexpectedly blocking.
 
-Using ``select_for_update`` on backends which do not support
+Evaluating a queryset with ``select_for_update()`` in autocommit mode is
+a :exc:`~django.db.transaction.TransactionManagementError` error because the
+rows are not locked in that case. If allowed, this would facilitate data
+corruption and could easily be caused by calling code that expects to be run in
+a transaction outside of one.
+
+Using ``select_for_update()`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
+
+.. versionchanged:: 1.6.3
+
+    It is now an error to execute a query with ``select_for_update()`` in
+    autocommit mode. With earlier releases in the 1.6 series it was a no-op.
+
+.. warning::
+
+    Although ``select_for_update()`` normally fails in autocommit mode, since
+    :class:`~django.test.TestCase` automatically wraps each test in a
+    transaction, calling ``select_for_update()`` in a ``TestCase`` even outside
+    an :func:`~django.db.transaction.atomic()` block will (perhaps unexpectedly)
+    pass without raising a ``TransactionManagementError``. To properly test
+    ``select_for_update()`` you should use
+    :class:`~django.test.TransactionTestCase`.
 
 Methods that do not return QuerySets
 ------------------------------------
@@ -1338,8 +1432,12 @@ get_or_create
 
 .. method:: get_or_create(**kwargs)
 
-A convenience method for looking up an object with the given ``kwargs``,
-creating one if necessary.
+A convenience method for looking up an object with the given ``kwargs`` (may be
+empty if your model has defaults for all fields), creating one if necessary.
+
+.. versionchanged:: 1.6
+
+    Older versions of Django required ``kwargs``.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
@@ -1415,12 +1513,45 @@ whenever a request to a page has a side effect on your data. For more, see
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
+.. warning::
+
+  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
+  attributes and reverse relations. In that case you will restrict the queries
+  inside the context of that relation. That could lead you to some integrity
+  problems if you don't use it consistently.
+
+  Being the following models::
+
+      class Chapter(models.Model):
+          title = models.CharField(max_length=255, unique=True)
+
+      class Book(models.Model):
+          title = models.CharField(max_length=256)
+          chapters = models.ManyToManyField(Chapter)
+
+  You can use ``get_or_create()`` through Book's chapters field, but it only
+  fetches inside the context of that book::
+
+      >>> book = Book.objects.create(title="Ulysses")
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, True)
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, False)
+      >>> Chapter.objects.create(title="Chapter 1")
+      <Chapter: Chapter 1>
+      >>> book.chapters.get_or_create(title="Chapter 1")
+      # Raises IntegrityError
+
+  This is happening because it's trying to get or create "Chapter 1" through the
+  book "Ulysses", but it can't do any of them: the relation can't fetch that
+  chapter because it isn't related to that book, but it can't create it either
+  because ``title`` field should be unique.
+
+
 bulk_create
 ~~~~~~~~~~~
 
 .. method:: bulk_create(objs, batch_size=None)
-
-.. versionadded:: 1.4
 
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
@@ -1439,12 +1570,14 @@ This has a number of caveats though:
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
   does not retrieve and set the primary key attribute, as ``save()`` does.
+* It does not work with many-to-many relationships.
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at maximum 999 variables per query is used.
 
 .. versionadded:: 1.5
+
     The ``batch_size`` parameter was added in version 1.5.
 
 count
@@ -1537,14 +1670,55 @@ This example returns the latest ``Entry`` in the table, according to the
 
 If your model's :ref:`Meta <meta-options>` specifies
 :attr:`~django.db.models.Options.get_latest_by`, you can leave off the
-``field_name`` argument to ``latest()``. Django will use the field specified
-in :attr:`~django.db.models.Options.get_latest_by` by default.
+``field_name`` argument to ``earliest()`` or ``latest()``. Django will use the
+field specified in :attr:`~django.db.models.Options.get_latest_by` by default.
 
-Like :meth:`get()`, ``latest()`` raises
-:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the given
-parameters.
+Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
+:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the
+given parameters.
 
-Note ``latest()`` exists purely for convenience and readability.
+Note that ``earliest()`` and ``latest()`` exist purely for convenience and
+readability.
+
+earliest
+~~~~~~~~
+
+.. method:: earliest(field_name=None)
+
+.. versionadded:: 1.6
+
+Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
+the direction is changed.
+
+first
+~~~~~
+.. method:: first()
+
+.. versionadded:: 1.6
+
+Returns the first object matched by the queryset, or ``None`` if there
+is no matching object. If the ``QuerySet`` has no ordering defined, then the
+queryset is automatically ordered by the primary key.
+
+Example::
+
+    p = Article.objects.order_by('title', 'pub_date').first()
+
+Note that ``first()`` is a convenience method, the following code sample is
+equivalent to the above example::
+
+    try:
+        p = Article.objects.order_by('title', 'pub_date')[0]
+    except IndexError:
+        p = None
+
+last
+~~~~
+.. method:: last()
+
+.. versionadded:: 1.6
+
+Works like  :meth:`first()`, but returns the last object in the queryset.
 
 aggregate
 ~~~~~~~~~
@@ -1566,6 +1740,7 @@ aggregated.
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
 
@@ -1596,32 +1771,32 @@ The most efficient method of finding whether a model with a unique field
 (e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
 
     entry = Entry.objects.get(pk=123)
-    if some_query_set.filter(pk=entry.pk).exists():
+    if some_queryset.filter(pk=entry.pk).exists():
         print("Entry contained in queryset")
 
 Which will be faster than the following which requires evaluating and iterating
 through the entire queryset::
 
-    if entry in some_query_set:
+    if entry in some_queryset:
        print("Entry contained in QuerySet")
 
 And to find whether a queryset contains any items::
 
-    if some_query_set.exists():
-        print("There is at least one object in some_query_set")
+    if some_queryset.exists():
+        print("There is at least one object in some_queryset")
 
 Which will be faster than::
 
-    if some_query_set:
-        print("There is at least one object in some_query_set")
+    if some_queryset:
+        print("There is at least one object in some_queryset")
 
 ... but not by a large degree (hence needing a large queryset for efficiency
 gains).
 
-Additionally, if a ``some_query_set`` has not yet been evaluated, but you know
-that it will be at some point, then using ``some_query_set.exists()`` will do
+Additionally, if a ``some_queryset`` has not yet been evaluated, but you know
+that it will be at some point, then using ``some_queryset.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
-retrieve the results) than simply using ``bool(some_query_set)``, which
+retrieve the results) than simply using ``bool(some_queryset)``, which
 retrieves the results and then checks if any were returned.
 
 update
@@ -1735,7 +1910,8 @@ methods on your models. It does, however, emit the
 (including cascaded deletions).
 
 .. versionadded:: 1.5
-    Allow fast-path deletion of objects
+
+    Allow fast-path deletion of objects.
 
 Django needs to fetch objects into memory to send signals and handle cascades.
 However, if there are no cascades and no signals, then Django may take a
@@ -2042,6 +2218,7 @@ Range test (inclusive).
 
 Example::
 
+    import datetime
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))
@@ -2069,7 +2246,7 @@ numbers and even characters.
 year
 ~~~~
 
-For date/datetime fields, exact year match. Takes a four-digit year.
+For date and datetime fields, an exact year match. Takes an integer year.
 
 Example::
 
@@ -2080,6 +2257,9 @@ SQL equivalent::
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';
 
 (The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
 .. fieldlookup:: month
 
@@ -2099,12 +2279,16 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
+
 .. fieldlookup:: day
 
 day
 ~~~
 
-For date and datetime fields, an exact day match.
+For date and datetime fields, an exact day match. Takes an integer day.
 
 Example::
 
@@ -2118,6 +2302,10 @@ SQL equivalent::
 
 Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: week_day
 
@@ -2140,12 +2328,75 @@ Note this will match any record with a ``pub_date`` that falls on a Monday (day
 2 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
-.. warning::
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the ``year``, ``month``,
-    ``day`` and ``week_day`` lookups are performed in UTC. This is a known
-    limitation of the current implementation.
+.. fieldlookup:: hour
+
+hour
+~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact hour match. Takes an integer between 0 and 23.
+
+Example::
+
+    Event.objects.filter(timestamp__hour=23)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('hour' FROM timestamp) = '23';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
+
+.. fieldlookup:: minute
+
+minute
+~~~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact minute match. Takes an integer between 0 and 59.
+
+Example::
+
+    Event.objects.filter(timestamp__minute=29)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('minute' FROM timestamp) = '29';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
+
+.. fieldlookup:: second
+
+second
+~~~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact second match. Takes an integer between 0 and 59.
+
+Example::
+
+    Event.objects.filter(timestamp__second=31)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('second' FROM timestamp) = '31';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
 
 .. fieldlookup:: isnull
 
@@ -2183,8 +2434,7 @@ Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
 full text searches. See the `MySQL documentation`_ for additional details.
 
-.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html
-
+.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/fulltext-boolean.html
 
 .. fieldlookup:: regex
 
@@ -2247,6 +2497,21 @@ Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
 aggregate functions, see
 :doc:`the topic guide on aggregation </topics/db/aggregation>`.
+
+.. warning::
+
+    SQLite can't handle aggregation on date/time fields out of the box.
+    This is because there are no native date/time fields in SQLite and Django
+    currently emulates these features using a text field. Attempts to use
+    aggregation on date/time fields in SQLite will raise
+    ``NotImplementedError``.
+
+.. admonition:: Note
+
+    Aggregation functions return ``None`` when used with an empty
+    ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
+    instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
+    ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
 
 Avg
 ~~~

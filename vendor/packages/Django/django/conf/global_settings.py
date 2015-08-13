@@ -46,8 +46,7 @@ USE_TZ = False
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-# Languages we provide translations for, out of the box. The language name
-# should be the utf-8 encoded local name for the language.
+# Languages we provide translations for, out of the box.
 LANGUAGES = (
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
@@ -99,10 +98,12 @@ LANGUAGES = (
     ('mk', gettext_noop('Macedonian')),
     ('ml', gettext_noop('Malayalam')),
     ('mn', gettext_noop('Mongolian')),
+    ('my', gettext_noop('Burmese')),
     ('nb', gettext_noop('Norwegian Bokmal')),
     ('ne', gettext_noop('Nepali')),
     ('nl', gettext_noop('Dutch')),
     ('nn', gettext_noop('Norwegian Nynorsk')),
+    ('os', gettext_noop('Ossetic')),
     ('pa', gettext_noop('Punjabi')),
     ('pl', gettext_noop('Polish')),
     ('pt', gettext_noop('Portuguese')),
@@ -130,7 +131,7 @@ LANGUAGES = (
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar", "fa")
+LANGUAGES_BIDI = ("he", "ar", "fa", "ur")
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -158,7 +159,7 @@ FILE_CHARSET = 'utf-8'
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
-# Whether to send broken-link emails.
+# Whether to send broken-link emails. Deprecated, must be removed in 1.8.
 SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info. If left empty, will default to the dummy backend.
@@ -257,7 +258,7 @@ ALLOWED_INCLUDE_ROOTS = ()
 ADMIN_FOR = ()
 
 # List of compiled regular expression objects representing URLs that need not
-# be reported when SEND_BROKEN_LINK_EMAILS is True. Here are a few examples:
+# be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
 #    import re
 #    IGNORABLE_404_URLS = (
 #        re.compile(r'^/apple-touch-icon.*\.png$'),
@@ -286,7 +287,7 @@ MEDIA_URL = ''
 
 # Absolute path to the directory static files should be collected to.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = None
 
 # URL that handles the static files served from STATIC_ROOT.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -366,6 +367,7 @@ DATE_INPUT_FORMATS = (
 # * Note that these format strings are different from the ones to display dates
 TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'
+    '%H:%M:%S.%f',  # '14:30:59.000200'
     '%H:%M',        # '14:30'
 )
 
@@ -467,7 +469,7 @@ SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the se
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
 SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If None, the backend will use a sensible default.
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'  # class to serialize session data
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'  # class to serialize session data
 
 #########
 # CACHE #
@@ -516,6 +518,7 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
@@ -543,6 +546,7 @@ CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 ############
 # MESSAGES #
@@ -573,7 +577,7 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 ###########
 
 # The name of the class to use to run the test suite
-TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 ############
 # FIXTURES #

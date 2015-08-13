@@ -76,8 +76,7 @@ class Resolver404(Http404):
     pass
 
 class NoReverseMatch(Exception):
-    # Don't make this raise an error when used in a template.
-    silent_variable_failure = True
+    pass
 
 def get_callable(lookup_view, can_fail=False):
     """
@@ -379,6 +378,9 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
+    def resolve400(self):
+        return self._resolve_special('400')
+
     def resolve403(self):
         return self._resolve_special('403')
 
@@ -394,6 +396,8 @@ class RegexURLResolver(LocaleRegexProvider):
     def _reverse_with_prefix(self, lookup_view, _prefix, *args, **kwargs):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
+        text_args = [force_text(v) for v in args]
+        text_kwargs = dict((k, force_text(v)) for (k, v) in kwargs.items())
 
         if not self._populated:
             self._populate()
@@ -411,8 +415,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 if args:
                     if len(args) != len(params) + len(prefix_args):
                         continue
-                    unicode_args = [force_text(val) for val in args]
-                    candidate = (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
+                    candidate_subs = dict(zip(prefix_args + params, text_args))
                 else:
                     if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
                         continue
@@ -423,10 +426,20 @@ class RegexURLResolver(LocaleRegexProvider):
                             break
                     if not matches:
                         continue
-                    unicode_kwargs = dict([(k, force_text(v)) for (k, v) in kwargs.items()])
-                    candidate = (prefix_norm.replace('%', '%%') + result) % unicode_kwargs
-                if re.search('^%s%s' % (prefix_norm, pattern), candidate, re.UNICODE):
-                    return candidate
+                    candidate_subs = text_kwargs
+                # WSGI provides decoded URLs, without %xx escapes, and the URL
+                # resolver operates on such URLs. First substitute arguments
+                # without quoting to build a decoded URL and look for a match.
+                # Then, if we have a match, redo the substitution with quoted
+                # arguments in order to return a properly encoded URL.
+                candidate_pat = prefix_norm.replace('%', '%%') + result
+                if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
+                    candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
+                    url = candidate_pat % candidate_subs
+                    # Don't allow construction of scheme relative urls.
+                    if url.startswith('//'):
+                        url = '/%%2F%s' % url[2:]
+                    return url
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
         # error messages.
@@ -436,8 +449,11 @@ class RegexURLResolver(LocaleRegexProvider):
             lookup_view_s = "%s.%s" % (m, n)
         else:
             lookup_view_s = lookup_view
+
+        patterns = [pattern for (possibility, pattern, defaults) in possibilities]
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
-                "arguments '%s' not found." % (lookup_view_s, args, kwargs))
+                "arguments '%s' not found. %d pattern(s) tried: %s" %
+                             (lookup_view_s, args, kwargs, len(patterns), patterns))
 
 class LocaleRegexURLResolver(RegexURLResolver):
     """
@@ -544,6 +560,15 @@ def get_script_prefix():
     instance is normally going to be a lot cleaner).
     """
     return getattr(_prefixes, "value", '/')
+
+def clear_script_prefix():
+    """
+    Unsets the script prefix for the current thread.
+    """
+    try:
+        del _prefixes.value
+    except AttributeError:
+        pass
 
 def set_urlconf(urlconf_name):
     """

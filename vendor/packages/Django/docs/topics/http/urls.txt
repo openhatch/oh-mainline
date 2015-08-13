@@ -26,10 +26,9 @@ This mapping can be as short or as long as needed. It can reference other
 mappings. And, because it's pure Python code, it can be constructed
 dynamically.
 
-.. versionadded:: 1.4
-    Django also provides a way to translate URLs according to the active
-    language. See the :ref:`internationalization documentation
-    <url-internationalization>` for more information.
+Django also provides a way to translate URLs according to the active
+language. See the :ref:`internationalization documentation
+<url-internationalization>` for more information.
 
 .. _how-django-processes-a-request:
 
@@ -52,11 +51,17 @@ algorithm the system follows to determine which Python code to execute:
 3. Django runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL.
 
-4. Once one of the regexes matches, Django imports and calls the given
-   view, which is a simple Python function (or a :doc:`class based view
-   </topics/class-based-views/index>`). The view gets passed an
-   :class:`~django.http.HttpRequest` as its first argument and any values
-   captured in the regex as remaining arguments.
+4. Once one of the regexes matches, Django imports and calls the given view,
+   which is a simple Python function (or a :doc:`class based view
+   </topics/class-based-views/index>`). The view gets passed the following
+   arguments:
+
+   * An instance of :class:`~django.http.HttpRequest`.
+   * If the matched regular expression returned no named groups, then the
+     matches from the regular expression are provided as positional arguments.
+   * The keyword arguments are made up of any named groups matched by the
+     regular expression, overridden by any arguments specified in the optional
+     ``kwargs`` argument to :func:`django.conf.urls.url`.
 
 5. If no regex matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
@@ -107,7 +112,7 @@ Example requests:
 * ``/articles/2003/03/03/`` would match the final pattern. Django would call
   the function ``news.views.article_detail(request, '2003', '03', '03')``.
 
-.. _Dive Into Python's explanation: http://diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
+.. _Dive Into Python's explanation: http://www.diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
 
 Named groups
 ============
@@ -123,6 +128,8 @@ is ``(?P<name>pattern)``, where ``name`` is the name of the group and
 ``pattern`` is some pattern to match.
 
 Here's the above example URLconf, rewritten to use named groups::
+
+    from django.conf.urls import patterns, url
 
     urlpatterns = patterns('',
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -196,6 +203,8 @@ A convenient trick is to specify default parameters for your views' arguments.
 Here's an example URLconf and view::
 
     # URLconf
+    from django.conf.urls import patterns, url
+
     urlpatterns = patterns('',
         url(r'^blog/$', 'blog.views.page'),
         url(r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
@@ -231,7 +240,7 @@ Error handling
 When Django can't find a regex matching the requested URL, or when an
 exception is raised, Django will invoke an error-handling view.
 
-The views to use for these cases are specified by three variables. Their
+The views to use for these cases are specified by four variables. Their
 default values should suffice for most projects, but further customization is
 possible by assigning values to them.
 
@@ -249,9 +258,7 @@ The variables are:
 * ``handler404`` -- See :data:`django.conf.urls.handler404`.
 * ``handler500`` -- See :data:`django.conf.urls.handler500`.
 * ``handler403`` -- See :data:`django.conf.urls.handler403`.
-
-.. versionadded:: 1.4
-    ``handler403`` is new in Django 1.4.
+* ``handler400`` -- See :data:`django.conf.urls.handler400`.
 
 .. _urlpatterns-view-prefix:
 
@@ -338,7 +345,6 @@ itself. It includes a number of other URLconfs::
         url(r'^comments/', include('django.contrib.comments.urls')),
         url(r'^community/', include('django_website.aggregator.urls')),
         url(r'^contact/', include('django_website.contact.urls')),
-        url(r'^r/', include('django.conf.urls.shortcut')),
         # ... snip ...
     )
 
@@ -404,11 +410,15 @@ An included URLconf receives any captured parameters from parent URLconfs, so
 the following example is valid::
 
     # In settings/urls/main.py
+    from django.conf.urls import include, patterns, url
+
     urlpatterns = patterns('',
         url(r'^(?P<username>\w+)/blog/', include('foo.urls.blog')),
     )
 
     # In foo/urls/blog.py
+    from django.conf.urls import patterns, url
+
     urlpatterns = patterns('foo.views',
         url(r'^$', 'blog.index'),
         url(r'^archive/$', 'blog.archive'),
@@ -430,6 +440,8 @@ which should be a dictionary of extra keyword arguments to pass to the view
 function.
 
 For example::
+
+    from django.conf.urls import patterns, url
 
     urlpatterns = patterns('blog.views',
         url(r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
@@ -461,11 +473,15 @@ For example, these two URLconf sets are functionally identical:
 Set one::
 
     # main.py
+    from django.conf.urls import include, patterns, url
+
     urlpatterns = patterns('',
         url(r'^blog/', include('inner'), {'blogid': 3}),
     )
 
     # inner.py
+    from django.conf.urls import patterns, url
+
     urlpatterns = patterns('',
         url(r'^archive/$', 'mysite.views.archive'),
         url(r'^about/$', 'mysite.views.about'),
@@ -474,11 +490,15 @@ Set one::
 Set two::
 
     # main.py
+    from django.conf.urls import include, patterns, url
+
     urlpatterns = patterns('',
         url(r'^blog/', include('inner')),
     )
 
     # inner.py
+    from django.conf.urls import patterns, url
+
     urlpatterns = patterns('',
         url(r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
         url(r'^about/$', 'mysite.views.about', {'blogid': 3}),
@@ -498,6 +518,8 @@ supported -- you can pass any callable object as the view.
 
 For example, given this URLconf in "string" notation::
 
+    from django.conf.urls import patterns, url
+
     urlpatterns = patterns('',
         url(r'^archive/$', 'mysite.views.archive'),
         url(r'^about/$', 'mysite.views.about'),
@@ -507,6 +529,7 @@ For example, given this URLconf in "string" notation::
 You can accomplish the same thing by passing objects rather than strings. Just
 be sure to import the objects::
 
+    from django.conf.urls import patterns, url
     from mysite.views import archive, about, contact
 
     urlpatterns = patterns('',
@@ -519,6 +542,7 @@ The following example is functionally identical. It's just a bit more compact
 because it imports the module that contains the views, rather than importing
 each view individually::
 
+    from django.conf.urls import patterns, url
     from mysite import views
 
     urlpatterns = patterns('',
@@ -535,6 +559,7 @@ the view prefix (as explained in "The view prefix" above) will have no effect.
 Note that :doc:`class based views</topics/class-based-views/index>` must be
 imported::
 
+    from django.conf.urls import patterns, url
     from mysite.views import ClassBasedView
 
     urlpatterns = patterns('',
@@ -646,6 +671,9 @@ It's fairly common to use the same view function in multiple URL patterns in
 your URLconf. For example, these two URL patterns both point to the ``archive``
 view::
 
+    from django.conf.urls import patterns, url
+    from mysite.views import archive
+
     urlpatterns = patterns('',
         url(r'^archive/(\d{4})/$', archive),
         url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}),
@@ -663,6 +691,9 @@ using the same view and parameters. Then, you can use this name in reverse URL
 matching.
 
 Here's the above example, rewritten to use named URL patterns::
+
+    from django.conf.urls import patterns, url
+    from mysite.views import archive
 
     urlpatterns = patterns('',
         url(r'^archive/(\d{4})/$', archive, name="full-archive"),
@@ -836,6 +867,8 @@ However, you can also ``include()`` a 3-tuple containing::
     (<patterns object>, <application namespace>, <instance namespace>)
 
 For example::
+
+    from django.conf.urls import include, patterns, url
 
     help_patterns = patterns('',
         url(r'^basic/$', 'apps.help.views.views.basic'),

@@ -354,7 +354,7 @@ Backwards incompatible changes in 1.5
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the
-    :doc:`deprecation plan </internals/deprecation>` for any features that
+    :ref:`deprecation plan <deprecation-removed-in-1.5>` for any features that
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
@@ -644,11 +644,12 @@ databases <contrib_app_multiple_databases>` for more information.
 XML deserializer will not parse documents with a DTD
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to prevent exposure to attacks related to external entity references
-and entity expansion, the XML model deserializer now refuses to parse XML
-documents containing a DTD (DOCTYPE definition). Since the XML serializer does
-not output a DTD, this will not impact typical usage, only cases where
-custom-created XML documents are passed to Django's model deserializer.
+In order to prevent exposure to denial-of-service attacks related to external
+entity references and entity expansion, the XML model deserializer now refuses
+to parse XML documents containing a DTD (DOCTYPE definition). Since the XML
+serializer does not output a DTD, this will not impact typical usage, only
+cases where custom-created XML documents are passed to Django's model
+deserializer.
 
 Formsets default ``max_num``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -675,7 +676,7 @@ Miscellaneous
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is ``0666`` (octal) and the current umask value
+  needs. The new default value is ``0o666`` (octal) and the current umask value
   is first masked out.
 
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by

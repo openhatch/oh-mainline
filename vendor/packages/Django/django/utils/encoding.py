@@ -4,14 +4,11 @@ import codecs
 import datetime
 from decimal import Decimal
 import locale
-try:
-    from urllib.parse import quote
-except ImportError:     # Python 2
-    from urllib import quote
 import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -36,7 +33,7 @@ class StrAndUnicode(object):
     def __init__(self, *args, **kwargs):
         warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
                       "and apply the @python_2_unicode_compatible decorator "
-                      "instead.", PendingDeprecationWarning, stacklevel=2)
+                      "instead.", DeprecationWarning, stacklevel=2)
         super(StrAndUnicode, self).__init__(*args, **kwargs)
 
     if six.PY3:
@@ -54,7 +51,11 @@ def python_2_unicode_compatible(klass):
     To support Python 2 and 3 with a single code base, define a __str__ method
     returning text and apply this decorator to the class.
     """
-    if not six.PY3:
+    if six.PY2:
+        if '__str__' not in klass.__dict__:
+            raise ValueError("@python_2_unicode_compatible cannot be applied "
+                             "to %s because it doesn't define __str__()." %
+                             klass.__name__)
         klass.__unicode__ = klass.__str__
         klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
     return klass
@@ -142,6 +143,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
+    if isinstance(s, six.memoryview):
+        s = bytes(s)
     if isinstance(s, bytes):
         if encoding == 'utf-8':
             return s
@@ -234,11 +237,17 @@ def filepath_to_uri(path):
     # some flexibility for hardcoding separators.
     return quote(force_bytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
 
-# The encoding of the default system locale but falls back to the
-# given fallback encoding if the encoding is unsupported by python or could
-# not be determined.  See tickets #10335 and #5846
-try:
-    DEFAULT_LOCALE_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
-    codecs.lookup(DEFAULT_LOCALE_ENCODING)
-except:
-    DEFAULT_LOCALE_ENCODING = 'ascii'
+def get_system_encoding():
+    """
+    The encoding of the default system locale but falls back to the given
+    fallback encoding if the encoding is unsupported by python or could
+    not be determined.  See tickets #10335 and #5846
+    """
+    try:
+        encoding = locale.getdefaultlocale()[1] or 'ascii'
+        codecs.lookup(encoding)
+    except Exception:
+        encoding = 'ascii'
+    return encoding
+
+DEFAULT_LOCALE_ENCODING = get_system_encoding()

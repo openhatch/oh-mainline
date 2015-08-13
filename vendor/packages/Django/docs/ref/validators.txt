@@ -96,7 +96,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ------------------
 .. data:: validate_email
 
-    A :class:`RegexValidator` instance that ensures a value looks like an
+    An ``EmailValidator`` instance that ensures a value looks like an
     email address.
 
 ``validate_slug``
@@ -115,7 +115,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_ipv6_address``
 -------------------------
-.. versionadded:: 1.4
 
 .. data:: validate_ipv6_address
 
@@ -123,7 +122,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_ipv46_address``
 --------------------------
-.. versionadded:: 1.4
 
 .. data:: validate_ipv46_address
 

@@ -1,16 +1,19 @@
 from __future__ import absolute_import
 
-from datetime import date
-
-from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
-from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.tests.utils import mysql, oracle, no_mysql, no_oracle, no_spatialite
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, oracle, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 
-from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+if HAS_GEOS:
+    from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
+    from django.contrib.gis.geometry.backend import Geometry
+    from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
+
+    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class RelatedGeoModelTest(TestCase):
 
     def test02_select_related(self):
@@ -202,6 +205,8 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(val_dict['id'], c_id)
             self.assertEqual(val_dict['location__id'], l_id)
 
+    # TODO: fix on Oracle -- qs2 returns an empty result for an unknown reason
+    @no_oracle
     def test10_combine(self):
         "Testing the combination of two GeoQuerySets.  See #10807."
         buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
@@ -248,6 +253,10 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(vqs))
         self.assertEqual(3, vqs[0]['num_books'])
 
+    # TODO: fix on Oracle -- get the following error because the SQL is ordered
+    # by a geometry object, which Oracle apparently doesn't like:
+    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
+    @no_oracle
     def test13c_count(self):
         "Testing `Count` aggregate with `.values()`.  See #15305."
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')

@@ -7,10 +7,9 @@ Using the Django authentication system
 This document explains the usage of Django's authentication system in its
 default configuration. This configuration has evolved to serve the most common
 project needs, handling a reasonably wide range of tasks, and has a careful
-implementation of passwords and permissions, and can handle many projects as
-is.  For projects where authentication needs differ from the default, Django
-supports extensive :doc:`extension and customization
-</topics/auth/customizing>` of authentication.
+implementation of passwords and permissions. For projects where authentication
+needs differ from the default, Django supports extensive :doc:`extension and
+customization </topics/auth/customizing>` of authentication.
 
 Django authentication provides both authentication and authorization together
 and is generally referred to as the authentication system, as these features
@@ -25,17 +24,18 @@ User objects
 authentication system. They typically represent the people interacting with
 your site and are used to enable things like restricting access, registering
 user profiles, associating content with creators etc. Only one class of user
-exists in Django's authentication framework, i.e., 'superusers' or admin
-'staff' users are just user objects with special attributes set, not different
-classes of user objects.
+exists in Django's authentication framework, i.e., :attr:`'superusers'
+<django.contrib.auth.models.User.is_superuser>` or admin :attr:`'staff'
+<django.contrib.auth.models.User.is_staff>` users are just user objects with
+special attributes set, not different classes of user objects.
 
 The primary attributes of the default user are:
 
-* username
-* password
-* email
-* first name
-* last name
+* :attr:`~django.contrib.auth.models.User.username`
+* :attr:`~django.contrib.auth.models.User.password`
+* :attr:`~django.contrib.auth.models.User.email`
+* :attr:`~django.contrib.auth.models.User.first_name`
+* :attr:`~django.contrib.auth.models.User.last_name`
 
 See the :class:`full API documentation <django.contrib.auth.models.User>` for
 full reference, the documentation that follows is more task oriented.
@@ -70,7 +70,7 @@ first time you run it with ``'django.contrib.auth'`` in your
 :setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
 you can use a command line utility::
 
-    manage.py createsuperuser --username=joe --email=joe@example.com
+    $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
 You will be prompted for a password. After you enter one, the user will be
 created immediately. If you leave off the :djadminopt:`--username` or the
@@ -135,6 +135,16 @@ Authenticating Users
         else:
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
+
+    .. note::
+
+        This is a low level way to authenticate a set of credentials; for
+        example, it's used by the
+        :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`. Unless
+        you are writing your own authentication system, you probably won't use
+        this. Rather if you are looking for a way to limit access to logged in
+        users, see the :func:`~django.contrib.auth.decorators.login_required`
+        decorator.
 
 .. _topic-authorization:
 
@@ -247,6 +257,39 @@ The permission can then be assigned to a
 :class:`~django.contrib.auth.models.User` via its ``user_permissions``
 attribute or to a :class:`~django.contrib.auth.models.Group` via its
 ``permissions`` attribute.
+
+Permission caching
+------------------
+
+The :class:`~django.contrib.auth.backends.ModelBackend` caches permissions on
+the ``User`` object after the first time they need to be fetched for a
+permissions check. This is typically fine for the request-response cycle since
+permissions are not typically checked immediately after they are added (in the
+admin, for example). If you are adding permissions and checking them immediately
+afterward, in a test or view for example, the easiest solution is to re-fetch
+the ``User`` from the database. For example::
+
+    from django.contrib.auth.models import Permission, User
+    from django.shortcuts import get_object_or_404
+
+    def user_gains_perms(request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        # any permission check will cache the current set of permissions
+        user.has_perm('myapp.change_bar')
+
+        permission = Permission.objects.get(codename='change_bar')
+        user.user_permissions.add(permission)
+
+        # Checking the cached permission set
+        user.has_perm('myapp.change_bar')  # False
+
+        # Request new instance of User
+        user = get_object_or_404(User, pk=user_id)
+
+        # Permission cache is repopulated from the database
+        user.has_perm('myapp.change_bar')  # True
+
+        ...
 
 .. _auth-web-requests:
 
@@ -436,10 +479,10 @@ The login_required decorator
 
     .. versionchanged:: 1.5
 
-    The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts
-    view function names and :ref:`named URL patterns <naming-url-patterns>`.
-    This allows you to freely remap your login view within your URLconf
-    without having to update the setting.
+        The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts
+        view function names and :ref:`named URL patterns <naming-url-patterns>`.
+        This allows you to freely remap your login view within your URLconf
+        without having to update the setting.
 
 .. note::
 
@@ -460,7 +503,7 @@ checks to make sure the user has an email in the desired domain::
             return HttpResponse("You can't vote in this poll.")
         # ...
 
-.. function:: user_passes_test(func, [login_url=None])
+.. function:: user_passes_test(func, [login_url=None, redirect_field_name=REDIRECT_FIELD_NAME])
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
@@ -481,9 +524,19 @@ checks to make sure the user has an email in the desired domain::
     automatically check that the :class:`~django.contrib.auth.models.User` is
     not anonymous.
 
-    :func:`~django.contrib.auth.decorators.user_passes_test()` takes an
-    optional ``login_url`` argument, which lets you specify the URL for your
-    login page (:setting:`settings.LOGIN_URL <LOGIN_URL>` by default).
+    :func:`~django.contrib.auth.decorators.user_passes_test` takes two
+    optional arguments:
+
+    ``login_url``
+       Lets you specify the URL that users who don't pass the test will be
+       redirected to. It may be a login page and defaults to
+       :setting:`settings.LOGIN_URL <LOGIN_URL>` if you don't specify one.
+
+    ``redirect_field_name``
+       Same as for :func:`~django.contrib.auth.decorators.login_required`.
+       Setting it to ``None`` removes it from the URL, which you may want to do
+       if you are redirecting users that don't pass the test to a non-login
+       page where there's no "next page".
 
     For example::
 
@@ -523,12 +576,10 @@ The permission_required decorator
     As in the :func:`~django.contrib.auth.decorators.login_required` decorator,
     ``login_url`` defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
-    .. versionchanged:: 1.4
-
-    Added ``raise_exception`` parameter. If given, the decorator will raise
-    :exc:`~django.core.exceptions.PermissionDenied`, prompting
-    :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` instead of
-    redirecting to the login page.
+    If the ``raise_exception`` parameter is given, the decorator will raise
+    :exc:`~django.core.exceptions.PermissionDenied`, prompting :ref:`the 403
+    (HTTP Forbidden) view<http_forbidden_view>` instead of redirecting to the
+    login page.
 
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -552,8 +603,6 @@ password management. These make use of the :ref:`stock auth forms
 
 Django provides no default template for the authentication views - however the
 template context is documented for each view below.
-
-.. versionadded:: 1.4
 
 The built-in views all return
 a :class:`~django.template.response.TemplateResponse` instance, which allows
@@ -802,11 +851,25 @@ patterns.
     that can be used to reset the password, and sending that link to the
     user's registered email address.
 
-    .. versionchanged:: 1.4
-        Users flagged with an unusable password (see
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
-        will not be able to request a password reset to prevent misuse
-        when using an external authentication source like LDAP.
+    If the email address provided does not exist in the system, this view
+    won't send an email, but the user won't receive any error message either.
+    This prevents information leaking to potential attackers. If you want to
+    provide an error message in this case, you can subclass
+    :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
+    ``password_reset_form`` argument.
+
+
+    Users flagged with an unusable password (see
+    :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
+    allowed to request a password reset to prevent misuse when using an
+    external authentication source like LDAP. Note that they won't receive any
+    error message since this would expose their account's existence but no
+    mail will be sent either.
+
+    .. versionchanged:: 1.6
+
+        Previously, error messages indicated whether a given email was
+        registered.
 
     **URL name:** ``password_reset``
 
@@ -823,8 +886,6 @@ patterns.
     * ``subject_template_name``: The full name of a template to use for
       the subject of the email with the reset password link. Defaults
       to :file:`registration/password_reset_subject.txt` if not supplied.
-
-      .. versionadded:: 1.4
 
     * ``password_reset_form``: Form that will be used to get the email of
       the user to reset the password for. Defaults to
@@ -871,7 +932,7 @@ patterns.
 
     * ``protocol``: http or https
 
-    * ``uid``: The user's id encoded in base 36.
+    * ``uid``: The user's primary key encoded in base 64.
 
     * ``token``: Token to check that the reset link is valid.
 
@@ -880,7 +941,12 @@ patterns.
     .. code-block:: html+django
 
         Someone asked for password reset for email {{ email }}. Follow the link below:
-        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb36=uid token=token %}
+        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+    .. versionchanged:: 1.6
+
+      Reversing ``password_reset_confirm`` takes a ``uidb64`` argument instead
+      of ``uidb36``.
 
     The same template context is used for subject template. Subject must be
     single line plain text string.
@@ -893,6 +959,11 @@ patterns.
     doesn't have an explicit ``post_reset_redirect`` URL set.
 
     **URL name:** ``password_reset_done``
+
+    .. note::
+
+        If the email address provided does not exist in the system, the user is inactive, or has an unusable password,
+        the user will still be redirected to this view but no email will be sent.
 
     **Optional arguments:**
 
@@ -907,7 +978,7 @@ patterns.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
-.. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect, current_app, extra_context])
+.. function:: password_reset_confirm(request[, uidb64, token, template_name, token_generator, set_password_form, post_reset_redirect, current_app, extra_context])
 
     Presents a form for entering a new password.
 
@@ -915,7 +986,12 @@ patterns.
 
     **Optional arguments:**
 
-    * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
+    * ``uidb64``: The user's id encoded in base 64. Defaults to ``None``.
+
+      .. versionchanged:: 1.6
+
+          The ``uidb64`` parameter was previously base 36 encoded and named
+          ``uidb36``.
 
     * ``token``: Token to check that the password is valid. Defaults to
       ``None``.
@@ -945,8 +1021,8 @@ patterns.
     * ``form``: The form (see ``set_password_form`` above) for setting the
       new user's password.
 
-    * ``validlink``: Boolean, True if the link (combination of uidb36 and
-      token) is valid or unused yet.
+    * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
+      ``token``) is valid or unused yet.
 
 .. function:: password_reset_complete(request[,template_name, current_app, extra_context])
 
@@ -1014,9 +1090,14 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A form used in the admin interface to change a user's password.
 
+    Takes the ``user`` as the first positional argument.
+
 .. class:: AuthenticationForm
 
     A form for logging a user in.
+
+    Takes ``request`` as its first positional argument, which is stored on the
+    form instance for use by sub-classes.
 
 .. class:: PasswordChangeForm
 
@@ -1029,7 +1110,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: SetPasswordForm
 
-    A form that lets a user change his/her password without entering the old
+    A form that lets a user change their password without entering the old
     password.
 
 .. class:: UserChangeForm
@@ -1047,7 +1128,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 Authentication data in templates
 --------------------------------
 
-The currently logged-in user and his/her permissions are made available in the
+The currently logged-in user and their permissions are made available in the
 :doc:`template context </ref/templates/api>` when you use
 :class:`~django.template.RequestContext`.
 
@@ -1117,6 +1198,7 @@ Thus, you can check permissions in template ``{% if %}`` statements:
     {% endif %}
 
 .. versionadded:: 1.5
+
     Permission lookup by "if in".
 
 It is possible to also look permissions up by ``{% if in %}`` statements.

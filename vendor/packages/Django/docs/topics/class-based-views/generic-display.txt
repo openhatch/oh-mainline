@@ -1,8 +1,8 @@
 .. _Generic views:
 
-=========================
-Class-based generic views
-=========================
+==================================
+Built-in Class-based generic views
+==================================
 
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
@@ -89,6 +89,7 @@ We'll be using these models::
         class Meta:
             ordering = ["-name"]
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -98,6 +99,7 @@ We'll be using these models::
         email = models.EmailField()
         headshot = models.ImageField(upload_to='author_headshots')
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -195,6 +197,8 @@ Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
 
 
+.. _adding-extra-context:
+
 Adding extra context
 --------------------
 
@@ -232,7 +236,7 @@ template, but you can override it to send more::
     ``get_context_data`` on the super class. When no two classes try to define the
     same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
-    to super), any children of that class will also need to explictly set it
+    to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
 
@@ -250,7 +254,7 @@ specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
     from django.views.generic import DetailView
-    from books.models import Publisher, Book
+    from books.models import Publisher
 
     class PublisherDetail(DetailView):
 
@@ -328,6 +332,7 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
+    from django.conf.urls import patterns
     from books.views import PublisherBookList
 
     urlpatterns = patterns('',
@@ -377,6 +382,7 @@ Imagine we had a ``last_accessed`` field on our ``Author`` model that we were
 using to keep track of the last time anybody looked at that author::
 
     # models.py
+    from django.db import models
 
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
@@ -392,6 +398,7 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
+    from django.conf.urls import patterns, url
     from books.views import AuthorDetailView
 
     urlpatterns = patterns('',
@@ -403,7 +410,6 @@ Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
     from django.views.generic import DetailView
-    from django.shortcuts import get_object_or_404
     from django.utils import timezone
     from books.models import Author
 

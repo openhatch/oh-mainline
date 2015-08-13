@@ -14,9 +14,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from django.contrib import auth
-# UNUSABLE_PASSWORD is still imported here for backwards compatibility
 from django.contrib.auth.hashers import (
-    check_password, make_password, is_password_usable, UNUSABLE_PASSWORD)
+    check_password, make_password, is_password_usable)
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import python_2_unicode_compatible
@@ -170,29 +169,30 @@ class BaseUserManager(models.Manager):
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email=None, password=None, **extra_fields):
+    def _create_user(self, username, email, password,
+                     is_staff, is_superuser, **extra_fields):
         """
         Creates and saves a User with the given username, email and password.
         """
         now = timezone.now()
         if not username:
             raise ValueError('The given username must be set')
-        email = UserManager.normalize_email(email)
+        email = self.normalize_email(email)
         user = self.model(username=username, email=email,
-                          is_staff=False, is_active=True, is_superuser=False,
-                          last_login=now, date_joined=now, **extra_fields)
-
+                          is_staff=is_staff, is_active=True,
+                          is_superuser=is_superuser, last_login=now,
+                          date_joined=now, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        return self._create_user(username, email, password, False, False,
+                                 **extra_fields)
+
     def create_superuser(self, username, email, password, **extra_fields):
-        u = self.create_user(username, email, password, **extra_fields)
-        u.is_staff = True
-        u.is_active = True
-        u.is_superuser = True
-        u.save(using=self._db)
-        return u
+        return self._create_user(username, email, password, True, True,
+                                 **extra_fields)
 
 
 @python_2_unicode_compatible
@@ -263,22 +263,15 @@ def _user_get_all_permissions(user, obj):
     permissions = set()
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
-            if obj is not None:
-                permissions.update(backend.get_all_permissions(user, obj))
-            else:
-                permissions.update(backend.get_all_permissions(user))
+            permissions.update(backend.get_all_permissions(user, obj))
     return permissions
 
 
 def _user_has_perm(user, perm, obj):
     for backend in auth.get_backends():
         if hasattr(backend, "has_perm"):
-            if obj is not None:
-                if backend.has_perm(user, perm, obj):
-                    return True
-            else:
-                if backend.has_perm(user, perm):
-                    return True
+            if backend.has_perm(user, perm, obj):
+                return True
     return False
 
 
@@ -301,28 +294,26 @@ class PermissionsMixin(models.Model):
     groups = models.ManyToManyField(Group, verbose_name=_('groups'),
         blank=True, help_text=_('The groups this user belongs to. A user will '
                                 'get all permissions granted to each of '
-                                'his/her group.'))
+                                'his/her group.'),
+        related_name="user_set", related_query_name="user")
     user_permissions = models.ManyToManyField(Permission,
         verbose_name=_('user permissions'), blank=True,
-        help_text='Specific permissions for this user.')
+        help_text=_('Specific permissions for this user.'),
+        related_name="user_set", related_query_name="user")
 
     class Meta:
         abstract = True
 
     def get_group_permissions(self, obj=None):
         """
-        Returns a list of permission strings that this user has through his/her
+        Returns a list of permission strings that this user has through their
         groups. This method queries all available auth backends. If an object
         is passed in, only permissions matching this object are returned.
         """
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                if obj is not None:
-                    permissions.update(backend.get_group_permissions(self,
-                                                                     obj))
-                else:
-                    permissions.update(backend.get_group_permissions(self))
+                permissions.update(backend.get_group_permissions(self, obj))
         return permissions
 
     def get_all_permissions(self, obj=None):
@@ -427,7 +418,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         SiteProfileNotAvailable if this site does not allow profiles.
         """
         warnings.warn("The use of AUTH_PROFILE_MODULE to define user profiles has been deprecated.",
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
@@ -461,7 +452,7 @@ class User(AbstractUser):
 
     Username, password and email are required. Other fields are optional.
     """
-    class Meta:
+    class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
 
 
@@ -473,8 +464,8 @@ class AnonymousUser(object):
     is_staff = False
     is_active = False
     is_superuser = False
-    _groups = EmptyManager()
-    _user_permissions = EmptyManager()
+    _groups = EmptyManager(Group)
+    _user_permissions = EmptyManager(Permission)
 
     def __init__(self):
         pass

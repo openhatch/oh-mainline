@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import base64
 from datetime import datetime, timedelta
+import logging
 import string
 
 from django.conf import settings
@@ -10,8 +11,10 @@ from django.utils.crypto import constant_time_compare
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_by_path
+
+from django.contrib.sessions.exceptions import SuspiciousSession
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -92,13 +95,16 @@ class SessionBase(object):
             hash, serialized = encoded_data.split(b':', 1)
             expected_hash = self._hash(serialized)
             if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousOperation("Session data corrupted")
+                raise SuspiciousSession("Session data corrupted")
             else:
                 return self.serializer().loads(serialized)
-        except Exception:
-            # ValueError, SuspiciousOperation, deserialization exceptions. If
-            # any of these happen, just return an empty dictionary (an empty
-            # session).
+        except Exception as e:
+            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
+            # these happen, just return an empty dictionary (an empty session).
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' %
+                        e.__class__.__name__)
+                logger.warning(force_text(e))
             return {}
 
     def update(self, dict_):

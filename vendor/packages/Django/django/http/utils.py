@@ -31,11 +31,11 @@ def conditional_content_removal(request, response):
         if response.streaming:
             response.streaming_content = []
         else:
-            response.content = ''
+            response.content = b''
         response['Content-Length'] = '0'
     if request.method == 'HEAD':
         if response.streaming:
             response.streaming_content = []
         else:
-            response.content = ''
+            response.content = b''
     return response

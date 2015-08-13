@@ -78,6 +78,7 @@ In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
     from django.utils.translation import ugettext as _
+    from django.http import HttpResponse
 
     def my_view(request):
         output = _("Welcome to my site.")
@@ -87,6 +88,7 @@ Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
     from django.utils.translation import ugettext
+    from django.http import HttpResponse
 
     def my_view(request):
         output = ugettext("Welcome to my site.")
@@ -122,7 +124,7 @@ specified with Python's standard named-string interpolation syntax. Example::
 This technique lets language-specific translations reorder the placeholder
 text. For example, an English translation may be ``"Today is November 26."``,
 while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
-the month and the day placeholders swapped.
+month and the day placeholders swapped.
 
 For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
 instead of positional interpolation (e.g., ``%s`` or ``%d``) whenever you
@@ -190,6 +192,7 @@ of its value.)
 For example::
 
     from django.utils.translation import ungettext
+    from django.http import HttpResponse
 
     def hello_world(request, count):
         page = ungettext(
@@ -203,9 +206,12 @@ For example::
 In this example the number of objects is passed to the translation
 languages as the ``count`` variable.
 
-Lets see a slightly more complex usage example::
+Note that pluralization is complicated and works differently in each language.
+Comparing ``count`` to 1 isn't always the correct rule. This code looks
+sophisticated, but will produce incorrect results for some languages::
 
     from django.utils.translation import ungettext
+    from myapp.models import Report
 
     count = Report.objects.count()
     if count == 1:
@@ -214,42 +220,45 @@ Lets see a slightly more complex usage example::
         name = Report._meta.verbose_name_plural
 
     text = ungettext(
-            'There is %(count)d %(name)s available.',
-            'There are %(count)d %(name)s available.',
-            count
+        'There is %(count)d %(name)s available.',
+        'There are %(count)d %(name)s available.',
+        count
     ) % {
         'count': count,
         'name': name
     }
 
-Here we reuse localizable, hopefully already translated literals (contained in
-the ``verbose_name`` and ``verbose_name_plural`` model ``Meta`` options) for
-other parts of the sentence so all of it is consistently based on the
-cardinality of the elements at play.
+Don't try to implement your own singular-or-plural logic, it won't be correct.
+In a case like this, consider something like the following::
+
+    text = ungettext(
+        'There is %(count)d %(name)s object available.',
+        'There are %(count)d %(name)s objects available.',
+        count
+    ) % {
+        'count': count,
+        'name': Report._meta.verbose_name,
+    }
 
 .. _pluralization-var-notes:
 
 .. note::
 
-    When using this technique, make sure you use a single name for every
-    extrapolated variable included in the literal. In the example above note how
-    we used the ``name`` Python variable in both translation strings. This
-    example would fail::
+    When using ``ungettext()``, make sure you use a single name for every
+    extrapolated variable included in the literal. In the examples above, note
+    how we used the ``name`` Python variable in both translation strings. This
+    example, besides being incorrect in some languages as noted above, would
+    fail::
 
-        from django.utils.translation import ungettext
-        from myapp.models import Report
-
-        count = Report.objects.count()
-        d = {
-            'count': count,
+        text = ungettext(
+            'There is %(count)d %(name)s available.',
+            'There are %(count)d %(plural_name)s available.',
+            count
+        ) % {
+            'count': Report.objects.count(),
             'name': Report._meta.verbose_name,
             'plural_name': Report._meta.verbose_name_plural
         }
-        text = ungettext(
-                'There is %(count)d %(name)s available.',
-                'There are %(count)d %(plural_name)s available.',
-                count
-        ) % d
 
     You would get an error when running :djadmin:`django-admin.py
     compilemessages <compilemessages>`::
@@ -281,6 +290,7 @@ For example::
 
 or::
 
+    from django.db import models
     from django.utils.translation import pgettext_lazy
 
     class MyThing(models.Model):
@@ -294,8 +304,6 @@ will appear in the ``.po`` file as:
     msgctxt "month name"
     msgid "May"
     msgstr ""
-
-.. versionadded:: 1.4
 
 Contextual markers are also supported by the :ttag:`trans` and
 :ttag:`blocktrans` template tags.
@@ -328,6 +336,7 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -335,8 +344,6 @@ model, do the following::
 
 You can mark names of ``ForeignKey``, ``ManyTomanyField`` or ``OneToOneField``
 relationship as translatable by using their ``verbose_name`` options::
-
-    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         kind = models.ForeignKey(ThingKind, related_name='kinds',
@@ -355,6 +362,7 @@ It is recommended to always provide explicit
 relying on the fallback English-centric and somewhat naïve determination of
 verbose names Django performs by looking at the model's class name::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -370,6 +378,7 @@ Model methods ``short_description`` attribute values
 For model methods, you can provide translations to Django and the admin site
 with the ``short_description`` attribute::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -404,6 +413,7 @@ If you ever see output that looks like ``"hello
 If you don't like the long ``ugettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -416,6 +426,44 @@ convert them to strings, because they should be converted as late as possible
 (so that the correct locale is in effect). This necessitates the use of the
 helper function described next.
 
+.. _lazy-plural-translations:
+
+Lazy translations and plural
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
+generally don't know the ``number`` argument at the time of the string
+definition. Therefore, you are authorized to pass a key name instead of an
+integer as the ``number`` argument. Then ``number`` will be looked up in the
+dictionary under that key during string interpolation. Here's example::
+
+    from django import forms
+    from django.utils.translation import ugettext_lazy
+
+    class MyForm(forms.Form):
+        error_message = ungettext_lazy("You only provided %(num)d argument",
+            "You only provided %(num)d arguments", 'num')
+
+        def clean(self):
+            # ...
+            if error:
+                raise forms.ValidationError(self.error_message % {'num': number})
+
+If the string contains exactly one unnamed placeholder, you can interpolate
+directly with the ``number`` argument::
+
+    class MyForm(forms.Form):
+        error_message = ungettext_lazy("You provided %d argument",
+            "You provided %d arguments")
+
+        def clean(self):
+            # ...
+            if error:
+                raise forms.ValidationError(self.error_message % number)
+
+
 Joining strings: string_concat()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -426,6 +474,7 @@ that concatenates its contents *and* converts them to strings only when the
 result is included in a string. For example::
 
     from django.utils.translation import string_concat
+    from django.utils.translation import ugettext_lazy
     ...
     name = ugettext_lazy('John Lennon')
     instrument = ugettext_lazy('guitar')
@@ -513,9 +562,8 @@ string in the message catalogs.
 
 It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
-``{% blocktrans %}`` instead.
+:ttag:`{% blocktrans %}<blocktrans>` instead.
 
-.. versionadded:: 1.4
 
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax::
@@ -540,8 +588,6 @@ or should be used as arguments for other template tags or filters::
         {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
     {% endfor %}
     </p>
-
-.. versionadded:: 1.4
 
 ``{% trans %}`` also supports :ref:`contextual markers<contextual-markers>`
 using the ``context`` keyword:
@@ -581,8 +627,6 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 
 .. note:: The previous more verbose format is still supported:
    ``{% blocktrans with book|title as book_t and author|title as author_t %}``
-
-.. versionchanged:: 1.4
 
 If resolving one of the block arguments fails, blocktrans will fall back to
 the default language by deactivating the currently active language
@@ -627,8 +671,6 @@ be retrieved (and stored) beforehand::
     {% blocktrans %}
     This is a URL: {{ the_url }}
     {% endblocktrans %}
-
-.. versionadded:: 1.4
 
 ``{% blocktrans %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
@@ -678,7 +720,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
 
 .. code-block:: html+django
 
-    {# Translators: Label of a button that triggers search{% endcomment #}
+    {# Translators: Label of a button that triggers search #}
     <button type="submit">{% trans "Go" %}</button>
 
     {# Translators: This is a text of the base template #}
@@ -804,7 +846,7 @@ There are also simple filters available for convenience:
 
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
-* ``{{ LANGUAGE_CODE|bidi }}`` (False)
+* ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
 
 .. _Django templates: ../templates_python/
 
@@ -972,7 +1014,7 @@ Client-side caching will save bandwidth and make your site load faster. If
 you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
 covered. Otherwise, you can apply :ref:`conditional decorators
 <conditional-decorators>`. In the following example, the cache is invalidated
-whenever your restart your application server.
+whenever you restart your application server.
 
 .. code-block:: python
 
@@ -1156,21 +1198,6 @@ Once the string literals of an application have been tagged for later
 translation, the translation themselves need to be written (or obtained). Here's
 how that works.
 
-.. _locale-restrictions:
-
-.. admonition:: Locale restrictions
-
-    Django does not support localizing your application into a locale for which
-    Django itself has not been translated. In this case, it will ignore your
-    translation files. If you were to try this and Django supported it, you
-    would inevitably see a mixture of translated strings (from your application)
-    and English strings (from Django itself). If you want to support a locale
-    for your application that is not already part of Django, you'll need to make
-    at least a minimal translation of the Django core.
-
-    A good starting point is to copy the Django English ``.po`` file and to
-    translate at least some :term:`translation strings <translation string>`.
-
 Message files
 -------------
 
@@ -1194,10 +1221,9 @@ To create or update a message file, run this command::
 
     django-admin.py makemessages -l de
 
-...where ``de`` is the language code for the message file you want to create.
-The language code, in this case, is in :term:`locale format<locale name>`. For
-example, it's ``pt_BR`` for Brazilian Portuguese and ``de_AT`` for Austrian
-German.
+...where ``de`` is the :term:`locale name` for the message file you want to
+create. For example, ``pt_BR`` for Brazilian Portuguese, ``de_AT`` for Austrian
+German or ``id`` for Indonesian.
 
 The script should be run from one of two places:
 
@@ -1554,8 +1580,6 @@ For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 ``LocaleMiddleware`` tries to determine the user's language preference by
 following this algorithm:
 
-.. versionchanged:: 1.4
-
 * First, it looks for the language prefix in the requested URL.  This is
   only performed when you are using the ``i18n_patterns`` function in your
   root URLconf. See :ref:`url-internationalization` for more information
@@ -1617,17 +1641,12 @@ Notes:
           ('en', _('English')),
       )
 
-* The ``LocaleMiddleware`` can only select languages for which there is a
-  Django-provided base translation. If you want to provide translations
-  for your application that aren't already in the set of translations
-  in Django's source tree, you'll want to provide at least a basic
-  one as described in the :ref:`Locale restrictions<locale-restrictions>`
-  note.
-
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
 :class:`~django.http.HttpRequest`. Feel free to read this value in your view
 code. Here's a simple example::
+
+    from django.http import HttpResponse
 
     def hello_world(request, count):
         if request.LANGUAGE_CODE == 'de-at':

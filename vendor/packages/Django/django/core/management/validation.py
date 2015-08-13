@@ -27,7 +27,6 @@ def get_validation_errors(outfile, app=None):
     """
     from django.db import models, connection
     from django.db.models.loading import get_app_errors
-    from django.db.models.fields.related import RelatedObject
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 
     e = ModelErrorCollection(outfile)
@@ -52,6 +51,10 @@ def get_validation_errors(outfile, app=None):
 
         # If this is the current User model, check known validation problems with User models
         if settings.AUTH_USER_MODEL == '%s.%s' % (opts.app_label, opts.object_name):
+            # Check that REQUIRED_FIELDS is a list
+            if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+                e.add(opts, 'The REQUIRED_FIELDS must be a list or tuple.')
+
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
                 e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
@@ -106,25 +109,23 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
-                # Try to import PIL in either of the two ways it can end up installed.
                 try:
-                    from PIL import Image
+                    from django.utils.image import Image
                 except ImportError:
-                    try:
-                        import Image
-                    except ImportError:
-                        e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+                    e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):
                 e.add(opts, '"%s": BooleanFields do not accept null values. Use a NullBooleanField instead.' % f.name)
             if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
                 e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
+            if isinstance(f, models.GenericIPAddressField) and not getattr(f, 'null', False) and getattr(f, 'blank', False):
+                e.add(opts, '"%s": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.' % f.name)
             if f.choices:
                 if isinstance(f.choices, six.string_types) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
-                        if not isinstance(c, (list, tuple)) or len(c) != 2:
-                            e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
+                        if isinstance(c, six.string_types) or not is_iterable(c) or len(c) != 2:
+                            e.add(opts, '"%s": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
@@ -154,11 +155,19 @@ def get_validation_errors(outfile, app=None):
                     continue
 
                 # Make sure the related field specified by a ForeignKey is unique
-                if not f.rel.to._meta.get_field(f.rel.field_name).unique:
-                    e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.rel.field_name, f.rel.to.__name__))
+                if f.requires_unique_target:
+                    if len(f.foreign_related_fields) > 1:
+                        has_unique_field = False
+                        for rel_field in f.foreign_related_fields:
+                            has_unique_field = has_unique_field or rel_field.unique
+                        if not has_unique_field:
+                            e.add(opts, "Field combination '%s' under model '%s' must have a unique=True constraint" % (','.join([rel_field.name for rel_field in f.foreign_related_fields]), f.rel.to.__name__))
+                    else:
+                        if not f.foreign_related_fields[0].unique:
+                            e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.foreign_related_fields[0].name, f.rel.to.__name__))
 
                 rel_opts = f.rel.to._meta
-                rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+                rel_name = f.related.get_accessor_name()
                 rel_query_name = f.related_query_name()
                 if not f.rel.is_hidden():
                     for r in rel_opts.fields:
@@ -282,7 +291,7 @@ def get_validation_errors(outfile, app=None):
                 )
 
             rel_opts = f.rel.to._meta
-            rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+            rel_name = f.related.get_accessor_name()
             rel_query_name = f.related_query_name()
             # If rel_name is none, there is no reverse accessor (this only
             # occurs for symmetrical m2m relations to self). If this is the

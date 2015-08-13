@@ -4,20 +4,80 @@ import datetime
 import time
 import warnings
 from email.header import Header
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 from django.conf import settings
 from django.core import signals
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, iri_to_uri
+from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
+from django.utils.six.moves.urllib.parse import urlparse
+
+
+# See http://www.iana.org/assignments/http-status-codes
+REASON_PHRASES = {
+    100: 'CONTINUE',
+    101: 'SWITCHING PROTOCOLS',
+    102: 'PROCESSING',
+    200: 'OK',
+    201: 'CREATED',
+    202: 'ACCEPTED',
+    203: 'NON-AUTHORITATIVE INFORMATION',
+    204: 'NO CONTENT',
+    205: 'RESET CONTENT',
+    206: 'PARTIAL CONTENT',
+    207: 'MULTI-STATUS',
+    208: 'ALREADY REPORTED',
+    226: 'IM USED',
+    300: 'MULTIPLE CHOICES',
+    301: 'MOVED PERMANENTLY',
+    302: 'FOUND',
+    303: 'SEE OTHER',
+    304: 'NOT MODIFIED',
+    305: 'USE PROXY',
+    306: 'RESERVED',
+    307: 'TEMPORARY REDIRECT',
+    400: 'BAD REQUEST',
+    401: 'UNAUTHORIZED',
+    402: 'PAYMENT REQUIRED',
+    403: 'FORBIDDEN',
+    404: 'NOT FOUND',
+    405: 'METHOD NOT ALLOWED',
+    406: 'NOT ACCEPTABLE',
+    407: 'PROXY AUTHENTICATION REQUIRED',
+    408: 'REQUEST TIMEOUT',
+    409: 'CONFLICT',
+    410: 'GONE',
+    411: 'LENGTH REQUIRED',
+    412: 'PRECONDITION FAILED',
+    413: 'REQUEST ENTITY TOO LARGE',
+    414: 'REQUEST-URI TOO LONG',
+    415: 'UNSUPPORTED MEDIA TYPE',
+    416: 'REQUESTED RANGE NOT SATISFIABLE',
+    417: 'EXPECTATION FAILED',
+    418: "I'M A TEAPOT",
+    422: 'UNPROCESSABLE ENTITY',
+    423: 'LOCKED',
+    424: 'FAILED DEPENDENCY',
+    426: 'UPGRADE REQUIRED',
+    428: 'PRECONDITION REQUIRED',
+    429: 'TOO MANY REQUESTS',
+    431: 'REQUEST HEADER FIELDS TOO LARGE',
+    500: 'INTERNAL SERVER ERROR',
+    501: 'NOT IMPLEMENTED',
+    502: 'BAD GATEWAY',
+    503: 'SERVICE UNAVAILABLE',
+    504: 'GATEWAY TIMEOUT',
+    505: 'HTTP VERSION NOT SUPPORTED',
+    506: 'VARIANT ALSO NEGOTIATES',
+    507: 'INSUFFICIENT STORAGE',
+    508: 'LOOP DETECTED',
+    510: 'NOT EXTENDED',
+    511: 'NETWORK AUTHENTICATION REQUIRED',
+}
 
 
 class BadHeaderError(ValueError):
@@ -33,8 +93,9 @@ class HttpResponseBase(six.Iterator):
     """
 
     status_code = 200
+    reason_phrase = None        # Use default reason phrase for status code.
 
-    def __init__(self, content_type=None, status=None, mimetype=None):
+    def __init__(self, content_type=None, status=None, reason=None, mimetype=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
@@ -46,21 +107,29 @@ class HttpResponseBase(six.Iterator):
         self._handler_class = None
         if mimetype:
             warnings.warn("Using mimetype keyword argument is deprecated, use"
-                          " content_type instead", PendingDeprecationWarning)
+                          " content_type instead",
+                          DeprecationWarning, stacklevel=2)
             content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
         self.cookies = SimpleCookie()
-        if status:
+        if status is not None:
             self.status_code = status
-
+        if reason is not None:
+            self.reason_phrase = reason
+        elif self.reason_phrase is None:
+            self.reason_phrase = REASON_PHRASES.get(self.status_code,
+                                                    'UNKNOWN STATUS CODE')
         self['Content-Type'] = content_type
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
+        def to_bytes(val, encoding):
+            return val if isinstance(val, bytes) else val.encode(encoding)
+
         headers = [
-            ('%s: %s' % (key, value)).encode('us-ascii')
+            (b': '.join([to_bytes(key, 'ascii'), to_bytes(value, 'latin-1')]))
             for key, value in self._headers.values()
         ]
         return b'\r\n'.join(headers)
@@ -71,7 +140,7 @@ class HttpResponseBase(six.Iterator):
         __str__ = serialize_headers
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
-        """Converts headers key/value to ascii/latin1 native strings.
+        """Converts headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
         `value` value can't be represented in the given charset, MIME-encoding
@@ -107,7 +176,7 @@ class HttpResponseBase(six.Iterator):
 
     def __setitem__(self, header, value):
         header = self._convert_to_charset(header, 'ascii')
-        value = self._convert_to_charset(value, 'latin1', mime_encode=True)
+        value = self._convert_to_charset(value, 'latin-1', mime_encode=True)
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
@@ -254,7 +323,7 @@ class HttpResponse(HttpResponseBase):
 
     streaming = False
 
-    def __init__(self, content='', *args, **kwargs):
+    def __init__(self, content=b'', *args, **kwargs):
         super(HttpResponse, self).__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content
@@ -304,7 +373,7 @@ class HttpResponse(HttpResponseBase):
                 'Creating streaming responses with `HttpResponse` is '
                 'deprecated. Use `StreamingHttpResponse` instead '
                 'if you need the streaming behavior.',
-                PendingDeprecationWarning, stacklevel=2)
+                DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_iterator'):
             self._iterator = iter(self._container)
         return self
@@ -360,14 +429,14 @@ class CompatibleStreamingHttpResponse(StreamingHttpResponse):
 
     These responses will stream only if no middleware attempts to access the
     `content` attribute. Otherwise, they will behave like a regular response,
-    and raise a `PendingDeprecationWarning`.
+    and raise a `DeprecationWarning`.
     """
     @property
     def content(self):
         warnings.warn(
             'Accessing the `content` attribute on a streaming response is '
             'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         content = b''.join(self)
         self.streaming_content = [content]
         return content
@@ -377,7 +446,7 @@ class CompatibleStreamingHttpResponse(StreamingHttpResponse):
         warnings.warn(
             'Accessing the `content` attribute on a streaming response is '
             'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         self.streaming_content = [content]
 
 
@@ -385,11 +454,13 @@ class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
     def __init__(self, redirect_to, *args, **kwargs):
-        parsed = urlparse(redirect_to)
+        parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
-            raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
+            raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
+
+    url = property(lambda self: self['Location'])
 
 
 class HttpResponseRedirect(HttpResponseRedirectBase):

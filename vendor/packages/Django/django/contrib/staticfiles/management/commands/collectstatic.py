@@ -8,6 +8,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_text
 from django.utils.datastructures import SortedDict
+from django.utils.functional import LazyObject
 from django.utils.six.moves import input
 
 from django.contrib.staticfiles import finders, storage
@@ -60,9 +61,6 @@ class Command(NoArgsCommand):
             self.local = False
         else:
             self.local = True
-        # Use ints for file times (ticket #14665), if supported
-        if hasattr(os, 'stat_float_times'):
-            os.stat_float_times(False)
 
     def set_options(self, **options):
         """
@@ -119,8 +117,14 @@ class Command(NoArgsCommand):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
             for original_path, processed_path, processed in processor:
+                if isinstance(processed, Exception):
+                    self.stderr.write("Post-processing '%s' failed!" % original_path)
+                    # Add a blank line before the traceback, otherwise it's
+                    # too easy to miss the relevant part of the error message.
+                    self.stderr.write("")
+                    raise processed
                 if processed:
-                    self.log("Post-processed '%s' as '%s" %
+                    self.log("Post-processed '%s' as '%s'" %
                              (original_path, processed_path), level=1)
                     self.post_processed_files.append(original_path)
                 else:
@@ -134,32 +138,37 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         self.set_options(**options)
-        # Warn before doing anything more.
-        if (isinstance(self.storage, FileSystemStorage) and
-                self.storage.location):
+
+        message = ['\n']
+        if self.dry_run:
+            message.append(
+                'You have activated the --dry-run option so no files will be modified.\n\n'
+            )
+
+        message.append(
+            'You have requested to collect static files at the destination\n'
+            'location as specified in your settings'
+        )
+
+        if self.is_local_storage() and self.storage.location:
             destination_path = self.storage.location
-            destination_display = ':\n\n    %s' % destination_path
+            message.append(':\n\n    %s\n\n' % destination_path)
         else:
             destination_path = None
-            destination_display = '.'
+            message.append('.\n\n')
 
         if self.clear:
-            clear_display = 'This will DELETE EXISTING FILES!'
+            message.append('This will DELETE EXISTING FILES!\n')
         else:
-            clear_display = 'This will overwrite existing files!'
+            message.append('This will overwrite existing files!\n')
 
-        if self.interactive:
-            confirm = input("""
-You have requested to collect static files at the destination
-location as specified in your settings%s
+        message.append(
+            'Are you sure you want to do this?\n\n'
+            "Type 'yes' to continue, or 'no' to cancel: "
+        )
 
-%s
-Are you sure you want to do this?
-
-Type 'yes' to continue, or 'no' to cancel: """
-% (destination_display, clear_display))
-            if confirm != 'yes':
-                raise CommandError("Collecting static files cancelled.")
+        if self.interactive and input(''.join(message)) != 'yes':
+            raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
@@ -171,12 +180,10 @@ Type 'yes' to continue, or 'no' to cancel: """
                         "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
                 'modified_count': modified_count,
-                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
-                'action': self.symlink and 'symlinked' or 'copied',
-                'destination': (destination_path and " to '%s'"
-                                % destination_path or ''),
-                'unmodified': (collected['unmodified'] and ', %s unmodified'
-                               % unmodified_count or ''),
+                'identifier': 'static file' + ('' if modified_count == 1 else 's'),
+                'action': 'symlinked' if self.symlink else 'copied',
+                'destination': (" to '%s'" % destination_path if destination_path else ''),
+                'unmodified': (', %s unmodified' % unmodified_count if collected['unmodified'] else ''),
                 'post_processed': (collected['post_processed'] and
                                    ', %s post-processed'
                                    % post_processed_count or ''),
@@ -189,6 +196,13 @@ Type 'yes' to continue, or 'no' to cancel: """
         """
         if self.verbosity >= level:
             self.stdout.write(msg)
+
+    def is_local_storage(self):
+        if issubclass(self.storage.__class__, LazyObject):
+            storage = self.storage._wrapped
+        else:
+            storage = self.storage
+        return isinstance(storage, FileSystemStorage)
 
     def clear_dir(self, path):
         """
@@ -231,7 +245,9 @@ Type 'yes' to continue, or 'no' to cancel: """
                     else:
                         full_path = None
                     # Skip the file if the source file is younger
-                    if target_last_modified >= source_last_modified:
+                    # Avoid sub-second precision (see #14665, #19540)
+                    if (target_last_modified.replace(microsecond=0)
+                            >= source_last_modified.replace(microsecond=0)):
                         if not ((self.symlink and full_path
                                  and not os.path.islink(full_path)) or
                                 (not self.symlink and full_path

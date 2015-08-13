@@ -140,11 +140,27 @@ Methods
         password hashing. Doesn't save the
         :class:`~django.contrib.auth.models.User` object.
 
+        When the ``raw_password`` is ``None``, the password will be set to an
+        unusable password, as if
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        were used.
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally stored
+            as an unusable password.
+
     .. method:: check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally
+            considered to be an unusable password, resulting in this method
+            returning ``False`` for such a password.
 
     .. method:: set_unusable_password()
 
@@ -165,7 +181,7 @@ Methods
 
     .. method:: get_group_permissions(obj=None)
 
-        Returns a set of permission strings that the user has, through his/her
+        Returns a set of permission strings that the user has, through their
         groups.
 
         If ``obj`` is passed in, only returns the group permissions for
@@ -235,11 +251,6 @@ Manager methods
 
     .. method:: create_user(username, email=None, password=None, **extra_fields)
 
-        .. versionchanged:: 1.4
-           The ``email`` parameter was made optional. The username
-           parameter is now checked for emptiness and raises a
-           :exc:`~exceptions.ValueError` in case of a negative result.
-
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 
         The :attr:`~django.contrib.auth.models.User.username` and
@@ -254,7 +265,7 @@ Manager methods
         be called.
 
         The ``extra_fields`` keyword arguments are passed through to the
-        :class:`~django.contrib.auth.models.User`'s ``__init__`` method to
+        :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom User model
         <auth-custom-user>`.
 
@@ -308,18 +319,20 @@ Fields
 :class:`~django.contrib.auth.models.Permission` objects have the following
 fields:
 
-.. attribute:: name
+.. class:: models.Permission
 
-    Required. 50 characters or fewer. Example: ``'Can vote'``.
+    .. attribute:: name
 
-.. attribute:: content_type
+        Required. 50 characters or fewer. Example: ``'Can vote'``.
 
-    Required. A reference to the ``django_content_type`` database table, which
-    contains a record for each installed Django model.
+    .. attribute:: content_type
 
-.. attribute:: codename
+        Required. A reference to the ``django_content_type`` database table,
+        which contains a record for each installed model.
 
-    Required. 100 characters or fewer. Example: ``'can_vote'``.
+    .. attribute:: codename
+
+        Required. 100 characters or fewer. Example: ``'can_vote'``.
 
 Methods
 -------
@@ -337,19 +350,21 @@ Fields
 
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
-.. attribute:: name
+.. class:: models.Group
 
-    Required. 80 characters or fewer. Any characters are permitted. Example:
-    ``'Awesome Users'``.
+    .. attribute:: name
 
-.. attribute:: permissions
+        Required. 80 characters or fewer. Any characters are permitted. Example:
+        ``'Awesome Users'``.
 
-    Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+    .. attribute:: permissions
 
-        group.permissions = [permission_list]
-        group.permissions.add(permission, permission, ...)
-        group.permissions.remove(permission, permission, ...)
-        group.permissions.clear()
+        Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+
+            group.permissions = [permission_list]
+            group.permissions.add(permission, permission, ...)
+            group.permissions.remove(permission, permission, ...)
+            group.permissions.clear()
 
 .. _topics-auth-signals:
 
@@ -446,3 +461,37 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.
+
+    If you need more control, you can create your own authentication backend
+    that inherits from this class and override these attributes or methods:
+
+.. attribute:: RemoteUserBackend.create_unknown_user
+
+    ``True`` or ``False``.  Determines whether or not a
+    :class:`~django.contrib.auth.models.User` object is created if not already
+    in the database.  Defaults to ``True``.
+
+.. method:: RemoteUserBackend.authenticate(remote_user)
+
+    The username passed as ``remote_user`` is considered trusted. This method
+    simply returns the ``User`` object with the given username, creating a new
+    ``User`` object if :attr:`~RemoteUserBackend.create_unknown_user` is
+    ``True``.
+
+    Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
+    ``False`` and a ``User`` object with the given username is not found in the
+    database.
+
+.. method:: RemoteUserBackend.clean_username(username)
+
+   Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
+   information) prior to using it to get or create a
+   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
+   username.
+
+.. method:: RemoteUserBackend.configure_user(user)
+
+   Configures a newly created user.  This method is called immediately after a
+   new user is created, and can be used to perform custom setup actions, such
+   as setting the user's groups based on attributes in an LDAP directory.
+   Returns the user object.

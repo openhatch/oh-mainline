@@ -46,7 +46,7 @@ The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
 ``mysite.settings``. Note that the settings module should be on the
 Python `import search path`_.
 
-.. _import search path: http://diveintopython.net/getting_to_know_python/everything_is_an_object.html
+.. _import search path: http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html
 
 The django-admin.py utility
 ---------------------------
@@ -267,3 +267,8 @@ It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
 
 .. _@login_required: ../authentication/#the-login-required-decorator
+
+.. seealso::
+
+    :doc:`The Settings Reference </ref/settings>`
+        Contains the complete list of core and contrib app settings.

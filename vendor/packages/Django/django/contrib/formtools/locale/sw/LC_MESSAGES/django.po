@@ -1,12 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# machaku <bmachaku@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-07 15:24+0000\n"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-11-12 07:35+0000\n"
 "Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
@@ -26,12 +27,8 @@ msgstr "hatua iliyopita"
 
 #: templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
-msgstr "kusanya"
+msgstr "wasilisha"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Samahani, fomu yako imekwisha muda wake. Tafadhali endelea kujaza fomu "
-"kuanzia ukurasa huu."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "Data za uratibu zimekosekana au zimechakachuliwa."

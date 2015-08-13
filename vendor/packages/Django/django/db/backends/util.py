@@ -19,26 +19,54 @@ class CursorWrapper(object):
         self.cursor = cursor
         self.db = db
 
-    def set_dirty(self):
-        if self.db.is_managed():
-            self.db.set_dirty()
+    WRAP_ERROR_ATTRS = frozenset(['fetchone', 'fetchmany', 'fetchall', 'nextset'])
 
     def __getattr__(self, attr):
-        if attr in ('execute', 'executemany', 'callproc'):
-            self.set_dirty()
-        return getattr(self.cursor, attr)
+        cursor_attr = getattr(self.cursor, attr)
+        if attr in CursorWrapper.WRAP_ERROR_ATTRS:
+            return self.db.wrap_database_errors(cursor_attr)
+        else:
+            return cursor_attr
 
     def __iter__(self):
         return iter(self.cursor)
 
+    # The following methods cannot be implemented in __getattr__, because the
+    # code must run when the method is invoked, not just when it is accessed.
+
+    def callproc(self, procname, params=None):
+        self.db.validate_no_broken_transaction()
+        self.db.set_dirty()
+        with self.db.wrap_database_errors:
+            if params is None:
+                return self.cursor.callproc(procname)
+            else:
+                return self.cursor.callproc(procname, params)
+
+    def execute(self, sql, params=None):
+        self.db.validate_no_broken_transaction()
+        self.db.set_dirty()
+        with self.db.wrap_database_errors:
+            if params is None:
+                return self.cursor.execute(sql)
+            else:
+                return self.cursor.execute(sql, params)
+
+    def executemany(self, sql, param_list):
+        self.db.validate_no_broken_transaction()
+        self.db.set_dirty()
+        with self.db.wrap_database_errors:
+            return self.cursor.executemany(sql, param_list)
+
 
 class CursorDebugWrapper(CursorWrapper):
 
-    def execute(self, sql, params=()):
-        self.set_dirty()
+    # XXX callproc isn't instrumented at this time.
+
+    def execute(self, sql, params=None):
         start = time()
         try:
-            return self.cursor.execute(sql, params)
+            return super(CursorDebugWrapper, self).execute(sql, params)
         finally:
             stop = time()
             duration = stop - start
@@ -52,10 +80,9 @@ class CursorDebugWrapper(CursorWrapper):
             )
 
     def executemany(self, sql, param_list):
-        self.set_dirty()
         start = time()
         try:
-            return self.cursor.executemany(sql, param_list)
+            return super(CursorDebugWrapper, self).executemany(sql, param_list)
         finally:
             stop = time()
             duration = stop - start
@@ -77,7 +104,7 @@ class CursorDebugWrapper(CursorWrapper):
 ###############################################
 
 def typecast_date(s):
-    return s and datetime.date(*map(int, s.split('-'))) or None # returns None if s is null
+    return datetime.date(*map(int, s.split('-'))) if s else None # returns None if s is null
 
 def typecast_time(s): # does NOT store time zone information
     if not s: return None
@@ -147,6 +174,6 @@ def format_number(value, max_digits, decimal_places):
     if isinstance(value, decimal.Decimal):
         context = decimal.getcontext().copy()
         context.prec = max_digits
-        return '%s' % str(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
+        return "{0:f}".format(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
     else:
         return "%.*f" % (decimal_places, value)

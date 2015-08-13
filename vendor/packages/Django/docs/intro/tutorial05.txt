@@ -15,9 +15,9 @@ What are automated tests?
 Tests are simple routines that check the operation of your code.
 
 Testing operates at different levels. Some tests might apply to a tiny detail
-- *does a particular model method return values as expected?*, while others
-examine the overall operation of the software - *does a sequence of user inputs
-on the site produce the desired result?* That's no different from the kind of
+(*does a particular model method return values as expected?*) while others
+examine the overall operation of the software (*does a sequence of user inputs
+on the site produce the desired result?*). That's no different from the kind of
 testing you did earlier in :doc:`Tutorial 1 </intro/tutorial01>`, using the
 :djadmin:`shell` to examine the behavior of a method, or running the
 application and entering data to check how it behaves.
@@ -132,7 +132,7 @@ We identify a bug
 Fortunately, there's a little bug in the ``polls`` application for us to fix
 right away: the ``Poll.was_published_recently()`` method returns ``True`` if
 the ``Poll`` was published within the last day (which is correct) but also if
-the ``Poll``'s ``pub_date`` field is in the future (which certainly isn't).
+the ``Poll``’s ``pub_date`` field is in the future (which certainly isn't).
 
 You can see this in the Admin; create a poll whose date lies in the future;
 you'll see that the ``Poll`` change list claims it was published recently.
@@ -156,11 +156,11 @@ Create a test to expose the bug
 What we've just done in the :djadmin:`shell` to test for the problem is exactly
 what we can do in an automated test, so let's turn that into an automated test.
 
-The best place for an application's tests is in the application's ``tests.py``
-file - the testing system will look there for tests automatically.
+A conventional place for an application's tests is in the application's
+``tests.py`` file; the testing system will automatically find tests in any file
+whose name begins with ``test``.
 
-Put the following in the ``tests.py`` file in the ``polls`` application (you'll
-notice  ``tests.py`` contains some dummy tests, you can remove those)::
+Put the following in the ``tests.py`` file in the ``polls`` application::
 
     import datetime
 
@@ -189,7 +189,7 @@ Running tests
 
 In the terminal, we can run our test::
 
-    python manage.py test polls
+    $ python manage.py test polls
 
 and you'll see something like::
 
@@ -239,7 +239,7 @@ past::
 
     def was_published_recently(self):
         now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <  now
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
 and run the test again::
 
@@ -350,7 +350,7 @@ With that ready, we can ask the client to do some work for us::
     >>> response.status_code
     404
     >>> # on the other hand we should expect to find something at '/polls/'
-    >>> # we'll use 'reverse()' rather than a harcoded URL
+    >>> # we'll use 'reverse()' rather than a hardcoded URL
     >>> from django.core.urlresolvers import reverse
     >>> response = client.get(reverse('polls:index'))
     >>> response.status_code
@@ -369,6 +369,8 @@ With that ready, we can ask the client to do some work for us::
     >>> response = client.get('/polls/')
     >>> response.content
     '\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
+    >>> # If the following doesn't work, you probably omitted the call to
+    >>> # setup_test_environment() described above
     >>> response.context['latest_poll_list']
     [<Poll: Who is your favorite Beatle?>]
 
@@ -503,8 +505,8 @@ of the process of creating polls.
 message: "No polls are available." and verifies the ``latest_poll_list`` is
 empty. Note that the :class:`django.test.TestCase` class provides some
 additional assertion methods. In these examples, we use
-:meth:`~django.test.TestCase.assertContains()` and
-:meth:`~django.test.TestCase.assertQuerysetEqual()`.
+:meth:`~django.test.SimpleTestCase.assertContains()` and
+:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
 
 In ``test_index_view_with_a_past_poll``, we create a poll and verify that it
 appears in the list.
@@ -632,7 +634,7 @@ a piece of code, it usually means that code should be refactored or removed.
 Coverage will help to identify dead code. See
 :ref:`topics-testing-code-coverage` for details.
 
-:doc:`Testing Django applications </topics/testing/index>` has comprehensive
+:doc:`Testing in Django </topics/testing/index>` has comprehensive
 information about testing.
 
 .. _Selenium: http://seleniumhq.org/

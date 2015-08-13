@@ -6,7 +6,7 @@ Django 1.5 is the first version of Django to support Python 3. The same code
 runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
 compatibility layer.
 
-.. _six: http://packages.python.org/six/
+.. _six: http://pythonhosted.org/six/
 
 This document is primarily targeted at authors of pluggable application
 who want to support both Python 2 and 3. It also describes guidelines that
@@ -42,7 +42,7 @@ developers are used to dealing with such constraints.
 Porting tools provided by Django are inspired by this philosophy, and it's
 reflected throughout this guide.
 
-.. _Python's official porting guide: http://docs.python.org/py3k/howto/pyporting.html
+.. _Python's official porting guide: http://docs.python.org/3/howto/pyporting.html
 .. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
 
 Porting tips
@@ -78,8 +78,8 @@ wherever possible and avoid the ``b`` prefixes.
 String handling
 ---------------
 
-Python 2's :func:`unicode` type was renamed :func:`str` in Python 3,
-:func:`str` was renamed ``bytes()``, and :func:`basestring` disappeared.
+Python 2's :func:`unicode` type was renamed ``str()`` in Python 3,
+``str()`` was renamed ``bytes()``, and :func:`basestring` disappeared.
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
 
@@ -138,7 +138,7 @@ In Python 2, the object model specifies :meth:`~object.__str__` and
 :meth:`~object.__unicode__` methods. If these methods exist, they must return
 ``str`` (bytes) and ``unicode`` (text) respectively.
 
-The ``print`` statement and the :func:`str` built-in call
+The ``print`` statement and the :class:`str` built-in call
 :meth:`~object.__str__` to determine the human-readable representation of an
 object. The :func:`unicode` built-in calls :meth:`~object.__unicode__` if it
 exists, and otherwise falls back to :meth:`~object.__str__` and decodes the
@@ -201,8 +201,8 @@ According to :pep:`3333`:
 Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
 contains ``bytes``, which may become an issue if you compare it with a
 ``str`` in your tests. The preferred solution is to rely on
-:meth:`~django.test.TestCase.assertContains` and
-:meth:`~django.test.TestCase.assertNotContains`. These methods accept a
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.SimpleTestCase.assertNotContains`. These methods accept a
 response and a unicode string as arguments.
 
 Coding guidelines
@@ -233,7 +233,7 @@ In order to enable the same behavior in Python 2, every module must import
     my_bytestring = b"This is a bytestring"
 
 If you need a byte string literal under Python 2 and a unicode string literal
-under Python 3, use the :func:`str` builtin::
+under Python 3, use the :class:`str` builtin::
 
     str('my string')
 
@@ -246,7 +246,7 @@ consequence, the following pattern is sometimes necessary::
 
 Be cautious if you have to `index bytestrings`_.
 
-.. _index bytestrings: http://docs.python.org/py3k/howto/pyporting.html#bytes-literals
+.. _index bytestrings: http://docs.python.org/3/howto/pyporting.html#bytes-literals
 
 Exceptions
 ~~~~~~~~~~
@@ -317,6 +317,9 @@ Division
         def __idiv__(self, other):  # Python 2 compatibility
             return type(self).__itruediv__(self, other)
 
+Special methods are looked up on the class and not on the instance to reflect
+the behavior of the Python interpreter.
+
 .. module: django.utils.six
 
 Writing compatible code with six
@@ -356,7 +359,10 @@ The ``long`` type no longer exists in Python 3. ``1L`` is a syntax error. Use
 ``xrange``
 ~~~~~~~~~~
 
-Import ``six.moves.xrange`` wherever you use ``xrange``.
+If you use ``xrange`` on Python 2, import ``six.moves.range`` and use that
+instead. You can also import ``six.moves.xrange`` (it's equivalent to
+``six.moves.range``) but the first technique allows you to simply drop the
+import when dropping support for Python 2.
 
 Moved modules
 ~~~~~~~~~~~~~
@@ -365,24 +371,13 @@ Some modules were renamed in Python 3. The ``django.utils.six.moves``
 module (based on the :mod:`six.moves module <six.moves>`) provides a
 compatible location to import them.
 
-The ``urllib``, ``urllib2`` and ``urlparse`` modules were reworked in depth
-and :mod:`django.utils.six.moves <six.moves>` doesn't handle them. Django
-explicitly tries both locations, as follows::
-
-    try:
-        from urllib.parse import urlparse, urlunparse
-    except ImportError:     # Python 2
-        from urlparse import urlparse, urlunparse
-
-PY3
+PY2
 ~~~
 
-If you need different code in Python 2 and Python 3, check :data:`six.PY3`::
+If you need different code in Python 2 and Python 3, check :data:`six.PY2`::
 
-    if six.PY3:
-        # do stuff Python 3-wise
-    else:
-        # do stuff Python 2-wise
+    if six.PY2:
+        # compatibility code for Python 2
 
 This is a last resort solution when :mod:`six` doesn't provide an appropriate
 function.
@@ -393,14 +388,4 @@ Django customized version of six
 --------------------------------
 
 The version of six bundled with Django (``django.utils.six``) includes a few
-extras.
-
-.. function:: assertRaisesRegex(testcase, *args, **kwargs)
-
-    This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
-    ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
-    exists in current Python3 versions, but issues a warning.
-
-
-In addition to six' defaults moves, Django's version provides ``thread`` as
-``_thread`` and ``dummy_thread`` as ``_dummy_thread``.
+customizations for internal use only.

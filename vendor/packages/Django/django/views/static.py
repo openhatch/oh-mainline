@@ -9,16 +9,16 @@ import os
 import stat
 import posixpath
 import re
-try:
-    from urllib.parse import unquote
-except ImportError:     # Python 2
-    from urllib import unquote
 
 from django.http import (CompatibleStreamingHttpResponse, Http404,
     HttpResponse, HttpResponseRedirect, HttpResponseNotModified)
 from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_noop
+
+STREAM_CHUNK_SIZE = 4096
+
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -58,12 +58,14 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
-    mimetype, encoding = mimetypes.guess_type(fullpath)
-    mimetype = mimetype or 'application/octet-stream'
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
-    response = CompatibleStreamingHttpResponse(open(fullpath, 'rb'), content_type=mimetype)
+    content_type, encoding = mimetypes.guess_type(fullpath)
+    content_type = content_type or 'application/octet-stream'
+    f = open(fullpath, 'rb')
+    response = CompatibleStreamingHttpResponse(iter(lambda: f.read(STREAM_CHUNK_SIZE), b''),
+                                               content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
