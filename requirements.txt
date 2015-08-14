@@ -23,7 +23,6 @@ django-inplaceedit
 django-kombu
 django-model-utils
 django-picklefield
-django-picklefield/src
 django-registration
 django-tastypie
 django-voting
