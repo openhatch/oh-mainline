@@ -3,8 +3,8 @@ import os
 import sys
 
 # Use the modules in vendor/
-import vendor
-vendor.vendorify()
+#import vendor
+#vendor.vendorify()
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
