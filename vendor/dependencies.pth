@@ -1,6 +1,6 @@
 packages/docutils
-packages/feedparser/feedparser
-packages/gdata/src
+packages/feedparser
+packages/gdata
 packages/ghettoq
 packages/html2text
 packages/html5lib
@@ -13,7 +13,7 @@ packages/markupsafe
 packages/mimeparse
 packages/mock
 packages/oauthlib
-packages/odict/src
+packages/odict
 packages/openid
 packages/ordereddict
 packages/Pygments
@@ -37,9 +37,8 @@ packages/staticgenerator
 packages/twisted
 packages/typecheck
 packages/unicodecsv
-packages/unittest-xml-reporting/src
+packages/unittest-xml-reporting
 packages/webob
 packages/webtest
-packages/whoosh/src
+packages/whoosh
 packages/zope.interface
-packages/zope.interface/src
