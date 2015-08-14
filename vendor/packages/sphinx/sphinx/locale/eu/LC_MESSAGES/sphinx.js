@@ -1,1 +1,0 @@
-Documentation.addTranslations({"locale": "eu", "plural_expr": "(n != 1)", "messages": {"Hide Search Matches": "Bilaketa bat-etortzeak ezkutatu", "Permalink to this definition": "Definizio honetarako esteka iraunkorra", "Permalink to this headline": "Goiburu honetarako esteka iraunkorra"}});

@@ -1,3 +1,0 @@
-Twisted>=2.5
-w3lib
-pyOpenSSL

@@ -1,9 +1,0 @@
-{% extends  "inplaceeditform/render_media_field.html" %}
-
-{% block media %}
-    {{ block.super }}
-    {% comment %}http://malsup.github.io/jquery.form.js{% endcomment %}
-    <script src="{{ STATIC_URL }}js/jquery.form.js" type="text/javascript"></script>
-{% endblock %}
-
-

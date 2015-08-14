@@ -1,1 +1,0 @@
-Documentation.addTranslations({"locale": "cs", "plural_expr": "(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2", "messages": {"Hide Search Matches": "Skr\u00fdt v\u00fdsledky vyhled\u00e1v\u00e1n\u00ed", "Permalink to this definition": "Trval\u00fd odkaz na tuto definici", "Permalink to this headline": "Trval\u00fd odkaz na tento nadpis"}});

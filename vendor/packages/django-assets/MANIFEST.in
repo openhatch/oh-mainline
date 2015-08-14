@@ -1,5 +1,0 @@
-include README
-include LICENSE
-include CHANGES
-include MANIFEST.in
-recursive-include docs *

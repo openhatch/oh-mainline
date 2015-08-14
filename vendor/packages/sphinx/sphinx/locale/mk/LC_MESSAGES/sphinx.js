@@ -1,1 +1,0 @@
-Documentation.addTranslations({"locale": "mk", "plural_expr": "(n % 10 == 1 && n % 100 != 11) ? 0 : 1", "messages": {"Hide Search Matches": "", "Permalink to this definition": "", "Permalink to this headline": ""}});

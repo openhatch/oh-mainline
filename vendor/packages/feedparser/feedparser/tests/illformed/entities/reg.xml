@@ -1,9 +1,0 @@
-<!--
-Description: reg
-Expect:      bozo and feed['title'] == u'testing \xae entity'
--->
-<rss>
-<channel>
-<title>testing &reg; entity</title>
-</channel>
-</rss>

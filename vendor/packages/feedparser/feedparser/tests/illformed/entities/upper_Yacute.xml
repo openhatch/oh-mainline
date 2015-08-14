@@ -1,9 +1,0 @@
-<!--
-Description: Yacute
-Expect:      bozo and feed['title'] == u'testing \xdd entity'
--->
-<rss>
-<channel>
-<title>testing &Yacute; entity</title>
-</channel>
-</rss>

@@ -1,8 +1,0 @@
-pip-egg-info/staticgenerator.egg-info/PKG-INFO
-pip-egg-info/staticgenerator.egg-info/SOURCES.txt
-pip-egg-info/staticgenerator.egg-info/dependency_links.txt
-pip-egg-info/staticgenerator.egg-info/top_level.txt
-staticgenerator/__init__.py
-staticgenerator/filesystem.py
-staticgenerator/handlers.py
-staticgenerator/middleware.py

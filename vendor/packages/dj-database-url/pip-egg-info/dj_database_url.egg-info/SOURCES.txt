@@ -1,7 +1,0 @@
-dj_database_url.py
-setup.cfg
-pip-egg-info/dj_database_url.egg-info/PKG-INFO
-pip-egg-info/dj_database_url.egg-info/SOURCES.txt
-pip-egg-info/dj_database_url.egg-info/dependency_links.txt
-pip-egg-info/dj_database_url.egg-info/not-zip-safe
-pip-egg-info/dj_database_url.egg-info/top_level.txt

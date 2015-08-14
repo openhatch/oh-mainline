@@ -1,7 +1,0 @@
-setuptools
-
-[test]
-zope.event
-
-[docs]
-z3c.recipe.sphinxdoc

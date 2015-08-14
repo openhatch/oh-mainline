@@ -1,1 +1,0 @@
-Updated bump message to use the bumped version, not the old version.
