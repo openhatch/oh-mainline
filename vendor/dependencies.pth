@@ -4,7 +4,6 @@ packages/BeautifulSoup
 packages/beautifulsoup4
 packages/bleach
 packages/celery
-packages/decorator/src
 packages/dj-database-url
 packages/django-assets
 packages/django-authopenid

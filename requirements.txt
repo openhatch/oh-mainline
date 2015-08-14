@@ -7,3 +7,4 @@ south
 twill
 mechanize
 django-reversion
+decorator
