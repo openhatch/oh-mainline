@@ -16,6 +16,7 @@ bleach
 celery
 dj-database-url
 django-assets
+django-allauth
 django-authopenid
 django-celery
 django-debug-toolbar

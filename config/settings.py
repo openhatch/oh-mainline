@@ -7,53 +7,54 @@ import logging
 import datetime
 import sys
 import dj_database_url
+import environ
 
-LOGGING_CONFIG = None
+env = environ.Env()
+
+#LOGGING_CONFIG = None
+
+# LOGGING CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
+# A sample logging configuration. The only tangible logging
+# performed by this configuration is to send an email to
+# the site admins on every HTTP 500 error when DEBUG=False.
+# See http://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'formatters': {
-        'verbose': {
-            'format': '\n%(levelname)08s %(asctime)25s - %(name)25s - %(message)15s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
     },
     'handlers': {
-        'null': {
-            'class': 'django.utils.log.NullHandler',
-        },
-        'console':{
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
     },
     'loggers': {
-        'django': {
-            'handlers': ['null'],
-            'propagate': False,
-            'level': 'INFO',
-        },
         'django.request': {
-            'handlers': ['null'],
+            'handlers': ['mail_admins'],
             'level': 'ERROR',
-            'propagate': False,
+            'propagate': True,
         },
-        'mysite': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': False,
-        }
     }
 }
 
-import logging.config
-logging.config.dictConfig(LOGGING)
+#import logging.config
+#logging.config.dictConfig(LOGGING)
+
+ROOT_DIR = environ.Path(__file__)
+APPS_DIR = ROOT_DIR.path('mysite')
 
 # Figure out where in the filesystem we are.
-DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
+#DIRECTORY_CONTAINING_SETTINGS_PY = os.path.abspath(os.path.dirname(__file__))
 # This is needed for {% version %}
-MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY
+#MEDIA_ROOT_BEFORE_STATIC = DIRECTORY_CONTAINING_SETTINGS_PY
 
 # Now, actual settings
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -80,7 +81,7 @@ TEST_DATABASE_CHARSET = 'utf8'
 
 DATABASES = {
     'default': {
-        'NAME': os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'site.db'),
+        'NAME': os.path.join(APPS_DIR, 'site.db'),
         'ENGINE': 'django.db.backends.sqlite3',
         'CHARSET': 'utf8',
     },
@@ -127,7 +128,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'static')
+MEDIA_ROOT = os.path.join(APPS_DIR, 'static')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -143,12 +144,12 @@ ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'k%&pic%c5%6$%(h&eynhgwhibe9-h!_iq&(@ktx#@1-5g2+he)'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
+    'django.core.context_processors.request',
+    'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'django_authopenid.context_processors.authopenid',
+    #'django_authopenid.context_processors.authopenid',
     'social.apps.django_app.context_processors.backends',
     'social.apps.django_app.context_processors.login_redirect',
 )
@@ -161,6 +162,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = [
+    #'djangosecure.middleware.SecurityMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     # This must live on top of Auth + Session middleware
     'mysite.base.middleware.DetectLogin',
@@ -169,7 +171,7 @@ MIDDLEWARE_CLASSES = [
     'sessionprofile.middleware.SessionProfileMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_authopenid.middleware.OpenIDMiddleware',
+    #'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.HandleWannaHelpQueue',
     'django.middleware.transaction.TransactionMiddleware',
 ]
@@ -208,8 +210,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.webdesign',
     'django.contrib.admin',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'registration',
-    'django_authopenid',
+    #'django_authopenid',
     'django_extensions',
     'south',
     'django_assets',
@@ -234,7 +239,8 @@ INSTALLED_APPS = (
 )
 
 # testrunner allows us to control which testrunner to use
-TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+# TEST_RUNNER = 'mysite.testrunner.OpenHatchTestRunner'
 # Optionally, use XML reporting
 if os.environ.get('USE_XML_TEST_REPORTING', None):
     TEST_RUNNER = 'mysite.testrunner.OpenHatchXMLTestRunner'
@@ -366,6 +372,7 @@ except ImportError:
 AUTHENTICATION_BACKENDS = (
     'social.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 SOCIAL_AUTH_PIPELINE = (
