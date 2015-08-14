@@ -10,6 +10,7 @@ services:
 
 install:
  - sudo pip install --upgrade pip
+ - sudo pip install -r requirements.txt
  - sudo pip install coveralls
  - sudo pip install codecov
  - sudo cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
