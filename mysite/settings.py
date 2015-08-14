@@ -229,6 +229,7 @@ INSTALLED_APPS = (
     'djkombu',
     'inplaceeditform',
     'django_webtest',
+    'decorator',
     'social.apps.django_app.default',
 )
 
