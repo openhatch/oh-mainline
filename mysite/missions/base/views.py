@@ -193,9 +193,14 @@ class Mission(object):
     view_classes = None
 
     def __init__(self):
-        """ Initialize a mission """
-        if not all(self.mission_id, self.name, self.view_classes):
-            raise IncompleteConfiguration("%s is not fully configured." % self)
+        """
+        Initialize a mission
+        Note: `all` is the Python built-in.
+               all(iterable) returns True if all elements of the iterable are true
+               (or if the iterable is empty)
+        """
+        if not all((self.mission_id, self.name, self.view_classes,)):
+            raise IncompleteConfiguration("%s is not fully configured." % (self, ))
 
     @classmethod
     def get(cls):
