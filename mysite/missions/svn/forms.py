@@ -16,39 +16,56 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import django.forms
-from django.forms import ValidationError
 import os
-from mysite.missions.base.view_helpers import get_mission_data_path
 import patch
+
+from django.forms import Form, ValidationError
+
+from mysite.missions.base.view_helpers import get_mission_data_path
 from mysite.missions.svn import view_helpers
 
 
-class CheckoutForm(django.forms.Form):
+class CheckoutForm(Form):
+    """
+    Mission form for checkout step to see if a user corrrectly checked out
+    the svn repo
+    """
     secret_word = django.forms.CharField(
-        error_messages={'required': 'No secret word was given.'})
+        error_messages={'required': 'No secret word was given.'}
+    )
     SECRET_WORD_FILE = 'word.txt'
 
     def __init__(self, username=None, *args, **kwargs):
+        """ Initalize checkout form and set username """
         super(CheckoutForm, self).__init__(*args, **kwargs)
         self.username = username
 
     def clean_secret_word(self):
-        cat_trunk = view_helpers.SvnRepository(self.username).cat('/trunk/' + self.SECRET_WORD_FILE).strip()
-        if self.cleaned_data['secret_word'] != cat_trunk:
+        """
+        Gets secret word from svn trunk and checks if user submitted
+        word is the same. Raise error if the words do not match
+        """
+        secret_word_trunk = view_helpers.SvnRepository(self.username).cat('/trunk/' + self.SECRET_WORD_FILE).strip()
+        if self.cleaned_data['secret_word'] != secret_word_trunk:
             raise ValidationError, 'The secret word is incorrect.'
 
 
-class DiffForm(django.forms.Form):
+class DiffForm(Form):
+    """
+    Mission step's form to see if a user's svn diff is correct
+    """
     diff = django.forms.CharField(
         error_messages={'required': 'No svn diff output was given.'},
-        widget=django.forms.Textarea())
+        widget=django.forms.Textarea()
+    )
     FILE_TO_BE_PATCHED = 'README'
     NEW_CONTENT = os.path.join(get_mission_data_path('svn'),
                                'README-new-for-svn-diff')
 
-    def __init__(self, username=None, wcdir=None, request=None, *args, **kwargs):
+    def __init__(self, username=None, wcdir=None, request=None,
+                 *args, **kwargs):
         super(DiffForm, self).__init__(request, *args, **kwargs)
+
         self.username = username
         self.wcdir = wcdir
         if wcdir:
@@ -88,7 +105,7 @@ class DiffForm(django.forms.Form):
             raise ValidationError, 'The file resulting from patching does not have the correct contents.'
 
     def commit_diff(self):
-        """Commit the diff form and the patch."""
+        """ Commit the diff form and the patch. """
         open(self.file_to_patch, 'w').write(self.new_content)
         commit_message = '''Fix a typo in %s. Thanks for reporting this, %s!''' % (self.FILE_TO_BE_PATCHED, self.username)
         view_helpers.subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.wcdir])
