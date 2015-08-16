@@ -18,27 +18,26 @@
 
 from mysite.missions.base.view_helpers import *
 
+
 class SvnRepository(object):
-    INITIAL_CONTENT = os.path.join(
-        get_mission_data_path('svn'), 'svn-initial.svndump')
+    """ Class for SVN Repository operations """
+    INITIAL_CONTENT = os.path.join(get_mission_data_path('svn'), 'svn-initial.svndump')
 
     def __init__(self, username):
+        """ Initialize an instance """
         self.username = username
         self.repo_path = os.path.join(settings.SVN_REPO_PATH, username)
-
         self.file_url = 'file://' + self.repo_path
         self.public_url = settings.SVN_REPO_URL_PREFIX + username
 
     def reset(self):
+        """ Resets svn repository """
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
-        subprocess.check_call(
-            ['svnadmin', 'create', '--fs-type', 'fsfs', self.repo_path])
+        subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', self.repo_path])
 
-        # Configure the repository so svnserve uses a password file stored
-        # within it.
-        svnserve_conf_path = os.path.join(
-            self.repo_path, 'conf', 'svnserve.conf')
+        # Configure the repository settings so svnserve uses the stored password file
+        svnserve_conf_path = os.path.join(self.repo_path, 'conf', 'svnserve.conf')
         svnserve_conf = RawConfigParser()
         svnserve_conf.read(svnserve_conf_path)
         svnserve_conf.set('general', 'anon-access', 'read')
@@ -47,26 +46,24 @@ class SvnRepository(object):
         svnserve_conf.write(open(svnserve_conf_path, 'w'))
 
         # Assign a password for the user.
-        password = ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)),
-                            format='words').lower().split()[:3])
+        password = ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)), format='words').lower().split()[:3])
         passwd_path = os.path.join(self.repo_path, 'conf', 'passwd')
         passwd_file = RawConfigParser()
         passwd_file.read(passwd_path)
         passwd_file.set('users', self.username, password)
         passwd_file.write(open(passwd_path, 'w'))
 
-        dumploader = subprocess.Popen(
-            ['svnadmin', 'load', '--ignore-uuid', self.repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        # Attempt to load svnadmin
+        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', self.repo_path],
+                                      stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE)
         dumploader.communicate(open(self.INITIAL_CONTENT).read())
         if dumploader.returncode != 0:
             raise RuntimeError, 'svnadmin load failed'
 
         # Install the pre-commit hook.
         precommit_hook_path = os.path.join(self.repo_path, 'hooks', 'pre-commit')
-        open(precommit_hook_path, 'w').write('''#!/bin/sh -e
-export PATH=%s
-exec %s -W ignore %s svn_precommit "$@"
-''' % (pipes.quote(os.environ['PATH']), pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
+        open(precommit_hook_path, 'w').write('''#!/bin/sh -e export PATH=%s exec %s -W ignore %s svn_precommit "$@"''' % (pipes.quote(os.environ['PATH']), pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
         os.chmod(precommit_hook_path, 0755)
 
     def exists(self):
@@ -86,50 +83,6 @@ exec %s -W ignore %s svn_precommit "$@"
 
     def cat(self, path):
         return subproc_check_output(['svn', 'cat', self.file_url + path])
-
-
-def get_username_for_svn_txn(repo_path, txn_id):
-    """
-    Returns username for an svn transaction.
-    Helper function for hook scripts in the svn commit mission.
-    This function may be mocked in the tests.
-    """
-    return subproc_check_output(['svnlook', 'author', repo_path, '-t', txn_id]).strip()
-
-
-def get_changes_for_svn_txn(repo_path, txn_id):
-    """
-    Returns changes made in an svn transaction.
-    Helper function for hook scripts in the svn commit mission.
-    This function may be mocked in the tests.
-    """
-    changes = subproc_check_output(['svnlook', 'changed', repo_path, '-t', txn_id])
-
-    # Formatting note for the svn change syntax
-    # Lines are in the form:
-    # <one letter for operation> <three spaces> <path in repository> <newline>
-    # as in:
-    #     "U    trunk/README\n"
-    for line in StringIO(changes):
-        yield line[0], line[4:-1]
-
-
-def get_file_for_svn_txn(repo_path, txn_id, filename):
-    """
-    Returns file in an svn transaction.
-    Helper function for hook scripts in the svn commit mission.
-    This function may be mocked in the tests.
-    """
-    return subproc_check_output(['svnlook', 'cat', repo_path, '-t', txn_id, filename])
-
-
-def get_log_for_svn_txn(repo_path, txn_id):
-    """
-    Returns svn log for an svn transaction.
-    Helper function for hook scripts in the svn commit mission.
-    This function may be mocked in the tests.
-    """
-    return subproc_check_output(['svnlook', 'log', repo_path, '-t', txn_id])
 
 
 class SvnCommitMission(object):
@@ -187,3 +140,46 @@ class SvnCommitMission(object):
 
         # After all checks have passed, set the commit mission to completed
         set_mission_completed(person, 'svn_commit')
+
+def get_username_for_svn_txn(repo_path, txn_id):
+    """
+    Returns username for an svn transaction.
+    Helper function for hook scripts in the svn commit mission.
+    This function may be mocked in the tests.
+    """
+    return subproc_check_output(['svnlook', 'author', repo_path, '-t', txn_id]).strip()
+
+
+def get_changes_for_svn_txn(repo_path, txn_id):
+    """
+    Returns changes made in an svn transaction.
+    Helper function for hook scripts in the svn commit mission.
+    This function may be mocked in the tests.
+    """
+    changes = subproc_check_output(['svnlook', 'changed', repo_path, '-t', txn_id])
+
+    # Formatting note for the svn change syntax
+    # Lines are in the form:
+    # <one letter for operation> <three spaces> <path in repository> <newline>
+    # as in:
+    #     "U    trunk/README\n"
+    for line in StringIO(changes):
+        yield line[0], line[4:-1]
+
+
+def get_file_for_svn_txn(repo_path, txn_id, filename):
+    """
+    Returns file in an svn transaction.
+    Helper function for hook scripts in the svn commit mission.
+    This function may be mocked in the tests.
+    """
+    return subproc_check_output(['svnlook', 'cat', repo_path, '-t', txn_id, filename])
+
+
+def get_log_for_svn_txn(repo_path, txn_id):
+    """
+    Returns svn log for an svn transaction.
+    Helper function for hook scripts in the svn commit mission.
+    This function may be mocked in the tests.
+    """
+    return subproc_check_output(['svnlook', 'log', repo_path, '-t', txn_id])

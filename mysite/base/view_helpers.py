@@ -128,6 +128,10 @@ def clear_static_cache(path):
 
 
 def subproc_check_output(*args, **kw):
+    """
+
+    :rtype : object
+    """
     if 'stdout' in kw:
         raise ValueError, 'stdout must not be specified'
     kw['stdout'] = subprocess.PIPE

@@ -112,7 +112,6 @@ class DiffForm(forms.Form):
     def commit_diff(self):
         """ Commit the proposed patch to the mission user's svn repo. """
         open(self.file_to_patch, 'w').write(self.proposed_content)
-        commit_message = "Fix a typo in {0:s}. Thanks for reporting this, {1:s}!".format(self.FILE_TO_BE_PATCHED,
-                                                                                         self.username)
+        commit_message = "Fix a typo in {0:s}. Thanks for reporting this, {1:s}!".format(self.FILE_TO_BE_PATCHED, self.username)
         snv_commit_command = ['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.working_directory]
         view_helpers.subproc_check_output(snv_commit_command)
