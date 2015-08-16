@@ -105,7 +105,7 @@ class DiffForm(forms.Form):
             raise forms.ValidationError('The patch will not apply correctly to the latest revision.')
 
         # Check that the resulting file matches what is expected.
-        self.proposed_content = ''.join(self.the_patch.patch_stream(open(self.file_to_patch), self.the_patch.hunks[0]))
+        self.proposed_content = ''.join(self.proposed_patch.patch_stream(open(self.file_to_patch), self.proposed_patch.hunks[0]))
         if self.proposed_content != open(self.NEW_CONTENT).read():
             raise forms.ValidationError('The file resulting from patching does not have the correct contents.')
 
