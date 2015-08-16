@@ -27,10 +27,7 @@ from mysite.missions.base.views import (
     view,
     login_required
 )
-from mysite.missions.base.view_helpers import (
-    mission_completed,
-    set_mission_completed,
-)
+from mysite.missions.base.view_helpers import mission_completed, set_mission_completed
 from mysite.missions.base.views import *
 from mysite.missions.svn import forms, view_helpers
 
@@ -64,7 +61,6 @@ def diff_submit(request):
     2. If POST method try to commit the diff
     3. Else GET method returns the view to be displayed
     """
-    # Initialize the data dictionary
     data = {'svn_diff_form': forms.DiffForm(request.user.username),
             'svn_diff_error_message': ''}
 
@@ -90,7 +86,7 @@ def diff_submit(request):
 
 @login_required
 def checkout_submit(request):
-    """ Handle svn checkout mission step form and completion """
+    """ Handle svn mission's checkout form for GET and POST """
     data = {'svn_checkout_form': forms.CheckoutForm(request.user.username),
             'svn_checkout_error_message': ''}
     if request.method == 'POST':
