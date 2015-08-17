@@ -15,11 +15,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import mock
 import os
+import os.path
 import shutil
+import subprocess
 import tempfile
 
-import mock
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase as DjangoTestCase
@@ -27,9 +29,9 @@ from django.utils.unittest import skipIf
 
 import mysite.base.depends
 from mysite.base.tests import *
-from mysite.missions.svn import views, view_helpers
 from mysite.base.tests import TwillTests
 from mysite.missions.base.tests import TestCase, subproc_check_output, make_testdata_filename
+from mysite.missions.svn import views, view_helpers
 from mysite.missions.svn.forms import DiffForm
 from mysite.profile.models import Person
 
@@ -113,29 +115,21 @@ class SvnViewTests(TwillTests):
         checkoutdir = tempfile.mkdtemp()
         try:
             # Check the repository out and make the required change.
-            subprocess.check_call(
-                ['svn', 'checkout', response.context['checkout_url'],
-                 checkoutdir])
-            new_contents = open(
-                os.path.join(view_helpers.get_mission_data_path('svn'),
-                             DiffForm.NEW_CONTENT)).read()
-            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED),
-                 'w').write(new_contents)
+            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            new_contents = open(os.path.join(view_helpers.get_mission_data_path('svn'), DiffForm.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, DiffForm.FILE_TO_BE_PATCHED), 'w').write(new_contents)
 
             # Make the diff.
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
 
             # Submit the diff.
-            response = self.client.post(
-                reverse(views.diff_submit), {'diff': diff})
+            response = self.client.post(reverse(views.diff_submit), {'diff': diff})
             paulproteus = Person.objects.get(user__username='paulproteus')
-            self.assert_(
-                view_helpers.mission_completed(paulproteus, 'svn_diff'))
+            self.assert_(view_helpers.mission_completed(paulproteus, 'svn_diff'))
 
             # Check that there is a new commit that applies to the working
             # copy cleanly.
-            update_output = subproc_check_output(
-                ['svn', 'update'], cwd=checkoutdir)
+            update_output = subproc_check_output(['svn', 'update'], cwd=checkoutdir)
             self.assertTrue('Updated to revision ' in update_output)
         finally:
             shutil.rmtree(checkoutdir)

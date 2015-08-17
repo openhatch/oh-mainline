@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import patch # TODO verify import
+import patch
 
 from django import forms
 
@@ -91,7 +91,7 @@ class DiffForm(forms.Form):
             raise forms.ValidationError('The patch affects more than one file.')
 
         # Check that proposed patch has the correct filename.
-        if self.file_to_patch not in self.cleaned_data['diff']:
+        if (self.file_to_patch.source[0] != self.FILE_TO_BE_PATCHED) or (self.file_to_patch.target[0] != self.FILE_TO_BE_PATCHED):
             raise forms.ValidationError('The patch affects the wrong file.')
 
         # Get a mission user's working copy of the svn repo
