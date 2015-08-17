@@ -61,28 +61,32 @@ def diff_submit(request):
     2. If POST method try to commit the diff
     3. Else GET method returns the view to be displayed
     """
-    data = {'svn_diff_form': forms.DiffForm(request.user.username),
-            'svn_diff_error_message': ''}
+    data = {'svn_diff_form': forms.DiffForm(), 'svn_diff_error_message': ''}
+    # data = {'svn_diff_form': forms.DiffForm(request.user.username),
+    #         'svn_diff_error_message': ''}
 
     if request.method == 'POST':
         # mkdtemp() returns the absolute path of the directory
-        temp_svn_directory = tempfile.mkdtemp()
-        form = forms.DiffForm(request.user.username,
-                              temp_svn_directory,
-                              request.POST)
-        if form.is_valid():
-            form.commit_diff()
-            view_helpers.set_mission_completed(request.user.get_profile(), 'svn_diff')
-            return HttpResponseRedirect(reverse('svn_diff'))
+        # temp_svn_directory = tempfile.mkdtemp()
+        # form = forms.DiffForm(request.user.username,
+        #                       temp_svn_directory,
+        #                       request.POST)
+        wcdir = tempfile.mkdtemp()
+        try:
+            form = forms.DiffForm(request.user.username, wcdir, request.POST)
+            if form.is_valid():
+                form.commit_diff()
+                view_helpers.set_mission_completed(request.user.get_profile(), 'svn_diff')
+                return HttpResponseRedirect(reverse('svn_diff'))
+        finally:
+            shutil.rmtree(wcdir)
 
         data['svn_diff_form'] = form
-        shutil.rmtree(temp_svn_directory)
 
     # If we get here, just hack up the request object to pretend it is a GET
     # so the dispatch system in the class-based view can use the GET handler.
     request.method = 'GET'
     return Diff.as_view()(request, extra_context_data=data)
-
 
 @login_required
 def checkout_submit(request):
@@ -92,8 +96,7 @@ def checkout_submit(request):
     if request.method == 'POST':
         form = forms.CheckoutForm(request.user.username, request.POST)
         if form.is_valid():
-            view_helpers.set_mission_completed(request.user.get_profile(),
-                                               'svn_checkout')
+            view_helpers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
             return HttpResponseRedirect(reverse('svn_checkout'))
         data['svn_checkout_form'] = form
 
@@ -136,8 +139,7 @@ class SvnBaseView(mysite.missions.base.views.MissionBaseView):
                     'checkout_url': repo.public_trunk_url(),
                     'secret_word_file': forms.CheckoutForm.SECRET_WORD_FILE,
                     'file_for_svn_diff': forms.DiffForm.FILE_TO_BE_PATCHED,
-                    'new_secret_word':
-                        view_helpers.SvnCommitMission.NEW_SECRET_WORD,
+                    'new_secret_word': view_helpers.SvnCommitMission.NEW_SECRET_WORD,
                     'commit_username': self.request.user.username,
                     'commit_password': repo.get_password()})
         data.update(new_data)

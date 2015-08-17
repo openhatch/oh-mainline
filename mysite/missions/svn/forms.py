@@ -72,8 +72,7 @@ class DiffForm(forms.Form):
         self.username = username
         self.working_directory = working_directory
         if working_directory:
-            self.file_to_patch = os.path.join(working_directory,
-                                              self.FILE_TO_BE_PATCHED)
+            self.file_to_patch = os.path.join(working_directory, self.FILE_TO_BE_PATCHED)
 
         # Initialize proposed_patch and proposed_content
         self.proposed_patch = None
@@ -92,7 +91,7 @@ class DiffForm(forms.Form):
             raise forms.ValidationError('The patch affects more than one file.')
 
         # Check that proposed patch has the correct filename.
-        if self.FILE_TO_BE_PATCHED not in self.cleaned_data['diff']:
+        if self.file_to_patch not in self.cleaned_data['diff']:
             raise forms.ValidationError('The patch affects the wrong file.')
 
         # Get a mission user's working copy of the svn repo
@@ -112,6 +111,6 @@ class DiffForm(forms.Form):
     def commit_diff(self):
         """ Commit the proposed patch to the mission user's svn repo. """
         open(self.file_to_patch, 'w').write(self.proposed_content)
-        commit_message = "Fix a typo in {0:s}. Thanks for reporting this, {1:s}!".format(self.FILE_TO_BE_PATCHED, self.username)
-        snv_commit_command = ['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.working_directory]
-        view_helpers.subproc_check_output(snv_commit_command)
+        commit_message = "Fix a typo in {0:s}. Thanks for reporting this, {1:s}!".format(self.file_to_patch, self.username)
+        svn_commit_command = ['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', self.working_directory]
+        view_helpers.subproc_check_output(svn_commit_command)

@@ -149,7 +149,6 @@ def get_username_for_svn_txn(repo_path, txn_id):
     """
     return subproc_check_output(['svnlook', 'author', repo_path, '-t', txn_id]).strip()
 
-
 def get_changes_for_svn_txn(repo_path, txn_id):
     """
     Returns changes made in an svn transaction.
@@ -166,7 +165,6 @@ def get_changes_for_svn_txn(repo_path, txn_id):
     for line in StringIO(changes):
         yield line[0], line[4:-1]
 
-
 def get_file_for_svn_txn(repo_path, txn_id, filename):
     """
     Returns file in an svn transaction.
@@ -174,7 +172,6 @@ def get_file_for_svn_txn(repo_path, txn_id, filename):
     This function may be mocked in the tests.
     """
     return subproc_check_output(['svnlook', 'cat', repo_path, '-t', txn_id, filename])
-
 
 def get_log_for_svn_txn(repo_path, txn_id):
     """

@@ -128,17 +128,14 @@ def clear_static_cache(path):
 
 
 def subproc_check_output(*args, **kw):
-    """
-
-    :rtype : object
-    """
+    """ Checks the ouput of a subprocess """
     if 'stdout' in kw:
         raise ValueError, 'stdout must not be specified'
     kw['stdout'] = subprocess.PIPE
     subproc = subprocess.Popen(*args, **kw)
     output = subproc.stdout.read()
     if subproc.wait() != 0:
-        raise RuntimeError, 'subprocess failed with return code %d' % subproc.returncode
+        raise RuntimeError('subprocess failed with return code %d' % subproc.returncode)
     return output
 
 
