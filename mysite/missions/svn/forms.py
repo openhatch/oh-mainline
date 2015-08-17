@@ -91,7 +91,7 @@ class DiffForm(forms.Form):
             raise forms.ValidationError('The patch affects more than one file.')
 
         # Check that proposed patch has the correct filename.
-        if (self.file_to_patch.source[0] != self.FILE_TO_BE_PATCHED) or (self.file_to_patch.target[0] != self.FILE_TO_BE_PATCHED):
+        if (self.file_to_patch != self.FILE_TO_BE_PATCHED) or (self.file_to_patch.target[0] != self.FILE_TO_BE_PATCHED):
             raise forms.ValidationError('The patch affects the wrong file.')
 
         # Get a mission user's working copy of the svn repo

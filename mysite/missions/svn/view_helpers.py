@@ -54,16 +54,32 @@ class SvnRepository(object):
         passwd_file.write(open(passwd_path, 'w'))
 
         # Attempt to load svnadmin
-        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', self.repo_path],
-                                      stdin=subprocess.PIPE,
-                                      stdout=subprocess.PIPE)
+        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', self.repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         dumploader.communicate(open(self.INITIAL_CONTENT).read())
         if dumploader.returncode != 0:
-            raise RuntimeError, 'svnadmin load failed'
+            raise RuntimeError('svnadmin load failed')
 
         # Install the pre-commit hook.
+        print("SELF REPO PATH")
+        print(self.repo_path)
+
         precommit_hook_path = os.path.join(self.repo_path, 'hooks', 'pre-commit')
-        open(precommit_hook_path, 'w').write('''#!/bin/sh -e export PATH=%s exec %s -W ignore %s svn_precommit "$@"''' % (pipes.quote(os.environ['PATH']), pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
+        print("PRECOMMIT HOOK PATH")
+        print(precommit_hook_path)
+        print("END OF PRECOMMIT HOOK PATH")
+
+
+        precommit_handle = open(precommit_hook_path, 'w')
+        precommit_handle.write('#!/bin/sh -e')
+        precommit_handle.write('export PATH=%s' % pipes.quote(os.environ['PATH']))
+        precommit_handle.write('exec %s -W ignore %s svn_precommit "$@"' % (pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
+
+
+#         open(precommit_hook_path, 'w').write('''#!/bin/sh -e
+# export PATH=%s
+# exec %s -W ignore %s svn_precommit "$@"
+# ''' % (pipes.quote(os.environ['PATH']), pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
+
         os.chmod(precommit_hook_path, 0755)
 
     def exists(self):
