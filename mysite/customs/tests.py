@@ -777,7 +777,7 @@ class GitHubTrackerEditingViews(WebTest):
             select_subclasses().count())
         form = mysite.customs.forms.GitHubTrackerForm({
             'tracker_name': 'KDE Github',
-            'github_url': 'https://github.com/kde/project-A',
+            'github_url': 'https://github.com/kde/Super-cool_project.1',
             'created_for_project': self.kde.id,
             'bitsized_tag': 'easy',
             'max_connections': '8',
