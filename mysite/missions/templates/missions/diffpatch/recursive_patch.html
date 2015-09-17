@@ -116,7 +116,7 @@
       </pre>
       <p>Then, download the original collection of recipes.</p>
       <pre>
-	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.diffrecursive_get_original_tarball" %}
+	curl -0 {{ url_prefix }}{% url "mysite.missions.diffpatch.views.diffrecursive_get_original_tarball" %}
       </pre>
       <p>Unpack it, but do not change into its directory.</p>
       <pre>
@@ -124,7 +124,7 @@
       </pre>
       <p>Now, download the patch file contributed by the "enterprising American" in this mission step:</p>
       <pre>
-	curl -O {{ url_prefix }}{% url "mysite.missions.diffpatch.views.patchrecursive_get_patch" %}
+	curl -0 {{ url_prefix }}{% url "mysite.missions.diffpatch.views.patchrecursive_get_patch" %}
       </pre>
       <p>Apply that patch (you can read more in the "medium" hints about how this works):</p>
       <p><code>patch -p1 &lt; recipes.patch</code></p>
