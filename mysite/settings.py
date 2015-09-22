@@ -330,8 +330,7 @@ SVN_REPO_URL_PREFIX = 'file://' + SVN_REPO_PATH + '/'
 SVNADMIN_PATH = '/usr/bin/svnadmin'
 
 # The script to invoke for management commands in this environment.
-PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(
-    os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
+PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(os.path.join(DIRECTORY_CONTAINING_SETTINGS_PY, '../manage.py'))
 SOUTH_TESTS_MIGRATE = False
 
 GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
