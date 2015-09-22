@@ -149,7 +149,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.request',
     'django_authopenid.context_processors.authopenid',
-    'social.apps.django_app.context_processors.backends',
+    #'social.apps.django_app.context_processors.backends',
     'social.apps.django_app.context_processors.login_redirect',
 )
 

@@ -1,0 +1,22 @@
+# Pro-tip: Try not to put anything here. There should be no dependency in
+#	production that isn't in development.
+-r base.txt
+
+# WSGI Handler
+# ------------------------------------------------
+gevent==1.0.2
+gunicorn==19.3.0
+
+# Static and Media Storage
+# ------------------------------------------------
+boto==2.38.0
+django-storages-redux==1.2.3
+Collectfast==0.2.3
+
+# Mailgun Support
+# ---------------
+django-mailgun==0.2.2
+
+# Raven is the Sentry client
+# --------------------------
+raven

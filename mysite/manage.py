@@ -11,7 +11,7 @@ if __name__ == '__main__':
     # We have to add the new current working directory to sys.path, because
     # Python's sys.path was calculcated when this file (mysite/manage.py) was
     # started initially. We only really needs this for the vendor/ directory.
-    sys.path.append(os.getcwd())
+    #sys.path.append(os.getcwd())
 
     # Now, act as though nothing is wrong.
     execfile('manage.py', globals(), locals())
