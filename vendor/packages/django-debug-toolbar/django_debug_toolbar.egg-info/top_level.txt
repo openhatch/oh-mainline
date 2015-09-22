@@ -1,2 +1,0 @@
-tests
-debug_toolbar

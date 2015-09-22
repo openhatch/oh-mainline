@@ -1,3 +1,0 @@
-setuptools>=0.7
-nose
-mock>=0.7.0

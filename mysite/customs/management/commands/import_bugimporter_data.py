@@ -39,8 +39,7 @@ def jsonlines_decoder(f):
 # why this function exists.
 def _import_one(bug_dict):
     try:
-        mysite.customs.core_bugimporters.import_one_bug_item(
-            bug_dict)
+        mysite.customs.core_bugimporters.import_one_bug_item(bug_dict)
     except Exception:
         logging.exception("Failed to process one bug_dict %s", bug_dict)
 

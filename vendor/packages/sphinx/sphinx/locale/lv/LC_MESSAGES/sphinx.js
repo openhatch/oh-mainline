@@ -1,1 +1,0 @@
-Documentation.addTranslations({"locale": "lv", "plural_expr": "(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2)", "messages": {"Hide Search Matches": "Pasl\u0113pt atlases v\u0101rdus", "Permalink to this definition": "Past\u0101v\u012bga nor\u0101de uz \u0161o defin\u012bciju", "Permalink to this headline": "Past\u0101v\u012bga nor\u0101de \u0161o virsrakstu"}});

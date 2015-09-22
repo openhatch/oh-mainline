@@ -1,2 +1,0 @@
-gdata
-atom
