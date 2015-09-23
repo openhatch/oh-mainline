@@ -19,7 +19,7 @@
 
 
 {% block heading %}
-{{ block.super }} - Delete the {{ tracker_name }} tracker
+{{ block.super }} - Delete this  tracker
 {% endblock heading %}
 
 {% block form_name %}
@@ -27,7 +27,7 @@
 {% endblock form_name %}
 
 {% block form_action %}
-'{% url "mysite.customs.views.delete_tracker" tracker_type tracker_id tracker_name %}'
+'{% url "mysite.customs.views.delete_tracker" tracker_type tracker_id %}'
 {% endblock form_action %}
 
 {% block form_body %}

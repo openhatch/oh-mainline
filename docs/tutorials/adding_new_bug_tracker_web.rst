@@ -18,9 +18,8 @@ easily following these steps.
 For Trac and Roundup:
 
 - Fill the new tracker form like this:
-    - Tracker name: Name of your project
     - Base url: This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.
-    - Bug project name format: This field contains instructions of how to fill it, but if you are not sure, probably {tracker_name} is the best option.
+    - Bug project name format: This field contains instructions of how to fill it.
     - Bitesized type: Choose the field that can help identify a bug as bite-sized. If you don't find the field you need in the select box, you may have to contact us to add it.
     - Bitesized text: The value that the Bitesized type contains for a bite-sized ticket.
     - Documentation type: Ditto Bitesized type.

@@ -141,7 +141,7 @@ Editing project - {{ project.display_name }}
 		  <ul class="raquo_bullets">
 		    {% for tracker in trackers %}
 		    <li><a href="{{ tracker.get_edit_url }}">
-			{{ tracker.tracker_name }}
+			{{ tracker_type }}
 		    </a></li>
 		    {% endfor %}
 		  </ul>

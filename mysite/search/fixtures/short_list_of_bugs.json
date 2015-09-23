@@ -1,6 +1,6 @@
 [
 {"pk": 1, "model": "customs.trackermodel", "fields": {}},
-{"pk": 1, "model": "customs.tractrackermodel", "fields": {"documentation_text": "", "old_trac": false, "documentation_type": "", "base_url": "http://example.com/", "as_appears_in_distribution": "", "bitesized_text": "", "bitesized_type": "", "bug_project_name_format": "rofl", "tracker_name": "Example Trac Tracker"}},
+{"pk": 1, "model": "customs.tractrackermodel", "fields": {"documentation_text": "", "old_trac": false, "documentation_type": "", "base_url": "http://example.com/", "as_appears_in_distribution": "", "bitesized_text": "", "bitesized_type": "", "bug_project_name_format": "rofl"}},
 {
     "pk": 2,
         "model": "search.project",

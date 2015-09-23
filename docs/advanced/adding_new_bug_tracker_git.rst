@@ -66,7 +66,6 @@ In a little more detail
       existing_bug_urls: []
       get_older_bug_data: null
       queries: [!!python/unicode 'http://scons.tigris.org/issues/xml.cgi']
-      tracker_name: !!python/unicode 'SCons'
 
   After the run, check the log files /tmp/scrapy-log and /tmp/results.json
   for correct results.

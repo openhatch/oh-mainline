@@ -537,9 +537,8 @@ class BugTrackerEditingViews(WebTest):
         self.twisted = mysite.search.models.Project.create_dummy(
             name='Twisted System')
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
-            bug_project_name_format='{tracker_name}',
+            bug_project_name_format='format',
             bitesized_type='keywords',
             bitesized_text='easy',
             documentation_type='keywords',
@@ -562,14 +561,6 @@ class BugTrackerEditingViews(WebTest):
         self.assert_(success)
         return client
 
-    def test_slash_does_not_crash_tracker_editor(self):
-        mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name="something/or other")
-        client = self.login_with_client()
-        url = reverse(mysite.customs.views.list_trackers)
-        response = client.post(url, {'list_trackers-tracker_type': 'trac'})
-        self.assertEqual(200, response.status_code)
-
     def test_bug_tracker_edit_form_fills_in_hidden_field(self):
         client = self.login_with_client()
         url = (reverse(
@@ -586,7 +577,6 @@ class BugTrackerEditingViews(WebTest):
         url = reverse(mysite.customs.views.edit_tracker_url,
                       kwargs={'tracker_id': '101',
                               'tracker_type': 'trac',
-                              'tracker_name': 'whatever',
                               'url_id': '000'})
 
         # reverse won't work without a url_id so we need to add one
@@ -604,7 +594,6 @@ class BugTrackerEditingViews(WebTest):
         url = reverse(mysite.customs.views.edit_tracker_url_do,
                       kwargs={'tracker_id': self.twisted.id,
                               'tracker_type': 'trac',
-                              'tracker_name': 'twisted',
                               'url_id': url_id})
         r = client.get(url)
         self.assertEquals(r.status_code, 200)
@@ -627,7 +616,6 @@ class BugzillaTrackerEditingViews(WebTest):
             mysite.customs.models.BugzillaTrackerModel.objects.all().
             select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
-            'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
             'created_for_project': self.kde.id,
             'query_url_type': 'xml',
@@ -650,7 +638,6 @@ class BugzillaTrackerEditingViews(WebTest):
             mysite.customs.models.BugzillaTrackerModel.objects.all().
             select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
-            'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
             'created_for_project': self.kde.id,
             'query_url_type': 'xml',
@@ -699,7 +686,6 @@ class BugzillaTrackerListing(WebTest):
         client = self.login_with_client()
 
         form = mysite.customs.forms.BugzillaTrackerForm({
-            'tracker_name': 'KDE',
             'base_url': 'https://bugs.kde.org/',
             'created_for_project': self.kde.id,
             'query_url_type': 'xml',
@@ -738,7 +724,6 @@ class LaunchpadTrackerEditingViews(WebTest):
             mysite.customs.models.LaunchpadTrackerModel.objects.all().
             select_subclasses().count())
         form = mysite.customs.forms.LaunchpadTrackerForm({
-            'tracker_name': 'KDE Bugzill',
             'launchpad_name': 'https://bugs.kde.org/',
             'created_for_project': self.kde.id,
             'bitsized_tag': 'easy',
@@ -776,7 +761,6 @@ class GitHubTrackerEditingViews(WebTest):
             mysite.customs.models.GitHubTrackerModel.objects.all().
             select_subclasses().count())
         form = mysite.customs.forms.GitHubTrackerForm({
-            'tracker_name': 'KDE Github',
             'github_url': 'https://github.com/kde/project-A',
             'created_for_project': self.kde.id,
             'bitsized_tag': 'easy',
@@ -851,7 +835,6 @@ class JiraTrackerEditingViews(WebTest):
             select_subclasses().count())
 
         form = mysite.customs.forms.JiraTrackerForm({
-            'tracker_name': 'KDE Jira',
             'base_url': 'https://jira.kde.org/',
             'created_for_project': self.kde.id,
             'bitesized_tag': 'easy',
@@ -880,9 +863,8 @@ class ExportTrackerAsDict(django.test.TestCase):
     def setUp(self, *args, **kwargs):
         # Set up the Twisted TrackerModel that will be used here.
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
-            bug_project_name_format='{tracker_name}',
+            bug_project_name_format='format',
             bitesized_type='keywords',
             bitesized_text='easy',
             documentation_type='keywords',
@@ -911,8 +893,7 @@ class ExportTrackerAsDict(django.test.TestCase):
                   'base_url': 'http://twistedmatrix.com/trac/',
                   'bitesized_text': 'easy',
                   'bitesized_type': 'keywords',
-                  'bug_project_name_format': '{tracker_name}',
-                  'tracker_name': 'Twisted',
+                  'bug_project_name_format': 'format',
                   'as_appears_in_distribution': '',
                   'custom_parser': '',
                   'bugimporter': 'trac',
@@ -948,7 +929,6 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # not on Google Code. It just makes the test look more similar to
         # the other tests.
         tm = mysite.customs.models.GoogleTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             google_name='twisted',
         )
 
@@ -987,7 +967,6 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # not on Github. It just makes the test look more similar to
         # the other tests.
         tm = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             github_name='twisted',
             github_repo='mainline',
         )
@@ -1022,7 +1001,6 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # not on Jira. It just makes the test look more similar to
         # the other tests.
         tm = mysite.customs.models.JiraTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://jira.twistedmatrix.com',
             bitesized_type='label',
             bitesized_text='bitesize',
@@ -1058,15 +1036,13 @@ class DuplicateNames(django.test.TestCase):
     def test_two_trackers_of_same_name(self):
         # Set up two trackers with the same name.
         gh = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             github_name='twisted',
             github_repo='mainline',
         )
 
         trac = mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
-            bug_project_name_format='{tracker_name}',
+            bug_project_name_format='format',
             bitesized_type='keywords',
             bitesized_text='easy',
             documentation_type='keywords',
@@ -1085,9 +1061,8 @@ class TrackerAPI(WebTest):
 
         # Set up the Twisted TrackerModel that will be used here.
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
-            bug_project_name_format='{tracker_name}',
+            bug_project_name_format='format',
             bitesized_type='keywords',
             bitesized_text='easy',
             documentation_type='keywords',
@@ -1106,9 +1081,8 @@ class TrackerAPI(WebTest):
 
         # Set up the Twisted TrackerModel that will be used here.
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
-            bug_project_name_format='{tracker_name}',
+            bug_project_name_format='format',
             bitesized_type='keywords',
             bitesized_text='easy',
             documentation_type='keywords',
@@ -1141,9 +1115,8 @@ class ImportBugsFromFiles(django.test.TestCase):
 
         # Set up the Twisted TrackerModel that will be used here.
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
-            bug_project_name_format='{tracker_name}',
+            bug_project_name_format='format',
             bitesized_type='keywords',
             bitesized_text='easy',
             documentation_type='keywords',
@@ -1153,8 +1126,7 @@ class ImportBugsFromFiles(django.test.TestCase):
         # If the sample data contains exactly one item,
         # and that item does not contain any data, do we crash?
         sample_data = [{'canonical_bug_link': 'http://example.com/ticket1',
-                        'last_polled': '2013-08-02T07:47:11.307599',
-                        '_tracker_name': 'Twisted'},]
+                        'last_polled': '2013-08-02T07:47:11.307599'}]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
         # Try the import, and watch us not crash
@@ -1197,8 +1169,7 @@ class ImportBugsFromFiles(django.test.TestCase):
                         'date_reported': '2013-08-02T07:47:11.307599',
                         'last_touched': '2013-08-02T07:47:11.307599',
                         'status': 'new',
-                        '_project_name': 'Twisted',
-                        '_tracker_name': 'Twisted'}]
+                        '_project_name': 'Twisted'}]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
         # Try the import, and watch us succeed.
@@ -1228,7 +1199,6 @@ class ImportBugsFromFiles(django.test.TestCase):
              'importance': 'high',
              'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
              'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34),
-             '_tracker_name': 'Twisted',
              'submitter_realname': '',
              'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14),
              'people_involved': 3,
@@ -1270,7 +1240,6 @@ class ImportBugsFromFiles(django.test.TestCase):
              'importance': 'high',
              'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
              'date_reported': datetime.datetime(2011, 8, 9, 16, 22, 34),
-             '_tracker_name': 'Twisted',
              'submitter_realname': '',
              'last_touched': datetime.datetime(2012, 4, 12, 17, 44, 14),
              'people_involved': 3,
@@ -1313,7 +1282,6 @@ class ImportBugsFromFiles(django.test.TestCase):
              'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/5228',
              'date_reported': (
                  datetime.datetime(2011, 8, 9, 16, 22, 34).isoformat()),
-             '_tracker_name': 'Twisted',
              'submitter_realname': '',
              'last_touched': (
                  datetime.datetime(2012, 4, 12, 17, 44, 14).isoformat()),
