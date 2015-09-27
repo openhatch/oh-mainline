@@ -41,7 +41,7 @@ import mock
 import datetime
 import logging
 from django.utils import unittest
-from django.utils.unittest import expectedFailure
+from django.utils.unittest import expectedFailure, skip
 
 import mysite.base.view_helpers
 import mysite.base.decorators
@@ -547,6 +547,7 @@ class NagiosTests(django.test.TestCase):
                          send_weekly_exit_code())
 
 # Test cases for remote command sanity checking
+@skip('Skip these until jwm (or someone else) has a chance to look at them')
 class RemoteCommandCheckTests(django.test.TestCase):
     @mock.patch.dict('os.environ')
     @mock.patch('django.contrib.auth.models.User.objects.get')
