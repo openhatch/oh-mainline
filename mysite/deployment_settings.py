@@ -10,7 +10,7 @@ from settings import *
 DATABASES = {'default': dj_database_url.config()}
 
 OHLOH_API_KEY = 'SXvLaGPJFaKXQC0VOocAg'
-DEBUG = False
+DEBUG = True
 ADMINS = [
     ('Private Server Monitoring List',
      'monitoring-private@lists.openhatch.org',)
