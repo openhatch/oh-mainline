@@ -80,7 +80,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '127.0.0.1')
 EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', 25)
 EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN')
-EMAIL_HOST_PASSWORD = os.environ('MAILGUN_SMTP_PASSWORD')
+EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD')
 
 # This OAuth 2.0 key is controlled by Asheesh, who also
 # stores its corresponding secret in the production instance.
