@@ -7,8 +7,7 @@
 from settings import *
 # ...and then we override some values.
 
-# Use Postgres in production
-DATABASES['default'] = OTHER_DATABASES['postgres']
+DATABASES = {'default': dj_database_url.config()}
 
 OHLOH_API_KEY = 'SXvLaGPJFaKXQC0VOocAg'
 DEBUG = False
@@ -49,9 +48,6 @@ GOOGLE_ANALYTICS_CODE = 'UA-15096810-1'
 # work properly
 SVN_REPO_URL_PREFIX = 'svn://svn-mission.openhatch.org/'
 GIT_REPO_URL_PREFIX = 'https://git-mission.openhatch.org/git-mission-data/git/'
-# user@host spec to use when SSHing into the remote node that contains
-# git and svn mission repositories.
-REMOTE_REPO_SETUP_ACCESS_SPEC = 'deploy@linode.openhatch.org'
 # Share cookies with subdomain (necessary for Vanilla)
 SESSION_COOKIE_DOMAIN = '.openhatch.org'
 URL_PREFIX = 'https://openhatch.org'
@@ -81,10 +77,16 @@ STATIC_ROOT='/home/deploy/milestone-a/mysite/statik'
 # settings.py explains how to get email working in
 # development via a debugging-oriented SMTP server.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 25
+EMAIL_HOST = os.environ['MAILGUN_SMTP_SERVER']
+EMAIL_PORT = os.environ['MAILGUN_SMTP_PORT']
+EMAIL_HOST_USER = os.environ['MAILGUN_SMTP_LOGIN']
+EMAIL_HOST_PASSWORD = os.environ['MAILGUN_SMTP_PASSWORD']
 
 # This OAuth 2.0 key is controlled by Asheesh, who also
 # stores its corresponding secret in the production instance.
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1083745569348-o11asa1kur096enaq5pt8tq0rff3golt.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'overridden-in-production'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
+
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+
+INSTALLED_APPS = tuple([x for x in INSTALLED_APPS if 'debug_toolbar' not in x])

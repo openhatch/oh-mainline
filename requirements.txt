@@ -1,3 +1,2 @@
-setuptools
 psycopg2
-Pillow-PIL
+pillow

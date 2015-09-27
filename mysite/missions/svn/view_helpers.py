@@ -35,7 +35,7 @@ class SvnRepository(object):
         if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
             subprocess.check_call([
                 'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
-                'milestone-a/manage.py', 'missions', 'svn_reset', self.username
+                'milestone-a/manage.py', 'svn_reset', self.username
             ])
             return
 
@@ -79,6 +79,12 @@ exec %s -W ignore %s svn_precommit "$@"
         os.chmod(precommit_hook_path, 0755)
 
     def exists(self):
+        if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
+            return subprocess.call([
+                'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
+                'milestone-a/manage.py', 'svn_exists', self.username
+            ]) == 0
+
         return os.path.isdir(self.repo_path)
 
     def file_trunk_url(self):

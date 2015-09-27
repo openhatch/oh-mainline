@@ -14,34 +14,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import subprocess
+import sys
 
-from django.contrib.auth.models import User
 from django.core.management import BaseCommand, CommandError
-
-
-VALID_COMMANDS = (
-    ['milestone-a/manage.py', 'git_reset'],
-    ['milestone-a/manage.py', 'git_exists'],
-    ['milestone-a/manage.py', 'svn_reset'],
-    ['milestone-a/manage.py', 'svn_exists'],
-)
+from mysite.missions.git import view_helpers
 
 
 class Command(BaseCommand):
     args = '<username>'
-    help = 'Initialize the git repository for a user'
+    help = 'Determine whether the git repository for a user exists'
 
     def handle(self, *args, **options):
-        if len(args) != 0:
-            raise CommandError, 'Command takes no arguments.'
+        if len(args) != 1:
+            raise CommandError, 'Exactly one argument expected.'
+        username, = args
 
-        command = os.environ['SSH_ORIGINAL_COMMAND'].split()
-        if command[:-1] not in VALID_COMMANDS:
-            raise CommandError, 'Permission denied.'
-
-        # Make sure the user exists.
-        User.objects.get(username=command[-1])
-
-        subprocess.check_call(command)
+        if not view_helpers.GitRepository(username).exists():
+            sys.exit(1)

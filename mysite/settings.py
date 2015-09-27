@@ -334,7 +334,9 @@ GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git
 # For local sites, this is what you clone
 GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/'
 
-REMOTE_REPO_SETUP_ACCESS_SPEC = None
+# user@host spec to use when SSHing into the remote node that contains
+# git and svn mission repositories.
+REMOTE_REPO_SETUP_ACCESS_SPEC = os.environ.get('REMOTE_REPO_SETUP_ACCESS_SPEC')
 
 # This setting is used by the customs bug importers.
 TRACKER_POLL_INTERVAL = 1  # Days

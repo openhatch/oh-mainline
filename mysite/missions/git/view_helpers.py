@@ -34,8 +34,9 @@ class GitRepository(object):
         if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
             subprocess.check_call([
                 'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
-                'milestone-a/manage.py', 'missions', 'git_reset', self.username
+                'milestone-a/manage.py', 'git_reset', self.username
             ])
+            return
 
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
@@ -46,7 +47,7 @@ class GitRepository(object):
             ['cp', '../../../missions/git/data/hello.py', '.'], cwd=self.repo_path)
         subprocess.check_call(['git', 'add', '.'], cwd=self.repo_path)
         subprocess.check_call(
-            ['git', 'commit', '-m', '"Initial commit"'], cwd=self.repo_path)
+            ['git', 'commit', '-m', 'Initial commit'], cwd=self.repo_path)
 
         # Touch the git-daemon-export-ok file
         file_obj = file(
@@ -56,6 +57,12 @@ class GitRepository(object):
         person = Person.objects.get(user__username=self.username)
 
     def exists(self):
+        if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
+            return subprocess.call([
+                'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
+                'milestone-a/manage.py', 'git_exists', self.username
+            ]) == 0
+
         return os.path.isdir(self.repo_path)
 
 

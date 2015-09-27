@@ -33,7 +33,7 @@ import mysite.account.forms
 import django_authopenid.views
 
 # used for the robots.txt redirection
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 # from django.views.generic.simple import direct_to_template
 
 from voting.views import vote_on_object
@@ -53,6 +53,9 @@ urlpatterns = patterns('',
                        # if so, just permit it as a redirect.
                        (r'^,$', lambda x: HttpResponsePermanentRedirect('/')),
                        (r'^\)$', lambda x: HttpResponsePermanentRedirect('/')),
+
+                       url(r'^(?P<path>/+wiki($|/.*))',
+                        RedirectView.as_view(url='http://wiki.openhatch.org/%(path)s')),
 
                        (r'^\+api/v1/profile/',
                         include(
