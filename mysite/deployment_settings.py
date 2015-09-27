@@ -85,8 +85,8 @@ EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD')
 # This OAuth 2.0 key is controlled by Asheesh, who also
 # stores its corresponding secret in the production instance.
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1083745569348-o11asa1kur096enaq5pt8tq0rff3golt.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 INSTALLED_APPS = tuple([x for x in INSTALLED_APPS if 'debug_toolbar' not in x])
