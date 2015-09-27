@@ -2,6 +2,8 @@
 set -x
 set -e
 
+git push heroku
+
 ### ssh to deploy@linode.openhatch.org
 ### and update the site.
 ssh -t deploy@linode.openhatch.org milestone-a/mysite/scripts/deploy_myself.sh
