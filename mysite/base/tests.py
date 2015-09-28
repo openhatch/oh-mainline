@@ -400,11 +400,10 @@ class Unsubscribe(TwillTests):
         self.client.post(reverse(mysite.profile.views.unsubscribe_do), {'token_string': valid_token_string})
         self.assertFalse(get_dude().email_me_re_projects)
 
-    @expectedFailure
     def test_submit_form(self):
         def get_dude():
             return mysite.profile.models.Person.objects.get(user__username='paulproteus')
-            
+
         dude = get_dude()
         self.assertTrue(get_dude().email_me_re_projects)
 
