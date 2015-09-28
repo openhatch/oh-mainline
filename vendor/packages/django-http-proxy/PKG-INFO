@@ -1,0 +1,23 @@
+Metadata-Version: 1.1
+Name: django-http-proxy
+Version: 0.4
+Summary: A simple HTTP proxy for the Django framework.
+Home-page: http://django-http-proxy.readthedocs.org/
+Author: Yuri van der Meer
+Author-email: contact@yvandermeer.net
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content

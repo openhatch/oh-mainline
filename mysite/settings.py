@@ -227,6 +227,7 @@ INSTALLED_APPS = (
     'inplaceeditform',
     'django_webtest',
     'social.apps.django_app.default',
+    'httpproxy',
 )
 
 # testrunner allows us to control which testrunner to use

@@ -36,6 +36,7 @@ import django_authopenid.views
 from django.views.generic import RedirectView, TemplateView
 # from django.views.generic.simple import direct_to_template
 
+from httpproxy.views import HttpProxy
 from voting.views import vote_on_object
 
 import mysite.account.views
@@ -54,8 +55,23 @@ urlpatterns = patterns('',
                        (r'^,$', lambda x: HttpResponsePermanentRedirect('/')),
                        (r'^\)$', lambda x: HttpResponsePermanentRedirect('/')),
 
-                       url(r'^(?P<path>/+wiki($|/.*))',
-                        RedirectView.as_view(url='http://wiki.openhatch.org/%(path)s')),
+                       (r'^blog/(?P<url>.*)',
+                        HttpProxy.as_view(base_url='http://blog.openhatch.org')),
+
+                       url(r'^forum(?P<path>($|/.*))',
+                        RedirectView.as_view(url='http://forum.openhatch.org%(path)s')),
+
+                       (r'^wiki$', lambda x: redirect('/wiki/')),
+                       (r'^(?P<url>w(iki)?($|/.*))',
+                        HttpProxy.as_view(base_url='http://wiki.openhatch.org')),
+
+                       (r'^contact/?$', lambda x: redirect('/wiki/Contact')),
+                       (r'^policies-etc/?$', lambda x: redirect('/wiki/Privacy_policy')),
+                       (r'^source-code-etc/?$', lambda x: redirect('/wiki/Category:Hacking_OpenHatch')),
+                       (r'^colophon/?$', lambda x: redirect('/wiki/About_OpenHatch')),
+                       (r'^about/?$', lambda x: redirect('/wiki/About_OpenHatch')),
+                       (r'^/blog/source-code-etc/?$', lambda x: redirect('/wiki/Category:Hacking_Openhatch')),
+                       (r'^/blog/about/?$', lambda x: redirect('/wiki/About_OpenHatch')),
 
                        (r'^\+api/v1/profile/',
                         include(

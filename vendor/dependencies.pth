@@ -12,6 +12,7 @@ packages/django-authopenid
 packages/django-celery
 packages/django-debug-toolbar
 packages/django-extensions
+packages/django-http-proxy
 packages/django-inplaceedit
 packages/django-invitation
 packages/django-kombu
