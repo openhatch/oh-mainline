@@ -952,7 +952,6 @@ class QueryGrabHitCount(SearchTest):
 
 class ClearCacheWhenBugsChange(SearchTest):
 
-    @expectedFailure
     def test_cached_cleared_after_bug_save_or_delete(self):
         data = {u'language': u'shoutNOW'}
         query = mysite.search.view_helpers.Query.create_from_GET_data(data)
