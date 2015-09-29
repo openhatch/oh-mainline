@@ -27,20 +27,10 @@ SEND_BROKEN_LINK_EMAILS = False
 MANAGERS = ADMINS
 SERVER_EMAIL = 'mr_website@linode.openhatch.org'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
-
 # Note: POSTFIX_FORWARDER_TABLE_PATH is enabled in the deployment_settings.py
 #       while it is disabled by default in settings.py
 #       See documentation in advanced_installation.rst for more details
 POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
-
-# always use memcached on linode-one, also
-CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
 GOOGLE_ANALYTICS_CODE = 'UA-15096810-1'
 
