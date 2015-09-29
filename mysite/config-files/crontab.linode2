@@ -1,8 +1,6 @@
 ### This is for linode2.openhatch.org.
-MAILTO=asheesh@asheesh.org
+MAILTO=monitoring-private@openhatch.org
 
-@daily cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py customs_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' > customs.log.$(date -I)
-@daily cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py profile_daily_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
-@daily cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py clearsessions
-@hourly cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py profile_hourly_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
-*/10 * * * * cd $HOME/milestone-a; DATABASE_URL=$(heroku config:get DATABASE_URL -a openhatch) ./mysite/scripts/run_with_lock.sh ./manage.py profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning | grep -v 'import '
+@daily cd $HOME/milestone-a; ./mysite/scripts/run_with_lock.sh ./manage.py customs_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' >customs.log.$(date -I)
+@daily cd $HOME/milestone-a; ./mysite/scripts/snapshot_then_push.sh
+@daily . $HOME/.profile; cd $HOME/milestone-a; bash run_importer.sh

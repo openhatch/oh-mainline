@@ -1,0 +1,8 @@
+### This is for linode2.openhatch.org.
+MAILTO=monitoring-private@openhatch.org
+
+@daily cd $HOME/milestone-a; ./mysite/scripts/run_with_lock.sh ./manage.py profile_daily_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+@daily cd $HOME/milestone-a; ./mysite/scripts/run_with_lock.sh ./manage.py clearsessions
+@hourly cd $HOME/milestone-a; ./mysite/scripts/run_with_lock.sh ./manage.py profile_hourly_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+@hourly wget -q https://openhatch.org/blog/wp-cron.php -O- | grep -v ^'<br />$' | grep -v 'is_executable.*open_basedir restriction'
+*/10 * * * * cd $HOME/milestone-a; ./mysite/scripts/run_with_lock.sh ./manage.py profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning | grep -v 'import '
