@@ -58,6 +58,13 @@ urlpatterns = patterns('',
                        (r'^blog/(?P<url>.*)',
                         HttpProxy.as_view(base_url='http://blog.openhatch.org')),
 
+                       (r'^bugs/?$',
+                        lambda x: HttpResponsePermanentRedirect(
+                            'https://github.com/openhatch/oh-mainline/issues/')),
+                       (r'^bugs/(?P<number>\d+)$',
+                        lambda x, number: HttpResponsePermanentRedirect(
+                            'https://github.com/openhatch/oh-mainline/issues/{}'.format(int(number) + 315))),
+
                        url(r'^forum(?P<path>($|/.*))',
                         RedirectView.as_view(url='http://forum.openhatch.org%(path)s')),
 
