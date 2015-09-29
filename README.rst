@@ -2,8 +2,8 @@
 README
 ======
 
-.. image:: https://travis-ci.org/openhatch/oh-mainline.png?branch=master
-   :target: http://travis-ci.org/openhatch/oh-mainline
+.. image:: https://travis-ci.org/openhatch/oh-mainline.svg?branch=master
+   :target: https://travis-ci.org/openhatch/oh-mainline
 
 .. image:: https://coveralls.io/repos/openhatch/oh-mainline/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/openhatch/oh-mainline?branch=master

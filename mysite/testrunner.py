@@ -54,8 +54,11 @@ def override_settings_for_testing():
                                '--root', settings.SVN_REPO_PATH])
     settings.SVN_REPO_URL_PREFIX = 'svn://127.0.0.1:%d/' % svnserve_port
 
+    logging.disable('NOTSET')
+
 
 def cleanup_after_tests():
+    logging.disable('CRITICAL')
     if mysite.base.depends.svnadmin_available():
         pidfile = os.path.join(settings.SVN_REPO_PATH, 'svnserve.pid')
         pid = int(open(pidfile).read().strip())

@@ -15,38 +15,41 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import tempfile
-import StringIO
 import logging
+import os
+import StringIO
+import tempfile
 from webtest import Upload
-
-from mysite.profile.models import Person
-import mysite.account.forms
-from mysite.search.models import Project, ProjectInvolvementQuestion
-import mysite.project.views
-import mysite.account.views
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.test.client import Client
 from django.utils.unittest import skipIf
-
 from django_webtest import WebTest
+
+import mysite.account.forms
+import mysite.account.views
 import mysite.base.depends
+from mysite.profile.models import Person
+import mysite.project.views
+from mysite.search.models import Project, ProjectInvolvementQuestion
 
 
 class Login(WebTest):
+    """ Tests for user logins and logouts """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_login(self):
+        """ Test login with username and password """
         user = authenticate(username='paulproteus',
                             password="paulproteus's unbreakable password")
-        self.assert_(user and user.is_active)
+        self.assertTrue(user and user.is_active)
 
     def test_logout_web(self):
-        # Test the logout feature by inspecting Django's client session.
+        """
+        Test logout of a user. Test by inspecting Django's client sesssion.
+        """
         # Log in first before you test the log out feature.
         self.client = Client()
         username = 'paulproteus'
@@ -54,6 +57,7 @@ class Login(WebTest):
         self.client.login(username=username, password=password)
         # Check that the user is indeed still logged in
         self.assertEqual(1, self.client.session.get('_auth_user_id'))
+
         # Log out the user
         self.client.logout()
         # Test that user is indeed logged out by checking the client session
@@ -72,11 +76,13 @@ class Login(WebTest):
         login_page_form['username'] = username
         login_page_form['password'] = password
         login_page_form.submit()
+
         # Go to ANY page to confirm that 'log out' link is present and
         # 'log in' link is absent
         search_page = self.app.get('/search/')
         self.assertIn('log out', search_page.content)
         self.assertNotIn('log in', search_page.content)
+
         # After the log out link is clicked, go to ANY page to confirm that
         # the log out link is gone and log in link is present instead
         logout_page = search_page.click('log out')
@@ -86,18 +92,22 @@ class Login(WebTest):
 
 
     def test_logout_no_open_redirect(self):
+        """ Tests to ensure logout does not open redirect """
         client = Client()
+
         # All test cases should redirect to the OpenHatch root.
         # Verify existing logout still behaves as before:
         response = client.get('/account/logout/?next=/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
+
         # Verify appended redirect url is ignored:
         # Before the fix for issue 952, urlparse() redirected this url to
         # /account/logout/.
         response = client.get('/account/logout/?next=http://www.example.com')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/')
+
         # Verify appended redirect url is ignored
         # Before the fix for issue 952, urlparse() redirected this url to
         # example.com.
@@ -107,21 +117,23 @@ class Login(WebTest):
 
 
 class ProfileGetsCreatedWhenUserIsCreated(WebTest):
-
-    """django-authopenid only creates User objects, but we need Person objects
-    in all such cases. Test that creating a User will automatically create
-    a Person in our project."""
+    """
+    Test that a user profile is created when a user  is created.
+    django-authopenid only creates User objects, so we need to create Person
+    objects in all such cases. Test that creating a User will automatically
+    create a Person in our project.
+    """
     def test_login_creates_person_profile(self):
+        """ Test that a person object is created when user is created """
         # Create a user object
         u = User.objects.create(username='paulproteus')
         u.save()
-        # Even though we didn't add the person-paulproteus
-        # fixture, a Person object is created.
+        # Even though we didn't add the person-paulproteus fixture,
+        # check that a Person object is created.
         self.assert_(list(Person.objects.filter(user__username='paulproteus')))
 
 
 class Signup(WebTest):
-
     """ Tests for signup without invite code. """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -207,12 +219,12 @@ class Signup(WebTest):
 
 
 class EditPassword(WebTest):
+    """ Tests for password edits """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def change_password(self, old_pass, new_pass,
                         should_succeed=True):
-
-        ## Refactored below
+        """ Helper function for changing password tests """
         # From a sample user profile page, go into the reset password page
         user = 'paulproteus'
         paulproteus_page = self.app.get('/people/%s/' % (user,), user=user)
@@ -234,11 +246,13 @@ class EditPassword(WebTest):
         self.assertEqual(actual_should_succeed, should_succeed)
 
     def test_change_password(self):
+        """ Test that change password succeeds """
         old_pass = "paulproteus's unbreakable password"
         new_pass = 'new'
         self.change_password(old_pass=old_pass, new_pass=new_pass)
 
     def test_change_password_should_fail(self):
+        """ Test that wrong password entered fails """
         oldpass = "wrong"
         newpass = 'new'
         self.change_password(oldpass, newpass,
@@ -246,9 +260,11 @@ class EditPassword(WebTest):
 
 
 class EditContactInfo(WebTest):
+    """ Test contact information changes """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_edit_email_address(self):
+        """ Test for successful edits of email address """
         # Opt out of the periodic emails. This way, the only "checked"
         # checkbox is the one for if the user's email address gets shown.
         user = "paulproteus"
@@ -287,26 +303,26 @@ class EditContactInfo(WebTest):
         assert new_email not in paulproteus_page
 
 
+# list of photos
 photos = [os.path.join(os.path.dirname(__file__),
           '..', '..', 'sample-photo.' + ext)
           for ext in ('png', 'jpg')]
 
 
 def photo(f):
+    """ Helper function for photo file """
     filename = os.path.join(os.path.dirname(__file__), '..', f)
     assert os.path.exists(filename)
     return filename
 
 
-@skipIf(not mysite.base.depends.Image, ("Skipping photo-related tests "
-                                        "because PIL is missing. Look in "
-                                        "ADVANCED_INSTALLATION.mkd for "
-                                        "information."))
 class EditPhoto(WebTest):
+    """ Tests for photo edits """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def login_with_client(self, username='paulproteus',
                           password="paulproteus's unbreakable password"):
+        """ Helper function to login """
         client = Client()
         success = client.login(username=username,
                                password=password)
@@ -314,6 +330,7 @@ class EditPhoto(WebTest):
         return client
 
     def test_set_avatar(self):
+        """ Test if user avatar setting succeeds """
         username = 'paulproteus'
         for image in [photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')]:
@@ -342,6 +359,7 @@ class EditPhoto(WebTest):
             self.assertEqual(w, 40)
 
     def test_set_avatar_too_wide(self):
+        """ Test if avatar is too wide for setting """
         username = 'paulproteus'
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
@@ -388,20 +406,18 @@ class EditPhoto(WebTest):
             os.unlink(bad_image.name)
 
 
-@skipIf(not mysite.base.depends.Image, ("Skipping photo-related tests "
-                                        "because PIL is missing. Look in "
-                                        "ADVANCED_INSTALLATION.mkd for "
-                                        "information."))
-class EditPhotoWithOldPerson(WebTest):
+class EditPhotoWithExistingPerson(WebTest):
+    """ Test for edit and upload an updated photo for a user """
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
 
     def test_set_avatar(self):
+        """ Test if setting avatar succeeds """
         username = 'paulproteus'
         for image in (photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')):
             paulproteus_page = self.app.get('/people/paulproteus/',
                                             user=username)
-            settings_page= paulproteus_page.click(href='/account/settings/')
+            settings_page = paulproteus_page.click(href='/account/settings/')
             photo_page = settings_page.click(href='/account/edit/photo/')
             photo_form = photo_page.form
             photo_form['photo'] = Upload(image)
@@ -412,57 +428,63 @@ class EditPhotoWithOldPerson(WebTest):
             self.assert_(p.photo.read() == open(image).read())
 
 
-
 class SignupWithNoPassword(WebTest):
+    """ Test signup without a password """
 
     def test(self):
-        POST_data = {'username': 'mister_roboto'}
-        response = self.client.post(
-            reverse(mysite.account.views.signup_do), POST_data)
+        """ Test user signup with no password """
+        response = self.client.post(reverse(mysite.account.views.signup_do),
+                                    {'username': 'mister_roboto'})
         form = response.context['form']
         self.assertFalse(form.is_valid())
         self.assertEqual(User.objects.count(), 0)
 
 
 class LoginPageContainsUnsavedAnswer(WebTest):
+    """ Test for login page where a response is not saved """
 
     def test(self):
-        # Create an answer whose author isn't specified. This replicates the
-        # situation where the user isn't logged in.
+        """ Test successful handling of a login page with unsaved info"""
+
+        # Create an answer whose author isn't specified.
+        # This replicates the situation where the user isn't logged in.
         p = Project.create_dummy(name='Myproject')
-        q = ProjectInvolvementQuestion.create_dummy(
-            key_string='where_to_start', is_bug_style=False)
+        q = ProjectInvolvementQuestion.create_dummy(key_string='where_to_start',
+                                                    is_bug_style=False)
 
         # Do a GET on the project page to prove cookies work.
         self.client.get(p.get_url())
 
-        # POST some text to the answer creation post handler
         POST_data = {
             'project__pk': p.pk,
             'question__pk': q.pk,
             'answer__text': ("Help produce official documentation, share "
-                                 "the solution to a problem, or check, proof "
-                                 "and test other documents for accuracy."),
+                             "the solution to a problem, or check, proof "
+                             "and test other documents for accuracy."),
         }
-        response = self.client.post(
-            reverse(mysite.project.views.create_answer_do), POST_data,
-            follow=True)
 
-        # Now, the session will know about the answer, but the answer will
+        response = self.client.post(
+            reverse(mysite.project.views.create_answer_do),
+            POST_data,
+            follow=True
+        )
+
+        # The session will now know about the answer, but the answer will
         # not be published. Visit the login page, assert that the page
         # contains the text of the answer.
-
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
 
 
 class ClearSessionsOnPasswordChange(WebTest):
+    """ Test sessions cleared when password changes """
     fixtures = ['user-paulproteus']
 
     def user_logged_in(self, session):
         return '_auth_user_id' in session
 
     def test(self):
+        """ Test the session is cleared successfully """
         client1 = Client()
         client2 = Client()
 
@@ -477,10 +499,10 @@ class ClearSessionsOnPasswordChange(WebTest):
         self.assertTrue(self.user_logged_in(client2.session))
 
         client1.post(reverse(mysite.account.views.change_password_do),
-                     data={
-                         'old_password': password,
-                         'new_password1': new_password,
-                         'new_password2': new_password})
+                             data={'old_password': password,
+                                   'new_password1': new_password,
+                                   'new_password2': new_password
+                                   })
 
         self.assertTrue(self.user_logged_in(client1.session))
         self.assertFalse(self.user_logged_in(client2.session))
