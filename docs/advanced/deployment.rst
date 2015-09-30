@@ -24,9 +24,9 @@ You need to have these programs installed: **ssh**, **git**.
 
 The script does two things:
 
-* Push your current git HEAD onto origin/master.
-* SSHs (once) to the linode, where it runs mysite/scripts/deploy_myself.sh which
-  updates the site.
+* Pushes the current local master branch to Heroku.
+* SSHes to the two linodes, where it runs mysite/scripts/deploy_myself.sh
+  which updates the site.
 
 
 Recommended way to use the deploy script
@@ -34,10 +34,13 @@ Recommended way to use the deploy script
 
 ::
 
-    # Make sure .git/config has these 2 lines
+    # Make sure .git/config has these 5 lines
     [remote "origin"]
 	url = git@github.com:openhatch/oh-mainline.git
-     
+    [remote "heroku"]
+	url = https://git.heroku.com/openhatch-production.git
+	fetch = +refs/heads/*:refs/remotes/heroku/*
+
     git fetch  # get the latest
 
     git checkout origin/master -b deploy_me  # create a deploy_me branch
@@ -58,22 +61,26 @@ push random local work into the live site.
 Notes about the deployment
 ==========================
 
-Here are some relevant details of how web requests get routed to the OpenHatch code.
+Here are some relevant details of how web requests get routed to the
+OpenHatch code.
 
-* Web requests hit CloudFlare, which proxies them to linode.openhatch.org.
+* Web requests hit CloudFlare, which proxies them to Heroku (for
+  openhatch.org and www.openhatch.org) or linode.openhatch.org (for
+  other OpenHatch sites, like wiki.openhatch.org).
 
-* linode.openhatch.org has an nginx that dispatches them to Apache.
+* linode.openhatch.org has an nginx that handles some requests itself,
+  and dispatches others to Apache.
 
-* Apache mod_wsgi dispatches them to the mysite/scripts/app.wsgi.
-
-* In production, we use a mysite/local_settings.py file that imports mysite/deployment_settings.py and overrides the Django SECRET_KEY.
+* In production, we use a mysite/local_settings.py file that imports
+  mysite/deployment_settings.py and overrides the Django SECRET_KEY,
+  DATABASE_URL, and a few other settings.
 
 
 Other sites we host
 ===================
 
-The OpenHatch infrastructure hosts some other websites, including
-bostonpythonworkshop.com and corp.openhatch.org. For information about that, read
-the `documentation on the wiki about static site hosting`_.
+The OpenHatch organization hosts some other websites, including
+bostonpythonworkshop.com and corp.openhatch.org. For information about
+that, read the `documentation on the wiki about static site hosting`_.
 
 .. _documentation on the wiki about static site hosting: https://openhatch.org/wiki/Static_site_hosting
