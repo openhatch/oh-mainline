@@ -26,6 +26,7 @@ import shutil
 from django.test import TestCase as DjangoTestCase
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils.unittest import skipIf
 
 from mysite.profile.models import Person
 from mysite.base.tests import TwillTests
@@ -33,18 +34,16 @@ from mysite.missions.base.tests import (
     TestCase, subproc_check_output, make_testdata_filename)
 from mysite.missions.svn import views
 from mysite.missions.svn import view_helpers
-from django.utils.unittest import skipIf
 import mysite.base.depends
 from mysite.missions.svn.forms import DiffForm
 
 
-@skipIf(not mysite.base.depends.svnadmin_available(), (
-        "Skipping tests for Subversion training mission for now. To run "
-        "these tests, install the 'subversion' package in your package "
-        "manager."))
+@skipIf(not mysite.base.depends.svnadmin_available(),
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnBackendTests(TestCase):
-
+    """ Tests of SVN admin and backend """
     def get_info(self, path):
+        """ Helper function for svn info """
         svninfo = subproc_check_output(['svn', 'info', 'file://' + path])
         info = {}
         for line in svninfo.splitlines():
@@ -54,6 +53,7 @@ class SvnBackendTests(TestCase):
         return info
 
     def test_repo_reset(self):
+        """ Test if subversion repo is reset """
         repo_path = tempfile.mkdtemp(dir=settings.SVN_REPO_PATH)
         random_name = os.path.basename(repo_path)
         os.rmdir(repo_path)
@@ -71,10 +71,8 @@ class SvnBackendTests(TestCase):
                 shutil.rmtree(repo_path)
 
 
-@skipIf(not mysite.base.depends.svnadmin_available(), (
-        "Skipping tests for Subversion training mission for now. To run "
-        "these tests, install the 'subversion' package in your package "
-        "manager."))
+@skipIf(not mysite.base.depends.svnadmin_available(),
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnViewTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -197,11 +195,10 @@ class SvnViewTests(TwillTests):
 
     def test_diff_without_spaces_works(self):
         self.client.post(reverse(views.resetrepo))
-        self.client.post(reverse(views.diff_submit), {'diff': open(
-            make_testdata_filename(
-                'svn',
-                'svn-diff-without-spaces-on-blank-context-lines.patch'
-            )).read()}
+        self.client.post(reverse(views.diff_submit),
+            {'diff': open(make_testdata_filename('svn',
+                'svn-diff-without-spaces-on-blank-context-lines.patch')).read()
+            }
         )
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(view_helpers.mission_completed(paulproteus, 'svn_diff'))
@@ -248,52 +245,44 @@ class SvnViewTests(TwillTests):
             shutil.rmtree(checkoutdirpath)
 
 
-@skipIf(not mysite.base.depends.svnadmin_available(), (
-        "Skipping tests for Subversion training mission for now. To run "
-        "these tests, install the 'subversion' package in your package "
-        "manager."))
+@skipIf(not mysite.base.depends.svnadmin_available(),
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnViewTestsWhileLoggedOut(TwillTests):
+    """ Tests for SVN with logged out users"""
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
+        """ Helper function to setup a logged out user """
         TwillTests.setUp(self)
         self.client = self.login_with_client()
         self.client.logout()
 
-    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(
-            self):
+    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
+        """ Test that svn main view page is correct when user is logged out """
         response = self.client.get(reverse('svn_main_page'))
         self.assertTrue(response.context[0]
                         ['mission_step_prerequisites_passed'])
 
-# Mocked-up svnlook output for the pre-commit hook.
-
-
+#*** Mocked-up svnlook outputs for the pre-commit hook. ***
 def mock_get_username(repo, txn):
     return 'paulproteus'
-
 
 def mock_get_changes_good(repo, txn):
     return [('U', 'trunk/' + view_helpers.SvnCommitMission.SECRET_WORD_FILE),
             ('U', 'trunk/' + view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED)]
 
-
 def mock_get_changes_bad_modifies_extra_file(repo, txn):
     return mock_get_changes_good(repo, txn) + [('U', 'foo.txt')]
-
 
 def mock_get_changes_bad_skips_file(repo, txn):
     return mock_get_changes_good(repo, txn)[:-1]
 
-
 def mock_get_changes_bad_adds_file(repo, txn):
     return mock_get_changes_good(repo, txn) + [('A', 'foo.txt')]
-
 
 def mock_get_changes_bad_removes_file(repo, txn):
     return ([('D', filename) for action, filename
              in mock_get_changes_good(repo, txn)])
-
 
 def mock_get_file_good(repo, txn, filename):
     if filename == 'trunk/' + view_helpers.SvnCommitMission.SECRET_WORD_FILE:
@@ -304,31 +293,25 @@ def mock_get_file_good(repo, txn, filename):
     else:
         subproc_check_output(['false'])
 
-
 def mock_get_file_bad_secret_word(repo, txn, filename):
     if filename == 'trunk/' + view_helpers.SvnCommitMission.SECRET_WORD_FILE:
         return 'bad-secret-word\n'
     return mock_get_file_good(repo, txn, filename)
-
 
 def mock_get_file_bad_readme(repo, txn, filename):
     if filename == 'trunk/' + view_helpers.SvnCommitMission.FILE_TO_BE_PATCHED:
         return 'This substitute content is surely wrong.\n'
     return mock_get_file_good(repo, txn, filename)
 
-
 def mock_get_log_good(repo, txn):
     return 'This test log message will be accepted.\n'
-
 
 def mock_get_log_bad(repo, txn):
     return ''
 
 
-@skipIf(not mysite.base.depends.svnadmin_available(), (
-        "Skipping tests for Subversion training mission for now. To run "
-        "these tests, install the 'subversion' package in your package "
-        "manager."))
+@skipIf(not mysite.base.depends.svnadmin_available(),
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnCommitHookTests(DjangoTestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

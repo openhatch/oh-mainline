@@ -25,6 +25,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import logging
 import mysite.base.depends
 
+logger = logging.getLogger(__name__)
+
 RESERVED_USERNAMES = (
     'admin',
     'anonymous',
@@ -59,8 +61,7 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
         for fieldname in self.errors:
             for index, error_text in enumerate(self.errors[fieldname]):
                 uet = unicode(error_text)
-                self.errors[fieldname][
-                    index] = custom_error_messages_dict.get(uet, uet)
+                self.errors[fieldname][index] = custom_error_messages_dict.get(uet, uet)
 
     def clean_username(self):
         username = super(UserCreationFormWithEmail, self).clean_username()
@@ -87,8 +88,8 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
 
 
 class ShowEmailForm(django.forms.Form):
-    show_email = django.forms.BooleanField(
-        required=False, label="Make email publicly visible?")
+    show_email = django.forms.BooleanField(required=False,
+                                           label="Make email publicly visible?")
 
 
 class EditEmailForm(django.forms.ModelForm):
@@ -124,7 +125,7 @@ class EditLocationForm(django.forms.ModelForm):
         try:
             mysite.base.view_helpers.cached_geocoding_in_json(address)
         except Exception:
-            logging.exception("When geocoding, caught an exception")
+            logger.exception("When geocoding, caught an exception")
             raise django.forms.ValidationError(
                 "An error occurred while geocoding. Make sure the address is a valid place. If you think this is our error, contact us.")
         return address
@@ -150,8 +151,7 @@ class EditPhotoForm(django.forms.ModelForm):
             # FIXME This is fail-safe, not fail-secure, behavior.
             # If an image is too big, and the Python Imaging Library
             # is not installed, we simply do not resize it.E
-            logging.info(
-                "NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
+            logger.info("NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
             return self.cleaned_data['photo']
 
         # Safe copy of data...
@@ -160,15 +160,15 @@ class EditPhotoForm(django.forms.ModelForm):
         self.cleaned_data['photo'].seek(0)
         data_fd = StringIO.StringIO(data)
 
-        w, h = get_image_dimensions(data_fd)
-        if w > 200:
+        width, height = get_image_dimensions(data_fd)
+        if width > 200:
             # Scale it down.
             too_big = mysite.base.depends.Image.open(StringIO.StringIO(data))
             format = too_big.format
-            new_w = int(200)
-            new_h = int((h * 1.0 / w) * 200)
+            new_width = int(200)
+            new_height = int((height * 1.0 / width) * 200)
 
-            smaller = too_big.resize((new_w, new_h),
+            smaller = too_big.resize((new_width, new_height),
                                      mysite.base.depends.Image.ANTIALIAS)
 
             # "Save" it to memory
@@ -192,12 +192,9 @@ class SignUpIfYouWantToHelpForm(django.forms.Form):
         initial='forwarder',
         widget=django.forms.RadioSelect,
         label="You've expressed interest in helping out a project. How can people from that project contact you?",
-        choices=(
-                ('forwarder',
-                 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
-            ('public_email',
-             'By email; just display my real email address'),
-        ))
+        choices=(('forwarder', 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
+                 ('public_email', 'By email; just display my real email address'),)
+    )
 
 
 class EmailMeForm(django.forms.ModelForm):
