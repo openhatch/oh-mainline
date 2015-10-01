@@ -118,7 +118,7 @@ class Login(WebTest):
 
 class ProfileGetsCreatedWhenUserIsCreated(WebTest):
     """
-    Test that a user profile is created when a user  is created.
+    Test that a user profile is created when a user is created.
     django-authopenid only creates User objects, so we need to create Person
     objects in all such cases. Test that creating a User will automatically
     create a Person in our project.

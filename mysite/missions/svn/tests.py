@@ -39,7 +39,7 @@ from mysite.missions.svn.forms import DiffForm
 
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
-    ("Skipping tests of Subversion backend. Install the 'subversion' to run."))
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnBackendTests(TestCase):
     """ Tests of SVN admin and backend """
     def get_info(self, path):
@@ -72,7 +72,7 @@ class SvnBackendTests(TestCase):
 
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
-    ("Skipping tests of Subversion backend. Install the 'subversion' to run."))
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnViewTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -246,7 +246,7 @@ class SvnViewTests(TwillTests):
 
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
-    ("Skipping tests of Subversion backend. Install the 'subversion' to run."))
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnViewTestsWhileLoggedOut(TwillTests):
     """ Tests for SVN with logged out users"""
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -311,7 +311,7 @@ def mock_get_log_bad(repo, txn):
 
 
 @skipIf(not mysite.base.depends.svnadmin_available(),
-    ("Skipping tests of Subversion backend. Install the 'subversion' to run."))
+    ("Skipping tests of Subversion backend. Install 'subversion' package to run."))
 class SvnCommitHookTests(DjangoTestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
