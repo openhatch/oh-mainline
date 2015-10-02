@@ -701,6 +701,16 @@ PortfolioEntry.Save.save = function () {
     $saveLink = $(this);
 
     $pfEntry = $saveLink.closest('.portfolio_entry');
+
+    // Do some client-side validation.
+    $projectName = $pfEntry.find('input.project_name');
+    if ($projectName.size() === 1) {
+        if ($projectName.val() === "" || $projectName.val() === $projectName.attr('title')) {
+            alert("Couldn't save one of your projects. Did you forget to type a project name?");
+            return false;
+        }
+    }
+    
     Notifier.displayMessage('Saving, please wait!');
     var $updateIcon = $pfEntry.find('.actions li#update_icon');
     $updateIcon.toggle();
@@ -709,14 +719,7 @@ PortfolioEntry.Save.save = function () {
         $savePublishButton.remove();
     }
 
-    // Do some client-side validation.
-    $projectName = $pfEntry.find('input.project_name');
-    if ($projectName.size() === 1) {
-        if ($projectName.val() === $projectName.attr('title')) {
-            alert("Couldn't save one of your projects. Did you forget to type a project name?");
-            return false;
-        }
-    }
+
     PortfolioEntry.Save.postOptions.data = {
         'csrfmiddlewaretoken': $.cookie('csrftoken'),
         'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
