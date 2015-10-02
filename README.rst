@@ -14,6 +14,8 @@ README
 
 Thanks for checking out our repository. We love this project; hope you do too.
 
-You can find our documentation in the docs/ directory. It's automatically rendered online at http://openhatch.readthedocs.org/en/latest/index.html
+You can find our documentation in the docs_ directory. It's automatically rendered online at http://openhatch.readthedocs.org/en/latest/index.html
 
 Is readthedocs not working?  Let us know by emailing hello@openhatch.org or finding us on IRC at #openhatch on irc.freenode.net.
+
+.. _docs: https://github.com/openhatch/oh-mainline/tree/master/docs
