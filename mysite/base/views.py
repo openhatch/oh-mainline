@@ -19,26 +19,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponse, HttpResponseBadRequest
-from mysite.base.view_helpers import render_response
+import datetime
 import json
+import logging
+import random
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.template import loader, Context
 
 import mysite.account
-import mysite.profile.view_helpers
 import mysite.account.forms
 from mysite.base.decorators import view
+from mysite.base.view_helpers import render_response
 import mysite.customs.feed
+import mysite.missions.models
+import mysite.profile.view_helpers
 import mysite.search.view_helpers
 import mysite.search.models
-import mysite.missions.models
 
-import random
-import datetime
-import logging
-
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +60,7 @@ def front_page_data():
 def home(request):
     data = front_page_data()
 
-    everybody = list(
-        mysite.profile.models.Person.objects.exclude(link_person_tag=None))
+    everybody = list(mysite.profile.models.Person.objects.exclude(link_person_tag=None))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
@@ -72,18 +71,15 @@ def home(request):
 
         data['nudge_location'] = person.should_be_nudged_about_location()
         data['nudge_tags'] = not person.get_tags_for_recommendations()
-        data['nudge_missions'] = not mysite.missions.models.StepCompletion.objects.filter(
-            person=person)
+        data['nudge_missions'] = not mysite.missions.models.StepCompletion.objects.filter(person=person)
 
 
         if person.get_published_portfolio_entries():
-            data['nudge_importer_when_user_has_some_projects'
-                 ] = True  # just nudge about the importer...
+            data['nudge_importer_when_user_has_some_projects'] = True  # just nudge about the importer...
         else:
             # the person has entered zero projects and hasn't touched the importer
             # so introduce him or her to use the importer!
-            data['nudge_importer_when_user_has_no_projects'
-                 ] = True  # give the general project editing nudge
+            data['nudge_importer_when_user_has_no_projects'] = True  # give the general project editing nudge
 
         data['show_nudge_box'] = (data['nudge_location'] or
                                   'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
@@ -91,25 +87,17 @@ def home(request):
 
         # For performance reasons, we do not send bug recommendations here.
 
-        completed_missions = dict((c.step.name, True)
-                                  for c in mysite.missions.models.StepCompletion.objects.filter(person=request.user.get_profile()))
+        completed_missions = dict((c.step.name, True) for c in mysite.missions.models.StepCompletion.objects.filter(person=request.user.get_profile()))
         data[u'completed_missions'] = completed_missions
 
         data[u'projects_i_wanna_help'] = person.projects_i_wanna_help.all()
         data[u'projects_i_helped'] = person.get_published_portfolio_entries()
 
         # These are for project maintainers
-        data[u'projects_with_wannahelpers'] = [
-            pfe.project for pfe in person.get_published_portfolio_entries()
-            if pfe.project.wannahelpernote_set.all().count()]
+        data[u'projects_with_wannahelpers'] = [pfe.project for pfe in person.get_published_portfolio_entries() if pfe.project.wannahelpernote_set.all().count()]
         data[u'maintainer_nudges'] = maintainer_nudges = {}
-        maintainer_nudges['show_project_page'] = (
-            person.get_published_portfolio_entries() and
-            not person.user.answer_set.all())
-        maintainer_nudges[u'add_bug_tracker'] = (
-            person.get_published_portfolio_entries() and
-            (not any([pfe.project.bug_set.all()
-                      for pfe in person.get_published_portfolio_entries()])))
+        maintainer_nudges['show_project_page'] = (person.get_published_portfolio_entries() and not person.user.answer_set.all())
+        maintainer_nudges[u'add_bug_tracker'] = (person.get_published_portfolio_entries() and (not any([pfe.project.bug_set.all() for pfe in person.get_published_portfolio_entries()])))
     else:  # no user logged in. Show front-page
         template_path = 'base/index.html'
 
@@ -124,16 +112,12 @@ def page_to_js(request):
     encoded_for_js = json.dumps(html_doc)
     # Note: using application/javascript as suggested by
     # http://www.ietf.org/rfc/rfc4329.txt
-    return render_response(request, 'base/append_ourselves.js',
-                           {'in_string': encoded_for_js},
-                           mimetype='application/javascript')
+    return render_response(request, 'base/append_ourselves.js', {'in_string': encoded_for_js}, mimetype='application/javascript')
 
 
 def page_not_found(request):
     t = loader.get_template('404.html')
-    c = Context({
-        'user': request.user
-    })
+    c = Context({'user': request.user })
 
     response = HttpResponse(t.render(c), status=404)
     return response
@@ -144,13 +128,11 @@ def geocode(request):
     if not address:
         return HttpResponseBadRequest()  # no address :-(
     # try to geocode
-    coordinates_as_json = mysite.base.view_helpers.cached_geocoding_in_json(
-        address)
+    coordinates_as_json = mysite.base.view_helpers.cached_geocoding_in_json(address)
     if coordinates_as_json == 'null':
         # We couldn't geocode that.
         return HttpResponseBadRequest()  # no address :-(
-    return HttpResponse(coordinates_as_json,
-                        mimetype='application/json')
+    return HttpResponse(coordinates_as_json, mimetype='application/json')
 
 # Obtains meta data for request return
 
@@ -162,23 +144,18 @@ def meta_data():
     # local name for shortness
     my = data['bug_diagnostics']
 
-    one_hour_and_two_days_ago = (datetime.datetime.now() -
-                                 datetime.timedelta(days=2, hours=1))
+    one_hour_and_two_days_ago = (datetime.datetime.now() - datetime.timedelta(days=2, hours=1))
 
-    my['Bugs last polled more than than two days + one hour ago'] = mysite.search.models.Bug.open_ones.filter(
-        last_polled__lt=one_hour_and_two_days_ago).count()
+    my['Bugs last polled more than than two days + one hour ago'] = mysite.search.models.Bug.open_ones.filter(last_polled__lt=one_hour_and_two_days_ago).count()
 
-    three_days_ago = (datetime.datetime.now() -
-                      datetime.timedelta(days=3))
-    my['Bugs last polled more than three days ago'] = mysite.search.models.Bug.open_ones.filter(
-        last_polled__lt=three_days_ago).count()
+    three_days_ago = (datetime.datetime.now() - datetime.timedelta(days=3))
+    my['Bugs last polled more than three days ago'] = mysite.search.models.Bug.open_ones.filter(last_polled__lt=three_days_ago).count()
 
     # Test for 0 division
     allbug = mysite.search.models.Bug.open_ones.count()
     perbug = 0.0
     if allbug:
-        perbug = (mysite.search.models.Bug.open_ones.filter(
-            last_polled__lt=three_days_ago).count() * 100.0 / allbug)
+        perbug = (mysite.search.models.Bug.open_ones.filter(last_polled__lt=three_days_ago).count() * 100.0 / allbug)
 
     my['Bugs last polled more than three days ago (in percent)'] = perbug
 
@@ -211,7 +188,7 @@ def meta_exit_code(data=None):
 
 @view
 def meta(request):
-    return (request, 'meta.html', meta_data())
+    return request, 'meta.html', meta_data()
 
 
 @login_required
@@ -233,20 +210,17 @@ def save_portfolio_entry_ordering_do(request):
 
 @view
 def landing_for_opp_hunters(request):
-    return (request, 'landing_for_opp_hunters.html',
-            front_page_data())
+    return request, 'landing_for_opp_hunters.html', front_page_data()
 
 
 @view
 def landing_for_project_maintainers(request):
-    return (request, 'landing_for_project_maintainers.html',
-            front_page_data())
+    return request, 'landing_for_project_maintainers.html', front_page_data()
 
 
 @view
 def landing_for_documenters(request):
-    return (request, 'landing_for_documenters.html',
-            front_page_data())
+    return request, 'landing_for_documenters.html', front_page_data()
 
 
 @login_required
@@ -256,25 +230,24 @@ def test_email_re_projects(request):
     command = send_emails.Command()
     command.this_run_covers_things_since = datetime.datetime(2009, 5, 28)
     command.this_run_covers_things_up_until = datetime.datetime.utcnow()
-    context = command.get_context_for_email_to(
-        request.user.get_profile()) or {}
+    context = command.get_context_for_email_to(request.user.get_profile()) or {}
     if context:
         return mysite.base.decorators.as_view(request, 'email_re_projects.html', context, "test_email_re_projects")
     else:
-        return HttpResponse("(We couldn't find any recent project activity for you, so you wouldn't get an email updating you about it.)")
+        return HttpResponse("We couldn't find any recent project activity for you, so you wouldn't get an email updating you about it.")
+
 
 # The following view(s) generate stub pages that get converted
 # into themes for other system(s).
 #
 # Right now, there's only one for a single page in a single
 # other theming system. Enjoy!
-
-
 @view
 def wordpress_index(request):
     template_path = 'base/wordpress_index.html'
     data = {}
-    return (request, template_path, data)
+    return request, template_path, data
+
 
 def render_robots_txt(request):
     if settings.DEBUG:

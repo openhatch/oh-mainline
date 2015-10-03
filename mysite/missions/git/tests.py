@@ -28,11 +28,9 @@ class GitViewTestsWhileLoggedOut(TwillTests):
         self.client = self.login_with_client()
         self.client.logout()
 
-    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(
-            self):
+    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
         response = self.client.get(reverse(views.main_page))
-        self.assertTrue(response.context[0]
-                        ['mission_step_prerequisites_passed'])
+        self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
 
 class GitViewTests(TwillTests):
@@ -48,8 +46,7 @@ class GitViewTests(TwillTests):
 
     def test_main_page_does_not_complain_about_prereqs(self):
         response = self.client.get(reverse(views.main_page))
-        self.assertTrue(response.context[0]
-                        ['mission_step_prerequisites_passed'])
+        self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
     def test_resetrepo_returns_error_with_get(self):
         response = self.client.get(reverse(views.resetrepo))
@@ -61,61 +58,46 @@ class GitViewTests(TwillTests):
 
     def test_do_checkout_mission_correctly(self):
         word = 'the brain'
-        self.client.post(reverse(views.checkout_submit),
-                         {'secret_word': word})
+        self.client.post(reverse(views.checkout_submit), {'secret_word': word})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assert_(
-            view_helpers.mission_completed(paulproteus, 'git_checkout'))
+        self.assert_(view_helpers.mission_completed(paulproteus, 'git_checkout'))
 
     def test_do_checkout_mission_incorrectly(self):
         word = 'the wrong word'
-        self.client.post(reverse(views.checkout_submit),
-                         {'secret_word': word})
+        self.client.post(reverse(views.checkout_submit), {'secret_word': word})
 
     def email_address_is_rejected(self, email_address):
-        response = self.client.post(
-            reverse(views.long_description_submit),
-            {'user_email': email_address})
+        response = self.client.post(reverse(views.long_description_submit), {'user_email': email_address})
         self.assertEqual(200, response.status_code)
 
     def test_do_git_description_mission_incorrectly(self):
-        self.assertFalse(
-            self.email_address_is_rejected('paulproteus@pathi.local'))
-        self.assertFalse(
-            self.email_address_is_rejected('filipovskii_off@Puppo.(none)'))
+        self.assertFalse(self.email_address_is_rejected('paulproteus@pathi.local'))
+        self.assertFalse(self.email_address_is_rejected('filipovskii_off@Puppo.(none)'))
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(
-            view_helpers.mission_completed(paulproteus, 'git_config'))
+        self.assertFalse(view_helpers.mission_completed(paulproteus, 'git_config'))
 
     def test_do_git_description_mission_correctly(self):
         correct_email = 'paulproteus@openhatch.org'
-        self.client.post(reverse(views.long_description_submit),
-                         {'user_email': correct_email})
+        self.client.post(reverse(views.long_description_submit), {'user_email': correct_email})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertTrue(
-            view_helpers.mission_completed(paulproteus, 'git_config'))
+        self.assertTrue(view_helpers.mission_completed(paulproteus, 'git_config'))
 
-    def test_do_git_description_mission_correctly_with_weird_email_address(
-            self):
+    def test_do_git_description_mission_correctly_with_weird_email_address(self):
         correct_email = 'paulproteus@localhost.com'
-        self.client.post(reverse(views.long_description_submit),
-                         {'user_email': correct_email})
+        self.client.post(reverse(views.long_description_submit), {'user_email': correct_email})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertTrue(
-            view_helpers.mission_completed(paulproteus, 'git_config'))
+        self.assertTrue(view_helpers.mission_completed(paulproteus, 'git_config'))
 
     def test_do_rebase_mission_incorrectly(self):
         word = 'the wrong word'
         self.client.post(reverse(views.rebase_submit), {'secret_word': word})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(
-            view_helpers.mission_completed(paulproteus, 'git_rebase'))
+        self.assertFalse(view_helpers.mission_completed(paulproteus, 'git_rebase'))
 
     def test_do_diff_mission_correctly(self):
         self.client.post(reverse(views.resetrepo))
         cwd = self.repo_path
-        with open(os.path.join(cwd, '../../../missions/git/data/hello.patch'),
-                  'r') as expected_diff_file:
+        with open(os.path.join(cwd, '../../../missions/git/data/hello.patch'), 'r') as expected_diff_file:
             expected_diff = expected_diff_file.read()
         self.client.post(reverse(views.resetrepo))
         self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
@@ -125,9 +107,7 @@ class GitViewTests(TwillTests):
     def test_do_diff_mission_correctly_in_swedish(self):
         self.client.post(reverse(views.resetrepo))
         cwd = self.repo_path
-        with open(
-            os.path.join(cwd, '../../../missions/git/data/swedish-patch'),
-                'r') as expected_diff_file:
+        with open(os.path.join(cwd, '../../../missions/git/data/swedish-patch'), 'r') as expected_diff_file:
             expected_diff = expected_diff_file.read()
         self.client.post(reverse(views.resetrepo))
         self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
@@ -137,13 +117,10 @@ class GitViewTests(TwillTests):
     def test_do_diff_mission_incorrectly(self):
         self.client.post(reverse(views.resetrepo))
         cwd = self.repo_path
-        with open(os.path.join(cwd, '../../../missions/git/data/hello.patch'),
-                  'r') as expected_diff_file:
+        with open(os.path.join(cwd, '../../../missions/git/data/hello.patch'), 'r') as expected_diff_file:
             expected_diff = expected_diff_file.read()
         unexpected_diff = expected_diff.replace('Hello', 'Goodbye')
         self.client.post(reverse(views.resetrepo))
-        self.client.post(reverse(views.diff_submit),
-                         {'diff': unexpected_diff})
+        self.client.post(reverse(views.diff_submit), {'diff': unexpected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(
-            view_helpers.mission_completed(paulproteus, 'git_diff'))
+        self.assertFalse(view_helpers.mission_completed(paulproteus, 'git_diff'))

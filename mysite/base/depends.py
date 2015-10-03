@@ -29,6 +29,7 @@ import os
 import logging
 import django.conf
 
+logger = logging.getLogger(__name__)
 
 # class used if module does not exist
 class nothing(object):
@@ -45,9 +46,7 @@ except:
     lxml.html = None
 
 if lxml.html is None:
-    logging.info("Some parts of the OpenHatch site may fail because the "
-                 "lxml library is not installed. Look in "
-                 "ADVANCED_INSTALLATION.mkd for information about lxml.")
+    logger.info("Some parts of the OpenHatch site may fail because the lxml library is not installed. Look in ADVANCED_INSTALLATION.md for information about lxml.")
 
 
 # Pillow, PIL, Images - Here we try to import "Image", from the Python Imaging Library.
@@ -84,8 +83,6 @@ def postmap_available(already_emitted_warning=[]):
             pass
         else:
             already_emitted_warning.append(True)
-            logging.warn('postmap binary not found at {0}. Look in '
-                         'ADVANCED_INSTALLATION for the section about '
-                         'postfix for more information.'.format(POSTMAP_PATH))
+            logger.warn('postmap binary not found at {0}. Look in ADVANCED_INSTALLATION for the section about postfix for more information.'.format(POSTMAP_PATH))
         return False
     return True
