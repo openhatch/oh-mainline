@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-import BeautifulSoup
 import datetime
 import tasks
 import mock
@@ -36,10 +35,10 @@ import django.db
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.utils.unittest import skipIf
 from django.utils.unittest import skip
 from django_webtest import WebTest
 from django.test.client import Client
+from django.test import TestCase
 
 from mysite.base.view_helpers import ObjectFromDict
 from mysite.base.models import Timestamp
@@ -56,7 +55,9 @@ import mysite.profile.templatetags.profile_extras
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
+
 import pprint
+import BeautifulSoup
 
 
 class BasicHelpers(WebTest):
@@ -2483,3 +2484,54 @@ class TestBreakLongWordsFilter(WebTest):
         output = mysite.profile.templatetags.profile_extras.break_long_words(
             nine_chars)
         self.assertEqual(output, nine_chars_plus_wbr)
+
+
+class TestFunctions(WebTest):
+
+    def test_url2printably_short_less_cutoff(self):
+        cutoff = 50
+        url = 'https://example.com'
+        self.assertLess(len(url), cutoff)
+        self.assertTrue(mysite.profile.models.url2printably_short(url, cutoff))
+
+    def test_url2printably_short_equal_cutoff(self):
+        cutoff = 50
+        url = 'https://example.com/blogit/peanutbutter/jelly.html'
+        self.assertEqual(len(url), cutoff)
+        self.assertTrue(mysite.profile.models.url2printably_short(url, cutoff))
+
+    def test_url2printably_short_greater_cutoff(self):
+        cutoff = 50
+        url = 'https://example.com/blog/peanutbutter/jelly/baseballhotdogsandapplepie.html'
+        self.assertGreater(len(url), cutoff)
+        self.assertTrue(mysite.profile.models.url2printably_short(url, cutoff))
+
+
+class TagTypeTest(TestCase):
+    """ Tests TagType model """
+    def create_tagtype(self, name=None):
+        return TagType.objects.create(name=name)
+
+    def test_tagtype_creation(self):
+        t = self.create_tagtype(name='raspberrypi')
+        self.assertIsInstance(t, TagType)
+        self.assertEqual(t.__unicode__(), t.name)
+
+
+class CitationTest(WebTest):
+    """ Tests Citation model """
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def create_citation(self, portfolio_entry=None, summary=None):
+        return Citation.objects.create(portfolio_entry=portfolio_entry, summary=summary)
+
+    def test_citation_creation(self):
+        self.user = "paulproteus"
+        self.paulproteus = Person.objects.get(user__username='paulproteus')
+        self.project = Project.objects.get_or_create(name='project name')[0]
+        self.portfolio_entry = PortfolioEntry.objects.get_or_create(project=self.project,
+            person=Person.objects.get(user__username=self.user))[0]
+
+        c = self.create_citation(portfolio_entry=self.portfolio_entry, summary='citationsforus')
+        self.assertIsInstance(c, Citation)
+        self.assertEqual(c.__unicode__(), "pk=%s, summary=%s" % (c.pk, c.summary))
