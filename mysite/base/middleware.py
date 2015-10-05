@@ -21,7 +21,6 @@ import staticgenerator.middleware
 
 
 def get_user_ip(request):
-#    return request.META['REMOTE_ADDR']
     if request.META['REMOTE_ADDR'] == '127.0.0.1':
         return "98.140.110.121"
     else:
@@ -34,11 +33,8 @@ class HandleWannaHelpQueue(object):
         if not hasattr(request, 'user') or not hasattr(request, 'session'):
             return None
 
-        if (hasattr(request, 'user') and
-            request.user.is_authenticated() and
-                'wanna_help_queue_handled' not in request.session):
-            mysite.project.view_helpers.flush_session_wanna_help_queue_into_database(
-                request.user, request.session)
+        if (hasattr(request, 'user') and request.user.is_authenticated() and 'wanna_help_queue_handled' not in request.session):
+            mysite.project.view_helpers.flush_session_wanna_help_queue_into_database(request.user, request.session)
             request.session['wanna_help_queue_handled'] = True
         return None
 
@@ -52,19 +48,17 @@ class DetectLogin(object):
             return response
 
         if request.user.is_authenticated() and 'post_login_stuff_run' not in request.session:
-            mysite.project.view_helpers.take_control_of_our_answers(
-                request.user, request.session)
+            mysite.project.view_helpers.take_control_of_our_answers(request.user, request.session)
             request.session['post_login_stuff_run'] = True
         return response
 
 
 class StaticGeneratorMiddlewareOnlyWhenAnonymous(object):
-
-    '''This is a wrapper around
+    """This is a wrapper around
     staticgenerator.middleware.StaticGeneratorMiddleware that only saves to the
     cache when request.user.is_authenticated() is False.
 
-    We never want to do static generation for when people are logged in.'''
+    We never want to do static generation for when people are logged in."""
 
     def process_response(self, request, response):
         # If somehow the request has no 'user' attribute, bail.

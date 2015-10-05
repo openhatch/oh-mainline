@@ -15,23 +15,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from decorator import decorator
-from odict import odict
-import logging
-from django.http import HttpResponse
-import re
 import collections
-import mysite.base.view_helpers
-import json
-import django.core.cache
-import hashlib
+from decorator import decorator
 from functools import partial
+import hashlib
+import json
+import logging
+from odict import odict
+import re
 
-from django.template.loader import render_to_string
-import django.db.models.query
-from mysite.base.view_helpers import render_response
-from django.core.urlresolvers import reverse, resolve
 import django.contrib.auth.decorators
+import django.core.cache
+from django.core.urlresolvers import reverse, resolve
+import django.db.models.query
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+import mysite.base.view_helpers
+from mysite.base.view_helpers import render_response
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +55,7 @@ def as_view(request, template, data, slug, just_modify_data=False):
     # Depends on whether this is a login-requiring page.
     try:
         view_function, _, _ = resolve(request.path)
-        is_login_required = isinstance(view_function,
-                                       django.contrib.auth.decorators._CheckLogin)
+        is_login_required = isinstance(view_function, django.contrib.auth.decorators._CheckLogin)
         if is_login_required:
             data['go_here_after_logging_in_or_out'] = '/'
         else:
@@ -76,14 +77,12 @@ def view(func, *args, **kw):
     slug = func.__name__  # Used by account settings
     return as_view(request, template, view_data, slug)
 
-# vim: ai ts=3 sts=4 et sw=4 nu
-
 
 @decorator
 def unicodify_strings_when_inputted(func, *args, **kwargs):
-    '''Decorator that makes sure every argument passed in that is
+    """Decorator that makes sure every argument passed in that is
     a string-esque type is turned into a Unicode object. Does so
-    by decoding UTF-8 byte strings into Unicode objects.'''
+    by decoding UTF-8 byte strings into Unicode objects."""
     args_as_list = list(args)
     # first, *args
     for i in range(len(args)):
@@ -142,8 +141,7 @@ def cache_function_that_takes_request(func, *args, **kwargs):
     # 3. query string
     key_data.append(request.META.get('QUERY_STRING', ''))
 
-    key_string = 'cache_request_function_' + \
-        hashlib.sha1(repr(key_data)).hexdigest()
+    key_string = 'cache_request_function_' + hashlib.sha1(repr(key_data)).hexdigest()
     content = django.core.cache.cache.get(key_string, None)
     if content:
         logger.info("Cache hot for %s", repr(key_data))

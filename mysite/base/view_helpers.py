@@ -16,21 +16,34 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.utils import http
-import urllib
-import os
-import os.path
-import shutil
-import tempfile
+import base64
 import datetime
 import dateutil.parser
-import subprocess
+import hashlib
 import json
+import logging
+import os
+import os.path
+import random
+import re
+import shutil
+import subprocess
+import tempfile
+import traceback
+import urllib
 
+import django.conf
+from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse
 import django.shortcuts
 from django.template import RequestContext
-import django.conf
+from django.utils import http
+
+import mysite.base.decorators
+import mysite.base.disk_cache
+
+logger = logging.getLogger(__name__)
 
 
 def json_response(python_object):
@@ -46,8 +59,7 @@ class ObjectFromDict(object):
                 if type(data[key]) == type({}):
                     data[key] = ObjectFromDict(data[key], recursive=recursive)
                 elif type(data[key]) == type([]):
-                    data[key] = [ObjectFromDict(item, recursive=recursive)
-                                 for item in data[key]]
+                    data[key] = [ObjectFromDict(item, recursive=recursive) for item in data[key]]
             setattr(self, key, data[key])
 
 
@@ -61,8 +73,7 @@ def sanitize_wide_unicode(data):
     elif type(data) == type(u''):
         # Replace any wide unicode or surrogate code points with a unicode
         # question mark.
-        data = u''.join(c if not (0xD800 <= ord(c) <= 0xDFFF or ord(c) >= 0x10000)
-                        else u'\ufffd' for c in data)
+        data = u''.join(c if not (0xD800 <= ord(c) <= 0xDFFF or ord(c) >= 0x10000) else u'\ufffd' for c in data)
     return data
 
 
@@ -99,8 +110,7 @@ def clear_static_cache(path):
 
     # 0. Create new temp dir
     try:
-        new_temp_path = tempfile.mkdtemp(
-            dir=django.conf.settings.WEB_ROOT + '/')
+        new_temp_path = tempfile.mkdtemp(dir=django.conf.settings.WEB_ROOT + '/')
     except OSError, e:
         if e.errno == 28:  # No space left on device
             # Aww shucks, we can't do it the smart way.
@@ -157,37 +167,7 @@ def get_object_or_none(klass, *args, **kwargs):
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
         return None
-# This file is part of OpenHatch.
-# Copyright (C) 2010 Parker Phinney
-# Copyright (C) 2009, 2010 OpenHatch, Inc.
-# Copyright (C) 2010 John Stumpo
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mysite.base.disk_cache
-import json
-from django.core.cache import cache
-from django.conf import settings
-import hashlib
-import re
-import traceback
-import logging
-import mysite.base.decorators
-import datetime
-import base64
-import os
-import random
 
 notifications_dictionary = {
     "edit_password_done":
@@ -207,8 +187,7 @@ def put_forwarder_in_contact_blurb_if_they_want(string, user):
     forwarder_regex = r'\$fwd\b'
     # if they want a forwarder
     if re.search(forwarder_regex, string):
-        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(
-            user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
+        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
         # "we can trust that" they already have a forwarder created if they
         # want one (we make it at edit-time and then at garbage collection time
         # (nightly), if necessary)
@@ -226,10 +205,8 @@ def put_forwarder_in_contact_blurb_if_they_want(string, user):
 
 def generate_forwarder(user):
     Forwarder = mysite.profile.models.Forwarder
-    random_str = "%s.%s" % (
-        user.username, base64.b64encode(os.urandom(6), altchars='_.'))
-    our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow(
-    ) + settings.FORWARDER_LIFETIME_TIMEDELTA, stops_being_listed_on=datetime.datetime.utcnow() + settings.FORWARDER_LISTINGTIME_TIMEDELTA)
+    random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
+    our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA, stops_being_listed_on=datetime.datetime.utcnow() + settings.FORWARDER_LISTINGTIME_TIMEDELTA)
     our_new_forwarder.save()
     return our_new_forwarder
 
@@ -240,12 +217,8 @@ def get_notification_from_request(request):
         try:
             notification_text = notifications_dictionary[notification_id]
         except KeyError:
-            notification_text = ("Couldn't find notification text "
-                                 + "for id = `%s`" % notification_id)
-        return [{
-            'id': notification_id,
-            'text': notification_text
-        }]
+            notification_text = ("Couldn't find notification text " + "for id = `%s`" % notification_id)
+        return [{'id': notification_id, 'text': notification_text}]
     else:
         return []
 
@@ -260,15 +233,12 @@ def mysql_regex_escape(s):
     return ret
 
 # source: http://code.google.com/apis/kml/articles/geocodingforkml.html
-import urllib
-
-
 def _geocode(address=None, response_data=None):
     # This function queries the Google Maps API geocoder with an
     # address. It gets back json, which it then parses and
     # returns a string with the longitude and latitude of the address.
 
-    logging.info('Geocoding address: %s' % address)
+    logger.info('Geocoding address: %s' % address)
 
     mapsUrl = 'https://maps.googleapis.com/maps/api/geocode/json?'
 
@@ -280,27 +250,22 @@ def _geocode(address=None, response_data=None):
         if response_data:
             coordinates = json.loads(response_data)
         else:
-            coordinates = json.loads(
-                urllib.urlopen(mapsUrl + query_string).read())
+            coordinates = json.loads(urllib.urlopen(mapsUrl + query_string).read())
         status = coordinates['status']
 
         # For more info on status,
         # https://developers.google.com/maps/documentation/geocoding/#StatusCodes
         if status == 'OK':
-            latitude = float(
-                coordinates['results'][0]['geometry']['location']['lat'])
-            longitude = float(
-                coordinates['results'][0]['geometry']['location']['lng'])
-            return {'latitude': latitude,
-                    'longitude': longitude}
+            latitude = float(coordinates['results'][0]['geometry']['location']['lat'])
+            longitude = float(coordinates['results'][0]['geometry']['location']['lng'])
+            return {'latitude': latitude, 'longitude': longitude}
         return None
     except IOError:
-        logging.exception("While attempting to geocode, got an error.")
-        logging.warning(
-            "If you are online and still get this message, something is wrong.")
+        logger.exception("While attempting to geocode, got an error.")
+        logger.warning("If you are online and still get this message, something is wrong.")
     except Exception:
         stack = traceback.extract_stack()
-        logging.debug('An error occurred: %s' % stack)
+        logger.debug('An error occurred: %s' % stack)
         raise
 
 
@@ -334,8 +299,7 @@ def cached_geocoding_in_json(address):
         geocoded_in_json = json.dumps(geocoded_and_inaccessible)
         if geocoded:
             # cache for a week, which should be plenty
-            cache_duration = A_LONG_TIME_IN_SECONDS + \
-                random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
+            cache_duration = A_LONG_TIME_IN_SECONDS + random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
         else:
             cache_duration = random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
         if settings.DEBUG:
@@ -354,13 +318,10 @@ def get_uri_metadata_for_generating_absolute_links(request):
     if request.is_secure():
         uri_scheme = 'https'
 
-    uri_scheme2colon_number_to_drop = {
-        'http': ':80',
-        'https': ':443'}
+    uri_scheme2colon_number_to_drop = {'http': ':80', 'https': ':443'}
 
     url_prefix = host_name
-    if colon_and_port_number not in uri_scheme2colon_number_to_drop[
-            uri_scheme]:
+    if colon_and_port_number not in uri_scheme2colon_number_to_drop[uri_scheme]:
         url_prefix += colon_and_port_number
 
     data['url_prefix'] = url_prefix
