@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.db import models
 import datetime
 import hashlib
+from django.db import models
 
 
 class Timestamp(models.Model):
@@ -50,15 +50,6 @@ class Timestamp(models.Model):
         timestamp.save()  # definitely!
         return timestamp
 
-    @staticmethod
-    def key_for_model(cls):
-        """This is a helper function that lets the user pass us a model, and
-        we generate the key to use.
-
-        It just takes the class name and prepends
-        "model last updated " to it."""
-        s = 'model last updated ' + cls.__module__ + '.' + cls.__name__
-        return s
 
 # Adjustments to default Django sqlite3 behavior
 def activate_foreign_keys(sender, connection, **kwargs):
