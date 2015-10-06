@@ -21,9 +21,23 @@ from __future__ import absolute_import
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import datetime
+import logging
+import mock
+import os
+from StringIO import StringIO
 
+from django.core.urlresolvers import reverse
+import django.test
+import django.contrib.auth.models
+import django.core.serializers
+from django.conf import settings
+from django.test.client import Client
+from django_webtest import WebTest
+from django.utils.unittest import skipIf, expectedFailure
 
 from mysite.search.models import Bug, Project
+import mysite.search
 from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
@@ -32,44 +46,23 @@ import mysite.customs.views
 import mysite.base.depends
 import mysite.customs.api
 import mysite.customs.core_bugimporters
-
-from django.core.urlresolvers import reverse
-
-import logging
-import mock
-import os
-
-import django.test
-import django.contrib.auth.models
-import django.core.serializers
-from django.conf import settings
-from django.test.client import Client
-from django_webtest import WebTest
-
-from StringIO import StringIO
-import datetime
-
 import mysite.customs.feed
-
-from django.utils.unittest import skipIf, expectedFailure
-
 import mysite.customs.models
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.import_bugimporter_data
 import mysite.customs.management.commands.snapshot_public_data
 
 logger = logging.getLogger(__name__)
+LXML_MSG = "To run these tests, you must install lxml. See Advanced Installation documentation."
+PIL_MSG = "Skipping photo-related tests because PIL is missing. See Advanced Installation documentation."
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class OhlohIconTests(django.test.TestCase):
-    '''Test that we can grab icons from Ohloh.'''
+    """Test that we can grab icons from Ohloh."""
 
     @expectedFailure
-    @skipIf(not mysite.base.depends.Image, (
-            "Skipping photo-related tests because PIL is missing. Look in "
-            "ADVANCED_INSTALLATION.mkd for information."))
+    @skipIf(not mysite.base.depends.Image, PIL_MSG)
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
@@ -87,12 +80,10 @@ class OhlohIconTests(django.test.TestCase):
 
     def test_ohloh_errors_correctly_even_when_we_send_her_spaces(self):
         oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project,
-                          'surely nothing is called this name')
+        self.assertRaises(ValueError, oh.get_icon_for_project, 'surely nothing is called this name')
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BlogCrawl(django.test.TestCase):
 
     def test_summary2html(self):
@@ -101,19 +92,15 @@ class BlogCrawl(django.test.TestCase):
 
     @mock.patch("feedparser.parse")
     def test_blog_entries(self, mock_feedparser_parse):
-        mock_feedparser_parse.return_value = {
-            'entries': [
-                {
-                    'title': 'Yo &eacute;',
-                    'summary': 'Yo &eacute;'
-                }]}
+        mock_feedparser_parse.return_value = {'entries': [{'title': 'Yo &eacute;', 'summary': 'Yo &eacute;'}]}
         entries = mysite.customs.feed._blog_entries()
         self.assertEqual(entries[0]['title'], u'Yo \xe9')
         self.assertEqual(entries[0]['unicode_text'], u'Yo \xe9')
 
 
 class BlogCache(django.test.TestCase):
-    """Test caching of blog entries.
+    """
+    Test caching of blog entries.
 
     Because the cache is reused across tests (Effectively global) we fudge a
     unique key prefix per test so that the key namespace is different for each
@@ -128,8 +115,7 @@ class BlogCache(django.test.TestCase):
 
     def test_basics(self):
         for i in range(4):
-            entries = mysite.customs.feed.cached_blog_entries(
-                self.blog_fetcher_version_1, key_prefix='a')
+            entries = mysite.customs.feed.cached_blog_entries(self.blog_fetcher_version_1, key_prefix='a')
             self.assertEqual(entries, self.blog_fetcher_version_1())
 
     def test_with_lock_contention(self):
@@ -137,27 +123,24 @@ class BlogCache(django.test.TestCase):
         # It'll fail.
 
         # Shove in data version 1
-        mysite.customs.feed.cached_blog_entries(
-            self.blog_fetcher_version_1, key_prefix='b')
+        mysite.customs.feed.cached_blog_entries(self.blog_fetcher_version_1, key_prefix='b')
         # Delete the freshness key so that it looks like it expired.
         mysite.customs.feed.cache.delete('bblog_entries-datafresh')
 
         # Take the lock so that the code under test can't get it
-        blog_update_lock = mysite.customs.feed.CacheLock(
-            'b' + mysite.customs.feed.LOCK_KEYNAME)
+        blog_update_lock = mysite.customs.feed.CacheLock('b' + mysite.customs.feed.LOCK_KEYNAME)
         with blog_update_lock:
-            entries = mysite.customs.feed.cached_blog_entries(
-                self.blog_fetcher_version_2, key_prefix='b')
+            entries = mysite.customs.feed.cached_blog_entries(self.blog_fetcher_version_2, key_prefix='b')
         # Verify that we still got stale data in return
         self.assertEqual(entries, self.blog_fetcher_version_1())
 
         # With the lock released, try to update again
-        entries = mysite.customs.feed.cached_blog_entries(
-            self.blog_fetcher_version_2, key_prefix='b')
+        entries = mysite.customs.feed.cached_blog_entries(self.blog_fetcher_version_2, key_prefix='b')
         # And ensure that we get data version 2 (Fake)
         self.assertEqual(entries, self.blog_fetcher_version_2())
 
-@skipIf(mysite.base.depends.lxml.html is None, "To run these tests, you must install lxml. See ADVANCED_INSTALLATION.mkd for more.")
+
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class DataExport(django.test.TestCase):
 
     def test_snapshot_user_table_without_passwords(self):
@@ -173,8 +156,7 @@ class DataExport(django.test.TestCase):
         u.save()
 
         # snapshot the public version of that user's data into fake stdout
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # Now, delete the user and see if we can reimport bob
@@ -185,8 +167,7 @@ class DataExport(django.test.TestCase):
         # This code re-imports from the snapshot.
         # for more in serializers.deserialize(), read
         # http://docs.djangoproject.com/en/dev/topics/serialization
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # Now the tests:
@@ -203,17 +184,14 @@ class DataExport(django.test.TestCase):
 
         # Now, set up the test:
         # Create two Person objects, with corresponding email addresses
-        u1 = django.contrib.auth.models.User.objects.create(
-            username='privateguy', email='hidden@example.com')
+        u1 = django.contrib.auth.models.User.objects.create(username='privateguy', email='hidden@example.com')
         Person.create_dummy(user=u1)
 
-        u2 = django.contrib.auth.models.User.objects.create(
-            username='publicguy', email='public@example.com')
+        u2 = django.contrib.auth.models.User.objects.create(username='publicguy', email='public@example.com')
         Person.create_dummy(user=u2, show_email=True)
 
         # snapshot the public version of the data into fake stdout
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # Now, delete the them all and see if they come back
@@ -223,17 +201,14 @@ class DataExport(django.test.TestCase):
         # This code re-imports from the snapshot.
         # for more in serializers.deserialize(), read
         # http://docs.djangoproject.com/en/dev/topics/serialization
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # Now the tests:
         # Django user objects really should have an email address
         # so, if we hid it, we make one up based on the user ID
         new_p1 = Person.objects.get(user__username='privateguy')
-        self.assertEquals(
-            new_p1.user.email,
-            'user_id_%d_has_hidden_email_address@example.com' % new_p1.user.id)
+        self.assertEquals(new_p1.user.email, 'user_id_%d_has_hidden_email_address@example.com' % new_p1.user.id)
 
         new_p2 = Person.objects.get(user__username='publicguy')
         self.assertEquals(new_p2.user.email, 'public@example.com')
@@ -247,16 +222,14 @@ class DataExport(django.test.TestCase):
         b.save()
 
         # snapshot fake bug into fake stdout
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # now, delete bug...
         b.delete()
 
         # let's see if we can re-import fire-ant!
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # testing to see if there are ANY bugs
@@ -279,41 +252,35 @@ class DataExport(django.test.TestCase):
         t.save()
 
         # snapshot fake timestamp into fake stdout
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # now, delete the timestamp...
         t.delete()
 
         # let's see if we can re-import the timestamp
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # testing to see if there are ANY
         self.assertTrue(Timestamp.objects.all())
         # testing to see if ours is there
-        reincarnated_t = mysite.base.models.Timestamp.objects.get(
-            key=TIMESTAMP_KEY_TO_USE)
+        reincarnated_t = mysite.base.models.Timestamp.objects.get(key=TIMESTAMP_KEY_TO_USE)
         self.assertEquals(reincarnated_t.timestamp, TIMESTAMP_DATE_TO_USE)
 
     def test_snapshot_project(self):
         fake_stdout = StringIO()
         # make fake Project
-        proj = Project.create_dummy_no_icon(
-            name="karens-awesome-project", language="Python")
+        proj = Project.create_dummy_no_icon(name="karens-awesome-project", language="Python")
 
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # now delete fake Project...
         proj.delete()
 
         # let's see if we can reincarnate it!
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # test: are there ANY projects?
@@ -329,42 +296,36 @@ class DataExport(django.test.TestCase):
         Person.objects.get(user__username='x').delete()
 
         # do a snapshot...
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # delete the User
         django.contrib.auth.models.User.objects.all().delete()
 
         # let's see if we can reincarnate it!
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         django.contrib.auth.models.User.objects.get(username='x')
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
     def test_snapshot_project_with_icon(self, fake_icon):
-        fake_icon_data = open(
-            os.path.join(settings.MEDIA_ROOT, 'no-project-icon.png')).read()
+        fake_icon_data = open(os.path.join(settings.MEDIA_ROOT, 'no-project-icon.png')).read()
         fake_icon.return_value = fake_icon_data
 
         fake_stdout = StringIO()
         # make fake Project
-        proj = Project.create_dummy(
-            name="karens-awesome-project", language="Python")
+        proj = Project.create_dummy(name="karens-awesome-project", language="Python")
         proj.save()
 
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # now delete fake Project...
         proj.delete()
 
         # let's see if we can reincarnate it!
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # test: are there ANY projects?
@@ -378,23 +339,14 @@ class DataExport(django.test.TestCase):
 
         fake_stdout = StringIO()
         # make fake Person who doesn't care if people know where he is
-        zuckerberg = Person.create_dummy(
-            first_name="mark",
-            location_confirmed=True,
-            location_display_name='Palo Alto',
-            latitude=0,
-            longitude=0)
-        self.assertEquals(
-            zuckerberg.get_public_location_or_default(), 'Palo Alto')
+        zuckerberg = Person.create_dummy(first_name="mark", location_confirmed=True,
+                                         location_display_name='Palo Alto', latitude=0, longitude=0)
+        self.assertEquals(zuckerberg.get_public_location_or_default(), 'Palo Alto')
 
         # make a fake Person who REALLY cares about location being private
-        munroe = Person.create_dummy(first_name="randall",
-                                     location_confirmed=False,
-                                     location_display_name='Cambridge',
-                                     latitude=0,
-                                     longitude=0)
-        self.assertEquals(munroe.get_public_location_or_default(),
-                          'Inaccessible Island')
+        munroe = Person.create_dummy(first_name="randall", location_confirmed=False,
+                                     location_display_name='Cambridge', latitude=0, longitude=0)
+        self.assertEquals(munroe.get_public_location_or_default(), 'Inaccessible Island')
 
         # Creating dummy tags, tags_persons and tagtypes
         # Dummy TagTypes
@@ -404,23 +356,18 @@ class DataExport(django.test.TestCase):
         tagtype_can_mentor.save()
 
         # Dummy Tags
-        tag_facebook_development = Tag(
-            text="Facebook development", tag_type=tagtype_understands)
+        tag_facebook_development = Tag(text="Facebook development", tag_type=tagtype_understands)
         tag_facebook_development.save()
-        tag_something_interesting = Tag(
-            text="Something interesting", tag_type=tagtype_can_mentor)
+        tag_something_interesting = Tag(text="Something interesting", tag_type=tagtype_can_mentor)
         tag_something_interesting.save()
 
         # Dummy Links
-        link_zuckerberg = Link_Person_Tag(
-            person=zuckerberg, tag=tag_facebook_development)
+        link_zuckerberg = Link_Person_Tag(person=zuckerberg, tag=tag_facebook_development)
         link_zuckerberg.save()
-        link_munroe = Link_Person_Tag(
-            person=munroe, tag=tag_something_interesting)
+        link_munroe = Link_Person_Tag(person=munroe, tag=tag_something_interesting)
         link_munroe.save()
 
-        command = (
-            mysite.customs.management.commands.snapshot_public_data.Command())
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # now, delete fake people
@@ -440,18 +387,15 @@ class DataExport(django.test.TestCase):
         mysite.profile.models.TagType.objects.all().delete()
         mysite.profile.models.Link_Person_Tag.objects.all().delete()
         # go go reincarnation gadget
-        for obj in django.core.serializers.deserialize('json',
-                                                       fake_stdout.getvalue()):
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
         # did we snapshot/save ANY Persons?
         self.assertTrue(Person.objects.all())
 
         # did our fake Persons get saved?
-        new_zuckerberg = mysite.profile.models.Person.objects.get(
-            user__first_name="mark")
-        new_munroe = mysite.profile.models.Person.objects.get(
-            user__first_name="randall")
+        new_zuckerberg = mysite.profile.models.Person.objects.get(user__first_name="mark")
+        new_munroe = mysite.profile.models.Person.objects.get(user__first_name="randall")
 
         # check that location_confirmed was saved accurately
         self.assertEquals(new_zuckerberg.location_confirmed, True)
@@ -459,54 +403,37 @@ class DataExport(django.test.TestCase):
 
         # check that location_display_name is appropriate
         self.assertEquals(new_zuckerberg.location_display_name, 'Palo Alto')
-        self.assertEquals(new_munroe.location_display_name,
-                          'Inaccessible Island')
+        self.assertEquals(new_munroe.location_display_name, 'Inaccessible Island')
 
         # Check that Zuckerburg has a real lat/long
-        self.assertNotEqual(mysite.profile.models.DEFAULT_LATITUDE,
-                            new_zuckerberg.latitude)
-        self.assertNotEqual(mysite.profile.models.DEFAULT_LONGITUDE,
-                            new_zuckerberg.longitude)
+        self.assertNotEqual(mysite.profile.models.DEFAULT_LATITUDE, new_zuckerberg.latitude)
+        self.assertNotEqual(mysite.profile.models.DEFAULT_LONGITUDE, new_zuckerberg.longitude)
 
         # Check that Randall has no lat/long
-        self.assertEquals(mysite.profile.models.DEFAULT_LATITUDE,
-                          new_munroe.latitude)
-        self.assertEquals(mysite.profile.models.DEFAULT_LONGITUDE,
-                          new_munroe.longitude)
+        self.assertEquals(mysite.profile.models.DEFAULT_LATITUDE, new_munroe.latitude)
+        self.assertEquals(mysite.profile.models.DEFAULT_LONGITUDE, new_munroe.longitude)
 
         # check that we display both as appropriate
-        self.assertEquals(
-            new_zuckerberg.get_public_location_or_default(), 'Palo Alto')
-        self.assertEquals(
-            new_munroe.get_public_location_or_default(), 'Inaccessible Island')
+        self.assertEquals(new_zuckerberg.get_public_location_or_default(), 'Palo Alto')
+        self.assertEquals(new_munroe.get_public_location_or_default(), 'Inaccessible Island')
 
         # get tags linked to our two dummy users...
-        new_link_zuckerberg = (
-            mysite.profile.models.Link_Person_Tag.objects.get(
-                id=new_zuckerberg.user_id))
-        new_link_munroe = (
-            mysite.profile.models.Link_Person_Tag.objects.get(
-                id=new_munroe.user_id))
+        new_link_zuckerberg = mysite.profile.models.Link_Person_Tag.objects.get(id=new_zuckerberg.user_id)
+        new_link_munroe = mysite.profile.models.Link_Person_Tag.objects.get(id=new_munroe.user_id)
 
-        new_tag_facebook_development = mysite.profile.models.Tag.objects.get(
-            link_person_tag__person=new_zuckerberg)
-        new_tag_something_interesting = mysite.profile.models.Tag.objects.get(
-            link_person_tag__person=new_munroe)
+        new_tag_facebook_development = mysite.profile.models.Tag.objects.get(link_person_tag__person=new_zuckerberg)
+        new_tag_something_interesting = mysite.profile.models.Tag.objects.get(link_person_tag__person=new_munroe)
 
         # ...and tagtypes for the tags
-        new_tagtype_understands = mysite.profile.models.TagType.objects.get(
-            tag__tag_type=new_tag_facebook_development.tag_type)
-        new_tagtype_can_mentor = mysite.profile.models.TagType.objects.get(
-            tag__tag_type=new_tag_something_interesting.tag_type)
+        new_tagtype_understands = mysite.profile.models.TagType.objects.get(tag__tag_type=new_tag_facebook_development.tag_type)
+        new_tagtype_can_mentor = mysite.profile.models.TagType.objects.get(tag__tag_type=new_tag_something_interesting.tag_type)
 
         # finally, check values
         self.assertEquals(new_link_zuckerberg.person, new_zuckerberg)
         self.assertEquals(new_link_munroe.person, new_munroe)
 
-        self.assertEquals(new_tag_facebook_development.text,
-                          'Facebook development')
-        self.assertEquals(new_tag_something_interesting.text,
-                          'Something interesting')
+        self.assertEquals(new_tag_facebook_development.text, 'Facebook development')
+        self.assertEquals(new_tag_something_interesting.text, 'Something interesting')
 
         self.assertEquals(new_tagtype_understands.name, 'understands')
         self.assertEquals(new_tagtype_can_mentor.name, 'can_mentor')
@@ -518,26 +445,19 @@ class DataExport(django.test.TestCase):
         self.load_snapshot_file('snapshot2.json')
 
     def load_snapshot_file(self, snapshot_file_name):
-        snapshot_file_path = os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'snapshots', snapshot_file_name
-        )
+        snapshot_file_path = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'snapshots', snapshot_file_name)
         with open(snapshot_file_path) as snapshot_file:
-            for obj in django.core.serializers.deserialize('json',
-                                                           snapshot_file,
-                                                           using='default'):
+            for obj in django.core.serializers.deserialize('json', snapshot_file, using='default'):
                 obj.save()
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BugTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         super(BugTrackerEditingViews, self).setUp()
-        self.twisted = mysite.search.models.Project.create_dummy(
-            name='Twisted System')
+        self.twisted = mysite.search.models.Project.create_dummy(name='Twisted System')
         self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
             tracker_name='Twisted',
             base_url='http://twistedmatrix.com/trac/',
@@ -546,27 +466,18 @@ class BugTrackerEditingViews(WebTest):
             bitesized_text='easy',
             documentation_type='keywords',
             documentation_text='documentation')
-        for url in (
-                ['http://twistedmatrix.com/trac/query?status=new&'
-                 'status=assigned&status=reopened&format=csv&keywords=%7Eeasy'
-                 '&order=priority',
-                 'http://twistedmatrix.com/trac/query?status=assigned&'
-                 'status=new&status=reopened&format=csv&order=priority&'
-                 'keywords=~documentation']):
-            mysite.customs.models.TracQueryModel.objects.create(
-                url=url, tracker=self.tm)
+        for url in ['http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                    'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation']:
+            mysite.customs.models.TracQueryModel.objects.create(url=url, tracker=self.tm)
 
-    def login_with_client(self, username='paulproteus',
-                          password="paulproteus's unbreakable password"):
+    def login_with_client(self, username='paulproteus', password="paulproteus's unbreakable password"):
         client = Client()
-        success = client.login(username=username,
-                               password=password)
+        success = client.login(username=username, password=password)
         self.assert_(success)
         return client
 
     def test_slash_does_not_crash_tracker_editor(self):
-        mysite.customs.models.TracTrackerModel.all_trackers.create(
-            tracker_name="something/or other")
+        mysite.customs.models.TracTrackerModel.all_trackers.create(tracker_name="something/or other")
         client = self.login_with_client()
         url = reverse(mysite.customs.views.list_trackers)
         response = client.post(url, {'list_trackers-tracker_type': 'trac'})
@@ -574,22 +485,16 @@ class BugTrackerEditingViews(WebTest):
 
     def test_bug_tracker_edit_form_fills_in_hidden_field(self):
         client = self.login_with_client()
-        url = (reverse(
-            mysite.customs.views.add_tracker,
-            kwargs={'tracker_type': 'trac'})
-            + '?project_id=%d' % (self.twisted.id, ))
+        url = (reverse(mysite.customs.views.add_tracker, kwargs={'tracker_type': 'trac'}) + '?project_id=%d' % (self.twisted.id, ))
         response = client.get(url)
-        self.assertEqual(
-            self.twisted,
-            response.context['tracker_form'].initial['created_for_project'])
+        self.assertEqual(self.twisted, response.context['tracker_form'].initial['created_for_project'])
 
     def test_bug_tracker_edit_url_missing_url_id_302s(self):
         client = self.login_with_client()
-        url = reverse(mysite.customs.views.edit_tracker_url,
-                      kwargs={'tracker_id': '101',
-                              'tracker_type': 'trac',
-                              'tracker_name': 'whatever',
-                              'url_id': '000'})
+        url = reverse(mysite.customs.views.edit_tracker_url, kwargs={'tracker_id': '101',
+                                                                     'tracker_type': 'trac',
+                                                                     'tracker_name': 'whatever',
+                                                                     'url_id': '000'})
 
         # reverse won't work without a url_id so we need to add one
         # then remove it once the url has been generated.
@@ -603,18 +508,15 @@ class BugTrackerEditingViews(WebTest):
         client = self.login_with_client()
         # get url_id
         url_id = mysite.customs.models.TracQueryModel.objects.all()[0].id
-        url = reverse(mysite.customs.views.edit_tracker_url_do,
-                      kwargs={'tracker_id': self.twisted.id,
-                              'tracker_type': 'trac',
-                              'tracker_name': 'twisted',
-                              'url_id': url_id})
+        url = reverse(mysite.customs.views.edit_tracker_url_do, kwargs={'tracker_id': self.twisted.id,
+                                                                        'tracker_type': 'trac',
+                                                                        'tracker_name': 'twisted',
+                                                                        'url_id': url_id})
         r = client.get(url)
         self.assertEquals(r.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BugzillaTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -624,10 +526,7 @@ class BugzillaTrackerEditingViews(WebTest):
 
     def test_form_create_bugzilla_tracker(self):
         # We start with no BugzillaTrackerModel objects in the DB
-        self.assertEqual(
-            0,
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
             'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
@@ -640,17 +539,11 @@ class BugzillaTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(
-            1,
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(1, mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
 
     def test_form_create_bugzilla_tracker_with_custom_parser(self):
         # We start with no BugzillaTrackerModel objects in the DB
-        self.assertEqual(
-            0,
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.BugzillaTrackerForm({
             'tracker_name': 'KDE Bugzilla',
             'base_url': 'https://bugs.kde.org/',
@@ -664,19 +557,12 @@ class BugzillaTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(
-            1,
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().count())
-        btm = (
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().get())
+        self.assertEqual(1, mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
+        btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BugzillaTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -684,19 +570,14 @@ class BugzillaTrackerListing(WebTest):
         super(BugzillaTrackerListing, self).setUp()
         self.kde = mysite.search.models.Project.create_dummy(name='KDE')
 
-    def login_with_client(self, username='paulproteus',
-                          password="paulproteus's unbreakable password"):
+    def login_with_client(self, username='paulproteus', password="paulproteus's unbreakable password"):
         client = Client()
-        success = client.login(username=username,
-                               password=password)
+        success = client.login(username=username, password=password)
         self.assert_(success)
         return client
 
     def test_view_url_form(self):
-        self.assertEqual(
-            0,
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().count())
 
         client = self.login_with_client()
 
@@ -714,18 +595,13 @@ class BugzillaTrackerListing(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        btm = (
-            mysite.customs.models.BugzillaTrackerModel.objects.all().
-            select_subclasses().get())
+        btm = mysite.customs.models.BugzillaTrackerModel.objects.all().select_subclasses().get()
 
-        resp = client.get(
-            '/customs/add/bugzilla/' + str(btm.id) + '/KDE/url/do')
+        resp = client.get('/customs/add/bugzilla/' + str(btm.id) + '/KDE/url/do')
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class LaunchpadTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -735,10 +611,7 @@ class LaunchpadTrackerEditingViews(WebTest):
 
     def test_form_create_launchpad_tracker(self):
         # We start with no LaunchpadTrackerModel objects in the DB
-        self.assertEqual(
-            0,
-            mysite.customs.models.LaunchpadTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.LaunchpadTrackerForm({
             'tracker_name': 'KDE Bugzill',
             'launchpad_name': 'https://bugs.kde.org/',
@@ -752,18 +625,11 @@ class LaunchpadTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(
-            1,
-            mysite.customs.models.LaunchpadTrackerModel.objects.all().
-            select_subclasses().count())
-        self.assertEqual(
-            1,
-            mysite.customs.models.LaunchpadQueryModel.objects.all().count())
+        self.assertEqual(1, mysite.customs.models.LaunchpadTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(1, mysite.customs.models.LaunchpadQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class GitHubTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -773,10 +639,7 @@ class GitHubTrackerEditingViews(WebTest):
 
     def test_form_create_github_tracker(self):
         # We start with no GitHubTrackerModel objects in the DB
-        self.assertEqual(
-            0,
-            mysite.customs.models.GitHubTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
         form = mysite.customs.forms.GitHubTrackerForm({
             'tracker_name': 'KDE Github',
             'github_url': 'https://github.com/kde/Super-cool_project.1',
@@ -789,56 +652,38 @@ class GitHubTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(
-            1,
-            mysite.customs.models.GitHubTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(1, mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
         # We test for 2 GitHubQueryModel.objects since we must create
         # QueryModels (one for 'open' bugs, another for 'closed'
         # bugs), since GitHub's v2 API doesn't let us list all bugs
         # regardless of status.
-        self.assertEqual(
-            2,
-            mysite.customs.models.GitHubQueryModel.objects.all().count())
+        self.assertEqual(2, mysite.customs.models.GitHubQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class GitHubTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def login_with_client(self, username='paulproteus',
-                          password="paulproteus's unbreakable password"):
+    def login_with_client(self, username='paulproteus', password="paulproteus's unbreakable password"):
         client = Client()
-        success = client.login(username=username,
-                               password=password)
+        success = client.login(username=username, password=password)
         self.assert_(success)
         return client
 
     def test_view_github_trackers(self):
-        self.assertEqual(
-            0,
-            mysite.customs.models.GitHubTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
         client = self.login_with_client()
-        resp = client.post('/customs/', {'list_trackers-tracker_type':
-                                         'github'})
+        resp = client.post('/customs/', {'list_trackers-tracker_type': 'github'})
         self.assertEqual(resp.status_code, 200)
 
     def test_create_github_tracker(self):
-        self.assertEqual(
-            0,
-            mysite.customs.models.GitHubTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.GitHubTrackerModel.objects.all().select_subclasses().count())
         client = self.login_with_client()
         resp = client.get('/customs/add/github')
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, (
-        "To run these tests, you must install lxml. See "
-        "ADVANCED_INSTALLATION.mkd for more information."))
+@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class JiraTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -847,10 +692,7 @@ class JiraTrackerEditingViews(WebTest):
         self.kde = mysite.search.models.Project.create_dummy(name='kde')
 
     def test_form_create_jira_tracker(self):
-        self.assertEqual(
-            0,
-            mysite.customs.models.JiraTrackerModel.objects.all().
-            select_subclasses().count())
+        self.assertEqual(0, mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
 
         form = mysite.customs.forms.JiraTrackerForm({
             'tracker_name': 'KDE Jira',
@@ -866,17 +708,11 @@ class JiraTrackerEditingViews(WebTest):
         self.assertTrue(form.is_valid())
         form.save()
 
-        self.assertEqual(
-            1,
-            mysite.customs.models.JiraTrackerModel.objects.all().
-            select_subclasses().count())
-        self.assertEqual(
-            1,
-            mysite.customs.models.JiraQueryModel.objects.all().count())
+        self.assertEqual(1, mysite.customs.models.JiraTrackerModel.objects.all().select_subclasses().count())
+        self.assertEqual(1, mysite.customs.models.JiraQueryModel.objects.all().count())
+
 
 # Tests for importing bug data from YAML files, as emitted by oh-bugimporters
-
-
 class ExportTrackerAsDict(django.test.TestCase):
 
     def setUp(self, *args, **kwargs):
@@ -903,13 +739,8 @@ class ExportTrackerAsDict(django.test.TestCase):
         exported = self.tm.as_dict()
         golden = {'documentation_text': 'documentation',
                   'documentation_type': 'keywords',
-                  'queries': ([u'http://twistedmatrix.com/trac/query?'
-                               u'status=new&status=assigned&status=reopened'
-                               u'&format=csv&keywords=%7Eeasy&order=priority',
-                               u'http://twistedmatrix.com/trac/query?'
-                               u'status=assigned&status=new&status=reopened&'
-                               u'format=csv&order=priority&'
-                               u'keywords=~documentation']),
+                  'queries': [u'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                              u'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'],
                   'base_url': 'http://twistedmatrix.com/trac/',
                   'bitesized_text': 'easy',
                   'bitesized_type': 'keywords',
@@ -925,21 +756,16 @@ class ExportTrackerAsDict(django.test.TestCase):
 
     def test_export_includes_existing_bugs(self):
         # Create the list of Bug objects we'll create
-        expected_bug_urls = sorted([
-            'http://twistedmatrix.com/trac/ticket/5858',
-            'http://twistedmatrix.com/trac/ticket/4298',
-        ])
+        expected_bug_urls = sorted(['http://twistedmatrix.com/trac/ticket/5858', 'http://twistedmatrix.com/trac/ticket/4298'])
         # Make sure there is a corresponding Twisted project
         mysite.search.models.Project.create_dummy(name='Twisted')
         for expected_bug_url in expected_bug_urls:
-            b = mysite.search.models.Bug.create_dummy(
-                canonical_bug_link=expected_bug_url)
+            b = mysite.search.models.Bug.create_dummy(canonical_bug_link=expected_bug_url)
             b.tracker_id = self.tm.id
             b.save()
         exported = self.tm.as_dict()
         sorted_bug_urls = sorted(exported.get('existing_bug_urls', []))
-        self.assertEqual(expected_bug_urls,
-                         sorted_bug_urls)
+        self.assertEqual(expected_bug_urls, sorted_bug_urls)
 
 
 class ExportOldBugDataLinks(django.test.TestCase):
@@ -949,21 +775,14 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # Note that we use Twisted here as an example, even though they're
         # not on Google Code. It just makes the test look more similar to
         # the other tests.
-        tm = mysite.customs.models.GoogleTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
-            google_name='twisted',
-        )
+        tm = mysite.customs.models.GoogleTrackerModel.all_trackers.create(tracker_name='Twisted', google_name='twisted',)
 
         # Create the list of Bug objects we'll create
-        expected_bug_urls = sorted([
-            'http://twistedmatrix.com/trac/ticket/5858',
-            'http://twistedmatrix.com/trac/ticket/4298',
-        ])
+        expected_bug_urls = sorted(['http://twistedmatrix.com/trac/ticket/5858', 'http://twistedmatrix.com/trac/ticket/4298'])
         # Make sure there is a corresponding Twisted project
         mysite.search.models.Project.create_dummy(name='Twisted')
         for expected_bug_url in expected_bug_urls:
-            b = mysite.search.models.Bug.create_dummy(
-                canonical_bug_link=expected_bug_url)
+            b = mysite.search.models.Bug.create_dummy(canonical_bug_link=expected_bug_url)
             b.tracker_id = tm.id
             b.last_polled = datetime.datetime(2012, 9, 15, 0, 0, 0)
             b.save()
@@ -971,8 +790,7 @@ class ExportOldBugDataLinks(django.test.TestCase):
         url = exported['get_older_bug_data']
 
         expected_url = 'https://code.google.com/p/twisted/issues/csv'
-        colspec = ('colspec=ID+Status+Priority+Owner+Summary+Stars+Opened+'
-                   'Closed+Reporter+Cc+Difficulty+Modified+Type')
+        colspec = 'colspec=ID+Status+Priority+Owner+Summary+Stars+Opened+Closed+Reporter+Cc+Difficulty+Modified+Type'
 
         root, querystr = url.split('?')
 
@@ -988,30 +806,20 @@ class ExportOldBugDataLinks(django.test.TestCase):
         # Note that we use Twisted here as an example, even though they're
         # not on Github. It just makes the test look more similar to
         # the other tests.
-        tm = mysite.customs.models.GitHubTrackerModel.all_trackers.create(
-            tracker_name='Twisted',
-            github_name='twisted',
-            github_repo='mainline',
-        )
+        tm = mysite.customs.models.GitHubTrackerModel.all_trackers.create(tracker_name='Twisted', github_name='twisted', github_repo='mainline', )
 
         # Create the list of Bug objects we'll create
-        expected_bug_urls = sorted([
-            'http://twistedmatrix.com/trac/ticket/5858',
-            'http://twistedmatrix.com/trac/ticket/4298',
-        ])
+        expected_bug_urls = sorted(['http://twistedmatrix.com/trac/ticket/5858', 'http://twistedmatrix.com/trac/ticket/4298', ])
         # Make sure there is a corresponding Twisted project
         mysite.search.models.Project.create_dummy(name='Twisted')
         for expected_bug_url in expected_bug_urls:
-            b = mysite.search.models.Bug.create_dummy(
-                canonical_bug_link=expected_bug_url)
+            b = mysite.search.models.Bug.create_dummy(canonical_bug_link=expected_bug_url)
             b.tracker_id = tm.id
             b.last_polled = datetime.datetime(2012, 9, 15, 0, 0, 0)
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        expected_url = (
-            'https://api.github.com/repos/twisted/mainline/issues?'
-            'since=2012-09-15T00%3A00%3A00')
+        expected_url = 'https://api.github.com/repos/twisted/mainline/issues?since=2012-09-15T00%3A00%3A00'
         # If you want to sanity-check this, just replace 'twisted' in the
         # above URL with e.g. 'acm-uiuc' or some other valid Github user,
         # and 'mainline' with 'mango-django' or some other valid repo owned by
@@ -1032,23 +840,17 @@ class ExportOldBugDataLinks(django.test.TestCase):
         )
 
         # Create the list of Bug objects we'll create
-        expected_bug_urls = sorted([
-            'http://twistedmatrix.com/trac/ticket/5858',
-            'http://twistedmatrix.com/trac/ticket/4298',
-        ])
+        expected_bug_urls = sorted(['http://twistedmatrix.com/trac/ticket/5858', 'http://twistedmatrix.com/trac/ticket/4298', ])
         # Make sure there is a corresponding Twisted project
         mysite.search.models.Project.create_dummy(name='Twisted')
         for expected_bug_url in expected_bug_urls:
-            b = mysite.search.models.Bug.create_dummy(
-                canonical_bug_link=expected_bug_url)
+            b = mysite.search.models.Bug.create_dummy(canonical_bug_link=expected_bug_url)
             b.tracker_id = tm.id
             b.last_polled = datetime.datetime(2012, 9, 15, 0, 0, 0)
             b.save()
         exported = tm.as_dict()
         url = exported['get_older_bug_data']
-        expected_url = (
-            'http://jira.twistedmatrix.com/rest/api/2/search?'
-            'maxResults=1000&jql=created>=2012-09-15T00:00:00')
+        expected_url = 'http://jira.twistedmatrix.com/rest/api/2/search?maxResults=1000&jql=created>=2012-09-15T00:00:00'
 
         # If you want to sanity-check this, just replace 'twisted' in the
         # above URL with e.g. 'cyanogenmod' or some other valid Jira project.
@@ -1096,8 +898,7 @@ class TrackerAPI(WebTest):
             documentation_text='documentation')
 
         api = mysite.customs.api.TrackerModelResource()
-        request = django.test.client.RequestFactory().get(
-            '/+api/v1/customs/tracker_model/')
+        request = django.test.client.RequestFactory().get('/+api/v1/customs/tracker_model/')
         objs = api.get_object_list(request)
         obj = objs[0]
         self.assertEqual(self.tm, obj)
@@ -1118,17 +919,13 @@ class TrackerAPI(WebTest):
 
         # Query for ourselves with the tracker_id parameter that is not == us
         api = mysite.customs.api.TrackerModelResource()
-        request = django.test.client.RequestFactory().get(
-            '/+api/v1/customs/tracker_model/?tracker_id=%d' % (
-                self.tm.pk - 1,))
+        request = django.test.client.RequestFactory().get('/+api/v1/customs/tracker_model/?tracker_id=%d' % (self.tm.pk - 1))
         objs = api.get_object_list(request)
         self.assertFalse(objs)
 
         # Query for ourselves properly
         api = mysite.customs.api.TrackerModelResource()
-        request = django.test.client.RequestFactory().get(
-            '/+api/v1/customs/tracker_model/?tracker_id=%d' % (
-                self.tm.pk,))
+        request = django.test.client.RequestFactory().get('/+api/v1/customs/tracker_model/?tracker_id=%d' % self.tm.pk)
         objs = api.get_object_list(request)
         self.assertEqual(1, len(objs))
         obj = objs[0]
@@ -1156,7 +953,7 @@ class ImportBugsFromFiles(django.test.TestCase):
         # and that item does not contain any data, do we crash?
         sample_data = [{'canonical_bug_link': 'http://example.com/ticket1',
                         'last_polled': '2013-08-02T07:47:11.307599',
-                        '_tracker_name': 'Twisted'},]
+                        '_tracker_name': 'Twisted'}]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
         # Try the import, and watch us not crash
@@ -1200,7 +997,8 @@ class ImportBugsFromFiles(django.test.TestCase):
                         'last_touched': '2013-08-02T07:47:11.307599',
                         'status': 'new',
                         '_project_name': 'Twisted',
-                        '_tracker_name': 'Twisted'}]
+                        '_tracker_name': 'Twisted'
+                        }]
         # Make sure we start out empty
         self.assertFalse(Bug.all_bugs.all())
         # Try the import, and watch us succeed.
@@ -1242,7 +1040,8 @@ class ImportBugsFromFiles(django.test.TestCase):
              'last_polled': datetime.datetime(2012, 9, 2, 22, 18, 56, 240068),
              'looks_closed': False,
              'good_for_newcomers': True,
-             'concerns_just_documentation': False}]
+             'concerns_just_documentation': False
+             }]
         self.assertFalse(Bug.all_bugs.all())
         mysite.customs.core_bugimporters.import_one_bug_item(sample_data[0])
         self.assertTrue(Bug.all_bugs.all())
