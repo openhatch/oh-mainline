@@ -57,12 +57,12 @@ LXML_MSG = "To run these tests, you must install lxml. See Advanced Installation
 PIL_MSG = "Skipping photo-related tests because PIL is missing. See Advanced Installation documentation."
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class OhlohIconTests(django.test.TestCase):
     """Test that we can grab icons from Ohloh."""
 
     @expectedFailure
-    @skipIf(not mysite.base.depends.Image, PIL_MSG)
+    #@skipIf(not mysite.base.depends.Image, PIL_MSG)
     def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
@@ -83,7 +83,7 @@ class OhlohIconTests(django.test.TestCase):
         self.assertRaises(ValueError, oh.get_icon_for_project, 'surely nothing is called this name')
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BlogCrawl(django.test.TestCase):
 
     def test_summary2html(self):
@@ -140,7 +140,7 @@ class BlogCache(django.test.TestCase):
         self.assertEqual(entries, self.blog_fetcher_version_2())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class DataExport(django.test.TestCase):
 
     def test_snapshot_user_table_without_passwords(self):
@@ -451,7 +451,7 @@ class DataExport(django.test.TestCase):
                 obj.save()
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BugTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -516,7 +516,7 @@ class BugTrackerEditingViews(WebTest):
         self.assertEquals(r.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BugzillaTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -562,7 +562,7 @@ class BugzillaTrackerEditingViews(WebTest):
         self.assertTrue('bugzilla.KDEBugzilla', btm.custom_parser)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class BugzillaTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -601,7 +601,7 @@ class BugzillaTrackerListing(WebTest):
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class LaunchpadTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -629,7 +629,7 @@ class LaunchpadTrackerEditingViews(WebTest):
         self.assertEqual(1, mysite.customs.models.LaunchpadQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class GitHubTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -660,7 +660,7 @@ class GitHubTrackerEditingViews(WebTest):
         self.assertEqual(2, mysite.customs.models.GitHubQueryModel.objects.all().count())
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class GitHubTrackerListing(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -683,7 +683,7 @@ class GitHubTrackerListing(WebTest):
         self.assertEqual(resp.status_code, 200)
 
 
-@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
+#@skipIf(mysite.base.depends.lxml.html is None, LXML_MSG)
 class JiraTrackerEditingViews(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
