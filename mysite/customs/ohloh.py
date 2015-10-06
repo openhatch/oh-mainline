@@ -17,33 +17,33 @@
 
 # This file is just a wrapper around the Ohloh.net API that helps
 # us get icons for projects.
-
-import xml.etree.ElementTree as ET
-import xml.parsers.expat
+import cStringIO as StringIO
 import urllib
 import urllib2
-import cStringIO as StringIO
-from django.conf import settings
-import mysite.customs.models
-from django.utils import http
+import xml.etree.ElementTree as ET
+import xml.parsers.expat
 
+from django.conf import settings
+from django.utils import http
+import mysite.customs.models
+import mysite.customs.mechanize_helpers
 
 def uni_text(s):
     if type(s) == unicode:
         return s
     return s.decode('utf-8')
 
-import mysite.customs.mechanize_helpers
-
 
 def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None):
-    '''Input: A URL to get,
+    """
+    Input: A URL to get,
     a bunch of parameters to toss onto the end url-encoded,
     many (a boolean) indicating if we should return a list of just one datum,
     API_KEY suggesting a key to use with Ohloh.
 
     Output: A list/dictionary of Ohloh data plus a saved WebResponse instance that
-    logs information about the request.'''
+    logs information about the request.
+    """
 
     if API_KEY is None:
         API_KEY = settings.OHLOH_API_KEY
@@ -53,18 +53,15 @@ def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None):
     params = my_params
     del my_params
 
-    # FIXME: We return more than just "ret" these days! Rename this variable.
-    ret = []
+    ohloh_data = []
 
     encoded = http.urlencode(params)
     url += encoded
     try:
-        b = mysite.customs.mechanize_helpers.mechanize_get(url)
-        web_response = mysite.customs.models.WebResponse.create_from_browser(b)
-        # Always save the WebResponse, even if we don't know
+        web_response = mysite.customs.models.WebResponse.create_from_browser(mysite.customs.mechanize_helpers.mechanize_get(url))
+        # Always save the WebResponse, even if we don't know that any other object will store a pointer here.
         web_response.save()
-        # that any other object will store a pointer here.
-    except urllib2.HTTPError, e:
+    except urllib2.HTTPError as e:
         # FIXME: Also return a web_response for error cases
         if str(e.code) == '404':
             if many:
@@ -74,8 +71,8 @@ def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None):
             raise
 
     try:
-        s = web_response.text
-        tree = ET.parse(StringIO.StringIO(s))
+        string_response = web_response.text
+        tree = ET.parse(StringIO.StringIO(string_response))
     except xml.parsers.expat.ExpatError:
         # well, I'll be. it doesn't parse.
         return None, web_response
@@ -91,12 +88,12 @@ def ohloh_url2data(url, selector, params={}, many=False, API_KEY=None):
         for child in interesting:
             if child.text:
                 this[unicode(child.tag)] = uni_text(child.text)
-        ret.append(this)
+        ohloh_data.append(this)
 
     if many:
-        return ret, web_response
-    if ret:
-        return ret[0], web_response
+        return ohloh_data, web_response
+    if ohloh_data:
+        return ohloh_data[0], web_response
     return None, web_response
 
 
@@ -170,11 +167,10 @@ class Ohloh(object):
         # we see if the project dicts have an exact match by project name.
 
         if not data:
-            # If there is no matching project possibilit at all, get out now.
+            # If there is no matching project possibilities at all, get out now.
             return None
 
-        exact_match_on_project_name = [datum for datum in data
-                                       if datum.get('name', None).lower() == project_name_query.lower()]
+        exact_match_on_project_name = [datum for datum in data if datum.get('name', None).lower() == project_name_query.lower()]
         if exact_match_on_project_name:
             # If there's an exact match on the project name, return this datum
             return exact_match_on_project_name[0]
@@ -188,5 +184,3 @@ _ohloh = Ohloh()
 
 def get_ohloh():
     return _ohloh
-
-# vim: set nu:
