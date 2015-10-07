@@ -40,6 +40,7 @@ OpenHatch project.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Contributor's Guide
 
    getting_started/project_overview
    getting_started/key_features_openhatch_site
@@ -58,6 +59,7 @@ developing software or writing documentation for OpenHatch projects.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Technical Guide
 
    advanced/styleguide
    advanced/layout_source_code
@@ -79,6 +81,7 @@ that keep the OpenHatch website running efficiently.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Operations Guide
 
    internals/monitoring
    internals/continuous_integration
@@ -100,6 +103,7 @@ knowledge with other contributors. The tutorials are intended to be focused
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorials
 
    tutorials/writing_missions
    tutorials/adding_new_bug_tracker_web
@@ -114,6 +118,7 @@ that support our goal of being a welcoming and helpful community.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Community Guide
 
    community/about_our_community
    community/contact
