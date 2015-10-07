@@ -86,11 +86,7 @@ var providers_small = {
 var providers = $.extend({}, providers_large, providers_small);
 
 var openid = {
-
-  cookie_expires: 6*30,	// 6 months.
-  cookie_name: 'openid_provider',
-  cookie_path: '/',
-
+  
   img_path: '/static/openid/images/',
 
   input_id: null,
@@ -168,11 +164,6 @@ var openid = {
             return false;
             });
 
-    var box_id = this.readCookie();
-    if (box_id) {
-      this.signin(box_id, true);
-    }  
-
   },
   getBoxHTML: function(provider, box_size, image_ext) {
 
@@ -192,7 +183,6 @@ var openid = {
     }
 
     this.highlight(box_id);
-    this.setCookie(box_id);
 
     // Although this file is called OpenID-JQuery.js, in the OpenHatch codebase,
     // it is the way we integrate _all_ third-party login systems.
@@ -257,24 +247,7 @@ var openid = {
     // add new highlight.
     $('.'+box_id).wrap('<div id="openid_highlight"></div>');
   },
-  setCookie: function (value) {
-
-    var date = new Date();
-    date.setTime(date.getTime()+(this.cookie_expires*24*60*60*1000));
-    var expires = "; expires="+date.toGMTString();
-
-    document.cookie = this.cookie_name+"="+value+expires+"; path=" + this.cookie_path;
-  },
-  readCookie: function () {
-    var nameEQ = this.cookie_name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-      var c = ca[i];
-      while (c.charAt(0)==' ') c = c.substring(1,c.length);
-      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-  },
+  
   useInputBox: function (provider) {
 
     var input_area = $('#openid_input_area');
