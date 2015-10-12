@@ -97,7 +97,7 @@ def main(argv=None):
         zip_safe = False,
         include_package_data = True,
 
-        description = "A website",
+        description = "The OpenHatch Project",
 
         author = 'The OpenHatch team <http://openhatch.org/about/> <http://openhatch.org/projects/OpenHatch>',
         author_email = 'all@openhatch.org',
