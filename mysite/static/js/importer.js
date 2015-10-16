@@ -961,6 +961,21 @@ $(PortfolioEntry.Add.init);
 /*
  *      Re-order projects
  *-------------------------*/
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 PortfolioEntry.Reorder = {
     '$list': null,
@@ -1021,10 +1036,13 @@ PortfolioEntry.Reorder = {
                 $(this).text('Working...').attr('disabled','disabled');
                 PortfolioEntry.Reorder.$done_reordering = $(this);
 
+                var csrftoken = getCookie('csrftoken');
+
                 var options = {
                     'type': 'POST',
                     'url': '/+do/save_portfolio_entry_ordering_do',
                     'data': query_string,
+                    headers: { "X-CSRFToken": csrftoken },
                     'success': function () {
                         PortfolioEntry.Reorder.$list.remove();
                         $('#portfolio_entries *').not('.loading_message').remove();
