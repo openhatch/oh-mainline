@@ -21,11 +21,8 @@ from django.contrib.auth.models import User
 from django.core.management import BaseCommand, CommandError
 
 
-VALID_COMMANDS = (
-    ['milestone-a/manage.py', 'git_reset'],
-    ['milestone-a/manage.py', 'git_exists'],
-    ['milestone-a/manage.py', 'svn_reset'],
-    ['milestone-a/manage.py', 'svn_exists'],
+VALID_COMMANDS = (['milestone-a/manage.py', 'git_reset'], ['milestone-a/manage.py', 'git_exists'],
+    ['milestone-a/manage.py', 'svn_reset'], ['milestone-a/manage.py', 'svn_exists'],
 )
 
 

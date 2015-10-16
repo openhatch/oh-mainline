@@ -20,16 +20,16 @@
 # that stress me out.
 
 # Sadly our dependencies use them, so I can't.
-import urllib
-import cStringIO as StringIO
 
+import cStringIO as StringIO
 import decorator
+import urllib
 
 @decorator.decorator
 def unicodify_strings_when_inputted(func, *args, **kwargs):
-    '''Decorator that makes sure every argument passed in that is
+    """Decorator that makes sure every argument passed in that is
     a string-esque type is turned into a Unicode object. Does so
-    by decoding UTF-8 byte strings into Unicode objects.'''
+    by decoding UTF-8 byte strings into Unicode objects."""
     args_as_list = list(args)
     # first, *args
     for i in range(len(args)):
@@ -63,7 +63,7 @@ def wrap_file_object_in_utf8_check(f):
 
 
 def utf8(s):
-    '''This function takes a bytestring or a Unicode object
+    """This function takes a bytestring or a Unicode object
     as its input, and it outputs a bytestring that is UTF-8
     encoded.
 
@@ -74,7 +74,7 @@ def utf8(s):
     Django with one particular difference: this function will
     raise a UnicodeDecodeError if you pass in a bytestring that
     cannot be decoded into UTF-8. This is a feature; in the case
-    of invalid data, we refuse the temptation to guess.'''
+    of invalid data, we refuse the temptation to guess."""
     # If the input is a bytestring, then we use the unicode
     # constructor to up-convert it:
     try:

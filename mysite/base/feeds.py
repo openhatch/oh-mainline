@@ -30,7 +30,6 @@ class RecentActivityFeed(Feed):
 
     def items(self):
         feed_items = list(Answer.objects.order_by('-modified_date')[:15])
-        feed_items.extend(
-            WannaHelperNote.objects.order_by('-modified_date')[:15])
+        feed_items.extend(WannaHelperNote.objects.order_by('-modified_date')[:15])
         feed_items.sort(key=lambda x: x.modified_date, reverse=True)
         return feed_items[:15]

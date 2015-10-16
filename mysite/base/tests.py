@@ -18,45 +18,41 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-import django.test
-from django.core.urlresolvers import reverse
-
-import twill
-from twill import commands as tc
-from django.core.handlers.wsgi import WSGIHandler
-from django.contrib.staticfiles.handlers import StaticFilesHandler
-from StringIO import StringIO
-from django.test.client import Client
-import os
-import os.path
-import subprocess
-
-from django.core.cache import cache
-from django.core.management import CommandError
-from django.conf import settings
-from django.contrib.auth.models import User
-
-import mock
 import datetime
 import logging
+import mock
+import os
+import os.path
+from StringIO import StringIO
+import subprocess
+import twill
+from twill import commands as tc
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.staticfiles.handlers import StaticFilesHandler
+from django.core.cache import cache
+from django.core.handlers.wsgi import WSGIHandler
+from django.core.management import CommandError
+import django.test
+from django.test.client import Client
 from django.utils import unittest
-from django.utils.unittest import expectedFailure, skip
+from django.utils.unittest import skip
+from django.core.urlresolvers import reverse
 
-import mysite.base.view_helpers
 import mysite.base.decorators
-import mysite.search.models
-import mysite.base.templatetags.base_extras
-import mysite.base.unicode_sanity
-import mysite.profile.views
-import mysite.base.views
-import mysite.project.views
-import mysite.settings
-
+import mysite.base.depends
 import mysite.base.management.commands.nagios
 import mysite.base.management.commands.remote_command_check
+import mysite.base.templatetags.base_extras
+import mysite.base.unicode_sanity
+import mysite.base.view_helpers
+import mysite.base.views
 import mysite.profile.management.commands.send_emails
-
+import mysite.profile.views
+import mysite.project.views
+import mysite.search.models
+import mysite.settings
 logger = logging.getLogger(__name__)
 
 
@@ -691,3 +687,17 @@ class RenderDevRobotsTest(django.test.TestCase):
 
     def tearDown(self):
         settings.DEBUG = self.original_value
+
+
+#class DependsTests(django.test.TestCase):
+
+    # def test_postmap_available_warning_emitted(self):
+    #     warning_emitted = True
+    #     response = self.postmap_available(warning_emitted)
+    #     self.assertTrue(response)
+
+    # def test_postmap_available_warning_not_emitted(self):
+    #     warning_emitted = False
+    #     response = postmap_available(self, warning_emitted)
+    #     assertTrue(response)
+

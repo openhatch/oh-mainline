@@ -43,8 +43,7 @@ def timesince_terse(value, **args):
     if type(value) == time.struct_time:
         # icky, but do it
         secs_since_epoch = calendar.timegm(value)
-        value = datetime.datetime.fromtimestamp(
-            secs_since_epoch)
+        value = datetime.datetime.fromtimestamp(secs_since_epoch)
 
     string = timesince(value, **args)
     ret = string.split(", ")[0]
@@ -147,8 +146,7 @@ def urlize_without_escaping_percent_signs(text, trim_url_limit=None, nofollow=Fa
     # I think this is a copy of a function in django.utils.html with one minor
     # change; see the comment below.
 
-    trim_url = lambda x, limit=trim_url_limit: limit is not None and (
-        len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
+    trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_unicode(text))
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
@@ -230,16 +228,13 @@ def version(path_string):
     """ Based on Stuart Colville's code at this blog post:
     http://muffinresearch.co.uk/archives/2008/04/08/automatic-asset-versioning-in-django/
     """
-    if settings.ADD_VERSION_STRING_TO_IMAGES and (
-            settings.ADD_VERSION_STRING_TO_IMAGES_IN_DEBUG_MODE
-            or not settings.DEBUG):
+    if settings.ADD_VERSION_STRING_TO_IMAGES and (settings.ADD_VERSION_STRING_TO_IMAGES_IN_DEBUG_MODE or not settings.DEBUG):
         try:
             if path_string in version_cache:
                 mtime = version_cache[path_string]
             else:
                 try:
-                    mtime = os.path.getmtime(
-                        '%s%s' % (settings.MEDIA_ROOT_BEFORE_STATIC, path_string,))
+                    mtime = os.path.getmtime('%s%s' % (settings.MEDIA_ROOT_BEFORE_STATIC, path_string,))
                 except (OSError, IOError):
                     mtime = 0
                 version_cache[path_string] = mtime
