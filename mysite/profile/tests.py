@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-import BeautifulSoup
 import datetime
 import tasks
 import mock
@@ -36,18 +35,17 @@ import django.db
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.utils.unittest import skipIf
 from django.utils.unittest import skip
 from django_webtest import WebTest
 from django.test.client import Client
+from django.test import TestCase
 
 from mysite.base.view_helpers import ObjectFromDict
 from mysite.base.models import Timestamp
 import mysite.account.tests
 from mysite.search.models import Project, WannaHelperNote
 from mysite.profile.models import (Person, Tag, TagType, Link_Person_Tag,
-                                   PortfolioEntry,
-                                   Citation, Forwarder)
+                                   PortfolioEntry, Citation, Forwarder)
 import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
@@ -56,7 +54,9 @@ import mysite.profile.templatetags.profile_extras
 from mysite.profile.management.commands import send_emails
 from mysite.profile import views
 from mysite.customs.models import WebResponse
+
 import pprint
+import BeautifulSoup
 
 
 class BasicHelpers(WebTest):
@@ -73,14 +73,14 @@ class BasicHelpers(WebTest):
 
 
 class ProfileTests(WebTest):
-    fixtures = ['user-paulproteus', 'person-paulproteus',
-                'cchost-data-imported-from-ohloh']
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
     def testSlash(self):
         self.client.get('/people/')
 
     def test__portfolio_updates_when_citation_added_to_db(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
+        # Create a citation with a Portfolio entry and a language
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
                 project=Project.objects.get_or_create(
@@ -113,27 +113,34 @@ class ProfileTests(WebTest):
         # Test case with no first name or last name.
         paulproteus.user.last_name = ''
         self.assertEqual(
-            paulproteus.get_full_name_and_username(), 'paulproteus')
+            paulproteus.get_full_name_and_username(),
+            'paulproteus'
+        )
         # Retest case with first name and last name.
         # This also returns the Person object to its initial state.
         paulproteus.user.first_name = 'Asheesh'
         paulproteus.user.last_name = 'Laroia'
-        self.assertEqual(paulproteus.get_full_name_and_username(),
-                         'Asheesh Laroia (paulproteus)')
+        self.assertEqual(
+            paulproteus.get_full_name_and_username(),
+            'Asheesh Laroia (paulproteus)'
+        )
 
 
 class DebTagsTests(BasicHelpers):
 
     def testAddOneDebtag(self):
         views.add_one_debtag_to_project('alpine', 'implemented-in::c')
-        self.assertEqual(views.list_debtags_of_project('alpine'),
-                         ['implemented-in::c'])
+        self.assertEqual(
+            views.list_debtags_of_project('alpine'),
+            ['implemented-in::c']
+        )
 
     def testImportDebtags(self):
-        views.import_debtags(cooked_string='alpine:works-with::mail, '
-                             'protocol::smtp')  # side effects galore!
-        self.assertEqual(set(views.list_debtags_of_project('alpine')),
-                         set(['works-with::mail', 'protocol::smtp']))
+        views.import_debtags(cooked_string='alpine:works-with::mail, ''protocol::smtp')  # side effects galore!
+        self.assertEqual(
+            set(views.list_debtags_of_project('alpine')),
+            set(['works-with::mail', 'protocol::smtp'])
+        )
 
 
 class Info(BasicHelpers):
@@ -199,30 +206,28 @@ class Info(BasicHelpers):
 # Create a mock Ohloh get_contribution_info_by_username
 mock_gcibu = mock.Mock()
 # This object will always return:
-mock_gcibu.return_value = ([{
-    'man_months': 1,
-    'project': u'MOCK ccHost',
-    u'permalink':
-    u'https://www.ohloh.net/p/cchost/contributors/65837553699824',
-    'project_homepage_url':
-    u'http://wiki.creativecommons.org/CcHost',
-    'first_commit_time':
-    '2008-04-03T23:51:45Z',
-    'primary_language': u'shell script'},
-],
+mock_gcibu.return_value = (
+    [
+        {'man_months': 1,
+         'project': u'MOCK ccHost',
+         u'permalink': u'https://www.ohloh.net/p/cchost/contributors/65837553699824',
+         'project_homepage_url': u'http://wiki.creativecommons.org/CcHost',
+         'first_commit_time': '2008-04-03T23:51:45Z',
+         'primary_language': u'shell script'},
+    ],
     None  # WebResponse
 )
 
 # Create a mock Ohloh get_contribution_info_by_ohloh_username
 mock_gcibou = mock.Mock()
-mock_gcibou.return_value = ([{
-    'man_months': 1,
-    u'permalink':
-    u'https://www.ohloh.net/p/cchost/contributors/65837553699824',
-    'project': u'MOCK ccHost',
-    'project_homepage_url':
-    u'http://wiki.creativecommons.org/CcHost',
-    'primary_language': u'Vala'}],
+mock_gcibou.return_value = (
+    [
+        {'man_months': 1,
+         u'permalink': u'https://www.ohloh.net/p/cchost/contributors/65837553699824',
+         'project': u'MOCK ccHost',
+         'project_homepage_url': u'http://wiki.creativecommons.org/CcHost',
+         'primary_language': u'Vala'}
+    ],
     None  # WebResponse
 )
 
@@ -235,18 +240,26 @@ class MockFetchPersonDataFromOhloh(object):
 # Mockup of stump's contribution list as given by ohloh, stripped down and
 # slightly tweaked for the purposes of testing.
 stumps_ohloh_results = mock.Mock()
-stumps_ohloh_results.return_value = ([
-    {u'contributor_name': u'stump', u'analysis_id': u'1145788',
-     u'man_months': u'11', u'primary_language_nice_name': u'C',
-     u'contributor_id': u'2008814186590608'},
-    {u'contributor_name': u'John Stumpo', u'analysis_id': u'1031175',
-     u'man_months': u'12', u'primary_language_nice_name': u'Python',
-     u'contributor_id': u'110891760646528'}
-], WebResponse())
+stumps_ohloh_results.return_value = (
+    [
+        {u'contributor_name': u'stump',
+         u'analysis_id': u'1145788',
+         u'man_months': u'11',
+         u'primary_language_nice_name': u'C',
+         u'contributor_id': u'2008814186590608'},
+        {u'contributor_name': u'John Stumpo',
+         u'analysis_id': u'1031175',
+         u'man_months': u'12',
+         u'primary_language_nice_name': u'Python',
+         u'contributor_id': u'110891760646528'}
+    ],
+    WebResponse()
+)
 stumps_project_lookup = mock.Mock()
 stumps_project_lookup.return_value = {
     u'name': u'WinKexec',
-    u'homepage_url': u'https://www.jstump.com/projects/kexec/'}
+    u'homepage_url': u'https://www.jstump.com/projects/kexec/'
+}
 
 
 class Portfolio(BasicHelpers):
@@ -288,10 +301,10 @@ class Portfolio(BasicHelpers):
 
         # Check we got a summary for each Citation.
         for citation_in_response in response['citations']:
-            self.assert_(
-                str(citation_in_response['pk']
-                    ) in response['summaries'].keys(),
-                "Expected that this Citation's pk would have a summary.")
+            self.assertTrue(
+                str(citation_in_response['pk']) in response['summaries'].keys(),
+                "Expected that this Citation's pk would have a summary."
+            )
 
         #
         # Are the citations in the response
@@ -299,8 +312,7 @@ class Portfolio(BasicHelpers):
         #
 
         # What we expect:
-        expected_list = serializers.serialize(
-            'python', [citation])
+        expected_list = serializers.serialize('python', [citation])
 
         # What we got:
         citations_in_response = response['citations']
@@ -326,13 +338,12 @@ class Portfolio(BasicHelpers):
                 self.assert_(object_is_expected)
 
     def test_paulproteus_can_get_his_import_status(self):
-        self._test_get_import_status(
-            client=self.login_with_client(), must_find_nothing=False)
+        self._test_get_import_status(client=self.login_with_client(),
+                                     must_find_nothing=False)
 
     def test_barry_cannot_get_paulproteuss_import_status(self):
-        self._test_get_import_status(
-            client=self.login_with_client_as_barry(),
-            must_find_nothing=True)
+        self._test_get_import_status(client=self.login_with_client_as_barry(),
+                                     must_find_nothing=True)
 
     def test_paulproteus_gets_no_deleted_projects(self):
         #
@@ -342,8 +353,7 @@ class Portfolio(BasicHelpers):
 
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
-                project=Project.objects.get_or_create(
-                    name='project name')[0],
+                project=Project.objects.get_or_create(name='project name')[0],
                 person=paulproteus)[0],
             languages='Python'
         )
@@ -360,11 +370,9 @@ class Portfolio(BasicHelpers):
             reverse(mysite.profile.views.gimme_json_for_portfolio))
         response_decoded = json.loads(response.content)
 
-        self.assertEqual(len(response_decoded['projects']), 0,
-                         "Expected no projects back.")
+        self.assertEqual(len(response_decoded['projects']), 0, "Expected no projects back.")
 
-        self.assertEqual(len(response_decoded['citations']), 0,
-                         "Expected no citations back.")
+        self.assertEqual(len(response_decoded['citations']), 0, "Expected no citations back.")
 
 
 class ImporterPublishCitation(BasicHelpers):
@@ -384,8 +392,7 @@ class ImporterPublishCitation(BasicHelpers):
         self.assertFalse(citation.is_published)
 
         view = mysite.profile.views.publish_citation_do
-        response = self.login_with_client().post(
-            reverse(view), {'pk': citation.pk})
+        response = self.login_with_client().post(reverse(view), {'pk': citation.pk})
 
         self.assertEqual(response.content, "1")
         self.assert_(Citation.untrashed.get(pk=citation.pk).is_published)
@@ -395,8 +402,7 @@ class ImporterPublishCitation(BasicHelpers):
         self.assertEqual(Citation.untrashed.filter(pk=failing_pk).count(), 0)
 
         view = mysite.profile.views.publish_citation_do
-        response = self.login_with_client().post(
-            reverse(view), {'pk': failing_pk})
+        response = self.login_with_client().post(reverse(view), {'pk': failing_pk})
         self.assertEqual(response.content, "0")
 
     def test_publish_citation_fails_when_citation_not_given(self):
@@ -438,8 +444,7 @@ class ImporterDeleteCitation(BasicHelpers):
         self.assertFalse(citation.is_deleted)
 
         view = mysite.profile.views.delete_citation_do
-        response = self.login_with_client().post(
-            reverse(view), {'citation__pk': citation.pk})
+        response = self.login_with_client().post(reverse(view), {'citation__pk': citation.pk})
 
         self.assertEqual(response.content, "1")
         self.assert_(Citation.objects.get(pk=citation.pk).is_deleted)
@@ -449,8 +454,7 @@ class ImporterDeleteCitation(BasicHelpers):
         self.assertEqual(Citation.objects.filter(pk=failing_pk).count(), 0)
 
         view = mysite.profile.views.delete_citation_do
-        response = self.login_with_client().post(
-            reverse(view), {'pk': failing_pk})
+        response = self.login_with_client().post(reverse(view), {'pk': failing_pk})
         self.assertEqual(response.content, "0")
 
     def test_delete_citation_fails_when_citation_not_given(self):
@@ -526,16 +530,14 @@ class Widget(BasicHelpers):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_widget_display(self):
-        widget_url = reverse(
-            mysite.profile.views.widget_display,
-            kwargs={'user_to_display__username': 'paulproteus'})
+        widget_url = reverse(mysite.profile.views.widget_display,
+                             kwargs={'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
         client.get(widget_url)
 
     def test_widget_display_js(self):
-        widget_js_url = reverse(
-            mysite.profile.views.widget_display_js,
-            kwargs={'user_to_display__username': 'paulproteus'})
+        widget_js_url = reverse(mysite.profile.views.widget_display_js,
+                                kwargs={'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
         client.get(widget_js_url)
 
@@ -571,8 +573,7 @@ class PersonalData(BasicHelpers):
             kwargs = navelgazing_view2args[view]
             url = reverse(view, kwargs=kwargs)
             response = self.client.get(url)
-            self.assertEqual(
-                response.context[0]['person'].user.username, 'paulproteus')
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
             self.client.logout()
 
 
@@ -594,9 +595,8 @@ class DeletePortfolioEntry(BasicHelpers):
         self.assertFalse(portfolio_entry.is_deleted)
 
         view = mysite.profile.views.delete_portfolio_entry_do
-        response = self.login_with_client().post(
-            reverse(view),
-            {'portfolio_entry__pk': portfolio_entry.pk})
+        response = self.login_with_client().post(reverse(view),
+                                                 {'portfolio_entry__pk': portfolio_entry.pk})
 
         response_decoded = json.loads(response.content)
 
@@ -606,18 +606,18 @@ class DeletePortfolioEntry(BasicHelpers):
         }
 
         self.assertEqual(response_decoded, expected_output)
-        self.assert_(PortfolioEntry.objects.get(pk=portfolio_entry.pk)
-                     .is_deleted)
+        self.assertTrue(PortfolioEntry.objects.get(pk=portfolio_entry.pk).is_deleted)
 
-    def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(
-            self):
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(self):
         failing_pk = 0
         self.assertEqual(
-            PortfolioEntry.objects.filter(pk=failing_pk).count(), 0)
+            PortfolioEntry.objects.filter(pk=failing_pk).count(),
+            0
+        )
 
         view = mysite.profile.views.delete_portfolio_entry_do
-        response = self.login_with_client().post(
-            reverse(view), {'portfolio_entry__pk': failing_pk})
+        response = self.login_with_client().post(reverse(view),
+                                                 {'portfolio_entry__pk': failing_pk})
         self.assertEqual(json.loads(response.content), {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_given(self):
@@ -629,10 +629,9 @@ class DeletePortfolioEntry(BasicHelpers):
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_yours(self):
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
-                project=Project.objects.get_or_create(
-                    name='project name')[0],
-                person=Person.objects.get(
-                    user__username='paulproteus'))[0]
+                project=Project.objects.get_or_create(name='project name')[0],
+                person=Person.objects.get(user__username='paulproteus')
+            )[0]
         )
         citation.save()
 
@@ -656,7 +655,8 @@ class AddCitationManually(BasicHelpers):
         proj = Project.create_dummy(name='project name')
         portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
             project=proj,
-            person=Person.objects.get(user__username='paulproteus'))
+            person=Person.objects.get(user__username='paulproteus')
+        )
 
         input_data = {
             'portfolio_entry': portfolio_entry.pk,
@@ -671,12 +671,13 @@ class AddCitationManually(BasicHelpers):
 
         # Check that a citation was created.
         c = Citation.untrashed.get(url=input_data['url'])
-        self.assertEqual(c.portfolio_entry, portfolio_entry,
+        self.assertEqual(c.portfolio_entry,
+                         portfolio_entry,
                          "The portfolio entry for the new citation is the "
                          "exactly the one whose id we POST'd to "
                          "profile.views.add_citation_manually.")
 
-        self.assert_(c.is_published,
+        self.assertTrue(c.is_published,
                      "Manually added citations are published by default.")
 
     def test_add_citation_manually_with_bad_portfolio_entry(self):
@@ -696,13 +697,13 @@ class AddCitationManually(BasicHelpers):
 
         # Check that no citation was created.
         self.assertEqual(
-            Citation.untrashed.filter(url=input_data['url']).count(), 0,
+            Citation.untrashed.filter(url=input_data['url']).count(),
+            0,
             "Expected no citation to be created when you try "
             "to add one for someone else.")
 
         # Check that an error is reported in the response.
-        self.assert_(
-            len(json.loads(response.content)['error_msgs']) == 1)
+        self.assertTrue(len(json.loads(response.content)['error_msgs']) == 1)
 
 
 class SavePortfolioEntry(BasicHelpers):
@@ -716,10 +717,9 @@ class SavePortfolioEntry(BasicHelpers):
 
         self.portfolio_entry = PortfolioEntry.objects.get_or_create(
             project=self.project,
-            person=Person.objects.get(user__username=self.user))[0]
-        citation = Citation(
-            portfolio_entry=self.portfolio_entry
-        )
+            person=Person.objects.get(user__username=self.user)
+        )[0]
+        citation = Citation(portfolio_entry=self.portfolio_entry)
         citation.is_published = False
         citation.save()
 
@@ -844,10 +844,11 @@ class PortfolioEntryAdd(BasicHelpers):
             "expected: after POSTing to view, there's a project named 'new "
             "project name'")
         )
-        self.assertEqual(PortfolioEntry.objects.filter(
-            person__user__username='paulproteus',
-            project__name='new project name').count(), 1, (
-            "expected: after POSTing to view, there's a portfolio entry for "
+        self.assertEqual(
+            PortfolioEntry.objects.filter(person__user__username='paulproteus',
+                                          project__name='new project name').count(),
+            1,
+            ("expected: after POSTing to view, there's a portfolio entry for "
             "paulproteus for a project named 'new project name'")
         )
 
@@ -880,9 +881,12 @@ class OtherContributors(WebTest):
         project = Project(name='project',
                           icon_raw="static/no-project-icon-w=40.png")
         project.save()
-        PortfolioEntry(project=project, person=paulproteus,
+        PortfolioEntry(project=project,
+                       person=paulproteus,
                        is_published=True).save()
-        PortfolioEntry(project=project, person=barry, is_published=True).save()
+        PortfolioEntry(project=project,
+                       person=barry,
+                       is_published=True).save()
         self.assertEqual(
             project.get_n_other_contributors_than(5, paulproteus),
             [barry]
@@ -1563,14 +1567,15 @@ class EmailForwarderGarbageCollection(WebTest):
         # stops_being_listed_on date is in the future
         def create_forwarder(address, valid, new_enough_for_display):
             expires_on_future_number = valid and 1 or -1
-            stops_being_listed_on_future_number = (new_enough_for_display
-                                                   and 1 or -1)
-            expires_on = (datetime.datetime.utcnow() +
-                          expires_on_future_number *
-                          datetime.timedelta(minutes=10))
-            stops_being_listed_on = (datetime.datetime.utcnow() +
-                                     stops_being_listed_on_future_number *
-                                     datetime.timedelta(minutes=10))
+            stops_being_listed_on_future_number = (new_enough_for_display and 1 or -1)
+            expires_on = (
+                datetime.datetime.utcnow() +
+                expires_on_future_number * datetime.timedelta(minutes=10)
+            )
+            stops_being_listed_on = (
+                datetime.datetime.utcnow() +
+                stops_being_listed_on_future_number * datetime.timedelta(minutes=10)
+            )
             user = User.objects.get(username="paulproteus")
             new_mapping = mysite.profile.models.Forwarder(
                 address=address, expires_on=expires_on, user=user,
@@ -1594,16 +1599,24 @@ class EmailForwarderGarbageCollection(WebTest):
         # valid_new should still be in the database
         # there should be no other forwarders for the address that valid_new
         # has
-        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
-            pk=valid_new.pk).count())
-        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
-            address=valid_new.address).count())
+        self.assertEqual(
+            1,
+            mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count()
+        )
+        self.assertEqual(
+            1,
+            mysite.profile.models.Forwarder.objects.filter(address=valid_new.address).count()
+        )
         # valid_old should still be in the database
-        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
-            pk=valid_old.pk).count())
+        self.assertEqual(
+            1,
+            mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count()
+        )
         # invalid should not be in the database
-        self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(
-            pk=invalid.pk).count())
+        self.assertEqual(
+            0,
+            mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count()
+        )
         # there should be 2 forwarders in total: we lost one
         forwarders = mysite.profile.models.Forwarder.objects.all()
         self.assertEqual(2, forwarders.count())
@@ -1618,7 +1631,7 @@ class EmailForwarderGarbageCollection(WebTest):
 
 class EmailForwarderResolver(WebTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    '''
+    """
     * put some mappings of forwarder addresses to dates and user objects in
       the Forwarder table
     * one of these will be expired
@@ -1627,7 +1640,7 @@ class EmailForwarderResolver(WebTest):
         * email forwarder address that's not in the database at all
         * email forwarder that's in the db but is expired
         * email forwarder that's in the db and is not expired
-    '''
+    """
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
@@ -1650,11 +1663,15 @@ class EmailForwarderResolver(WebTest):
                                             actually_create, should_work):
             future_number = future and 1 or -1
             if actually_create:
-                expiry_date = datetime.datetime.utcnow(
-                ) + future_number * datetime.timedelta(minutes=10)
+                expiry_date = (
+                    datetime.datetime.utcnow() + future_number * datetime.timedelta(minutes=10)
+                )
                 user = User.objects.get(username="paulproteus")
                 new_mapping = mysite.profile.models.Forwarder(
-                    address=address, expires_on=expiry_date, user=user)
+                    address=address,
+                    expires_on=expiry_date,
+                    user=user
+                )
                 new_mapping.save()
 
             output = get_email_address_from_forwarder_address(address)
@@ -1731,7 +1748,8 @@ class PeopleMapForNonexistentProject(WebTest):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus'),
-             u'method': u'GET'})
+             u'method': u'GET'}
+        )
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
@@ -1739,7 +1757,8 @@ class PeopleMapForNonexistentProject(WebTest):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'icanhelp:Phorum'},
              u'user': User.objects.get(username='paulproteus'),
-             u'method': u'GET'})
+             u'method': u'GET'}
+        )
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
@@ -1754,15 +1773,12 @@ class SaveReordering(BasicHelpers):
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-            PortfolioEntry.create_dummy_with_project(
-                person=paul, sort_order=-1),
-            PortfolioEntry.create_dummy_with_project(
-                person=paul, sort_order=-2),
+            PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-1),
+            PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-2),
         ]
 
         def get_ordering():
-            response = client.get(
-                reverse(mysite.profile.views.gimme_json_for_portfolio))
+            response = client.get(reverse(mysite.profile.views.gimme_json_for_portfolio))
             obj = json.loads(response.content)
             return [pfe['pk'] for pfe in obj['portfolio_entries']]
 
@@ -1772,8 +1788,10 @@ class SaveReordering(BasicHelpers):
 
         # POST to a view with a list of ids
         view = reverse(mysite.base.views.save_portfolio_entry_ordering_do)
-        client.post(view, {'sortable_portfolio_entry[]': [str(pfes[1].pk),
-                                                          str(pfes[0].pk)]})
+        client.post(
+            view,
+            {'sortable_portfolio_entry[]': [str(pfes[1].pk), str(pfes[0].pk)]}
+        )
 
         # Get the list of projects
         ordering_afterwards = get_ordering()
@@ -1792,17 +1810,16 @@ class ArchiveProjects(BasicHelpers):
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-            PortfolioEntry.create_dummy_with_project(
-                person=paul, sort_order=-1),
-            PortfolioEntry.create_dummy_with_project(
-                person=paul, sort_order=-2),
+            PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-1),
+            PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-2),
         ]
 
         # POST to a view with a list of ids
         view = reverse(mysite.base.views.save_portfolio_entry_ordering_do)
-        client.post(view, {
-            'sortable_portfolio_entry[]':
-            [str(pfes[0].pk), "FOLD", str(pfes[1].pk)]})
+        client.post(
+            view,
+            {'sortable_portfolio_entry[]': [str(pfes[0].pk), "FOLD", str(pfes[1].pk)]}
+        )
 
         this_should_be_archived = PortfolioEntry.objects.get(pk=pfes[1].pk)
         self.assert_(this_should_be_archived.is_archived)
@@ -1819,7 +1836,8 @@ class Notifications(WebTest):
         # First move the timestamp back
         Timestamp.update_timestamp_for_string(
             send_emails.Command.TIMESTAMP_KEY,
-            override_time=Timestamp.ZERO_O_CLOCK)
+            override_time=Timestamp.ZERO_O_CLOCK
+        )
         command = mysite.profile.management.commands.send_emails.Command()
         context = command.get_context_for_email_to(recipient)
         return context
@@ -1858,13 +1876,13 @@ class Notifications(WebTest):
         participants_who_are_news_to_each_other = []  # initial value
 
         if not how_to_add_people:
-            how_to_add_people = [Notifications.add_contributor,
-                                 Notifications.add_contributor]
+            how_to_add_people = [Notifications.add_contributor, Notifications.add_contributor]
 
         for index, add_person_function in enumerate(how_to_add_people):
             participant = Person.create_dummy(
                 first_name=str(index),
-                email_me_re_projects=people_want_emails)
+                email_me_re_projects=people_want_emails
+            )
             add_person_function(participant, project_with_two_participants)
             participants_who_are_news_to_each_other.append(participant)
 
@@ -1878,10 +1896,10 @@ class Notifications(WebTest):
             if emails_should_actually_be_sent:
                 # The timestamp log should have been modified since the top of
                 # the function.
-                self.assert_(
-                    send_emails.Command.get_time_range_endpoint_of_last_email(
-                    )
-                    > time_range_endpoint_at_func_top)
+                self.assertTrue(
+                    send_emails.Command.get_time_range_endpoint_of_last_email() >
+                    time_range_endpoint_at_func_top
+                )
 
         if outbox_or_context == 'context':
             command = mysite.profile.management.commands.send_emails.Command()
@@ -1895,14 +1913,14 @@ class Notifications(WebTest):
 
     @staticmethod
     def add_contributor(person, project):
-        PortfolioEntry.create_dummy(
-            person=person, project=project, is_published=True)
+        PortfolioEntry.create_dummy(person=person, project=project, is_published=True)
 
     @staticmethod
     def add_contributor_with_maintainer_status(person, project, is_maintainer):
-        PortfolioEntry.create_dummy(
-            person=person, project=project, is_published=True,
-            receive_maintainer_updates=is_maintainer)
+        PortfolioEntry.create_dummy(person=person,
+                                    project=project,
+                                    is_published=True,
+                                    receive_maintainer_updates=is_maintainer)
 
     @staticmethod
     def add_wannahelper(person, project, created_date=None):
@@ -1915,8 +1933,9 @@ class Notifications(WebTest):
 
     def test_email_the_people_with_checkboxes_checked(self):
         contributors, outbox = (
-            self.add_two_people_to_a_project_and_send_emails(
-                people_want_emails=True, outbox_or_context='outbox'))
+            self.add_two_people_to_a_project_and_send_emails(people_want_emails=True,
+                                                             outbox_or_context='outbox')
+        )
 
         self.assertEqual(len(outbox), 2)
 
@@ -1925,8 +1944,9 @@ class Notifications(WebTest):
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
         contributors, outbox = (
-            self.add_two_people_to_a_project_and_send_emails(
-                people_want_emails=False, outbox_or_context='outbox'))
+            self.add_two_people_to_a_project_and_send_emails(people_want_emails=False,
+                                                             outbox_or_context='outbox')
+        )
 
         self.assertEqual(len(outbox), 0)
 
@@ -1942,16 +1962,14 @@ class Notifications(WebTest):
         # Paul will be the recipient of the email, and he's a contributor to
         # the project created above, so he'll be getting information about that
         # project's recent activity in his periodic email
-        PortfolioEntry.create_dummy(
-            person=paul, project=project, is_published=True)
+        PortfolioEntry.create_dummy(person=paul, project=project, is_published=True)
 
         NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL = 5
 
         # 5 people have joined this project today
         for i in range(NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL):
             p = Person.create_dummy()
-            PortfolioEntry.create_dummy(
-                person=p, project=project, is_published=True)
+            PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
 
         # 1 person joined this project two weeks ago (too long ago to mention
         # in this email)
@@ -1961,7 +1979,8 @@ class Notifications(WebTest):
 
         Timestamp.update_timestamp_for_string(
             send_emails.Command.TIMESTAMP_KEY,
-            override_time=yesterday)
+            override_time=yesterday
+        )
 
         veteran = Person.create_dummy()
         veteran.user.first_name = 'VETERAN'
@@ -2042,8 +2061,9 @@ class Notifications(WebTest):
         # Paul will be the recipient of the email, and he's a contributor to
         # the project created above, so he'll be getting information about that
         # project's recent activity in his periodic email
-        PortfolioEntry.create_dummy(
-            person=paul, project=project, is_published=True)
+        PortfolioEntry.create_dummy(person=paul,
+                                    project=project,
+                                    is_published=True)
 
         # Since paul is the only newly marked contributor to this project,
         # there will be no news to report, and by stipulation the context of
@@ -2055,8 +2075,9 @@ class Notifications(WebTest):
         # 2 people have joined this project recently
         for i in range(number_of_new_contributors_other_than_paul):
             p = Person.create_dummy()
-            PortfolioEntry.create_dummy(
-                person=p, project=project, is_published=True)
+            PortfolioEntry.create_dummy(person=p,
+                                        project=project,
+                                        is_published=True)
 
         data = get_contributors_data()
         self.assertEqual(len(data['display_these_contributors']), 3)
@@ -2064,8 +2085,9 @@ class Notifications(WebTest):
 
         # Now add one more person
         p = Person.create_dummy()
-        PortfolioEntry.create_dummy(
-            person=p, project=project, is_published=True)
+        PortfolioEntry.create_dummy(person=p,
+                                    project=project,
+                                    is_published=True)
 
         data = get_contributors_data()
         self.assertEqual(len(data['display_these_contributors']), 3)
@@ -2075,8 +2097,9 @@ class Notifications(WebTest):
         # project doesn't show up in the summary (even when there are other
         # projects to speak of)
         solo_project = Project.create_dummy(name='solo project')
-        PortfolioEntry.create_dummy(
-            person=paul, project=solo_project, is_published=True)
+        PortfolioEntry.create_dummy(person=paul,
+                                    project=solo_project,
+                                    is_published=True)
         context = Notifications.get_email_context(paul)
         project2people = context['project2people']
         first_project, contributors_data = project2people[0]
@@ -2087,12 +2110,11 @@ class Notifications(WebTest):
         # The second project doesn't appear
         self.assertEqual(len(project2people), 1)
 
-    def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(
-            self):
+    def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(self):
         # This recipient is the only recent member of her projects
         no_news_for_me = Person.create_dummy(email='dont_email_me@example.com')
-        PortfolioEntry.create_dummy_with_project(
-            person=no_news_for_me, is_published=True)
+        PortfolioEntry.create_dummy_with_project(person=no_news_for_me,
+                                                 is_published=True)
 
         # The person above should NOT get an email
 
@@ -2111,10 +2133,9 @@ class Notifications(WebTest):
         for i in range(2):
             contributor = Person.create_dummy(
                 email='contributor.%d@example.com' % i)
-            PortfolioEntry.create_dummy(
-                person=contributor,
-                project=project_with_two_contributors,
-                is_published=True)
+            PortfolioEntry.create_dummy(person=contributor,
+                                        project=project_with_two_contributors,
+                                        is_published=True)
             contributors_who_are_news_to_each_other.append(contributor)
 
         outbox = Notifications.send_email_and_get_outbox()
@@ -2137,16 +2158,17 @@ class Notifications(WebTest):
     def set_when_emails_were_last_sent(when):
         Timestamp.update_timestamp_for_string(
             send_emails.Command.TIMESTAMP_KEY,
-            override_time=when)
+            override_time=when
+        )
 
     def try_to_send_some_emails(self, expect_success):
         add_and_send = self.add_two_people_to_a_project_and_send_emails
         people, outbox = add_and_send(
-            how_to_add_people=[
-                Notifications.add_contributor,
-                Notifications.add_wannahelper],
+            how_to_add_people=[Notifications.add_contributor,
+                               Notifications.add_wannahelper],
             outbox_or_context='outbox',
-            emails_should_actually_be_sent=expect_success)
+            emails_should_actually_be_sent=expect_success
+        )
         were_emails_sent = bool(outbox)
         self.assertEqual(expect_success, were_emails_sent)
 
@@ -2174,8 +2196,7 @@ class Notifications(WebTest):
         # recorded that we sent emails within 24 hours.
         self.try_to_send_some_emails(expect_success=False)
 
-    def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(
-            self):
+    def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(self):
 
         # Now let's make sure that the converse scenario works as expected. We
         # sent the emails over 24 hours ago, and somebody runs the
@@ -2205,17 +2226,21 @@ class Notifications(WebTest):
         project_i_maintain = Project.create_dummy()
 
         # first project
-        Notifications.add_contributor_with_maintainer_status(
-            person, project_i_contributed_to, False)
+        Notifications.add_contributor_with_maintainer_status(person,
+                                                             project_i_contributed_to,
+                                                             False)
 
         # second project
         Notifications.add_wannahelper(person, project_i_wanna_help)
 
         # third project
-        Notifications.add_contributor_with_maintainer_status(
-            person, project_i_maintain, True)
+        Notifications.add_contributor_with_maintainer_status(person,
+                                                             project_i_maintain,
+                                                             True)
 
-        maintainer_projects = mysite.profile.management.commands.send_emails.Command.get_maintainer_projects(person)
+        maintainer_projects = (
+            mysite.profile.management.commands.send_emails.Command.get_maintainer_projects(person)
+        )
         self.assertEqual(maintainer_projects, [project_i_maintain])
 
     def test_dont_tell_me_about_projects_where_i_am_the_only_participant(self):
@@ -2223,10 +2248,8 @@ class Notifications(WebTest):
         # the email
         person = Person.create_dummy()
         project_i_wanna_help_and_contributed_to = Project.create_dummy()
-        Notifications.add_contributor(
-            person, project_i_wanna_help_and_contributed_to)
-        Notifications.add_wannahelper(
-            person, project_i_wanna_help_and_contributed_to)
+        Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
+        Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
         command = mysite.profile.management.commands.send_emails.Command()
         email_context = command.get_context_for_email_to(person)
         self.assertEqual(None, email_context)
@@ -2253,7 +2276,8 @@ class Notifications(WebTest):
         # The timespan for this email is the last 24 hours
         Timestamp.update_timestamp_for_string(
             send_emails.Command.TIMESTAMP_KEY,
-            override_time=yesterday)
+            override_time=yesterday
+        )
 
         # This dude signs up to be a helper
         Notifications.add_wannahelper(new_wh, a_project)
@@ -2302,8 +2326,7 @@ class PeopleMapSummariesAreCheap(WebTest):
         # Give paulproteus some projects
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
-                project=Project.objects.get_or_create(
-                    name='project name')[0],
+                project=Project.objects.get_or_create(name='project name')[0],
                 is_published=True,
                 person=self.paulproteus)[0],
             languages='Python',
@@ -2312,8 +2335,7 @@ class PeopleMapSummariesAreCheap(WebTest):
 
         citation = Citation(
             portfolio_entry=PortfolioEntry.objects.get_or_create(
-                project=Project.objects.get_or_create(
-                    name='project name2')[0],
+                project=Project.objects.get_or_create(name='project name2')[0],
                 is_published=True,
                 person=self.paulproteus)[0],
             languages='Python',
@@ -2401,8 +2423,7 @@ class ProfileApiTest(BasicHelpers):
     def setUp(self):
         super(ProfileApiTest, self).setUp()
         portfolio_entry = PortfolioEntry.objects.get_or_create(
-            project=Project.objects.get_or_create(
-                name='project name')[0],
+            project=Project.objects.get_or_create(name='project name')[0],
             person=Person.objects.get(user__username='paulproteus'),
             is_published=True)[0]
 
@@ -2466,20 +2487,68 @@ class TestUserDeletion(BasicHelpers):
 class TestBreakLongWordsFilter(WebTest):
     def test_too_shirt_to_break(self):
         eight_chars = 'abcdefgh'
-        output = mysite.profile.templatetags.profile_extras.break_long_words(
-            eight_chars)
+        output = mysite.profile.templatetags.profile_extras.break_long_words(eight_chars)
         self.assertEqual(output, eight_chars)
 
     def test_simple_break(self):
         nine_chars = 'abcdefghi'
         nine_chars_plus_wbr = u'abcdefgh\u200bi'
-        output = mysite.profile.templatetags.profile_extras.break_long_words(
-            nine_chars)
+        output = mysite.profile.templatetags.profile_extras.break_long_words(nine_chars)
         self.assertEqual(output, nine_chars_plus_wbr)
 
     def test_break_across_tag_boundaries(self):
         nine_chars = 'abc<i>defghi</i>'
         nine_chars_plus_wbr = u'abcdefgh\u200bi'
-        output = mysite.profile.templatetags.profile_extras.break_long_words(
-            nine_chars)
+        output = mysite.profile.templatetags.profile_extras.break_long_words(nine_chars)
         self.assertEqual(output, nine_chars_plus_wbr)
+
+
+class TestFunctions(WebTest):
+
+    def test_url2printably_short_less_cutoff(self):
+        cutoff = 50
+        url = 'https://example.com'
+        self.assertLess(len(url), cutoff)
+        self.assertTrue(mysite.profile.models.url2printably_short(url, cutoff))
+
+    def test_url2printably_short_equal_cutoff(self):
+        cutoff = 50
+        url = 'https://example.com/blogit/peanutbutter/jelly.html'
+        self.assertEqual(len(url), cutoff)
+        self.assertTrue(mysite.profile.models.url2printably_short(url, cutoff))
+
+    def test_url2printably_short_greater_cutoff(self):
+        cutoff = 50
+        url = 'https://example.com/blog/peanutbutter/jelly/baseballhotdogsandapplepie.html'
+        self.assertGreater(len(url), cutoff)
+        self.assertTrue(mysite.profile.models.url2printably_short(url, cutoff))
+
+
+class TagTypeTest(TestCase):
+    """ Tests TagType model """
+    def create_tagtype(self, name=None):
+        return TagType.objects.create(name=name)
+
+    def test_tagtype_creation(self):
+        t = self.create_tagtype(name='raspberrypi')
+        self.assertIsInstance(t, TagType)
+        self.assertEqual(t.__unicode__(), t.name)
+
+
+class CitationTest(WebTest):
+    """ Tests Citation model """
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def create_citation(self, portfolio_entry=None, summary=None):
+        return Citation.objects.create(portfolio_entry=portfolio_entry, summary=summary)
+
+    def test_citation_creation(self):
+        self.user = "paulproteus"
+        self.paulproteus = Person.objects.get(user__username='paulproteus')
+        self.project = Project.objects.get_or_create(name='project name')[0]
+        self.portfolio_entry = PortfolioEntry.objects.get_or_create(project=self.project,
+            person=Person.objects.get(user__username=self.user))[0]
+
+        c = self.create_citation(portfolio_entry=self.portfolio_entry, summary='citationsforus')
+        self.assertIsInstance(c, Citation)
+        self.assertEqual(c.__unicode__(), "pk=%s, summary=%s" % (c.pk, c.summary))
