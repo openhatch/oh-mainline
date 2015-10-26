@@ -100,7 +100,7 @@ or on the issue ticket. Attending the weekly development meetings on IRC is a
 great time to ask for help or recommendations on issues to work on.
 
 
-.. _here: https://github.com/openhatch/oh-mainline/issues
+.. _here: https://github.com/openhatch/oh-mainline/issues?q=is%3Aopen+is%3Aissue+label%3Abitesize
 
 
 Getting unstuck
