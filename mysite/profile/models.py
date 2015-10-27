@@ -489,8 +489,9 @@ models.signals.post_save.connect(create_profile_when_user_created, User)
 
 
 
-def update_the_project_cached_contributor_count(sender, instance, **kwargs):
-    instance.project.update_cached_contributor_count_and_save()
+def update_the_project_cached_contributor_count(sender, instance, raw, **kwargs):
+    if not raw:
+        instance.project.update_cached_contributor_count_and_save()
 
 class TagType(models.Model):
     # {{{
@@ -752,9 +753,10 @@ models.signals.post_save.connect(
 # change.
 
 
-def flush_map_json_cache(*args, **kwargs):
-    path = os.path.join(settings.WEB_ROOT, '+cacheable')
-    shutil.rmtree(path, ignore_errors=True)
+def flush_map_json_cache(raw, *args, **kwargs):
+    if not raw:
+        path = os.path.join(settings.WEB_ROOT, '+cacheable')
+        shutil.rmtree(path, ignore_errors=True)
 
 models.signals.post_save.connect(flush_map_json_cache, sender=PortfolioEntry)
 models.signals.post_save.connect(flush_map_json_cache, sender=Person)
