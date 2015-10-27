@@ -99,7 +99,18 @@ OTHER_DATABASES = {
         'PASSWORD': '',
         'CHARSET': 'utf8',
     },
+    'docker': {
+        'NAME': 'openhatch',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': 'postgres',
+        'USER': 'openhatch',
+        'PASSWORD': 'openhatch',
+        'CHARSET': 'utf8',
+    },
 }
+
+if os.environ.get('DOCKER'):
+    DATABASES['default'] = OTHER_DATABASES['docker']
 
 if os.environ.get('USE_POSTGRES'):
     DATABASES['default'] = OTHER_DATABASES['postgres']

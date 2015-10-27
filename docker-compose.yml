@@ -1,0 +1,16 @@
+postgres:
+  image: postgres
+  environment:
+    - POSTGRES_PASSWORD=openhatch
+    - POSTGRES_USER=openhatch
+  volumes:
+    - /var/lib/postgresql/data
+
+openhatch:
+  image: openhatch
+  ports:
+    - "8081:80"
+  links:
+    - postgres
+  environment:
+    - DOCKER=true
