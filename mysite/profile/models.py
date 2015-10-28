@@ -16,34 +16,31 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# vim: set ai ts=4 sw=4 et:
-
+import cgi
+import collections
+import datetime
+import hashlib
+import logging
 import os.path
+import random
+import re
 import shutil
+import uuid
+import urllib
+
+from django.conf import settings
+from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.db.models import Q
+from django.utils import http
 
 from mysite.search.models import Project, get_image_data_scaled
 import mysite.customs.models
 import mysite.profile.view_helpers
 import mysite.base.models
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.conf import settings
-from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
-from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.utils import http
-
-import datetime
-import uuid
-import urllib
-import random
-import collections
-import re
-import cgi
-import logging
-import hashlib
 
 DEFAULT_LOCATION = 'Inaccessible Island'
 DEFAULT_LATITUDE = -37.3049962
@@ -76,7 +73,6 @@ def generate_person_photo_path(instance, filename, suffix=""):
 
 
 class RepositoryCommitter(models.Model):
-
     """Ok, so we need to keep track of repository committers, e.g.
         paulproteus@fspot
     That's because when a user says, 'oy, this data you guys imported isn't
@@ -87,9 +83,8 @@ class RepositoryCommitter(models.Model):
 
 
 class Person(models.Model):
-
     """ A human bean. """
-    # {{{
+
     homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
@@ -98,46 +93,52 @@ class Person(models.Model):
     bio = models.TextField(blank=True)
     contact_blurb = models.TextField(blank=True)
     expand_next_steps = models.BooleanField(default=True)
-    photo = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' +
-                              generate_person_photo_path(a, b),
-                              default='')
-    photo_thumbnail = models.ImageField(upload_to=
-                                        lambda a, b: 'static/photos/profile-photos/' +
-                                        generate_person_photo_path(
-                                            a, b, suffix="-thumbnail"),
-                                        default='',
-                                        null=True)
+    photo = models.ImageField(
+        upload_to=lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(a, b),
+        default=''
+    )
+    photo_thumbnail = models.ImageField(
+        upload_to=lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(
+            a, b, suffix="-thumbnail"),
+        default='',
+        null=True
+    )
 
-    photo_thumbnail_30px_wide = models.ImageField(upload_to=
-                                                  lambda a, b: 'static/photos/profile-photos/' +
-                                                  generate_person_photo_path(
-                                                      a, b, suffix="-thumbnail-30px-wide"),
-                                                  default='', null=True)
+    photo_thumbnail_30px_wide = models.ImageField(
+        upload_to=lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(
+            a, b, suffix="-thumbnail-30px-wide"),
+        default='',
+        null=True
+    )
 
-    photo_thumbnail_20px_wide = models.ImageField(upload_to=
-                                                  lambda a, b: 'static/photos/profile-photos/' +
-                                                  generate_person_photo_path(
-                                                      a, b, suffix="-thumbnail-20px-wide"),
-                                                  default='', null=True)
+    photo_thumbnail_20px_wide = models.ImageField(
+        upload_to=lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(
+            a, b, suffix="-thumbnail-20px-wide"),
+        default='',
+        null=True
+    )
 
-    blacklisted_repository_committers = models.ManyToManyField(
-        RepositoryCommitter)
+    blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
     dont_guess_my_location = models.BooleanField(default=False)
     location_confirmed = models.BooleanField(default=False)
-    location_display_name = models.CharField(max_length=255, blank=True,
-                                             default=DEFAULT_LOCATION,
-                                             verbose_name='Location')
+    location_display_name = models.CharField(
+        max_length=255,
+        blank=True,
+        default=DEFAULT_LOCATION,
+        verbose_name='Location'
+    )
     latitude = models.FloatField(null=False, default=-37.3049962)
     longitude = models.FloatField(null=False, default=-12.6790445)
-    email_me_re_projects = models.BooleanField(default=True,
-                                               verbose_name='Email me periodically about activity in my projects')
+    email_me_re_projects = models.BooleanField(
+        default=True,
+        verbose_name='Email me periodically about activity in my projects'
+    )
 
     irc_nick = models.CharField(max_length=30, blank=True, null=True)
 
     @staticmethod
     def create_dummy(first_name="", email=None, **kwargs):
-
+        """ Creates a dummy user """
         # Generate a random string to use as a username. Keep it short
         # so that it doesn't overflow the username field!
         username = uuid.uuid4().hex[:16]
@@ -148,7 +149,7 @@ class Person(models.Model):
         data = {'user': user}
 
         # If the caller of create_dummy passes in a user, then we won't use the
-        # user defined above
+        # dummy user defined above
         data.update(kwargs)
 
         # Save the user after the update, so we don't save a new user if one
@@ -164,14 +165,12 @@ class Person(models.Model):
         return person
 
     def location_is_public(self):
-        # If you change this method, change the method immediately below this
-        # one (Person.inaccessible_islanders)
+        """ If you change this method, change the method (Person.inaccessible_islanders) too """
         return self.location_confirmed and self.location_display_name
 
     @staticmethod
     def inaccessible_islanders():
-        # If you change this method, change the method immediately above this
-        # one (location_is_public)
+        """ If you change this method, change the method (location_is_public) too """
         return Person.objects.filter(Q(location_confirmed=False) | Q(location_display_name=''))
 
     def get_public_location_or_default(self):
@@ -193,8 +192,11 @@ class Person(models.Model):
             return DEFAULT_LONGITUDE
 
     def __unicode__(self):
-        return "username: %s, name: %s %s" % (self.user.username,
-                                              self.user.first_name, self.user.last_name)
+        return "username: %s, name: %s %s" % (
+            self.user.username,
+            self.user.first_name,
+            self.user.last_name
+        )
 
     def get_photo_url_or_default(self):
         try:
@@ -204,15 +206,12 @@ class Person(models.Model):
 
     @staticmethod
     def get_from_session_key(session_key):
-        '''Based almost entirely on
-        http://www.djangosnippets.org/snippets/1276/
-        Thanks jdunck!'''
+        """Based almost entirely on http://www.djangosnippets.org/snippets/1276/ Thanks jdunck!"""
 
         session_engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
         session_wrapper = session_engine.SessionStore(session_key)
         user_id = session_wrapper.get(SESSION_KEY)
-        auth_backend = load_backend(
-            session_wrapper.get(BACKEND_SESSION_KEY))
+        auth_backend = load_backend(session_wrapper.get(BACKEND_SESSION_KEY))
 
         if user_id and auth_backend:
             return Person.objects.get(user=auth_backend.get_user(user_id))
@@ -269,26 +268,35 @@ class Person(models.Model):
 
     def get_maintainer_portfolio_entries(self):
         """
-        Return the PortfolioEntries for which this person wants to receive
+        Return the PortfolioEntries that this person wants to receive from
         maintainer updates.
         """
-        return PortfolioEntry.published_ones.filter(person=self,
-                                                    receive_maintainer_updates=True)
+        return PortfolioEntry.published_ones.filter(
+            person=self,
+            receive_maintainer_updates=True
+        )
 
     def get_list_of_all_published_projects(self):
         # This method looks familiar but testing -- jl
-
         return self.get_published_portfolio_entries()
 
     def get_list_of_all_project_names(self):
         # if you change this method, be sure to increment the version number in
         # the cache key above
-        return list(self.get_published_portfolio_entries().values_list(
-            'project__name', flat=True).distinct())
+        return list(
+            self.get_published_portfolio_entries().values_list(
+                'project__name',
+                flat=True
+            ).distinct()
+        )
 
     def get_display_names_of_nonarchived_projects(self):
-        return list(self.get_nonarchived_published_portfolio_entries().values_list(
-            'project__display_name', flat=True).distinct())
+        return list(
+            self.get_nonarchived_published_portfolio_entries().values_list(
+                'project__display_name',
+                flat=True
+            ).distinct()
+        )
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -307,7 +315,7 @@ class Person(models.Model):
         return []
 
     def _get_recommended_search_terms(self):
-        # {{{
+
         terms = []
 
         # Add terms based on languages in citations
@@ -317,8 +325,10 @@ class Person(models.Model):
 
         # Add terms based on projects in citations
         terms.extend(
-            [pfe.project.name for pfe in self.get_published_portfolio_entries()
-             if pfe.project.name and pfe.project.name.strip()])
+            [pfe.project.name
+             for pfe in self.get_published_portfolio_entries()
+             if pfe.project.name and pfe.project.name.strip()]
+        )
 
         # Add terms based on tags
         terms.extend([tag.text for tag in self.get_tags_for_recommendations()])
@@ -331,22 +341,25 @@ class Person(models.Model):
         # FIXME: Add support for recommended projects.
         # FIXME: Add support for recommended project tags.
 
-        # }}}
-
     def get_published_citations_flat(self):
-        return sum([list(pfe.get_published_citations())
-                    for pfe in self.get_published_portfolio_entries()], [])
+        return sum(
+            [list(pfe.get_published_citations())
+             for pfe in self.get_published_portfolio_entries()],
+            []
+        )
 
     def get_tag_texts_for_map(self):
-        """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
-        my_tag_texts = Tag.objects.filter(link_person_tag__person=self).extra(
-            select={'lowername': 'LOWER(text)'})
+        """ Return a list of Tags linked to this Person. """
+        my_tag_texts = Tag.objects.filter(
+            link_person_tag__person=self).extra(select={'lowername': 'LOWER(text)'})
+
         without_irrelevant_tags = my_tag_texts.exclude(
             tag_type__name__in=['understands_not', 'studying'])
+
         just_distinct_lowername = without_irrelevant_tags.values(
             'lowername').distinct().order_by('lowername')
-        text_and_lower = just_distinct_lowername.values_list(
-            'lowername', 'text')
+
+        text_and_lower = just_distinct_lowername.values_list('lowername', 'text')
         lower_set_so_far = set()
         ret = []
         for (lower, text) in text_and_lower:
@@ -365,39 +378,42 @@ class Person(models.Model):
     def get_tag_descriptions_for_keyword(self, keyword):
         keyword = keyword.lower()
         d = self.get_tags_as_dict()
-        return sorted([TagType.short_name2long_name[short]
-                       for short in [key for key in d if (keyword in d[key])]])
+        return sorted(
+            [TagType.short_name2long_name[short]
+             for short in [key for key in d if (keyword in d[key])]]
+        )
 
     def get_tags_for_recommendations(self):
-        """Return a list of Tags linked to this Person.  For use with bug recommendations."""
+        """Return a list of Tags linked to this Person. For use with bug recommendations."""
         exclude_me = TagType.objects.filter(name='understands_not')
-        return [link.tag for link in self.link_person_tag_set.all() if link.tag.tag_type not in exclude_me]
+        return [link.tag
+                for link in self.link_person_tag_set.all()
+                if link.tag.tag_type not in exclude_me]
 
     def get_full_name(self):
-        # {{{
+
         name = self.user.first_name
         if self.user.first_name and self.user.last_name:
             name += " "
         name += self.user.last_name
         return name
-        # }}}
 
     def get_full_name_with_nbsps(self):
         full_name = self.get_full_name()
         full_name_escaped = cgi.escape(full_name)
-        full_name_escaped_with_nbsps = re.sub(
-            "\s+", "&nbsp;", full_name_escaped)
+        full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
         return full_name_escaped_with_nbsps
 
     def get_full_name_or_username(self):
         return self.get_full_name() or self.user.username
 
     def get_full_name_and_username(self):
-        full_name_start = ("%s (" % self.get_full_name()
-                           if self.user.first_name or self.user.last_name
-                           else "")
+        full_name_start = (
+            "%s (" % self.get_full_name() if self.user.first_name or self.user.last_name else ""
+        )
         full_name_end = (
-            ")" if self.user.first_name or self.user.last_name else "")
+            ")" if self.user.first_name or self.user.last_name else ""
+        )
         return "%s%s%s" % (full_name_start, self.user.username, full_name_end)
 
     def generate_thumbnail_from_photo(self):
@@ -418,17 +434,14 @@ class Person(models.Model):
             self.photo_thumbnail_20px_wide.save('', ContentFile(scaled_down))
 
     def get_collaborators_for_landing_page(self, n=9):
-        projects = set(
-            [e.project for e in self.get_published_portfolio_entries()])
+        projects = set([e.project for e in self.get_published_portfolio_entries()])
         infinity = 10000
         collaborator_lists = []
         for project in projects:
-            people = project.get_n_other_contributors_than(
-                n=infinity, person=self)
+            people = project.get_n_other_contributors_than(n=infinity, person=self)
             people = random.sample(people, min(n, len(people)))
             collaborator_lists.append(people)
-        round_robin = mysite.profile.view_helpers.roundrobin(
-            *collaborator_lists)
+        round_robin = mysite.profile.view_helpers.roundrobin(*collaborator_lists)
         collaborators = set()
         while len(collaborators) < n:
             try:
@@ -453,7 +466,7 @@ class Person(models.Model):
         return not self.location_confirmed and not self.dont_guess_my_location
 
     def get_coolness_factor(self, unhashed_tiebreaker):
-        '''This function's output is used as the sort order in (at least) the periodic emails.
+        """This function's output is used as the sort order in (at least) the periodic emails.
         You can be more cool if you:
            * Have projects
            * Have a picture
@@ -461,7 +474,7 @@ class Person(models.Model):
            * Are a wannahelper of something
         and finally we break ties by get_full_name_or_username(), just so that
         we have a predictable sort.
-        .'''
+        ."""
         hashed_tiebreaker = hashlib.sha1(unhashed_tiebreaker).hexdigest()
         factor = (bool(self.get_list_of_all_project_names()),
                   bool(self.get_tags_as_dict()),
@@ -475,13 +488,13 @@ class Person(models.Model):
         token.save()
         return token
 
-    # }}}
-
 
 def create_profile_when_user_created(instance, created, raw, *args, **kwargs):
-    """Post-save hook for Users. raw is populated from kwargs.
+    """
+    Post-save hook for Users. raw is populated from kwargs.
     See Django docs on Signals:
-    https://docs.djangoproject.com/en/dev/ref/signals/#post-save"""
+    https://docs.djangoproject.com/en/dev/ref/signals/#post-save
+    """
     if created and not raw:
         person, p_created = Person.objects.get_or_create(user=instance)
 
@@ -493,7 +506,7 @@ def update_the_project_cached_contributor_count(sender, instance, **kwargs):
     instance.project.update_cached_contributor_count_and_save()
 
 class TagType(models.Model):
-    # {{{
+
     short_name2long_name = {'understands': 'understands',
                             'can_mentor': 'can mentor in',
                             'can_pitch_in': 'can pitch in with',
@@ -504,11 +517,9 @@ class TagType(models.Model):
     def __unicode__(self):
         return self.name
 
-    # }}}
-
 
 class Tag(models.Model):
-    # {{{
+
     text = models.CharField(null=False, max_length=255)
     tag_type = models.ForeignKey(TagType)
 
@@ -523,34 +534,27 @@ class Tag(models.Model):
 
     def __unicode__(self):
         return "%s: %s" % (self.tag_type.name, self.text)
-    # }}}
 
 
 class Link_Project_Tag(models.Model):
-
-    "Many-to-many relation between Projects and Tags."
-    # {{{
+    """Many-to-many relation between Projects and Tags."""
     tag = models.ForeignKey(Tag)
     project = models.ForeignKey(Project)
     source = models.CharField(max_length=200)
-    # }}}
 
 
 class Link_Person_Tag(models.Model):
-
-    "Many-to-many relation between Person and Tags."
-    # {{{
+    """Many-to-many relation between Person and Tags."""
     tag = models.ForeignKey(Tag)
     person = models.ForeignKey(Person)
     source = models.CharField(max_length=200)
-    # }}}
 
 
 class PublishedPortfolioEntries(models.Manager):
 
     def get_query_set(self):
-        return super(PublishedPortfolioEntries, self).get_query_set().filter(
-            is_deleted=False, is_published=True)
+        return super(PublishedPortfolioEntries, self).get_query_set().filter(is_deleted=False,
+                                                                             is_published=True)
 
 
 class PortfolioEntry(models.Model):
@@ -558,8 +562,7 @@ class PortfolioEntry(models.Model):
     objects = models.Manager()
     published_ones = PublishedPortfolioEntries()
 
-    # FIXME: Constrain this so (person, project) pair uniquely finds a
-    # PortfolioEntry
+    # FIXME: Constrain this so (person, project) pair uniquely finds a PortfolioEntry
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
     project_description = models.TextField(blank=True)
@@ -573,13 +576,11 @@ class PortfolioEntry(models.Model):
     receive_maintainer_updates = models.BooleanField(default=True)
 
     def get_published_citations(self):
-        return Citation.untrashed.filter(portfolio_entry=self,
-                                         is_published=True)
+        return Citation.untrashed.filter(portfolio_entry=self, is_published=True)
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = {'project_description':
-                "DESCRIPTION-----------------------------" + uuid.uuid4().hex}
+        data = {'project_description': "DESCRIPTION-----------------------------" + uuid.uuid4().hex}
         data.update(kwargs)
         ret = PortfolioEntry(**data)
         ret.save()
@@ -648,8 +649,7 @@ class Citation(models.Model):
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.
         duplicates = [citation for citation in
-                      Citation.objects.filter(
-                          portfolio_entry=self.portfolio_entry)
+                      Citation.objects.filter(portfolio_entry=self.portfolio_entry)
                       if (citation.pk != self.pk) and (citation.summary == self.summary)]
 
         if duplicates:
@@ -695,7 +695,7 @@ class Forwarder(models.Model):
             expirable.delete()
 
         # Second, for users who have '$fwd' in their blurb, if they have no
-        # corresonding Forwarder object that we can list on the site, give
+        # corresponding Forwarder object that we can list on the site, give
         # them one.
         user_ids_that_need_forwarders = Person.objects.filter(
             contact_blurb__contains='$fwd').values_list('user_id', flat=True)
@@ -704,11 +704,9 @@ class Forwarder(models.Model):
             user__id__in=user_ids_that_need_forwarders,
             stops_being_listed_on__gt=now).values_list('user__id', flat=True)
 
-        user_ids_needing_regeneration = (set(
-            user_ids_that_need_forwarders).difference(
+        user_ids_needing_regeneration = (set(user_ids_that_need_forwarders).difference(
             set(user_ids_with_up_to_date_forwarders)))
-        users_needing_regeneration = [User.objects.get(pk=pk)
-                                      for pk in user_ids_needing_regeneration]
+        users_needing_regeneration = [User.objects.get(pk=pk) for pk in user_ids_needing_regeneration]
         for user in users_needing_regeneration:
             mysite.base.view_helpers.generate_forwarder(user)
             made_any_changes = True
@@ -742,16 +740,13 @@ def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
     RegeneratePostfixAliasesForForwarder().run()
 
-models.signals.post_save.connect(
-    update_the_project_cached_contributor_count, sender=PortfolioEntry)
-models.signals.post_save.connect(
-    make_forwarder_actually_work, sender=Forwarder)
+models.signals.post_save.connect(update_the_project_cached_contributor_count,
+                                 sender=PortfolioEntry)
+models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
 
 # The following signals are here so that we clear the cached list
 # of people for the map whenever Person, PortfolioEntry, or LinkPersonTag
 # change.
-
-
 def flush_map_json_cache(*args, **kwargs):
     path = os.path.join(settings.WEB_ROOT, '+cacheable')
     shutil.rmtree(path, ignore_errors=True)
@@ -759,6 +754,3 @@ def flush_map_json_cache(*args, **kwargs):
 models.signals.post_save.connect(flush_map_json_cache, sender=PortfolioEntry)
 models.signals.post_save.connect(flush_map_json_cache, sender=Person)
 models.signals.post_save.connect(flush_map_json_cache, sender=Link_Person_Tag)
-
-
-# vim: set nu:
