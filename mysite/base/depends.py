@@ -50,9 +50,7 @@ except:
     lxml.html = None
 
 if lxml.html is None:
-    logger.info("Some parts of the OpenHatch site may fail because the "
-                 "lxml library is not installed. Look in "
-                 "ADVANCED_INSTALLATION.mkd for information about lxml.")
+    logger.info("Some parts of the OpenHatch site may fail because the lxml library is not installed. Look in ADVANCED_INSTALLATION.md for information about lxml.")
 
 """
 PIL, Pillow - Images
@@ -93,8 +91,6 @@ def postmap_available(already_emitted_warning=[]):
             pass
         else:
             already_emitted_warning.append(True)
-            logger.warn('postmap binary not found at {0}. Look in '
-                         'ADVANCED_INSTALLATION for the section about '
-                         'postfix for more information.'.format(POSTMAP_PATH))
+            logger.warn('postmap binary not found at {0}. Look in ADVANCED_INSTALLATION for the section about postfix for more information.'.format(POSTMAP_PATH))
         return False
     return True

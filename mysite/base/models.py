@@ -45,8 +45,7 @@ class Timestamp(models.Model):
 
     @staticmethod
     def update_timestamp_for_string(s, override_time=None):
-        timestamp, _ = Timestamp.objects.get_or_create(key=Timestamp.hash(s), defaults={
-            'timestamp': datetime.datetime.utcnow()})
+        timestamp, _ = Timestamp.objects.get_or_create(key=Timestamp.hash(s), defaults={'timestamp': datetime.datetime.utcnow()})
         timestamp.timestamp = override_time or datetime.datetime.utcnow()
         timestamp.save()  # definitely!
         return timestamp
