@@ -15,26 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+from dateutil import tz
+import json
+import pytz
+from urlparse import parse_qsl
+
 from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
 from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
-try:
-    from urlparse import parse_qsl
-except ImportError:
-    from cgi import parse_qsl  # Python 2.5 on deployment
-
+from django.utils import http
 
 from mysite.search.models import Project
 import mysite.search.view_helpers
 import mysite.base.view_helpers
 from mysite.base.view_helpers import render_response
-
-import datetime
-from dateutil import tz
-import pytz
-from django.utils import http
-import json
 import mysite.search.forms
 import mysite.base.decorators
 
@@ -149,8 +145,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
     # data structure.
     facet2any_query_string = {}
     for facet in query.active_facet_options:
-        facet2any_query_string[facet] = query.get_facet_options(
-            facet, [''])[0]['query_string']
+        facet2any_query_string[facet] = query.get_facet_options(facet, [''])[0]['query_string']
 
     Bug = mysite.search.models.Bug
     from django.db.models import Q, Count
@@ -185,18 +180,17 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
-    """ The search results page accesses this view via jQuery's getJSON method, 
-    and loads its results into the DOM."""
-    # Purpose of this code: Serialize the list of bugs
-    # Step 1: Pull the bugs out of the database, getting them back
-    #   as simple Python objects
-
+    """
+    Purpose: Serialize the list of bugs
+    The search results page accesses this view via jQuery's getJSON method, and loads its results
+    into the DOM
+    """
+    # Step 1: Pull the bugs out of the database, getting them back as simple Python objects
     obj_serializer = serializers.get_serializer('python')()
     bugs = obj_serializer.serialize(bunch_of_bugs)
 
-    # Step 2: With a (tragically) large number of database calls,
-    # loop over these objects, replacing project primary keys with project
-    # display names.
+    # Step 2: With a (tragically) large number of database calls, loop over these objects,
+    # replacing project primary keys with project display names.
     for bug in bugs:
         project = Project.objects.get(pk=int(bug['fields']['project']))
         bug['fields']['project'] = project.display_name
@@ -208,22 +202,19 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     json_as_string = json.dumps(data_list, default=encode_datetime)
 
     # Step 5: Prefix it with the desired callback function name
-    json_string_with_callback = callback_function_name + \
-        '(' + json_as_string + ')'
+    json_string_with_callback = callback_function_name + '(' + json_as_string + ')'
 
     # Step 6: Return that.
     return HttpResponse(json_string_with_callback)
 
 
 def list_to_jquery_autocompletion_format(list):
-    """Converts a list to the format required by
-    jQuery's autocomplete plugin."""
+    """Converts a list to the format required by jQuery's autocomplete plugin."""
     return "\n".join(list)
 
 
 class SearchableField:
-
-    "A field in the database you can search."
+    """A field in the database you can search."""
     fields_by_prefix = {}
 
     def __init__(self, _prefix):
@@ -263,7 +254,6 @@ def project_has_icon(request, project_name):
         return HttpResponse("keep polling")
     return HttpResponse(p.get_url_of_icon_or_generic())
 
-
 """
 Ways we could do autocompletion:
 
@@ -277,4 +267,3 @@ Ask server to give a list of projects and languages beginning with "c"
 
 Add top 100 fulltext words to the mix.
 """
-# vim: set ai ts=4 sw=4 et nu:
