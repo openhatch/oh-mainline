@@ -1566,8 +1566,12 @@ class EmailForwarderGarbageCollection(WebTest):
             expires_on_future_number = valid and 1 or -1
             stops_being_listed_on_future_number = (new_enough_for_display
                                                    and 1 or -1)
-            expires_on = datetime.datetime.utcnow() + expires_on_future_number * datetime.timedelta(minutes=10)
-            stops_being_listed_on = datetime.datetime.utcnow() + stops_being_listed_on_future_number * datetime.timedelta(minutes=10)
+            expires_on = (datetime.datetime.utcnow() +
+                          expires_on_future_number *
+                          datetime.timedelta(minutes=10))
+            stops_being_listed_on = (datetime.datetime.utcnow() +
+                                     stops_being_listed_on_future_number *
+                                     datetime.timedelta(minutes=10))
             user = User.objects.get(username="paulproteus")
             new_mapping = mysite.profile.models.Forwarder(
                 address=address, expires_on=expires_on, user=user,
@@ -1879,7 +1883,7 @@ class Notifications(WebTest):
                 email_contexts[participant.pk] = email_context
             output = email_contexts
 
-        return participants_who_are_news_to_each_other, output
+        return (participants_who_are_news_to_each_other, output)
 
     @staticmethod
     def add_contributor(person, project):
