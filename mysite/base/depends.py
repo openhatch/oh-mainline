@@ -29,29 +29,36 @@ import os
 import logging
 import django.conf
 
+logger = logging.getLogger(__name__)
 
-# class used if module does not exist
+
 class nothing(object):
+    """ Used if a module (i.e. lxml, PIL, SVN, postmap) does not not exist """
     pass
 
-# lxml - Wrap lxml and the modules that are part of it
+"""
+lxml - XML
+Wrap lxml and the modules that are part of it
+"""
 try:
     import lxml
     import lxml.etree
     import lxml.html
 except:
-    lxml = nothing()
+    lxml = nothing()   # Set lxml to the 'nothing' class
     lxml.etree = None
     lxml.html = None
 
 if lxml.html is None:
-    logging.info("Some parts of the OpenHatch site may fail because the "
+    logger.info("Some parts of the OpenHatch site may fail because the "
                  "lxml library is not installed. Look in "
                  "ADVANCED_INSTALLATION.mkd for information about lxml.")
 
-
-# Pillow, PIL, Images - Here we try to import "Image", from the Python Imaging Library.
-# If we fail, Image is None.
+"""
+PIL, Pillow - Images
+Try to import "Image", from the Python Imaging Library.
+If we fail, Image is None.
+"""
 Image = None
 try:
     import Image
@@ -74,17 +81,19 @@ def svnadmin_available():
     return os.path.exists(django.conf.settings.SVNADMIN_PATH)
 
 
-# Postmap email - Check if available
 def postmap_available(already_emitted_warning=[]):
-    # Module-level state is used to track if we already emitted the warning.
-    # It is not thread-safe, but it sure is convenient.
+    """
+    Checks if POSTMAP is available
+    Module-level state is used to track if we already emitted the warning.
+    It is not thread-safe, but it sure is convenient.
+    """
     POSTMAP_PATH = '/usr/sbin/postmap'
     if not os.path.exists(POSTMAP_PATH):
         if already_emitted_warning:
             pass
         else:
             already_emitted_warning.append(True)
-            logging.warn('postmap binary not found at {0}. Look in '
+            logger.warn('postmap binary not found at {0}. Look in '
                          'ADVANCED_INSTALLATION for the section about '
                          'postfix for more information.'.format(POSTMAP_PATH))
         return False

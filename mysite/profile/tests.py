@@ -27,6 +27,7 @@ import tasks
 import mock
 import os
 import quopri
+import subprocess
 
 from django.core import mail
 from django.conf import settings
@@ -36,8 +37,6 @@ import django.db
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.utils.unittest import skipIf
-from django.utils.unittest import skip
 from django_webtest import WebTest
 from django.test.client import Client
 
@@ -130,10 +129,8 @@ class DebTagsTests(BasicHelpers):
                          ['implemented-in::c'])
 
     def testImportDebtags(self):
-        views.import_debtags(cooked_string='alpine:works-with::mail, '
-                             'protocol::smtp')  # side effects galore!
-        self.assertEqual(set(views.list_debtags_of_project('alpine')),
-                         set(['works-with::mail', 'protocol::smtp']))
+        views.import_debtags(cooked_string='alpine: works-with::mail, protocol::smtp')  # side effects galore!
+        self.assertEqual(set(views.list_debtags_of_project('alpine')), set(['works-with::mail', 'protocol::smtp']))
 
 
 class Info(BasicHelpers):
@@ -1078,8 +1075,7 @@ class EditHomepage(WebTest):
         response = edit_info_form.submit()
 
         # find the string we just submitted as our bio
-        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
-                         "http://www.asheesh.org/")
+        self.assertEqual(Person.get_by_username('paulproteus').homepage_url, "http://www.asheesh.org/")
         # now we should see our bio in the edit form
         edit_info_page = self.app.get('/profile/views/edit_info', user=username)
         self.assertIn('asheesh.org', edit_info_page.content)
@@ -1497,28 +1493,35 @@ class PostfixForwardersOnlyGeneratedWhenEnabledInSettings(WebTest):
 
 
 class PostmapBinaryCalledIfExists(WebTest):
+    """
+    If a function to test if postmap binary exists and works reliably, the
+    skip generator for this test may be removed
+    """
 
-    # If a function to test if postmap binary exists and works reliably, the
-    # skip generator for this test may be removed
-    @skip("Skip while postmap binary is unavailable on local test system")
-    @mock.patch('os.system')
+    @mock.patch('subprocess.call')
     def test(self, mock_update_table):
-        with mock.patch('mysite.base.depends.postmap_available') as a:
+        with mock.patch('mysite.base.depends.postmap_available') as available:
             task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
-            a.return_value = True
+            available.return_value = True
             task.run()
-            self.assertTrue(os.system.called)
+
+            if self.assertTrue(django.conf.settings.POSTFIX_FORWARDER_TABLE_PATH):
+                self.assertTrue(subprocess.call.called)
+            else:
+                self.assertFalse(subprocess.call.called)
+
 
 
 class PostmapBinaryNotCalledIfDoesNotExist(WebTest):
+    """ Tests that Postmap is not called if it is not installed and available """
 
-    @mock.patch('os.system')
+    @mock.patch('subprocess.call')
     def test(self, mock_update_table):
-        with mock.patch('mysite.base.depends.postmap_available') as a:
+        with mock.patch('mysite.base.depends.postmap_available') as available:
             task = mysite.profile.tasks.RegeneratePostfixAliasesForForwarder()
-            a.return_value = False
+            available.return_value = False
             task.run()
-            self.assertFalse(os.system.called)
+            self.assertFalse(subprocess.call.called)
 
 
 class PostFixGeneratorList(WebTest):
@@ -1538,11 +1541,9 @@ class PostFixGeneratorList(WebTest):
         mysite.base.view_helpers.generate_forwarder(asheesh)
         # run the function in Forwarder which creates/updates the list of
         # user/forwarder pairs for postfix to generate forwarders for
-        what_we_get = (mysite.profile.models.Forwarder.
-                       generate_list_of_lines_for_postfix_table())
+        what_we_get = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
 
-        what_we_want = [mysite.profile.models.Forwarder.objects.filter(
-            user__username='paulproteus')[0].generate_table_line()]
+        what_we_want = [mysite.profile.models.Forwarder.objects.filter(user__username='paulproteus')[0].generate_table_line()]
         # make sure that the list of strings that we get back contains an item
         # for the user with an email address and no item for the user without
         self.assertEqual(what_we_get, what_we_want)
@@ -1565,12 +1566,8 @@ class EmailForwarderGarbageCollection(WebTest):
             expires_on_future_number = valid and 1 or -1
             stops_being_listed_on_future_number = (new_enough_for_display
                                                    and 1 or -1)
-            expires_on = (datetime.datetime.utcnow() +
-                          expires_on_future_number *
-                          datetime.timedelta(minutes=10))
-            stops_being_listed_on = (datetime.datetime.utcnow() +
-                                     stops_being_listed_on_future_number *
-                                     datetime.timedelta(minutes=10))
+            expires_on = datetime.datetime.utcnow() + expires_on_future_number * datetime.timedelta(minutes=10)
+            stops_being_listed_on = datetime.datetime.utcnow() + stops_being_listed_on_future_number * datetime.timedelta(minutes=10)
             user = User.objects.get(username="paulproteus")
             new_mapping = mysite.profile.models.Forwarder(
                 address=address, expires_on=expires_on, user=user,
@@ -1594,16 +1591,12 @@ class EmailForwarderGarbageCollection(WebTest):
         # valid_new should still be in the database
         # there should be no other forwarders for the address that valid_new
         # has
-        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
-            pk=valid_new.pk).count())
-        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
-            address=valid_new.address).count())
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(address=valid_new.address).count())
         # valid_old should still be in the database
-        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(
-            pk=valid_old.pk).count())
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
         # invalid should not be in the database
-        self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(
-            pk=invalid.pk).count())
+        self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
         # there should be 2 forwarders in total: we lost one
         forwarders = mysite.profile.models.Forwarder.objects.all()
         self.assertEqual(2, forwarders.count())
@@ -1640,21 +1633,16 @@ class EmailForwarderResolver(WebTest):
             # if it isn't return the user's real email address
             # if it is expired, or if it's not in the table at all, return None
             try:
-                return Forwarder.objects.get(
-                    address=forwarder_address,
-                    expires_on__gt=datetime.datetime.utcnow()).user.email
+                return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
             except Forwarder.DoesNotExist:
                 return None
 
-        def test_possible_forwarder_address(address, future,
-                                            actually_create, should_work):
+        def test_possible_forwarder_address(address, future, actually_create, should_work):
             future_number = future and 1 or -1
             if actually_create:
-                expiry_date = datetime.datetime.utcnow(
-                ) + future_number * datetime.timedelta(minutes=10)
+                expiry_date = datetime.datetime.utcnow() + future_number * datetime.timedelta(minutes=10)
                 user = User.objects.get(username="paulproteus")
-                new_mapping = mysite.profile.models.Forwarder(
-                    address=address, expires_on=expiry_date, user=user)
+                new_mapping = mysite.profile.models.Forwarder(address=address, expires_on=expiry_date, user=user)
                 new_mapping.save()
 
             output = get_email_address_from_forwarder_address(address)
@@ -1891,7 +1879,7 @@ class Notifications(WebTest):
                 email_contexts[participant.pk] = email_context
             output = email_contexts
 
-        return (participants_who_are_news_to_each_other, output)
+        return participants_who_are_news_to_each_other, output
 
     @staticmethod
     def add_contributor(person, project):

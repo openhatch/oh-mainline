@@ -18,44 +18,40 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-import django.test
-from django.core.urlresolvers import reverse
-
-import twill
-from twill import commands as tc
-from django.core.handlers.wsgi import WSGIHandler
-from django.contrib.staticfiles.handlers import StaticFilesHandler
-from StringIO import StringIO
-from django.test.client import Client
+import datetime
+import logging
+import mock
 import os
 import os.path
 import subprocess
+from StringIO import StringIO
+import twill
+from twill import commands as tc
 
+import django.test
+from django.core.urlresolvers import reverse
+from django.core.handlers.wsgi import WSGIHandler
+from django.contrib.staticfiles.handlers import StaticFilesHandler
+from django.test.client import Client
 from django.core.cache import cache
 from django.core.management import CommandError
 from django.conf import settings
 from django.contrib.auth.models import User
-
-import mock
-import datetime
-import logging
 from django.utils import unittest
 from django.utils.unittest import expectedFailure, skip
 
-import mysite.base.view_helpers
 import mysite.base.decorators
-import mysite.search.models
-import mysite.base.templatetags.base_extras
-import mysite.base.unicode_sanity
-import mysite.profile.views
-import mysite.base.views
-import mysite.project.views
-import mysite.settings
-
 import mysite.base.management.commands.nagios
 import mysite.base.management.commands.remote_command_check
+import mysite.base.templatetags.base_extras
+import mysite.base.unicode_sanity
+import mysite.base.views
+import mysite.base.view_helpers
 import mysite.profile.management.commands.send_emails
+import mysite.profile.views
+import mysite.project.views
+import mysite.search.models
+import mysite.settings
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +75,7 @@ mock_get.return_value = None
 
 
 class TwillTests(django.test.TestCase):
-
+    """ Basic tests using twill for the base submodule"""
     @staticmethod
     def _twill_setup():
         app = StaticFilesHandler(WSGIHandler())
@@ -91,9 +87,8 @@ class TwillTests(django.test.TestCase):
         # call this if you want an interactive session
         twill.set_output(StringIO())
 
-    '''Some basic methods needed by other testing classes.'''
-
     def setUp(self):
+        """ Basic setup method needed by other testing classes """
         self.real_get = django.core.cache.cache.get
         django.core.cache.cache.get = mock_get
         self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
@@ -102,6 +97,7 @@ class TwillTests(django.test.TestCase):
         TwillTests._twill_quiet()
 
     def tearDown(self):
+        """ Basic teardown method needed by other testing classes """
         # If you get an error on one of these lines,
         # maybe you didn't run base.TwillTests.setUp?
         settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
@@ -110,7 +106,7 @@ class TwillTests(django.test.TestCase):
         django.core.cache.cache.get = self.real_get
 
     def login_with_twill(self):
-        # Visit login page
+        """ Tests login page for accounts """
         login_url = 'http://openhatch.org/account/login/old'
         tc.go(make_twill_url(login_url))
 
@@ -123,6 +119,7 @@ class TwillTests(django.test.TestCase):
 
     def login_with_client(self, username='paulproteus',
                           password="paulproteus's unbreakable password"):
+        """ Test login with a specific user """
         client = Client()
         success = client.login(username=username,
                                password=password)
@@ -130,6 +127,7 @@ class TwillTests(django.test.TestCase):
         return client
 
     def login_with_client_as_barry(self):
+        """ Test login as a specific user """
         return self.login_with_client(username='barry', password='parallelism')
 
 
@@ -545,6 +543,7 @@ class NagiosTests(django.test.TestCase):
         self.assertEqual(2, mysite.base.management.commands.nagios.Command.
                          send_weekly_exit_code())
 
+
 # Test cases for remote command sanity checking
 @skip('Skip these until jwm (or someone else) has a chance to look at them')
 class RemoteCommandCheckTests(django.test.TestCase):
@@ -691,3 +690,4 @@ class RenderDevRobotsTest(django.test.TestCase):
 
     def tearDown(self):
         settings.DEBUG = self.original_value
+
