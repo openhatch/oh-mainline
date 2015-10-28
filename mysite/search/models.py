@@ -16,34 +16,36 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from django.db import models
-from django.core.files.base import ContentFile
-from django.core.files.images import get_image_dimensions
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-from django.conf import settings
 import datetime
 import StringIO
 import logging
 import uuid
 from urlparse import urljoin
 import random
-import mysite.customs
-import mysite.base.unicode_sanity
-from django.core.urlresolvers import reverse
 import voting
-import mysite.customs.ohloh
+
+from django.core.files.base import ContentFile
+from django.core.files.images import get_image_dimensions
+from django.contrib.auth.models import User
+import django.contrib.contenttypes.models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.utils import http
+
 import mysite.base.depends
 import mysite.base.decorators
-import django.contrib.contenttypes.models
-from django.utils import http
+import mysite.base.unicode_sanity
+import mysite.customs
+import mysite.customs.ohloh
 
 logger = logging.getLogger(__name__)
 
 
 class OpenHatchModel(models.Model):
+    """ OpenHatch's baseline model """
     created_date = models.DateTimeField(null=True, auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
@@ -51,126 +53,24 @@ class OpenHatchModel(models.Model):
         abstract = True
 
 
-def get_image_data_scaled(image_data, width):
-    # NOTE: We refuse to scale images if we do not
-    # have the Python Imaging Library.
-    if not mysite.base.depends.Image:
-        logger.info(
-            "NOTE: We cannot resize this image, so we are going to pass it through. See ADVANCED_INSTALLATION.mkd for information on PIL.")
-        return image_data
-
-    # scale it
-    image_fd = StringIO.StringIO(image_data)
-    im = mysite.base.depends.Image.open(image_fd)
-    image_fd.seek(0)
-
-    w, h = get_image_dimensions(image_fd)
-
-    new_w = int(width)
-    new_h = int((h * 1.0 / w) * width)
-
-    smaller = im.resize((new_w, new_h),
-                        mysite.base.depends.Image.ANTIALIAS)
-
-    # "Save" it to memory
-    new_image_fd = StringIO.StringIO()
-    smaller.save(new_image_fd, format='PNG')
-    new_image_fd.seek(0)
-
-    # pull data out
-    image_data = new_image_fd.getvalue()
-    return image_data
-
-
 class Project(OpenHatchModel):
+    """ Project model inherits from OpenHatch Model"""
 
-    def save(self, *args, **kwargs):
-        if not self.display_name:
-            self.display_name = self.name
-        super(Project, self).save(*args, **kwargs)
-
-    def get_corresponding_bug_trackers(self):
-        '''This method returns all the bug trackers that should appear in the
-        project's +projedit page.
-
-        This is probably pretty inefficient, but it's not called very often.'''
-        # Grab all the bug trackers that bugs refer to
-        all_corresponding_bug_trackers = set([b.tracker for b in self.bug_set.all()
-                                              if b.tracker])
-        # Grab all the bug trackers that refer to the project
-        for tracker in mysite.customs.models.TrackerModel.objects.filter(created_for_project=self).select_subclasses():
-            all_corresponding_bug_trackers.add(tracker)
-
-        return all_corresponding_bug_trackers
-
-    @staticmethod
-    def generate_random_icon_path(instance, filename):
-        # MEDIA_ROOT is prefixed automatically.
-        return 'images/icons/projects/%s.png' % uuid.uuid4().hex
-
-    def name_with_quotes_if_necessary(self):
-        if '"' in self.name:
-            # GIVE UP NOW, it will not tokenize properly
-            return self.name
-        elif ' ' in self.name:
-            return '"%s"' % self.name
-        return self.name
-
-    @mysite.base.decorators.cached_property
-    def mentor_count(self):
-        '''Return a number of potential mentors, counted as the number of
-         people who can mentor in the project
-        '''
-        import mysite.profile.view_helpers
-        tq = mysite.profile.view_helpers.TagQuery('can_mentor', self.name)
-        return tq.people.count()
-
-    @staticmethod
-    def create_dummy(**kwargs):
-        data = dict(name=uuid.uuid4().hex,
-                    icon_raw='/static/no-project-icon.png',
-                    language='C')
-        data.update(kwargs)
-        ret = Project(**data)
-        ret.save()
-        return ret
-
-    @staticmethod
-    def create_dummy_no_icon(**kwargs):
-        data = dict(name=uuid.uuid4().hex,
-                    icon_raw='',
-                    language='C')
-        data.update(kwargs)
-        ret = Project(**data)
-        ret.save()
-        return ret
-
-    name = models.CharField(max_length=200, unique=True,
+    # *** START of Project model fields definition ***
+    name = models.CharField(max_length=200,
+                            unique=True,
                             help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',) * 2))
-    display_name = models.CharField(max_length=200, default='',
+    display_name = models.CharField(max_length=200,
+                                    default='',
                                     help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
-    homepage = models.URLField(max_length=200, blank=True, default='',
+    homepage = models.URLField(max_length=200,
+                               blank=True,
+                               default='',
                                verbose_name='Project homepage URL')
-    language = models.CharField(max_length=200, blank=True, default='',
+    language = models.CharField(max_length=200,
+                                blank=True,
+                                default='',
                                 verbose_name='Primary programming language')
-
-    def invalidate_all_icons(self):
-        self.icon_raw = None
-        self.icon_url = u''
-        self.icon_for_profile = None
-        self.icon_smaller_for_badge = None
-        self.icon_for_search_result = None
-        pass
-
-    def get_random_pfentry_that_has_a_project_description(self):
-        pfentries = self.portfolioentry_set.exclude(project_description='')
-        only_good_pfentries = lambda pfe: pfe.project_description.strip()
-        pfentries = filter(only_good_pfentries, pfentries)
-
-        if pfentries:
-            return random.choice(pfentries)
-        else:
-            return None
 
     # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
@@ -209,7 +109,89 @@ class Project(OpenHatchModel):
     # Cache the number of OpenHatch members who have contributed to this
     # project.
     cached_contributor_count = models.IntegerField(default=0, null=True)
+    # *** END of Project model fields definition ***
 
+    def save(self, *args, **kwargs):
+        if not self.display_name:
+            self.display_name = self.name
+        super(Project, self).save(*args, **kwargs)
+
+    def get_corresponding_bug_trackers(self):
+        """
+        This method returns all the bug trackers that should appear in the
+        project's +projedit page.
+
+        This is probably pretty inefficient, but it's not called very often.
+        1. Grab all the bug trackers that bugs refer to
+        2. Grab all the bug trackers that refer to the project
+        3. returns all the bug trackers that should appear in the
+           project's +projedit page
+        """
+
+        all_corresponding_bug_trackers = set([b.tracker for b in self.bug_set.all() if b.tracker])
+        for tracker in mysite.customs.models.TrackerModel.objects.filter(created_for_project=self).select_subclasses():
+            all_corresponding_bug_trackers.add(tracker)
+        return all_corresponding_bug_trackers
+
+    @staticmethod
+    def generate_random_icon_path(instance, filename):
+        # MEDIA_ROOT is prefixed automatically.
+        return 'images/icons/projects/%s.png' % uuid.uuid4().hex
+
+    def name_with_quotes_if_necessary(self):
+        if '"' in self.name:
+            # GIVE UP NOW, it will not tokenize properly
+            return self.name
+        elif ' ' in self.name:
+            return '"%s"' % self.name
+        return self.name
+
+    @mysite.base.decorators.cached_property
+    def mentor_count(self):
+        """Return a number of potential mentors, counted as the number of
+         people who can mentor in the project
+        """
+        import mysite.profile.view_helpers
+        tq = mysite.profile.view_helpers.TagQuery('can_mentor', self.name)
+        return tq.people.count()
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = dict(name=uuid.uuid4().hex,
+                    icon_raw='/static/no-project-icon.png',
+                    language='C')
+        data.update(kwargs)
+        ret = Project(**data)
+        ret.save()
+        return ret
+
+    @staticmethod
+    def create_dummy_no_icon(**kwargs):
+        data = dict(name=uuid.uuid4().hex,
+                    icon_raw='',
+                    language='C')
+        data.update(kwargs)
+        ret = Project(**data)
+        ret.save()
+        return ret
+
+    def invalidate_all_icons(self):
+        self.icon_raw = None
+        self.icon_url = u''
+        self.icon_for_profile = None
+        self.icon_smaller_for_badge = None
+        self.icon_for_search_result = None
+        pass
+
+    def get_random_pfentry_that_has_a_project_description(self):
+        pfentries = self.portfolioentry_set.exclude(project_description='')
+        only_good_pfentries = lambda pfe: pfe.project_description.strip()
+        pfentries = filter(only_good_pfentries, pfentries)
+
+        if pfentries:
+            return random.choice(pfentries)
+        else:
+            return None
 
     def get_url_of_icon_or_generic(self):
         # Recycle icon_smaller_for_badge since it's the same size as
@@ -232,9 +214,9 @@ class Project(OpenHatchModel):
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
 
     def update_scaled_icons_from_self_icon(self):
-        '''This method should be called when you update the Project.icon_raw attribute.
+        """This method should be called when you update the Project.icon_raw attribute.
         Side-effect: Saves a scaled-down version of that icon in the
-        Project.icon_smaller_for_badge field.'''
+        Project.icon_smaller_for_badge field."""
         # First of all, do nothing if self.icon_raw is a false value.
         if not self.icon_raw:
             return
@@ -436,8 +418,7 @@ class Answer(OpenHatchModel):
     title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
     author = models.ForeignKey(User, null=True)
-    question = models.ForeignKey(
-        ProjectInvolvementQuestion, related_name='answers')
+    question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
     objects = OwnedAnswersManager()
     all_even_unowned = models.Manager()
@@ -623,20 +604,41 @@ class WannaHelperNote(OpenHatchModel):
 def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, **kwargs):
     # always bump it
     import mysite.base.models
-    mysite.base.models.Timestamp.update_timestamp_for_string(
-        'hit_count_cache_timestamp'),
+    mysite.base.models.Timestamp.update_timestamp_for_string('hit_count_cache_timestamp'),
 
-# Clear the hit count cache whenever Bugs are added or removed. This is
-# simply done by bumping the Timestamp used to generate the cache keys.
-# The hit count cache is used in get_or_create_cached_hit_count() in
-# mysite.search.view_helpers.Query.
-# Clear all people's recommended bug cache when a bug is deleted
-# (or when it has been modified to say it looks_closed)
-models.signals.post_save.connect(
-    post_bug_save_delete_increment_hit_count_cache_timestamp,
-    Bug)
-models.signals.pre_delete.connect(
-    post_bug_save_delete_increment_hit_count_cache_timestamp,
-    Bug)
+    # Clear the hit count cache whenever Bugs are added or removed. This is
+    # simply done by bumping the Timestamp used to generate the cache keys.
+    # The hit count cache is used in get_or_create_cached_hit_count() in
+    # mysite.search.view_helpers.Query.
+    # Clear all people's recommended bug cache when a bug is deleted
+    # (or when it has been modified to say it looks_closed)
+    models.signals.post_save.connect(post_bug_save_delete_increment_hit_count_cache_timestamp, Bug)
+    models.signals.pre_delete.connect(post_bug_save_delete_increment_hit_count_cache_timestamp, Bug)
 
-# vim: set ai ts=4 nu:
+
+def get_image_data_scaled(image_data, width):
+    """NOTE: We refuse to scale images if we do not have the Pillow/PIL Python Imaging Library."""
+    if not mysite.base.depends.Image:
+        logger.info("NOTE: We cannot resize this image, so we are going to pass it through."
+                    "See ADVANCED_INSTALLATION.md for information on PIL.")
+        return image_data
+
+    # scale image
+    image_fd = StringIO.StringIO(image_data)
+    im = mysite.base.depends.Image.open(image_fd)
+    image_fd.seek(0)
+
+    w, h = get_image_dimensions(image_fd)
+    new_w = int(width)
+    new_h = int((h * 1.0 / w) * width)
+    smaller = im.resize((new_w, new_h),
+                        mysite.base.depends.Image.ANTIALIAS)
+
+    # "Save" scaled image to memory
+    new_image_fd = StringIO.StringIO()
+    smaller.save(new_image_fd, format='PNG')
+    new_image_fd.seek(0)
+
+    # pull data out
+    image_data = new_image_fd.getvalue()
+    return image_data
