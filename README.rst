@@ -14,7 +14,7 @@ README
 .. image:: http://readthedocs.org/projects/openhatch/badge/ 
    :target: http://openhatch.readthedocs.org/
 
-Thanks for checking out our repository. We love this project; hope you do too.
+Thanks for checking out our repository. We love this project; hope you do too. Do contribute to make it bigger.
 
 You can find our documentation in the docs_ directory. It's automatically rendered online at http://openhatch.readthedocs.org/en/latest/index.html
 
