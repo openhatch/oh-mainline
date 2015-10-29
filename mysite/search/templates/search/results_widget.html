@@ -99,6 +99,23 @@
         <a href='#' id='expand-all-link'><img src={% version '/static/images/icons/zoom-in.png' %}>Expand all</a>
         <a href='#' id='collapse-all-link'><img src={% version '/static/images/icons/zoom-out.png' %}>Collapse all</a>
     </span>
+    <span class='active_facet_value'>
+        View:
+    </span>
+    <span id='item-limit'>
+        <form action="/search/?{{ query_str }}" method="post">
+            {% csrf_token %}
+            <select name="items" onchange="this.form.submit()">
+                {% for option in options %}
+                {% if option == items %}
+                    <option selected='selected'>{{ option }}</option>
+                {% else %}
+                    <option value='{{ option }}'>{{ option }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </form>
+    </span>
 
     {% include 'search/navigation.html' %}
 
