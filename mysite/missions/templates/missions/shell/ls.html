@@ -20,6 +20,11 @@
     <div class='head'>
       <h3>Using ls for listing directory contents</h3>
     </div>
+    {% if command_ls_success %}
+        <div class="successmsg">
+          <p><strong>You have successfully completed this part of the mission.</strong></p>
+        </div>
+    {% endif %}
     <div class="body">
 
     <h3>ls: List directory contents</h3>
@@ -63,11 +68,6 @@
 
     <form method="post" action="{% url "mysite.missions.shell.views.command_ls_submit" %}#ls-form">{% csrf_token %}
         <div class="form-row">
-            {% if command_ls_success %}
-            <div class="successmsg">
-              <p><strong>You have successfully completed this part of the mission.</strong></p>
-            </div>
-            {% endif %}
             <input type="radio" name="option" value="1"> print the allocated size of each file, in blocks.<br>
             <input type="radio" name="option" value="2"> list subdirectories recursively.<br>
             <input type="radio" name="option" value="3"> reverse order while sorting.<br>
