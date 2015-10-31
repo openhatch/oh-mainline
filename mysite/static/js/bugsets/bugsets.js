@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var error_count = 0;
+var ERROR_COUNT_THRESHOLD = 6;
 
 function updateFields() {
     $('inplaceeditform').each(function () {
@@ -36,7 +38,10 @@ function getNewValue(obj_id, field_name) {
 
         // FIXME: This pops up an alert for all the fields, which is bad
         error: function () {
-            $("div#error-notification").html("You might need to check your internet connection and reload the page.\n (Could not reach server when refreshing page data.)");
+            error_count++;
+            if(error_count > ERROR_COUNT_THRESHOLD) {
+                $("div#error-notification").html("You might need to check your internet connection and reload the page.\n (Could not reach server when refreshing page data.)");
+            }
         },
 
         success: updateHTML
@@ -46,6 +51,8 @@ function getNewValue(obj_id, field_name) {
 function updateHTML(response) {
     // Don't update fields with empty values
     $("div#error-notification").html("");
+    // reset error_count
+    error_count = 0;
     if (response.new_html == '') {
         return;
     }
