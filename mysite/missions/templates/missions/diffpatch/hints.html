@@ -24,31 +24,32 @@
     <h3>Quick reference</h3>
   </div>
     <div class="submodule-body body">
-    
+
   <h3><b>Working with patch and diff</b></h3>
   <p>When working with patch, you are dealing with a patch file, which contains a
   list of differences produced by the <em>diff</em> program. The patch file applies
   those differences to one or more original files, producing patched versions.</p>
-  
+
   <p>In contrast, diff outputs the difference between two files by comparing both
   files line by line.</p>
+
   <p>This page is just a quick reference; see the bottom for other resources.</p>
   <br>
-  
+
   <p> To work with patch, you can use:<br><br>
  	<b>patch [options] [originalfile [patchfile]]</b> <br><br> but the more common method is :<br><br>  <b>patch -pnum < patchfile.patch</p></b>
-  
+
   <p> -pnum is the option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
-  
+
   <p> To work with diff, you can use:<br><br>
  	<b>diff -u original <em>updatedfile</em></b><br></p>
  	<p>For window users, redirect the output of your diff to a new file with this command:<br><br>
 	<b>diff -u original new > output.txt</b></p>
-	
+
 	<p> <b>-u</b> is the Output NUM (default 3) lines of unified context. </p>
 	<p> <b>-ur</b> is used when comparing directories of unified context by recursively comparing any subdirectories found.</p>
-  
-  
+
+
   <h3><b>Other resources</b></h3>
   <br>
   <p>Patch is an efficent method to fix errors in text files. The following sites have further information about patch:</p>
@@ -56,23 +57,23 @@
   <li><a href="http://en.wikipedia.org/wiki/Patch_(Unix)">Wikipedia has some good information about the <em>patch</em> function.</a></li>
   <li>Patch comes with a user "manual". You can read that by typing <tt>man patch</tt> in a terminal, or by <a href="http://linux.die.net/man/1/patch">visiting this page</a>.</li>
   </ul>
-  
+
   <p>There are different options to <em>diff</em>, which are detailed in diff's documentation.The followings sites are commonly used for further reading : </p>
-  
+
   <ul class="raquo_bullets">
       <li><a href="http://en.wikipedia.org/wiki/Diff_(Unix)">Wikipedia has some good information about the <em>diff</em> function.</a></li>
       <li>Diff comes with a user "manual". You can read that by typing <tt>man diff</tt> in a terminal, or by <a href="http://linux.die.net/man/1/diff">visiting this page</a>.</li>
       <br>
-      </ul> 
-   
+      </ul>
+
   <h3>Working with tarballs</h3>
 
   <ul class="raquo_bullets">
   <li><a href="http://openhatch.org/missions/tar/hints">Tools for working with tar archives.</a></li>
-  </ul> 
+  </ul>
  </div>
 
-{% endblock mission_main %} 
+{% endblock mission_main %}
 
 
 <!--
