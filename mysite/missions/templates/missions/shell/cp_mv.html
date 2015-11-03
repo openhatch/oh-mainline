@@ -22,27 +22,29 @@
     </div>
     <div class="body">
 
-    <h3>cp: copy files and directories:</h3>
-    <p>The <kbd class="kbd">cp</kbd> command will make a copy of a file for you. Example:</p>
+    <h3>cp: copy files and directories</h3>
+    <p>The <kbd class="kbd">cp</kbd> command will make a copy of a file for you. For example,</p>
 
     <code class="code">$ cp songs.txt music.txt</code>
 
     <p>will make an exact copy of <kbd class="kbd">songs.txt</kbd> and name it
-    <kbd class="kbd">music.txt</kbd>, but the file <kbd class="kbd">songs.txt</kbd>
-    will still be there.</p>
+    <kbd class="kbd">music.txt</kbd> (the file <kbd class="kbd">songs.txt</kbd>
+    will still be there, too).</p>
 
     <p>If you are copying a directory, you must use the option
-    <kbd class="kbd">-r (--recursive)</kbd> Example:</p>
+    <kbd class="kbd">-r (--recursive)</kbd>. For example,</p>
 
     <code class="code">$ cp -r songs music</code>
 
-    <p>Copies all the contents of <kbd class="kbd">songs</kbd> directory to
-    <kbd class="kbd">music</kbd> directory recursively. Remember? earlier we
-    explained how recursive option worked ? Here "recursively" means, to copy
-    the directory and all its files and subdirectories and all their files and
-    subdirectories of the subdirectories and all their files, and on and on,
-    "recursively".<br>
-    You can also use source and destination paths like:</p>
+    <p>copies all the contents of the <kbd class="kbd">songs</kbd> directory to the
+    <kbd class="kbd">music</kbd> directory recursively. Remember when we
+    explained how the recursive option worked when removing directories? Here,
+    "recursively" means we copy the directory and all its files and subdirectories,
+    and all the subdirectories' files and subdirectories, and on and on ("recursively")
+    until everything that was inside the <kbd class="kbd">songs</kbd> directory has
+    been copied to the <kbd class="kbd">music</kbd> directory.</p>
+
+    <p>You can also use source and destination paths like:</p>
 
     <code class="code">$ cp <i>source-path</i> <i>destination-path</i></code>
 
