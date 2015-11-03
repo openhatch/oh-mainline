@@ -46,13 +46,15 @@
     <code class="code">$ rm test.txt</code>
 
     <h3>Removing directories:</h3>
-    <p>By default <kbd class="kbd">rm</kbd> does not remove directories. If the
-    <kbd class="kbd">-r (--recursive)</kbd> option is specified, Example:</p>
+    <p>By default, <kbd class="kbd">rm</kbd> does not remove directories. If the
+    <kbd class="kbd">-r (--recursive)</kbd> option is specified, however, it will. For
+    example,</p>
     <code class="code">rm -r penguin</code>
     <p>will remove the directory <kbd class="kbd">penguin</kbd> and its contents
-    recursively. To understand what "recursively" means, think of it this way: to
-    remove the directory and all its files and subdirectories and all their files
-    and subdirectories of the subdirectories and all their files, and on and on, "recursively".
+    recursively. What does "recursively" mean? Think of it this way: this command will
+    remove the directory and all its files and subdirectories, and all the subdirectories'
+    files and subdirectories, and on and on ("recursively") until the original directory
+    <kbd class="kbd">penguin</kbd> is completely empty.
     </p>
 
     <h3>Challenge:</h3>
