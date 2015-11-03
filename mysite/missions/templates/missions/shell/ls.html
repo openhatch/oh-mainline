@@ -29,16 +29,16 @@
 
     <p><kbd class="kbd">ls</kbd> command with no option will list files and
     directories in bare format and you won't be able to view details like file
-    types, size, modification date, permission etc.</p>
+    type, size, modification date, permissions etc.</p>
 
     <p><b>2. List files using <kbd class="kbd">-l</kbd> option:</b></p>
 
     <code class="code">$ ls -l</code>
 
-    <p><kbd class="kbd">ls</kbd> command with option <kbd class="kbd">-l</kbd> i.e.
-    <kbd class="kbd">ls -l</kbd> will list files and directories along with their
-    size, modified date and time, owner of the file and it's permission.
-    Something like:</p>
+    <p>The <kbd class="kbd">ls</kbd> command with option <kbd class="kbd">-l</kbd> (i.e.
+    <kbd class="kbd">ls -l</kbd>) will list files and directories along with their
+    size, modified date and time, owner of the file, and permissions.
+    It will look something like this:</p>
     <pre>
     <kbd class="kbd">drwxr-xr-x   2 root root  4096 Oct 11 00:20 bin</kbd>
     </pre>
@@ -47,9 +47,9 @@
 
     <code class="code">$ ls -a</code>
 
-    <p><kbd class="kbd">ls</kbd> command with option <kbd class="kbd">-a</kbd>
-    i.e. <kbd class="kbd">ls -a</kbd> will list all the files including hidden
-    files starting with '.' (hidden file's name starts with '.')</p>
+    <p>The <kbd class="kbd">ls</kbd> command with option <kbd class="kbd">-a</kbd>
+    (i.e. <kbd class="kbd">ls -a</kbd>) will list all files, including hidden
+    files (whose names start with '.').</p>
 
     <p>There are many other options available. For more options, type
     <kbd class="kbd">ls --help</kbd> in your shell and you'll get a list of
@@ -82,7 +82,7 @@
     {% if command_ls_done %}
         <p class="next_mission_link">
             <a href='{% url "mysite.missions.shell.views.command_cd" %}'>
-        On to next &raquo;</a></p>
+        On to the next one &raquo;</a></p>
     {% endif %}
 
     </div>

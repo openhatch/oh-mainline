@@ -22,39 +22,43 @@
     </div>
     <div class="body">
 
-    <h3>mkdir: Make directory:</h3>
-    <p> The mkdir command will allow you to create directories. Example:</p>
+    <h3>mkdir: Make directory</h3>
+    <p> The mkdir command will allow you to create directories. For example,</p>
     <code class="code">$ mkdir penguin</code>
-    <p>will create a directory called "penguin".<br>
-    Any number of directories can be created simultaneously.
+    <p>will create a directory called "penguin".</p>
+
+    <p>Any number of directories can be created simultaneously.
     Thus, for example, the following command would create three directories
     within the current directory (i.e., the directory in which the user is
     currently working) with the names dir1, dir2 and dir3:</p>
     <code class="code">$ mkdir dir1 dir2 dir3</code>
-    <p>mkdir will return a warning message such as <kbd class="kbd">mkdir: cannot
-        create directory 'dir1': File exists</kbd> and will not create a file
+    <p>If a directory with that name already exists in the current directory,
+    mkdir will return a warning message such as <kbd class="kbd">mkdir: cannot
+    create directory 'dir1': File exists</kbd> and will not create a file
     with that name. However, it will then continue to create directories for any
     other names provided as arguments.</p>
 
     <h3>rm: Remove files or directories:</h3>
-    <p>The command name "rm" is derived from "remove". You can use this command
-    to remove or delete a file in your directory. For example, to remove
-    <kbd class="kbd">test.txt</kbd> present in your current directory, you will
-    have to type</p>
+    <p>The command name "rm" is derived from "remove." You can use this command
+    to remove or delete a file in your directory. For example, to remove a file named
+    <kbd class="kbd">test.txt</kbd> present in your current directory, you can
+    type</p>
     <code class="code">$ rm test.txt</code>
 
     <h3>Removing directories:</h3>
-    <p>By default <kbd class="kbd">rm</kbd> does not remove directories. If the
-    <kbd class="kbd">-r (--recursive)</kbd> option is specified, Example:</p>
+    <p>By default, <kbd class="kbd">rm</kbd> does not remove directories. If the
+    <kbd class="kbd">-r (--recursive)</kbd> option is specified, however, it will. For
+    example,</p>
     <code class="code">rm -r penguin</code>
     <p>will remove the directory <kbd class="kbd">penguin</kbd> and its contents
-    recursively. To understand what "recursively" means, think of it this way: to
-    remove the directory and all its files and subdirectories and all their files
-    and subdirectories of the subdirectories and all their files, and on and on, "recursively".
+    recursively. What does "recursively" mean? Think of it this way: this command will
+    remove the directory and all its files and subdirectories, and all the subdirectories'
+    files and subdirectories, and on and on ("recursively") until the original directory
+    <kbd class="kbd">penguin</kbd> is completely empty.
     </p>
 
     <h3>Challenge:</h3>
-    <p>What is the output of <kbd class="kbd">ls</kbd> command in the sequence given below ?</p>
+    <p>What is the output of the <kbd class="kbd">ls</kbd> command in the sequence given below?</p>
     <code class="snippet">
     $ ls<br>
     test.txt music<br>
@@ -86,7 +90,7 @@
     {% if command_mkdir_rm_done %}
         <p class="next_mission_link">
         <a href='{% url "mysite.missions.shell.views.command_cp_mv" %}'>
-        On to next &raquo;</a></p>
+        On to the next one &raquo;</a></p>
     {% endif %}
 
 
