@@ -36,10 +36,13 @@
   <p>This page is just a quick reference; see the bottom for other resources.</p>
   <br>
 
-  <p> To work with patch, you can use:<br><br>
- 	<b>patch [options] [originalfile [patchfile]]</b> <br><br> but the more common method is :<br><br>  <b>patch -pnum < patchfile.patch</p></b>
+  <p>To work with patch, you can use:</p><br>
+  <b>patch [options] [originalfile [patchfile]]</b><br>
+  <p>but the more common method is:<br><br></p>
+  <b>patch -pnum < patchfile.patch</b>
 
-  <p> -pnum is the option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
+  <p>-pnum is the option to tell patch how many levels of directories to ignore so
+  it finds the correct files to patch.</p>
 
   <p> To work with diff, you can use:<br><br>
  	<b>diff -u original <em>updatedfile</em></b><br></p>
