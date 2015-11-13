@@ -37,22 +37,25 @@
   <br>
 
   <p>To work with patch, you can use:</p><br>
-  <b>patch [options] [originalfile [patchfile]]</b><br>
+      <kbd class="kbd">patch [options] [originalfile [patchfile]]</kbd><br>
   <p>but the more common method is:<br><br></p>
-  <b>patch -pnum &lt; patchfile.patch</b>
+      <kbd class="kbd">patch -pnum &lt; patchfile.patch</kbd>
 
   <p>-pnum is the option to tell patch how many levels of directories to ignore so
   it finds the correct files to patch.</p>
 
   <p>To work with diff, you can use:<br><br>
-  <b>diff -u original <em>updatedfile</em></b><br></p>
+      <kbd class="kbd">diff -u original <em>updatedfile</em></kbd><br></p>
 
-  <p>For Windows users, you can redirect the output of your diff to a new file
-  with this command:<br><br>
-  <b>diff -u original new > output.txt</b></p>
+      <p>For Windows users, you can redirect the output of your diff to a new file
+      with this command:<br><br>
+      <kbd class="kbd">diff -u original new &gt; output.txt</kbd></p>
 
-  <p><b>-u</b> is the Output NUM (default 3) lines of unified context.</p>
-  <p><b>-ur</b> is used when comparing directories of unified context by recursively comparing any subdirectories found.</p>
+      <p><kbd class="kbd">-u</kbd> is the number of lines of unified context to
+      output. You can specify a number by putting it after this option (e.g.
+      <kbd class="kbd">-u 12</kbd>). If no number is specified, it will use the
+      default of 3.</p>
+      <p><kbd class="kbd">-ur</kbd> is used when comparing directories of unified context by recursively comparing any subdirectories found.</p>
 
 
   <h3><b>Other resources</b></h3>
