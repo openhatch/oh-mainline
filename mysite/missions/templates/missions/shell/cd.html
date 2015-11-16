@@ -42,7 +42,7 @@
     will move you to the Desktop subdirectory inside your home directory.</p>
 
     <h3>Challenge:</h3>
-    <p>Suppose your present working directory is <kbd class="kbd">/penguin/projects</kbd>,
+    <p>Suppose your current working directory is <kbd class="kbd">/penguin/projects</kbd>,
     what does the command <kbd class="kbd">cd</kbd> without a directory name do?</p>
     <form method="post" action="{% url "mysite.missions.shell.views.command_cd_submit" %}#cd-form">{% csrf_token %}
         <div class="form-row">
@@ -65,7 +65,7 @@
     {% if command_cd_done %}
         <p class="next_mission_link">
         <a href='{% url "mysite.missions.shell.views.command_mkdir_rm" %}'>
-        On to next &raquo;</a></p>
+        On to the next one &raquo;</a></p>
     {% endif %}
 
     </div>
