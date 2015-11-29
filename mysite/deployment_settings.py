@@ -60,7 +60,7 @@ ALLOWED_HOSTS=['testserver', 'openhatch.org', 'svn-mission.openhatch.org']
 #
 # This path is important because the nginx
 # configuration is consistent with it.
-STATIC_ROOT='/home/deploy/milestone-a/mysite/statik'
+STATIC_ROOT='/app/mysite/statik'
 
 # In production, we use localhost port 25 SMTP.
 #
