@@ -24,7 +24,7 @@
   <div class="body">
     <h3>More about virtualenv and virtualenvwrapper</h3>
     <p>Deleting a virtualenv is as simple as creating one. To delete a
-    virtualenv, at the terminal, type <kbd>rmvirtualenv</kbd> followed
+    virtualenv in Linux, at the terminal, type <kbd>rmvirtualenv</kbd> followed
     by the name of the virtualenv that you'd like to remove, like so:</p>
 
     <pre>rmvirtualenv TestEnv</pre>
@@ -35,6 +35,16 @@
     <p>Another useful command is <kbd>lsvirtualenv</kbd>, which lists all
     of the virtual environments that we have created so far.</p>
 
+	<p>To delete a virtualenv in Windows, at the Command Prompt type 
+	<kbd>rmdir /S</kbd> followed by the name of the virtualenv that you'd 
+	like to remove, like this:</p>
+	
+	<pre>rmdir /S TestEnv</pre>
+	
+	<p>This deletes all virtualenv files and the directory they were stored
+	in.  There is no Windows equivalent for the <kbd>lsvirtualenv</kbd> 
+	command.</p>
+	
     <p>If you'd like to learn more about virtual environments, we strongly
     recommend going through <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">
     the section about virtualenvs</a> in the book <a href="http://docs.python-guide.org/en/latest/">
