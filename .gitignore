@@ -41,3 +41,5 @@ tags
 *.sublime-project
 coverage_html_report/
 *.json.gz
+*.log
+*.out
