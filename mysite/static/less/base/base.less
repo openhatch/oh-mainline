@@ -99,11 +99,22 @@ body {
     margin-bottom: @footer-height + @footer-padding;
 }
 
+::-webkit-scrollbar {
+    background-color: #eee;
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.5);
+}
+
 code {
     overflow-x: auto;
     display: inline-block;
     width: 100%;
     white-space: nowrap;
+    padding: 10px 0 15px 0;
 }
 
 .link_like, a, body .ui-widget-content a { color: @orange; text-decoration: none; cursor:pointer; cursor:hand; }
