@@ -70,6 +70,14 @@ class GitDiffMission(object):
 
     @classmethod
     def commit_if_ok(cls, username, diff):
+        if settings.REMOTE_REPO_SETUP_ACCESS_SPEC:
+            remote_commit = subprocess.Popen([
+                'ssh', settings.REMOTE_REPO_SETUP_ACCESS_SPEC,
+                'milestone-a/manage.py', 'git_commit_if_ok', username
+            ], stdin=subprocess.PIPE)
+            remote_commit.communicate(diff)
+            return remote_commit.returncode == 0
+
         repo = GitRepository(username)
         commit_diff = subprocess.Popen(
             ['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
@@ -82,6 +90,6 @@ class GitDiffMission(object):
             subprocess.Popen(
                 ['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)
             return True
-        else:
-            subprocess.check_call(['git', 'am', '--abort'], cwd=repo.repo_path)
-            return False
+
+        subprocess.check_call(['git', 'am', '--abort'], cwd=repo.repo_path)
+        return False
