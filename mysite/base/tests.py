@@ -565,6 +565,21 @@ class RemoteCommandCheckTests(django.test.TestCase):
     @mock.patch.dict('os.environ')
     @mock.patch('django.contrib.auth.models.User.objects.get')
     @mock.patch('subprocess.check_call')
+    def test_remote_command_allows_git_reset(self, mock_call, mock_user):
+        os.environ['SSH_ORIGINAL_COMMAND'] = (
+            'milestone-a/manage.py missions git_commit_if_ok someuser')
+        mock_user.return_value = User(username='someuser')
+
+        self.assertEqual(
+            None,
+            mysite.base.management.commands.remote_command_check.Command().handle()
+        )
+        mock_call.assert_called_once_with([
+            'milestone-a/manage.py', 'missions', 'git_commit_if_ok', 'someuser'])
+
+    @mock.patch.dict('os.environ')
+    @mock.patch('django.contrib.auth.models.User.objects.get')
+    @mock.patch('subprocess.check_call')
     def test_remote_command_allows_svn_reset(self, mock_call, mock_user):
         os.environ['SSH_ORIGINAL_COMMAND'] = (
             'milestone-a/manage.py missions svn_reset someuser')
