@@ -60,3 +60,5 @@ The OpenHatch code base will be in transition over the course of 2016. Here are 
 
 * We will have a regularly scheduled monthly development meeting that is
   open to all to participate.
+
+See: http://lists.openhatch.org/pipermail/devel/2015-December/003872.html
