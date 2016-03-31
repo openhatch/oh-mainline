@@ -1,5 +1,11 @@
 # Contributing to OpenHatch
 
+We are no longer accepting contributions to this repository. See http://lists.openhatch.org/pipermail/devel/2015-December/003872.html for more information.
+
+---
+
+# Historical Contributing Information
+
 Yay! Its great that you want to contribute to the OpenHatch.org website. We look forward to receiving your contributions in code, feature requests and bug reports. Here are pointers and guidelines that we feel you should follow before creating your pull request, bug report or feature request.
 
 ## Code Contributors Guide
