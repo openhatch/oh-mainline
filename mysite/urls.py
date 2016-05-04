@@ -67,13 +67,12 @@ urlpatterns = patterns('',
 
                        url(r'^forum(?P<path>($|/.*))',
                         RedirectView.as_view(url='http://forum.openhatch.org%(path)s')),
+                       url(r'^wiki(?P<path>($|/.*))',
+                        RedirectView.as_view(url='http://wiki.openhatch.org%(path)s')),
 
-                       (r'^wiki$', lambda x: redirect('/wiki/')),
-                       (r'^(?P<url>w(iki)?($|/.*))',
-                        HttpProxy.as_view(base_url='http://wiki.openhatch.org')),
 
                        (r'^contact/?$', lambda x: redirect('/wiki/Contact')),
-                       (r'^policies-etc/?$', lambda x: redirect('/wiki/Privacy_policy')),
+                       (r'^policies-etc/?$', lambda x: redirect('/wiki/OpenHatch_wiki:Privacy_policy')),
                        (r'^source-code-etc/?$', lambda x: redirect('/wiki/Category:Hacking_OpenHatch')),
                        (r'^colophon/?$', lambda x: redirect('/wiki/About_OpenHatch')),
                        (r'^about/?$', lambda x: redirect('/wiki/About_OpenHatch')),
