@@ -69,7 +69,7 @@ urlpatterns = patterns('',
                         RedirectView.as_view(url='http://forum.openhatch.org%(path)s')),
 
                        (r'^wiki$', lambda x: redirect('/wiki/')),
-                       (r'^(?P<url>w(iki)?($|/.*))',
+                       (r'^w(iki)?(?P<url>($|/.*))',
                         HttpProxy.as_view(base_url='http://wiki.openhatch.org')),
 
                        (r'^contact/?$', lambda x: redirect('/wiki/Contact')),
