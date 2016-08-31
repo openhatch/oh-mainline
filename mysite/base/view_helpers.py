@@ -314,7 +314,7 @@ def address2cache_key_name(address):
 
 
 def cached_geocoding_in_json(address):
-    A_LONG_TIME_IN_SECONDS = 60 * 60 * 24 * 7
+    A_LONG_TIME_IN_SECONDS = 60 * 60 * 25 * 7
     JUST_FIVE_MINUTES_IN_SECONDS = 5 * 60
     if address == 'Inaccessible Island':
         is_inaccessible = True
