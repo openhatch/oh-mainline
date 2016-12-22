@@ -25,11 +25,15 @@
 
   <h3>Creating virtualenvs</h3>
   <p>At the terminal, you can create a new virtual environment by typing
-  <kbd>mkvirtualenv</kbd>, followed by a name of your choice for the new
+  <kbd>mkvirtualenv</kbd> (just <kbd>virtualenv</kbd> in the Windows Command
+  Prompt), followed by a name of your choice for the new
   virtualenv.</p>
 
-  <p>Now, open up the terminal, type the following command and press Enter:</p>
-  <kbd>mkvirtualenv TestEnv</kbd>
+  <p>Now, open up the terminal or Command Prompt, type the following command 
+  and press Enter:</p>
+  
+  <p><kbd>mkvirtualenv TestEnv</kbd>  (Linux/Mac)<br>
+  <kbd>virtualenv TestEnv</kbd>   (Windows)</p>
 
   <p>The above command will create a new virtual environment called <kbd>
   TestEnv</kbd>. The name of the virtual environment can be anything you like.
@@ -38,15 +42,18 @@
     New python executable in TestEnv/bin/python
     Installing setuptools, pip...done.
   </pre>
+  <p>In Linux or on a Mac, after creating a virtualenv, the name of the virtualenv 
+  you created, surrounded by parenthesis, <kbd>(TestEnv)</kbd> in this case, will 
+  appear before your terminal prompt.  In Windows, you will need to type another
+  command (replace <kbd>TestEnv</kbd> with the name of your virtualenv) and press 
+  Enter:</p>
+  
+  <kbd>.\TestEnv\Scripts\activate</kbd>
 
-  <p>After running the <kbd>mkvirtualenv</kbd> command above, the name of the
-  virtualenv you created, surrounded by parenthesis, <kbd>(TestEnv)</kbd> in
-  this case, will appear before your terminal prompt, which will look somewhat
-  similar to:</p>
-
-  <p><kbd>(TestEnv)C:\Users\username></kbd> on Windows or,</p>
-
-  <p><kbd>(TestEnv)user@hostname:~ $</kbd> on Linux/Mac OS X.</p>
+  <p>Your prompt will then look similar to the below:</p>
+  
+  <p><kbd>(TestEnv)C:\Users\username></kbd> on Windows or,<br>
+  <kbd>(TestEnv)user@hostname:~ $</kbd> on Linux/Mac OS X.</p>
 
   <p>This means that we are inside our virtualenv <kbd>TestEnv</kbd>, and we
   can now install packages in it, which brings us neatly to our next topic.</p>
