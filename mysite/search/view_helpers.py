@@ -36,22 +36,24 @@ logger = logging.getLogger(__name__)
 
 
 def order_bugs(query):
-    # Minus sign: reverse order
-    # Minus good for newcomers: this means true values
-    # (like 1) appear before false values (like 0)
-    # Minus last touched: Old bugs last.
+    """
+    Return a query ordered by newcomer friendliness and time since bug was last touched
+    :param query:
+    :return: query which is ordered by newcomer and last touched
+
+    Minus sign: reverse order
+    Minus good for newcomers: this means true values
+    (like 1) appear before false values (like 0)
+    Minus last touched: Old bugs last.
+    """
     return query.order_by('-good_for_newcomers', '-last_touched')
 
 
 class Query:
 
-    def __init__(self, terms=None, active_facet_options=None,
-                 any_facet_options=False, terms_string=None):
+    def __init__(self, terms=None, active_facet_options=None, any_facet_options=None, terms_string=None):
         self.terms = terms or []
-        self.active_facet_options = (
-            mysite.base.decorators.no_str_in_the_dict(active_facet_options)
-            or {}
-        )
+        self.active_facet_options = mysite.base.decorators.no_str_in_the_dict(active_facet_options) or {}
         self.any_facet_options = any_facet_options or []
         if type(terms_string) == str:
             terms_string = unicode(terms_string, 'utf-8')
@@ -70,23 +72,22 @@ class Query:
         # Strategy: Find the strings validly inside quotes, and remove them
         # from the original string. Then split the remainder (and probably
         # trim whitespace from the remaining terms).
-        ret = []
+        query_terms = []
         splitted = re.split(r'(".*?")', string)
 
         for (index, word) in enumerate(splitted):
             if (index % 2) == 0:
-                ret.extend(word.split())
+                query_terms.extend(word.split())
             else:
                 assert word[0] == '"'
                 assert word[-1] == '"'
-                ret.append(word[1:-1])
+                query_terms.append(word[1:-1])
 
-        return ret
+        return query_terms
 
     @staticmethod
     def create_from_GET_data(GET):
-        possible_facets = [u'language', u'toughness', u'contribution_type',
-                           u'project']
+        possible_facets = [u'language', u'toughness', u'contribution_type', u'project']
 
         active_facet_options = {}
         any_facet_options = []
@@ -119,14 +120,13 @@ class Query:
         q = Q()
 
         # toughness facet
-        toughness_is_active = ('toughness' in self.active_facet_options.keys())
+        toughness_is_active = 'toughness' in self.active_facet_options.keys()
         exclude_toughness = exclude_active_facets and toughness_is_active
-        if (self.active_facet_options.get('toughness', None) == 'bitesize'
-                and not exclude_toughness):
+        if self.active_facet_options.get('toughness', None) == 'bitesize' and not exclude_toughness:
             q &= Q(good_for_newcomers=True)
 
         # language facet
-        language_is_active = (u'language' in self.active_facet_options.keys())
+        language_is_active = u'language' in self.active_facet_options.keys()
         exclude_language = exclude_active_facets and language_is_active
         if u'language' in self.active_facet_options and not exclude_language:
             language_value = self.active_facet_options[u'language']
@@ -136,41 +136,37 @@ class Query:
 
         # project facet
         # FIXME: Because of the way the search page is set up, we have to use
-        # the project's display_name to identify the project, which isn't
-        # very nice.
-        project_is_active = (u'project' in self.active_facet_options.keys())
+        #        the project's display_name to identify the project, which isn't
+        #        very nice.
+        project_is_active = u'project' in self.active_facet_options.keys()
         exclude_project = exclude_active_facets and project_is_active
         if u'project' in self.active_facet_options and not exclude_project:
             project_value = self.active_facet_options[u'project']
             q &= Q(project__display_name__iexact=project_value)
 
         # contribution type facet
-        contribution_type_is_active = ('contribution_type' in
-                                       self.active_facet_options.keys())
+        contribution_type_is_active = 'contribution_type' in self.active_facet_options.keys()
         exclude_contribution_type = exclude_active_facets and contribution_type_is_active
-        if (self.active_facet_options.get('contribution_type', None) == 'documentation'
-                and not exclude_contribution_type):
+        if self.active_facet_options.get('contribution_type', None) == 'documentation' and not exclude_contribution_type:
             q &= Q(concerns_just_documentation=True)
 
         # NOTE: This is a terrible hack. We should stop doing this and
-        # just ditch this entire class and swap it out for something like
-        # haystack.
+        #       just ditch this entire class and swap it out for something like
+        #       haystack.
         if connection.vendor == 'sqlite':
             use_regexes = False
         else:
-            use_regexes = False # HACK for now, while Hacker News is visiting
+            use_regexes = False  # HACK for now, while Hacker News is visiting
 
+        # 'firefox' grabs 'mozilla firefox'.
         for word in self.terms:
             if use_regexes:
-                whole_word = "[[:<:]]%s($|[[:>:]])" % (
-                    mysite.base.view_helpers.mysql_regex_escape(word))
+                whole_word = "[[:<:]]%s($|[[:>:]])" % mysite.base.view_helpers.mysql_regex_escape(word)
                 terms_disjunction = (
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |
                     Q(description__iregex=whole_word) |
                     Q(as_appears_in_distribution__iregex=whole_word) |
-
-                    # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__iregex=whole_word)
                 )
             else:
@@ -179,8 +175,6 @@ class Query:
                     Q(title__icontains=word) |
                     Q(description__icontains=word) |
                     Q(as_appears_in_distribution__icontains=word) |
-
-                    # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__icontains=word)
                 )
 
@@ -196,10 +190,7 @@ class Query:
         GET_data = dict(self.active_facet_options)
 
         # ...except the toughness facet option in question.
-        GET_data.update({
-            u'q': unicode(self.terms_string),
-            unicode(facet_name): unicode(option_name),
-        })
+        GET_data.update({u'q': unicode(self.terms_string), unicode(facet_name): unicode(option_name), })
         query_string = http.urlencode(GET_data)
         query = Query.create_from_GET_data(GET_data)
         the_all_option = u'any'
@@ -224,22 +215,21 @@ class Query:
             'name': name,
             'count': query.get_or_create_cached_hit_count(),
             'query_string': query_string,
-            'is_active': is_active
+            'is_active': is_active,
         }
 
     def get_facet_options(self, facet_name, option_names):
         # Assert that there are only unicode strings in this list
         option_names = mysite.base.decorators.no_str_in_the_list(option_names)
 
-        options = [self.get_facet_option_data(facet_name, n)
-                   for n in option_names]
+        options = [self.get_facet_option_data(facet_name, n) for n in option_names]
         # ^^ that's a list of facet options, where each "option" is a
         # dictionary that looks like this:
         # {
         #   'name': name,
         #   'count': query.get_or_create_cached_hit_count(),
         #   'query_string': query_string,
-        #   'is_active': is_active
+        #   'is_active': is_active,
         # }
 
         # Now we're gonna sort these dictionaries.
@@ -259,8 +249,7 @@ class Query:
         # If you sort (naively) by x['count'], then the lower numbers appear
         # higher in the list. Let's reverse that with reverse=True.
 
-        options.sort(
-            key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
+        options.sort(key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
         # We want the Unknown language to appear last, unless it's active. If
         # the key lambda function returns False, then those options appear
         # first (because False appears before True), which is what we want.
@@ -274,16 +263,13 @@ class Query:
 
     def get_possible_facets(self):
 
-        project_options = self.get_facet_options(
-            u'project', self.get_project_names())
+        project_options = self.get_facet_options(u'project', self.get_project_names())
 
         toughness_options = self.get_facet_options(u'toughness', [u'bitesize'])
 
-        contribution_type_options = self.get_facet_options(
-            u'contribution_type', [u'documentation'])
+        contribution_type_options = self.get_facet_options(u'contribution_type', [u'documentation'])
 
-        language_options = self.get_facet_options(
-            u'language', self.get_language_names())
+        language_options = self.get_facet_options(u'language', self.get_language_names())
 
         # looks something like:
         # [{'count': 1180L, 'query_string': 'q=&language=Python',
@@ -297,9 +283,8 @@ class Query:
         # {'count': 2374L, 'query_string': 'q=&language=',
         # 'is_active': True, 'name': 'any'}]
 
+        # The languages facet is based on the project languages, for now
         possible_facets = (
-            # The languages facet is based on the project languages, "for
-            # now"
             (u'language', {
                 u'name_in_GET': u"language",
                 u'sidebar_heading': u"Languages",
@@ -349,10 +334,8 @@ class Query:
         query_without_language_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_language_facet.get_bugs_unordered()
-        distinct_language_columns = bugs.values(
-            u'project__language').distinct()
-        languages = [x[u'project__language']
-                     for x in distinct_language_columns]
+        distinct_language_columns = bugs.values(u'project__language').distinct()
+        languages = [x[u'project__language'] for x in distinct_language_columns]
         languages = [l or u'Unknown' for l in languages]
 
         # Add the active language facet, if there is one
@@ -380,11 +363,9 @@ class Query:
         query_without_project_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_project_facet.get_bugs_unordered()
-        project_ids = list(
-            bugs.values_list(u'project__id', flat=True).distinct())
+        project_ids = list(bugs.values_list(u'project__id', flat=True).distinct())
         projects = Project.objects.filter(id__in=project_ids)
-        project_names = [
-            project.display_name or u'Unknown' for project in projects]
+        project_names = [project.display_name or u'Unknown' for project in projects]
 
         # Add the active project facet, if there is one
         if u'project' in self.active_facet_options:
@@ -396,15 +377,7 @@ class Query:
 
     def get_sha1(self):
 
-        # first, make a dictionary mapping strings to strings
-        simple_dictionary = {}
-
-        # add terms_string
-        simple_dictionary[u'terms'] = str(sorted(self.terms))
-
-        # add active_facet_options
-        simple_dictionary[u'active_facet_options'] = str(
-            sorted(self.active_facet_options.items()))
+        simple_dictionary = {u'terms': str(sorted(self.terms)), u'active_facet_options': str(sorted(self.active_facet_options.items()))}
 
         stringified = str(sorted(simple_dictionary.items()))
         # then return a hash of our sorted items self.
@@ -412,11 +385,9 @@ class Query:
         return hashlib.sha1(stringified).hexdigest()
 
     def get_hit_count_cache_key(self):
-        hashed_query = self.get_sha1()
-        hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
-            CCT)
-        hit_count_cache_key = "hcc_%s_%s" % (
-            hashlib.sha1(hcc_timestamp.__str__()).hexdigest(), hashed_query)
+        the_hashed_query = self.get_sha1()
+        hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(CCT)
+        hit_count_cache_key = "hcc_%s_%s" % (hashlib.sha1(hcc_timestamp.__str__()).hexdigest(), the_hashed_query)
         return hit_count_cache_key
 
     def get_or_create_cached_hit_count(self):
@@ -460,14 +431,10 @@ def get_projects_with_bugs():
     """
     Return a sorted list of all the Projects for which we've indexed bugs.
     """
-    projects = mysite.search.models.Project.objects.annotate(
-        bug_count=Count('bug')).filter(
-        bug_count__gt=0).order_by(u'display_name')
+    projects = mysite.search.models.Project.objects.annotate(bug_count=Count('bug')).filter(bug_count__gt=0).order_by(u'display_name')
     return projects
 
 
 def get_cited_projects_lacking_bugs():
-    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all().values_list(
-        'project_id', flat=True)
-    return mysite.search.models.Project.objects.filter(id__in=project_ids).annotate(
-        bug_count=Count('bug')).filter(bug_count=0)
+    project_ids = mysite.profile.models.PortfolioEntry.published_ones.all().values_list('project_id', flat=True)
+    return mysite.search.models.Project.objects.filter(id__in=project_ids).annotate(bug_count=Count('bug')).filter(bug_count=0)
