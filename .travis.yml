@@ -1,0 +1,36 @@
+sudo: false
+
+language: python
+python:
+  - 2.7
+env:
+  - USE_POSTGRES=true
+  - USE_POSTGRES=
+
+services:
+  - postgres
+
+matrix:
+  allow_failures:
+    - env: USE_POSTGRES=true
+
+install:
+ - pip install --upgrade pip
+ - pip install coveralls
+ - pip install codecov
+ - cp /usr/lib/*/libz.so $VIRTUAL_ENV/lib
+
+script: coverage run --source="mysite" manage.py test
+
+before_install:
+ - pip install -r requirements.txt
+ - git config --global user.name TravisDummy
+ - git config --global user.email dummy@travis-ci.org
+
+
+before_script:
+  - psql -c 'create database openhatch' -U postgres
+
+after_success:
+  - coveralls
+  - codecov

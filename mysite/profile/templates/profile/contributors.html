@@ -1,0 +1,71 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load profile_extras %}
+{% load humanize %}
+
+{% if contributors %}
+<div class='other-contributors'>
+    {% with project.get_contributors|length as contributor_count %}
+        {% if contributor_count <= 5 %}
+            {% if contributor_count >= 2 %}
+                <label>Other contributors ({{ contributor_count|sub:1 }}):</label>
+            {% else %}
+                <label>Other contributor:</label>
+            {% endif %}
+        {% else %}
+            <label>Other contributors 1-4 (of {{ contributor_count|sub:1 }}):</label>
+        {% endif %}
+    <ul>
+        {% for person in contributors %}
+        <li>
+            <a href='{{ person.profile_url }}'>
+                <img src='{{ person.get_photo_thumbnail_url_or_default }}' />
+                {% spaceless %}
+                <span class='fullname'>
+                    {% if person.user.first_name or person.user.last_name %}
+                        <span>{{ person.user.first_name }} {{ person.user.last_name }}</span>
+                    {% else %}
+                        <span>{{ person.user.username }}</span>
+                    {% endif %}
+                </span>
+                {% endspaceless %}
+
+                {% if person.user.first_name and person.user.last_name %}
+                    <span class='username' style="color: #888;">
+                        ({{ person.user.username }})
+                    </span>
+                {% endif %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% if contributor_count <= 5 %}
+        <a class='see-all'
+            href='{% url "mysite.profile.views.people" %}?q=project:{{ project.name|urlencode }}'
+        >Show on map &raquo;</a>
+    {% else %}
+        <a class='see-all'
+                href='{% url "mysite.profile.views.people" %}?q=project:{{ project.name|urlencode }}'
+            >Show all on map &raquo;</a>
+    {% endif %}
+
+    {% endwith %}
+</div>
+{% endif %}
+{# vim: set filetype=htmldjango: #}

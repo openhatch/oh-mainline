@@ -1,0 +1,51 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+<h1>Some tables</h1>
+
+
+<h2>Diagnostics for bug tracker updating</h2>
+
+<h3>What are we diagnosing?</h3>
+
+<p>So we store these "Bug" objects. How do they update?</p>
+
+<p>Each Bug object doesn't know how to update itself. Instead, we have
+a nightly job per bug tracker. When that job wakes up,
+it refreshes all the bugs that came from that bug tracker.
+</p>
+
+<p>So if a Bug object's last_polled stamp is more old than one day + one hour,
+then it means we're not properly updating it from its bug tracker. If it's older
+than <em>two</em> days, then something is terribly wrong!</p>
+
+<p>These Bug diagnostics only apply to bugs we think are <em>open</em>.
+We happen to retain information on bugs that were once open (for example,
+if the bug was marked as resolved), but it is not important if those bugs
+become stale.</p>
+
+<h3>Data</h3>
+
+<table>
+{% for key, value in bug_diagnostics.items %}
+<tr>
+<td>{{ key }}:</td>
+<td>{{ value }}</td>
+</tr>
+{% endfor %}
+</table>
+

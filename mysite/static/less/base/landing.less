@@ -1,0 +1,88 @@
+@import "base";
+
+body#landing {
+
+    /* The columns on the front page take up about one-third
+       of the width. Later rules for responding to browser
+       width changes will adjust these rules further. */
+    .column {
+        margin-left: -1px;
+        width:32%;
+    }
+    #landing-module {
+        background: @emphasized-module-interior;
+        #landing-message {
+            font-size: 2em;
+            padding: 10px 0 15px 0;
+            margin: 0 0 20px 0;
+            .screw-you-webkit;
+        }
+    }
+
+    .submodule-container {
+        clear: both;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 30px;
+    }
+
+    .submodule {
+        float: left;
+        width: 21%;
+        margin-right: 12px;
+        font-size: 1.15em;
+        .screw-you-webkit;
+    }
+
+    /* Add responsive design for phones and tablets,
+        so each box occupies its own row. */
+    @media (max-width: 800px) {
+      .submodule {
+        width: 100%;
+        margin-right: 0px;
+      }
+      .column.three-column {
+        width: 100%;
+      }
+    }
+
+    p {
+        padding: 5px 0;
+    }
+
+    h4 {
+        font-size: 1.5em;
+        float: none;
+    }
+
+    .landing-page-pic {
+        height: auto;
+        width: auto;
+        max-width: 150px;
+        max-height: 150px;
+    }
+
+    .penguin {
+        float: left;
+        padding: 0 20px 20px 10px;
+        height: auto;
+        width: auto;
+        max-width: 100px;
+        max-height: 80px;
+    }
+
+    .blurb {
+        font-size: 15px;
+    }
+
+    .outreach-head {
+        font-weight: bold;
+    }
+
+    .outreach-title {
+        padding-bottom: 15px;
+        margin-bottom: -8px;
+        margin-top: 18px;
+        display: inline-block;
+    }
+}

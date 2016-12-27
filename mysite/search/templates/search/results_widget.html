@@ -1,0 +1,106 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load search %}
+{% load base_extras %}
+
+<div class='results-widget'>
+    <span id='results-summary'>
+
+        {% if bunch_of_bugs %}
+            {% ifequal bunch_of_bugs|length 1 %}
+                There's just one
+            {% else %}
+                Showing 
+                <span id='results-summary-start'>{{ start }}</span> to
+                <span id='results-summary-end'>{{ end }}</span> of 
+                {{ total_bug_count }}
+            {% endifequal %}
+        {% endif %}
+            
+        {% if not bunch_of_bugs %}
+            No
+        {% endif %}
+
+        {% for facet, value in query.active_facet_options.items %}
+            {% ifequal facet "toughness" %}
+                <span class=active_facet_value>
+                    {% spaceless %}
+                        {% include 'bug_search_facet_value_in_summary.html' %}
+                    {% endspaceless %}
+                </span>
+            {% endifequal %}
+        {% endfor %}
+
+        {% if bunch_of_bugs or query %}
+            bug{{ bunch_of_bugs|pluralize }}
+        {% endif %}
+
+        {% if not bunch_of_bugs %}
+            {% if query.terms or query.active_facet_options %}
+                {% ifnotequal start 1 %}
+                    on this page
+                {% else %}
+                    found
+                {% endifnotequal %}
+            {% else %}
+                {# No search query #}
+            {% endif %}
+        {% endif %}
+
+        {% if query.terms %}
+        matching
+        <strong id='results-summary-language'>{{ query.terms_string }}</strong>{% if not query.active_facet_options %}.{% endif %}
+        {% endif %}
+
+        {% spaceless %}
+            {% for facet, value in query.get_active_facet_options_except_toughness.items %}
+                {% if not forloop.first and forloop.last %}
+                    {% ifnotequal forloop.counter0 1 %}
+                        and
+                    {% endifnotequal %}
+                {% endif %}
+                <span class='active_facet_value'>
+                    {% ifequal facet "language" %}
+                    whose main project language is
+                    {% endifequal %}
+                    {% ifequal facet "project" %}
+                    in 
+                    {% endifequal %}
+                    {% ifequal facet "contribution_type" %}
+                    which need
+                    {% endifequal %}
+                    {% spaceless %}
+                    {% include 'bug_search_facet_value_in_summary.html' %}
+                    {% endspaceless %}
+                </span>
+            {% endfor %}
+        {% endspaceless %}
+
+    </span>
+
+
+    <span id='expand-collapse-all'>
+        <a href='#' id='expand-all-link'><img src={% version '/static/images/icons/zoom-in.png' %}>Expand all</a>
+        <a href='#' id='collapse-all-link'><img src={% version '/static/images/icons/zoom-out.png' %}>Collapse all</a>
+    </span>
+
+    {% include 'search/navigation.html' %}
+
+</div><!-- /.results-widget -->
+{# vim: set filetype=htmldjango: #}

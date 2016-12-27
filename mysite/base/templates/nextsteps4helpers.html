@@ -1,0 +1,102 @@
+{% extends 'base/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+    Next steps 
+{% endblock %}
+
+{% block body_id %}nextsteps4helpers{% endblock %}
+
+{% block body_class %}{{ block.super }} three_columns{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    h1 { padding-top: .6em; text-shadow: 0 1px 0 #fff; }
+    h2 { font-weight: normal; margin-top: .6em; }
+{% endblock %}
+
+{% block pagetop %}
+    <h1>You're now registered as a helper for <strong>{{ the_lucky_project.display_name }}</strong>.</h1>
+{% endblock %}
+
+{% block content %}
+    <div class='column'>
+        <div class='module'>
+            <div class='module-head'>
+                <h3>
+                    <span style='font-weight: normal;'>
+                        Next step #1:
+                    </span>
+                    Learn about some of the other registered helpers for
+                    {{ the_lucky_project.display_name }}</h3>
+            </div>
+            <div class='module-body'>
+                <ul class="people-list">
+                    {% for person in helpers|slice:":3" %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% empty %}
+                        No one yet.
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='column'>
+        <div class='module' id='me'>
+            <div class='module-head'>
+                <h3>
+                    <span style='font-weight: normal;'>
+                        Next step #2:
+                    </span>
+                    Read about getting involved in {{ the_lucky_project.display_name }}</h3>
+            </div>
+            <div class='module-body'>
+                <ul class="people-list">
+                    {% with user.get_profile as person %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endwith %}
+                </ul>
+                <p class='rabbit_hole'><a href='{% url "mysite.profile.views.people" %}'>Find people near you &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class='column'>
+        <div class='module' id='me'>
+            <div class='module-head'>
+                <h3>
+                    <span style='font-weight: normal;'>
+                        Next step #3:
+                    </span>
+                    Complete your profile</h3>
+            </div>
+            <div class='module-body'>
+                <ul class="people-list">
+                    {% with user.get_profile as person %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endwith %}
+                </ul>
+                <p class='rabbit_hole'><a href='{% url "mysite.profile.views.people" %}'>Find people near you &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

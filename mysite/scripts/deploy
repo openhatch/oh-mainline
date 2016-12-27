@@ -1,0 +1,13 @@
+#!/bin/bash
+set -x
+set -e
+
+git push heroku
+
+### ssh to deploy@linode.openhatch.org
+### and update the site.
+ssh -t deploy@linode.openhatch.org milestone-a/mysite/scripts/deploy_myself.sh
+
+### Also do the same to linode2.openhatch.org, in order
+### to make sure bug downloading is up to date.
+ssh -t deploy@linode2.openhatch.org milestone-a/mysite/scripts/deploy_myself.sh

@@ -1,0 +1,99 @@
+{% extends 'missions/shell/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% block mission_main %}
+<div class='submodule fat'>
+    <div class='head'>
+        <h3>Creating and removing</h3>
+    </div>
+    <div class="body">
+
+    <h3>mkdir: Make directory</h3>
+    <p> The mkdir command will allow you to create directories. For example,</p>
+    <code class="code">$ mkdir penguin</code>
+    <p>will create a directory called "penguin".</p>
+
+    <p>Any number of directories can be created simultaneously.
+    Thus, for example, the following command would create three directories
+    within the current directory (i.e., the directory in which the user is
+    currently working) with the names dir1, dir2 and dir3:</p>
+    <code class="code">$ mkdir dir1 dir2 dir3</code>
+    <p>If a directory with that name already exists in the current directory,
+    mkdir will return a warning message such as <kbd class="kbd">mkdir: cannot
+    create directory 'dir1': File exists</kbd> and will not create a file
+    with that name. However, it will then continue to create directories for any
+    other names provided as arguments.</p>
+
+    <h3>rm: Remove files or directories:</h3>
+    <p>The command name "rm" is derived from "remove." You can use this command
+    to remove or delete a file in your directory. For example, to remove a file named
+    <kbd class="kbd">test.txt</kbd> present in your current directory, you can
+    type</p>
+    <code class="code">$ rm test.txt</code>
+
+    <h3>Removing directories:</h3>
+    <p>By default, <kbd class="kbd">rm</kbd> does not remove directories. If the
+    <kbd class="kbd">-r (--recursive)</kbd> option is specified, however, it will. For
+    example,</p>
+    <code class="code">rm -r penguin</code>
+    <p>will remove the directory <kbd class="kbd">penguin</kbd> and its contents
+    recursively. What does "recursively" mean? Think of it this way: this command will
+    remove the directory and all its files and subdirectories, and all the subdirectories'
+    files and subdirectories, and on and on ("recursively") until the original directory
+    <kbd class="kbd">penguin</kbd> is completely empty.
+    </p>
+
+    <h3>Challenge:</h3>
+    <p>What is the output of the <kbd class="kbd">ls</kbd> command in the sequence given below?</p>
+    <code class="snippet">
+    $ ls<br>
+    test.txt music<br>
+    $ mkdir videos<br>
+    $ rm -r music<br>
+    $ ls
+    </code>
+    <form method="post" action="{% url "mysite.missions.shell.views.command_mkdir_rm_submit" %}#create-and-remove-form">{% csrf_token %}
+        <div class="form-row">
+            {% if command_mkdir_rm_success %}
+            <div class="successmsg">
+                <p><strong>You have successfully completed this part of the mission.</strong></p>
+            </div>
+            {% endif %}
+            <input type="radio" name="option" value="1">
+              <kbd class="kbd">test.txt</kbd><br>
+            <input type="radio" name="option" value="2">
+              <kbd class="kbd">videos</kbd><br>
+            <input type="radio" name="option" value="3">
+              <kbd class="kbd">test.txt videos</kbd><br>
+            <input type="radio" name="option" value="4">
+              <kbd class="kbd">music videos</kbd><br>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+    {% if command_mkdir_rm_error_message %}
+    <ul class="errorlist"><li>{{ command_mkdir_rm_error_message }}</li></ul>
+    {% endif %}
+    {% if command_mkdir_rm_done %}
+        <p class="next_mission_link">
+        <a href='{% url "mysite.missions.shell.views.command_cp_mv" %}'>
+        On to the next one &raquo;</a></p>
+    {% endif %}
+
+
+    </div>
+</div>
+{% endblock %}

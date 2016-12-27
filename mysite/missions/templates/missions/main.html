@@ -1,0 +1,175 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2011 Josh Schreuder
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block body_id %}missions_index{% endblock %}
+
+{% block title %}
+Open source training missions
+{% endblock title %}
+
+{% block pagetop %}
+    <h3 class="up-top"><img alt='Training Missions' id='training-missions' alt='Training Missions' src='/static/images/training-missions.png' /></h3>
+{% endblock pagetop %}
+
+{% block main %}
+<div class="module">
+  <div class="module-body">
+    <h2>About the training missions</h2>
+    <p>Some video games have a “training level” where you can get shot
+      at without dying. These training missions are a place to learn
+      open source contribution skills without getting burned.</p>
+
+    <p>A training mission shuns “manuals” and long, boring blobs
+    of text. Instead it says, “Here’s a short, concrete task to
+    perform. Interact with this web-based robot here, and it will tell
+    you if you succeeded.”</p>
+
+    <h2>Get to know about: "The Shell"</h2>
+
+    <p>These missions teach you about how to use the command line tool called the "shell" and few basic commands which will help you in other missions.
+    </p>
+
+    <div class="submodule-container">
+    {% with fully_completed_missions.shell as mission_completed %}
+    {% with "Using the shell" as mission_title %}
+    {% with "Learn how to use the shell and play with commands." as mission_description %}
+    {% with "/missions/shell/about" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    <div class="clearer">&nbsp;</div>
+    </div>
+
+    <h2>Before the missions: Prepare your command line</h2>
+
+    <p>Contributing to free, open source software frequently
+      requires using a text-based command line. Our training
+      missions are written with that in mind. A command line
+      is available on Windows, Mac OS, Linux, and other systems,
+      and we can show you how to launch it and play around in it.</p>
+
+    <p>If you're not sure how to use a command prompt to run programs
+      like tar, diff, and git on Windows, you can get started with
+      "Prepare your command line" below. We have not written our own
+      instructions for other platforms yet, but you can try these
+      external resources for <a href="https://help.ubuntu.com/community/UsingTheTerminal">Ubuntu</a>
+      and <a href="http://mac.tutsplus.com/tutorials/terminal/navigating-the-terminal-a-gentle-introduction/">Mac OS</a>.</p>
+
+    {% with "Windows" as mission_title %}
+    {% with 'Get "Git Bash" and GNU tools on Windows.' as mission_description %}
+    {% with "/missions/windows-setup" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    <h2>Get to know the tech used within open source</h2>
+
+    <p>These missions give you a tour of command-line tools you may
+      run into when contributing to free software.</p>
+
+    <div class="submodule-container">
+    {% with fully_completed_missions.tar as mission_completed %}
+    {% with "Using tar" as mission_title %}
+    {% with "Learn how to work with tar archives." as mission_description %}
+    {% with "/missions/tar" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    {% with fully_completed_missions.diffpatch as mission_completed %}
+    {% with "Using diff and patch" as mission_title %}
+    {% with "Learn how to use diff and patch to submit changes to a project or apply others' changes." as mission_description %}
+    {% with "/missions/diffpatch" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    <div class="clearer">&nbsp;</div>
+    </div>
+
+    <h2>Practice contributing to a project</h2>
+
+    <p>These missions let you practice sharing a patch with a maintainer.</p>
+    
+    <div class="submodule-container">
+    {% with fully_completed_missions.svn as mission_completed %}
+    {% with "Using Subversion" as mission_title %}
+    {% with "Learn how to interact with projects that use the Subversion version control system." as mission_description %}
+    {% with "/missions/svn" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    {% with fully_completed_missions.git as mission_completed %}
+    {% with "Using git" as mission_title %}
+    {% with "Learn how to interact with projects that use the Git version control system." as mission_description %}
+    {% with "/missions/git" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+
+    <div class="clearer">&nbsp;</div>
+    </div>
+
+    <h2>Setup your Python environment</h2>
+
+    <p>These missions teach you how to install Python packages and create
+    virtual environments.</p>
+
+    <div class="submodule-container">
+    {% with fully_completed_missions.pipvirtualenv as mission_completed %}
+    {% with "Using pip and virtualenv" as mission_title %}
+    {% with "Learn how to install Python packages and how to work with virtual environments." as mission_description %}
+    {% with "/missions/pipvirtualenv" as mission_link %}
+    {% include 'missions/mission_card.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+
+    <div class="clearer">&nbsp;</div>
+    </div>
+
+    <h2>Where they came from, and where they're going</h2>
+    <p>You can read about
+      <a href="https://openhatch.org/blog/2010/the-thinking-behind-the-training-missions/">vision behind the training missions</a> on the OpenHatch blog.
+      They were initially built as a
+      <a href="https://openhatch.org/blog/2010/google-summer-of-code-project-training-missions/">Google Summer of Code</a> project.
+    </p>
+
+    <p>Now, our community of volunteers takes care of creating more missions and fixing bugs in them. We could use feedback, and if you want to jump in to help, we'd love to have you!
+      <a href="http://openhatch.org/contact/">Get in touch with us</a> and let us know what you think (or how you want to help out!). If you get stuck, <a href="http://openhatch.org/wiki/Mission_help">read our tips</a>.
+      </p>
+    {% endwith %}
+    {% endwith %}
+
+  </div>
+</div>
+{% endblock main %}

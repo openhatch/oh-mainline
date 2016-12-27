@@ -1,0 +1,20 @@
+@import "base";
+
+.column {
+    clear: none;
+}
+
+.two-column-left {
+    float: left;
+    width: @column-width;
+}
+
+.two-column-right {
+/*    margin-left: @column-width + @padding-between-columns; */
+    width: @column-width * 2 + @padding-between-columns * 2;
+    float: none;
+    clear: none;
+}
+
+#more-content { clear: both; }
+

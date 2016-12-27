@@ -1,0 +1,94 @@
+.project-page h3 {
+    clear: none;
+    padding: 10px 8px 4px 8px;
+    margin: 5px 10px 5px 5px;
+    background: #EDEDED;
+    }
+    
+.project-page #active-tab {
+    background: #666;
+    color: #FFF;
+    text-shadow: 0 1px 0 #aaa;
+    }
+    
+body.two_columns #left .module > .body {
+    border: none;
+    padding: 0;
+    }
+    
+#left .module .body {
+    background: none;
+    }
+    
+.prerequisite .step-title {
+    color: #DFB;
+    }
+    
+.step-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    background: #666;
+    color: #FFF;
+    width: 97.5%;
+    margin: 0 8px 0 0;
+    border: 1pt solid #999;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    }
+    
+.step-title p {
+    margin: 0 0 0 30px;
+    padding: 5px 5px 5px 5px;
+    }
+    
+.step-desc {
+    width: 300px;
+    display: none;
+    }
+    
+.step-buttons {
+    margin-top: 15px;
+    text-align: right;
+    }
+    
+.step-button {
+    width: 150px;
+    height: 110px;
+    padding: 10px 8px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    display: inline;
+    }
+    
+.step-time {
+    background: #EEEFDD;
+    border-right: 1pt solid #CCC;
+    border-bottom: 1pt solid #CCC;
+    }
+    
+.step-hint {
+    background: #FFFFBB;
+    border-right: 1pt solid #FFFF99;
+    border-bottom: 1pt solid #EEEE99; 
+    }
+    
+.step-frustration-handler {
+    background: #DC99AB;
+    border-right: 1pt solid #AA7788;
+    border-bottom: 1pt solid #AA7788;
+    }
+    
+.code {
+    font-family: monospace;
+    font-size: .9em;
+    }
+    
+.command {
+    clear: both;
+    background: #EEEEDE;
+    margin: 5px 0;
+    padding: 10px;
+    border: 2pt dashed #DEDEDD;
+    display: block;
+    font-size: 1em;
+    }

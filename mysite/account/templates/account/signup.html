@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load i18n %}
+
+{% block title %}Sign up{% endblock %}
+
+{% block body_id %}signup_with_password{% endblock %}
+
+{% block css %}
+{{ block.super }}
+body#signup_with_password .errorlist li { width: 90%; }
+body#signup_with_password .module { margin: 0 305px; width: 350px; }
+body#signup_with_password .module .head { width: 345px; }
+body#signup_with_password .module .body { width: 310px; }
+#expand-second-form { margin-top: 20px; }
+#associate-with-existing-account { margin-top: 10px; display: none; }
+form p { float: none; display: block; margin: 0 0 10px 0; }
+form label { float: none; display: block;  }
+input[type='text'], input[type='password'] { width: 90%; }
+input[type='submit'] { padding: 2%; width: 40%; }
+body#signup_with_password form input { float: none; display: block; }
+body#signup_with_password .body { background: #fff;} 
+.help_text { font-size: .85em; }
+{% endblock %}
+
+{% block content %}
+<div class='module'>
+    <div class='module-head'>
+        <h3>Sign up <span style='font-weight: normal;'>(without OpenID)</span></h3>
+        <ul>
+            <li><a style='font-weight: normal;' href='/account/login/'>(or log in)</a></li>
+        </ul>
+    </div>
+    <div class='module-body'>
+        <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
+        <form name="signup" action="{% url "mysite.account.views.signup_do" %}" method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" name="next" value="{{ request.REQUEST.next }}">
+            <p> <input type="submit" value="Done!" /> </p>
+        </form>
+        Or <a href='/account/login/'>sign up using an account you already have</a>.
+    </div>
+    <div class="module-foot">
+    </div>
+</div>
+{% endblock content %}

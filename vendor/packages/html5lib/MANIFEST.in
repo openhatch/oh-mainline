@@ -1,0 +1,6 @@
+include html5lib/tests/testdata/encoding/*
+include html5lib/tests/testdata/sanitizer/*
+include html5lib/tests/testdata/serializer/*
+include html5lib/tests/testdata/sniffer/*
+include html5lib/tests/testdata/tokenizer/*
+include html5lib/tests/testdata/tree-construction/*

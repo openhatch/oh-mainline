@@ -1,0 +1,8 @@
+README
+setup.cfg
+pip-egg-info/unicodecsv.egg-info/PKG-INFO
+pip-egg-info/unicodecsv.egg-info/SOURCES.txt
+pip-egg-info/unicodecsv.egg-info/dependency_links.txt
+pip-egg-info/unicodecsv.egg-info/top_level.txt
+unicodecsv/__init__.py
+unicodecsv/test.py

@@ -1,0 +1,7 @@
+<p>This is the ugliest page imaginable that lets you delete a user
+from the site.</p>
+
+<form method="POST" action="">{% csrf_token %}
+{{ form.as_table }}
+<input type="submit" value="Submit" />
+</form>

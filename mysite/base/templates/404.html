@@ -1,0 +1,39 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+Error 404: Page not found
+{% endblock title %}
+
+{% block body_id %}error{% endblock body_id %}
+
+{% block main %}
+<div class='module'>
+    <div class='module-head'>
+        404
+    </div>
+    <div class='module-body'>
+        That page couldn't be found.
+        If you got here from a link within the site, our system
+        automatically emailed us. Otherwise, please <a href="/contact/">contact us</a>.
+    </div>
+</div>
+{% endblock main %}

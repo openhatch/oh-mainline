@@ -1,0 +1,20 @@
+Metadata-Version: 1.1
+Name: jsmin
+Version: 2.0.2
+Summary: JavaScript minifier.
+Home-page: UNKNOWN
+Author: Dave St.Germain
+Author-email: dave@st.germa.in
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: Freeware
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Pre-processors
+Classifier: Topic :: Text Processing :: Filters

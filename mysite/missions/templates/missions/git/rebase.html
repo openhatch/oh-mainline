@@ -1,0 +1,63 @@
+{% extends 'missions/git/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Ayffero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the rebase step yet. You have to do the
+  <a href="{% url "mysite.missions.git.views.diff" %}">diff step first</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
+
+{% block mission_main_body %}
+
+<p>Congratulations! The Brain has accepted your patch and commited it to the main repository. Now no one will accidentally get a "goodbye" instead of "hello"!  In fact, The Brain was so happy with your patch, he has invited you to his top secret dinner party. To get in the door, you'll need to find the password he has hidden in the commit log when your patch was applied.</p>
+
+<p>To learn the secret password, you will need to update your local copy and read the logs: <abbr title=" git log">(hover for hint)</abbr><br style="clear: left;" />
+<ul>
+	<li><code>git fetch</code></li>
+	<li><code>git rebase origin/master</code></li>
+</ul>
+
+{% if git_rebase_done %}
+<div class="successmsg">
+  <p><strong>Kudos! You have successfully completed the mission.  You are ready to work with git repositories. If you want to review more concepts, please check out the
+  <a href="http://www.git-scm.com">main git website</a></p>.
+</div>
+<p class="next_mission_link">
+  <a href="{% url "mysite.missions.base.views.main_page" %}">Return to the main mission page &raquo;</a></p>
+{% else %}
+<form method="post" action="{% url "mysite.missions.git.views.rebase_submit" %}#gitrebase-form">{% csrf_token %}
+  <div class="form-row">
+    <a name="gitrebase-form"></a>
+    {% if git_rebase_error_message %}
+    <ul class="errorlist"><li>{{ git_rebase_error_message }}</li></ul>
+    {% endif %}
+    {{ git_rebase_form.secret_word.errors }}
+    <br style="clear: left;" />
+    Give the secret password to join the dinner party: <br style="clear: left;" />
+    {{ git_rebase_form.secret_word }}
+    <br style="clear: left;" />
+    <input type="submit" value="Submit" style="float: none;" />
+  </div>
+</form>
+{% endif %}
+
+{% endblock mission_main_body %}
+

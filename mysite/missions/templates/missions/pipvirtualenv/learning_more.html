@@ -1,0 +1,96 @@
+{% extends 'missions/pipvirtualenv/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>More about pip and virtualenv</h3>
+  </div>
+  <div class="body">
+    <h3>More about virtualenv and virtualenvwrapper</h3>
+    <p>Deleting a virtualenv is as simple as creating one. To delete a
+    virtualenv, at the terminal, type <kbd>rmvirtualenv</kbd> followed
+    by the name of the virtualenv that you'd like to remove, like so:</p>
+
+    <pre>rmvirtualenv TestEnv</pre>
+
+    <p>The above command will delete the virtualenv <kbd>TestEnv</kbd>,
+    that we created earlier.</p>
+
+    <p>Another useful command is <kbd>lsvirtualenv</kbd>, which lists all
+    of the virtual environments that we have created so far.</p>
+
+    <p>If you'd like to learn more about virtual environments, we strongly
+    recommend going through <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">
+    the section about virtualenvs</a> in the book <a href="http://docs.python-guide.org/en/latest/">
+    The Hitchhiker’s Guide to Python!</a>.</p>
+
+    <p>For a full list of virtualenvwrapper commands, go
+    <a href="http://virtualenvwrapper.readthedocs.org/en/latest/command_ref.html">
+    here</a>.</p>
+
+    <h3>More about pip</h3>
+    <p>You can also use pip to search the <a href="https://pypi.python.org/pypi">
+    Python Package Index (PyPI)</a> for packages. For instance, to search for a
+    package that allows you to work with HTTP, type,</p>
+
+    <pre>pip search http</pre>
+
+    <p>or maybe, to search for packages related to <a href="http://matplotlib.org/">
+    matplotlib</a>, a Python 2D plotting library, type:</p>
+
+    <pre>pip search matplotlib</pre>
+
+    <p>If you find yourself installing the same package frequently in virtualenvs,
+    it quickly becomes a pain to wait for pip to download the package again on every
+    separate install. The <a href="https://pip.pypa.io/en/latest/reference/pip_wheel.html">
+    pip wheel</a> command can be used here. Here's the syntax:</p>
+
+    <pre>
+      pip wheel <em>foo</em>
+      pip install <em>foo</em>
+    </pre>
+
+    <p>where <kbd><em>foo</em></kbd> is the name of the package to install.</p>
+
+    <p>The <kbd>pip wheel</kbd> command above downloads the package <kbd><em>
+    foo</em></kbd> from <a href="https://pypi.python.org/pypi">PyPI</a> and
+    keeps it in a special directory of its own. After that, whenever
+    you try and install the same package <kbd><em>foo</kbd></em>, pip will skip
+    the downloading phase and install it using the the file saved by
+    <kbd>pip wheel</kbd>.</p>
+
+    <p>This may not seem like a big deal for small packages, but for large
+    packages like matplotlib, which is roughly 48 megabytes in size, <kbd>
+    pip wheel</kbd> can save you a lot of time.</p>
+
+    <p>
+      You can learn more about pip 
+      <a href="https://pip.pypa.io/en/latest/index.html">here</a>.
+    </p>
+
+    <p class="next_mission_link">
+    <a href='{% url "mysite.missions.pipvirtualenv.views.reference" %}'>
+      Quick Reference &raquo;
+    </a></p>
+    
+
+  </div>
+</div>
+{% endblock %}
+

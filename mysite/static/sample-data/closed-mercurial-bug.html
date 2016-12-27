@@ -1,0 +1,397 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>
+Issue 1550: help('modules') broken by several 3rd party libraries (svn patch attached) - Python tracker
+
+</title>
+<link rel="shortcut icon" href="@@file/favicon.ico" />
+<link media="screen" href="http://python.org/styles/screen-switcher-default.css" type="text/css" id="screen-switcher-stylesheet" rel="stylesheet" />
+<link media="screen" href="http://python.org/styles/netscape4.css" type="text/css" rel="stylesheet" />
+<link media="print" href="http://python.org/styles/print.css" type="text/css" rel="stylesheet" />
+<link media="screen" href="http://python.org/styles/largestyles.css" type="text/css" rel="alternate stylesheet" title="large text" />
+<link media="screen" href="http://python.org/styles/defaultfonts.css" type="text/css" rel="alternate stylesheet" title="default fonts" />
+<link rel="stylesheet" type="text/css" href="@@file/style.css" />
+<meta http-equiv="Content-Type"
+      content="text/html; charset=utf-8" />
+
+<script type="text/javascript">
+submitted = false;
+function submit_once() {
+    if (submitted) {
+        alert("Your request is being processed.\nPlease be patient.");
+        event.returnValue = 0;    // work-around for IE
+        return 0;
+    }
+    submitted = true;
+    return 1;
+}
+
+function help_window(helpurl, width, height) {
+    HelpWin = window.open('http://bugs.python.org/' + helpurl, 'RoundupHelpWindow', 'scrollbars=yes,resizable=yes,toolbar=no,height='+height+',width='+width);
+}
+</script>
+
+
+
+</head>
+<body>
+  <!--  Logo  -->
+  <h1 id="logoheader">
+    <a accesskey="1" href="." id="logolink">
+       <img src="http://python.org/images/python-logo.gif" alt="homepage" border="0" id="logo" /></a>
+  </h1>
+
+<div id="utility-menu">
+<!-- Search Box -->
+<div id="searchbox">
+    <form name="searchform" method="get" action="issue" id="searchform">
+      <div id="search">
+       <input type="hidden" name="@columns"
+              value="id,activity,title,creator,assignee,status,type" />
+       <input type="hidden" name="@sort" value="-activity" />
+       <input type="hidden" name="@group" value="priority" />
+       <input type="hidden" name="@filter" value="status" />
+       <input type="hidden" name="@action" value="searchid" />
+       <input class="input-text" id="search-text" name="@search_text" size="10" />
+       
+         <input type="hidden" name="status" value="-1,1,3" />
+         <input type="submit" id="submit" value="search in open issues" name="submit" class="input-button" />
+       
+       
+      </div>
+     </form>
+</div>
+</div>
+
+
+<div id="left-hand-navigation">
+  
+    <!--  Main Menu NEED LEVEL TWO HEADER AND FOOTER -->
+ <div id="menu">
+  <ul class="level-one">
+   <li class=""><a href="http://python.org/about" class="" title="About The Python Language">About</a></li>
+   <li class=""><a href="http://python.org/news" class="" title="">News</a></li>
+   <li class=""><a href="http://python.org/doc" class="" title="">Documentation</a></li>
+   <li class=""><a href="http://python.org/download" class="" title="">Download</a></li>
+   <li class=""><a href="http://python.org/community" class="" title="">Community</a></li>
+   <li class=""><a href="http://python.org/psf" class="" title="Python Software Foundation">PSF</a></li>
+   <li class=""><a href="http://python.org/links" class="" title="">Links</a></li>
+   <li class=""><a href="http://python.org/dev" class="" title="Python Core Language Development">Core Development</a></li>
+   <li class="selected"><a href="." class="selected" title="Python Issue Tracker">Issue Tracker</a>
+    <ul class="level-two">
+     <li>
+      <b>Issues</b>
+       <ul class="level-three">
+        
+        <li></li>
+    <li><a href="issue?status=-1,1,3&amp;@sort=-activity&amp;@search_text=&amp;@dispname=Show All&amp;@startwith=0&amp;@filter=status&amp;@group=priority&amp;@columns=id,activity,title,creator,assignee,status,type&amp;@pagesize=50">Show Open</a></li>
+    <li><a href="issue?status=-1,1,3&amp;@sort=-activity&amp;@search_text=&amp;@dispname=Show Unassigned&amp;@startwith=0&amp;@filter=status,assignee&amp;@group=priority&amp;@columns=id,activity,title,creator,status&amp;assignee=-1&amp;@pagesize=50">Show Unassigned</a></li>
+        <li>
+         <a href="issue?@template=search&amp;status=1">Search</a>
+        </li>
+        <li>
+         <form method="post" action="#">
+          <input type="submit" class="form-small"
+                 value="Show issue:" />
+          <input class="form-small" size="4" type="text" name="@number" />
+          <input type="hidden" name="@type" value="issue" />
+          <input type="hidden" name="@action" value="show" />
+         </form>
+        </li>
+       </ul>
+     </li>
+     <li>
+      <b>User</b>
+      <form method="post" action="#">
+       <ul class="level-three">
+      <li>
+       Login<br />
+       <input size="10" name="__login_name" /><br />
+       <input size="10" type="password" name="__login_password" /><br />
+       <input type="hidden" name="@action" value="Login" />
+       <input type="checkbox" name="remember" id="remember" />
+       <label for="remember">Remember me?</label><br />
+       <input class="form-small" type="submit" value="Login" /><br />
+       <input type="hidden" name="__came_from"
+              value="issue1550" />
+       <input type="hidden" name="@sort" value=""/>
+<input type="hidden" name="@group" value=""/>
+<input type="hidden" name="@pagesize" value="50"/>
+<input type="hidden" name="@startwith" value="0"/>
+       </li>
+       <li>
+       <a href="user?@template=register">Register</a>
+	</li>
+       <li><a href="user?@template=forgotten">Lost&nbsp;your&nbsp;login?</a>
+       </li>
+       </ul>
+      </form>
+     </li>
+     
+     
+     
+     <li class="">
+   <b>Help</b><br />
+   <a href="http://wiki.python.org/moin/TrackerDocs/">Tracker Documentation</a>
+
+   <a href="http://psf.upfronthosting.co.za/roundup/meta">Report
+     Tracker Problem</a><br />
+     </li>
+
+    </ul>
+   </li>
+  </ul>
+ </div> <!-- menu -->
+</div> <!-- left-hand-navigation -->
+
+<div id="content-body">
+<div id="body-main">
+<div id="content">
+<div id="breadcrumb">
+ 
+ 
+ Issue1550
+ 
+</div>
+ 
+ <td class="content">
+
+
+
+
+
+<div>
+
+<form method="POST" name="itemSynopsis"
+      onsubmit="return submit_once()"
+      enctype="multipart/form-data" action="issue1550">
+
+<fieldset><legend>classification</legend>
+<table class="form">
+<tr>
+ <th class="required">Title:</th>
+ 
+ <td colspan="3">
+  <span>help('modules') broken by several 3rd party libraries (svn patch attached)</span>
+  <input type="hidden" name="title"
+         value="help('modules') broken by several 3rd party libraries (svn patch attached)">
+ </td>
+</tr>
+
+<tr>
+ <th class="required"><a class="classhelp" href="issue_type?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('issue_type?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Type</a>:</th>
+ <td>behavior</td>
+ <th><a class="classhelp" href="stage?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('stage?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Stage</a>:</th>
+ <td></td>
+</tr>
+
+<tr>
+ <th><a class="classhelp" href="component?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('component?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Components</a>:</th>
+ <td>Demos and Tools, Library (Lib)</td>
+ <th><a class="classhelp" href="version?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('version?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Versions</a>:</th>
+ <td>Python 3.0, Python 2.6, Python 2.5</td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset><legend>process</legend>
+<table class="form">
+<tr>
+ <th><a class="classhelp" href="status?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('status?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Status</a>:</th>
+ <td>resolved</td>
+ <th>Resolution:</th>
+ <td>accepted</td>
+</tr>
+
+<tr>
+ <th>
+  Dependencies:
+  
+ </th>
+ <td>
+  
+ </td>
+ <th>Superseder:</th>
+ <td>
+  
+  
+ </td>
+ </tr>
+ <tr>
+ <th>Assigned To:</th>
+ 
+ <td>
+  ping
+ </td>
+ <th>Nosy List:
+  
+ </th>
+ <td>
+     benjhayden, ping
+     (2)
+ </td>
+</tr>
+<tr>
+ <th>
+   <a class="classhelp" href="priority?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('priority?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Priority</a>:
+ </th>
+ <td>normal</td>
+ <th><a class="classhelp" href="keyword?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=name&amp;@pagesize=50" onclick="javascript:help_window('keyword?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=name&amp;@pagesize=50', '500', '400');return false;">Keywords</a></th>
+ <td>easy, patch</td>
+
+
+</tr>
+<tr>
+ <th>
+   <a class="classhelp" href="priority?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50" onclick="javascript:help_window('priority?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=order&amp;@pagesize=50', '500', '400');return false;">Priority</a>:
+ </th>
+ <td>normal</td>
+ <th><a class="classhelp" href="keyword?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=name&amp;@pagesize=50" onclick="javascript:help_window('keyword?@startwith=0&amp;@template=help&amp;properties=id,name,description&amp;form=itemSynopsis&amp;type=checkbox&amp;@sort=name&amp;@pagesize=50', '500', '400');return false;">Topics</a></th>
+ <td>bitesized</td>
+
+
+</tr>
+
+
+
+
+</table>
+</fieldset>
+<table class="form">
+
+</table>
+</form>
+
+<p>Created on <b>2007-12-03 16:34</b> by <b>benjhayden</b>, last changed <b>2008-01-13 11:32</b> by <b>ping</b>.</p>
+
+<table class="files">
+ <tr><th colspan="5" class="header">Files</th></tr>
+ <tr>
+  <th>File name</th>
+  <th>Uploaded</th>
+  <th>Description</th>
+  <th>Edit</th>
+  <th>Remove</th>
+ </tr>
+ <tr>
+  <td>
+   <a href="file8863/pydocbug.patch">pydocbug.patch</a>
+  </td>
+  <td>
+   <span>benjhayden</span>,
+   <span>2007-12-03 16:34</span>
+  </td>
+  <td></td>
+  <td>
+  </td>
+  <td>
+   
+  </td>
+ </tr>
+</table>
+
+<table class="messages">
+ <tr><th colspan="4" class="header">Messages (2)</th></tr>
+ 
+  <tr>
+    <th>
+     <a href="#msg58131" id="msg58131">msg58131</a> - <a
+    href="msg58131">(view)</a></th>
+   <th>Author: Ben Hayden (benjhayden)</th>
+   <th>Date: 2007-12-03 16:34</th>
+   <th>
+    
+   </th>
+  </tr>
+  <tr>
+   <td colspan="4" class="content">
+    
+    <pre>Instead of listing installed modules, help('modules') prints a "please
+wait" message, then a traceback noting that a module raised an exception
+during import, then nothing else.
+This happens in 2.5 and 2.6a0, but not in 2.4, which apparently doesn't
+__import__() EVERY module.
+Tested only on Gentoo Linux 2.6.19, but same behavior is probable on
+other platforms because pydoc and pkgutil are written in cross-platform
+Python.
+
+Prominent 3rd party libraries that break help('modules') include Django,
+Pyglet, wxPython, SymPy, and Pypy. Arguably, the bug is in those
+libraries, but they have good reasons for their behavior. Also, the Unix
+philosophy of forgiving input is a good one. Also, __import__()ing every
+module takes a significant run-time hit, especially if libraries compute
+eg. configuration.
+
+The patch utilizes a pre-existing hook in pkgutil to simply quietly add
+the module to the output. (Long live lambda.)</pre>
+   </td>
+  </tr>
+ 
+ 
+  <tr>
+    <th>
+     <a href="#msg59852" id="msg59852">msg59852</a> - <a
+    href="msg59852">(view)</a></th>
+   <th>Author: Ka-Ping Yee (ping)</th>
+   <th>Date: 2008-01-13 11:32</th>
+   <th>
+    
+   </th>
+  </tr>
+  <tr>
+   <td colspan="4" class="content">
+    
+    <pre>Committed the patch in <a href='http://svn.python.org/view?rev=59939&view=rev'>revision 59939</a>.
+
+I'm not clear how it was determined that importing every module was
+necessary in order to list the modules or scan their synopsis lines
+(this seems to have happened in <a href='http://svn.python.org/view?rev=45510&view=rev'>revision 45510</a>).  This can probably
+be made more efficient in the future.</pre>
+   </td>
+  </tr>
+ 
+</table>
+
+<table class="history"><tr><th colspan="4" class="header">
+History
+</th></tr><tr>
+<th>Date</th>
+<th>User</th>
+<th>Action</th>
+<th>Args</th>
+</tr>
+<tr><td>2008-01-13&nbsp;11:32:19</td><td>ping</td><td>set</td><td>status: open -> closed<br />resolution: accepted<br />messages:
+  + <a href="msg59852">msg59852</a></td></tr>
+<tr><td>2008-01-12&nbsp;01:03:30</td><td>akuchling</td><td>set</td><td>keywords:
+  + <a href="keyword6">easy</a></td></tr>
+<tr><td>2007-12-09&nbsp;02:02:29</td><td>christian.heimes</td><td>set</td><td>priority: normal<br />assignee: <a href="user16">ping</a><br />nosy:
+  + <a href="user16">ping</a><br />keywords:
+  + <a href="keyword2">patch</a><br />versions:
+  + Python 3.0</td></tr>
+<tr><td>2007-12-03&nbsp;16:34:09</td><td>benjhayden</td><td>create</td><td></td></tr>
+</table>
+
+</div>
+
+</td>
+</div> <!-- content-body -->
+<div id="footer">
+<div id="credits">
+<a href="http://www.python.org/about/website">Website maintained by the Python community</a><br />
+
+<a href="http://www.upfrontsystems.co.za/" title="issue tracker hosting provided by Upfront Systems, South Africa">hosting by Upfront Systems</a> / 
+  <a href="http://roundup.sf.net" title="Powered by the Roundup Issue Tracker">powered by Roundup</a>
+</div> <!-- credits -->
+Copyright &copy; 1990-2009, <a href="http://python.org/psf">Python Software Foundation</a><br />
+<a href="http://python.org/about/legal">Legal Statements</a>
+</div> <!-- footer -->
+</div> <!-- body-main -->
+</div> <!-- content -->
+
+
+
+</body>
+</html>
+

@@ -1,0 +1,68 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+{% comment %}
+OMG inline styles every-freaking-where. WTF. #TODO: FIX!
+{% endcomment %}
+
+{% cache 86400 recent_activity_answer_v3 answer.pk %}
+                    <li style='font-size: .9em; float: left; width: 100%;'>
+		                {% if answer.author %}
+                        <a href='{{ answer.author.get_profile.profile_url }}'>
+                            <img style='width: 30px; float: left; margin-right: 10px;' alt="Profile Picture for {{ answer.author.get_profile.get_full_name_and_username }}" src={% version answer.author.get_profile.get_photo_thumbnail_30px_wide_url_or_default %} />
+                        </a>
+                        {% else %}
+                            <img style='width: 30px; float: left; margin-right: 10px;' alt="Default profie picture. A penguin" src={% version '/static/images/profile-photos/penguin-30px.png' %} >
+                        {% endif %}
+                        <div style='float: left; width: 80%;'>
+                            <span>
+                              {% with answer.author as user %}
+                              <strong>
+                                {% spaceless %}
+                                <a href='{{ user.get_profile.profile_url }}'>
+                                  {% include 'name.html' %}
+                                </a>
+                                {% endspaceless %}
+                              </strong>
+                              {% endwith %}
+                              added an answer to the question
+                            </span>
+                            {% spaceless %}
+                                {% with answer.question as question %}
+                                {% with answer.project as project %}
+                                <a href='{{ answer.project.get_url }}#answer_whose_pk_is_{{ answer.pk }}'>
+                                    <span>&ldquo;</span>
+                                    {% with 1 as mention_project_name %}
+                                    {% include 'question_text.html' %}
+                                    {% endwith %}
+                                    <span>&rdquo;</span>
+                                </a>
+                                {% endwith %}
+                                {% endwith %}
+                            {% endspaceless %}
+                            {% endcache %}
+                            <span style='color: #aaa;'>
+                                &middot;
+                                {{ answer.modified_date|timesince_terse }} ago
+                            </span>
+                            <br/>
+                        </div>
+                    </li>

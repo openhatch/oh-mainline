@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html  PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'><html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+<title>Twisted Documentation: PB Limits</title>
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
+  </head>
+
+  <body bgcolor="white">
+    <h1 class="title">PB Limits</h1>
+    <div class="toc"><ol><li><a href="#auto0">Banana Limits</a></li><li><a href="#auto1">Perspective Broker Limits</a></li></ol></div>
+    <div class="content">
+  <span/>
+
+  <p>There are a number of limits you might encounter when using Perspective
+Broker.  This document is an attempt to prepare you for as many of them as
+possible so you can avoid them or at least recognize them when you do run
+into them.</p>
+
+  <h2>Banana Limits<a name="auto0"/></h2>
+
+  <p>Perspective Broker is implemented in terms of a simpler, less
+functional protocol called Banana.  Twisted's implementation of Banana
+imposes a limit on the length of any sequence-like data type.  This applies
+directly to lists and strings and indirectly to dictionaries, instances and
+other types.  The purpose of this limit is to put an upper bound on the
+amount of memory which will be allocated to handle a message received over
+the network.  Without, a malicious peer could easily perform a denial of
+service attack resulting in exhaustion of the receiver's memory.  The basic
+limit is 640 * 1024 bytes, defined by <code>twisted.spread.banana.SIZE_LIMIT</code>.
+It's possible to raise this limit by changing this value (but take care to
+change it on both sides of the connection).</p>
+
+  <p>Another limit imposed by Twisted's Banana implementation is a limit on
+the size of long integers.  The purpose of this limit is the same as the 
+ <code>SIZE_LIMIT</code>.  By default, only integers between -2 ** 448 and 2
+** 448 (exclusive) can be transferred.  This limit can be changed using 
+ <code class="API"><a href="http://twistedmatrix.com/documents/11.0.0/api/twisted.spread.banana.setPrefixLimit.html" title="twisted.spread.banana.setPrefixLimit">twisted.spread.banana.setPrefixLimit</a></code>.</p>
+
+  <h2>Perspective Broker Limits<a name="auto1"/></h2>
+
+  <p>Perspective Broker imposes an additional limit on top of these lower
+level limits.  The number of local objects for which remote references may
+exist at a single time over a single connection, by default, is limited to
+1024, defined by <code>twisted.spread.pb.MAX_BROKER_REFS</code>.  This limit
+also exists to prevent memory exhaustion attacks.</p>
+
+</div>
+
+    <p><a href="index.html">Index</a></p>
+    <span class="version">Version: 11.0.0</span>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% if mentors %}
+          <p>
+              There {{ mentors|length|pluralize:"is,are" }}
+              <a href='{% url "mysite.profile.views.people" %}?q=can_mentor:"{{ topic|urlencode }}"'>
+                  <strong>{{ mentors|length}}</strong>
+                  {{ mentors|length|pluralize:"person,people" }}
+                  who can mentor in
+                  <strong>{{ topic }}</strong></a>{% if explain_language %},
+              {{ project.display_name }}'s primary language{% endif %}.
+          </p>
+{% else %}
+
+          <p>
+              No one on OpenHatch has signed up as a mentor
+              for {{ topic }}. Can you?
+              <a href="{% url "mysite.profile.views.edit_info" %}">Add the tag</a>.
+          </p>
+
+{% endif %}
+{# vim: set filetype=htmldjango: #}

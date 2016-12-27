@@ -1,0 +1,78 @@
+[
+  {"model": "missions.Step",
+   "pk": 1,
+   "fields": {"name": "tar"}
+  },
+  {"model": "missions.Step",
+   "pk": 2,
+   "fields": {"name": "tar_extract"}
+  },
+  {"model": "missions.Step",
+   "pk": 3,
+   "fields": {"name": "diffpatch_patchsingle"}
+  },
+  {"model": "missions.Step",
+   "pk": 4,
+   "fields": {"name": "diffpatch_diffsingle"}
+  },
+  {"model": "missions.Step",
+   "pk": 5,
+   "fields": {"name": "diffpatch_diffrecursive"}
+  },
+  {"model": "missions.Step",
+   "pk": 6,
+   "fields": {"name": "diffpatch_patchrecursive"}
+  },
+  {"model": "missions.Step",
+   "pk": 7,
+   "fields": {"name": "svn_checkout"}
+  },
+  {"model": "missions.Step",
+   "pk": 8,
+   "fields": {"name": "svn_diff"}
+  },
+  {"model": "missions.Step",
+   "pk": 9,
+   "fields": {"name": "svn_commit"}
+  },
+  {"model": "missions.Step",
+   "pk": 10,
+   "fields": {"name": "git_checkout"}
+  },
+  {"model": "missions.Step",
+   "pk": 11,
+   "fields": {"name": "git_diff"}
+  },
+  {"model": "missions.Step",
+   "pk": 12,
+   "fields": {"name": "git_rebase"}
+  },
+  {"model": "missions.Step",
+   "pk": 13,
+   "fields": {"name": "git_config"}
+   },
+  {"model": "missions.Step",
+   "pk": 14,
+   "fields": {"name": "pipvirtualenv_pipfreeze"}
+   },
+  {"model": "missions.Step",
+   "pk": 15,
+   "fields": {"name": "pipvirtualenv_piplist"}
+   },
+  {"model": "missions.Step",
+    "pk": 16,
+    "fields": {"name": "command_cd"}
+   },
+  {"model": "missions.Step",
+    "pk": 17,
+    "fields": {"name": "command_ls"}
+   },
+  {"model": "missions.Step",
+    "pk": 18,
+    "fields": {"name": "command_mkdir_rm"}
+   },
+  {"model": "missions.Step",
+    "pk": 19,
+    "fields": {"name": "command_cp_mv"}
+   }
+]

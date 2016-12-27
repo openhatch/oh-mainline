@@ -1,0 +1,267 @@
+{% extends 'base/two_columns.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% load base_extras %}
+{% load profile_extras %}
+
+{% block body_id %}profile{% endblock %}
+
+{% block description_for_anonymous_users %}
+    <strong>
+        Learn below
+    </strong>
+    how
+    {% firstof person.user.first_name person.user.username %}
+    is involved in <abbr title='that is, Free, Libre Open Source Software'>FLOSS</abbr>
+{% endblock %}
+
+{% block pagetop %}
+
+    <div id='nameplate'>
+            {% if person.user.first_name or person.user.last_name %}
+            <h1 class='name'>
+                    {{ person.user.first_name }}
+                    {{ person.user.last_name }}
+                    <span class='username' style="font-size: .7em;">
+                        ({{ person.user.username }})
+                    </span>
+            </h1>
+            {% else %}
+            <h1 class='name'>
+            <a href='/people/{{ person.user.username }}'>
+                <div class='name'>
+                    {{ person.user.username }}
+                </div>
+            </a>
+            </h1>
+
+
+            {% if editable %}
+              <a href='{% url "account.views.edit_name" %}' class="edit-name-link">
+                <div id='edit_your_name_notification' 
+                    class='notification'>Tell us your name!</div>
+              </a>
+            {% endif %}
+            {% endif %}
+
+	    <div style="clear: left; float: left;">
+	      {% if person.location_display_name and person.location_confirmed %}
+              {{ person.location_display_name }}
+	      {% endif %}
+          {% if editable %}
+          {% if not person.location_display_name or not person.location_confirmed %}
+          <a href="{% url "mysite.account.views.set_location" %}">Set your location</a>
+          {% endif %}
+          {% endif %}
+
+          {% if person.show_email and person.user.email %}
+          <div>
+              <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
+          </div>
+          {% endif %}
+	      
+	    </div>
+			
+    </div><!-- /.nameplate -->
+    
+    {% if editable %}
+    <div id="editsettings">
+        <a href="/account/settings">Edit Your Settings</a>
+    </div>
+    {% endif %}
+
+{% endblock pagetop %}
+
+{% block left %}
+<div id='avatar' class='module'>
+    {% if editable %}
+    {% if person.photo %}
+    <img src={% version photo_url %}>
+    {% else %}
+    {# Haven't uploaded a photo yet #}
+    <style>
+
+        #avatar .default_image { background: url({% version photo_url %}) no-repeat; }
+    </style>
+    <a href="/account/edit/photo/" class='default_image'>
+        <div class='notification' >Upload a photo</div>
+    </a>
+    {% endif %}
+    {% else %}
+<img src={% version photo_url %}>
+
+    {% endif %}
+</div>
+
+<div id='info' class='module'>
+
+    <div class='module-head'>
+        <h3>Info</h3>
+    </div>
+
+        {% if editable and not person.bio and not person.homepage_url and not tags_flat %}
+            <div class='module-body has_notification'>
+        {% else %}
+            <div class='module-body'>
+        {% endif %}
+
+        <style>
+            h4 { padding: 0;}
+        </style>
+
+        {% if projects_i_wanna_help or editable or person.bio or person.homepage_url or tags_flat %}
+        {% else %}
+        {# When the info box is empty on this profile #}
+        <small style='color: #777;'>Nothing here yet.</small>
+        {% endif %}
+
+        {% if not person.bio and not person.homepage_url and not tags_flat %}
+        {% ifequal user.get_profile person %}
+        <ul class='nudgebuttons'>
+            <li>
+            <a href='{% url "mysite.profile.views.edit_info" %}'>
+                <div class='notification smaller'>
+                    <strong>Add info to your profile!</strong>
+                    <p>We'll use it to suggest interesting projects.</p>
+                </div>
+            </a>
+            </li>
+        </ul>
+        {% endifequal %}
+        {% endif %}
+
+        {% if person.bio %}
+        <h4>bio</h4>
+        <p id="bio" style='clear: both;'>
+            {{person.bio}}
+        </p>
+        {% endif %}
+
+        {% if person.homepage_url %}
+        <h4>web site</h4>
+        <p>
+            <a rel="me" href="{{ person.homepage_url|prepend_http_if_necessary }}">{{ person.homepage_url|break_long_words }}</a>
+        </p>
+        {% endif %}
+
+        {% if person.irc_nick %}
+        <h4>irc nick</h4>
+        <p id="ircnick" style='clear: both;'>
+            {{ person.irc_nick }}
+        </p>
+        {% endif %}
+
+        {% comment %} 
+        <div class="tags" id="tags-links"
+            <span class="tag-type">links:</span>
+            <ul>
+                <li> <a href="#">My website</a> </li>
+                <li> <a href="#">My Facebook</a> </li>
+                <li> <a href="#">identi.ca</a> </li>
+                <li> <a href="#">openhatch</a> </li>
+            </ul>
+        </div>
+        {% endcomment %} 
+
+
+
+        {% if tags.understands and tags_flat.understands %}
+        <div class='tags' id='tags-understands'>
+            <h4>understands</h4>
+
+            {% for thingamabob in tags.understands %}
+            <a href="{% url "mysite.profile.views.people" %}?q=understands:&quot;{{thingamabob.text|urlencode}}&quot;">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.understands_not and tags_flat.understands_not %}
+        <div class='tags' id='tags-understands_not'>
+            <h4>will never understand</h4>
+            {% for thingamabob in tags.understands_not %}
+            <a href="{% url "mysite.profile.views.people" %}?q=understands_not:&quot;{{thingamabob.text|urlencode}}&quot;">
+              {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.can_pitch_in and tags_flat.can_pitch_in %}
+        <div class='tags' id='tags-can_pitch_in'>
+            <h4>can pitch in with</h4>
+            {% for thingamabob in tags.can_pitch_in %}
+            <a href="{% url "mysite.profile.views.people" %}?q=can_pitch_in:&quot;{{thingamabob.text|urlencode}}&quot;">
+            {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.studying and tags_flat.studying %}
+        <div class='tags' id='tags-studying'>
+            <h4>currently studying</h4>
+            {% for thingamabob in tags.studying %}
+            <a href="{% url "mysite.profile.views.people" %}?q=studying:&quot;{{thingamabob.text|urlencode}}&quot;">
+              {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.can_mentor and tags_flat.can_mentor %}
+        <div class='tags' id='tags-can_mentor'>
+            <h4>can mentor in</h4>
+            {% for thingamabob in tags.can_mentor %}
+            <a href="{% url "mysite.profile.views.people" %}?q=can_mentor:&quot;{{thingamabob.text|urlencode}}&quot;">
+              {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if projects_i_wanna_help %}
+        <div class='tags'>
+            <h4>is interested in helping</h4>
+            {% spaceless %}
+            {% for project in projects_i_wanna_help %}
+                <a href='{{ project.get_url }}'>{{ project.display_name }}</a>
+                {% if not forloop.last %}
+                    <span>, </span>
+                {% endif %}
+            {% endfor %}
+            {% endspaceless %}
+        </div>
+        {% endif %}
+    </div>
+</div> <!-- end of person info module -->
+
+{% if person.contact_blurb %}
+<div id='contact_blurb' class='module'>
+
+    <div class='module-head'>
+
+        <h3>How to contact me</h3>
+
+    </div>
+
+    <div class='module-body' style='font-size: .95em;'>
+        {{contact_blurb|urlizetrunc:"23"|linebreaks}}
+    </div>
+</div> <!-- end of contact blurb module -->
+{% endif %}
+
+{% endblock left %}
+
+{% comment %}
+vim: set ai et ts=4 sw=4 nu:
+{% endcomment %}

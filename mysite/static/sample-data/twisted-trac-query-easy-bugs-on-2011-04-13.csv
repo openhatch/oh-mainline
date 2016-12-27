@@ -1,0 +1,19 @@
+id,summary,keywords,status,owner,type,priority
+581,CopiedFailure.getTraceback should include the result of CopiedFailure.getErrorMessage even if unsafeTracebacks is not set,easy,new,,enhancement,normal
+1616,interface to query reactor name,easy,new,,enhancement,normal
+2661,Deprecate IFinishableConsumer so it can be deleted,"easy, review",new,,task,normal
+3037,loseWriteConnection breaks loseConnection,easy,new,igorsobreira,defect,normal
+3790,Use Document.createElement and Document.createTextNode instead of dom.Element and dom.Text,easy,new,,enhancement,normal
+4086,"tap2rpm has an unused ""unsigned"" command-line option.",easy,new,jtanis,enhancement,normal
+4262,Multicast documentation is misleading,"documentation, easy",new,itamar,defect,normal
+4450,deprecate twisted.python.filepath.FilePath.statinfo,easy,new,cyli,enhancement,normal
+4687,ConchSessionForTestAvatar should declare interface,easy,new,lvh,defect,normal
+4692,imap4 LOGINCredentials is not generic for smtp use,easy,new,,enhancement,normal
+4963,Deprecate twisted.mail.protocols.SSLContextFactory,easy,new,,task,normal
+4966,NOT_DONE_YET is missing from __all__ in twisted.web.server,easy,new,,defect,normal
+4967,Minor XMLRPC documentation fixes,documentation easy,new,,enhancement,normal
+199,replace asserts with real exceptions in conch,easy,new,,enhancement,low
+710,returning None from buildProtocol in ReconnectingClientFactory causes exception,easy,new,,enhancement,low
+1601,t.py.text.greedyWrap makes t.py.usage.Options.longdesc ugly,easy,new,binjured,defect,low
+4498,Use zipfile.ZipFile.open instead of twisted.python.zipstream in twisted.python.zippath,easy,new,,enhancement,lowest
+4957,Failure.parents has duplicate class,easy,new,,defect,lowest

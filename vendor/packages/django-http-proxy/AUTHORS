@@ -1,0 +1,8 @@
+-*- restructuredtext -*-
+
+The Django HTTP Proxy is developed and maintained by Yuri van der Meer.
+
+Many thanks to Will Larson for providing the inspiration and original source
+code for this app:
+
+http://lethain.com/entry/2008/sep/30/suffer-less-by-using-django-dev-server-as-a-proxy/

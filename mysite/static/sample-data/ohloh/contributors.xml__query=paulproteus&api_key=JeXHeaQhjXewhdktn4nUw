@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <items_returned>3</items_returned>
+  <items_available>3</items_available>
+  <first_item_position>0</first_item_position>
+  <result>
+    <contributor_fact>
+      <contributor_id>2060147635589231</contributor_id>
+      <analysis_id>1454281</analysis_id>
+      <contributor_name>paulproteus</contributor_name>
+      <primary_language_id>1</primary_language_id>
+      <primary_language_nice_name>HTML</primary_language_nice_name>
+      <comment_ratio>0.519557195571956</comment_ratio>
+      <first_commit_time>2007-09-12T20:29:16Z</first_commit_time>
+      <last_commit_time>2009-04-10T14:08:23Z</last_commit_time>
+      <man_months>4</man_months>
+      <commits>66</commits>
+      <median_commits>5</median_commits>
+    </contributor_fact>
+    <contributor_fact>
+      <contributor_id>65837553699824</contributor_id>
+      <account_id>19440</account_id>
+      <account_name>Asheesh Laroia</account_name>
+      <analysis_id>1143684</analysis_id>
+      <contributor_name>paulproteus</contributor_name>
+      <primary_language_id>11</primary_language_id>
+      <primary_language_nice_name>shell script</primary_language_nice_name>
+      <comment_ratio></comment_ratio>
+      <first_commit_time>2008-04-03T23:51:45Z</first_commit_time>
+      <last_commit_time>2008-04-10T00:07:40Z</last_commit_time>
+      <man_months>1</man_months>
+      <commits>3</commits>
+      <median_commits>3</median_commits>
+    </contributor_fact>
+    <contributor_fact>
+      <contributor_id>18318035536880</contributor_id>
+      <account_id>19440</account_id>
+      <account_name>Asheesh Laroia</account_name>
+    </contributor_fact>
+  </result>
+</response>

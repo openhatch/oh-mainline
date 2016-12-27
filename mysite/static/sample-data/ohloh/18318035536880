@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Debian GNU/Linux Contributors - Asheesh Laroia - Ohloh</title>
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+
+  <link href="https://www.ohloh.net/stylesheets/main.css?1295542775" media="screen" rel="stylesheet" type="text/css" />
+  <link href="https://www.ohloh.net/stylesheets/thickbox.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <!--[if IE]>
+	<link href="https://www.ohloh.net/stylesheets/ie_hacks.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <script defer type="text/javascript" src="/javascripts/pngfix.js"></script>
+  <![endif]-->
+
+  <script src="https://www.ohloh.net/javascripts/jquery-1.2.6-with-plugins.min.js?1295542694" type="text/javascript"></script>
+  <script src="https://www.ohloh.net/javascripts/main.js?1295542694" type="text/javascript"></script>
+
+
+
+
+  
+
+  
+  </head>
+<body>
+  <div id="page">
+    <div class='row' id='mast'>
+  <div class='logos'>
+    <a class='ohloh' href='https://www.ohloh.net/'>    </a>
+    <a class='root' href='https://www.ohloh.net/'>    </a>
+  </div>
+</div>
+    <div class='row'>
+  <ul class='select_ main_menu clear'>
+    <li class='search'>
+      <form action='/search' class='search'>
+        <input class='text' name='q' type='text' />
+      </form>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/accounts/new"><span>Register</span></a>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/sessions/new"><span>Login</span></a>
+    </li>
+    <li class='home'><a href="/"><span>Home</span></a></li>
+    <li class='people'><a href="/people"><span>People</span></a></li>
+    <li class='projects'><a href="/p"><span>Projects</span></a></li>
+    <li class='forums'><a href="/forums"><span>Forums</span></a></li>
+    <li class='tools'><a href="/tools"><span>Tools</span></a></li>
+    <li class='blog'><a href="/blog"><span style="color:#cc3300">Blog</span></a></li>
+  </ul>
+  <ul class='nomargin session' style='display:none'>
+    <li><a href="/sessions/new">Login</a></li>
+    <li><a href="/accounts/new">Register</a></li>
+  </ul>
+</div>
+
+    
+    
+    
+
+    <div class="row">
+      <div class="col span_13 prepend_3 last">
+      </div>
+    </div>
+<div class='row'>
+  <div class='col span_3 layout_anchor'>
+    <div class='inset_middle'>
+      <a href='/p/debian'>
+        <img alt="Openlogo-nd-100_med" class="logo" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/271/openlogo-nd-100_med.png" />
+      </a>
+    </div>
+  </div>
+  <div class='col span_13 last layout_h1 float_right'>
+    <div class='inset_middle'>
+      <h1><a href="/p/debian">Debian GNU/Linux</a></h1>
+    </div>
+  </div>
+</div>
+<div class='row'>
+  <div class='col span_3'>
+        <div class='sidebar mezzo sidebar_project'>
+      <div class='actions'>
+        <h6>
+          General
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/debian'>
+              Summary
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/messages'>
+              Journal Entries
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/reviews'>
+              Reviews
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/links'>
+              Links
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/rss_articles'>
+              News
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/managers'>
+              Managers
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/widgets'>
+              Widgets
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='actions'>
+        <h6>
+          Development
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/debian/analyses/latest'>
+              Code Analysis
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/contributors'>
+              Contributors
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/commits'>
+              Commits
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/enlistments'>
+              Enlistments
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='actions'>
+        <h6>
+          Edit
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/debian/permissions'>
+              Permissions
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/edits'>
+              History
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class='one' />
+  </div>
+  <div class='col span_13 last mezzo'>
+    <div class='position clear'>
+      <div class='inset'>
+        <a href="/accounts/paulproteus" class="avatar "><img alt="Avatar" class="avatar" height="32" src="https://secure.gravatar.com/avatar.php?gravatar_id=44c4e8d8ef5137fd8bcd78f9cee164ef&amp;rating=PG&amp;size=32&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="32" /></a>
+        <div class='avatared'>
+          <h3 class='nomargin'>
+            <a href="/accounts/paulproteus">Asheesh Laroia</a>
+            <span class='datespan'>
+              &mdash;
+              Nov 2006 to Present
+            </span>
+          </h3>
+          
+        </div>
+      </div>
+      <div class='clear'>
+        <hr class='one' />
+        <div class='languages clear'>
+          <div class='label'>Languages:</div>
+          <div class='values'>Make</div>
+        </div>
+        <div class='technologies clear'>
+          <div class='label'>Technologies:</div>
+          <div class='values'><a href="/p/make">GNU Make</a></div>
+        </div>
+      </div>
+    </div>
+    <div class='clear'></div>
+    <div class='clear'>
+      <h3 class='inset_top'>Commit Timeline</h3>
+      <p class='inset_middle'>Ohloh did not measure any commits by this contributor.</p>
+    </div>
+    <div class='clear'>
+      <h3 class='inset_top'>Language Statistics</h3>
+      <p class='inset_middle'>Ohloh did not measure any lines of code written by this contributor.</p>
+      <div class='inset_bottom'>&nbsp;</div>
+    </div>
+  </div>
+</div>
+    <div class="clear" style="padding:1px;"></div>
+    <div id='footer'>
+  <div class='row'>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>Ohloh</h4>
+        <ul>
+          <li>
+            <a href='https://www.ohloh.net/about/us'>About</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/help/support'>Support</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/blog'>Blog</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/releases'>Releases</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/news'>News</a>
+          </li>
+          <li><a href="https://www.ohloh.net/forums">Forums</a></li>
+          <li>
+            <a href='https://www.ohloh.net/api/getting_started'>API</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/terms'>Terms</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/privacy'>Privacy</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>New Projects</h4>
+        <ul>
+          <li><a href="https://www.ohloh.net/p/freoffice-online-services-plugin">Freoffice Online Services Plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/freoffice-blog-plugin">Freoffice Blog Plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/guile-gir">guile-gir</a></li>
+          <li><a href="https://www.ohloh.net/p/atptgit">a-test-project-testing-gitty</a></li>
+          <li><a href="https://www.ohloh.net/p/heredar">Heredar</a></li>
+          <li><a href="https://www.ohloh.net/p/android-romupdater">ROM Updater</a></li>
+          <li><a href="https://www.ohloh.net/p/vauto">vauto</a></li>
+          <li><a href="https://www.ohloh.net/p/hornetq-rest-war">HornetQ-Rest WAR</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo'>
+      <div class='inset'>
+        <h4><a href="/posts">Recent Posts</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='/forums/11/topics/6145#posts-17226'>
+              CRM Software
+              <span class='author'>
+                by
+                crm-admirer
+              </span>
+              <br />
+              <div class='comment'>
+                Hi guys,
+                My feed back about ohloh is good but as per my experience regarding CRM business solutio...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/10/topics/6144#posts-17225'>
+              Avogadro failed enlistment
+              <span class='author'>
+                by
+                Marcus D. Hanwell
+              </span>
+              <br />
+              <div class='comment'>
+                The Avogadro project failed to update 12 days ago, and it seems to be stuck now.
+                
+                https://www.ohl...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/10/topics/6131#posts-17224'>
+              Analysis for project 'Boost C++ Libraries' stalled for several month
+              <span class='author'>
+                by
+                Rene Rivera
+              </span>
+              <br />
+              <div class='comment'>
+                I removed some extraneous enlistments.. Which seems to have kick-started the processing. Unfortun...
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo last'>
+      <div class='inset'>
+        <h4><a href="/reviews?sort_by=recently_added">Recent Reviews</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/visualnunit/reviews'>
+              Visual Nunit
+              <span class='author'>
+                by
+                onetester
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2099">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                You say "Visual Nunit 2010 1.1.7 Released", but on the site there's only 1.1.3. That's on SourceF...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/365/reviews'>
+              Atlas
+              <span class='author'>
+                by
+                DarwinNE
+              </span>
+              <br />
+              			<span id="footer_star_2098">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_ro_mini.png) left bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                Atlas can provide a very useful basic automatically tuned linear algebra package when an optimize...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/apache/reviews'>
+              Apache HTTP Server
+              <span class='author'>
+                by
+                Thila
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2097">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                Very Good
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p style='clear:left'>&nbsp;</p>
+  <p class='copyright clear'>
+    Copyright ©
+    2011
+    <a href="http://www.blackducksoftware.com">Black Duck Software, Inc.</a>,
+    All Rights Reserved.
+  </p>
+</div>
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20399350-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  
+
+  </div>
+</body>
+</html>

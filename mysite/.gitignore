@@ -1,0 +1,37 @@
+# git-ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+*~
+.*.swp
+.*.swo
+*.pyc
+*.orig
+.project
+.ropeproject
+
+# Little notes we make while developing.
+notes/*
+
+# Project icons
+static/images/icons/projects/*
+mysite/static/project-icons/*
+
+# Profile photos
+static/static/photos/*
+
+# User analysis tool
+static/piwik
+
+static/_cache
+
+# Add this to use ghettoq instead of rabbitmq 
+../use_ghettoq
+
+# Settings that we don't want to appear in the distribution
+secret_settings.py
+
+# User Subversion repositories for the missions
+missions-userdata/svn/*
+!missions-userdata/svn/README

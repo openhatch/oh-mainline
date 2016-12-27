@@ -1,0 +1,13 @@
+Universal Feed Parser
+Parse RSS and Atom feeds in Python. 4000 unit tests. Open source.
+
+Copyright (c) 2002-2008, Mark Pilgrim
+open source, see LICENSE file for details
+
+-----
+
+To install:
+$ python setup.py install
+
+Full documentation is available in the docs/ directory, or online at
+http://feedparser.org/docs/

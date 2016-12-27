@@ -1,0 +1,7 @@
+setup.cfg
+jsmin/__init__.py
+jsmin/test.py
+pip-egg-info/jsmin.egg-info/PKG-INFO
+pip-egg-info/jsmin.egg-info/SOURCES.txt
+pip-egg-info/jsmin.egg-info/dependency_links.txt
+pip-egg-info/jsmin.egg-info/top_level.txt

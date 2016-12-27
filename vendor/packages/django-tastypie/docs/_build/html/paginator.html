@@ -1,0 +1,189 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Paginator &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="GeoDjango" href="geodjango.html" />
+    <link rel="prev" title="Throttling" href="throttling.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geodjango.html" title="GeoDjango"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="throttling.html" title="Throttling"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="paginator">
+<span id="ref-paginator"></span><h1>Paginator<a class="headerlink" href="#paginator" title="Permalink to this headline">¶</a></h1>
+<p>Similar to Django&#8217;s <tt class="docutils literal"><span class="pre">Paginator</span></tt>, Tastypie includes a <tt class="docutils literal"><span class="pre">Paginator</span></tt> object
+which limits result sets down to sane amounts for passing to the client.</p>
+<p>This is used in place of Django&#8217;s <tt class="docutils literal"><span class="pre">Paginator</span></tt> due to the way pagination
+works. <tt class="docutils literal"><span class="pre">limit</span></tt> &amp; <tt class="docutils literal"><span class="pre">offset</span></tt> (tastypie) are used in place of <tt class="docutils literal"><span class="pre">page</span></tt>
+(Django) so none of the page-related calculations are necessary.</p>
+<p>This implementation also provides additional details like the
+<tt class="docutils literal"><span class="pre">total_count</span></tt> of resources seen and convenience links to the
+<tt class="docutils literal"><span class="pre">previous</span></tt>/<tt class="docutils literal"><span class="pre">next</span></tt> pages of data as available.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Using this class is simple, but slightly different than the other classes used
+by Tastypie. Like the others, you provide the <tt class="docutils literal"><span class="pre">Paginator</span></tt> (or your own
+subclass) as a <tt class="docutils literal"><span class="pre">Meta</span></tt> option to the <tt class="docutils literal"><span class="pre">Resource</span></tt> in question. <strong>Unlike</strong> the
+others, you provide the class, <em>NOT</em> an instance. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="c"># Add it here.</span>
+        <span class="n">paginator_class</span> <span class="o">=</span> <span class="n">Paginator</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="implementing-your-own-paginator">
+<h2>Implementing Your Own Paginator<a class="headerlink" href="#implementing-your-own-paginator" title="Permalink to this headline">¶</a></h2>
+<p>Adding other features to a paginator usually consists of overriding one of
+the built-in methods. For instance, adding a page number to the output
+might look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span>
+
+
+<span class="k">class</span> <span class="nc">PageNumberPaginator</span><span class="p">(</span><span class="n">Paginator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">page</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PageNumberPaginator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">page</span><span class="p">()</span>
+        <span class="n">output</span><span class="p">[</span><span class="s">&#39;page_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+</div>
+<p>Another common request is to alter the structure Tastypie uses in the
+list view. Here&#8217;s an example of renaming:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span>
+
+
+<span class="k">class</span> <span class="nc">BlogEntryPaginator</span><span class="p">(</span><span class="n">Paginator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">page</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BlogEntryPaginator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">page</span><span class="p">()</span>
+
+        <span class="c"># First keep a reference.</span>
+        <span class="n">output</span><span class="p">[</span><span class="s">&#39;pagination&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;meta&#39;</span><span class="p">]</span>
+        <span class="n">output</span><span class="p">[</span><span class="s">&#39;entries&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;objects&#39;</span><span class="p">]</span>
+
+        <span class="c"># Now nuke the original keys.</span>
+        <span class="k">del</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;meta&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;objects&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Paginator</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#implementing-your-own-paginator">Implementing Your Own Paginator</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="throttling.html"
+                        title="previous chapter">Throttling</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="geodjango.html"
+                        title="next chapter">GeoDjango</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/paginator.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geodjango.html" title="GeoDjango"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="throttling.html" title="Throttling"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

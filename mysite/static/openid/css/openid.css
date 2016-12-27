@@ -1,0 +1,61 @@
+#auth_form {
+    display: block;
+    width: 250px;
+    float: left;
+    margin-right: 20px;
+}
+
+#openid_form {
+    display: block;
+    float: left;
+}
+#openid_choice {
+    display: none;
+}
+#openid_input_area {
+    clear: both;
+    padding: 10px;
+}
+#openid_input_area #wordpress-domain{
+    font-size: 1.3em;
+    float: left;
+    padding: 7px 0;
+}
+#openid_input_area p{
+    margin: 0;
+
+}
+#openid_btns a { float: left; }
+#openid_btns a:hover { background-color: #ffc; }
+#openid_btns { clear: both; }
+#openid_btns .small { float: right; width: 102px; }
+#openid_btns .large { width: 206px; float: left; }
+#openid_btns a { border: 2px solid #fff; }
+#openid_btns .large a { float: left; margin-right: 6px; margin-bottom: 6px; }
+#openid_highlight .openid_large_btn,
+#openid_highlight .openid_small_btn {
+    border-color: #ffd72d; 
+}
+.openid_large_btn {
+    width: 93px;
+    height: 60px;
+    margin: 0 6px px 0;
+    float: left;
+}
+.openid_small_btn {
+    width: 24px;
+    height: 24px;
+    margin: 3px;
+    float: left;
+}
+a.openid_large_btn:focus {
+    outline: none;
+}
+a.openid_large_btn:focus {
+    -moz-outline-style: none;
+}
+.openid_selected {
+    border: 4px solid #DDD;
+}
+
+#openid_submit { left: 0; clear: both; margin-left: 0; }

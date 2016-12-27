@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <result>
+    <project>
+      <id>479665</id>
+      <name>Creative Commons search engine</name>
+      <created_at>2009-12-01T17:04:12Z</created_at>
+      <updated_at>2010-08-26T18:05:19Z</updated_at>
+      <description>This code powers search.creativecommons.org. Mostly PHP, some JavaScript, and a healthy dose of Creative Commons zeal.</description>
+      <homepage_url>http://search.creativecommons.org/</homepage_url>
+      <download_url>http://search.creativecommons.org/</download_url>
+      <url_name>ccsearch-</url_name>
+      <user_count>0</user_count>
+      <average_rating></average_rating>
+      <rating_count>0</rating_count>
+      <analysis_id>1454281</analysis_id>
+      <analysis>
+        <id>1454281</id>
+        <project_id>479665</project_id>
+        <updated_at>2011-01-27T12:50:28Z</updated_at>
+        <logged_at>2011-01-27T12:50:25Z</logged_at>
+        <min_month>2006-07-01T00:00:00Z</min_month>
+        <max_month>2010-01-01T00:00:00Z</max_month>
+        <twelve_month_contributor_count>4</twelve_month_contributor_count>
+        <total_code_lines>1402</total_code_lines>
+        <main_language_id>2</main_language_id>
+        <main_language_name>PHP</main_language_name>
+      </analysis>
+      <licenses>
+        <license>
+          <name>gpl2_or_later</name>
+          <nice_name>GNU General Public License 2 or later</nice_name>
+        </license>
+      </licenses>
+    </project>
+  </result>
+</response>

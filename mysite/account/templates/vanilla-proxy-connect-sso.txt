@@ -1,0 +1,3 @@
+{% if request.user.is_authenticated %}UniqueID={{ user.id }}
+Name={{ user.username }}
+Email={{ user.email }}{% endif %}

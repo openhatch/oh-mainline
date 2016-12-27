@@ -1,0 +1,664 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>ccHost</title>
+  <meta name="description" content="ccHost code quality, license and developer report by Ohloh metrics" />
+  <meta name="keywords" content="ccHost, license, code,code quality, " />
+
+  <link href="https://www.ohloh.net/stylesheets/main.css?1295542775" media="screen" rel="stylesheet" type="text/css" />
+  <link href="https://www.ohloh.net/stylesheets/thickbox.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <!--[if IE]>
+	<link href="https://www.ohloh.net/stylesheets/ie_hacks.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <script defer type="text/javascript" src="/javascripts/pngfix.js"></script>
+  <![endif]-->
+
+  <script src="https://www.ohloh.net/javascripts/jquery-1.2.6-with-plugins.min.js?1295542694" type="text/javascript"></script>
+  <script src="https://www.ohloh.net/javascripts/main.js?1295542694" type="text/javascript"></script>
+
+
+
+
+  
+
+  
+  </head>
+<body>
+  <div id="page">
+    <div class='row' id='mast'>
+  <div class='logos'>
+    <a class='ohloh' href='https://www.ohloh.net/'>    </a>
+    <a class='root' href='https://www.ohloh.net/'>    </a>
+  </div>
+</div>
+    <div class='row'>
+  <ul class='select_ main_menu clear'>
+    <li class='search'>
+      <form action='/search' class='search'>
+        <input class='text' name='q' type='text' />
+      </form>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/accounts/new"><span>Register</span></a>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/sessions/new"><span>Login</span></a>
+    </li>
+    <li class='home'><a href="/"><span>Home</span></a></li>
+    <li class='people'><a href="/people"><span>People</span></a></li>
+    <li class='projects'><a href="/p"><span>Projects</span></a></li>
+    <li class='forums'><a href="/forums"><span>Forums</span></a></li>
+    <li class='tools'><a href="/tools"><span>Tools</span></a></li>
+    <li class='blog'><a href="/blog"><span style="color:#cc3300">Blog</span></a></li>
+  </ul>
+  <ul class='nomargin session' style='display:none'>
+    <li><a href="/sessions/new">Login</a></li>
+    <li><a href="/accounts/new">Register</a></li>
+  </ul>
+</div>
+
+    
+    
+    
+
+    <div class="row">
+      <div class="col span_13 prepend_3 last">
+      </div>
+    </div>
+<div class='row'>
+  <div class='col span_3 layout_anchor'>
+    <div class='inset_middle'>
+      <a href='/p/cchost'>
+        &nbsp;
+      </a>
+    </div>
+  </div>
+  <div class='col span_13 last layout_h1 float_right'>
+    <div class='inset_middle'>
+      <h1><a href="/p/cchost">ccHost</a></h1>
+    </div>
+  </div>
+</div>
+<div class='row'>
+  <div class='col span_3'>
+        <div class='sidebar mezzo sidebar_project'>
+      <div class='actions'>
+        <h6>
+          General
+        </h6>
+        <ul>
+          <li class=' selected first'>
+            <a class='' href='/p/cchost'>
+              Summary
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/messages'>
+              Journal Entries
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/reviews'>
+              Reviews
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/links'>
+              Links
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/rss_articles'>
+              News
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/managers'>
+              Managers
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/widgets'>
+              Widgets
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='actions'>
+        <h6>
+          Development
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/cchost/analyses/latest'>
+              Code Analysis
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/contributors'>
+              Contributors
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/commits'>
+              Commits
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/enlistments'>
+              Enlistments
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='actions'>
+        <h6>
+          Edit
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/cchost/permissions'>
+              Permissions
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/cchost/edits'>
+              History
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class='one' />
+  </div>
+  <div class='col span_13 last mezzo'>
+    
+    <div class='col span_7 mezzo'>
+      <div class='clear inset'>
+        <p></p>
+      </div>
+      <div class='clear inset mezzo'>
+        <a class='needs_login follow' href='#'>
+          Follow
+        </a>
+        <a class='float_right follow_count' href='/p/cchost/followers'>
+          0 followers
+        </a>
+        <h4 class='nomargin'>Journal Entries</h4>
+        <div class='clear'>
+          <div class='float_right'>
+            <a class='timeline_link' href='/p/cchost/messages/timeline'>Timeline View</a>
+          </div>
+        </div>
+        
+        <h6 class='soft'>
+          No entries yet.
+          Link your entries with 'cchost' to include this project.
+        </h6>
+      </div>
+      <hr class='one' />
+      <div class='clear c1_light piano'>
+        <div class='inset'>
+          <h4>Ohloh Analysis Summary</h4>
+                        <ul class="factoids">
+                                <li class="neutral"><a href="/wiki/mostly_written">Mostly written in PHP</a></li>
+                              <li class="good"><a href="https://www.ohloh.net/p/cchost/factoids/2939765">Increasing year-over-year development activity</a></li>
+                    <li class="good"><a href="https://www.ohloh.net/p/cchost/factoids/2939766">Established codebase</a></li>
+                    <li class="warning"><a href="https://www.ohloh.net/p/cchost/factoids/2939767">Only a single active developer</a></li>
+                  </ul>
+          <p class='updated'>Updated 01 Feb 2011 01:00 UTC</p>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano'>
+        <div class='inset_top'>
+          <h4>Ratings & Reviews</h4>
+        </div>
+        <div class='clear' id='community_and_your_rating'>
+          <div class='col span_3'>
+            <div class='inset_middle'>
+              <h6 class='soft'>Community Rating</h6>
+              <div class='nomargin clear'>
+                <span class='score_text'>0.0/5.0</span>
+                <span class='jrating' id='average_rating_stars' read_only='t' star_style='big'>        </span>
+              </div>
+              <p class='soft small' id='average_rating_details_2'>
+                Based on
+                0
+                user ratings.
+              </p>
+            </div>
+          </div>
+          <div class='col span_3 last'>
+            <div class='inset_middle'>
+              <h6 class='soft'>Your Rating</h6>
+              <div class='nomargin clear'>
+                <div class='needs_login jrating' id='cchost' score='0' star_style='big'>        </div>
+              </div>
+              <p class='soft small'>
+                Click to rate this project.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class='inset'>
+          <a href="https://www.ohloh.net/p/cchost/reviews/new" class="needs_login">Be the first to review this project!</a>
+        </div>
+      </div>
+      <div class='piano'>
+        <div class='inset'>
+          <h4><a href="https://www.ohloh.net/p/cchost/links">Links</a></h4>
+          <p class='nomargin'>
+            0 links
+            submitted so far.
+            <a href="https://www.ohloh.net/p/cchost/links/new">Submit your own links.</a>
+          </p>
+        </div>
+        
+        <div class='inset'>
+        </div>
+      </div>
+      <div class='piano'>
+        <div class='inset'>
+          <h4>News</h4>
+          <p><a href="https://www.ohloh.net/p/cchost/rss_subscriptions/new">Add an RSS feed.</a></p>
+          <ul>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class='col span_6 mezzo last'>
+      <div class='inset'>
+        <a href="/p/cchost/external_download" class="external" onclick="var f = document.createElement('form'); f.style.display = 'none'; this.parentNode.appendChild(f); f.method = 'POST'; f.action = this.href;var m = document.createElement('input'); m.setAttribute('type', 'hidden'); m.setAttribute('name', '_method'); m.setAttribute('value', 'post'); f.appendChild(m);f.submit();return false;">Download Page</a>
+        <dd class='small soft'>1 downloads</dd>
+      </div>
+      <div class='c1_light'>
+        <div class='inset'>
+          <dl class='nomargin'>
+            <dt class='first'><a href="http://wiki.creativecommons.org/CcHost">Homepage</a></dt>
+            <dd class='small soft'><a href="http://wiki.creativecommons.org/CcHost">http://wiki.creativecommons.org/CcHost</a></dd>
+            <dt class='first'>Licensed under</dt>
+            <dd><a href="https://www.ohloh.net/licenses/3">GNU General Public License 2</a></dd>
+            <dt class='first'>Tagged as</dt>
+            <dd>
+              <a class='noborder' href='/p/cchost/tags/select'>
+                <img alt='Project Tags' height='16' src='/images/tag_yellow.png' style='vertical-align:middle' width='16' />
+              </a>
+              <a href="/p/cchost/tags/select">Add tags to this project</a>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano inset'>
+        <h4 class='iusethis'>Who uses ccHost?</h4>
+        <div class='iusethis'>
+          <a class='iusethis needs_login' href='#' id='stackit_cchost' onMouseOut="this.style.background = 'url(https://www.ohloh.net/images/iuseit_small.png) 0px 0px no-repeat'" onMouseOver="this.style.background = 'url(https://www.ohloh.net/images/iuseit_small.png) 0 -69px no-repeat'" style='display:block;float:left;background: url(https://www.ohloh.net/images/iuseit_small.png) 0px 0px no-repeat; text-decoration: none; width: 70px; height: 69px;' title='ccHost has been stacked by 0 users. Click here to add it to your stack.'>
+            <div style='width: 70px; line-height: 1.2em; height: 69px'>
+              <p style='font-weight: bold; font-size:18pt; text-align:center; padding:4px 0px 0px 0px; color:#fff; font-family:helvetica; letter-spacing:-0.05em; line-height: 1.2em; '>0</p>
+            </div>
+          </a>
+        </div>
+        <div class='users lightup_avatar clear'>
+        </div>
+      </div>
+      <hr class='one' />
+      
+      <div class='piano inset'>
+        <h4 class='iusethis'>Who manages ccHost?</h4>
+        <div class='users lightup_avatar clear'>
+        </div>
+        <a href='/p/cchost/manages/new'>I'm a manager</a>
+      </div>
+      <div class='piano inset'>
+        <h4 class='nomargin'>Where in the world?</h4>
+      </div>
+      
+      <div class='multipanel clear' id='map_container'>
+        <ul class='nav clear'>
+          <li class='selected' id='li_users'>
+            <a href="#" id="a_users" onclick="">Users</a>
+          </li>
+          <li id='li_contributors'>
+            <a href="#" id="a_contributors" onclick="return ProjectMap.getContributors();">Contributors</a>
+          </li>
+          <li>
+            <a href="/p/cchost/map">View Larger Map</a>
+          </li>
+        </ul>
+        <div class='content'>
+          <div id='map'></div>
+          <p class='nomargin' id='map_status'></p>
+        </div>
+      </div>
+      <hr class='one' />
+      
+      
+      <div class='col span_6 last'>
+        <hr class='one' />
+      </div>
+      <script type='text/javascript'>
+        //<![CDATA[
+          var project_analysis = {"markup_man_years": 4.24665157075637, "logic_man_years": 13.9668486455496};
+          
+        //]]>
+      </script>
+      <div class='col span_6 last' id='cocomo'>
+        <table cellpadding='0' cellspacing='0' width='100%'>
+          <tr>
+            <th>
+              <h4 class='nomargin'>Project Cost</h4>
+            </th>
+            <th class='last'></th>
+          </tr>
+          <tr class='prolog'>
+            <td colspan='2'>
+              This calculator estimates how much it would cost to hire a team to write this project from scratch.
+              <a href="/wiki/project_codebase_cost">More &raquo</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Include</td>
+            <td class='value'>
+              <select id='cocomo_loc_dropdown'>
+                <option class='selected' value='93766'>Markup And Code</option>
+                <option value='18358'>Markup Only</option>
+                <option value='57050'>Code Only</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Codebase</td>
+            <td class='value'>
+              <span id='cocomo_loc'>75,408</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Effort (est.)</td>
+            <td class='value'>
+              <span id='cocomo_years'>18</span>
+              Person Years
+            </td>
+          </tr>
+          <tr>
+            <td>Avg. Salary</td>
+            <td class='value'>
+              $
+              <input class='right' id='cocomo_salary' size='7' type='text' value='55000' />
+              year
+            </td>
+          </tr>
+          <tr class='last'>
+            <td class='value' colspan='2'>
+              $
+              <span id='cocomo_value'>1,001,742</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class='col span_6 last'>
+        <hr class='one' />
+        <a class='promo' href='/p/cchost/widgets'>
+          <div class='inset'>
+            <h4>Widgets</h4>
+            <p>Learn how to embed this and other widgets on your site.</p>
+            <div class='badge_preview' style='text-align:center'>
+              <img src='/p/15329/widgets/project_thin_badge.gif' />
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="clear" style="padding:1px;"></div>
+    <div id='footer'>
+  <div class='row'>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>Ohloh</h4>
+        <ul>
+          <li>
+            <a href='https://www.ohloh.net/about/us'>About</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/help/support'>Support</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/blog'>Blog</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/releases'>Releases</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/news'>News</a>
+          </li>
+          <li><a href="https://www.ohloh.net/forums">Forums</a></li>
+          <li>
+            <a href='https://www.ohloh.net/api/getting_started'>API</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/terms'>Terms</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/privacy'>Privacy</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>New Projects</h4>
+        <ul>
+          <li><a href="https://www.ohloh.net/p/freoffice-online-services-plugin">Freoffice Online Services Plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/freoffice-blog-plugin">Freoffice Blog Plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/guile-gir">guile-gir</a></li>
+          <li><a href="https://www.ohloh.net/p/atptgit">a-test-project-testing-gitty</a></li>
+          <li><a href="https://www.ohloh.net/p/heredar">Heredar</a></li>
+          <li><a href="https://www.ohloh.net/p/android-romupdater">ROM Updater</a></li>
+          <li><a href="https://www.ohloh.net/p/vauto">vauto</a></li>
+          <li><a href="https://www.ohloh.net/p/hornetq-rest-war">HornetQ-Rest WAR</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo'>
+      <div class='inset'>
+        <h4><a href="/posts">Recent Posts</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='/forums/11/topics/6145#posts-17226'>
+              CRM Software
+              <span class='author'>
+                by
+                crm-admirer
+              </span>
+              <br />
+              <div class='comment'>
+                Hi guys,
+                My feed back about ohloh is good but as per my experience regarding CRM business solutio...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/10/topics/6144#posts-17225'>
+              Avogadro failed enlistment
+              <span class='author'>
+                by
+                Marcus D. Hanwell
+              </span>
+              <br />
+              <div class='comment'>
+                The Avogadro project failed to update 12 days ago, and it seems to be stuck now.
+                
+                https://www.ohl...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/10/topics/6131#posts-17224'>
+              Analysis for project 'Boost C++ Libraries' stalled for several month
+              <span class='author'>
+                by
+                Rene Rivera
+              </span>
+              <br />
+              <div class='comment'>
+                I removed some extraneous enlistments.. Which seems to have kick-started the processing. Unfortun...
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo last'>
+      <div class='inset'>
+        <h4><a href="/reviews?sort_by=recently_added">Recent Reviews</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/visualnunit/reviews'>
+              Visual Nunit
+              <span class='author'>
+                by
+                onetester
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2099">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                You say "Visual Nunit 2010 1.1.7 Released", but on the site there's only 1.1.3. That's on SourceF...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/365/reviews'>
+              Atlas
+              <span class='author'>
+                by
+                DarwinNE
+              </span>
+              <br />
+              			<span id="footer_star_2098">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_ro_mini.png) left bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                Atlas can provide a very useful basic automatically tuned linear algebra package when an optimize...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/apache/reviews'>
+              Apache HTTP Server
+              <span class='author'>
+                by
+                Thila
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2097">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                Very Good
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p style='clear:left'>&nbsp;</p>
+  <p class='copyright clear'>
+    Copyright ©
+    2011
+    <a href="http://www.blackducksoftware.com">Black Duck Software, Inc.</a>,
+    All Rights Reserved.
+  </p>
+</div>
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20399350-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  <script type="text/javascript">
+//<![CDATA[
+var ProjectMap = {
+	getStacks: function() {
+		$('#a_users').onclick=null;
+		$('#a_contributors').onclick=null;
+
+		$('#li_users').addClass('selected');
+		$('#li_contributors').removeClass('selected');
+
+		Map.map.clearOverlays();
+		$('#map_status').innerHTML='Loading users...';
+		Map.defaultIconImage='/images/map_gray.png';
+		Map.url='/p/cchost/stacks/near';
+		Map.onComplete=function(jsonData){
+			if(jsonData && jsonData.accounts && jsonData.accounts.length > 0){
+				$('#map_status').html('Showing ' + jsonData.accounts.length +
+					' of <a href="https://www.ohloh.net/p/cchost/stacks">0 users</a>.');
+			}else{
+				$('#map_status').html('No users located.');
+			}
+			$('#a_contributors').onclick=ProjectMap.getContributors;
+		};
+		Map.getMarkers();
+		return false;
+	},
+	getContributors: function() {
+		$('#a_users').onclick=null;
+		$('#a_contributors').onclick=null;
+
+		$('#li_users').removeClass('selected');
+		$('#li_contributors').addClass('selected');
+
+		Map.map.clearOverlays();
+		$('#map_status').innerHTML='Loading contributors...';
+		Map.defaultIconImage='/images/map_yellow.png';
+		Map.url='/p/cchost/contributors/near';
+		Map.onComplete=function(jsonData){
+			if(jsonData && jsonData.accounts && jsonData.accounts.length > 0){
+				$('#map_status').html('Showing ' + jsonData.accounts.length +
+										' of <a href="https://www.ohloh.net/p/cchost/contributors">8 contributors</a>.');
+								}else{
+				$('#map_status').html('No contributors located.');
+			}
+			$('#a_users').bind('click', ProjectMap.getStacks);
+		};
+		Map.getMarkers();
+		return false;
+	}
+}
+//]]>
+</script>
+<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAchKtP8sqcRD35MfSaUWftRS9_JF4cRcfPwG-aXRJHg4WOCZxNBRBki7ZWqp4LTQhBtwTAbJN8LgzUQ' type='text/javascript'></script><script type="text/javascript">
+//<![CDATA[
+		  $(document).ready(function(){ Map.load(0, null); Map.moveTo(10,20,0);});
+			$(window).bind('unload', function(){ GUnload(); });
+
+//]]>
+</script><script type="text/javascript">
+//<![CDATA[
+Map.postMap = ProjectMap.getStacks;
+//]]>
+</script>
+
+
+  </div>
+</body>
+</html>

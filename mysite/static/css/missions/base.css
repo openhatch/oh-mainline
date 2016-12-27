@@ -1,0 +1,136 @@
+body.missions .successmsg {
+  background-color: #e4ffc0;
+  margin: 10px 0px;
+  padding: 5px 10px;
+  -moz-border-radius: 5px 5px 5px 5px;
+  -webkit-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+}
+
+body.missions div.body > * {
+  float: left;
+  width: 100%;
+}
+
+/* Don't let the above rule force code markup and hyperlinks to be floated left. */
+body.missions div.body code {
+  float: none;
+}
+body.missions div.body a {
+  float: none;
+}
+
+body.missions p.next_mission_link {
+    width: 100%;
+}
+
+body.missions .file-upload-row {
+  width: 100%
+}
+
+body.missions .file-upload {
+  margin-top: 5px;
+  padding: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  width: 100%;
+  background: #F9F9F9
+}
+
+body.missions .file-upload input[type="file"] {
+  padding: 0;
+  font-size: 100%
+}
+.tick-progress {
+  list-style-image: url("/static/images/tick.png");
+  margin-left: 30px;
+}
+.cross-progress {
+  list-style-image: url("/static/images/no-tick.png");
+  margin-left: 30px;
+}
+body.missions .bump-over {
+  margin-left: 30px;
+}
+body.missions .submodule.skinny ul li a{
+  vertical-align: 3px;
+}
+
+body.missions .mission-help {
+    padding: 3px;
+    padding-right: 7px;
+    background-color: yellow;
+}
+
+body#missions_index div.body h2 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+    clear: both;
+}
+
+body#missions_index .submodule {
+    width: 21%;
+    margin-right: 12px;
+}
+
+body#missions_index .submodule h3 {
+    text-align: center;
+    border-bottom: 1px solid;
+    float: none;
+}
+
+body#missions_index .submodule h3.uncompleted {
+    color: black;
+}
+
+body#missions_index .submodule .go_to_it {
+    text-align: right;
+    float: right;
+}
+
+body#missions_index .submodule .status {
+    float: left;
+    text-align: center;
+    width: 80%;
+}
+
+/* When there are hints for training missions, the "low" hint sometimes needs help laying out its child elements properly. */
+#low {
+    clear: both;
+}
+
+body.missions .code {
+    padding: 9.5px;
+    margin: 0px 0px 10px;
+    font-size: 13px;
+    line-height: 20px;
+    word-break: break-all;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    background-color: #F5F5F5;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+body.missions .kbd {
+    padding: 2px 4px;
+    white-space: nowrap;
+    background-color: #F7F7F9;
+    border: 1px solid #E1E1E8;
+    border-radius: 4px;
+}
+
+body.missions .snippet {
+    padding: 9.5px;
+    margin: 0px 0px 10px;
+    font-size: 13px;
+    line-height: 10px;
+    word-break: break-all;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    background-color: #F5F5F5;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+

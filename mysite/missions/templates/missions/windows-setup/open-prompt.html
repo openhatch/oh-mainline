@@ -1,0 +1,44 @@
+{% extends 'missions/windows-setup/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load base_extras %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>{{ this_mission_page_short_name }}</h3>
+  </div>
+  <div class="body">
+    <p>In this section, we will make sure you can open the Git Bash prompt that you just installed. To launch it:</p>
+
+    <ul class="raquo_bullets">
+      <li>Click the Windows or Start icon</li>
+      <li>In the Programs list, open the Git folder</li>
+      <li>Click the option for Git Bash.</li>
+    </ul>
+
+    <p>(Don't be distracted by the "Git GUI" program. In this tutorial, we use "Git Bash.")</p>
+
+    <p>You should see a new window that looks like
+      <a target="_blank" href="http://www.prosoftstudio.com/wp-content/uploads/2011/05/01-Open-Git-Bash.png">this screenshot</a>.</p>
+
+    <p class="next_mission_link">
+	<a href="{% url "missions-windows-setup-understand-prompt" %}">Once you have it running, let's see how to use it!! &raquo;</a></p>
+  </div>
+</div>
+{% endblock mission_main %}

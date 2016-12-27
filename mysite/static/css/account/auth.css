@@ -1,0 +1,18 @@
+body.auth form { width: 100%; float: left; }
+body.auth form p, .form-row, form li { float: left; width: 90%; margin: 5px 0 10px 0; list-style: none; }
+body.auth label { float: left; text-align: right; width: 30%; padding-right: 10px; padding-top: 13px; }
+body.auth input[type='text'],
+body.auth input[type='file'],
+body.auth input[type='password'] { padding: 8px; float: left; width: 60%; }
+body.auth input[type='file'] { margin: 10px 0; width: 200px; }
+body.auth input[type='submit'] { margin-left: 30%; position: relative; left: 10px; float: left; }
+body.auth #login .text, #signup .text { font-size: .7em; width: 100px; margin-right: 6px; }
+body.auth #login .button, #signup .button { font-size: .7em; margin: -17px 6px 0 0; }
+body.auth input[type='checkbox'] { position: relative; top: 10px; }
+body.auth .foot input[type='submit'] { float: right; left: 0; }
+.login-links {float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;}
+
+body#signup_with_password .module { margin: 0 305px; width: 350px; }
+body#signup_with_password input { float: none; display: block;width: 90% }
+.help_text { font-size: .85em;}
+p.example { clear: left; }

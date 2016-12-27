@@ -1,0 +1,61 @@
+{% extends 'base/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+Customs
+{% endblock title %}
+{% block body_id %}edit_tracker_info_form{% endblock %}
+{% block body_class %}{{ block.super }} nice_form{% endblock %}
+
+{% block content %}
+<div class='module'>
+    <div class='head'>
+        <h3>{% block heading %}Customs{% endblock %}</h3>
+        <span>For instructions on adding your project's bug tracker, please see our <a href="https://openhatch.org/wiki/Bug_trackers">wiki page</a>.</span>
+        <ul>
+            <li>
+            {% block top_url %}{% endblock %}
+            </li>
+        </ul>
+    </div>
+    <div class='body'>
+        {% if customs_notification %}
+        <div class='notification'>
+            {{ customs_notification }}
+            <div style="float: right; display: inline;">
+                <a id='clear_message' href="?">(clear this message)</a>
+            </div>
+        </div>
+        {% endif %}
+        {% block customs_content %}
+        <form class="clearfix" name={% block form_name %}{% endblock %} method='POST'
+            action={% block form_action %}{% endblock %}>{% csrf_token %}
+            {% block form_body %}{% endblock %}
+            <p> <input type='submit'
+                        {% block submit_button_attributes %}
+                            value='Save'
+                            {% endblock %} />
+                            {% block second_form_button %}{% endblock %}</p>
+        </form>
+        {% block content_below_form %}{% endblock %}
+        {% endblock customs_content %}
+    </div>
+</div>
+{% endblock content %}

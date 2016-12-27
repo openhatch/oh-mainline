@@ -1,0 +1,69 @@
+{% extends 'missions/git/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_main_body %}
+
+{% if not repository_exists %}
+
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the git checkout step yet! <br />
+You have to create your repository on the
+  <a href='{% url "mysite.missions.git.views.main_page" %}'>Mission start page</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
+
+{% else %}
+
+<p>Your first mission is to obtain a copy of the remote git repository. For this mission, we will use the git repository you created on the mission start page.  Running the following command will clone the remote repository and create a copy on your hard drive.</p>
+
+<p>You can clone the repository by running:<br style="clear: left;" />
+<code>git clone {{ checkout_url }} git_missions</code>
+<p>Then, go into this newly cloned local repository by running:<br style="clear: left;" />
+<code>cd git_missions</code>
+
+<p>Once you are inside this repository, use <code>git blame</code> to find the author responsible for this mishap! (<abbr title="on linux: cd git_missions, then type: git blame hello.py">hover for hint</abbr>)</p>
+
+{% if git_checkout_done %}
+<div class="successmsg">
+  <p><strong>You have successfully completed this part of the mission.</strong></p>
+</div>
+<p class="next_mission_link">
+  <a href="{% url "mysite.missions.git.views.diff" %}">Creating a patch of your changes &raquo;</a></p>
+{% else %}
+<form method="post" action="{% url "mysite.missions.git.views.checkout_submit" %}">{% csrf_token %}
+  <div class="form-row">
+    <a name="gitcheckout-form"></a>
+    {% if git_checkout_error_message %}
+    <ul class="errorlist"><li>{{ git_checkout_error_message }}</li></ul>
+    {% endif %}
+    {{ git_checkout_form.secret_word.errors }}
+    <br style="clear: left;" />
+    Author's name: <br style="clear: left;" />
+    {{ git_checkout_form.secret_word }}
+    <br style="clear: left;" />
+    <input type="submit" value="Submit" style="float: none;" />
+  </div>
+</form>
+
+{% endif %}
+{% endif %}
+
+{% endblock mission_main_body %}

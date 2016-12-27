@@ -1,0 +1,84 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% with project.people_who_wanna_help.all as helpers %}
+    <div class='head'>
+        <h3>People who want to help <span style='font-weight: normal;'>({% firstof helpers|length "none listed yet" %})</span></h3>
+        {% if helpers %}
+            <ul>
+                <li>
+                    <a href='{% url "mysite.profile.views.people" %}?q=icanhelp:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See on map</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+    {% if people_to_show %}
+      <div id="iwh_handler" class="body tab">
+	<form id='mark_contacted_do_form' action="{% url "mysite.project.views.mark_contacted_do" %}" method="POST">{% csrf_token %}
+        <div class="explanation">
+          <p>The following people are interested in helping.
+	    Send them an email! (<a href="//openhatch.org/wiki/Contacting_new_contributors">tips</a>)
+	  </p>
+	  <p>
+	    You can use this page to track who has been
+	    {% if user.is_authenticated %}
+	    contacted.
+	    {% else %}
+	    contacted if you log in.
+	    {% endif %}
+	    {% if user.is_authenticated %}
+	    Click the checkbox next to their name, and save. The page will publish today's date and your username.
+	    {% else %}
+	    There will be a checkbox next to their name. When you check it, the page will publish today's date and your username.
+	    {% endif %}
+	  </p>
+        </div>
+	<div class="wannahelper_checkboxes">
+	<ul class="people-list">
+        {% for person in mark_contacted_forms %}
+          {% with person.person as person %}{% include 'profile/person-summary-li.html' %}{% endwith %}
+	  {% if user.is_authenticated %}
+	  <li class="wannahelper_checkbox_item">
+		     {{ person.form.person_id }}{{ person.form.project_id }}
+		     {% if not person.note.contacted_on %}{{ person.form.checked }}{% endif %}
+	  </li>
+	  {% endif %}
+	  {% if  person.note.contacted_on %}
+	  <li class="contacted_on">
+          Contacted on {{ person.note.contacted_on }} by {{ person.note.contacted_by }}
+	  </li>
+	  {% endif %}
+        {% endfor %}
+	</ul>
+        <input type='hidden' id='id_mark_contact-project' name='mark_contact-project' value='{{ project.pk }}'>
+	</div>
+	<div>
+	  <input type='submit' id='mark_contact-button' style='float: right; margin-right: 10px;' value='Save'>
+	</div>
+      </div>
+
+    {% endif %}
+    </form>
+{% endwith %}
+{% if user_wants_to_help %}
+            <form action="{% url "mysite.project.views.unlist_self_from_wanna_help_do" %}" id='delist_me_as_a_helper' method="POST">{% csrf_token %}
+                <input type='hidden' name='project' value='{{project.id}}'>
+                <input type='submit' style='float: left; margin-left: 10px;' id='delist_helper_button' value='De-list me!'>
+            </form>
+{% endif %}
+{# vim: set filetype=htmldjango: #}

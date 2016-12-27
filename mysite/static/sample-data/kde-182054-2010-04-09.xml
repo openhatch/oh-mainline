@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!DOCTYPE bugzilla SYSTEM "http://bugs.kde.org/bugzilla.dtd">
+
+<bugzilla version="3.2.5+"
+          urlbase="http://bugs.kde.org/"
+          maintainer="sysadmin@kde.org"
+>
+
+    <bug>
+          <bug_id>182054</bug_id>
+          
+          <creation_ts>2009-01-27 03:05</creation_ts>
+          <short_desc>Need warning during multi-image annotation if description data is to be overwritten</short_desc>
+          <delta_ts>2010-01-04 23:04:29</delta_ts>
+          <reporter_accessible>1</reporter_accessible>
+          <cclist_accessible>1</cclist_accessible>
+          <classification_id>1</classification_id>
+          <classification>Unclassified</classification>
+          <product>kphotoalbum</product>
+          <component>general</component>
+          <version>unspecified</version>
+          <rep_platform>Debian testing</rep_platform>
+          <op_sys>Linux</op_sys>
+          <bug_status>UNCONFIRMED</bug_status>
+          
+          
+          
+          
+          <keywords>junior-jobs</keywords>
+          <priority>NOR</priority>
+          <bug_severity>wishlist</bug_severity>
+          <target_milestone>---</target_milestone>
+          
+          
+          <votes>20</votes>
+          
+          <reporter>jedd progsoc org</reporter>
+          <assigned_to name="KPhotoAlbum Bugs">kpabugs willden org</assigned_to>
+          <cc>alexjironkin gmail com</cc>
+    
+    <cc>blackie kde org</cc>
+          
+
+      
+
+      
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-01-27 03:05:48</bug_when>
+            <thetext>Version:            (using KDE 3.5.10)
+OS:                Linux
+Installed from:    Debian testing/unstable Packages
+
+When annotating multiple items (ctrl-2), the Description tag is empty regardless of the content of those images&apos; Description field.
+
+Making changes to that field will therefore overwrite any existing data in that field across all photos, which is not necessarily what the user might want or expect to happen.
+
+
+Wishful items:
+
+ o  At the very least, identify to the user either in the annotation dialog, or before accepting new Description data, that extant data exists and is about to be overwritten
+
+ o  Identify that description data exists up-front, as soon as that dialog is initiated, perhaps with a note just above the Description field.
+
+ o  Consider an enhancement where each image has two description fields associated with it - a group description, and a specific-to-that-image description (the latter being what we have now).  Both would still be modifiable in the multi-image annotation dialog, but both fields would be identified and greyed if there&apos;s potential conflict.  This approach would allow for generic descriptions for a set of photos, and then specific descriptions for each picture.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-06-11 21:07:15</bug_when>
+            <thetext>The code for the Annotation dialog itself is in AnnotationsDialog/Dialog.cpp
+The description field itself is the instance variable _description.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-06-30 21:35:45</bug_when>
+            <thetext>Just had a look at the devel branch and this has already been fixed. When annotating multiple images the &quot;Description&quot; that appears is from that  image if it has it or not, and when it is saved, it only overrides the Description for that image.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-07-01 21:06:30</bug_when>
+            <thetext>Aren&apos;t you talking about the Ctrl+1 case, not the Ctrl+2 case?</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-07-01 22:40:38</bug_when>
+            <thetext>Right, yeah my bad I see what its doing now :).</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-07-04 21:44:58</bug_when>
+            <thetext>Created an attachment (id=35048)
+patch to fix the wish.
+
+Dialog now throws a question box during the multiple image annotation (Ctrl 2), to notify that the data will be overridden in all selected images.
+
+Also the description field is now populated with the description from the top element.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-07-11 15:51:51</bug_when>
+            <thetext>May I suggest a few improvement to the patch
+* I don&apos;t think it is that a good idea to use the first picture&apos;s text. The most general use case, I think, is that people will use Ctrl+1 to add some text and tags to individual images. Next they might add more general tags. In that case they would see the wrong text for all the images. How about instead check if there is a different text on some of the images, and then put the text &quot;(different text on individual images, setting text here will override them all)&quot; to the text edit. If all the images had the same text, then simply put that there.
+* Only show the warning message if there 
+  1) are some text in the text box to be written
+  2) There was some different text in each of the images.
+
+Thanks for moving this issues forward.
+Jesper.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2010-01-04 23:04:29</bug_when>
+            <thetext>Hi Alex, fancy finishing this patch, so we can get it integrated in the next release?
+
+Cheers
+Jesper.</thetext>
+          </long_desc>
+      
+          <attachment
+              isobsolete="0"
+              ispatch="1"
+              isprivate="0"
+          >
+            <attachid>35048</attachid>
+            <date>2009-07-04 21:44</date>
+            <desc>patch to fix the wish.</desc>
+            <filename>182054.txt</filename>
+            <type>text/plain</type>
+            <size>1590</size>
+            <data encoding="base64">IyMjIEVjbGlwc2UgV29ya3NwYWNlIFBhdGNoIDEuMAojUCBrcGhvdG9hbGJ1bQpJbmRleDogQW5u
+b3RhdGlvbkRpYWxvZy9EaWFsb2cuaAo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBBbm5vdGF0aW9uRGlhbG9nL0Rp
+YWxvZy5oCShyZXZpc2lvbiA5OTEzOTQpCisrKyBBbm5vdGF0aW9uRGlhbG9nL0RpYWxvZy5oCSh3
+b3JraW5nIGNvcHkpCkBAIC0xMjQsNyArMTI0LDcgQEAKICAgICB2b2lkIHNhdmVBbmRDbG9zZSgp
+OwogCiBwcml2YXRlOgotICAgIERCOjpJbWFnZUluZm9MaXN0IF9vcmlnTGlzdDsKKyAgICBEQjo6
+SW1hZ2VJbmZvTGlzdCBfb3JpZ0xpc3Q7ICAgICAgICAgIC8vTGlzdCBvZiB0aGUgcG9pbnRlcnMg
+b2YgdGhlIGltYWdlIGluZm9zLgogICAgICBRTGlzdDxEQjo6SW1hZ2VJbmZvPiBfZWRpdExpc3Q7
+CiAgICAgaW50IF9jdXJyZW50OwogICAgIFVzYWdlTW9kZSBfc2V0dXA7CkluZGV4OiBBbm5vdGF0
+aW9uRGlhbG9nL0RpYWxvZy5jcHAKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQotLS0gQW5ub3RhdGlvbkRpYWxvZy9EaWFs
+b2cuY3BwCShyZXZpc2lvbiA5OTEzOTQpCisrKyBBbm5vdGF0aW9uRGlhbG9nL0RpYWxvZy5jcHAJ
+KHdvcmtpbmcgY29weSkKQEAgLTUxNCw3ICs1MTQsOCBAQAogICAgICAgICAgICAgc2V0VXBDYXRl
+Z29yeUxpc3RCb3hGb3JNdWx0aUltYWdlU2VsZWN0aW9uKCAqaXQsIGxpc3QgKTsKIAogICAgICAg
+ICBfaW1hZ2VMYWJlbC0+c2V0VGV4dCggUVN0cmluZzo6ZnJvbUxhdGluMSgiIikgKTsKLSAgICAg
+ICAgX2Rlc2NyaXB0aW9uLT5zZXRUZXh0KCBRU3RyaW5nOjpmcm9tTGF0aW4xKCIiKSApOworICAg
+ICAgICAvL1VzZSB0aGUgZGVzY3JpcHRpb24gb2YgdGhlIHRvcCBpbWFnZS4KKyAgICAgICAgX2Rl
+c2NyaXB0aW9uLT5zZXRUZXh0KCBsaXN0LmZpcnN0KCktPmRlc2NyaXB0aW9uKCkgKTsKIAogICAg
+ICAgICBfcHJldkJ1dC0+c2V0RW5hYmxlZCggZmFsc2UgKTsKICAgICAgICAgX25leHRCdXQtPnNl
+dEVuYWJsZWQoIGZhbHNlICk7CkBAIC0xMDQyLDYgKzEwNDMsMTMgQEAKICAgICAgICAgfQogICAg
+IH0KICAgICBlbHNlIGlmICggX3NldHVwID09IElucHV0TXVsdGlJbWFnZUNvbmZpZ01vZGUgKSB7
+CisKKyAgICAgICAgaWYgKCBhbnlDaGFuZ2VzICkgeworICAgICAgICAJaW50IGNvZGUgPSAgS01l
+c3NhZ2VCb3g6OnF1ZXN0aW9uWWVzTm8oIHRoaXMsIGkxOG4oIjxwPlRoaXMgd2lsbCBvdmVycmlk
+ZSBpbmZvcm1hdGlvbiBpbiA8Yj5hbGw8L2I+IHNlbGVjdGVkIGltYWdlcy4gRG8geW91IHJlYWxs
+eSB3YW50IHRvIHByb2NlZWQ/PC9wPiIpICk7CisgICAgICAgIAlpZiAoY29kZSA9PSBLTWVzc2Fn
+ZUJveDo6Tm8gKQorICAgICAgICAJCXJldHVybjsKKyAgICAgICAgfQorCiAgICAgICAgIGZvcigg
+UTNQdHJMaXN0SXRlcmF0b3I8TGlzdFNlbGVjdD4gaXQoIF9vcHRpb25MaXN0ICk7ICppdDsgKytp
+dCApIHsKICAgICAgICAgICAgICgqaXQpLT5zbG90UmV0dXJuKCk7CiAgICAgICAgIH0K
+</data>        
+
+          </attachment>
+      
+
+    </bug>
+
+</bugzilla>

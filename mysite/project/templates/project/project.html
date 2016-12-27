@@ -1,0 +1,581 @@
+{% extends 'base/two_columns.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2011 Jack Grigg
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2010 Jessica McKellar
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load profile_extras %}
+{% load base_extras %}
+
+{% block title %}
+Projects - {{ project.display_name }} 
+{% endblock title %}
+
+{% block body_id %}project{% endblock body_id %}
+
+{% block description_for_anonymous_users %}
+<strong>Learn below</strong>
+about how you can help {{ project.display_name }}
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+{% comment %} CSSTODO {% endcomment %}
+#big-project-list form p label{ text-align: left; display: block; width: 100%;}
+#big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
+#big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
+#big-project-list .note { margin-left: 2em; font-weight: normal; }
+{% endblock css %}
+
+{% block pagetop %}
+
+    <noscript>
+        <style type='text/css'>
+            li form * { display: inherit ! important; }
+            li form strong { display: inline ! important; }
+            li form.answer_question { float: left; background-color: #ffc; }
+            body#project li form a.collapse_answer_form { display: none ! important; }
+        </style>
+    </noscript>
+
+    <h3 class='supertitle'><a href='{% url "mysite.project.views.projects" %}'>&laquo; Projects</a></h3>
+    <h1>{{ project.display_name }}</h1>
+
+    <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'> {% comment %} CSSTODO {% endcomment %}
+        <div class='module-head'>
+            <h3>Next steps for helpers
+                <a id='show' style='font-weight: normal;' href='#'>(show)</a>
+		<form style="display: none;" id="show_form" method='POST' action="{% url "mysite.profile.views.set_expand_next_steps_do" %}">{% csrf_token %}
+		  <input type="hidden" name="value" value="True" />
+		</form>
+                <a id='hide' style='font-weight: normal;' href='#'>(hide)</a>
+		<form style="display: none;" id="hide_form" method='POST' action="{% url "mysite.profile.views.set_expand_next_steps_do" %}">{% csrf_token %}
+		  <input type="hidden" name="value" value="False" />
+		</form>
+            </h3>
+        </div>
+    </div>
+
+    <div class='next_steps_for_helpers contains_just_the_body {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
+        <div class='module-body'>
+                <ul class='raquo_bullets'>
+                    <li><a href='{% url "mysite.profile.views.edit_info" %}'>
+                            Talk about your skills and interests on your profile</a></li>
+                    <li><a href='{% url "mysite.search.views.search_index" %}?q={{ project.name|urlencode }}&toughness=bitesize'>
+                            Find a bite-size bug in {{ project.display_name }}
+                        </a></li>
+                    <li><a href='{% url "mysite.profile.views.edit_info" %}#contact_blurb'>
+                                Make sure your contact info is up to date</a></li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+{% endblock pagetop %}
+
+{% block left %}
+<div id='project-tab-container' class='module contains_questions'>
+    <ul class='module-head tab_nav'>
+            <li class='ui-state-active'>
+                <h3><a href='#chatter'>Q&A</a></h3>
+            </li>
+             {% if settings.ENABLE_NEW_IWH_HANDLER and people_to_show%}
+                <li >
+                    <h3><a href='#iwh_handler'>IWH Handler</a></h3>
+                </li>
+            {% endif %}
+    </ul>
+    <div id="chatter" class='module-body tab'>
+        <div style="font-size: 1.3em" class="you-are-missing-things">
+        {% if cookies_disabled %}
+        <div>Please enable cookies in order to post answers.</div>
+        {% endif %}
+        <noscript><div>Please enable javascript in order to post answers.</div></noscript>
+        </div>
+        <ul id='paragraph_questions' class='questions'>
+            {% for question, answers in question2answer %}
+                <li>
+                    <h3><strong>Q:</strong>
+                        {% include 'question_text.html' %}
+                    </h3>
+                    <ul class='answers'>
+                        {% for answer in answers %}
+                            <li id='answer_whose_pk_is_{{ answer.pk }}'>
+                                {% include 'project/voting_controls.html' %}
+                                {% if not question.is_bug_style %}
+
+                                    {% ifequal user answer.author %}
+                                        {% with 1 as edit_form %}
+                                            {% include 'project/forms/paragraph.html' %}
+                                        {% endwith %}
+                                    {% endifequal %}
+
+                                    <span class="answer" id="answer_{{answer.pk}}">
+                                        {{ answer.text|bleach_urlize|linebreaks }}
+                                        <br/>
+                                        {% include 'project/byline.html' %}
+                                    </span>
+
+                                {% else %}
+
+                                    {% ifequal user answer.author %}
+                                        {% with 1 as edit_form %}
+                                            {% include 'project/forms/bug.html' %}
+                                        {% endwith %}
+                                    {% endifequal %}
+
+                                    <span class="answer" id="answer_{{answer.pk}}">
+
+                                        <div class="bug_answer_title">
+                                            {% ifequal user answer.author %}
+                                            {% endifequal %}
+                                            <strong>{{answer.title}}</strong>
+                                        </div>
+                                        {{answer.text|urlize_without_escaping_percent_signs|safe|linebreaks}}
+                                        <br/>
+                                        {% include 'project/byline.html' %}
+                                    </span>
+
+                                {% endif %}
+
+                            </li>
+                        {% endfor %}
+
+                        {# this li allows you to add an answer #}
+                        <li>
+                            {% if question.is_bug_style %}
+                                {% include 'project/forms/bug.html' %}
+                            {% else %}
+                                {% include 'project/forms/paragraph.html' %}
+                            {% endif %}
+                        </li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+        <strong id="other-questions">
+            <a href="{% url "mysite.project.views.suggest_question" %}?project__pk={{project.pk}}">
+                What else do you want to talk about?
+            </a>
+        </strong>
+    </div><!-- /#chatter -->
+</div><!-- /.module #requests -->
+
+{% endblock left %}
+
+{% block main %}
+    <div class='module' id='about'>
+        <div class='module-head'>
+            <h3>About {{ project.display_name }}</h3>
+            <ul>
+                <li>
+                    <a href='{{ project.get_edit_page_url }}'>Edit project settings</a>
+                </li>
+            </ul>
+        </div>
+        <div class='module-body'>
+            <div class='project_icon' 
+                    style="float: left; width: 64px; margin-right: 20px;
+                    background-image: url({% version project.get_url_of_icon_or_generic %})"
+                    ><span class='alt-text'>
+                        (logo)
+                    </span></div>
+            <div style='float: left; width: 70%;'>
+                {% if random_pfentry %}
+                    <h2 style='font-size: 1.3em; font-weight: normal;'>
+                        {% spaceless %}
+                            <span>{{ random_pfentry.project_description|urlize|linebreaks}}</span>
+                        {% endspaceless %}
+                    </h2>
+                    <p style='font-size: .9em; margin: 5px 0 0 40px;'>
+                        from the profile of
+                        <a href='{{ random_pfentry.person.profile_url }}'>
+                            {% with random_pfentry.person.user as user %}
+                            {% include 'name.html' %}
+                            {% endwith %}
+                        </a>
+                    </p>
+                {% else %}
+                    <div style='color: #777; font-size: .85em;'>
+                        No one has described this project yet. To describe the
+                        project, <a href='{% url "mysite.profile.views.importer" %}?add_project_name={{ project.display_name|urlencode }}'>
+                            add it to your profile</a>.
+                    </div>
+                {% endif %}
+
+                {% if project.homepage %}
+                    <div style='margin-top: 10px;'>
+                        Homepage: <a href="{{ project.homepage }}">{{ project.homepage }}</a>
+                    </div>
+                {% endif %}
+
+                {% if project.language %}
+                    <div style='margin-top: 10px;'>
+                        The code is mostly written in <strong>{{ project.language }}</strong>.
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+
+    {% if not user_wants_to_help %}
+        <div class='module' id='wannahelp'>
+            <form id='want2help_form' action="{% url "mysite.project.views.wanna_help_do" %}" method="POST">{% csrf_token %}
+                <input type='hidden' name='project' value='{{project.id}}'>
+                <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
+            </form>
+        </div>
+    {% endif %}
+
+
+<div class='module' id='wanna_help'>
+    {% include 'project/project-wanna-help-box.html' %}
+</div>
+
+<div class='module' id='contributors'>
+    <div class='module-head'>
+        <h3>Registered contributors ({% firstof project.get_contributor_count "none listed yet" %})</h3>
+            <ul>
+                <li>
+                    {% if project.cached_contributor_count %}
+                        <a class='actionlink' href='{% url "mysite.profile.views.people" %}?q=project:"{{project.name|urlencode}}"'>See all</a>
+                    {% endif %}
+                    <a class='actionlink' href='{% url "mysite.profile.views.importer" %}?add_project_name={{ project.name|urlencode }}'>Add yourself</a>
+                </li>
+            </ul>
+    </div>
+    {% if project.cached_contributor_count %}
+        <div class='module-body'>
+            <ul class="people-list">
+                {% for person in contributors %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+<div class='module' id='bugs'>
+    <div class='module-head'> <h3>Volunteer opportunities, etc.</h3> </div>
+    <div class='module-body'>
+        <style>
+            #bugs p { margin-top: 0; }
+        </style>
+        {% if project.get_open_bugs %}
+            <p style='font-size: 1.1em;'>
+                    <a href='/search/?project={{ project.name|urlencode }}'>
+                        <strong>
+                            Volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                        </strong>
+                        matching {{ project.display_name }} ({{ project.get_open_bugs|length }})
+                    </a>
+            </p>
+        {% else %}
+            <p>
+                No volunteer opportunities in {{project.display_name}} indexed here yet. 
+                <a href='{% url "mysite.project.views.edit_project" project.name %}#edit_bug_trackers'>
+                    Add a bug tracker</a>.
+
+            </p>
+    {% endif %}
+  
+  {% with mentors as mentors %}
+  {% with project.display_name as topic %}
+  {% with 0 as explain_language %}
+  {% include 'project/mentor_summary.html' %}
+  {% endwith %}
+  {% endwith %}
+  {% endwith %}
+
+  {% if project.language %}
+  {% with language_mentors as mentors %}
+  {% with project.language as topic %}
+  {% with 1 as explain_language %}
+  {% include 'project/mentor_summary.html' %}
+  {% endwith %}
+  {% endwith %}
+  {% endwith %}
+  {% endif %}
+
+  You can <a id='show_copypastebox' href='#'>embed the "I want to help" button</a> on your website. (<a href='/blog/2010/let-people-help-your-project-give-them-a-button-to-click/'>More about this</a>.)
+  <div id='copypastebox'>
+      <textarea style='font-size: .8em; font-family: monospace;'>{{ button_as_widget_source }}</textarea>
+  </div>
+
+    </div>
+</div><!-- /.module #bugs -->
+
+{% endblock main %}
+
+{% block js %}
+<script type='text/javascript'>
+    $(function(){
+        $('.step-checkbox').click(function() {
+            $(this).toggleClass('step-checkbox-checked');
+            $(this).toggleClass('step-checkbox-unchecked');
+            return false;
+        });
+    });
+</script>
+
+<script type='text/javascript'>
+$(function(){
+        $('#project-tab-container').tabs({
+            cookie: {
+                // keeps tab choice for one day
+                expires: 1
+            }
+        });
+        $('.invisible_if_js').removeClass('invisible_if_js');
+});
+</script>
+
+    <script type='text/javascript'>
+        {# If you move this to an external .js file, check for Django template tags, there might be some. #}
+        
+        $(function() {
+            $('.add_an_answer')
+                .focus(function() {
+                    $form = $(this).parent();
+                    $form.addClass('active');
+                    $form.find('input:text, textarea').unbind('blur');
+                });
+
+            // Bind a function to the 'x' on input forms.  this function collapses the form
+            $('.collapse_answer_form').click(function(){
+                $form = $(this).parent().parent();
+                $form.removeClass('active');
+                if($form.hasClass('is_edit_form')){
+                    $form.hide();
+                    answer_id = $(this).attr('id').split('_')[3];
+                    console.debug(answer_id);
+                    $answer = $("#answer_" + answer_id);
+                    $answer.show();
+                    $delete_form = $("#delete_form_" + answer_id);
+                    $delete_form.show();
+                    $edit_link = $("#edit_link_"  + answer_id);
+                    $edit_link.show();
+                }
+                return false;
+            });
+            $('.edit_link').click(function(){
+                answer_id = this.id.split('_')[2];
+                $form = $("#edit_form_"  + answer_id);
+                $form.show();
+                $form.find('input:text, textarea').unbind('blur');
+                $answer = $("#answer_"  + answer_id);
+                $answer.hide();
+                $delete_form = $("#delete_form_"  + answer_id);
+                $delete_form.hide();
+                $(this).hide();
+                $form.find('input:text, textarea').focus();
+                return false;
+            });
+            $("form.delete input").click(function(){
+                return confirm('are you sure?');
+            });
+            ourJacker = new VoteHijacker();
+            ourJacker.initialize();
+
+            ourOtherJacker = new Want2HelpJacker();
+            ourOtherJacker.initialize();
+            
+        });
+
+
+var VoteHijacker = function() {};
+
+VoteHijacker.prototype =
+{
+    initialize: function()
+    {
+        this.registerEventHandlers();
+    },
+
+    registerEventHandlers: function()
+    {
+        $('form.answervote').each(function() {
+            var form = this;
+            var answer__pk = /(\d+)$/.exec(form.id)[1];
+            var action = /(up|down|clear)vote/.exec(form.action)[1];
+            var prefix = 'answer';
+            var options = {
+                'dataType': 'json',
+                'error': function(){
+                    alert("Error voting: " + response.error_message);
+                },
+                'success': function createCallback(answer__pk, form) {
+                    return function callback(response) {
+                        if(!response.success){
+                            if(response.error_message == "Not authenticated."){
+                                alert("Please log in to vote.");
+                            }
+                            else{
+                                alert("Error voting: " + response.error_message);
+                            }
+                            return;
+                        }
+                        var action = /(up|down|clear)vote/.exec(form.action)[1];
+                        var upArrowType = "grey";
+                        var upFormAction = "up";
+                        var downArrowType = "grey";
+                        var downFormAction = "down";
+
+                        if (action == "up")
+                        {
+                            var upArrowType = "mod";
+                            var upFormAction = "clear";
+                        }
+                        else if (action == "down")
+                        {
+                            var downArrowType = "mod";
+                            var downFormAction = "clear";
+                        }
+
+                        VoteHijacker.updateArrow("up", prefix, answer__pk, upArrowType);
+                        VoteHijacker.updateArrow("down", prefix, answer__pk, downArrowType);
+                        VoteHijacker.updateFormAction("up", prefix, answer__pk, upFormAction);
+                        VoteHijacker.updateFormAction("down", prefix, answer__pk, downFormAction);
+                        VoteHijacker.updateScore(prefix, answer__pk, response.score);
+                    };
+                }(answer__pk, form)
+            };
+            $(this).ajaxForm(options);
+        });
+    }
+};
+
+VoteHijacker.arrowTooltipMessages = { 
+    // $arrowType_$currentState: $messageToDisplay
+    'down_grey': 'vote down', // grey means off, mod means on
+    'up_grey': 'vote up',
+    'down_mod': 'cancel vote',
+    'up_mod': 'cancel vote'
+};
+
+VoteHijacker.updateArrow = function(arrowType, prefix, id, state)
+{
+    var $img = $('#' + prefix + arrowType + "arrow" + id);
+
+    // Change the image source
+    var img = $img.get(0);
+    var re = new RegExp(arrowType + "(?:mod|grey)\\.png");
+    img.src = img.src.replace(re, arrowType + state + ".png");
+
+    // Change the tipsy text, which is stored in the title attribute
+    var msg = VoteHijacker.arrowTooltipMessages[arrowType+"_"+state];
+    $img.attr('title', msg);
+    try{
+        // fade out
+        $img.getTipsy().fadeOut('slow', function() { $(this).remove(); });
+    }
+    catch (exception) {
+        // silence errors
+    }
+};
+
+VoteHijacker.updateFormAction = function(formType, prefix, id, action)
+{
+    var form = $('#' + prefix + formType + id).get(0);
+    form.action = form.action.replace(/(?:up|down|clear)vote/, action + "vote");
+};
+
+VoteHijacker.updateScore = function(prefix, id, score)
+{
+    var scoreElement = $('#' + prefix + "score" + id).get(0);
+    scoreElement.innerHTML = score.score;
+    scoreElement.title = "after " + score.num_votes + " vote" + VoteHijacker.pluralize(score.num_votes);
+};
+
+VoteHijacker.pluralize = function(value)
+{
+    if (value != 1)
+    {
+        return "s";
+    }
+    return "";
+};
+</script>
+
+<script type='text/javascript'>
+function yay_we_want_to_help() {
+   /* Create a tipsy-style message that reports success */
+   var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
+
+   /* Trigger tipsy destruction. */
+   $('#wannahelp-button').getTipsy().remove();
+
+   $('#want2help_form').remove();
+   $('#next_steps_for_helpers').addClass('expanded').removeClass('collapsed');
+}
+
+$('#show, #hide').click(function () { $('.next_steps_for_helpers').toggleClass('collapsed').toggleClass('expanded'); });
+$('#show').click(function () { $('#show_form').ajaxSubmit()});
+$('#hide').click(function () { $('#hide_form').ajaxSubmit()});
+$('#show_copypastebox').click(function() { $('#copypastebox').toggleDisplay(); return false; });
+
+Want2HelpJacker = function () { }
+Want2HelpJacker.prototype = {
+    'initialize': function () {
+        /* Hijack the 'I want to help' form so that it POST's asynchronously. */
+        var options = {
+            'url': "{% url "mysite.project.views.wanna_help_do" %}",
+            'type': 'POST',
+            'success': function (response) {
+                /* HACK! In the case that we need to log in, accept a message from the server
+                 * indicating as much.
+                 */
+                if (response.substring(0, 10) === "redirect: ") {
+                    var destination = response.substring(10);
+                    document.location = destination;
+                    return;
+                }
+
+                // otherwise, proceed as normal.
+
+                /* Replace the list of person summaries. */
+                $('#wanna_help').load(window.location + " #wanna_help")
+
+                // Call the "Yay, we want to help" function
+                yay_we_want_to_help();
+            },
+            'error': function () {
+                $.jGrowl("Oops! Something went wrong. Please try again.");
+            }
+        };
+        $('#want2help_form').ajaxForm(options);
+        $('#want2help_form').find('input:submit').click(function () {
+            $button = $(this);
+            $button.val('Working...')
+        });
+
+    }
+};
+{% if user_just_signed_up_as_wants_to_help %}
+$(yay_we_want_to_help);
+{% endif %}
+</script>
+
+{% endblock js %}
+
+{% comment %}
+vim: set ai et ts=4 sw=4 nu:
+{% endcomment %}

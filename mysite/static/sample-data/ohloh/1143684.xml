@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <result>
+    <analysis>
+      <id>1143684</id>
+      <project_id>15329</project_id>
+      <updated_at>2011-02-01T01:04:31Z</updated_at>
+      <logged_at>2011-02-01T01:00:42Z</logged_at>
+      <min_month>2005-04-01T00:00:00Z</min_month>
+      <max_month>2010-04-01T00:00:00Z</max_month>
+      <twelve_month_contributor_count>1</twelve_month_contributor_count>
+      <total_code_lines>75408</total_code_lines>
+      <main_language_id>2</main_language_id>
+      <main_language_name>PHP</main_language_name>
+    </analysis>
+  </result>
+</response>

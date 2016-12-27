@@ -1,0 +1,60 @@
+{% extends 'missions/svn/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the diffing step yet. You have to do the
+  <a href="{% url "svn_checkout" %}">checkout step first</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
+
+{% block mission_main_body %}
+<p>It's good of you to share with us the information you have gathered, but you still have to gain a little more of Mr. Bad's trust.</p>
+<p>Your headquarters knows that Mr. Bad isn't the best typist, so it is likely that the plans have a typographical error somewhere.  Mr. Bad is embarrassed by typos, so if you were to fix such an error, that would make him happy.  Maybe he will even be happy enough to grant you commit access.</p>
+
+<p>You can give Mr. Bad a patch containing your changes.  If he likes it, he'll commit it for you.</p>
+
+<p>Your mission is this:</p>
+<ul class="raquo_bullets">
+  <li>You can use your working copy from the previous mission.</li>
+  <li>The file <code>{{ file_for_svn_diff }}</code> contains a spelling error.  Fix it in your working copy.</li>
+  <li>Run <code>svn diff</code> and paste its output into the box below.</li>
+</ul>
+
+{% if svn_diff_done %}
+<div class="successmsg">
+  <p><strong>You have successfully completed this part of the mission.</strong></p>
+</div>
+<p class="next_mission_link">
+  <a href="{% url "svn_commit" %}">Committing your changes &raquo;</a></p>
+{% else %}
+<form method="post" action="{% url "mysite.missions.svn.views.diff_submit" %}#svndiff-form">{% csrf_token %}
+  <div class="form-row">
+    <a name="svndiff-form"></a>
+    {{ svn_diff_form.diff.errors }}
+    <br style="clear: left;" />
+    <code>svn diff</code> output: <br style="clear: left;" />
+    {{ svn_diff_form.diff }}
+    <br style="clear: left;" />
+    <input type="submit" value="Submit" style="float: none;" />
+  </div>
+</form>
+{% endif %}
+{% endblock %}

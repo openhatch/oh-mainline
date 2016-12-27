@@ -1,0 +1,140 @@
+{% extends 'profile/base_profile.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+{{ person.get_full_name_or_username }}
+{% endblock title %}
+
+{% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
+
+{% block main %}
+<div id='portfolio' class='module project-display viewer'>
+    <div class='module-head'>
+        <ul>
+            <li>
+                {% if editable %}
+                    <a class='add-edit-projects' href=
+                    '{% url "mysite.profile.views.portfolio_editor" %}'>Add/edit &raquo;
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
+        <h3>Projects</h3>
+    </div>
+        <div class='module-body'>
+        {% with person.get_published_portfolio_entries as portfolio_entries %} 
+            {% if portfolio_entries %}
+                <ul>
+                    {% for pf_entry in portfolio_entries %}
+                    {% include 'profile/portfolio/portfolio_entry_element.html' %}
+                    {% endfor %}
+                </ul>
+                {% if how_many_archived_pf_entries %}
+                    <a id='show_more_projects' href='#'>
+                        And {{ how_many_archived_pf_entries }} more&hellip;</a>
+                    <noscript>
+                        Enable JavaScript to see more stuff here.
+                    </noscript>
+                {% endif %}
+            {% else %}
+                {% if editable %}
+                {# YOUR profile lacks projects. #}
+                <ul class='nudgebuttons' style="float: left; padding-bottom: 10px;border-bottom: 2px dashed #ccc; margin-bottom: 10px;">
+
+                    <li>
+                    <a href='{% url "mysite.search.views.search_index" %}'>
+                        <div class='notification'>
+                            <div class='arrow' style=''>&raquo; <!--&#9654;--></div>
+                            <strong>
+                                Find a project to work on
+                            </strong>
+                            <span>
+                                Looking for something to put here? No problem! Get started by searching our database of bite-sized bugs...
+                            </span>
+                        </div>
+                    </a>
+                    </li>
+
+                    <li>
+                    <a href='{% url "mysite.profile.views.portfolio_editor" %}'>
+                        <div class='notification'>
+                            <div class='arrow' style=''>&raquo; <!--&#9654;--></div>
+                            <strong>
+                                Add your contributions
+                            </strong>
+                            <span>
+                                If you've contributed to open source already, say so on our project editor!
+                                We want you to share your bug reports, translations, patches, community management, and code commits.
+                            </span>
+                        </div>
+                    </a>
+                    </li>
+
+                    <li>
+                    <a href='{% url "mysite.customs.views.list_trackers" %}'>
+                        <div class='notification'>
+				<div class='arrow' style=''>&raquo; <!--&#9654;--></div>
+                            <strong>
+                                Add your project's bugs
+                            </strong>
+                            <span>
+                                If you are looking to list a project on Open Hatch for other contributors to find and submit patches to, add the project, add a bug tracker, and configure your project settings so others can find it.
+                            </span>
+                        </div>
+                    </a>
+                    </li>
+
+                </ul>
+
+                {# To find things to do in the open source community, use our volunteer opportunity finder.   #}
+                {# <a href='{% url "mysite.search.views.search_index" %}'>find a bug to work on</a>. <a href='{% url "mysite.search.views.search_index" %}'>find someone near you to work with</a>#}
+
+                {% endif %}
+                <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
+            {% endif %}
+        {% endwith %}
+
+    </div>
+    <div class="module-foot">
+        {% if editable and person.get_published_portfolio_entries %}
+        <ul>
+            <li>
+            <a href='{% url "mysite.search.views.search_index" %}'>
+                Find a project &raquo;
+            </a>
+            </li>
+            <li>
+            <a href='{% url "mysite.customs.views.list_trackers" %}'>
+                Add project's bugs &raquo;
+            </a>
+            </li>
+        </ul>
+        {% endif %}
+    </div>
+</div> <!-- /#portfolio -->
+{% endblock main %}
+
+{% block js %}
+    <script type='text/javascript'>
+        $(ShowMoreProjects.init);
+    </script>
+{% endblock js %}

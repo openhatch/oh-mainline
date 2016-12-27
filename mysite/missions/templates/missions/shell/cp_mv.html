@@ -1,0 +1,112 @@
+{% extends 'missions/shell/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% block mission_main %}
+<div class='submodule fat'>
+    <div class='head'>
+        <h3>Copying and moving</h3>
+    </div>
+    <div class="body">
+
+    <h3>cp: copy files and directories</h3>
+    <p>The <kbd class="kbd">cp</kbd> command will make a copy of a file for you. For example,</p>
+
+    <code class="code">$ cp songs.txt music.txt</code>
+
+    <p>will make an exact copy of <kbd class="kbd">songs.txt</kbd> and name it
+    <kbd class="kbd">music.txt</kbd> (the file <kbd class="kbd">songs.txt</kbd>
+    will still be there, too).</p>
+
+    <p>If you are copying a directory, you must use the option
+    <kbd class="kbd">-r (--recursive)</kbd>. For example,</p>
+
+    <code class="code">$ cp -r songs music</code>
+
+    <p>copies all the contents of the <kbd class="kbd">songs</kbd> directory to the
+    <kbd class="kbd">music</kbd> directory recursively. Remember when we
+    explained how the recursive option worked when removing directories? Here,
+    "recursively" means we copy the directory and all its files and subdirectories,
+    and all the subdirectories' files and subdirectories, and on and on ("recursively")
+    until everything that was inside the <kbd class="kbd">songs</kbd> directory has
+    been copied to the <kbd class="kbd">music</kbd> directory.</p>
+
+    <p>You can also use source and destination paths:</p>
+
+    <code class="code">$ cp <i>source-path</i> <i>destination-path</i></code>
+
+    <p>For example,</p>
+
+    <code class="code">$ cp songs.txt music/list/</code>
+
+    <p>will copy the file <kbd class="kbd">songs.txt</kbd> to a subdirectory
+    <kbd class="kbd">list</kbd> inside the <kbd class="kbd">music</kbd> directory
+    (which is in the current working directory).</p>
+
+    <h3>mv: move (rename) files</h3>
+    <p>The <kbd class="kbd">mv</kbd> command will rename a file or move a file to a
+    different location. Examples are as follows:</p>
+
+    <code class="code">$ mv songs.txt music.txt</code>
+
+    <p>will rename the file <kbd class="kbd">songs.txt</kbd> to <kbd class="kbd">music.txt</kbd>.</p>
+
+    <code class="code">$ mv songs.txt ~/Desktop</code>
+
+    <p>will move the file <kbd class="kbd">songs.txt</kbd> to your
+    <kbd class="kbd">Desktop</kbd> directory, but it will not rename it.
+    You must specify a new file name to rename a file. </p>
+
+    <h3>Challenge:</h3>
+    <p>What is the output of <kbd class="kbd">ls</kbd> command in the sequence given below?
+    <form method="post" action="{% url "mysite.missions.shell.views.command_cp_mv_submit" %}#copy-and-move-form">{% csrf_token %}
+        <div class="form-row">
+        <code class="snippet">
+            $ ls<br>
+            test.txt music<br>
+            $ mv test.txt songs.txt<br>
+            $ cp songs.txt music/<br>
+            $ ls
+        </code>
+        {% if command_cp_mv_success %}
+            <div class="successmsg">
+                <p><strong>You have successfully completed this part of the mission.</strong></p>
+            </div>
+        {% endif %}
+            <input type="radio" name="option" value="1">
+              <kbd class="kbd">music</kbd><br>
+            <input type="radio" name="option" value="2">
+              <kbd class="kbd">songs.txt</kbd><br>
+            <input type="radio" name="option" value="3">
+              <kbd class="kbd">test.txt music</kbd><br>
+            <input type="radio" name="option" value="4">
+              <kbd class="kbd">songs.txt music</kbd><br>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+
+    {% if command_cp_mv_error_message %}
+        <ul class="errorlist"><li>{{ command_cp_mv_error_message }}</li></ul>
+    {% endif %}
+    {% if command_cp_mv_done %}
+        <p class="next_mission_link">
+        <a href='{% url "mysite.missions.shell.views.more_info" %}'>
+        On to the next one &raquo;</a></p>
+    {% endif %}
+
+    </div>
+</div>
+{% endblock %}

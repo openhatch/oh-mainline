@@ -1,0 +1,136 @@
+{% extends 'base/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2010 John Stumpo
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+    Edit your info
+{% endblock %}
+{% block body_id %}edit_profile_info_form{% endblock %}
+{% block body_class %}{{ block.super }} nice_form{% endblock %}
+
+{% block content %}
+    <style type='text/css'>
+    </style>
+    <div id='edit_info' class='module'>
+        <div class='module-head'>
+            <h3>Edit your info</h3>
+        </div>
+        <div class='module-body contains-submodules two-columns'>
+                {% if has_errors %}
+                <!--has_errors-->
+                <ul id="error_msg" class="errorlist">
+                    <li>
+                        We've saved nearly all of your information, but there
+                        was an error.  Please see below.
+                    </li>
+                </ul>
+                {% endif %}
+
+
+                <form name='edit-tags'
+                        action='/people/info/edit/do'
+                        method='POST'>{% csrf_token %}
+
+                        <div class='form-row'>
+                        <h2>You, in a nutshell</h2>
+                    </div>
+
+                        <div class='form-row'>
+                            <h3>Bio:</h3>
+                            {{ form.bio }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>Web site:</h3>
+                            {{ form.homepage_url }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>IRC nick:</h3>
+                            {{ form.irc_nick }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h2>Tag yourself</h2>
+                            <p class='why'>After you save, these tags will appear on your profile. Click them to find similar people. {# In the near future, this information will help people find you in the <a href='/people/'>People Search</a>.#} </p>
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>I understand:</h3>
+                            {{ form.understands }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>I will never understand:</h3>
+                            {{ form.understands_not }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>I'm currently studying:</h3>
+                            {{ form.studying }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h2>Volunteering</h2>
+                            <p class='why'>These tags help us match you with interesting people and projects.</p>
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>When projects need help, I'm willing to pitch in with:</h3>
+                            {{ form.can_pitch_in }}
+                        </div>
+
+                        <div class='form-row'>
+                            <h3>I can mentor in:</h3>
+                            {{ form.can_mentor }}
+                        </div>
+                        <div class='form-row' id='contact_blurb'>
+                            <h3>How to contact me:</h3>
+                            {% if contact_blurb_error %}
+                            <!--contact_blurb_error-->
+                            <ul id="error_msg" class="errorlist">
+                                <li>
+                                To use our forwarding service, please <a href="{% url "mysite.account.views.edit_contact_info" %}">tell us your email address</a>!
+                                </li>
+                            </ul>
+                            {% endif %}
+                            <p class='example'>
+                                We preserve linebreaks and turn URLs into links.
+                                We provide a Craigslist-style email forwarding
+                                service.  To use it, include the string
+                                <tt>$fwd</tt> in the text area below.
+                                For example,
+                                &ldquo;<tt>Email me at $fwd</tt>&rdquo;
+                                will appear on your profile as "Email me at
+                                {{ forwarder_sample|urlizetrunc:'23' }}".
+                                Keep in mind: This information will be public and
+                                crawlable by search engines. Your email forwarding
+                                address will change every few days to thwart
+                                spammers.
+                            </p>
+                             {{ contact_blurb_form.contact_blurb }}
+                        </div>
+
+                        <input class='save-button' type='submit' style='clear: left; float: left;' value='Save' />
+                        <a style="float: left; font-size: 1.1em; margin: 1px 0 0 10px" href="{{ user.get_profile.profile_url }} ">Cancel</a>
+                    </form>
+                </div>
+        {% endblock %}

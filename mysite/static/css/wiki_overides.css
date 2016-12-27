@@ -1,0 +1,9 @@
+ body {	background: #ffffff url('http://openhatch.org/static/images/motif-eee.png') repeat !important; color: black !important; margin: 0 !important; padding: 0 !important; }
+a { color: #ff6d3d !important; }
+a.new { color: #BA0000 !important; }
+.pBody, #content, .ca-nstab-main { border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;  border-width: 4px !important; border-color: #e4e4e4 !important; }
+.selected { border-top-left-radius: 8px; border-top-right-radius: 8px; border-width: 4px !important; border-color: #e4e4e4 !important; }
+h1, h2, h3, h4, h5, h6 { border-bottom-color: #e4e4e4 !important; }
+#footer { border-width: 2px !important; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-left-style: solid !important; border-right-style: solid !important; border-left-color: #e4e4e4 !important; border-right-color: #e4e4e4 !important; border-bottom-color: #e4e4e4 !important; border-top-color: #e4e4e4 !important; width: 80% !important; margin-left: 15% !important; }
+#footer div img { padding-top: 8px !important; }
+#p-personal { margin-top: 5px !important; }

@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en" dir="ltr">
+  <head>
+<base href="https://launchpad.net/%7Emozilla/+index" />
+
+    <title>Mozilla does not use Launchpad</title>
+    <link rel="shortcut icon" href="/@@/launchpad.png" />
+
+    
+      <link rel="alternate" type="application/atom+xml"
+            href="http://feeds.launchpad.net/~mozilla/latest-bugs.atom"
+            title="Latest Bugs for Mozilla" />
+      <link rel="alternate" type="application/atom+xml"
+            href="http://feeds.launchpad.net/~mozilla/branches.atom"
+            title="Latest Branches for Mozilla" />
+      <link rel="alternate" type="application/atom+xml"
+            href="http://feeds.launchpad.net/~mozilla/revisions.atom"
+            title="Latest Revisions by Mozilla" />
+    
+
+    
+  
+  <link type="text/css" rel="stylesheet"
+        media="screen, print"
+        href="/+icing/rev12161/combo.css" />
+
+
+    
+
+    
+    <style type="text/css">
+      fieldset.collapsed div, fieldset div.collapsed {display: none;}
+    </style>
+    <noscript>
+      <style type="text/css">
+        fieldset.collapsible div, fieldset div.collapsed {display: block;}
+      </style>
+    </noscript>
+
+    
+  
+
+  
+
+  
+  
+  <script type="text/javascript"
+          src="/+icing/rev12161/MochiKit.js"></script>
+
+  <script type="text/javascript"
+          src="/+icing/rev12161/build/launchpad.js"></script>
+
+  <script type="text/javascript">var cookie_scope = '; Path=/; Secure; Domain=.launchpad.net';</script>
+  <script type="text/javascript">
+    // Define a global YUI sandbox that should be used by everyone.
+    var LPS = YUI({
+      // Don't try to fetch the loader module.
+      bootstrap: false,
+      // Don't try to fetch CSS files.
+      fetchCSS: false,
+      // Turn off combo loading.
+      combine: false,
+      // For paranoia, set a low timeout to not wait on loading a resource.
+      timeout: 50
+      });
+  </script>
+
+
+  <script id="base-layout-load-scripts" type="text/javascript">
+    LPS.use('node', 'lp', function(Y) {
+        Y.on('load', function(e) {
+            sortables_init();
+            initInlineHelp();
+            Y.lp.activate_collapsibles();
+            activateFoldables();
+            activateConstrainBugExpiration();
+        }, window);
+
+        // Hook up the function that dismisses the help window if we click
+        // anywhere outside of it.
+        Y.on('click', handleClickOnPage, window);
+    });
+
+    LPS.use('lp.app.links',
+      function(Y) {
+        Y.on('load', function(e) {
+            Y.lp.app.links.check_valid_lp_links();
+        }, window);
+    });
+  </script>
+
+    
+    
+    <meta name="robots" content="noindex,nofollow" />
+    
+  
+  </head>
+
+  <body id="document"
+        class="tab-overview
+      main_side
+      public
+      yui3-skin-sam">
+        <script type="text/javascript">
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-12833497-1']);
+          _gaq.push(['_setDomainName', '.launchpad.net']);
+          _gaq.push(['_setAllowHash', false]);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+          })();
+        </script>
+    <div class="yui-d0">
+      <div id="locationbar" class="login-logout">
+        
+
+<div id="logincontrol"><a href="https://launchpad.net/~mozilla/+login">Log in / Register</a></div>
+
+
+
+      </div><!--id="locationbar"-->
+
+      <div id="watermark" class="watermark-apps-portlet">
+        <div class="flowed-block">
+          <img alt="" width="64" height="64" src="/@@/person-inactive-logo" />
+        </div>
+        <div class="flowed-block wide">
+          <h2>Mozilla</h2>
+          
+  <!-- Application Menu -->
+  <ul class="facetmenu">
+    
+      <li class="overview active"
+          title="General information about Mozilla"><span>Overview</span></li>
+      
+      
+    
+    
+      
+      <li class="branches"
+          title="Bazaar Branches and revisions registered and authored by Mozilla"><a
+    href="https://code.launchpad.net/~mozilla">Code</a></li>
+      
+    
+    
+      
+      <li class="bugs"
+          title="Bug reports that Mozilla is involved with"><a
+    href="https://bugs.launchpad.net/~mozilla">Bugs</a></li>
+      
+    
+    
+      
+      <li class="specifications"
+          title="Feature specifications that Mozilla is involved with"><a
+    href="https://blueprints.launchpad.net/~mozilla">Blueprints</a></li>
+      
+    
+    
+      
+      <li class="translations"
+          title="Software that Mozilla is involved in translating"><a
+    href="https://translations.launchpad.net/~mozilla">Translations</a></li>
+      
+    
+    
+      
+      <li class="answers"
+          title="Questions that Mozilla is involved with"><a
+    href="https://answers.launchpad.net/~mozilla">Answers</a></li>
+      
+    
+  </ul>
+
+        </div>
+      </div>
+
+      <div class="yui-t4">
+        <div id="maincontent" class="yui-main">
+          <div class="yui-b" dir="ltr">
+            <div class="context-publication">
+              
+              
+
+              <div id="registration" class="registering">
+                
+              </div>
+            </div>
+
+            
+            
+              <div>
+  
+
+  <div id="not-lp-user-or-team">
+
+    
+      <p>Mozilla does not use Launchpad.
+        
+          This page was created
+          <span title="2009-11-16 10:09:53 UTC">on 2009-11-16</span>
+          
+          
+            <strong>when importing comments for Mozilla Bugzilla #499498.</strong>.
+          
+        
+        
+      </p>
+
+      
+        
+
+        <p>
+          <a href="/people/+requestmerge?field.dupe_person=mozilla">Are you Mozilla?</a>
+        </p>
+      
+
+      
+    
+
+    
+  </div>
+
+</div>
+          </div><!-- yui-b -->
+        </div><!-- yui-main -->
+
+        <div id="side-portlets" class="yui-b side">
+          <div>
+  
+
+  
+  
+
+
+  
+</div>
+        </div><!-- yui-b side -->
+      </div><!-- yui-t4 -->
+
+      
+  <div id="footer" class="footer">
+    <div class="lp-arcana">
+        <div class="lp-branding">
+          <a href="https://launchpad.net/"><img src="/@@/launchpad-logo-and-name-hierarchy.png" alt="Launchpad" /></a>
+          &nbsp;&bull;&nbsp;
+          <a href="https://launchpad.net/+tour">Take the tour</a>
+          &nbsp;&bull;&nbsp;
+          <a href="https://help.launchpad.net/">Read the guide</a>
+          &nbsp;
+          <form id="globalsearch" method="get"
+                accept-charset="UTF-8"
+                action="https://launchpad.net/+search">
+            <input type="search" id="search-text" name="field.text" />
+            <input type="submit" value="" class="icon-only sprite search-icon" />
+          </form>
+        </div>
+        
+  
+
+    </div>
+
+    <div class="colophon">
+      &copy; 2004-2010
+      <a href="http://canonical.com/">Canonical&nbsp;Ltd.</a>
+      &nbsp;&bull;&nbsp;
+      <a href="https://launchpad.net/legal">Terms of use</a>
+      &nbsp;&bull;&nbsp;
+      <a href="/feedback">Contact Launchpad Support</a>
+      
+      &nbsp;&bull;&nbsp;
+      <a href="http://identi.ca/launchpadstatus">System status</a>
+      <span id="lp-version">
+      &nbsp;&bull;&nbsp;
+        r12161
+        
+        
+        (<a href="https://code.launchpad.net/~launchpad-pqm/launchpad/stable/">get the code</a>)
+      </span>
+    </div>
+  </div>
+
+    </div><!-- yui-d0-->
+
+    <div id="help-pane" class="invisible">
+      <div id="help-body">
+        
+        <iframe id="help-pane-content" class="invisible" src="javascript:void(0);"></iframe>
+      </div>
+      <div id="help-footer">
+        <span id="help-close"></span>
+      </div>
+    </div>
+
+    
+  
+
+  <script>LP.client.cache['context'] =
+                 {"languages_collection_link": "https://launchpad.net/api/devel/~mozilla/languages", "members_collection_link": "https://launchpad.net/api/devel/~mozilla/members", "sub_teams_collection_link": "https://launchpad.net/api/devel/~mozilla/sub_teams", "open_membership_invitations_collection_link": "https://launchpad.net/api/devel/~mozilla/open_membership_invitations", "ppas_collection_link": "https://launchpad.net/api/devel/~mozilla/ppas", "private": false, "proposed_members_collection_link": "https://launchpad.net/api/devel/~mozilla/proposed_members", "memberships_details_collection_link": "https://launchpad.net/api/devel/~mozilla/memberships_details", "all_specifications_collection_link": "https://launchpad.net/api/devel/~mozilla/all_specifications", "is_probationary": true, "mugshot_link": "https://launchpad.net/api/devel/~mozilla/mugshot", "invited_members_collection_link": "https://launchpad.net/api/devel/~mozilla/invited_members", "gpg_keys_collection_link": "https://launchpad.net/api/devel/~mozilla/gpg_keys", "archive_link": null, "deactivated_members_collection_link": "https://launchpad.net/api/devel/~mozilla/deactivated_members", "irc_nicknames_collection_link": "https://launchpad.net/api/devel/~mozilla/irc_nicknames", "http_etag": "\"47b761a216788ba58ba718e1dd060b3497378894-86354f2ad1e3168976f90a8c4ae9a546e4f699dd\"", "is_valid": false, "self_link": "https://launchpad.net/api/devel/~mozilla", "confirmed_email_addresses_collection_link": "https://launchpad.net/api/devel/~mozilla/confirmed_email_addresses", "mailing_list_auto_subscribe_policy": "Ask me when I join a team", "team_owner_link": null, "members_details_collection_link": "https://launchpad.net/api/devel/~mozilla/members_details", "hide_email_addresses": true, "admins_collection_link": "https://launchpad.net/api/devel/~mozilla/admins", "valid_specifications_collection_link": "https://launchpad.net/api/devel/~mozilla/valid_specifications", "visibility": "Public", "latitude": null, "date_created": "2009-11-16T10:09:53.880520+00:00", "preferred_email_address_link": null, "is_ubuntu_coc_signer": false, "display_name": "Mozilla", "expired_members_collection_link": "https://launchpad.net/api/devel/~mozilla/expired_members", "sshkeys_collection_link": "https://launchpad.net/api/devel/~mozilla/sshkeys", "name": "mozilla", "resource_type_link": "https://launchpad.net/api/devel/#person", "super_teams_collection_link": "https://launchpad.net/api/devel/~mozilla/super_teams", "participants_collection_link": "https://launchpad.net/api/devel/~mozilla/participants", "time_zone": null, "longitude": null, "hardware_submissions_collection_link": "https://launchpad.net/api/devel/~mozilla/hardware_submissions", "logo_link": "https://launchpad.net/api/devel/~mozilla/logo", "is_team": false, "karma": 0, "wiki_names_collection_link": "https://launchpad.net/api/devel/~mozilla/wiki_names", "homepage_content": null, "jabber_ids_collection_link": "https://launchpad.net/api/devel/~mozilla/jabber_ids"};</script>
+
+  </body>
+</html>
+
+
+  <!--
+    Facet name: overview
+    Page type: main_side
+    Has global search: True
+    Has application tabs: True
+    Has side portlets: True
+
+    At least 14 queries/external actions issued in 0.51 seconds
+
+    Features: {'hard_timeout': u'15000'} 
+    in scopes {'pageid:BugTask:+create-question': False, 'pageid:Archive:+packages': False, 'default': True, 'pageid:Distribution:+bugs': False, 'pageid:Archive:EntryResource:getBuildSummariesForSourceIds': False, 'pageid:MailingListApplication:MailingListAPIView': False, 'pageid:POFile:+translate': False, 'pageid:Person:+commentedbugs': False, 'pageid:Archive:+index': False, 'pageid:BugTask:+index': False, 'pageid:CodeImportSchedulerApplication:CodeImportSchedulerAPI': False, 'pageid:Person:+bugs': False, 'pageid:Milestone:+index': False} 
+
+    r12161
+  -->
+
+

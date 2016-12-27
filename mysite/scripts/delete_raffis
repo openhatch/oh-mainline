@@ -1,0 +1,3 @@
+raffis = Person.objects.filter(user__email__contains='raphael.kl')
+[r.user.delete() for r in raffis]
+raffis.delete()

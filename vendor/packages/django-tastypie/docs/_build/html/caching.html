@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Caching &mdash; Tastypie v0.9.13-beta documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.13-beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tastypie v0.9.13-beta documentation" href="index.html" />
+    <link rel="next" title="Validation" href="validation.html" />
+    <link rel="prev" title="Resource Fields" href="fields.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="validation.html" title="Validation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fields.html" title="Resource Fields"
+             accesskey="P">previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="caching">
+<span id="ref-caching"></span><h1>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h1>
+<p>When adding an API to your site, it&#8217;s important to understand that most
+consumers of the API will not be people, but instead machines. This means that
+the traditional &#8220;fetch-read-click&#8221; cycle is no longer measured in minutes but
+in seconds or milliseconds.</p>
+<p>As such, caching is a very important part of the deployment of your API.
+Tastypie ships with two classes to make working with caching easier. These
+caches store at the object level, reducing access time on the database.</p>
+<p>However, it&#8217;s worth noting that these do <em>NOT</em> cache serialized representations.
+For heavy traffic, we&#8217;d encourage the use of a caching proxy, especially
+<a class="reference external" href="http://www.varnish-cache.org/">Varnish</a>, as it shines under this kind of usage. It&#8217;s far faster than Django
+views and already neatly handles most situations.</p>
+<p>The first section below demonstrates how to cache at the Django level, reducing
+the amount of work required to satisfy a request. In many cases your API serves
+web browsers or is behind by a caching proxy such as <a class="reference external" href="http://www.varnish-cache.org/">Varnish</a> and it is possible
+to set HTTP Cache-Control headers to avoid issuing a request to your application
+at all. This is discussed in the <a class="reference internal" href="#http-cache-control"><em>HTTP Cache-Control</em></a> section below.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Using these classes is simple. Simply provide them (or your own class) as a
+<tt class="docutils literal"><span class="pre">Meta</span></tt> option to the <tt class="docutils literal"><span class="pre">Resource</span></tt> in question. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">tastypie.cache</span> <span class="kn">import</span> <span class="n">SimpleCache</span>
+<span class="kn">from</span> <span class="nn">tastypie.resources</span> <span class="kn">import</span> <span class="n">ModelResource</span>
+
+
+<span class="k">class</span> <span class="nc">UserResource</span><span class="p">(</span><span class="n">ModelResource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="s">&#39;auth/user&#39;</span>
+        <span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;is_superuser&#39;</span><span class="p">]</span>
+        <span class="c"># Add it here.</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">SimpleCache</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="caching-options">
+<h2>Caching Options<a class="headerlink" href="#caching-options" title="Permalink to this headline">¶</a></h2>
+<p>Tastypie ships with the following <tt class="docutils literal"><span class="pre">Cache</span></tt> classes:</p>
+<div class="section" id="nocache">
+<h3><tt class="docutils literal"><span class="pre">NoCache</span></tt><a class="headerlink" href="#nocache" title="Permalink to this headline">¶</a></h3>
+<p>The no-op cache option, this does no caching but serves as an api-compatible
+plug. Very useful for development.</p>
+</div>
+<div class="section" id="simplecache">
+<h3><tt class="docutils literal"><span class="pre">SimpleCache</span></tt><a class="headerlink" href="#simplecache" title="Permalink to this headline">¶</a></h3>
+<p>This option does basic object caching, attempting to find the object in the
+cache &amp; writing the object to the cache. It uses Django&#8217;s current
+<tt class="docutils literal"><span class="pre">CACHE_BACKEND</span></tt> to store cached data. The constructor receive a <cite>timeout</cite>
+parameter to control per-resource the default timeout for the cache.</p>
+</div>
+</div>
+<div class="section" id="implementing-your-own-cache">
+<h2>Implementing Your Own Cache<a class="headerlink" href="#implementing-your-own-cache" title="Permalink to this headline">¶</a></h2>
+<p>Implementing your own <tt class="docutils literal"><span class="pre">Cache</span></tt> class is as simple as subclassing <tt class="docutils literal"><span class="pre">NoCache</span></tt>
+and overriding the <tt class="docutils literal"><span class="pre">get</span></tt> &amp; <tt class="docutils literal"><span class="pre">set</span></tt> methods. For example, a json-backed
+cache might look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">tastypie.cache</span> <span class="kn">import</span> <span class="n">NoCache</span>
+
+
+<span class="k">class</span> <span class="nc">JSONCache</span><span class="p">(</span><span class="n">NoCache</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">TASTYPIE_JSON_CACHE</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">data_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">TASTYPIE_JSON_CACHE</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that this is <em>NOT</em> necessarily an optimal solution, but is simply
+demonstrating how one might go about implementing your own <tt class="docutils literal"><span class="pre">Cache</span></tt>.</p>
+</div>
+<div class="section" id="http-cache-control">
+<span id="id1"></span><h2>HTTP Cache-Control<a class="headerlink" href="#http-cache-control" title="Permalink to this headline">¶</a></h2>
+<p>The HTTP protocol defines a <tt class="docutils literal"><span class="pre">Cache-Control</span></tt> header, which can be used to tell
+clients and intermediaries who is allowed to cache a response and for how long.
+Mark Nottingham has a <a class="reference external" href="http://www.mnot.net/cache_docs/">general caching introduction</a> and the <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/cache/#controlling-cache-using-other-headers">Django cache
+documentation</a> describes how to set caching-related headers in your code. The
+range of possible options is beyond the scope of this documentation, but it&#8217;s
+important to know that, by default, Tastypie will prevent responses from being
+cached to ensure that clients always receive current information.</p>
+<p>To override the default <tt class="docutils literal"><span class="pre">no-cache</span></tt> response, your <tt class="docutils literal"><span class="pre">Resource</span></tt> should ensure
+that your <tt class="docutils literal"><span class="pre">cache</span></tt> class implements <tt class="docutils literal"><span class="pre">cache_control</span></tt>. The default
+<tt class="docutils literal"><span class="pre">SimpleCache</span></tt> does this by default. It uses the timeout passed to the
+initialization as the <tt class="docutils literal"><span class="pre">max-age</span></tt> and <tt class="docutils literal"><span class="pre">s-maxage</span></tt>. By default, it does not
+claim to know if the results should be public or privately cached but this can
+be changed by passing either a <tt class="docutils literal"><span class="pre">public=True</span></tt> or a <tt class="docutils literal"><span class="pre">private=True</span></tt> to the
+initialization of the <tt class="docutils literal"><span class="pre">SimpleClass</span></tt>.</p>
+<p>Behind the scenes, the return value from the <tt class="docutils literal"><span class="pre">cache_control</span></tt> method is passed
+to the <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/cache/?from=olddocs#controlling-cache-using-other-headers">cache_control</a> helper provided by Django. If you wish to add your own
+methods to it, you can do so by overloading the <tt class="docutils literal"><span class="pre">cache_control</span></tt> method and
+modifying the dictionary it returns.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tastypie.cache</span> <span class="kn">import</span> <span class="n">SimpleCache</span>
+
+<span class="k">class</span> <span class="nc">NoTransformCache</span><span class="p">(</span><span class="n">SimpleCache</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">cache_control</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">control</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">NoTransformCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cache_control</span><span class="p">()</span>
+        <span class="n">control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&quot;no_transform&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">control</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="http-vary">
+<h2>HTTP Vary<a class="headerlink" href="#http-vary" title="Permalink to this headline">¶</a></h2>
+<p>The HTTP protocol defines a <tt class="docutils literal"><span class="pre">Vary</span></tt> header, which can be used to tell clients
+and intermediaries on what headers your response varies. This allows clients to
+store a correct response for each type. By default, Tastypie will send the
+<tt class="docutils literal"><span class="pre">Vary:</span> <span class="pre">Accept</span></tt> header so that a seperate response is cached for each
+<tt class="docutils literal"><span class="pre">Content-Type</span></tt>. However, if you wish to change this, simply pass a list to
+the <tt class="docutils literal"><span class="pre">varies</span></tt> kwarg of any <tt class="docutils literal"><span class="pre">Cache</span></tt> class.</p>
+<p>It is important to note that if a list is passed, Tastypie not automatically
+include the <tt class="docutils literal"><span class="pre">Vary:</span> <span class="pre">Accept</span></tt> and you should include it as a member of your
+list.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ExampleResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">SimpleCache</span><span class="p">(</span><span class="n">varies</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;Accept&quot;</span><span class="p">,</span> <span class="s">&quot;Cookie&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="toc.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Caching</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#caching-options">Caching Options</a><ul>
+<li><a class="reference internal" href="#nocache"><tt class="docutils literal"><span class="pre">NoCache</span></tt></a></li>
+<li><a class="reference internal" href="#simplecache"><tt class="docutils literal"><span class="pre">SimpleCache</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementing-your-own-cache">Implementing Your Own Cache</a></li>
+<li><a class="reference internal" href="#http-cache-control">HTTP Cache-Control</a></li>
+<li><a class="reference internal" href="#http-vary">HTTP Vary</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fields.html"
+                        title="previous chapter">Resource Fields</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="validation.html"
+                        title="next chapter">Validation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/caching.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="validation.html" title="Validation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fields.html" title="Resource Fields"
+             >previous</a> |</li>
+        <li><a href="toc.html">Tastypie v0.9.13-beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2013, Daniel Lindsley, Cody Soyland, Matt Croydon, Josh Bohde &amp; Issac Kelly.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

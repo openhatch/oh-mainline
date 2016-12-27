@@ -1,0 +1,280 @@
+/*  This is CSS especially for the OpenHatch blog.
+
+    This theme is based on Kubrick, a theme designed and built by Michael Heilemann,
+    whose blog you will find at http://binarybonsai.com/
+
+    The CSS, XHTML and design is released under GPL:
+    http://www.opensource.org/licenses/gpl-license.php
+
+    In the beautiful future, we will convert this to "less".
+
+*/
+
+body.wordpress .two-column-right .module { width: 100%;}
+
+body.wordpress #footer {
+    clear: both;
+}
+
+body.wordpress p {
+    margin: 0.8em 0;
+    line-height: 150%;
+}
+
+body.wordpress #main li {
+    line-height: 140%;
+}
+
+body.wordpress .submodule {
+    background-color: #f4f4f4;
+}
+
+body.wordpress #left .module > .module-body {
+ /* Overrides two_columns.css. */
+     padding: 10px;
+}
+
+body.wordpress .module > .module-body ul {
+    padding-left: 15px;
+}
+
+body.wordpress .module > .module-body li {
+    list-style-type: circle;
+    margin: 0.8em 0;
+}
+
+body.wordpress #sidebar-list {
+    padding-left: 0px;
+}
+
+body.wordpress #sidebar > .module-body li {
+    list-style-type: none;
+}
+body.wordpress #sidebar > .module-body li li {
+    list-style-type: circle;
+    width: 260px;
+}
+
+body.wordpress .widget_tag_cloud {
+    width: 260px;
+}
+
+body.wordpress #outermost {
+    background: url('images/background.png') top left no-repeat;
+}
+
+body.wordpress h1, body.wordpress h2, body.wordpress h3, body.wordpress h4 {
+    margin: 0;
+}
+body.wordpress h1 { font-size: 21pt; }
+
+body.wordpress #nav h2 {
+    width: 200px;
+}
+
+body.wordpress #page-top {
+    width: 1000px;
+}
+
+body.wordpress ul#account-links {
+    margin-left: 20px;
+}
+
+/*need equiv*/
+
+body.wordpress .navigation {
+    margin-bottom: 0;
+    width: 714px;
+}
+
+body.wordpress .alignleft {
+    padding: 10px 20px;
+    float: left;
+}
+
+body.wordpress .alignright {
+    padding: 10px 20px;
+    float: right;
+}
+
+/*end need equiv*/
+
+/* unique */
+
+body.wordpress #comments {
+    border-top: 1px solid #ddd;
+    float: left;
+    width: 600px;
+    background: #f0f0f0;
+    margin-top: -10px;
+    padding: 10px 20px;
+}
+body.wordpress #respond h3, body.wordpress #comments h3 {
+    margin-top: 10px;
+    float: left;
+    width: 683px;
+}
+body.wordpress #commentform {
+    float: left;
+}
+
+body.wordpress #respond {
+}
+
+body.wordpress input[type='text'], body.wordpress textarea {
+    margin: 5px 10px 5px 0;
+    width: 560px;
+    font-family: sans-serif;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+}
+
+body.wordpress input[type='text'] {
+    height: 20px;
+    width: 400px;
+}
+
+body.wordpress input[type='submit'] {
+    clear: both;
+    float: right;
+    margin: 10px 10px 20px 0;
+    border: 0;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: hand;
+    cursor: pointer;
+}
+
+body.wordpress label {
+   float: left;
+   padding: 13px 0;
+   font-size: 16px;
+   width: 240px;
+   text-align: right;
+}
+
+/* end unique */
+
+body.wordpress #more-content {
+    width: 1000px;
+    height: 60px;
+    padding: 5px;
+    margin: 0;
+    clear: both;
+}
+
+body.wordpress #more-content p {
+    padding: 20px 28px 10px 0;
+}
+
+/* unique */
+
+body.wordpress #sidebar ul li ul {
+    padding: 5px 0 0 15px;
+}
+
+body.wordpress #sidebar ul li ul li {
+    list-style: circle;
+}
+
+body.wordpress #sidebar h2 {
+    margin-bottom: 0px;
+    font-size: 12pt;
+    font-weight: normal;
+    color: #555;
+    letter-spacing: 0;
+}
+
+body.wordpress #searchform {
+}
+
+body.wordpress #searchform label {
+    font-size: 10px;
+    text-align: left;
+    visibility: hidden;
+}
+
+body.wordpress #searchform label {
+    width: 20px;
+}
+
+body.wordpress #searchform #s, #searchform #searchsubmit {
+    text-align: left;
+    float: left;
+    padding-bottom: 0;
+}
+
+body.wordpress #searchform #searchsubmit { padding: 4px 6px; margin: 0;}
+
+body.wordpress #searchform #s {
+    width: 245px;
+    margin-left: -20px;
+}
+
+/* end unique */
+
+body.wordpress h3 {
+    margin: 0;
+    font-weight: bold;
+}
+
+body.wordpress .module > .head ul li {
+    float: right;
+    padding: 17px 20px;
+    line-height: 13pt;
+    font-weight: bold;
+    margin-right: 0 3px 0 0;
+}
+
+body.wordpress .module > .head ul li a:hover {
+    color: orange;
+    text-decoration: underline;
+}
+body.wordpress .tags {
+    width: 200px;
+}
+
+/* unique */
+
+body.wordpress .comment {
+    padding: 5px 0;
+}
+body.wordpress .commentlist {
+    width: 500px;
+}
+body.wordpress .commentlist li {
+    margin-top: 10px;
+    float: left;
+    width: 90%;
+}
+
+body.wordpress blockquote {
+    background-color: #eee;
+    padding: 10px 20px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+}
+/* end unique */
+
+/* How can I use OpenHatch to help me contribute to free software? page */
+body.wordpress #post-409 h2 {
+    cursor: pointer;
+}
+
+/* add to any */
+body.wordpress input.a2a_menu_find {
+    float: none;
+    margin: auto;
+}
+
+body.wordpress #footer {
+    background-image: url(/static/images/dark-hatch.png);
+}
+
+/* attempt to make captions work */
+body.wordpress .wp-caption-text {
+	font-size:9px;
+}

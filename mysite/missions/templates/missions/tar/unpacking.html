@@ -1,0 +1,66 @@
+{% extends 'missions/tar/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load base_extras %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class="submodule-body body">
+    {% if unpack_done %}
+      <div id="success-msg" class="successmsg">
+        <p><strong>You have successfully completed this part of the mission.</strong></p>
+        <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
+        <p class="next_mission_link">
+           <a href="{% url "mysite.missions.tar.views.creating" %}">On to creating a tarball &raquo;</a>
+        </p>
+        {% block js %}
+        {{ block.super }}
+        <script type='text/javascript' src="{% version '/static/js/missions/base.js' %}"></script>
+        <script type='text/javascript'>
+        if (typeof OH === 'undefined') OH = {};
+        if (typeof OH.Page === 'undefined') OH.Page = {};
+        OH.Page['post_url'] = '{% url "mysite.missions.tar.views.reset" %}';
+        OH.Page['mission_parts'] = 'tar_extract';
+        </script>
+        {% endblock %}
+      </div>
+      {% endif %}
+      <div class="mission-step">
+        <oppia oppia-id="12" exploration-version="4" src="//missions-beta.openhatch.org">
+      </div>
+      <script type="text/javascript">
+        window.OPPIA_PLAYER.onStateTransitionPostHook = function(
+            iframeNode, oldStateName, jsonAnswer, newStateName) {
+          if (newStateName == 'success') {
+            $('#link-unpacking').removeClass('cross-progress').addClass('tick-progress');
+            $.post(
+                   "{% url "mysite.missions.tar.views.extract_mission_success" %}",
+                   {'csrfmiddlewaretoken': $.cookie('csrftoken'),
+                    unpack_success: true},
+                   function (response) {
+                     console.log(response);
+                   });
+          }
+        }
+        window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
+          window.location = "{% url "mysite.missions.tar.views.creating" %}";
+        }
+      </script>
+  </div>
+</div>
+{% endblock mission_main %}

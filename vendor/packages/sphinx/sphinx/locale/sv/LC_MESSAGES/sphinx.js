@@ -1,0 +1,1 @@
+Documentation.addTranslations({"locale": "sv", "plural_expr": "(n != 1)", "messages": {"Hide Search Matches": "D\u00f6lj S\u00f6kresultat", "Permalink to this definition": "Permalink till denna definition", "Permalink to this headline": "Permalink till denna rubrik"}});

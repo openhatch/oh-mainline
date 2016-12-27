@@ -1,0 +1,100 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2010 Jessica McKellar
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}Change your photo{% endblock %}
+
+{% block body_class%}{{ block.super }} auth{% endblock %}
+
+{% block main %}
+<!--Include script for Ajax image upload-->
+    <script type="text/javascript" src="/static/js/account/edit_photo.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            set_callback_for_image_upload("{{ csrf_token }}"); 
+        });
+
+    </script>
+    <div class='module'>
+        <div class='module-head'>
+            <ul>
+                <li>
+                    <a href='{% url "mysite.profile.views.display_person_web" user.username %}'>&laquo; Back to portfolio</a>
+                </li>
+            </ul>
+            <h3>Profile photo settings</h3>
+        </div>
+        <div class='module-body contains-submodules two-columns'>
+            <div class='submodule'>
+                <div class='submodule-head'>
+                    <h3>Current profile photo</h3>
+                </div>
+                <div class='submodule-body'>
+                    <img id="profileimage" src="{{ photo_url }}" />
+                </div>
+            </div>
+            <div class="submodule photo-wide">
+            <div class="notification" id="notification">
+                <div id="notification_message"></div>
+                <div class="clearbutton">
+                    <a id="clear_message" href="?">(clear this message)</a>
+                </div>
+            </div>
+
+            <form method='POST'
+                    name='edit_photo'
+                    id='edit_photo' 
+                    action='/account/edit/photo/do'
+                    enctype="multipart/form-data">{% csrf_token %}
+                <div class='head'>
+                    <h3>Change your profile photo</h3>
+                </div>
+                <div class='body'>
+		    {% if non_validation_error %}
+
+		    <ul class="errorlist">
+		      <li>
+			Oops! Something went wrong while preparing this
+			photo. Please <a href="../../../contact/">contact
+			us</a>, and we'll do our best to figure out why.
+		      </li>
+		    </ul>
+		    {% endif %}
+                    {% for field in edit_photo_form %}
+                        <div class='form-row'>
+                            {{ field.errors }}
+                            <label>Choose a photo</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                <p>You can give us a JPEG, PNG, or other reasonable image file of 4MB or smaller.</p>
+                </div>
+                <div class='foot'>
+                    <input type="submit" value="Upload">
+                </div>
+            </form>
+            <div id="progressBar" class="default" style="display:none;"><div></div></div>
+            </div>
+    </div>
+    <div class="module-foot">
+    </div>
+</div>
+{% endblock main %}

@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>CSS 3 Test - OpenHatch</title>
+    </head>
+    <body>
+        <style type='text/css'>
+            @import url('/static/css/base/base.css');
+            @import url('/static/css/base/one_column.css');
+            @font-face {
+                font-family: Tuffy;
+                src: url('/static/fonts/tuffy_regular.ttf');
+            }
+            #main {
+                width: 960px;
+                float: left;
+                margin: 50px;
+            }
+        </style>
+        <div id='main'>
+            <div class='module'>
+                <div class='head'><h3>CSS3 Test</h3></div>
+                <div class='body'>
+                    This text should appear in the font <strong>Tuffy</strong>
+                    if you're viewing this in a browser that supports CSS3.
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

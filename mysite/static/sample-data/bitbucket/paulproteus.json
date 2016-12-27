@@ -1,0 +1,31 @@
+{
+    "repositories": [
+        {
+            "website": "", 
+            "slug": "bayberry-data", 
+            "name": "bayberry-data", 
+            "followers_count": 1, 
+            "description": "Training data for an anti wiki spam corpus.\r\n"
+        }, 
+        {
+            "website": null, 
+            "slug": "fix-crash-in-kwallet-handling-code", 
+            "name": "Fix crash in kwallet handling code", 
+            "followers_count": 0, 
+            "description": ""
+        }, 
+        {
+            "website": null, 
+            "slug": "python-keyring-lib", 
+            "name": "Python Keyring Lib", 
+            "followers_count": 0, 
+            "description": "Fix a KWallet crash."
+        }
+    ], 
+    "user": {
+        "username": "paulproteus", 
+        "first_name": "", 
+        "last_name": "", 
+        "resource_uri": "/1.0/users/paulproteus/"
+    }
+}

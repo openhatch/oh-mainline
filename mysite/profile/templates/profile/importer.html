@@ -1,0 +1,140 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+Manage projects
+{% endblock title %}
+
+{% block body_id %}profile{% endblock %}
+{% block body_class %}{{ block.super }} enable_jquery_ui{% endblock %}
+
+{% block main %}
+{% with 1 as edit_mode %}
+<div id='portfolio' class='module editor'>
+    <div class='module-head'>
+        <h3>Manage projects</h3>
+        <ul>
+            <li>
+            <a id='back_to_profile' href='{% url "mysite.profile.views.display_person_web" person.user.username %}'>
+                &laquo; Back to profile
+            </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class='module-body contains-submodules'>
+        <div class='apologies'>
+            <p>Hi! Here you can document your involvement with free/open source projects.
+                Be proud of everything! Add your bug reports, translations,
+                patches, and code commits.
+            </p>
+            
+            <p style='font-size: 11pt;'>(To find things to do in the free/open source
+            community, check out the
+            <a href='{% url "mysite.search.views.search_index" %}'>
+                volunteer opportunity finder</a>.)
+            </p></div>
+
+        <h4 id='projects_heading'>
+            <span>Projects</span>
+            <span class='separator'>&middot;</span>
+            <a id='add_pf_entry' href='#'>Add a project</a>
+            <span id='reorder_projects_wrapper'>
+                <span class='separator'>&middot;</span>
+                <a id='reorder_projects' href='#'>Sort/archive projects</a>
+            </span>
+        </h4>
+        <div style='width: 920px;' id="portfolio_entries">
+            <div class='loading_message' style='width: 100%; float: left; text-align: center;'>Loading...</div>
+            <!-- JavaScript will swoop in and replace this with useful stuff. -->
+        </div>
+	<div class="post_editor_buttons clearfix">
+          <button style='display: none;' id='done_reordering'>Save this ordering</button>
+          <button id='save_all_projects'>Save all projects</button>
+          <a id='back_to_profile'
+             href='{% url "mysite.profile.views.display_person_web" person.user.username %}'>
+            &laquo; Back to profile
+          </a>
+	</div>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div id="portfolio_entry_building_block">
+        {% include 'profile/portfolio/portfolio_entry_element.html' %}
+    </div>
+    <div id="add_a_portfolio_entry_building_block">
+        {% with 1 as adding_mode %}
+        {% include 'profile/portfolio/portfolio_entry_element.html' %}
+        {% endwith %}
+    </div>
+    <div id="citation_building_block">
+        {% include 'profile/portfolio/citation_element.html' %}
+    </div>
+    <div id="citation_form_building_block">
+        {% include 'profile/portfolio/citation_form.html' %}
+    </div>
+</div>
+
+{% endwith %}
+
+
+{% endblock main %}
+
+{% block js_before_bundle %}
+<script type="text/javascript">
+var want_importer = true;
+</script>
+{% endblock js_before_bundle %}
+
+{% block js %}
+<script type="text/javascript">
+    $(function() {
+        $("#progressbar").progressbar(); 
+        AutoSaucepan.init();
+        var jactive1=false;
+        $('.explain_citations').live('click', function () {
+            if(!jactive1){
+                jactive1=true;
+            $.jGrowl("<strong style='color: yellow;'>Web pages that talk about your involvement</strong><p> Your involvement could include patches, translations, design ideas, leadership roles, or any other kind of contribution. Some things you could link to: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>bug report</li> <li>archived post to a mailing list</li> <li>staff page</li> <li>WebSVN</li> </ul></p> <p style='margin-bottom: 0'>(Cue some tactical Googling!)</p>", {'life': 14000,'close':function(){
+                    jactive1=false;
+                }});
+            return false;}
+        });
+        var jactive2=false;
+        $('.explain_maintainer_updates').live('click', function () {
+            if(!jactive2){
+                jactive2=true;
+            $.jGrowl("<strong style='color: yellow;'>Maintainer updates</strong><p>Check this box to receive updates geared towards project maintainers, including: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>new contributors</li> <li>people who click the 'I want to help' button</li> </ul></p>", {'life': 14000,
+                'close':function(){
+                    jactive2=false;
+                }});
+            return false;}
+        });
+    });
+</script>
+
+{% if test_js %}<script type='text/javascript'>testJS = true;</script>{% endif %}
+{% endblock js %}
+
+{% block js_tests %}
+<script type='text/javascript' src='/static/js/tester.js'></script>
+{% endblock js_tests %}

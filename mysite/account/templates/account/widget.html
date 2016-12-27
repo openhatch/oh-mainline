@@ -1,0 +1,45 @@
+{% extends 'account/settings_tab.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block title %}
+Widgetize yourself -
+{{ block.super }}
+{% endblock title %}
+
+{% block body_id %}widget-settings{% endblock %}
+
+{% block settings_main %}
+<div class='submodule fat'>
+    <div class='head'>
+        <h3>Widgetize yourself</h3>
+    </div>
+    <div class='body'>
+        <p>Show off your open source participation on your web things.</p>
+        <script type='text/javascript'
+            src='{% url "mysite.profile.views.widget_display_js" user.username %}'></script>
+
+        <div id='widget-instructions'>
+            Include this <acronym title="Hot Taxidermists Making Latkes">HTML</acronym> wherever in your page you want to put the widget:
+            <textarea style="width: 220px; height: 100px; "><script type='text/javascript' src='{{uri_scheme}}://{{ url_prefix}}/people/{{ user.username }}/openhatch-widget.js'></script></textarea>
+        </div>
+    </div>
+</div>
+{% endblock settings_main %}

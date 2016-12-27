@@ -1,0 +1,44 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+<form id="openid_form" name="openid_form"
+    action="{% url "user_signin" %}" method="post">{% csrf_token %}
+    {% if next and not answers and not request.GET.from_offsite %}
+        <p>Please log in to proceed.</p>
+    {% endif %}
+    <p id='please_click'>Choose an account below to log in with OpenID. (<a href='/blog/2009/why-we-support-openid'>What is OpenID?</a>)</p>
+    <input type="hidden" name="action" value="verify" />
+    <input type="hidden" name="next" value="{{ next }}" />
+    <div id="openid_choice">
+        <div id="openid_btns">
+        <div class="large">
+        </div>
+        <div class="small">
+        </div>
+        </div>
+    </div>
+    <div id="openid_input_area">
+        <label for="id_openid_ul">
+            OpenID URL:
+        </label>
+        {{ form.openid_url }}
+        <input name="openid_submit" type="submit"
+        value="Sign in">
+    </div>
+</form>
+<a id="js-google-oauth2" class="hidden" href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">Google OAuth 2.0 login link</a>

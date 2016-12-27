@@ -1,0 +1,60 @@
+{% extends 'account/settings.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block settings_main %}
+{% comment %}
+NB: All forms in pages that descend from this have the same name.
+{% endcomment %}
+<div class='submodule fat column two-column-right'>
+    <div class='submodule-head'>
+        <h3>{% block submodule_head %}{% endblock %}</h3>
+    </div>
+    <div class='submodule-body'>
+      {% if account_notification %}
+      <div class='notification'>
+	{{ account_notification }}
+	<div style="float: right; display: inline;">
+	  <a id='clear_message' href="?">(clear this message)</a>
+	</div>
+      </div>
+      {% endif %}
+        <form name='a_settings_tab_form' method='POST'
+            action={% block form_action %}{% endblock %}>{% csrf_token %}
+            {% block submodule_body %}{% endblock %}
+            <p> <input type='submit'
+                        {% block submit_button_attributes %}
+                            value='Save'
+                        {% endblock %} /> </p>
+        </form>
+    </div>
+</div>
+{% endblock settings_main %}
+{% block js %}
+    {{ block.super }}
+<script type='text/javascript'>
+    $(function () {
+        $('#clear_message').click(function () {
+            $(this).parent().parent().hide();
+            return false;
+        });
+    });
+</script>
+{% endblock %}

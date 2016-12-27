@@ -1,0 +1,107 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010, 2011 Jack Grigg
+# Copyright (C) 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block body_class %}{{ block.super }} missions{% endblock %}
+
+{% block js_in_head %}
+<script type="text/javascript"><!-- TODO: make work with jQuery in footer, not header -->
+  $(document).ready(function() {
+      $("#hint_tabs").tabs();
+  });
+</script>
+<script type='text/javascript' src="/static/js/missions/oppia-player.js"></script>
+{% endblock js_in_head %}
+
+{% block pagetop %}
+    <h3 class="up-top"><img alt='Training Missions' id='training-missions' alt='Training Missions' src='/static/images/training-missions-blank.png' /></h3>
+{% endblock pagetop %}
+
+{% block main %}
+<div class='module'>
+    <div class='module-head'>
+    	<ul>
+          <li>
+            <a href="{% url "mysite.missions.base.views.main_page" %}">
+              &laquo; Back to list of missions
+            </a>
+          </li>
+        </ul>
+        <h3>Missions: {{ mission_name }}</h3>
+    </div>
+    <div class='module-body contains-submodules two-columns'>
+        <div class='submodule skinny'>
+            <div class='submodule-body'>
+                <ul>
+                    <style>
+                        #link-{{ slug }} a {
+                            font-weight: bold;
+                        }
+                    </style>
+		    {% block side_nav_links %}
+{% if mission %}
+{% for url, step_name in mission.step_urls %}
+<li>
+  <a href='{{ url }}'>
+    {{ step_name }}
+  </a>
+</li>
+{% endfor %}
+{% endif %}
+
+		    {% endblock side_nav_links %}
+                </ul>
+		<div class="mission-help">
+		  <div style="float: left;">
+		    <img src="/static/images/buildhelper/tutorial-button.png" width="71" height="50" />
+		  </div>
+		  <div>
+		    Having trouble with the mission?
+		    Read <a href="//openhatch.org/wiki/Mission help">how to get help</a>.
+		  </div>
+		</div>
+            </div>
+        </div>
+	{% block mission_main %}
+	<div class='submodule fat'>
+	  <div class='submodule-head'>
+	    <h3>{{ this_mission_page_short_name}}</h3>
+	  </div>
+	  <div class="submodule-body">
+	    {% if mission_step_prerequisites_passed %}
+	    {% block mission_main_body %}
+	    Eek, this mission has no body!
+	    {% endblock mission_main_body %}
+	    {% else %}
+	    {% block mission_missing_prerequisite_text %}
+	    Eek, you need to do a pre-requisite. But the mission
+	    has no specific advice for you.
+	    {% endblock %}
+	    {% endif %}
+	  </div>
+	</div>
+	{% endblock mission_main %}
+</div>
+</div>
+{% endblock main %}
+
+{% block title %}
+Missions: {{mission_name}}: {{this_mission_page_short_name}}
+{% endblock title %}

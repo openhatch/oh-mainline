@@ -1,0 +1,1 @@
+Documentation.addTranslations({"locale": "ko", "plural_expr": "0", "messages": {"Hide Search Matches": "\uac80\uc0c9 \uacb0\uacfc \uc228\uae30\uae30", "Permalink to this definition": "\uc815\uc758 \uc8fc\uc18c", "Permalink to this headline": "\uc81c\ubaa9 \uc8fc\uc18c"}});

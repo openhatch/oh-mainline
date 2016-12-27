@@ -1,0 +1,60 @@
+# Django-inplaceedit.
+# Copyright (C) 2010-2013
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <goinnn@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-09-05 06:31-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Pablo Martín <goinnn@gmail.com>\n"
+"Language-Team: En <goinnn@gmail.com>\n"
+"Language: En\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: settings.py:21
+msgid "Doubleclick to edit"
+msgstr ""
+
+#: settings.py:26
+msgid "Write a translation"
+msgstr ""
+
+#: settings.py:28
+msgid "Successfully saved"
+msgstr ""
+
+#: settings.py:30
+msgid "You have unsaved changes!"
+msgstr ""
+
+#: templates/inplaceeditform/inc.inplace_toolbar.html:3
+msgid "Enable edit inline"
+msgstr ""
+
+#: templates/inplaceeditform/inc.inplace_toolbar.html:4
+msgid "Disable edit inline"
+msgstr ""
+
+#: templates/inplaceeditform/render_field.html:9
+#: templates/inplaceeditform/adaptor_file/render_field.html:5
+msgid "Apply change"
+msgstr ""
+
+#: templates/inplaceeditform/render_field.html:11
+#: templates/inplaceeditform/adaptor_file/render_field.html:7
+msgid "Save"
+msgstr ""
+
+#: templates/inplaceeditform/render_field.html:16
+msgid "Cancel change"
+msgstr ""
+
+#: templates/inplaceeditform/render_field.html:18
+msgid "Cancel"
+msgstr ""

@@ -1,0 +1,153 @@
+body#project input[type='text'], body#project textarea { padding: 4px;  }
+body#project input, body#project textarea { font-size: 10pt;   }
+body#project textarea { width: 96%;  }
+body#project input[type='text'] { width: 96%; display: block; clear: left; }
+body#project input[type='submit'] { padding: 2px 8px; display: block; }
+
+
+body#project h1 { float: left; margin-top: 10px; }
+body#project h3.supertitle { font-size: 10pt; margin-top: 20px; display: inline; margin-right: 10px;}
+body#project .head { width: 100% ! important; }
+body#project h3 a { color: #555; }
+body#project #left { width: 60%; margin-right: 20px; }
+body#project #left .module { width: 92.8%; }
+body#project #left .module > .body { width: 92.5%; }
+body#project #main { width: 37%;}
+body#project .module { width: 100% ! important; }
+body#project #main .module > .body { width: 89%; }
+body#project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }
+
+/* Questions and answers */
+body#project input, body#project textarea, body#project input[type='submit'] { float: none; }
+body#project .contains_questions .body h3 { font-size: 1.2em; font-weight: normal; float: none; margin-bottom: 10px; }
+body#project .contains_questions .body h3 strong { font-weight: normal; color: #949494; }
+body#project ul.answers > li { float: left; width: 100%; border-bottom: 0px dashed #d7d7d7; padding: 10px 0; }
+body#project ul.answers > li:last-child { border: 0; }
+
+body#project .show_when_editing { display: none; }
+body#project .blur { color: #888; }
+body#project textarea { height: 60px; }
+body#project textarea, body#project input[type='text'] { font-family: sans-serif; }
+body#project ul.answers textarea.blur { height: 1.2em; }
+body#project .questions > li { float: left; width: 100%; margin: 10px 0 30px; }
+
+body#project .bug_answer_title { font-size: 1.1em; padding-bottom: 3px; margin-bottom: 3px; }
+body#project form.answer_question { float: left; width: 85%; padding: 4px 12px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
+body#project form.active {  background-color: #ffc; }
+body#project form.active .show_when_editing { display: block; }
+body#project form.active a.collapse_answer_form { padding: 3px; margin: 10px 0 0 0; font-size: .9em;}
+
+body#project form.active input[type='submit'] { margin-bottom: 5px;}
+body#project form.is_edit_form { display: none; }
+
+body#project .input-note { clear: both; float: right; width: 100%; font-size: .9em; color: #686868; }
+body#project .input-note .tips { float: right; width: 70%; font-size: .9em; color: #686868; }
+body#project .input-note p { margin: 3px 0 6px;  }
+body#project .input-note li { list-style: circle; margin: 3px 0 3px 20px ! important; }
+
+body#project .input-note ul.sections li { float: left; margin: 0 10px 0 0 ! important; list-style: none; width: 48%; }
+body#project .input-note ul.sections li:last-child { margin-right: 0 ! important; }
+body#project .input-note p.example { color: #555; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding: 3px 5px; background-color: #ffffd9; border: 1px solid #ffceb4; }
+
+body#project label { margin: 6px 0 3px 0; display: block; }
+
+
+body#project .questions li form.delete { display: inline; }
+body#project .questions li form.delete input[type='submit'] { padding: 0; background: none; font: inherit; border: 0; font-size: 1em; display: inline; color: #FF6D3D;}
+body#project .questions li form.delete input[type='submit']:hover { cursor:hand; cursor:pointer; text-decoration: underline;}
+body#project .questions li a.edit_link { }
+body#project .questions li .answer{float: left; width: 75%;}
+body#project .voting { float: right; width: 8%; margin-right: 2%; text-align: center; }
+body#project .voting .score { color: #444; font-size: .8em; margin-bottom: 3px; width: 100%;  }
+body#project form.is_edit_form { display: none; }
+
+body#project .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }
+body#project .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
+
+body#project #other-questions { display: block; margin-bottom: 10px; }
+body#project li:target { background-color: #ffd; }
+body#project .quotemark { color: #555; }
+
+body#project .actionlink {float: right; font-weight: normal; margin-right: 10px}
+
+body#project #wannahelp { width: 101% ! important; padding: 0; background: transparent; }
+body#project #wanna_help_thanks_tipsy_closer {float: right;}
+body#project #wannahelp-button { -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 10px 20px; color: #444; float: right; border: 3px solid #fff; white-space: normal; font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background-color: #c8e29d; background-repeat: repeat-x; background-position: top; font-size: 13pt; }
+body#project #wannahelp-button:active { background-position: bottom;}
+body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { text-decoration: none; color: #222; }
+
+body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
+body#project #message_for_helpers input[type='image']:hover { background-color: #d3d3d3; }
+body#project #next_steps { display: block; text-align: right; margin-top: 1em; }
+
+body#project .next_steps_for_helpers { width: 100% ! important; }
+body#project .next_steps_for_helpers h3 { color: #222; text-shadow: 0 1px 0 #fff; }
+body#project .next_steps_for_helpers .body { width: 95.8%; }
+body#project .next_steps_for_helpers #show { display: none; }
+
+body#project .next_steps_for_helpers.contains_just_the_head.expanded { -moz-border-radius-bottomleft: 0; -webkit-border-bottom-right-radius: 0; -moz-border-radius-bottomright: 0; border-radius-bottomleft: 0; border-radius-bottomright: 0; position: relative; padding-bottom: 0; top: 15px; float: right; width: 250px ! important; margin-top: 10px; }
+body#project .next_steps_for_helpers.contains_just_the_head { margin-top: 15px; left: -5px; }
+body#project .next_steps_for_helpers.contains_just_the_head h3 { padding-bottom: 0; }
+body#project .next_steps_for_helpers.collapsed.contains_just_the_head { padding-bottom: 8px; top: 0; float: right; width: 250px ! important; }
+body#project .next_steps_for_helpers.collapsed.contains_just_the_body { display: none; }
+body#project .next_steps_for_helpers.collapsed #show { display: inline; }
+body#project .next_steps_for_helpers.collapsed #hide { display: none; }
+
+body#project .next_steps_for_helpers li { text-indent: -1em; width: 25%; float: left; margin-right: 5%; font-size: 1.3em; }
+
+body#project #copypastebox { display: none; }
+
+body#edit_project #control_descriptions p { margin-top: 0; }
+body#edit_project #control_descriptions th, 
+body#edit_project #control_descriptions td { border-spacing: 0; padding: 10px 20px 5px 0; vertical-align: top; border-top: 1px dashed #ccc; }
+body#edit_project #control_descriptions th { border-top: 0; text-align: left; }
+body#edit_project #control_descriptions td p { margin: 0; }
+
+
+body#edit_project .tab_nav { float: left; width: 100%; border-bottom: 1px dashed #b4b4b4; }
+body#edit_project .tab_nav li.ui-tabs-selected { font-weight: bold; }
+body#edit_project .tab_nav li { height: 25px; float: left; color: #555; background-position: center 20px; padding-bottom: 10px; padding-right: 1.5%;  }
+body#edit_project .tab_nav li:last-child { margin-right: 0; border-right: 0; }
+body#edit_project .tab_nav li a { font-size: 1.2em; line-height: 1.2em; display: block; margin-bottom: .3em; }
+body#edit_project .tab { float: left; width: 100%; padding-top: 10px; }
+
+body#project span { word-wrap: break-word;}
+
+body#project .wannahelper_checkboxes {
+    max-height: 200px;
+    overflow: auto;
+    margin-bottom: 5px;
+}
+
+body#project .people-list li {
+    width: 90%;
+    margin-bottom: 0;
+}
+
+body#project .people-list li.wannahelper_checkbox_item {
+    padding-top: 9px;
+    width: 8%;
+    display: inline;
+}
+body#project .people-list li.contacted_on {
+    width: 100%;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 3px;
+}
+
+body#project .tab_nav li, body#project .tab_nav h3 {
+    display: inline;
+    clear: none;
+    padding-bottom: 5px;
+    }
+body#project .tab_nav .ui-state-active h3 {
+    background: white;
+    }
+body#bugset_create #button-container {
+    display: inline;
+    float: right;
+}
+body#landing #subscription-email {
+    display: block;
+}

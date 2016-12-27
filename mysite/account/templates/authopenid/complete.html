@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009, 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load base_extras %}
+{% load i18n %}
+
+{% block title %}Pick a username{% endblock %}
+
+{% block body_id %}associate-openid{% endblock %}
+
+{% block body_class %}{{ block.super }} auth{% endblock %}
+
+{% block css %}
+{{ block.super }}
+{% comment %} CSSTODO {% endcomment %}
+body#associate-openid .errorlist li { width: 90%; }
+#openid-associate { margin: 0 355px; width: 250px; }
+#openid-associate .head { width: 250px; }
+#openid-associate .body { width: 210px; }
+#expand-second-form { display: block; clear: both; margin-top: 20px; }
+#associate-with-existing-account { margin-top: 10px; }
+{% if not form2.errors %}
+#associate-with-existing-account { display: none; }
+{% endif %}
+form p { float: none; display: block; width: 100%; margin: 0 0 10px 0; }
+form label { float: none; display: block; }
+body#associate-openid form input { float: none; display: block; }
+body#associate-openid form input[type='radio'] { float: left; }
+body#associate-openid form input[type='submit'] { clear: both; }
+body#associate-openid form ul { float: none; display: block; }
+body#associate-openid form li { width: 100%;  }
+body#associate-openid .body { background: #fff;} 
+label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
+
+{% endblock css %}
+
+{% block content %}
+    {% with request|get_project_display_names_to_help_from_session as project_names_to_help %}
+    <div class='module' id='openid-associate'>
+
+        <div class='module-head'>
+            <h3>{% if project_names_to_help %}
+                    <span style='font-weight: normal;'>One last step: </span>
+                    We need a bit of info
+                {% else %}
+                    Pick a hip username
+                {% endif %}</h3>
+        </div>
+
+        <div class='module-body'>
+
+            <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
+
+            <form name="fregister" action="{% url "mysite.account.views.register" %}"
+                    method="POST" class="login">{% csrf_token %}
+                <input type="hidden" name="next"
+                        value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
+                {{ form1.as_p }}
+                {% if project_names_to_help %}
+                {{ extra_profile_form.as_p }}
+                {% endif %}
+                <p><input type="submit" name="bnewaccount" value="ok"></p>
+            </form>
+            
+            <a href='#' id='expand-second-form' style='display: block; '>
+                Or associate this OpenID with an existing account.
+            </a>
+
+            <form id='associate-with-existing-account' name="fverify" action="{% url "user_register" %}" method="POST" class='login hidden'>{% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}" />
+                {{ form2.as_p }}
+                <p><input type="submit" name="bverify" value="Associate"></p>
+            </form>
+        </div>
+    </div>
+{% endwith %}
+{% endblock content %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+$(function () {
+    $('#expand-second-form').click(function () {
+        $('#associate-with-existing-account').toggleDisplay();
+    });
+});
+</script>
+{% endblock js %}

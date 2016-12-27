@@ -1,0 +1,252 @@
+{% extends 'profile/people.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+
+{% block body_id %}people-map{% endblock body_id %}
+{% block body_class %}
+{{ block.super }}
+people-list-page
+{% if not people %}no_results{% endif %}
+{% endblock body_class %}
+
+{% block title %}
+People Search
+{% endblock title %}
+
+{% block people_main %}
+    {% if property and value %}
+    where {{ property }} = {{ value }}
+    {% endif %}
+
+    <form action=".">
+        <div id='search'>
+            <div class='keyword field'>
+                <label for='search_profiles'>Search for</label>
+                <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
+            </div>
+            <div class='submit field'>
+              <div class="input-and-labels">
+                <label for='search_locations'>&nbsp;</label>
+                <input type="submit" value="Search"/> 
+              </div>
+            </div>
+        </div>
+    </form>
+
+    {% if not q %}
+    <ul class='suggestions'>
+        {# this is cached in the view #}
+        {% for suggestion in suggestions %}
+            <li>
+                <span class='introduce_suggestions'>Popular
+                    {{ suggestion.display_name}}:</span>
+                <ul>
+                    {% for thing in suggestion.values|slice:":3" %}
+                    {% include 'profile/suggestion_li.html' %}
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for thing in suggestion.values|slice:"3:" %}
+                    {% include 'profile/suggestion_li.html' %}
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul><!-- /.suggestions -->
+    {% endif %}
+
+    {% if q %}
+    {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in or icanhelp_count %}
+    <div id='refine_search' class='greybox'>
+        <ul class='filter_conjunction'>
+
+            {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in %}
+            <li>
+                <span class='term'>Want help with {{ q }}?</span>
+                <ul class='filter_disjunction'>
+
+                {# Link to can_mentor: search #}
+                {% if suggestions_for_searches_regarding_people_who_can_mentor %}
+                    {% for suggestion in suggestions_for_searches_regarding_people_who_can_mentor %}
+                        <li><a href='?q=can_mentor:"{{suggestion.query|urlencode}}"'>
+                                Find mentors in
+                                {{ suggestion.query }}{{ suggestion.summary_addendum}}</a>
+                            ({{ suggestion.count }})
+                        </li>
+                    {% endfor %}
+                {% endif %}
+
+                {# Link to can_pitch_in: search #}
+	            {% if suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                    {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                            <li><a href='?q=can_pitch_in:"{{suggestion.query|urlencode}}"'>
+                                Find people who can pitch in with
+                                {{ suggestion.query }}{{suggestion.summary_addendum}}
+                                </a>
+                                ({{suggestion.count}})
+                            </li>
+                      {% endfor %}
+	            {% endif %}
+
+                </ul>
+            </li>
+            {% endif %}
+
+            {# Link to icanhelp: search #}
+            {% if icanhelp_count %}
+                <li>
+                    <span class='term'>Want to help expand the {{ q }} community?</span>
+                    <ul>
+                        <li>
+                            <a href='?q=icanhelp:"{{ q }}"'>Find people willing
+                                to contribute to the {{ q }} project</a>
+                            ({{ icanhelp_count }})
+                        </li>
+                    </ul>
+                </li>
+            {% endif %}
+        </ul>
+    </div><!-- /#refine_search -->
+    {% endif %}
+
+    {% with projects_that_match_q_exactly.0 as matching_project %}
+        {% if matching_project %}
+            <div id='project_yeller'>
+                <a href='{{ matching_project.get_url }}'>{{ matching_project.display_name }}</a> is a project with 
+                <a href='?q=project:{{matching_project.name_with_quotes_if_necessary|urlencode}}'>
+                    {{ matching_project.get_contributors|length }}
+                    contributor{{ matching_project.get_contributors|length|pluralize}}</a>.
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% endif %}
+
+    <div id='search_summary'>
+        <div id='search_summary_heading'>
+            {% if total_query_summary %}
+                {{ total_query_summary|safe }}
+            {% else %}
+                {% if q %}
+                    People 
+                    {# If there's a query, tell us the people who match it. #}
+                    {{ this_query_summary }}
+                    {% spaceless %}
+                    {% ifequal query_type 'all_tags' %}<span>&lsquo;</span>{% endifequal %}
+                    <strong>
+                        {% if query_is_a_project_name %}
+                            <a href='{{ queried_project.get_url }}'>{{ q }}</a>
+                        {% else %}
+                            <span>{{ q }}</span>
+                        {% endif %}
+                    </strong>
+                    {% ifequal query_type 'all_tags' %}<span>&rsquo;</span>{% endifequal %}
+                    {% endspaceless %}{{this_query_post_summary}}
+                {% else %}
+                    {% comment %}
+
+                    If there's *no query*, we say nothing, letting the visitor
+		    use the search box.
+                    {% endcomment %}
+
+                {% endif %}
+
+                {% if people %}
+                    <span id='thinking'>Figuring out who lives here&hellip;</span>
+                {% endif %}
+            {% endif %}
+
+        </div>
+
+        <div id='summary_of_mapped_people'>
+            <span id='people_count'>
+	      {% if people|length %}
+                    <span>{{ people|length|pluralize:"Just," }}</span>
+                    <span>{{ people|length }}</span>
+                    {{ people|length|pluralize:"person,people" }}
+              {% endif %}
+            </span>
+
+        </div>
+    </div><!-- /#search_summary -->
+
+    {% if people %}
+
+    {# Here's the big list of everybody with an account on the site. #}
+    <div id="results">
+    <ul class="people-list people-list-map">
+        {% for person in people|slice:":1000" %}
+                {% if person.user.first_name and person.user.last_name %}
+                    <div>
+                        <a class="person" href="/people/{{person.user.username}}">
+                            {{person.user.first_name}} {{person.user.last_name}}
+                        </a> {{person.location_display_name}}
+                    </div>
+                {% else %}
+                    <div>
+                        <a class="person" href="/people/{{person.user.username}}">
+                            {{person.user.username}}
+                        </a> {{person.location_display_name}}
+                    </div>
+                 {% endif %}
+        {% endfor %}
+        {% if people|length >= 1000 %}
+            <div>and {{ people|length|add:"-1000" }} more users.</div>
+        {% endif %}
+    </ul>
+    
+    </div>
+
+    {% endif %}
+
+    {% if q and matching_project_suggestions %}
+    <div class='greybox matching_project_suggestions'>
+            {% ifequal query_type 'project' %}
+                Other projects
+            {% else %}
+                Projects
+            {% endifequal %}
+            matching &lsquo;{{q}}&rsquo;:
+        <span id='a_few_matching_project_suggestions'>
+            {% for project in a_few_matching_project_suggestions %}
+                {% spaceless %}
+                <a href='?q=project:{{project.name_with_quotes_if_necessary}}'>
+                    {{project.display_name}}</a>
+                {% if forloop.last %}
+                    (<a id='show_all_matching_projects' href='#'>more</a>)
+                {% else %}<span>, </span>{% endif %}
+                {% endspaceless %}
+            {% endfor %}
+        </span>
+        <ul id='all_matching_project_suggestions'>
+            {% for project in matching_project_suggestions %}
+                <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.display_name}}</a></li>
+            {% endfor %}
+            {% if people %}
+                (<a id='show_fewer_matching_projects' href='#'>less</a>)
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+
+{% endblock people_main %}

@@ -1,0 +1,73 @@
+{% extends 'missions/shell/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% block mission_main %}
+<div class='submodule fat'>
+    <div class='head'>
+        <h3>Using cd to change directory</h3>
+    </div>
+    <div class="body">
+
+    <h3>cd: change directory</h3>
+    <p>The <kbd class="kbd">cd</kbd> command will allow you to change directories.
+    When you open a terminal you will be in your home directory.
+    To move around the file system you will use <kbd class="kbd">cd</kbd>. Examples:</p>
+
+    <p>To navigate into the root directory, use: <code class="code">$ cd /</code></p>
+
+    <p>To navigate to your home directory, use:<code class="code">$ cd</code> or <code class="code">$ cd ~</code></p>
+
+    <p>To navigate up one directory level, use:<code class="code">$ cd ..</code></p>
+
+    <p>To navigate to the previous directory (or back), use <code class="code">$ cd -</code></p>
+
+    <p>To navigate through multiple levels of directory at once, specify the full
+    directory path that you want to go to. For example, use,
+    <code class="code">$ cd /var/www</code> to go directly to the /www subdirectory of
+    /var/. As another example, <code class="code">$ cd ~/Desktop</code>
+    will move you to the Desktop subdirectory inside your home directory.</p>
+
+    <h3>Challenge:</h3>
+    <p>Suppose your current working directory is <kbd class="kbd">/penguin/projects</kbd>,
+    what does the command <kbd class="kbd">cd</kbd> without a directory name do?</p>
+    <form method="post" action="{% url "mysite.missions.shell.views.command_cd_submit" %}#cd-form">{% csrf_token %}
+        <div class="form-row">
+            {% if command_cd_success %}
+            <div class="successmsg">
+               <p><strong>You have successfully completed this part of the mission.</strong></p>
+            </div>
+            {% endif %}
+            <input type="radio" name="option" value="1"> It has no effect.<br>
+            <input type="radio" name="option" value="2"> It changes the working directory to <kbd class="kbd">/</kbd>.<br>
+            <input type="radio" name="option" value="3"> It changes the working directory to the user's home directory.<br>
+            <input type="radio" name="option" value="4"> It produces an error message.<br>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+    {% if command_cd_error_message %}
+        <ul class="errorlist"><li>{{ command_cd_error_message }}</li></ul>
+    {% endif %}
+
+    {% if command_cd_done %}
+        <p class="next_mission_link">
+        <a href='{% url "mysite.missions.shell.views.command_mkdir_rm" %}'>
+        On to the next one &raquo;</a></p>
+    {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+{% with answer as feed_item %}
+{% with feed_item.person as person %}
+{% with feed_item.person.user as user %}
+{% with feed_item.project as project %}
+
+{% cache 86400 recent_activity_wannahelp_v4 answer.pk %}
+<li style='font-size: .9em; float: left; width: 100%;'>
+  <a href='{{ person.profile_url }}'>
+    <img style='width: 30px; float: left; margin-right: 10px;' alt="Profile Picture for {{ feed_item.person.get_full_name_and_username }}" src='{{ feed_item.person.get_photo_thumbnail_30px_wide_url_or_default }}' />
+  </a>
+  <div style='float: left; width: 80%;'>
+    <span>
+      <strong>
+        {% spaceless %}
+        <a href='{{ person.profile_url }}'>
+          {% include 'name.html' %}
+        </a>
+        {% endspaceless %}
+      </strong>
+    </span>
+    {% spaceless %}
+    {% with feed_item.project as project %}
+      is willing to help
+      <a style='font-weight: bold;' href='{{ project.get_url }}'>{{project.display_name}}</a>
+    {% endwith %}
+    {% endspaceless %}
+    {% endcache %}
+    <span style='color: #aaa;'>
+      &middot;
+      {{ feed_item.modified_date|timesince_terse }} ago
+    </span>
+    <br/>
+  </div>
+</li>
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}

@@ -1,0 +1,8 @@
+README
+setup.py
+unicodecsv/__init__.py
+unicodecsv/test.py
+unicodecsv.egg-info/PKG-INFO
+unicodecsv.egg-info/SOURCES.txt
+unicodecsv.egg-info/dependency_links.txt
+unicodecsv.egg-info/top_level.txt

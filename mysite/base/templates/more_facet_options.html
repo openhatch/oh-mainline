@@ -1,0 +1,36 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+                                <li class='more_facet_options'>
+                                    <a rel='facebox' href='#{{ facet_name }}s'>
+                                        More {{ facet_name }}s &raquo;
+                                    </a>
+                                    <div style='display: none;' id='{{ facet_name }}s'>
+                                        <h2>Select a {{ facet_name }} {{ facet.sorted_by }}</h2>
+                                        <ul class='facet_more_options'>
+                                            {% for option in facet.options %}
+                                                {% include 'facet_option.html' %}
+                                            {% endfor %}
+                                            {% with facet.the_any_option as option %}
+                                                {% include 'facet_option.html' %}
+                                            {% endwith %}
+                                        </ul>
+                                        <button id='close_facebox' >Close</button>
+                                    </div>
+                                </li>

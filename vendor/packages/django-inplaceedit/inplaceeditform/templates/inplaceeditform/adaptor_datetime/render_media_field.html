@@ -1,0 +1,15 @@
+{% extends  "inplaceeditform/adaptor_date/render_media_field.html" %}
+
+{% block media %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function () {
+                function getValueDateTime(form, field_id) {
+                    return form.find("#"+field_id+"_0").val() + " " + form.find("#"+field_id+"_1").val();
+                }
+                $(".applyDatetime").data("getValue", getValueDateTime);
+        });
+        })(jQuery);
+    </script>
+{% endblock %}

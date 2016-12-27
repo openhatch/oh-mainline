@@ -1,0 +1,6 @@
+### This is for linode2.openhatch.org.
+MAILTO=asheesh@asheesh.org
+
+@daily cd $HOME/milestone-a; ./mysite/scripts/run_with_lock.sh ./manage.py customs_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' >customs.log.$(date -I)
+@daily cd $HOME/milestone-a; ./mysite/scripts/snapshot_then_push.sh
+@daily . $HOME/.profile; cd $HOME/milestone-a; bash run_importer.sh

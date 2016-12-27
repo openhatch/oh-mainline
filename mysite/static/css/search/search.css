@@ -1,0 +1,233 @@
+body#search .module { margin-bottom: 5px; margin-top: 0; }
+body#search #content { position: relative; top: -4px; padding-top: 0; }
+body#search #container #pagetop img#volunteer-opportunities { position: relative; }
+body#search #page-top { float: left; width: 1000px; font-size: 19pt; }
+body#search .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
+	body#search .no-results strong { background-color: #fff; }
+body#search #sidebar { float: left; width: 220px; margin-right: 20px; }
+body#search #main { width: 715px; float: left; }
+body#search p { margin: 0; }
+body#search input[type='text'].default-text-active { color: #999 ! important; }
+
+/*          Filters
+ *---------------------- */
+
+body#search #filters { width: 75%; margin-right: 1%; margin-bottom: 10px; }
+    body#search #filters > .head { float: left; width: 100%; }
+    body#search #filters li { margin-left: 0; margin-bottom: .3em; margin-right: 0.3em; float: left;}
+    body#search #filters > .body { padding: 1em; float: left; width: 96.5%; font-size: .9em; }
+    body#search #filters > .body > ul > li { float: left; margin-right: 2em; }
+
+    body#search #filters label.on { font-weight: bold; }
+    body#search #filters h4 { margin-bottom: 5px; }
+
+    /*      Facets
+     *-------------------------------- */
+
+    body#search #facets { }
+    body#search #facets ul { margin-left: 10px; }
+    body#search #facets .facet-list { width: 20%;}
+    /* "bolder" is slightly more apparent than "bold". */
+    body#search #facets .facet-list ul li.active { font-weight: bolder; }
+    body#search #facets ul li, #suggested_searches li, .facet_more_options li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
+    body#search #filters > .body > ul > li > ul { margin-top: .5em; }
+    body#search #facets div.more_facet_options { list-style: none; margin-left: 2.5em; }
+    body#search #facets div.active, body#search .facet_more_options div.active { font-weight: bold; }
+
+body#search #about_projects, #about_bug_trackers { margin-top: 0; }
+body#search #about_projects { width: 20%; }
+body#search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
+body#search #about_projects h3 { margin-bottom: 5px; font-weight: normal; }
+body#search #how_many_projects { font-weight: normal; text-align: center; font-size: 140%; margin-top: .3em; width: 100% ! important; }
+body#search #how_many_projects a { color: #555; }
+	body#search #how_many_projects a:hover { color: #111; text-decoration: none; }
+		body#search #how_many_projects a:hover strong { background-color: #555; }
+body#search #how_many_projects strong { background-color: #747474; -webkit-border-radius: 8px; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
+body#search #about_projects #learn_more { text-align: center; margin-top: 10px; margin-bottom: 0; }
+body#search #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
+body#search .expanded .separator_betw_tags_and_desc { display: none ! important; }
+
+/*          Search field
+ *---------------------- */
+body#search #textual_search { width: 22%; }
+body#search #textual_search .body { width: 87%; padding: 1em; }
+body#search #textual_search input[type='text'] { width: 70%; }
+body#search #textual_search input[type='submit'] { width: 20%; padding: 5px; }
+
+/*          Results summary
+ *---------------------- */
+body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; float: left; width: 97%; font-size: .75em; margin-bottom: 15px; border: 0px dashed #dedede; border-bottom-width: 1px; }
+    body#search .results-widget:last-child { border-bottom-width: 0; border-top-width: 1px; }
+    body#search .results-widget > span { float: left; }
+    body#search #results-summary { width: 50%; margin-right: 2%; }
+    body#search #error-notification { color: red; font-size: 1em;}
+    body#search #expand-collapse-all { width: 25%; }
+    body#search #expand-collapse-all img { float: left; margin-right: 5px; }
+    body#search #expand-collapse-all a { float: left; margin-right: 1em; }
+    body#search span.navigation { font-weight: bold; float: right; width: 120px; }
+    body#search .link-wrapper { float: right; width: 50px; height: 1em; }
+
+
+
+/*          Results
+ *---------------------- */
+body#search #results { font-size: 1.21em; }
+body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
+    body#search #results li { overflow: hidden; border: 1px solid transparent; border-bottom-width: 3px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 5px 8px; font-size: 100%; float: left; list-style: none; width: 99%; white-space: nowrap; margin: 0; margin-bottom: 3px; }
+
+        body#search #results .body { background-color: #fff; }
+
+        /*      Project data
+         *----------------- */
+        body#search #results li .project_data { text-align: right; margin-right: 2%; padding-top: 2px; width: 13%; float: left; }
+        body#search #results li .project__name { color: #a3a3a3; cursor: pointer; cursor: hand; white-space: normal; }
+        body#search #results li .project__name:hover { color: #000; text-decoration: underline; }
+        body#search #results li:hover .project__name, body#search #results li.expanded .project__name { color: #000; }
+        body#search #results li:hover .project_data img, body#search #results li.expanded .project_data img { opacity: 1; }
+        body#search #results li .project_data img { vertical-align: middle; opacity: 0.5; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */  }
+        body#search #results li .below_the_fold { color: #555; display: none; }
+        body#search #results li .below_the_fold a {font-size: .9em; display: block; margin-top: 1em;}
+        body#search #results li .helpers { font-size: .8em; margin-top: 5px; }
+        body#search #results li .helpers a { color: #ffa588; white-space: pre-wrap;}
+        body#search #results li .helpers .no_mentors { color: #555;  }
+        body#search #results li:hover .helpers a, body#search #results li.expanded .helpers a { color: #ff6d3d; }
+
+        /*      Bug data
+         *----------------- */
+        body#search #results li .opp_data { border-left: 1px dashed #dedede; padding-left: 1%; width: 83%; float: left; }
+
+        body#search #results li .details { padding: .3em .7em; padding-top: 0; float: left; font-size: 11px; display: none; }
+        body#search #results li label { color: #777; }
+        body#search #results li .field { width: 33%; float: left; margin-top: .3em; }
+        body#search #results li .tags { float: left; width: 80px; }
+        body#search #results li .head { font-size: 1em; float: left; padding: 5px 10px; width: 99%; overflow: hidden; }
+
+        /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
+        body#search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; }
+        body#search #results li:hover { border-color: #dedede; }
+
+        body#search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
+
+        body#search #results li .second-line .description p { font-family: sans-serif; display: inline; }
+        body#search #results li .good-for-beginners { background-color: #dcffcc; padding: 1px; }
+
+        body#search a.title { font-size: 1.1em; }
+        body#search a.title:focus { text-decoration: underline; -moz-outline: none; }
+        body#search a.title:hover { text-decoration: underline; }
+        body#search #results .title .untruncated { display: none; }
+
+        body#search #results li .description-container p { margin-top: 5px; }
+        body#search #results .tag-details { display: none; }
+        body#search #results li .show-details { padding: .3em 7em; float: left; width: 71px; text-align: right; }
+        body#search #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
+        body#search #results li .description-container { width: 98.5%; padding: .3em 0; font-size: 0.8em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
+            body#search #results li .description-container * { display: inline; }
+            body#search #results li .description-container br { display: none; }
+        body#search #results li .description { font-family: monospace; }
+
+        body#search #results li.expanded { border-color: #dedede; background: #fff; white-space: normal; }
+            body#search #results li.expanded .title { font-weight: bold; text-shadow: 0 1px 0 #fff; }
+            body#search #results li.expanded .title .truncated { display: none; }
+            body#search #results li.expanded .title .untruncated { display: inline; }
+            body#search #results li.expanded .description-container { white-space: normal; float: left; }
+            body#search #results li.expanded .below_the_fold { margin-top: 1.5em; font-size: .75em; display: block; }
+
+                body#search #results li.expanded .meta-data { float: left; width: 100%; }
+                body#search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
+                body#search #results li.expanded .description-container br { display: inherit; }
+                body#search #results li.expanded .description-container .description { width: 100%; margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px dashed #dedede; max-height: 400px; overflow-y: auto; }
+            body#search #results li.expanded .second-line { border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; overflow: visible; }
+            body#search #results li.expanded .details { display: block; float: left; width: 85%; font-size: .73em; padding: 5px 0; }
+                body#search #results li.expanded .details .fields { float: left; width: 100%; }
+                body#search #results h5 { color: #999; margin-bottom: 2px; }
+
+            body#search #results li .tags .project { padding: .3em .7em; float: left; }
+
+        body#search.actually_search #results form { float: left; width: 690px; }
+            body#search #results form#search_fulltext input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
+            body#search #results form#search_fulltext input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
+
+body#search .separator { color: #aaa; }
+body#search .project-info { float: left; padding: .3em .7em; }
+
+body#search .highlight { background-color: #ff8; font-weight: bold; }
+body#search .sep { color: #b4b4b4; }
+
+body#search .top_left { float: left; width: 83%; overflow: hidden; }
+body#search .top_right { white-space: nowrap; float: right; width: 12%; padding: 3px 10px; text-align: right; font-size: .9em; }
+
+body#search #examples { clear: left; margin-right: 1em; }
+body#search #examples ul, body#search #personal_recommendations ul { display: block; margin-left: 10px; }
+body#search #examples li, body#search #personal_recommendations li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
+body#search #examples, body#search #personal_recommendations { margin-top: 1em;  width: 48%; float: left; }
+body#search #examples h3, body#search #personal_recommendations h3 { font-size: 1.2em; color: #222; margin-bottom: 3px; float: left; font-weight: normal; width: 100%; }
+
+/*      Create a BugAlert
+ *------------------------ */
+body#search #create_bug_alert { padding: 10px 15px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; float: left; background: #ffc; font-size: .9em; }
+    body#search #create_bug_alert .success { margin-bottom: 10px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 8px; background-color: #ff7; }
+    body#search #create_bug_alert .left { float: left; margin-right: 20px; width: 40%; }
+    body#search #create_bug_alert .right { float: left; width: 50%; }
+    body#search #create_bug_alert p { margin-bottom: 10px; }
+    body#search #create_bug_alert label { float: left; position: relative; top: 6px; margin-right: 10px; }
+    body#search #create_bug_alert input[type='text'] { width: 30%; }
+    body#search #create_bug_alert input[type='submit'] { float: none; clear: left;  display: block; }
+    body#search #create_bug_alert .errorlist li { display: block; float: none; background-color: #f98; color: #000; font-weight: bold; }
+
+body#search .head h3 { font-weight: normal; text-shadow: 0 1px 0 #fff; }
+body#search #results { width: 100%; }
+body#search #results .body { width: 99%; padding: 5px; }
+body#search .contributors { display: none; }
+
+#define-bite-size { font-weight: normal; }
+
+body#search .facet_more_options { height: 400px; font-size: 1.2em; overflow-y: auto; }
+body#search .facet_more_options li { margin-top: 3px; }
+
+#facebox h2 { font-weight: normal; font-size: 1.5em; }
+
+.active_facet_value a:hover { text-decoration: line-through; }
+
+/* vim: set ai ts=4 sts=4 et sw=4 nowrap: */
+
+/* For phones and tablets: Add responsive design so each box uses whole
+    width */
+@media (max-width: 800px) {
+  body#search #filters, body#search #facets .facet-list, body#search #about_projects, body#search #textual_search {
+    width: 100%;
+  }
+}
+
+/* Inplace edit form stuff */
+form.inplaceeditform > button {
+    margin: 0;
+    vertical-align: top;
+}
+
+li.bug.expanded span.textareainplaceedit {
+    white-space: pre-line;
+}
+
+li.bug.expanded form.inplaceeditform {
+    white-space: normal;
+    float: none;
+    width: auto;
+}
+
+body#search.bugsets #results li.expanded .description-container .description {
+    overflow-y: visible;
+}
+
+body#search.bugsets #results li .helpers ,
+body#search.bugsets #results li .below_the_fold {
+    word-wrap: break-word;
+}
+
+span.skills > span {
+    background-color: #dcffcc;
+    padding: 1px;
+}
+
+body#search.bugsets #results li .field {
+    width: 42%;
+}

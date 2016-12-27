@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <result>
+    <project>
+      <id>4265</id>
+      <name>Debian GNU/Linux</name>
+      <created_at>2007-02-02T20:23:53Z</created_at>
+      <updated_at>2011-02-01T03:00:50Z</updated_at>
+      <description>Debian is a free operating system (OS) for your computer. An operating system is the set of basic programs and utilities that make your computer run. Debian uses the Linux kernel (the core of an operating system), but most of the basic OS tools come from the GNU project; hence the name GNU/Linux.</description>
+      <homepage_url>http://www.debian.org/</homepage_url>
+      <download_url>http://www.debian.org/distrib/</download_url>
+      <url_name>debian</url_name>
+      <medium_logo_url>http://cloud.ohloh.net/attachments/271/openlogo-nd-100_med.png</medium_logo_url>
+      <small_logo_url>http://cloud.ohloh.net/attachments/271/openlogo-nd-100_small.png</small_logo_url>
+      <user_count>1471</user_count>
+      <average_rating>4.68273</average_rating>
+      <rating_count>498</rating_count>
+      <analysis_id>1621337</analysis_id>
+      <analysis>
+        <id>1621337</id>
+        <project_id>4265</project_id>
+        <updated_at>2010-12-14T16:27:20Z</updated_at>
+        <logged_at>2010-10-20T09:17:49Z</logged_at>
+        <min_month>1996-04-01T00:00:00Z</min_month>
+        <max_month>2010-12-01T00:00:00Z</max_month>
+        <twelve_month_contributor_count>1190</twelve_month_contributor_count>
+        <total_code_lines>54651103</total_code_lines>
+        <main_language_id>42</main_language_id>
+        <main_language_name>C</main_language_name>
+      </analysis>
+      <licenses>
+        <license>
+          <name>Distributable</name>
+          <nice_name>Distributable</nice_name>
+        </license>
+      </licenses>
+    </project>
+  </result>
+</response>

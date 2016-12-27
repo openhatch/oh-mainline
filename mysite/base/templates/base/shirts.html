@@ -1,0 +1,129 @@
+{% extends 'base/one_column.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2009 Karen Rustad
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+{% block title %}
+Donate to OpenHatch and support community engagement
+{% endblock title %}
+
+{% block body_class %}{{ block.super }} missions{% endblock %}
+
+{% block js_in_head %}
+{{ block.super }}
+<script type="text/javascript">
+document.documentElement.className = 'javascript_is_enabled';
+</script>
+{% endblock %}
+
+{% block main %}
+<div class="module">
+  <div class='module-head'>
+    <ul>
+      <li>
+	<a href="/">&laquo; Back to front page</a>
+      </li>
+    </ul>
+    <h3>OpenHatch t-shirt payment form</h3>
+  </div>
+  <div class='module-body contains-submodules one-column'>
+    <img width="300" class="left" src="/static/images/oh-t-shirt-final-design-sm.png" />
+    <div id="shirt-welcome">
+    <p>Thanks for pre-ordering an OpenHatch t-shirt! The shirts look great and we're really excited to see people wearing them. :)</p>
+    
+    <form id="init-shirt-form" action="">
+    # of shirts: <input id="num-shirts" maxlength="1" size="1" value="1"></input><br/>
+    XXL? (XXL shirts cost $2 more) <input id="is-xxl" type="checkbox"></input><br/>
+    Shipping? <select id="shipping">
+        <option name="no-ship" value="no-ship">No shipping</option>
+        <option name="dom-ship" value="dom-ship">Domestic shipping (+$5)</option>
+        <option name="intl-ship" value="intl-ship">International shipping (+$10)</option>
+    </select><br/>
+
+    <p>OpenHatch is a non-profit organization, and we depend on donations from companies and individuals to do what we do. If you want to and are able to donate, we'd deeply appreciate any amount.</p>
+    Donation amount (totally optional): <input id="donation" size="4" value="0"></input><br/>
+    <input type="submit" style="float: left" value="Calculate total"></input>
+    </form>
+    <div class="clearer"></div>
+    </div>
+
+    <div id="paypal-form" class="hidden">
+    <p>Your total comes to <strong>$<span id="total">20.00</span></strong>. Click the button below to checkout via PayPal.</p>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_donations">
+<input type="hidden" name="business" value="donate@openhatch.org">
+<input type="hidden" name="lc" value="US">
+<input type="hidden" name="item_name" value="OpenHatch">
+<input type="hidden" name="no_note" value="0">
+<input type="hidden" name="currency_code" value="USD">
+<input type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest">
+<input type="hidden" id="paypal-amount" name="amount" value="20.00">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+    <script type="text/javascript">
+    $('#init-shirt-form').live('submit',function(event) {
+        event.preventDefault();
+        var total = 0;
+        var numShirts = $("#num-shirts").val();
+        var isXXL = $("#is-xxl").attr('checked');
+        var shipping = $("#shipping").val();
+        var donation = $("#donation").val();
+        
+        total += numShirts * 20;
+
+        if (isXXL) {
+            total += 2;
+        }
+        
+        if (shipping == "dom-ship") {
+            total += 5;
+        }
+        else if (shipping == "intl-ship") {
+            total += 10;
+        }
+        
+        total += parseInt(donation);
+        
+        console.log("Total: " + total);
+        $('#total').text(total + ".00");
+        $('#paypal-amount').attr('value',total + ".00");
+        $("#paypal-form").toggleClass('hidden');
+        $("#shirt-welcome").toggleClass('hidden');
+    });
+    </script>
+    </div>
+
+  </div>
+</div>
+{% endblock main %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+  $(function () {$('#tab_me').tabs();});
+</script>
+{% endblock js %}
+

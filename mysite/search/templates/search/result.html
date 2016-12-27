@@ -1,0 +1,155 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2011 Jack Grigg
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2009 Karen Rustad
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load search %}
+{% load base_extras %}
+{% load profile_extras %}
+
+<div class='project_data'>
+
+    {# Project logo #}
+    <img src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' 
+        title='{{bug.project.display_name}}' />
+
+    {# Project name #}
+    <span class='project__name'>
+        {{ bug.project.display_name|break_long_words:16 }} 
+    </span>
+
+    {# Mentors #}
+    <div class="helpers">
+        {% if bug.project.get_mentors_search_url and bug.project.mentor_count %}
+        <a href="{{ bug.project.get_mentors_search_url }}">
+            Mentors: {{ bug.project.mentor_count }} (and {{bug.project.get_language_mentors_count }} in {{ bug.project.language }})</a>
+        {% endif %}
+    </div>
+
+    <div class='below_the_fold'>
+        {# Primary project language #}
+        {% if bug.project.language %}
+            <h5>Primary language</h5>
+            <div class='{% if bug.project.language.lower|in_list:query.terms %}highlight{% endif %}'>
+                {{ bug.project.language }}
+            </div>
+        {% endif %}
+        <a href='{{ bug.project.get_url }}'>More about this project</a>
+    </div>
+
+</div>
+<div class='opp_data'>
+    <div class='first-line'>
+        <div class='top_left'>
+
+            {% if bug.as_appears_in_distribution %}
+                <span>
+                    in {{ bug.as_appears_in_distribution|highlight:query.terms }}
+                </span>
+            {% endif %}
+
+            <a style='color: #000;' href='javascript:void(0);' class='title'>
+                <span class='truncated'>
+                    {{ bug.title|truncatewords:'13'|highlight:query.terms }}
+                </span>
+                <span class='untruncated'>
+                    {{ bug.title|highlight:query.terms }}
+                </span>
+            </a>
+        </div>
+        <div class='top_right'>
+            <span class='expand'><a href='javascript:void(0);' class="expand-link">expand</a></span>
+            <span class='sep'>&middot;</span>
+            <span class='link'><a 
+                        rel='tipsy-south'
+                        title='go to original bug report'
+                        target='_new' href='{{ bug.canonical_bug_link }}'>link</a></span>
+        </div>
+    </div>
+    <div class='second-line'>
+        <span class='description-container'>
+            <span class='meta-data'>
+                {% if bug.good_for_newcomers %}
+                    <span class='good-for-beginners'>Bite-size</span>
+                {% endif %}
+
+                {% if bug.good_for_newcomers and bug.last_touched %}
+                    <span class='sep'>&middot;</span>
+                {% endif %}
+
+                {% if bug.last_touched %}
+                    <span class='age'>updated {{ bug.last_touched|timesince_terse }} ago</span>
+                {% endif %}
+            </span>
+
+
+            <span class='sep separator_betw_tags_and_desc'>&middot;</span>
+            <span class='description'><p>{{ bug.description|highlight:query.terms }}</p></span>
+        </span>
+    </div>
+    <div class='details'>
+        <div class='fields'>
+            <span class='field people_involved'>
+                <label>People involved: </label>
+                <span class='value'>
+                    {{ bug.people_involved }}
+                </span>
+            </span>
+            <span class='field status'>
+                <label>Status: </label>
+                <span class='value'>
+                    {{ bug.status }}
+                </span>
+            </span>
+            <span class='field last_touched'>
+                <label>Last touched: </label>
+                <span class='value'>
+                    {% if bug.last_touched %}
+                        {{ bug.last_touched|timesince_terse }} ago
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </span>
+            </span>
+            <span class='field origin'>
+                <label>Link: </label>
+                <span class='value'>
+                    <a class='canonical_bug_link' target='_new'
+                            href='{{ bug.canonical_bug_link }}'>
+                        {{ bug.canonical_bug_link|truncate_chars:"30"}}</a>
+                </span>
+            </span>
+            <span class='field importance'>
+                <label>Importance: </label>
+                <span class='value'>
+                    {{ bug.importance }}
+                </span>
+            </span>
+            <span class='field date_reported'>
+                <label>First reported: </label>
+                <span class='value'>
+                    {% if bug.date_reported %}
+                        {{ bug.date_reported|timesince_terse }} ago
+                    {% endif %}
+                </span>
+                {# <a href=''>poll now</a> #}
+            </span>
+        </div>
+    </div>
+</div>
+{# vim: set filetype=htmldjango: #}

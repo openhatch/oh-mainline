@@ -1,0 +1,56 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+    <div class='module' id='contribute-message'>
+        <div class='module-head'>
+            <h3>
+                <a style='color: inherit;' href='//openhatch.org/wiki/Get_involved'>
+                  Join our community
+                </a>
+            </h3>
+        </div>
+        <div class='module-body'>
+        <ul style="padding-bottom: 5px;">
+          <li>
+            <strong>Come hang out with us!</strong>
+
+			 <p>OpenHatch needs people to greet and direct
+             prospective contributors to projects and events,
+             hack on our Python+Django codebase,
+             suggest improvements to all aspects of our work,
+             and more.</p>
+
+             <p class="module-foot">
+               <a href='//openhatch.org/wiki/Get_involved'>Read more about getting involved &raquo;</a>
+             </p>
+		   </li>
+           <li>
+             <form method="post"
+               action="http://lists.openhatch.org/mailman/subscribe/announce">
+               {% csrf_token %}
+               <strong>Subscribe to our <a href="http://blog.openhatch.org/tag/newsletter/">monthly newsletter</a>!</strong>
+               <p>
+			     <label for="subscription-email">Your email address:</label>
+
+                 <input id="subscription-email" name="email">
+                 <input name="email-button" value="Subscribe" type="submit">
+               </p>
+			 </form>
+           </li>
+         </ul>
+       </div>
+    </div>

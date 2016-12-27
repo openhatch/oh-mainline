@@ -1,0 +1,69 @@
+{% extends 'missions/pipvirtualenv/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Setup pip and virtualenv</h3>
+  </div>
+  <div class="body">
+
+    <h3>Linux</h3>
+
+    <p>To install pip, virtualenv, virtualenvwrapper and wheel execute the
+    following commands at the terminal for your Linux distro:</p>
+
+    <p>On Debian or Ubuntu (this includes Debian/Ubuntu derivative distros
+    like Linux Mint, Xubuntu, Kubuntu, etc.):</p>
+    <kbd>sudo apt-get install python-pip python-virtualenv virtualenvwrapper python-wheel</kbd>
+
+    <p>On Fedora (or Fedora derivative distros):</p>
+    <kbd>sudo yum install python-pip python-virtualenv python-virtualenvwrapper python-wheel</kbd>
+
+    <p>Some Python packages that have C extensions also require a C compiler
+    so that the C extensions can be compiled. A good example of a package
+    that has such requirements is <a href="http://www.numpy.org/">NumPy</a>,
+    a package for scientific computing with Python.</p>
+
+    <p>To install a C compiler on Debian or Ubuntu, at the terminal,
+    type the following command and press Enter:</p>
+    <pre>sudo apt-get install build-essential python-dev</pre>
+
+    <p>To install a C compiler on Fedora, at the terminal, type the
+    following command and press Enter:</p>
+    <pre>sudo yum install python-devel</pre>
+
+    <h3>Mac OS X</h3>
+    <p>Before you can work with pip and virtualenvs, you'll need to check if
+    Python is installed on your machine; checking for Python on your computer
+    is as simple as opening up the Terminal application and typing <q>python</q>
+    and pressing Enter. If you're greeted with a Python prompt (which looks like
+    <q>>>></q>), you're good to go; instead if you get an error, we recommend going
+    through the <a href="http://docs.python-guide.org/en/latest/starting/install/osx/">
+    Installing Python on Mac OS X</a> section of the <a href="http://docs.python-guide.org/en/latest/">
+    The Hitchhiker’s Guide to Python!</a></p>
+    
+
+    <p class="next_mission_link">
+    <a href='{% url "mysite.missions.pipvirtualenv.views.installing_packages" %}'>
+      On to installing packages and creating virtualenvs &raquo;
+    </a></p>
+  </div>
+</div>
+{% endblock %}
+

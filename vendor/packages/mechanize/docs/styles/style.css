@@ -1,0 +1,195 @@
+body {
+  /* for IE6; text size for non-IE browsers is in .html files */
+  font-size:87.5%;
+}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,p,blockquote,th,td {
+  margin:0;
+  padding:0;
+}
+#sf a img {
+  float:right;
+  border:none;
+}
+#content {
+  padding-top:18px;
+  padding-bottom:18px;
+  padding-left:10px;
+  padding-right:10px;
+  max-width:750px;
+  min-width:400px;
+  margin:0 50px;
+  padding-left:40px;
+  /* there's a half-abandoned attempt to stick to baseline grid here:
+seems too easy for that to get messed up by font-weight variations
+&c.; due to choice of 14/21 px grid? */
+  /* background:#fff url('../images/gridbg.gif'); */
+}
+#main {
+  clear:both;
+}
+#nav {
+  float:right;
+  display:inline;
+  padding-top:1.429em;
+  padding-right:1.5em;
+  list-style-type:none;
+  padding-bottom:0px;
+  border-bottom:1px solid black;
+}
+#nav li {
+  float:left;
+  /* display:inline; */
+  _height:0;/*novalidate*/
+  margin-left:0.6em;
+  padding-bottom:0;
+  padding-top:0;
+}
+#nav a, #nav .thispage {
+  padding:0 11px 0 11px;
+  /* display:inline; */
+  font:bold 1.143em verdana, arial, helvetica, sans-serif;
+  line-height:1.3125em;
+  margin:1.3125em 0;
+  overflow:auto;
+}
+#subnav li, #TOC li {
+  list-style-type:none;
+  margin-left:10px;
+}
+ol {
+  font-weight:bold;
+  font-style:italic;
+  font-family:verdana, arial, helvetica, sans-serif;
+}
+ol p {
+  font-weight:normal;
+  font-style:normal;
+  font-family:times, serif;
+}
+li p {
+  margin:0;
+}
+p.q {
+  font-weight:bold;
+  font-style:italic;
+  font-family:verdana, arial, helvetica, sans-serif;
+  margin-top:1.5em;
+}
+#subnav a, #subnav .thispage,
+#TOC a, #TOC .thispage {
+  font-family:lucida, sans-serif;
+  font-weight:600;
+}
+#subnav, #TOC {
+  float:right;
+  clear:right;
+  width:162px;
+  padding:10px 20px;
+  background-color:#eee;
+  margin-left:3em;
+  margin-bottom:3em;
+  border-left:thick solid #2d4706;
+}
+#TOC {
+  border-left:none;
+}
+h1 {
+  padding-left:10px;
+  padding-top:20px;
+  font:2em verdana, arial, helvetica, sans-serif;
+  line-height:1.5em;
+  margin:1.5em 0;
+  color:#c4c496;
+}
+h2 {
+  font:bold 1.143em verdana, arial, helvetica, sans-serif;
+  line-height:1.313em;
+  margin:1.313em 0;
+}
+h3 {
+  font:bold 1em verdana, arial, helvetica, sans-serif;
+  line-height:1.5em;
+  margin:1.5em 0;
+  font-style:italic;
+}
+p {
+  font:normal 1em times, serif;
+  line-height:1.5em;
+  margin:1.5em 0;
+}
+pre {
+  font-family:"Courier New", Courier, monospace;
+  line-height:1.5em;
+  margin-top:1.5em;
+  margin-bottom:1.5em;
+  margin-left:10px;
+}
+code {
+  font-family:"Courier New", Courier, monospace;
+  line-height:1.3em;  /* Avoid breaking baseline grid in firefox :-( */
+  margin:1.5em 0;
+}
+ul {
+  border-bottom:1.5em;
+}
+li {
+  margin-left:2em;
+}
+dt {
+  line-height:1.5em;
+  margin:1.5em 0;
+}
+dd {
+  line-height:1.5em;
+  margin-top:1.5em;
+  margin-bottom:1.5em;
+  margin-left:2em;
+}
+.expanded li {
+  margin-left:2em;
+  margin-top:1.5em;
+  margin-bottom:1.5em;
+}
+.expanded li li {
+  margin-left:2em;
+  margin-top:0;
+  margin-bottom:0;
+}
+a {
+  color:#2d4706;
+}
+a, .thispage {
+  text-decoration:none;
+  font-weight:bold;
+}
+a:link {
+  color:#2d4706;
+}
+a:visited {
+  color:#41680d;
+}
+a:hover {
+  color:#000;
+}
+.warning {
+  background-color:#ffffaa;
+}
+.docwarning {
+  background-color:#f3ecd2;
+}
+
+pre.sourceCode { }
+pre.sourceCode span.Normal { }
+pre.sourceCode span.Keyword { color: #007020; font-weight: bold; }
+pre.sourceCode span.DataType { color: #902000; }
+pre.sourceCode span.DecVal { color: #40a070; }
+pre.sourceCode span.BaseN { color: #40a070; }
+pre.sourceCode span.Float { color: #40a070; }
+pre.sourceCode span.Char { color: #4070a0; }
+pre.sourceCode span.String { color: #4070a0; }
+pre.sourceCode span.Comment { color: #60a0b0; font-style: italic; }
+pre.sourceCode span.Others { color: #007020; }
+pre.sourceCode span.Alert { color: red; font-weight: bold; }
+pre.sourceCode span.Function { color: #06287e; }
+pre.sourceCode span.RegionMarker { }
+pre.sourceCode span.Error { color: red; font-weight: bold; }
