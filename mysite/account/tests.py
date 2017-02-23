@@ -506,3 +506,32 @@ class ClearSessionsOnPasswordChange(WebTest):
 
         self.assertTrue(self.user_logged_in(client1.session))
         self.assertFalse(self.user_logged_in(client2.session))
+
+class UrlRedirect(WebTest):
+    """ Test to check open redirection in register URL """
+    fixtures = ['user-paulproteus']
+
+    def test_appended_url_redirect(self):
+        """
+        If the next url is of different website, the test should refuse to
+        redirect the user there, rather it should redirect to OpenHatch root
+        """
+        client = Client()
+        username = 'paulproteus'
+        password = "paulproteus's unbreakable password"
+        client.login(username=username, password=password)
+
+        # All test cases should redirect to the OpenHatch root.
+        response = client.get('/openid/register/?next=/')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
+
+        # Verify appended redirect url is ignored:
+        response = client.get('/openid/register/?next=http://www.example.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
+
+        # Verify appended redirect url is ignored
+        response = client.get('/account/logout/?next=http:///www.example.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], 'http://testserver/')
