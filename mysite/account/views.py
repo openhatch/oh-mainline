@@ -42,7 +42,7 @@ import mysite.profile.views
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
-from mysite.base.decorators import view
+from mysite.base.decorators import view, authenticated
 import django.contrib.auth.views
 
 logger = logging.getLogger(__name__)
@@ -412,7 +412,7 @@ def invite_someone_do(request):
 # modified trivially in the POST handler.
 
 
-@django_authopenid.views.not_authenticated
+@authenticated
 def register(request,
              template_name='authopenid/complete.html',
              redirect_field_name=django.contrib.auth.REDIRECT_FIELD_NAME,
@@ -529,7 +529,6 @@ def register(request,
     }, context_instance=django_authopenid.views._build_context(
         request, extra_context=extra_context))
 
-# We use this "not_authenticated" wrapper so that if you *are* logged in,
+# We use this "authenticated" wrapper so that if you *are* logged in,
 # you go straight to the ?next= value.
-login = django_authopenid.views.not_authenticated(
-    django.contrib.auth.views.login)
+login = authenticated(django.contrib.auth.views.login)
