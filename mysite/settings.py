@@ -32,16 +32,16 @@ LOGGING = {
         'django': {
             'handlers': ['null'],
             'propagate': False,
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'django.request': {
             'handlers': ['null'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         },
         'mysite': {
             'handlers': ['console'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         }
     }
@@ -210,6 +210,7 @@ INSTALLED_APPS = (
     'south',
     'django_assets',
     'invitation',
+    'irc',
     'mysite.search',
     'mysite.profile',
     'mysite.customs',
@@ -404,7 +405,7 @@ except ImportError:
     pass
 
 # Settings for the IRC bot powering the IRC missions.
-IRC_MISSION_SERVER = ('chat.freenode.net', 6667)
+IRC_MISSION_SERVER = ('irc.freenode.net', 6667)
 IRC_MISSION_SERVER_PRETTYNAME = 'Freenode'
 IRC_MISSION_CHANNEL = '#oh-ircmission-test'
 IRC_MISSIONBOT_NICK = 'oh_bottest'

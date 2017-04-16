@@ -50,7 +50,9 @@ class TestBot(irc.bot.SingleServerIRCBot):
         return
 
     def on_dccmsg(self, c, e):
-        c.privmsg("You said: " + e.arguments[0])
+        # non-chat DCC messages are raw bytes; decode as text
+        text = e.arguments[0].decode('utf-8')
+        c.privmsg("You said: " + text)
 
     def on_dccchat(self, c, e):
         if len(e.arguments) != 2:
@@ -76,14 +78,11 @@ class TestBot(irc.bot.SingleServerIRCBot):
             for chname, chobj in self.channels.items():
                 c.notice(nick, "--- Channel statistics ---")
                 c.notice(nick, "Channel: " + chname)
-                users = chobj.users()
-                users.sort()
+                users = sorted(chobj.users())
                 c.notice(nick, "Users: " + ", ".join(users))
-                opers = chobj.opers()
-                opers.sort()
+                opers = sorted(chobj.opers())
                 c.notice(nick, "Opers: " + ", ".join(opers))
-                voiced = chobj.voiced()
-                voiced.sort()
+                voiced = sorted(chobj.voiced())
                 c.notice(nick, "Voiced: " + ", ".join(voiced))
         elif cmd == "dcc":
             dcc = self.dcc_listen()

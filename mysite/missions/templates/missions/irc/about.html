@@ -1,0 +1,43 @@
+{% extends 'missions/irc/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using IRC</h3>
+  </div>
+  <div class="body">
+
+      <h3>Using IRC</h3>
+
+      <p>Internet Relay Chat is a text-based chat system.  Open source projects commonly use IRC channels for live communication among developers, users, and other interested people.  For many projects, IRC is the main method of project coordination, so you will often be asked to take part in IRC discussions if you contribute to a project.</p>
+
+      <p>The first step toward participating in IRC is connecting to a server for the IRC network the project uses.  An IRC client is used to connect to an IRC server.  Many clients have lists of popular networks built-in; if the network you want is not in the list, you can also manually input the server name.</p>
+      <p>You also need to choose a nickname (commonly shortened to <em>nick</em>).  This is the name that other people on IRC will see.  Some networks allow you to register your nick so you can reclaim it from other people who may try to use it.  Generally, any nick that is not in use may be freely used if it is not registered or if the network does not have nick registration.</p>
+      <p>Once you are connected, you can join channels.  Channels have names starting with a <code>#</code> symbol.  For example, OpenHatch's IRC channel is called <code>#openhatch</code>.  When you are joined a channel, you receive any messages sent to the channel, you can see when others join and leave, and you can in most cases send messages of your own to a channel.  To join a channel, type:</p>
+      <p><code>/join <em>#channelname</em></code></p>
+
+      <h3>Getting started</h3>
+      <p>This mission will provide you information about using IRC. This mission also consist of a "Challenge",
+      which will be a question at the end of the tutorial of every command.</p>
+      <p class="next_mission_link">
+      <a href='{% url "mysite.missions.irc.views.joining" %}'>Get started with IRC&raquo;</a></p>
+
+  </div>
+</div>
+{% endblock %}

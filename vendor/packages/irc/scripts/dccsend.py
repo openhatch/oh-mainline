@@ -11,9 +11,10 @@ import os
 import struct
 import sys
 import argparse
+import subprocess
 
 import irc.client
-import irc.logging
+import jaraco.logging
 
 class DCCSend(irc.client.SimpleIRCClient):
     def __init__(self, receiver, filename):
@@ -26,11 +27,15 @@ class DCCSend(irc.client.SimpleIRCClient):
 
     def on_welcome(self, connection, event):
         self.dcc = self.dcc_listen("raw")
-        self.connection.ctcp("DCC", self.receiver, "SEND %s %s %d %d" % (
+        msg_parts = map(str, (
+            'SEND',
             os.path.basename(self.filename),
             irc.client.ip_quad_to_numstr(self.dcc.localaddress),
             self.dcc.localport,
-            self.filesize))
+            self.filesize,
+        ))
+        msg = subprocess.list2cmdline(msg_parts)
+        self.connection.ctcp("DCC", self.receiver, msg)
 
     def on_dcc_connect(self, connection, event):
         if self.filesize == 0:
@@ -71,12 +76,12 @@ def get_args():
     parser.add_argument('receiver', help="the nickname to receive the file")
     parser.add_argument('filename')
     parser.add_argument('-p', '--port', default=6667, type=int)
-    irc.logging.add_arguments(parser)
+    jaraco.logging.add_arguments(parser)
     return parser.parse_args()
 
 def main():
     args = get_args()
-    irc.logging.setup(args)
+    jaraco.logging.setup(args)
 
     c = DCCSend(args.receiver, args.filename)
     try:

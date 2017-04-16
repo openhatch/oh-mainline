@@ -3,9 +3,6 @@
 """
 irc/server.py
 
-Copyright © 2009 Ferry Boender
-Copyright © 2012 Jason R. Coombs
-
 This server has basic support for:
 
 * Connecting
@@ -43,29 +40,6 @@ will ever be connected to by the public.
 # Not Todo (Won't be supported)
 #   - Server linking.
 
-#
-# Permission is hereby granted, free of charge, to any person
-# obtaining a copy of this software and associated documentation
-# files (the "Software"), to deal in the Software without
-# restriction, including without limitation the rights to use,
-# copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following
-# conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-#
-
 from __future__ import print_function, absolute_import
 
 import argparse
@@ -75,20 +49,22 @@ import select
 import re
 
 import six
+from six.moves import socketserver
+import jaraco.logging
 
-from . import client
-from . import logging as log_util
+import irc.client
 from . import events
 from . import buffer
 
-SRV_WELCOME = "Welcome to %s v%s, the ugliest IRC server in the world." % (
-    __name__, client.VERSION)
+SRV_WELCOME = "Welcome to {__name__} v{irc.client.VERSION}.".format(**locals())
 
 log = logging.getLogger(__name__)
 
+
 class IRCError(Exception):
     """
-    Exception thrown by IRC command handlers to notify client of a server/client error.
+    Exception thrown by IRC command handlers to notify client of a
+    server/client error.
     """
     def __init__(self, code, value):
         self.code = code
@@ -101,9 +77,10 @@ class IRCError(Exception):
     def from_name(cls, name, value):
         return cls(events.codes[name], value)
 
+
 class IRCChannel(object):
     """
-    Object representing an IRC channel.
+    An IRC channel.
     """
     def __init__(self, name, topic='No topic'):
         self.name = name
@@ -111,7 +88,8 @@ class IRCChannel(object):
         self.topic = topic
         self.clients = set()
 
-class IRCClient(six.moves.socketserver.BaseRequestHandler):
+
+class IRCClient(socketserver.BaseRequestHandler):
     """
     IRC client connect and command handling. Client connection is handled by
     the `handle` method which sets up a two-way communication with the client.
@@ -128,8 +106,13 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
         self.send_queue = []        # Messages to send to client (strings)
         self.channels = {}          # Channels the client is in
 
-        six.moves.socketserver.BaseRequestHandler.__init__(self, request,
-            client_address, server)
+        # On Python 2, use old, clunky syntax to call parent init
+        if six.PY2:
+            socketserver.BaseRequestHandler.__init__(self, request,
+                client_address, server)
+            return
+
+        super().__init__(request, client_address, server)
 
     def handle(self):
         log.info('Client connected: %s', self.client_ident())
@@ -180,8 +163,8 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
             command, sep, params = line.partition(' ')
             handler = getattr(self, 'handle_%s' % command.lower(), None)
             if not handler:
-                log.info('No handler for command: %s. '
-                    'Full line: %s' % (command, line))
+                _tmpl = 'No handler for command: %s. Full line: %s'
+                log.info(_tmpl % (command, line))
                 raise IRCError.from_name('unknowncommand',
                     '%s :Unknown command' % command)
             response = handler(params)
@@ -269,8 +252,8 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
         """
         Handle client PING requests to keep the connection alive.
         """
-        response = ':%s PONG :%s' % (self.server.servername, self.server.servername)
-        return response
+        response = ':{self.server.servername} PONG :{self.server.servername}'
+        return response.format(**locals())
 
     def handle_join(self, params):
         """
@@ -287,27 +270,33 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
                     '%s :No such channel' % r_channel_name)
 
             # Add user to the channel (create new channel if not exists)
-            channel = self.server.channels.setdefault(r_channel_name, IRCChannel(r_channel_name))
+            channel = self.server.channels.setdefault(r_channel_name,
+                IRCChannel(r_channel_name))
             channel.clients.add(self)
 
             # Add channel to user's channel list
             self.channels[channel.name] = channel
 
             # Send the topic
-            response_join = ':%s TOPIC %s :%s' % (channel.topic_by, channel.name, channel.topic)
+            response_join = ':%s TOPIC %s :%s' % (channel.topic_by,
+                channel.name, channel.topic)
             self.send_queue.append(response_join)
 
-            # Send join message to everybody in the channel, including yourself and
-            # send user list of the channel back to the user.
-            response_join = ':%s JOIN :%s' % (self.client_ident(), r_channel_name)
+            # Send join message to everybody in the channel, including yourself
+            # and send user list of the channel back to the user.
+            response_join = ':%s JOIN :%s' % (self.client_ident(),
+                r_channel_name)
             for client in channel.clients:
                 client.send_queue.append(response_join)
 
             nicks = [client.nick for client in channel.clients]
-            response_userlist = ':%s 353 %s = %s :%s' % (self.server.servername, self.nick, channel.name, ' '.join(nicks))
+            _vals = (self.server.servername, self.nick, channel.name,
+                ' '.join(nicks))
+            response_userlist = ':%s 353 %s = %s :%s' % _vals
             self.send_queue.append(response_userlist)
 
-            response = ':%s 366 %s %s :End of /NAMES list' % (self.server.servername, self.nick, channel.name)
+            _vals = self.server.servername, self.nick, channel.name
+            response = ':%s 366 %s %s :End of /NAMES list' % _vals
             self.send_queue.append(response)
 
     def handle_privmsg(self, params):
@@ -387,7 +376,8 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
                 channel.clients.remove(self)
                 self.channels.pop(pchannel)
             else:
-                response = ':%s 403 %s :%s' % (self.server.servername, pchannel, pchannel)
+                _vars = self.server.servername, pchannel, pchannel
+                response = ':%s 403 %s :%s' % _vars
                 self.send_queue.append(response)
 
     def handle_quit(self, params):
@@ -421,7 +411,7 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
         """
         Return the client identifier as included in many command replies.
         """
-        return client.NickMask.from_params(self.nick, self.user,
+        return irc.client.NickMask.from_params(self.nick, self.user,
             self.server.servername)
 
     def finish(self):
@@ -439,7 +429,8 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
                 for client in channel.clients:
                     client.send_queue.append(response)
                 channel.clients.remove(self)
-        self.server.clients.pop(self.nick)
+        if self.nick:
+            self.server.clients.pop(self.nick)
         log.info('Connection finished: %s', self.client_ident())
 
     def __repr__(self):
@@ -454,8 +445,8 @@ class IRCClient(six.moves.socketserver.BaseRequestHandler):
             self.realname,
             )
 
-class IRCServer(six.moves.socketserver.ThreadingMixIn,
-        six.moves.socketserver.TCPServer):
+
+class IRCServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
@@ -469,7 +460,13 @@ class IRCServer(six.moves.socketserver.ThreadingMixIn,
         self.servername = 'localhost'
         self.channels = {}
         self.clients = {}
-        six.moves.socketserver.TCPServer.__init__(self, *args, **kwargs)
+
+        if six.PY2:
+            socketserver.TCPServer.__init__(self, *args, **kwargs)
+            return
+
+        super().__init__(*args, **kwargs)
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -478,28 +475,27 @@ def get_args():
         default='127.0.0.1', help="IP on which to listen")
     parser.add_argument("-p", "--port", dest="listen_port", default=6667,
         type=int, help="Port on which to listen")
-    log_util.add_arguments(parser)
+    jaraco.logging.add_arguments(parser)
 
     return parser.parse_args()
 
+
 def main():
     options = get_args()
-    log_util.setup(options)
+    jaraco.logging.setup(options)
 
     log.info("Starting irc.server")
 
-    #
-    # Start server
-    #
     try:
         bind_address = options.listen_address, options.listen_port
         ircserver = IRCServer(bind_address, IRCClient)
-        log.info('Listening on {listen_address}:{listen_port}'.format(
-            **vars(options)))
+        _tmpl = 'Listening on {listen_address}:{listen_port}'
+        log.info(_tmpl.format(**vars(options)))
         ircserver.serve_forever()
     except socket.error as e:
         log.error(repr(e))
         raise SystemExit(-2)
+
 
 if __name__ == "__main__":
     main()

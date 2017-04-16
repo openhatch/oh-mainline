@@ -70,6 +70,7 @@ numeric = {
     "323": "listend",
     "324": "channelmodeis",
     "329": "channelcreate",
+    "330": "whoisaccount", # <nick> <accountName> :<info> - Spawned from a /whois
     "331": "notopic",
     "332": "currenttopic",
     "333": "topicinfo",
@@ -82,6 +83,7 @@ numeric = {
     "351": "version",
     "352": "whoreply",
     "353": "namreply",
+    "354": "whospcrpl", # Response to a WHOX query
     "361": "killdone",
     "362": "closing",
     "363": "closeend",
@@ -150,6 +152,7 @@ numeric = {
     "476": "badchanmask",
     "477": "nochanmodes",  # "Channel doesn't support modes"
     "478": "banlistfull",
+    "480": "cannotknock", #generated when /knock <chan> is ran on a channel that you are either in or has /knock'ing disabled
     "481": "noprivileges",
     "482": "chanoprivsneeded",
     "483": "cantkillserver",

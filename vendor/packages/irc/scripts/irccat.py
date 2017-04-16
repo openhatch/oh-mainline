@@ -12,7 +12,7 @@ import argparse
 import itertools
 
 import irc.client
-import irc.logging
+import jaraco.logging
 
 target = None
 "The nick or channel to which to send messages"
@@ -45,19 +45,19 @@ def get_args():
     parser.add_argument('nickname')
     parser.add_argument('target', help="a nickname or channel")
     parser.add_argument('-p', '--port', default=6667, type=int)
-    irc.logging.add_arguments(parser)
+    jaraco.logging.add_arguments(parser)
     return parser.parse_args()
 
 def main():
     global target
 
     args = get_args()
-    irc.logging.setup(args)
+    jaraco.logging.setup(args)
     target = args.target
 
-    client = irc.client.IRC()
+    reactor = irc.client.Reactor()
     try:
-        c = client.server().connect(args.server, args.port, args.nickname)
+        c = reactor.server().connect(args.server, args.port, args.nickname)
     except irc.client.ServerConnectionError:
         print(sys.exc_info()[1])
         raise SystemExit(1)
@@ -66,7 +66,7 @@ def main():
     c.add_global_handler("join", on_join)
     c.add_global_handler("disconnect", on_disconnect)
 
-    client.process_forever()
+    reactor.process_forever()
 
 if __name__ == '__main__':
     main()
