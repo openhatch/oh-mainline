@@ -117,12 +117,40 @@ class Project(OpenHatchModel):
         return self.name
 
     @mysite.base.decorators.cached_property
+    def has_mentors(self):
+        '''Return True if the project has mentors. False, otherwise.
+        '''
+        return  self.mentor_count() > 0
+           
+    @mysite.base.decorators.cached_property
+    def get_mentors_search_url(self):
+        import mysite.profile.view_helpers
+        mentors_available = bool(mysite.profile.view_helpers.TagQuery(
+            'can_mentor', self.name).people)
+        if mentors_available or self.language:
+            query_var = self.name
+            if not mentors_available:
+                query_var = self.language
+            query_string = http.urlencode({u'q': u'can_mentor:"%s"' % query_var})
+            return reverse(mysite.profile.views.people) + '?' + query_string
+        else:
+            return ""
+        
+    @mysite.base.decorators.cached_property
     def mentor_count(self):
         '''Return a number of potential mentors, counted as the number of
          people who can mentor in the project
         '''
         import mysite.profile.view_helpers
         tq = mysite.profile.view_helpers.TagQuery('can_mentor', self.name)
+        return tq.people.count()
+    
+    @mysite.base.decorators.cached_property
+    def language_mentor_count(self):
+        '''Return the number of mentors for the project's programming language
+        '''
+        import mysite.profile.view_helpers
+        tq = mysite.profile.view_helpers.TagQuery('can_mentor', self.language)
         return tq.people.count()
 
     @staticmethod
@@ -308,20 +336,6 @@ class Project(OpenHatchModel):
         import mysite.project.views
         return reverse(mysite.project.views.edit_project,
                        kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)})
-
-    @mysite.base.decorators.cached_property
-    def get_mentors_search_url(self):
-        import mysite.profile.view_helpers
-        mentors_available = bool(mysite.profile.view_helpers.TagQuery(
-            'can_mentor', self.name).people)
-        if mentors_available or self.language:
-            query_var = self.name
-            if not mentors_available:
-                query_var = self.language
-            query_string = http.urlencode({u'q': u'can_mentor:"%s"' % query_var})
-            return reverse(mysite.profile.views.people) + '?' + query_string
-        else:
-            return ""
 
     def get_bug_count(self):
         if hasattr(self, 'bug_count'):

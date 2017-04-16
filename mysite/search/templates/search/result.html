@@ -35,9 +35,9 @@
 
     {# Mentors #}
     <div class="helpers">
-        {% if bug.project.get_mentors_search_url and bug.project.mentor_count %}
+        {% if bug.project.has_mentors %}
         <a href="{{ bug.project.get_mentors_search_url }}">
-            Mentors: {{ bug.project.mentor_count }} (and {{bug.project.get_language_mentors_count }} in {{ bug.project.language }})</a>
+            Mentors: {{ bug.project.mentor_count }} (and {{ bug.project.language_mentor_count }} in {{ bug.project.language }})</a>
         {% endif %}
     </div>
 
