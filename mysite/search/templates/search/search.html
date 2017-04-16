@@ -278,9 +278,11 @@ Volunteer opportunities in free and open source software
             </div>
             {% endif %}
 
-
+            <div id="projectModal" title="Project Data">
+                <div id="loadingWheel" style="display:none; position:absolute; left: 50%; top: 50%;"><img src="/static/images/snake.gif"/>
+                </div>
+            </div>
         </div>
-
     </div>
     {% endif %}
 
@@ -301,4 +303,5 @@ Volunteer opportunities in free and open source software
 
             });
 </script>
+<script src='/static/js/search/apiWrapper.js' type='text/javascript'/>
 {% endblock js %}

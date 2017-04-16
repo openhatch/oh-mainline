@@ -77,7 +77,7 @@ def search_index(request, invalid_subscribe_to_alert_form=None):
 
     if query:
         bugs = query.get_bugs_unordered()
-
+            
         # Sort
         bugs = mysite.search.view_helpers.order_bugs(bugs)
 
