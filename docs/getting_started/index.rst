@@ -1,8 +1,8 @@
 ===================
 Contributor's Guide
 ===================
-
-Confused?  `Contact us <http://openhatch.readthedocs.org/en/latest/community/contact.html>`_.
+Looking to Contribute?
+`Contact us <http://openhatch.readthedocs.org/en/latest/community/contact.html>`_.
 
 .. toctree::
     :maxdepth: 2
