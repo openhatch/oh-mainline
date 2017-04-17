@@ -63,9 +63,9 @@ body > div.jGrowl.bottom-right {
 }
 
 body > div.jGrowl.center {
-	top: 				0px;
+	top: 				40%;
 	width: 				50%;
-	left: 				25%;
+	left: 				16%;
 }
 
 /** Cross Browser Styling **/
