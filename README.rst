@@ -26,7 +26,7 @@ Is readthedocs not working?  Let us know by emailing hello@openhatch.org or find
 The Future of OpenHatch
 -----------------------
 
-The OpenHatch code base will be in transition over the course of 2016. Here are some 2016 resolutions from the OpenHatch core team:
+The OpenHatch code base will be in transition over the course of 2016. Here are some 2016 resolutions:
 
 * OpenHatch will focus on encouraging users and organizations to run Open
   Source Comes to Campus events. (This probably makes the best use of our
@@ -61,4 +61,4 @@ The OpenHatch code base will be in transition over the course of 2016. Here are 
 * We will have a regularly scheduled monthly development meeting that is
   open to all to participate.
 
-See: http://lists.openhatch.org/pipermail/devel/2015-December/003872.html
+See entire message from the OpenHatch core team: http://lists.openhatch.org/pipermail/devel/2015-December/003872.html
