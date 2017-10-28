@@ -143,7 +143,7 @@ class LaunchpadTrackerForm(TrackerFormThatHidesCreatedForProject):
 
 class GitHubTrackerForm(TrackerFormThatHidesCreatedForProject):
     github_url = django.forms.RegexField(
-        regex=r'^https?:\/\/github.com\/[a-zA-Z0-9\-]+\/[\-\w.]+$',
+        regex=r'^https?:\/\/github.com\/[a-zA-Z0-9\-]+\/[\-\w.]+[/]?$',
         max_length=200,
         required=True,
         help_text='This is the url of the GitHub project.',
